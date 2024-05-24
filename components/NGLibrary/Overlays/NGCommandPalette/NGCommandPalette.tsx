@@ -14,6 +14,7 @@ import {
     UserIcon,
 } from '@heroicons/react/24/outline'
 import {getMe} from '@/lib/api/users/me'
+import {ProjectName} from '@/lib/utils'
 
 function classNames(...classes: (string | boolean)[]) {
     return classes.filter(Boolean).join(' ')
@@ -365,7 +366,7 @@ export default function NGCommandPalette({...props}: {
                                      alt="Process spinner" className="mx-auto h-6 w-6 animate-spin dark:invert"/>
                                 <p className="mt-4 font-semibold text-default">Searching...</p>
                                 <p className="mt-2 text-alt">
-                                    We're searching for <code>{query}</code> across Yipnyap.
+                                    We're searching for <code>{query}</code> across {ProjectName}.
                                 </p>
                             </div>
                         )}
@@ -376,7 +377,7 @@ export default function NGCommandPalette({...props}: {
                                                         aria-hidden="true"/>
                                 <p className="mt-4 font-semibold text-default">Help with searching</p>
                                 <p className="mt-2 text-alt">
-                                    Use this tool to quickly search for anything across Yipnyap. You can also use
+                                    Use this tool to quickly search for anything across {ProjectName}. You can also use
                                     the search modifiers found in the footer below to limit the results to just users,
                                     packs, and more. Settings: <code>~</code>, Pages: <code>!</code>.
                                 </p>

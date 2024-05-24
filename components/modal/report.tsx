@@ -7,6 +7,7 @@ import {toast} from 'sonner'
 import {LoadingDots} from '@/components/shared/icons'
 import {Input} from '@/components/shared/input/text'
 import Button from '@/components/shared/button'
+import {ProjectName} from '@/lib/utils'
 
 export default function ReportAbuse() {
     const [open, setOpen] = useState(false)
@@ -27,7 +28,7 @@ export default function ReportAbuse() {
         setSubmitting(false)
         setOpen(false)
         toast.success(
-            'We got it! Thanks for making Yipnyap even better. Click here to see your report.',
+            `We got it! Thanks for making ${ProjectName} even better. Click here to see your report.`,
         )
     }
 

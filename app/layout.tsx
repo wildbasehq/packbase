@@ -10,14 +10,14 @@ import Preload from '@/app/preload'
 import dynamic from 'next/dynamic'
 
 export const metadata = {
-    title: 'Yipnyap - A furry safespace',
+    title: 'Project 1',
     description:
-        'Yipnyap is a place where furries meet and chat, without the fear of being judged.',
+        'A furry site.',
     twitter: {
         card: 'summary_large_image',
-        title: 'Yipnyap - A furry safespace',
+        title: 'Project 1',
         description:
-            'Yipnyap is a place where furries meet and chat, without the fear of being judged.',
+            'A furry site.',
     },
     metadataBase: new URL('https://ypnyp-dev-nextjs-ui.vercel.app/'),
     themeColor: '#FFF',
