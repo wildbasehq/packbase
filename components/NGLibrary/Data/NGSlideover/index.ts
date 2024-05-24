@@ -1,0 +1,1 @@
+export { NGSlideover } from './NGSlideover'

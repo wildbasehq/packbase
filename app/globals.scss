@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'styles/snapper/crawl';
+
+@layer base {
+  h1 {
+    @apply text-2xl;
+  }
+
+  h2 {
+    @apply text-xl;
+  }
+
+  h3 {
+    @apply text-lg;
+  }
+
+  a {
+    @apply text-blue-600 !important;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
+// @todo: i'll clean up this shit later
+.text-default {
+  @apply text-neutral-700 dark:text-white;
+}
+
+.border-default {
+  @apply border-neutral-300 dark:border-neutral-800;
+}
+
+.divide-default {
+  @apply divide-neutral-300 dark:divide-neutral-800;
+}
+
+.ring-default {
+  @apply ring-neutral-300 dark:ring-neutral-800;
+}
+
+.text-primary {
+  @apply text-indigo-500;
+}
+
+.bg-box {
+  @apply backdrop-blur-lg bg-white/95 dark:bg-neutral-800/95;
+}
+
+.bg-box-alt {
+  @apply backdrop-blur-lg bg-neutral-50/95 dark:bg-neutral-800/80;
+}
+
+.bg-default {
+  @apply bg-white dark:bg-neutral-800;
+}
+
+.bg-default-alt {
+  @apply bg-neutral-50 dark:bg-neutral-700/25;
+}

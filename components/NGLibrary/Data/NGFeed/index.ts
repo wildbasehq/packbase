@@ -1,0 +1,1 @@
+export {default as NGFeed} from './NGFeed';
