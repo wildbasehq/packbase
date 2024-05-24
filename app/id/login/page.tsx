@@ -96,7 +96,7 @@ export default function IDLogin({searchParams}: {
                 >
                     Login
                 </Link>
-                <div className="relative hidden h-full flex-col bg-muted p-8 text-white lg:flex dark:border-r">
+                <div className="absolute hidden left-0 h-full flex-col bg-muted p-8 text-white lg:flex">
                     <HoverCard.Root>
                         <HoverCard.Trigger className="w-fit">
                             <div
@@ -153,43 +153,50 @@ export default function IDLogin({searchParams}: {
                     </HoverCard.Root>
                 </div>
                 <div
-                    className="relative animate-slide-down-fade rounded bg-card h-fit justify-self-end sm:w-[350px] top-0 mr-[8.5rem]">
+                    className="relative animate-slide-down-fade rounded bg-card-solid border shadow h-fit sm:max-w-md top-0 mx-auto">
                     <div className="lg:p-8">
                         <div className="flex flex-col justify-center space-y-6">
-                            <div className="flex flex-col space-y-2 text-center">
-                                <Heading size="2xl" className="text-2xl">
-                                    Registration is closed.
-                                </Heading>
-                                <Text>
-                                    {ProjectName} is not open for public registration.
-                                </Text>
-                            </div>
-                            {/*<div className="flex flex-col space-y-2 text-center">*/}
-                            {/*    <h1 className="text-2xl font-semibold tracking-tight">*/}
-                            {/*        Create an account*/}
-                            {/*    </h1>*/}
-                            {/*    <p className="text-sm text-muted-foreground">*/}
-                            {/*        Enter your email below to create your account*/}
-                            {/*    </p>*/}
-                            {/*</div>*/}
-                            {/*<UserCreateForm/>*/}
-                            {/*<p className="px-8 text-center text-sm text-muted-foreground">*/}
-                            {/*    By clicking continue, you agree to our{" "}*/}
-                            {/*    <Link*/}
-                            {/*        to="/terms"*/}
-                            {/*        className="underline underline-offset-4 hover:text-primary"*/}
-                            {/*    >*/}
-                            {/*        Terms of Service*/}
-                            {/*    </Link>{" "}*/}
-                            {/*    and{" "}*/}
-                            {/*    <Link*/}
-                            {/*        to="/privacy"*/}
-                            {/*        className="underline underline-offset-4 hover:text-primary"*/}
-                            {/*    >*/}
-                            {/*        Privacy Policy*/}
-                            {/*    </Link>*/}
-                            {/*    .*/}
-                            {/*</p>*/}
+                            {process.env.NEXT_PUBLIC_REGISTRATION_CLOSE && (
+                                <div className="flex flex-col space-y-2 text-center">
+                                    <Heading size="2xl" className="text-2xl">
+                                        Registration is closed.
+                                    </Heading>
+                                    <Text>
+                                        {ProjectName} is not open for public registration.
+                                    </Text>
+                                </div>
+                            )}
+
+                            {!process.env.NEXT_PUBLIC_REGISTRATION_CLOSE && (
+                                <>
+                                    <div className="flex flex-col space-y-2 text-center">
+                                        <h1 className="text-2xl font-semibold tracking-tight">
+                                            Create an account
+                                        </h1>
+                                        <p className="text-sm text-muted-foreground">
+                                            Enter your email below to create your account
+                                        </p>
+                                    </div>
+                                    {/*<UserCreateForm/>*/}
+                                    <p className="px-8 text-center text-sm text-muted-foreground">
+                                        By clicking continue, you agree to our{" "}
+                                        <Link
+                                            href="/terms"
+                                            className="underline underline-offset-4 hover:text-primary"
+                                        >
+                                            Terms of Service
+                                        </Link>{" "}
+                                        and{" "}
+                                        <Link
+                                            href="/privacy"
+                                            className="underline underline-offset-4 hover:text-primary"
+                                        >
+                                            Privacy Policy
+                                        </Link>
+                                        .
+                                    </p>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
