@@ -9,6 +9,7 @@ import cx from 'classnames'
 import {buttonVariants} from '@/components/shared/buttonUI'
 import {Heading, Text} from '@/components/shared/text'
 import {ProjectName} from '@/lib/utils'
+import { ShaderGradientCanvas, ShaderGradient } from 'shadergradient'
 
 export default function IDLogin({searchParams}: {
     searchParams: { error_description: string; error: string; };
@@ -37,13 +38,55 @@ export default function IDLogin({searchParams}: {
     return (
         <>
             {/* test */}
-            <div className="animate-slide-down-fade absolute inset-0 bg-surface-container-low -z-10" style={{
+            <div className="animate-slide-down-fade absolute inset-0 bg-surface-container-low -z-10 dark:opacity-75" style={{
                 // fit to screen
                 background: 'url(/img/illustrations/home/fox-in-snowy-oasis.webp) center/cover no-repeat',
-            }}/>
+            }}>
+                <ShaderGradientCanvas
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        opacity: 0.85,
+                        // backdropFilter: 'blur(1em)'
+                    }}
+                >
+                    <ShaderGradient
+                        control='props'
+                        animate="on"
+                        color1="#606080"
+                        color2="#a78bfa"
+                        color3="#212121"
+                        grain="on"
+                        brightness={1}
+                        cAzimuthAngle={120}
+                        cDistance={3.5}
+                        cPolarAngle={80}
+                        cameraZoom={9.1}
+                        envPreset="city"
+                        frameRate={1}
+                        grainBlending={0.7}
+                        lightType="3d"
+                        positionX={-1}
+                        positionY={2.8}
+                        positionZ={0}
+                        // range="disabled"
+                        // rangeEnd={20}
+                        rotationX={-75}
+                        rotationY={0}
+                        rotationZ={-60}
+                        type="waterPlane"
+                        uAmplitude={0}
+                        uFrequency={0}
+                        uSpeed={0.05}
+                        uStrength={1.5}
+                        uTime={8}
+                        // enableTransition={false}
+                    />
+                </ShaderGradientCanvas>
+            </div>
 
             <div
-                className="container grid relative h-full flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
+                className="container relative flex h-full flex-col items-center justify-center lg:max-w-none lg:px-0">
                 <Link
                     href="/id/unlock"
                     className={cx(
