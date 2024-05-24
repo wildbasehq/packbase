@@ -7,20 +7,12 @@ import ms from 'ms'
  * outside the final product name. Should be sent with telemetry and
  * all requests to the server.
  *
- * @projectName Tigao
- * @since 2023-08-23
+ * @projectName Project 1
+ * @since 24-05-2024
  * @specific v3 frontend-only rewrite experiment
- * @authors @rek, @jexx
- *
- * @note
- * Check slack, list is reference of related/referenced project.
- * - Project Yipnyap: v1 (@rek)
- * - Nextgen: v2 ui redesign (@rek) (current live)
- * - Feral: v3 fullstack rewrite experiment (@rek)
- * - E: 4v4 shooter (@rek, @haz, @lemon, Studio Klondike)
- * - Tigao: v3 frontend-only rewrite experiment (@rek ui, @jexx attempt)
+ * @authors @rek
  */
-export const ProjectName = 'Yipnyap'
+export const ProjectName = 'Project 1'
 export const ProjectDeps = ['scalebite', 'ypnyp', 'feral']
 
 /**
