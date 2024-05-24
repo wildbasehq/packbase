@@ -1,49 +1,100 @@
-/** @type {Plugin} */
-const plugin = require("tailwindcss/plugin");
 const {default: flattenColorPalette} = require('tailwindcss/lib/util/flattenColorPalette');
-
-// Generate safelist for each colour in the palette, just bg-*-600, dark:bg-*-700.
-let safelist = [];
-const colors = require('tailwindcss/colors');
-for (const key of Object.keys(colors)) {
-    if (key !== 'inherit' && key !== 'current' && key !== 'transparent' && key !== 'black' && key !== 'white') {
-        safelist.push(`text-${key}-200`);
-        safelist.push(`bg-${key}-600`);
-        safelist.push(`bg-${key}-700`);
-        safelist.push(`dark:bg-${key}-700`);
-        safelist.push(`dark:bg-${key}-800`);
-    }
-}
+// const defaultColors = require('tailwindcss/colors');
+const plugin = require("tailwindcss/plugin");
 
 module.exports = {
-    content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
     darkMode: 'class',
-    safelist: [
-        'bg-neutral-50',
-        'dark:bg-neutral-700',
-        'dark:bg-neutral-800',
-        'text-neutral-900',
-        'dark:text-neutral-300',
-        'divide-neutral-200',
-        'dark:divide-neutral-700',
-        ...safelist,
-
-        // for skeleton loader
-        'h-32',
-        'h-48',
-        'h-40',
-        'h-56',
+    content: [
+        "./app/**/*.{js,ts,jsx,tsx}",
+        "./components/**/*.{js,ts,jsx,tsx}"
     ],
-    future: {
-        hoverOnlyWhenSupported: true,
-    },
     theme: {
         extend: {
+            animation: {
+                logoHue: 'logoHue 1s ease-out, logoHue 30s ease-out 1s infinite',
+                // Hue rotate
+                hue: "hue 1s ease-out",
+                // Shimmer
+                shimmer: "shimmer 1s ease-out infinite",
+                // Fade up and down
+                "fade-up": "fade-up 0.5s",
+                "fade-down": "fade-down 0.5s",
+                // Tooltip
+                "slide-up-fade": "slide-up-fade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+                "slide-down-fade": "slide-down-fade 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                "slide-up-fade-snapper": "slide-up-fade 0.3s cubic-bezier(0, 1.25, 0, 1) forwards",
+                "slide-down-fade-snapper": "slide-down-fade 0.3s cubic-bezier(0, 1.25, 0, 1)",
+                // Charm
+                "magic-sparkle": "magic-sparkle 1.5s forwards",
+            },
+            keyframes: {
+                hue: {
+                    "0%": { filter: "hue-rotate(0deg)" },
+                    "100%": { filter: "hue-rotate(360deg)" },
+                },
+                shimmer: {
+                    '100%': {
+                        transform: 'translateX(100%)',
+                    },
+                },
+                // Fade up and down
+                "fade-up": {
+                    "0%": {
+                        opacity: 0,
+                        transform: "translateY(10px)",
+                    },
+                    "80%": {
+                        opacity: 0.6,
+                    },
+                    "100%": {
+                        opacity: 1,
+                        transform: "translateY(0px)",
+                    },
+                },
+                "fade-down": {
+                    "0%": {
+                        opacity: 0,
+                        transform: "translateY(-10px)",
+                    },
+                    "80%": {
+                        opacity: 0.6,
+                    },
+                    "100%": {
+                        opacity: 1,
+                        transform: "translateY(0px)",
+                    },
+                },
+                // Tooltip
+                "slide-up-fade": {
+                    "0%": { opacity: 0, transform: "translateY(6px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                },
+                "slide-down-fade": {
+                    "0%": { opacity: 0, transform: "translateY(-6px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                },
+                // Charm
+                "magic-sparkle": {
+                    "0%": {
+                        transform: "scale(0)",
+                    },
+                    "50%": {
+                        transform: "scale(1)",
+                    },
+                    "100%": {
+                        transform: "scale(0)",
+                    },
+                },
+            },
             colors: {
                 code: {
                     highlight: 'rgb(125 211 252 / 0.1)',
                 },
                 // neutral: defaultColors.zinc,
+                sidebar: {
+                    default: '#ffffff',
+                    dark: '#1b1b1c',
+                },
 
                 accent: {
                     1: 'rgb(var(--color-accent-1) / <alpha-value>)',
@@ -143,78 +194,21 @@ module.exports = {
             borderRadius: {
                 default: '0.75rem',
             },
-            fontFamily: {
-                display: ["var(--font-lexend)", "system-ui", "sans-serif"],
-                default: ["var(--font-lexend)", "system-ui", "sans-serif"],
-            },
-            animation: {
-                shimmer: "shimmer 1s infinite linear",
-                // Fade up and down
-                "fade-up": "fade-up 0.5s",
-                "fade-down": "fade-down 0.5s",
-                // Tooltip
-                "slide-up-fade": "slide-up-fade 0.3s cubic-bezier(0,1.25,0,1)",
-                "slide-down-fade": "slide-down-fade 0.3s cubic-bezier(0,1.25,0,1)",
-            },
-            keyframes: {
-                shimmer: {
-                    '100%': {
-                        transform: 'translateX(100%)',
-                    },
-                },
-                // Fade up and down
-                "fade-up": {
-                    "0%": {
-                        opacity: 0,
-                        transform: "translateY(10px)",
-                    },
-                    "80%": {
-                        opacity: 0.6,
-                    },
-                    "100%": {
-                        opacity: 1,
-                        transform: "translateY(0px)",
-                    },
-                },
-                "fade-down": {
-                    "0%": {
-                        opacity: 0,
-                        transform: "translateY(-10px)",
-                    },
-                    "80%": {
-                        opacity: 0.6,
-                    },
-                    "100%": {
-                        opacity: 1,
-                        transform: "translateY(0px)",
-                    },
-                },
-                // Tooltip
-                "slide-up-fade": {
-                    "0%": {opacity: 0, transform: "translateY(6px)"},
-                    "100%": {opacity: 1, transform: "translateY(0)"},
-                },
-                "slide-down-fade": {
-                    "0%": {opacity: 0, transform: "translateY(-6px)"},
-                    "100%": {opacity: 1, transform: "translateY(0)"},
-                },
+            transitionTimingFunction: {
+                snapper: 'cubic-bezier(0,1.25,0,1)',
             },
         },
     },
     plugins: [
-        require("@tailwindcss/forms"),
-        require("@tailwindcss/typography"),
+        require('@tailwindcss/forms'),
         require("tailwindcss-inner-border"),
-        require('tailwindcss-animate'),
-        plugin(({addVariant}) => {
+        plugin(({ addVariant }) => {
             addVariant("radix-side-top", '&[data-side="top"]');
             addVariant("radix-side-bottom", '&[data-side="bottom"]');
-        }),
-        plugin(function ({addVariant}) {
             addVariant('low-fidelity', 'html.low-fidelity &')
             addVariant('unicorn', 'html[data-unicorn-engine] &')
         }),
-        function ({matchUtilities, theme}) {
+        function ({matchUtilities, theme,}) {
             matchUtilities(
                 {
                     highlight: (value) => ({boxShadow: `inset 0 1px 0 0 ${value}`}),
