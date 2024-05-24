@@ -7,9 +7,7 @@ import {ProjectName} from '@/lib/utils'
 import {Heading} from '@/components/shared/text'
 import {createClient} from '@/lib/supabase/client'
 import {useResourceUIStore, useUserAccountStore} from '@/lib/states'
-import {toast} from '@/lib/toast'
 import Body from '@/components/layout/body'
-import {FetchHandler} from 'lib/api'
 import {HandRaisedIcon} from '@heroicons/react/20/solid'
 
 const supabase = createClient()
