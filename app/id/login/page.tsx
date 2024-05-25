@@ -59,13 +59,13 @@ export default function IDLogin({searchParams}: {
                         color3="#212121"
                         grain="on"
                         brightness={1}
-                        cAzimuthAngle={120}
-                        cDistance={3.5}
+                        cAzimuthAngle={100}
+                        cDistance={4.5}
                         cPolarAngle={80}
-                        cameraZoom={9.1}
+                        cameraZoom={9}
                         envPreset="city"
                         frameRate={1}
-                        grainBlending={0.3}
+                        grainBlending={0.2}
                         lightType="3d"
                         positionX={-1}
                         positionY={2.8}
@@ -74,11 +74,11 @@ export default function IDLogin({searchParams}: {
                         rotationY={0}
                         rotationZ={-60}
                         type="waterPlane"
-                        uAmplitude={0}
-                        uFrequency={0}
-                        uSpeed={0.05}
-                        uStrength={1.5}
-                        uTime={8}
+                        uAmplitude={3}
+                        uFrequency={3}
+                        uSpeed={0.02}
+                        uStrength={1.1}
+                        uTime={0}
                         // enableTransition={false}
                     />
                 </ShaderGradientCanvas>
