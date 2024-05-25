@@ -13,7 +13,7 @@ export declare interface NGCardType {
 
 export const NGCardTheming = {
     all: ['px-4', 'py-5', 'sm:px-6'],
-    main: ['bg-card', 'flex', 'flex-col', 'shadow', 'overflow-hidden', 'border', 'border-default', 'rounded-default', 'highlight-white/5'],
+    main: ['bg-card', 'flex', 'flex-col', 'shadow', 'overflow-hidden', 'border', 'border-default', 'rounded', 'highlight-white/5'],
     card: {
         header: ['text-ColourScheme-900', 'dark:text-white'],
         body: ['dark:text-ColourScheme-300'],

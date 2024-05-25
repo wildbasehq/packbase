@@ -25,9 +25,9 @@ export default function NGGroupCard({...props}: NGGroupCardType) {
 
     return (
         <div>
-            <div className="flex flex-col rounded-default bg-card border border-default highlight-white/5">
+            <div className="flex flex-col rounded bg-card border border-default highlight-white/5">
                 {/* Banner */}
-                <div className="aspect-banner rounded-default bg-card" style={{
+                <div className="aspect-banner rounded bg-card" style={{
                     background: `url(${group.banner}) no-repeat center center/cover`,
                 }}></div>
 

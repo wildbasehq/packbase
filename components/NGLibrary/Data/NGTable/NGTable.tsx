@@ -27,7 +27,7 @@ export default function NGTable({...props}: NGTableType) {
             <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                     <div
-                        className="bg-card shadow overflow-hidden border-b border-default rounded-default">
+                        className="bg-card shadow overflow-hidden border-b border-default rounded">
                         <table className="min-w-full divide-y divide-default highlight-white/5">
                             <thead className="bg-default-alt">
                             <tr>

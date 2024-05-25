@@ -41,8 +41,8 @@ export default function NGStatsGrid({...props}: NGStatsGridType) {
             <h3 className="text-lg leading-6 font-medium text-default">Now</h3>
             <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
                 {stats.map((item) => (
-                    <div key={item.name} className="rounded-default shadow">
-                        <div className="px-4 py-5 bg-card highlight-white/5 rounded-default overflow-hidden sm:p-6">
+                    <div key={item.name} className="rounded shadow">
+                        <div className="px-4 py-5 bg-card highlight-white/5 rounded overflow-hidden sm:p-6">
                             <dt className="text-sm font-medium text-alt truncate">{item.name}</dt>
                             <dd className="mt-1 text-3xl font-semibold text-default">{item.stat}</dd>
                         </div>

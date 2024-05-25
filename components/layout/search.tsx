@@ -10,6 +10,8 @@ import {
 import Highlighter from 'react-highlight-words'
 import {ExclamationTriangleIcon} from '@heroicons/react/24/outline'
 import Tooltip from '@/components/shared/tooltip'
+import ReactTextTransition from "react-text-transition";
+
 
 function SearchIcon(props: any) {
     return (
@@ -109,13 +111,25 @@ function useSearchProps() {
 
 export function Search() {
     let [modifierKey, setModifierKey] = useState<string>()
+    const [index, setIndex] = useState<number>(0)
     let { buttonProps, dialogProps } = useSearchProps()
 
+    const texts = [
+        'This is covered by your NDA.',
+        'Never show this program to anyone.'
+    ]
+
     useEffect(() => {
+        const intervalId = setInterval(
+            () => setIndex((index) => index < texts.length - 1 ? index + 1 : 0),
+            5000,
+        );
+
         setModifierKey(
             /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform) ? '⌘' : 'Ctrl '
         )
-    }, [])
+        return () => clearTimeout(intervalId);
+    }, [texts.length])
 
     return (
         <div className="hidden lg:block lg:max-w-md lg:flex-auto">
@@ -126,7 +140,9 @@ export function Search() {
                     {...buttonProps}
                 >
                     <ExclamationTriangleIcon className="h-5 w-5 stroke-current mt-0.5"/>
-                    This is covered by your NDA.
+                    <ReactTextTransition translateValue="60%">
+                        {texts[index]}
+                    </ReactTextTransition>
                     {/*<kbd className="ml-auto text-2xs text-zinc-400 dark:text-zinc-500">*/}
                     {/*    <kbd className="font-sans">{modifierKey}</kbd>*/}
                     {/*    <kbd className="font-sans">K</kbd>*/}

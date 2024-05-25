@@ -1,7 +1,7 @@
 $n: 4;
 
 .item {
-  @apply relative w-full bg-neutral-200/50 rounded-default highlight-white/5 dark:bg-neutral-800/50;
+  @apply relative w-full bg-neutral-200/50 rounded highlight-white/5 dark:bg-neutral-800/50;
 
   opacity: 0;
   top: 16px;

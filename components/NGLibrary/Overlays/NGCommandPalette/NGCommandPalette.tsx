@@ -196,7 +196,7 @@ export default function NGCommandPalette({...props}: {
                 >
                     <Combobox
                         as="div"
-                        className="mx-auto max-w-xl transform divide-y divide-neutral-100 dark:divide-neutral-600 overflow-hidden rounded-default bg-card shadow-2xl ring-1 ring-black ring-opacity-5 transition-all"
+                        className="mx-auto max-w-xl transform divide-y divide-neutral-100 dark:divide-neutral-600 overflow-hidden rounded bg-card shadow-2xl ring-1 ring-black ring-opacity-5 transition-all"
                         onChange={(item: any) => {
                             if (item.member_count) {
                                 window.location.href = `/pack/${item.id}/`

@@ -17,7 +17,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     {label}
                     {description && <p className="mt-1 text-xs leading-5 text-alt">{description}</p>}
                 </label>
-                <div className="flex mt-2">
+                <div className="flex">
                     <div
                         className={`${className} w-full flex rounded-md bg-default shadow-sm ring-1 ring-inset ring-neutral-300 dark:ring-white/10 focus-within:ring-2 focus-within:ring-inset focus-within:!ring-indigo-600 sm:max-w-md`}>
                         {suffix && <span

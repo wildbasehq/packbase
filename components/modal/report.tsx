@@ -35,7 +35,7 @@ export default function ReportAbuse() {
     return (
         <div className="fixed bottom-5 right-5">
             <button
-                className="rounded-default bg-default p-4 text-default shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl active:translate-y-0 active:shadow-sm"
+                className="rounded bg-default p-4 text-default shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl active:translate-y-0 active:shadow-sm"
                 onClick={() => setOpen(!open)}
             >
                 {open ? <XCircleIcon size={24}/> : <AlertTriangle size={24}/>}

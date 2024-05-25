@@ -6,10 +6,11 @@ import UserAvatar from '@/components/shared/user/avatar'
 import {UserInfo} from '@/components/shared/user/info-col'
 import Link from 'next/link'
 import cx from 'classnames'
-import {buttonVariants} from '@/components/shared/buttonUI'
+import {Button, buttonVariants} from '@/components/shared/buttonUI'
 import {Heading, Text} from '@/components/shared/text'
 import {ProjectName} from '@/lib/utils'
 import { ShaderGradientCanvas, ShaderGradient } from 'shadergradient'
+import {Input} from '@/components/shared/input/text'
 
 export default function IDLogin({searchParams}: {
     searchParams: { error_description: string; error: string; };
@@ -64,13 +65,11 @@ export default function IDLogin({searchParams}: {
                         cameraZoom={9.1}
                         envPreset="city"
                         frameRate={1}
-                        grainBlending={0.7}
+                        grainBlending={0.3}
                         lightType="3d"
                         positionX={-1}
                         positionY={2.8}
                         positionZ={0}
-                        // range="disabled"
-                        // rangeEnd={20}
                         rotationX={-75}
                         rotationY={0}
                         rotationZ={-60}
@@ -96,14 +95,14 @@ export default function IDLogin({searchParams}: {
                 >
                     Login
                 </Link>
-                <div className="absolute hidden left-0 h-full flex-col bg-muted p-8 text-white lg:flex">
+                <div className="absolute hidden left-0 h-full flex-col p-8 text-white lg:flex">
                     <HoverCard.Root>
                         <HoverCard.Trigger className="w-fit">
                             <div
                                 className="z-20 flex pointer-events-none items-center text-lg p-2 font-medium bg-background rounded">
                                 <UserInfo size="lg" user={{
-                                    display_name: 'Dutss',
-                                    username: 'dutssz',
+                                    display_name: 'Bernie 🐻',
+                                    username: 'bernie_burr',
                                     avatar: '/img/illustrations/onboarding/pfp/bernie_burr.png'
                                 }}/>
                             </div>
@@ -120,14 +119,14 @@ export default function IDLogin({searchParams}: {
                                 {/*</div>*/}
                                 <div className="flex flex-col gap-[7px]">
                                     <UserAvatar size="3xl" user={{
-                                        display_name: 'Dutss',
-                                        username: 'dutssz',
+                                        display_name: 'Bernie 🐻',
+                                        username: 'bernie_burr',
                                         avatar: 'https://api.yipnyap.me/vault/@server/uploads/members/256/avatars/1668891639-bpfull.png'
                                     }}/>
                                     <div className="flex flex-col gap-4">
                                         <div>
-                                            <div className="text-md">Dutss</div>
-                                            <div className="text-sm text-alt">@dutssz</div>
+                                            <div className="text-md">Bernie 🐻</div>
+                                            <div className="text-sm text-alt">@bernie_burr</div>
                                         </div>
                                         <div className="text-sm">
                                             I draw
@@ -177,7 +176,22 @@ export default function IDLogin({searchParams}: {
                                             Enter your email below to create your account
                                         </p>
                                     </div>
-                                    {/*<UserCreateForm/>*/}
+                                    <div className="space-y-1">
+                                        <div>
+                                            <Input id="register-email" label="E-Mail" type="email" />
+                                        </div>
+                                        <div>
+                                            <Input id="register-pass" label="Password" type="password" />
+                                        </div>
+                                        <div>
+                                            <Input id="register-pass-conf" label="Confirm Password" type="password" />
+                                        </div>
+                                        <div>
+                                            <Button>
+                                                Register
+                                            </Button>
+                                        </div>
+                                    </div>
                                     <p className="px-8 text-center text-sm text-muted-foreground">
                                         By clicking continue, you agree to our{" "}
                                         <Link
