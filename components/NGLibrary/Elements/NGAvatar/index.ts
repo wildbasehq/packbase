@@ -1,1 +1,0 @@
-export {NGAvatar} from './NGAvatar';

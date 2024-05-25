@@ -56,12 +56,13 @@ export default function CrawlText({children, delay, fast}: { children: any; dela
                 setTextDOM(textArray)
                 Log('Ready to display')
                 setTimeout(() => {
+                    if (display) return
                     Log('Displaying text')
                     setDisplay(true)
                 }, delay)
             }
         }
-    }, [children, delay, fast, window])
+    }, [children, delay, fast])
 
     return (
         <>

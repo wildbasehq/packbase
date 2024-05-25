@@ -1,16 +1,12 @@
 'use client'
 
 import {
-    useCallback,
     useEffect,
     useId,
-    useRef,
     useState,
 } from 'react'
-import Highlighter from 'react-highlight-words'
 import {ExclamationTriangleIcon} from '@heroicons/react/24/outline'
-import Tooltip from '@/components/shared/tooltip'
-import ReactTextTransition from "react-text-transition";
+import ReactTextTransition, {presets} from 'react-text-transition'
 
 
 function SearchIcon(props: any) {
@@ -66,105 +62,38 @@ function LoadingIcon(props: any) {
     )
 }
 
-function HighlightQuery({ text, query }: { text: string; query: string }) {
-    return (
-        <Highlighter
-            highlightClassName="underline bg-transparent text-indigo-500"
-            searchWords={[query]}
-            autoEscape={true}
-            textToHighlight={text}
-        />
-    )
-}
-
-function useSearchProps() {
-    let buttonRef = useRef<HTMLButtonElement>(null)
-    let [open, setOpen] = useState(false)
-
-    return {
-        buttonProps: {
-            ref: buttonRef,
-            onClick() {
-                setOpen(true)
-            },
-        },
-        dialogProps: {
-            open,
-            // setOpen(open) {
-            //   let { width, height } = buttonRef.current.getBoundingClientRect()
-            //   if (!open || (width !== 0 && height !== 0)) {
-            //     setOpen(open)
-            //   }
-            // },
-            setOpen: useCallback(
-                (open: boolean | ((prevState: boolean) => boolean)) => {
-                    let { width, height } = buttonRef?.current?.getBoundingClientRect() || { width: 0, height: 0 }
-                    if (!open || (width !== 0 && height !== 0)) {
-                        setOpen(open)
-                    }
-                },
-                [setOpen]
-            ),
-        },
-    }
-}
+const texts = [
+    'This is covered by your NDA.',
+    'Never show this program to anyone.'
+]
 
 export function Search() {
-    let [modifierKey, setModifierKey] = useState<string>()
     const [index, setIndex] = useState<number>(0)
-    let { buttonProps, dialogProps } = useSearchProps()
-
-    const texts = [
-        'This is covered by your NDA.',
-        'Never show this program to anyone.'
-    ]
+    // let { buttonProps, dialogProps } = useSearchProps()
 
     useEffect(() => {
-        const intervalId = setInterval(
+        let intervalId = setInterval(
             () => setIndex((index) => index < texts.length - 1 ? index + 1 : 0),
             5000,
         );
 
-        setModifierKey(
-            /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform) ? '⌘' : 'Ctrl '
-        )
         return () => clearTimeout(intervalId);
-    }, [texts.length])
+    }, [setIndex])
 
     return (
         <div className="hidden lg:block lg:max-w-md lg:flex-auto">
-            <Tooltip content="Open news ticker">
-                <button
-                    type="button"
-                    className="hidden h-8 w-full items-center gap-2 rounded-md bg-white pl-2 pr-3 text-sm text-zinc-500 ring-1 ring-zinc-900/10 transition hover:ring-zinc-900/20 ui-not-focus-visible:outline-none dark:bg-white/5 dark:text-zinc-400 dark:ring-inset dark:ring-white/10 dark:hover:ring-white/20 lg:flex"
-                    {...buttonProps}
-                >
-                    <ExclamationTriangleIcon className="h-5 w-5 stroke-current mt-0.5"/>
-                    <ReactTextTransition translateValue="60%">
-                        {texts[index]}
-                    </ReactTextTransition>
-                    {/*<kbd className="ml-auto text-2xs text-zinc-400 dark:text-zinc-500">*/}
-                    {/*    <kbd className="font-sans">{modifierKey}</kbd>*/}
-                    {/*    <kbd className="font-sans">K</kbd>*/}
-                    {/*</kbd>*/}
-                </button>
-            </Tooltip>
-        </div>
-    )
-}
-
-export function MobileSearch() {
-    let {buttonProps, dialogProps} = useSearchProps()
-
-    return (
-        <div className="contents lg:hidden">
             <button
                 type="button"
-                className="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 ui-not-focus-visible:outline-none dark:hover:bg-white/5 lg:hidden"
-                aria-label="Find something..."
-                {...buttonProps}
+                className="hidden h-8 w-full items-center gap-2 rounded-md bg-white pl-2 pr-3 text-sm text-zinc-500 ring-1 ring-zinc-900/10 transition hover:ring-zinc-900/20 ui-not-focus-visible:outline-none dark:bg-white/5 dark:text-zinc-400 dark:ring-inset dark:ring-white/10 dark:hover:ring-white/20 lg:flex"
             >
-                <SearchIcon className="h-5 w-5 stroke-zinc-900 dark:stroke-white"/>
+                <ExclamationTriangleIcon className="h-5 w-5 stroke-current mt-0.5"/>
+                <ReactTextTransition translateValue="60%" springConfig={presets.stiff}>
+                    {texts[index]}
+                </ReactTextTransition>
+                {/*<kbd className="ml-auto text-2xs text-zinc-400 dark:text-zinc-500">*/}
+                {/*    <kbd className="font-sans">{modifierKey}</kbd>*/}
+                {/*    <kbd className="font-sans">K</kbd>*/}
+                {/*</kbd>*/}
             </button>
         </div>
     )

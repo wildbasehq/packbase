@@ -7,8 +7,6 @@
     "baseUrl": ".",
     "paths": {
       "@/components/*": ["components/*"],
-      "@nextgen2/*": ["components/NGLibrary/*"],
-      "@nextgen2": ["components/NGLibrary"],
       "@/pages/*": ["pages/*"],
       "@/app/*": ["app/*"],
       "@/lib/*": ["lib/*"],

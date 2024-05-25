@@ -6,28 +6,6 @@
   background: rgba($color, $opacity);
 }
 
-$colors: (
-  //'bg-body': theme('colors.n.1'),
-  //'bg-body-acrylic': theme('colors.n.1/50'),
-        'bg-card-alt': #f5f5f5,
-        'bg-hover': rgb(243, 243, 243),
-        'text-body': theme('colors.n.6'),
-        'text-alt': theme('colors.n.4'),
-        'fill-alt': theme('colors.n.4'),
-        'border-default': #e5e5e5,
-);
-
-$colors-dark: (
-  //'bg-body': theme('colors.n.7'),
-  //'bg-body-acrylic': theme('colors.n.7/50'),
-        'bg-card-alt': theme('colors.n.5'),
-        'bg-hover': rgb(36, 36, 36),
-        'text-body': #FFF,
-        'text-alt': theme('colors.n.4'),
-        'fill-alt': theme('colors.n.4'),
-        'border-default': #2e2e2e,
-);
-
 .bg-sidebar {
   @apply bg-gradient-to-b from-white to-n-1 dark:from-n-7 dark:to-[#1b1b1c];
 }
@@ -40,20 +18,8 @@ $colors-dark: (
   @apply bg-n-1/95 dark:bg-n-7/95;
 }
 
-html:not(.dark) {
-  @each $color, $value in $colors {
-    --color-#{$color}: #{$value};
-  }
-}
-
-html.dark {
-  @each $color, $value in $colors-dark {
-    --color-#{$color}: #{$value};
-  }
-}
-
 .font-pixel {
-  font-family: var(--font-pixelify);
+  font-family: var(--font-pixelify), sans-serif;
 }
 
 @layer base {
@@ -79,30 +45,10 @@ html.dark {
     --color-n-7: 30 30 30;
     --color-n-8: 20 20 20;
   }
-
-  // hover
-  .bg-hover {
-    background-color: var(--color-bg-hover);
-  }
 }
 
-//a:not(.no-style) {
-//  color: var(--color-text-primary);
-//}
-
-@each $color, $value in $colors {
-  // check if starts with bg
-  .#{$color} {
-    @if str-slice($color, 0, 2) == 'bg' {
-      background-color: var(--color-#{$color});
-    } @else if str-slice($color, 0, 4) == 'text' {
-      color: var(--color-#{$color});
-    } @else if str-slice($color, 0, 6) == 'border' {
-      border-color: var(--color-#{$color});
-    } @else if str-slice($color, 0, 4) == 'fill' {
-      fill: var(--color-#{$color});
-    }
-  }
+a:not(.no-style) {
+  color: var(--color-text-primary);
 }
 
 .load-stagger > * {
