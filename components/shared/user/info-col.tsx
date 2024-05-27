@@ -4,10 +4,9 @@ import UserAvatar from '@/components/shared/user/avatar'
 // @ts-ignore
 import * as HoverCard from '@radix-ui/react-hover-card'
 
-export default function UserInfoCol({user, size, inDrawer}: {
+export default function UserInfoCol({user, size}: {
     user: any; // object
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-    inDrawer?: boolean;
 }) {
     // const [snap, setSnap] = useState<number | string | null>('148px')
 

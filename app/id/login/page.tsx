@@ -1,4 +1,3 @@
-import {createClientComponentClient} from '@supabase/auth-helpers-nextjs'
 import UserInfoCol from '@/components/shared/user/info-col'
 import Link from 'next/link'
 import cx from 'classnames'
@@ -11,25 +10,10 @@ import LoginGradient from '@/app/id/login/client/gradient'
 export default function IDLogin({searchParams}: {
     searchParams: { error_description: string; error: string; };
 }) {
-    const supabase = createClientComponentClient({
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_KEY,
-    })
-
     switch (searchParams?.error_description) {
         case 'The resource owner or authorization server denied the request': {
             searchParams.error_description = 'Login cancelled'
         }
-    }
-
-    async function signInWithDiscord() {
-        await supabase.auth.signInWithOAuth({
-            provider: 'discord',
-            options: {
-                scopes: 'identify guilds',
-                redirectTo: `${window.location.origin}/auth/callback`
-            }
-        })
     }
 
     return (
