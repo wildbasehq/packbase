@@ -1,7 +1,7 @@
 import UserInfoCol from '@/components/shared/user/info-col'
 import Link from 'next/link'
 import cx from 'classnames'
-import {Button, buttonVariants} from '@/components/shared/buttonUI'
+import {buttonVariants} from '@/components/shared/ui/button'
 import {Heading, Text} from '@/components/shared/text'
 import {ProjectName} from '@/lib/utils'
 import {Input} from '@/components/shared/input/text'

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import {Logo} from '@/components/shared/logo'
-import {Button} from '@/components/shared/buttonUI'
+import {Button} from '@/components/shared/ui/button'
 import ActiveLink from '@/components/shared/activelink'
 import {HomeIcon, ScanFaceIcon, ServerIcon, UserIcon} from 'lucide-react'
 import {useEffect, useState} from 'react'
