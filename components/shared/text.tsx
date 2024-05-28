@@ -15,7 +15,7 @@ export function Heading({as, children, size = 'base', ...props}: {
     [key: string]: any;
 }): JSX.Element {
     const Comp = as || 'h1'
-    props.className = `${props.className || ''} ${textSize[size]}`
+    props.className = `${props.className || ''} ${textSize[size]} font-medium leading-none tracking-tight`
     return (
         <Comp {...props}>
             {children}
@@ -29,7 +29,7 @@ export function Text({children, size = 'base', ...props}: {
     [key: string]: any;
 }): JSX.Element {
     return (
-        <p className={`${textSize[size]}`} {...props}>
+        <p className={`${textSize[size]} text-sm [&_p]:leading-relaxed`} {...props}>
             {children}
         </p>
     )
