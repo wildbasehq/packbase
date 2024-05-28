@@ -60,7 +60,7 @@ export default function NavBar() {
 
                                 {!user && (
                                     <>
-                                        <Link href="/id/create">
+                                        <Link href="/id/login">
                                             <Button variant="ghost" size="self" className="flex h-6 w-6">
                                                 <ScanFaceIcon className="h-4 w-4"/>
                                             </Button>
