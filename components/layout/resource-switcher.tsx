@@ -257,9 +257,9 @@ export default function ResourceSwitcher() {
                                                                             whiteSpace: 'pre-line',
                                                                             width: '14.75rem'
                                                                         }}>
-                                                                            <Heading className="font-bold">
+                                                                            <Text className="font-bold">
                                                                                 Possibly Unavailable
-                                                                            </Heading>
+                                                                            </Text>
                                                                             <Text className="text-alt">
                                                                                 It&apos;s experiencing an outage, or may
                                                                                 no longer exist.
