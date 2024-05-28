@@ -1,12 +1,7 @@
 'use client'
 
-import {
-    useEffect,
-    useId,
-    useState,
-} from 'react'
+import {useId,} from 'react'
 import {ExclamationTriangleIcon} from '@heroicons/react/24/outline'
-import ReactTextTransition, {presets} from 'react-text-transition'
 
 
 function SearchIcon(props: any) {
@@ -38,7 +33,7 @@ function LoadingIcon(props: any) {
 
     return (
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" {...props}>
-            <circle cx="10" cy="10" r="5.5" strokeLinejoin="round" />
+            <circle cx="10" cy="10" r="5.5" strokeLinejoin="round"/>
             <path
                 stroke={`url(#${id})`}
                 strokeLinecap="round"
@@ -54,31 +49,16 @@ function LoadingIcon(props: any) {
                     y2="15"
                     gradientUnits="userSpaceOnUse"
                 >
-                    <stop stopColor="currentColor" />
-                    <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+                    <stop stopColor="currentColor"/>
+                    <stop offset="1" stopColor="currentColor" stopOpacity="0"/>
                 </linearGradient>
             </defs>
         </svg>
     )
 }
 
-const texts = [
-    'This is covered by your NDA.',
-    'Never show this program to anyone.'
-]
-
 export function Search() {
-    const [index, setIndex] = useState<number>(0)
     // let { buttonProps, dialogProps } = useSearchProps()
-
-    useEffect(() => {
-        let intervalId = setInterval(
-            () => setIndex((index) => index < texts.length - 1 ? index + 1 : 0),
-            5000,
-        );
-
-        return () => clearTimeout(intervalId);
-    }, [setIndex])
 
     return (
         <div className="hidden lg:block lg:max-w-md lg:flex-auto">
@@ -87,9 +67,7 @@ export function Search() {
                 className="hidden h-8 w-full items-center gap-2 rounded-md bg-white pl-2 pr-3 text-sm text-zinc-500 ring-1 ring-zinc-900/10 transition hover:ring-zinc-900/20 ui-not-focus-visible:outline-none dark:bg-white/5 dark:text-zinc-400 dark:ring-inset dark:ring-white/10 dark:hover:ring-white/20 lg:flex"
             >
                 <ExclamationTriangleIcon className="h-5 w-5 stroke-current mt-0.5"/>
-                <ReactTextTransition translateValue="60%" springConfig={presets.stiff}>
-                    {texts[index]}
-                </ReactTextTransition>
+                This is covered by your NDA
                 {/*<kbd className="ml-auto text-2xs text-zinc-400 dark:text-zinc-500">*/}
                 {/*    <kbd className="font-sans">{modifierKey}</kbd>*/}
                 {/*    <kbd className="font-sans">K</kbd>*/}
