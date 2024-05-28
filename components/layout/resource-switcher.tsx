@@ -304,10 +304,14 @@ function Resource({name, id, icon}: {
         <span className="flex min-w-0 items-center justify-between space-x-3">
             <UserAvatar name={name} size={40} avatar={icon}
                         className="inline-flex h-10 w-10 overflow-hidden"/>
-            <span className="flex-1 flex flex-col min-w-0">
-                <span className="truncate">{name}</span>
-                <span className="text-alt truncate">{id}</span>
-            </span>
+            <div className="flex-1 flex flex-col min-w-0">
+                <Text>
+                    {name}
+                </Text>
+                <Text className="text-alt">
+                    {id}
+                </Text>
+            </div>
         </span>
     )
 }
