@@ -1,92 +1,34 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
-import {Logo} from '@/components/shared/logo'
 import {Button} from '@/components/shared/ui/button'
-import ActiveLink from '@/components/shared/activelink'
-import {HomeIcon, ScanFaceIcon, ServerIcon, UserIcon} from 'lucide-react'
-import {useEffect, useState} from 'react'
+import {ScanFaceIcon} from 'lucide-react'
+import {useState} from 'react'
 import {ThemeToggle} from '@/components/shared/theme-toggle'
 import {Search} from '@/components/layout/search'
 import UserDropdown from '@/components/layout/user-dropdown'
 import {useResourceUIStore, useUserAccountStore} from '@/lib/states'
 import UserAvatar from '@/components/shared/user/avatar'
 import Popover from '@/components/shared/popover'
-import {LoadingCircle} from '@/components/shared/icons'
+import ResourceSwitcher from '@/components/layout/resource-switcher'
 
 export default function NavBar() {
     const {user} = useUserAccountStore()
     const {loading} = useResourceUIStore()
     const [navigation, setNavigation] = useState<any[]>([])
 
-    useEffect(() => {
-        setNavigation([{
-            name: 'Home',
-            href: '/',
-            icon: HomeIcon,
-        }, {
-            name: 'Profile',
-            tags: 'login register logout account settings profile user, identity',
-            href: '/id/create',
-            icon: UserIcon,
-        }, {
-            name: 'Server Information',
-            tags: 'status uptime health check',
-            href: '/stat',
-            icon: ServerIcon,
-        }])
-    }, [])
-
     return (
         <>
             <div
-                className={`flex sticky top-0 z-30 h-16 bg-sidebar border-0 border-b border-default border-solid ${loading ? 'before:animate-[shimmer_1s_linear_infinite] shimmer-template' : ''}`}>
+                className={`flex sticky top-0 z-30 h-16 bg-sidebar shadow-sm border-0 border-b border-default border-solid ${loading ? 'before:animate-[shimmer_1s_linear_infinite] shimmer-template' : ''}`}>
                 <nav
                     aria-label="Sections"
-                    className="hidden lg:flex lg:flex-col h-16 text-default">
-                    <div className="w-96 flex flex-row h-full divide-x divide-default border-r border-default">
-                        {/* Logo */}
-                        <Link
-                            href="/"
-                            className="flex items-center justify-center w-20 h-full cursor-pointer"
-                        >
-                            <Logo/>
-                        </Link>
-                        {(navigation.length === 0 || loading) && (
-                            <div className="flex items-center justify-center w-20 h-full">
-                                <LoadingCircle/>
-                            </div>
-                        )}
-
-                        {!loading && navigation.map((item: any, i: number) => (
-                            <ActiveLink
-                                key={i}
-                                href={item.href}
-                                className="flex items-center justify-center w-20 h-full cursor-pointer"
-                                activeClassName="bg-blue-50 bg-opacity-50 dark:bg-neutral-700"
-                                inactiveClassName="hover:bg-blue-50 hover:bg-opacity-50 dark:hover:bg-neutral-700"
-                            >
-                                <>
-                                    {item.icon && (
-                                        <>
-                                            {typeof item.icon !== 'string' && (
-                                                <item.icon className="flex-shrink-0 h-6 w-6 text-default"
-                                                           aria-hidden="true"/>
-                                            )}
-
-                                            {typeof item.icon === 'string' && (
-                                                <Image
-                                                    className={`flex-shrink-0 h-6 w-6 ${item.description?.startsWith('@') ? 'rounded-full' : 'rounded-lg'}`}
-                                                    src={item.icon}
-                                                    alt={`Icon for ${item.name}`}
-                                                />
-                                            )}
-                                        </>
-                                    )}
-                                </>
-                            </ActiveLink>
-                        ))}
+                    className="hidden relative lg:flex lg:flex-col h-16 text-default">
+                    <div
+                        className="flex items-center w-96 h-full py-2 px-5 border-r border-default">
+                        <div className="w-full">
+                            <ResourceSwitcher/>
+                        </div>
                     </div>
                 </nav>
 

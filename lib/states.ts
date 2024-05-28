@@ -62,9 +62,9 @@ interface ResourceStore {
 }
 
 const resourceDefault = {
-    id: 'maimai',
-    name: 'maimai DX BUDDiES',
-    icon: '/maimai/logo.png',
+    id: 'p1',
+    name: 'Wolfbite Project 1',
+    icon: '/logo.png',
     standalone: true,
 }
 
@@ -87,6 +87,12 @@ export const useResourceStore = create<ResourceStore>(
  * Resource UI store, not persistent
  */
 interface ResourceUIStore {
+    resourceDefault: {
+        id: string | number;
+        name: string;
+        icon: string;
+        standalone: boolean;
+    };
     loading: boolean;
     navigation: any[];
     setLoading: (loading: boolean) => void;
@@ -95,6 +101,7 @@ interface ResourceUIStore {
 
 export const useResourceUIStore = create<ResourceUIStore>(
     (set) => ({
+        resourceDefault,
         loading: true,
         navigation: [],
         setLoading: (loading) => set((state) => ({

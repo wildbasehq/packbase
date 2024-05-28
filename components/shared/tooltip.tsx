@@ -1,72 +1,36 @@
 'use client'
 
-import {ReactNode, useState} from 'react'
+import {ReactNode} from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
-import useWindowSize from '@/lib/hooks/use-window-size'
-import Leaflet from '../modal/leaflet'
 
-export default function Tooltip({
-                                    children,
-                                    content,
-                                    fullWidth,
-                                }: {
+export default function Tooltip({children, content, side}: {
     children: ReactNode;
     content: ReactNode | string;
-    fullWidth?: boolean;
+    side?: 'top' | 'bottom' | 'left' | 'right';
 }) {
-    const [openTooltip, setOpenTooltip] = useState(false)
-
-    const {isMobile, isDesktop} = useWindowSize()
-
     return (
-        <>
-            {isMobile && (
-                <button
-                    type="button"
-                    className={`${fullWidth ? 'w-full' : 'inline-flex'}`}
-                    onClick={() => setOpenTooltip(true)}
-                >
+        <TooltipPrimitive.Provider delayDuration={100}>
+            <TooltipPrimitive.Root>
+                <TooltipPrimitive.Trigger className="hidden sm:inline-flex" asChild>
                     {children}
-                </button>
-            )}
-            {openTooltip && isMobile && (
-                <Leaflet setShow={setOpenTooltip}>
+                </TooltipPrimitive.Trigger>
+                <TooltipPrimitive.Content
+                    sideOffset={4}
+                    side={side || 'top'}
+                    className="z-30 hidden items-center rounded-md border border-default bg-n-1 dark:bg-n-7 drop-shadow-lg sm:block"
+                >
                     {typeof content === 'string' ? (
-                        <span
-                            className="flex min-h-[150px] w-full items-center justify-center bg-white px-10 text-center text-sm text-gray-700">
-              {content}
-            </span>
+                        <div className="px-2 py-1.5">
+                  <span className="block text-center font-light text-xs">
+                    {content}
+                  </span>
+                        </div>
                     ) : (
                         content
                     )}
-                </Leaflet>
-            )}
-            {isDesktop && (
-                <TooltipPrimitive.Provider delayDuration={100}>
-                    <TooltipPrimitive.Root>
-                        <TooltipPrimitive.Trigger className="hidden sm:block" asChild>
-                            {children}
-                        </TooltipPrimitive.Trigger>
-                        <TooltipPrimitive.Content
-                            sideOffset={4}
-                            side="top"
-                            className="z-30 hidden animate-slide-up-fade items-center overflow-hidden rounded-md border border-default bg-card drop-shadow-lg sm:block"
-                        >
-                            <TooltipPrimitive.Arrow className="fill-current text-white"/>
-                            {typeof content === 'string' ? (
-                                <div className="p-2">
-                                  <span className="block max-w-xs text-center text-xs text-default">
-                                    {content}
-                                  </span>
-                                </div>
-                            ) : (
-                                content
-                            )}
-                            <TooltipPrimitive.Arrow className="fill-current text-white"/>
-                        </TooltipPrimitive.Content>
-                    </TooltipPrimitive.Root>
-                </TooltipPrimitive.Provider>
-            )}
-        </>
+                    <TooltipPrimitive.Arrow className="fill-n-1 dark:fill-n-7"/>
+                </TooltipPrimitive.Content>
+            </TooltipPrimitive.Root>
+        </TooltipPrimitive.Provider>
     )
 }
