@@ -21,9 +21,13 @@ export default function ResourceSwitcher() {
     // sound refs
     const [initialSound] = useSound('/sounds/switcher.ogg')
     const [switchedSound] = useSound('/sounds/switched.ogg')
-    const [cancelSound] = useSound('/sounds/switchcancel.ogg')
+    const [cancelSound] = useSound('/sounds/switch-hover-s.ogg', {
+        volume: 0.35,
+        playbackRate: .25,
+    })
     const [hoverSound] = useSound('/sounds/switch-hover-s.ogg', {
         volume: 0.25,
+        playbackRate: .5,
         interrupt: true,
     })
     const [heavyHoverSound] = useSound('/sounds/switch-hover-s.ogg', {
@@ -34,7 +38,9 @@ export default function ResourceSwitcher() {
     const {currentResource, setCurrentResource} = useResourceStore()
 
     const {resourceDefault, loading, setLoading} = useResourceUIStore()
-    const {ref, isComponentVisible, setIsComponentVisible} = useComponentVisible()
+    const {ref, isComponentVisible, setIsComponentVisible} = useComponentVisible({
+        soundOnClose: cancelSound
+    })
     // fuck you nextjs
     const [domReady, setDomReady] = useState(false)
 
