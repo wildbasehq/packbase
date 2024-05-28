@@ -1,12 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import 'snapper/crawl';
 
 @import 'to-org';
 @import 'nextgen2/main';
 @import 'unicorn/texture';
-@import 'snapper/deluxe-shimmer';
+@import 'nextgen2/snapper-engine/deluxe-shimmer';
 
 @layer base {
   :root {

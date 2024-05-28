@@ -143,6 +143,9 @@ module.exports = {
                 hue: "hue 1s ease-out",
                 // Shimmer
                 shimmer: "shimmer 1s ease-out infinite",
+                "shimmer-fast": "shimmer 0.5s ease-in-out infinite",
+                "pulse-inverse": "pulse-inverse 0.2s ease-out",
+                shake: "shake 50ms",
                 // Fade up and down
                 "fade-up": "fade-up 0.5s",
                 "fade-down": "fade-down 0.5s",
@@ -165,6 +168,22 @@ module.exports = {
                     '100%': {
                         transform: 'translateX(100%)',
                     },
+                },
+                'pulse-inverse': {
+                    '0%, 100%': {
+                        opacity: 1,
+                    },
+                    '50%': {
+                        opacity: 0.5,
+                    },
+                },
+                // horizontal quick
+                shake: {
+                    '0%': {transform: 'translateX(0)'},
+                    '25%': {transform: 'translateX(5px)'},
+                    '50%': {transform: 'translateX(-5px)'},
+                    '75%': {transform: 'translateX(5px)'},
+                    '100%': {transform: 'translateX(0)'},
                 },
                 // Fade up and down
                 "fade-up": {

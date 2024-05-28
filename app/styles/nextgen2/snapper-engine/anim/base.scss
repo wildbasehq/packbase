@@ -1,4 +1,4 @@
-$anim-cubic-bezier: 0.25s cubic-bezier(0,1.25,0,1);
+$anim-cubic-bezier: 0.25s cubic-bezier(0, 1.25, 0, 1);
 
 @import "crawl-text";
 @import "groupcreationanimation";
@@ -23,10 +23,10 @@ $anim-cubic-bezier: 0.25s cubic-bezier(0,1.25,0,1);
 }
 
 .snapanim-shake {
-  animation: shake infinite 100ms;
+  animation: snapShake infinite 100ms;
 }
 
-@keyframes shake {
+@keyframes snapShake {
   0% {
     transform: translateX(0);
   }

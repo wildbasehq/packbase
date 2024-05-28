@@ -20,11 +20,11 @@ export default function ResourceSwitcher() {
     const [initialSound] = useSound('/sounds/switcher.ogg')
     const [switchedSound] = useSound('/sounds/switched.ogg')
     const [cancelSound] = useSound('/sounds/switchcancel.ogg')
-    const [hoverSound] = useSound('/sounds/switch-hover-s.ogg', {
+    const [hoverSound] = useSound('/sounds/switch-hover.ogg', {
         volume: 0.25,
         interrupt: true,
     })
-    const [heavyHoverSound] = useSound('/sounds/switch-hover.ogg', {
+    const [heavyHoverSound] = useSound('/sounds/switch-hover-s.ogg', {
         playbackRate: .3,
     })
     const [failedSound] = useSound('/sounds/switch-failed.ogg')
@@ -35,7 +35,6 @@ export default function ResourceSwitcher() {
     const {ref, isComponentVisible, setIsComponentVisible} = useComponentVisible()
     // fuck you nextjs
     const [domReady, setDomReady] = useState(false)
-    const [animationPlaying, setAnimationPlaying] = useState(false)
 
     const [availableResources, setAvailableResources] = useState<{
         id: string | number;
@@ -75,11 +74,8 @@ export default function ResourceSwitcher() {
         setCurrentResource(resource)
 
         if (ref.current) {
-            setAnimationPlaying(true)
-            ref.current?.classList.add('before:animate-shimmer-fast')
             if (resource.standalone) {
                 setLoading(false)
-                setAnimationPlaying(false)
                 // playSound(heavyHoverSound)
                 return
             }
@@ -97,7 +93,6 @@ export default function ResourceSwitcher() {
                     }
 
                     setLoading(false)
-                    setAnimationPlaying(false)
                 }).catch(() => {
                     toast.error('The resource is experiencing an outage.', {
                         description: `"${resource!.name}" is not available. You have been switched back to the Universe.`,
@@ -105,7 +100,6 @@ export default function ResourceSwitcher() {
                     setCurrentResource(resourceDefault)
                     playSound(failedSound)
                     setLoading(false)
-                    setAnimationPlaying(false)
                     setAvailableResources((prev) => {
                         return prev.map((res) => {
                             if (res.id === resource.id) {
@@ -115,7 +109,7 @@ export default function ResourceSwitcher() {
                         })
                     })
                 })
-            }, 3000)
+            }, 10000)
         }
     }
 
@@ -138,24 +132,21 @@ export default function ResourceSwitcher() {
         <>
             {domReady ? (
                 <div ref={ref}
-                     className={`group flex flex-row items-center justify-between w-full cursor-pointer shimmer-template select-none before:animate-shimmer-fast ${loading ? 'cursor-no-drop' : ''}`}
+                     className={`group flex flex-row items-center justify-between cursor-pointer select-none ${loading ? '!cursor-no-drop' : ''}`}
                      aria-label="Switch resource"
                      title={loading ? 'Resource is still switching...' : 'Switch resource'}
-                     onAnimationIteration={() => {
-                         ref.current?.classList.remove('animate-pulse-inverse')
-                         if (!animationPlaying) {
-                             setLoading(false)
-                             ref.current?.classList.remove('before:animate-shimmer-fast', 'cursor-disabled')
-                         }
-                     }}
                      onClick={() => {
                          if (loading) {
-                             ref.current?.classList.add('animate-pulse-inverse')
+                             ref.current?.classList.add('[&>*>*]:animate-shake')
                              return playSound(heavyHoverSound)
                          }
                          if (!isComponentVisible) playSound(initialSound)
                          setIsComponentVisible(!isComponentVisible)
-                     }}>
+                     }}
+                     onAnimationEnd={() => {
+                         ref.current?.classList.remove('[&>*>*]:animate-shake')
+                     }}
+                >
                     <span className="relative flex z-10 w-full justify-between items-center">
                         {!currentResource || currentResource.standalone ? (
                             <div className="flex h-10 items-center space-x-2">
@@ -177,7 +168,7 @@ export default function ResourceSwitcher() {
                     {/* switcher */}
                     <div>
                         <div
-                            className={`absolute top-0 left-0 ${isComponentVisible ? 'h-screen' : 'h-full opacity-0 group-hover:opacity-100'} transition-all bg-white border-b w-full rounded rounded-tr-none rounded-tl-none shadow-sm pt-[64px] dark:bg-n-7`}>
+                            className={`absolute top-0 left-0 ${isComponentVisible ? 'h-screen' : 'h-full opacity-0 group-hover:opacity-100'} transition-all bg-white w-full shadow-sm pt-[64px] dark:bg-n-7`}>
                             {isComponentVisible && (
                                 <div
                                     className="h-full switcher-list-stagger overflow-y-auto overflow-x-visible">
@@ -202,7 +193,7 @@ export default function ResourceSwitcher() {
                                                                 <UserAvatar key={i}
                                                                             name={Math.random().toString(36).substring(7)}
                                                                             size={40}
-                                                                            className="inline-flex rounded overflow-hidden border"
+                                                                            className="inline-flex rounded-md overflow-hidden border"
                                                                             style={{
                                                                                 rotate: `${Math.floor(Math.random() * 10) - 5}deg`,
                                                                             }}/>
