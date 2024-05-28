@@ -25,25 +25,30 @@ export default function Preload({children}: {
         setServiceLoading('auth')
         // @ts-ignore
         supabase.auth.getUser().then(async ({data: {user}}) => {
-            if (user && user.identities) {
-                const {data: {session}} = await supabase.auth.getSession()
-                if (!session) {
-                    setUser(null)
-                    if (window.location.pathname !== '/id/login') {
-                        window.location.href = '/id/login'
-                    } else {
-                        proceed()
-                    }
-                    return
-                }
+            console.log({user})
+            if (user) {
+                if (user.user_metadata.waitlistType !== 'free') {
+                    // Assume they're in the waitlist
+                    setUser({
+                        id: user.id,
+                        username: user.email,
+                        displayName: user.email,
+                        waitlistType: user.user_metadata.waitlistType
+                    })
+                } else {
+                    const userProfile = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single()
+                    console.log(userProfile)
 
-                setUser({
-                    id: user.id,
-                    avatar: user.identities[0].identity_data?.avatar_url,
-                    username: user.identities[0].identity_data?.full_name || user.identities[0].identity_data?.name.split('#')[0],
-                    nickname: user.identities[0].identity_data?.custom_claims?.global_name,
-                    // guilds: userGuilds,
-                })
+                    setUser({
+                        id: user.id,
+                        username: user.email,
+                        displayName: user.email
+                    })
+                }
             }
             proceed()
         })

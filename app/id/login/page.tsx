@@ -1,21 +1,45 @@
+'use client'
 import UserInfoCol from '@/components/shared/user/info-col'
 import Link from 'next/link'
 import cx from 'classnames'
-import {buttonVariants} from '@/components/shared/ui/button'
+import {Button, buttonVariants} from '@/components/shared/ui/button'
 import {Heading, Text} from '@/components/shared/text'
 import {ProjectName} from '@/lib/utils'
 import {Input} from '@/components/shared/input/text'
 import LoginGradient from '@/app/id/login/client/gradient'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import {MailQuestion} from 'lucide-react'
+import {createClient} from '@/lib/supabase/client'
+import {FormEvent, useState} from 'react'
+import {LoadingCircle} from '@/components/shared/icons'
 
 export default function IDLogin({searchParams}: {
     searchParams: { error_description: string; error: string; };
 }) {
+    const [submitting, setSubmitting] = useState(false)
     switch (searchParams?.error_description) {
         case 'The resource owner or authorization server denied the request': {
             searchParams.error_description = 'Login cancelled'
         }
+    }
+
+    const createUser = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        if (submitting) return
+        setSubmitting(true)
+
+        const formData = new FormData(event.currentTarget)
+        const user = {
+            email: formData.get('register-email')?.toString() || '',
+            password: formData.get('register-password')?.toString() || ''
+        }
+        const supabase = createClient()
+        supabase.auth.signUp(user).then(r => {
+            console.log(r)
+            if (r.error) {
+                window.location.href = `/id/login?error=Serverland Error&error_description=${r.error.toString()}`
+            }
+        })
     }
 
     return (
@@ -69,6 +93,17 @@ export default function IDLogin({searchParams}: {
                                         </h1>
                                     </div>
 
+                                    {searchParams?.error_description && (
+                                        <Alert variant="destructive">
+                                            <AlertTitle>
+                                                {searchParams.error}
+                                            </AlertTitle>
+                                            <AlertDescription>
+                                                {searchParams.error_description}
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+
                                     <Alert>
                                         <AlertTitle>
                                             <MailQuestion className="inline-flex h-5 w-5"/> You'll need an invite code
@@ -82,16 +117,22 @@ export default function IDLogin({searchParams}: {
                                         </AlertDescription>
                                     </Alert>
 
-                                    <form className="space-y-1">
+                                    <form className="space-y-1" onSubmit={createUser}>
                                         <div>
                                             <Input id="register-email" label="E-Mail" type="email"/>
                                         </div>
                                         <div>
-                                            <Input id="register-pass" label="Password" type="password"/>
+                                            <Input id="register-password" label="Password" type="password"/>
                                         </div>
                                         <div>
-                                            <Input id="register-pass-conf" label="Confirm Password" type="password"/>
+                                            <Input id="register-password-conf" label="Confirm Password"
+                                                   type="password"/>
                                         </div>
+                                        <Button type="submit" variant={!submitting ? 'default' : 'ghost'}>
+                                            {!submitting ? 'Register' : (
+                                                <LoadingCircle className="h-5 w-5"/>
+                                            )}
+                                        </Button>
                                     </form>
 
                                     <p className="px-8 text-center text-sm text-muted-foreground">

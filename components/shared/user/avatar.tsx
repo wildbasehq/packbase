@@ -28,7 +28,7 @@ export default function UserAvatar({user, size = 'lg', avatar, ...props}: {
         return (
             <div
                 className={clsx(props.className, `inline-flex justify-center rounded items-center bg-n-5 text-white overflow-hidden`)}
-                style={props.style} title={`${props.name}'s avatar`}>
+                style={props.style} title={`${props.displayName}'s avatar`}>
                 <BoringAvatar variant="beam" square size={typeof size === 'number' ? size : sizes[size]} {...props} />
             </div>
         )
@@ -37,7 +37,7 @@ export default function UserAvatar({user, size = 'lg', avatar, ...props}: {
             <img width={1024}
                  height={1024}
                  src={user?.avatar || avatar}
-                 alt={`${user?.username || props.name}'s avatar`}
+                 alt={`${user?.username || props.displayName}'s avatar`}
                  {...props}
                  className={clsx(props.className, `inline-flex justify-center rounded items-center bg-n-5 text-white overflow-hidden`)}
             />

@@ -77,7 +77,121 @@
   * {
     @apply border-default;
   }
+
   body {
     //@apply bg-background text-foreground;
+  }
+}
+
+#snap-UniverseEntryTest {
+  transform: translateY(100%);
+  animation: slideUpUniverse 400ms cubic-bezier(0.32, 0.72, 0, 1);
+  animation-fill-mode: forwards;
+  animation-delay: 5s;
+}
+
+#NGContentArea.EntryTest {
+  animation: slideUpUniverseBody 400ms cubic-bezier(0.32, 0.72, 0, 1);
+  animation-fill-mode: forwards;
+  animation-delay: 5s;
+}
+
+.EntryPointTestStage2 {
+  animation: slideUpUniverseStage2 400ms cubic-bezier(0.32, 0.72, 0, 1) !important;
+  animation-fill-mode: forwards !important;
+}
+
+.EntryPointTestStage2Body {
+  animation: slideUpUniverseBodyStage2 400ms cubic-bezier(0.32, 0.72, 0, 1) !important;
+  animation-fill-mode: forwards !important;
+}
+
+.AccordionChevron {
+  color: var(--violet-10);
+  transition: transform 300ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.AccordionTrigger[data-state='open'] > .AccordionChevron {
+  transform: rotate(180deg);
+}
+
+.AccordionContent[data-state='open'] {
+  @apply border-b;
+  animation: slideDown 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.AccordionContent[data-state='closed'] {
+  animation: slideUp 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes slide-up-fade-out {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes slideUpUniverse {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpUniverseStage2 {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(0%);
+    height: 100%;
+  }
+}
+
+@keyframes slideUpUniverseBody {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-5%);
+    filter: blur(0.15rem);
+  }
+}
+
+@keyframes slideUpUniverseBodyStage2 {
+  0% {
+    transform: translateY(-5%);
+  }
+  100% {
+    transform: translateY(-15%);
+    filter: blur(0.5rem);
   }
 }
