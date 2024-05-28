@@ -14,6 +14,7 @@ import {XIcon} from 'lucide-react'
 import Tooltip from '@/components/shared/tooltip'
 import {ExclamationTriangleIcon} from '@heroicons/react/24/solid'
 import {Logo} from '@/components/shared/logo'
+import TextTicker from '@/components/shared/text-ticker'
 
 export default function ResourceSwitcher() {
     // sound refs
@@ -151,7 +152,12 @@ export default function ResourceSwitcher() {
                         {!currentResource || currentResource.standalone ? (
                             <div className="flex h-10 items-center space-x-2">
                                 <Logo className="w-8"/>
-                                <Text className="font-bold">{currentResource.name}</Text>
+                                <Text className="font-bold">
+                                    <TextTicker texts={[
+                                        currentResource.name,
+                                        '3 unreads'
+                                    ]} interval={5000}/>
+                                </Text>
                             </div>
                         ) : (
                             <Resource name={currentResource.name} id={currentResource.id} icon={currentResource.icon}/>
