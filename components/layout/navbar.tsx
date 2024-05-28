@@ -18,10 +18,10 @@ export default function NavBar() {
     return (
         <>
             <div
-                className={`flex sticky top-0 z-30 h-16 bg-sidebar shadow-sm border-0 border-b border-default border-solid`}>
+                className="flex sticky top-0 z-30 h-16 bg-sidebar shadow-sm border-0 border-b border-default border-solid">
                 <nav
                     aria-label="Sections"
-                    className="hidden lg:flex lg:flex-col h-16 text-default">
+                    className="hidden lg:flex lg:flex-col h-16">
                     <div
                         className={`relative flex items-center w-96 h-full py-2 px-5 border-r border-default shimmer-template ${loading ? 'before:animate-shimmer-fast overflow-hidden' : ''}`}>
                         <div className="w-full">
