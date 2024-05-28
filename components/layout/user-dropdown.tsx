@@ -8,6 +8,7 @@ import LogoutIcon from '@/components/shared/icons/logout'
 import UserAvatar from '@/components/shared/user/avatar'
 import Link from 'next/link'
 import {useRouter} from 'next/navigation'
+import {createClient} from '@/lib/supabase/client'
 
 export default function UserDropdown() {
     const {user, setUser} = useUserAccountStore()
@@ -26,10 +27,13 @@ export default function UserDropdown() {
             icon: LogoutIcon,
             className: 'group-hover:text-accent-1 group-hover:fill-accent-1',
             onClick: () => {
-                // destroy session
-                window.localStorage.removeItem('token')
-                window.localStorage.removeItem('user-account')
-                window.location.reload()
+                const supabase = createClient()
+                supabase.auth.signOut().then(() => {
+                    // clean session
+                    window.localStorage.removeItem('token')
+                    window.localStorage.removeItem('user-account')
+                    window.location.reload()
+                })
             },
         }
     ]
