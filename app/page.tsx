@@ -30,7 +30,7 @@ export default function Home() {
 
     return (
         <>
-            <Body>
+            <Body className="max-w-6xl">
                 {!user && <GuestLanding/>}
                 {notice && (
                     <div className="space-y-4 my-11 px-4 sm:px-6 lg:px-8">
