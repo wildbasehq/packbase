@@ -36,10 +36,10 @@ export default function WaitlistCheck() {
     }, [])
 
     const CurrentServiceIcon = ServiceStates[serviceStatus].icon
-    if (!user) return
+    if (!user) return (<></>)
     return (
         <div
-            className={`relative shadow-inner flex flex-col items-start justify-between gap-x-8 gap-y-4 border-b bg-sidebar px-4 py-4 sm:flex-row sm:items-center sm:px-6 lg:px-8 ${serviceStatus === 'dummy' && 'before:animate-[shimmer_1s_linear_infinite] shimmer-template'}`}>
+            className={`relative shadow-sm flex flex-col items-start justify-between gap-x-8 gap-y-4 border-b bg-sidebar px-4 py-4 sm:flex-row sm:items-center sm:px-6 lg:px-8 ${serviceStatus === 'dummy' && 'before:animate-[shimmer_1s_linear_infinite] shimmer-template'}`}>
             <div>
                 <div className="flex items-center gap-x-3">
                     <CurrentServiceIcon className="flex-none w-7 h-7 rounded-md p-1"/>
