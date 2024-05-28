@@ -6,7 +6,7 @@ import {Button, buttonVariants} from '@/components/shared/ui/button'
 import {Heading, Text} from '@/components/shared/text'
 import {ProjectName} from '@/lib/utils'
 import {Input} from '@/components/shared/input/text'
-import LoginGradient from '@/app/id/login/client/gradient'
+import LoginGradient from '@/app/id/create/client/gradient'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import {MailQuestion} from 'lucide-react'
 import {createClient} from '@/lib/supabase/client'
@@ -37,7 +37,7 @@ export default function IDLogin({searchParams}: {
         supabase.auth.signUp(user).then(r => {
             console.log(r)
             if (r.error) {
-                window.location.href = `/id/login?error=Serverland Error&error_description=${r.error.toString()}`
+                window.location.href = `/id/create?error=Serverland Error&error_description=${r.error.toString()}`
             }
         })
     }

@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import {Button} from '@/components/shared/ui/button'
 import {ScanFaceIcon} from 'lucide-react'
-import {useState} from 'react'
 import {ThemeToggle} from '@/components/shared/theme-toggle'
 import {Search} from '@/components/layout/search'
 import UserDropdown from '@/components/layout/user-dropdown'
@@ -15,7 +14,6 @@ import ResourceSwitcher from '@/components/layout/resource-switcher'
 export default function NavBar() {
     const {user} = useUserAccountStore()
     const {loading} = useResourceUIStore()
-    const [navigation, setNavigation] = useState<any[]>([])
 
     return (
         <>
@@ -62,7 +60,7 @@ export default function NavBar() {
 
                                 {!user && (
                                     <>
-                                        <Link href="/id/login">
+                                        <Link href="/id/create">
                                             <Button variant="ghost" size="self" className="flex h-6 w-6">
                                                 <ScanFaceIcon className="h-4 w-4"/>
                                             </Button>
