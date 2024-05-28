@@ -33,7 +33,7 @@ export default function Preload({children}: {
                         id: user.id,
                         username: user.email,
                         displayName: user.email,
-                        waitlistType: user.user_metadata.waitlistType
+                        waitlistType: user.user_metadata.waitlistType || 'wait'
                     })
                 } else {
                     const userProfile = await supabase
