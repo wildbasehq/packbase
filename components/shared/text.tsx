@@ -29,7 +29,7 @@ export function Text({children, size = 'base', ...props}: {
     [key: string]: any;
 }): JSX.Element {
     return (
-        <p className={`${textSize[size]} text-sm [&_p]:leading-relaxed`} {...props}>
+        <p className={`${textSize[size]} [&_p]:leading-relaxed`} {...props}>
             {children}
         </p>
     )
