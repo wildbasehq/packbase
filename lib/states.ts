@@ -1,5 +1,6 @@
 import {create} from 'zustand'
 import {persist} from 'zustand/middleware'
+import {ProjectName} from '@/lib/utils'
 
 interface UIStore {
     feedView: number;
@@ -63,7 +64,7 @@ interface ResourceStore {
 
 const resourceDefault = {
     id: 'p1',
-    name: 'Wolfbite Project 1',
+    name: ProjectName,
     icon: '/logo.png',
     standalone: true,
 }
