@@ -1,5 +1,6 @@
 'use client'
 
+import './resource-switcher.component.scss'
 import {Heading, Text} from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 import useComponentVisible from '@/lib/hooks/use-component-visible'
@@ -21,7 +22,7 @@ export default function ResourceSwitcher() {
     const [initialSound] = useSound('/sounds/switcher.ogg')
     const [switchedSound] = useSound('/sounds/switched.ogg')
     const [cancelSound] = useSound('/sounds/switchcancel.ogg')
-    const [hoverSound] = useSound('/sounds/switch-hover.ogg', {
+    const [hoverSound] = useSound('/sounds/switch-hover-s.ogg', {
         volume: 0.25,
         interrupt: true,
     })
@@ -174,7 +175,7 @@ export default function ResourceSwitcher() {
                     {/* switcher */}
                     <div>
                         <div
-                            className={`absolute top-0 left-0 ${isComponentVisible ? 'h-screen' : 'h-full opacity-0 group-hover:opacity-100'} transition-all bg-card/90 w-full shadow-sm pt-[64px]`}>
+                            className={`absolute top-0 left-0 ${isComponentVisible ? 'h-screen' : 'opacity-0 h-full group-hover:opacity-100'} transition-switcher bg-card/90 w-full shadow-sm pt-[64px]`}>
                             {isComponentVisible && (
                                 <div
                                     className="h-full switcher-list-stagger overflow-y-auto overflow-x-visible">

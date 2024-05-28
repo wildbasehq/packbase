@@ -65,7 +65,7 @@ a:not(.no-style) {
 
     @for $x from 0 through $n {
       &:nth-child(#{$x}) {
-        animation-delay: 15ms * ($x - 1) !important;
+        animation-delay: 25ms * ($x - 1) !important;
       }
     }
   }
