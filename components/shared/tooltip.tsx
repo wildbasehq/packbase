@@ -8,6 +8,14 @@ export default function Tooltip({children, content, side}: {
     content: ReactNode | string;
     side?: 'top' | 'bottom' | 'left' | 'right';
 }) {
+    if (content === null) {
+        return (
+            <>
+                {children}
+            </>
+        )
+    }
+
     return (
         <TooltipPrimitive.Provider delayDuration={100}>
             <TooltipPrimitive.Root>
