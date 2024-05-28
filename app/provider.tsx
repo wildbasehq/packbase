@@ -18,13 +18,16 @@ export function Providers({children}: { children: React.ReactNode }) {
     return (
         <PostHogProvider client={posthog}>
             <ThemeProvider attribute="class">
-                <Toaster className="dark:hidden"/>
-                <Toaster theme="dark" toastOptions={{
-                    style: {
-                        background: colors.neutral['800'],
-                        color: '#FFF'
-                    }
-                }}/>
+                <Toaster className="dark:hidden" position="top-center"/>
+                <Toaster className="hidden dark:block"
+                         theme="dark"
+                         position="top-center"
+                         toastOptions={{
+                             style: {
+                                 background: colors.neutral['800'],
+                                 color: '#FFF'
+                             }
+                         }}/>
                 <ModalProvider>{children}</ModalProvider>
             </ThemeProvider>
         </PostHogProvider>
