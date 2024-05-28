@@ -193,7 +193,7 @@ export default function ResourceSwitcher() {
                                                                 <UserAvatar key={i}
                                                                             name={Math.random().toString(36).substring(7)}
                                                                             size={40}
-                                                                            className="inline-flex rounded-md overflow-hidden border"
+                                                                            className="inline-flex overflow-hidden border"
                                                                             style={{
                                                                                 rotate: `${Math.floor(Math.random() * 10) - 5}deg`,
                                                                             }}/>
@@ -251,12 +251,12 @@ export default function ResourceSwitcher() {
                                                                             whiteSpace: 'pre-line',
                                                                             width: '14.75rem'
                                                                         }}>
-                                                                            <Text className="font-bold">Possibly
-                                                                                Unavailable</Text>
+                                                                            <Heading className="font-bold">
+                                                                                Possibly Unavailable
+                                                                            </Heading>
                                                                             <Text className="text-alt">
                                                                                 It&apos;s experiencing an outage, or may
-                                                                                no
-                                                                                longer exist.
+                                                                                no longer exist.
                                                                             </Text>
                                                                         </div>} side="left">
                                                                         <ExclamationTriangleIcon
@@ -297,7 +297,7 @@ function Resource({name, id, icon}: {
     return (
         <span className="flex min-w-0 items-center justify-between space-x-3">
             <UserAvatar name={name} size={40} avatar={icon}
-                        className="inline-flex h-10 w-10 rounded overflow-hidden"/>
+                        className="inline-flex h-10 w-10 overflow-hidden"/>
             <span className="flex-1 flex flex-col min-w-0">
                 <span className="truncate">{name}</span>
                 <span className="text-alt truncate">{id}</span>
