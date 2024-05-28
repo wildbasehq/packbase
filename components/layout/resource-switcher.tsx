@@ -168,7 +168,7 @@ export default function ResourceSwitcher() {
                     {/* switcher */}
                     <div>
                         <div
-                            className={`absolute top-0 left-0 ${isComponentVisible ? 'h-screen' : 'h-full opacity-0 group-hover:opacity-100'} transition-all bg-white w-full shadow-sm pt-[64px] dark:bg-n-7`}>
+                            className={`absolute top-0 left-0 ${isComponentVisible ? 'h-screen' : 'h-full opacity-0 group-hover:opacity-100'} transition-all bg-card/90 w-full shadow-sm pt-[64px]`}>
                             {isComponentVisible && (
                                 <div
                                     className="h-full switcher-list-stagger overflow-y-auto overflow-x-visible">

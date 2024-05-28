@@ -6,6 +6,10 @@
   @apply bg-gradient-to-b from-white to-n-1 dark:from-n-6 dark:to-n-7;
 }
 
+.bg-card\/90 {
+  @apply bg-gradient-to-b from-white/90 to-n-1/90 dark:from-n-6/90 dark:to-n-7/90;
+}
+
 .bg-card-solid {
   @apply bg-white dark:bg-n-7;
 }
