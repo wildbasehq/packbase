@@ -13,7 +13,7 @@ import {createClient} from '@/lib/supabase/client'
 import {FormEvent, useState} from 'react'
 import {LoadingCircle} from '@/components/shared/icons'
 
-export default function IDLogin({searchParams}: {
+export default function IDCreate({searchParams}: {
     searchParams: { error_description: string; error: string; };
 }) {
     const [submitting, setSubmitting] = useState(false)
