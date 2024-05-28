@@ -1,3 +1,5 @@
+import {cn} from '@/lib/utils'
+
 const textSize = {
     xs: 'text-xs',
     sm: 'text-sm',
@@ -15,7 +17,7 @@ export function Heading({as, children, size = 'base', ...props}: {
     [key: string]: any;
 }): JSX.Element {
     const Comp = as || 'h1'
-    props.className = `${props.className || ''} ${textSize[size]} font-medium leading-none tracking-tight`
+    props.className = cn(props.className, textSize[size], 'font-medium leading-none tracking-tight')
     return (
         <Comp {...props}>
             {children}
@@ -23,13 +25,15 @@ export function Heading({as, children, size = 'base', ...props}: {
     )
 }
 
-export function Text({children, size = 'base', ...props}: {
+export function Text({children, size = 'sm', ...props}: {
     children: React.ReactNode;
     size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl';
     [key: string]: any;
 }): JSX.Element {
+    props.className = cn(props.className, textSize[size], '[&_p]:leading-relaxed')
+
     return (
-        <p className={`${textSize[size]} [&_p]:leading-relaxed`} {...props}>
+        <p {...props}>
             {children}
         </p>
     )
