@@ -11,11 +11,25 @@ import {useResourceStore, useResourceUIStore} from '@/lib/states'
 import {Key, useEffect, useState} from 'react'
 import {ExpandingArrow, LoadingCircle} from '@/components/shared/icons'
 import {fetcher} from '@/lib/utils'
-import {XIcon} from 'lucide-react'
+import {MousePointerClickIcon, XIcon} from 'lucide-react'
 import Tooltip from '@/components/shared/tooltip'
-import {ExclamationTriangleIcon} from '@heroicons/react/24/solid'
+import {ExclamationTriangleIcon, HomeIcon, UsersIcon} from '@heroicons/react/24/solid'
 import {Logo} from '@/components/shared/logo'
 import TextTicker from '@/components/shared/text-ticker'
+import Link from 'next/link'
+
+const globalNavItems = [
+    {
+        icon: HomeIcon,
+        name: 'Resource Home',
+        href: '/',
+    },
+    {
+        icon: UsersIcon,
+        name: 'Members',
+        href: '/members',
+    },
+]
 
 export default function ResourceSwitcher() {
     // sound refs
@@ -143,19 +157,25 @@ export default function ResourceSwitcher() {
                      className={`group flex flex-row items-center justify-between cursor-pointer select-none ${loading ? '!cursor-no-drop' : ''}`}
                      aria-label="Switch resource"
                      title={loading ? 'Resource is still switching...' : 'Switch resource'}
-                     onClick={() => {
-                         if (loading) {
-                             ref.current?.classList.add('[&>*>*]:animate-shake')
-                             return playSound(heavyHoverSound)
-                         }
-                         if (!isComponentVisible) playSound(initialSound)
-                         setIsComponentVisible(!isComponentVisible)
-                     }}
                      onAnimationEnd={() => {
                          ref.current?.classList.remove('[&>*>*]:animate-shake')
                      }}
+                     onMouseEnter={() => {
+                         if (!isComponentVisible) playSound(hoverSound)
+                     }}
+                     onMouseLeave={() => {
+                         if (!isComponentVisible) playSound(cancelSound)
+                     }}
                 >
-                    <span className="relative flex z-10 w-full justify-between items-center">
+                    <span className="relative flex z-10 w-full justify-between items-center"
+                          onClick={() => {
+                              if (loading) {
+                                  ref.current?.classList.add('[&>*>*]:animate-shake')
+                                  return playSound(heavyHoverSound)
+                              }
+                              if (!isComponentVisible) playSound(initialSound)
+                              setIsComponentVisible(!isComponentVisible)
+                          }}>
                         {!currentResource || currentResource.standalone ? (
                             <div className="flex h-10 items-center space-x-2">
                                 <Logo className="w-8"/>
@@ -181,7 +201,29 @@ export default function ResourceSwitcher() {
                     {/* switcher */}
                     <div>
                         <div
-                            className={`absolute top-0 left-0 ${isComponentVisible ? 'h-screen' : 'opacity-0 h-full group-hover:opacity-100'} transition-switcher bg-card/90 w-full shadow-sm pt-[64px]`}>
+                            className={`absolute top-0 left-0 ${isComponentVisible ? 'h-screen' : 'opacity-0 h-full group-hover:opacity-100 group-hover:h-36'} transition-switcher bg-card/90 w-full shadow-sm pt-[64px]`}>
+                            {!isComponentVisible && (
+                                <div
+                                    className="hidden group-hover:flex flex-col justify-center items-center px-4 gap-4">
+                                    <div className="flex gap-4">
+                                        {globalNavItems.map(item => (
+                                            <Link href={item.href}>
+                                                <Tooltip content={item.name} side="bottom">
+                                                    <item.icon
+                                                        className="inline-flex h-8 w-8 text-default overflow-hidden"/>
+                                                </Tooltip>
+                                            </Link>
+                                        ))}
+                                    </div>
+
+                                    <Text size="xs" className="text-alt">
+                                        <MousePointerClickIcon
+                                            className="inline-flex align-middle h-4 w-4 -mt-[3px] mr-1"/>
+                                        Change resource
+                                    </Text>
+                                </div>
+                            )}
+
                             {isComponentVisible && (
                                 <div
                                     className="h-full switcher-list-stagger overflow-y-auto overflow-x-visible">
@@ -305,12 +347,11 @@ export default function ResourceSwitcher() {
 function Resource({name, id, icon}: {
     name: string;
     id: string | number;
-    icon?: string;
+    icon: any;
 }) {
     return (
         <span className="flex min-w-0 items-center justify-between space-x-3">
-            <UserAvatar name={name} size={40} avatar={icon}
-                        className="inline-flex h-10 w-10 overflow-hidden"/>
+            <UserAvatar name={name} size={40} avatar={icon} className="inline-flex h-10 w-10 overflow-hidden"/>
             <div className="flex-1 flex flex-col min-w-0">
                 <Text>
                     {name}
