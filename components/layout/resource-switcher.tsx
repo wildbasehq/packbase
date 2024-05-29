@@ -206,8 +206,8 @@ export default function ResourceSwitcher() {
                                 <div
                                     className="hidden group-hover:flex flex-col justify-center items-center px-4 gap-4">
                                     <div className="flex gap-4">
-                                        {globalNavItems.map(item => (
-                                            <Link href={item.href}>
+                                        {globalNavItems.map((item, i) => (
+                                            <Link href={item.href} key={i}>
                                                 <Tooltip content={item.name} side="bottom">
                                                     <item.icon
                                                         className="inline-flex h-8 w-8 text-default overflow-hidden"/>
