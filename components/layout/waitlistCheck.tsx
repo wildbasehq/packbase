@@ -1,22 +1,33 @@
 'use client'
 import {useUserAccountStore} from '@/lib/states'
 import {useEffect, useState} from 'react'
-import {HandHeartIcon, ShieldAlertIcon} from 'lucide-react'
+import {HandHeartIcon, LucideIcon, MailQuestionIcon, MailWarningIcon} from 'lucide-react'
 import {LoadingCircle} from '@/components/shared/icons'
+import {cn} from '@/lib/utils'
 
-const ServiceStates = {
+const ServiceStates: {
+    [x: string]: {
+        icon: typeof LoadingCircle | LucideIcon,
+        color?: string
+        status: string
+        text: string
+    }
+} = {
     free: {
         icon: HandHeartIcon,
+        color: 'text-green-500',
         status: 'Welcome!',
-        text: 'If you\'re reading this, congrats~! Someone gifted you an invite code!'
+        text: 'Someone gifted you an invite code! Complete the steps in home to get started~'
     },
     ban: {
-        icon: ShieldAlertIcon,
+        icon: MailWarningIcon,
+        color: 'text-red-500',
         status: 'Invite Revoked',
         text: 'Your invite was revoked as you violated our guidelines.'
     },
     wait: {
-        icon: LoadingCircle,
+        icon: MailQuestionIcon,
+        color: 'text-orange-500',
         status: 'Waiting',
         text: 'You\'re on the waitlist. You\'ll need an invite code from someone, or wait for us to open.'
     },
@@ -42,7 +53,8 @@ export default function WaitlistCheck() {
             className={`relative shadow-sm flex flex-col items-start justify-between gap-x-8 gap-y-4 border-b bg-sidebar px-4 py-4 sm:flex-row sm:items-center sm:px-6 lg:px-8 ${serviceStatus === 'dummy' && 'before:animate-[shimmer_1s_linear_infinite] shimmer-template'}`}>
             <div>
                 <div className="flex items-center gap-x-3">
-                    <CurrentServiceIcon className="flex-none w-7 h-7 rounded-md p-1"/>
+                    <CurrentServiceIcon
+                        className={cn('flex-none w-7 h-7 rounded-md p-1', ServiceStates[serviceStatus].color || '')}/>
                     <h1 className="flex gap-x-3 text-base leading-7">
                         <span className="font-semibold text-default">Status</span>
                         <span className="text-default-alt">:</span>
