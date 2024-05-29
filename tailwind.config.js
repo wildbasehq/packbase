@@ -137,6 +137,9 @@ module.exports = {
                 // sm: "calc(var(--radius) - 4px)",
                 DEFAULT: '0.75rem',
             },
+            aspectRatio: {
+                'banner': '3 / 1',
+            },
             animation: {
                 logoHue: 'logoHue 1s ease-out, logoHue 30s ease-out 1s infinite',
                 // Hue rotate
