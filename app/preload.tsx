@@ -29,11 +29,13 @@ export default function Preload({children}: {
             if (user) {
                 if (user.user_metadata.waitlistType !== 'free') {
                     // Assume they're in the waitlist
+                    const waitlistType = user.user_metadata.waitlistType || 'wait'
                     setUser({
                         id: user.id,
                         username: user.email,
                         displayName: user.email,
-                        waitlistType: user.user_metadata.waitlistType || 'wait'
+                        waitlistType,
+                        anonUser: ['wait', 'ban'].includes(waitlistType)
                     })
                 } else {
                     const userProfile = await supabase
