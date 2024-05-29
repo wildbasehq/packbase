@@ -41,36 +41,38 @@ export function SideNav({...props}: SideNavType) {
             <nav aria-label="Sections"
                  className={`${slimNavClass} hidden md:flex md:flex-col flex-shrink-0 border-r bg-sidebar/90 backdrop-blur-lg overflow-y-auto`}>
                 <div className="flex-1 min-h-0 divide-y divide-default overflow-y-auto no-scrollbar">
-                    <div className="load-stagger">
-                        {navItems.length === 0 && Array.from({length: 20}).map((_, i) => (
-                            <div key={i} className="flex min-h-[4rem] h-fit items-center px-6">
-                                {i === 12 ? (
-                                    <>
-                                        <Image src="/logo/unicorn-1-min.png" width={24} height={22} alt="Loading..."
-                                               className="flex-shrink-0 w-6 rounded-lg"/>
-                                        <div className="ml-3 my-4 text-sm">
-                                            <p className="font-medium text-default dark:text-neutral-50">
-                                                Originally for Yipnyap
-                                            </p>
-                                            <p className="mt-1 text-default dark:text-neutral-500">
-                                                Reduce, Reuse, Recycle, kids.
-                                            </p>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="flex-shrink-0 h-6 w-6 bg-n-5 rounded-lg"/>
-                                        <div className="ml-3 my-4 text-sm" style={{
-                                            // Random between 2 and 18
-                                            width: `${Math.floor(Math.random() * 16) + 2}rem`,
-                                        }}>
-                                            <div className="h-4 bg-card border rounded-lg anim-sidenav-pole-entry"/>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                    {navItems.length === 0 && (
+                        <div className="load-stagger">
+                            {Array.from({length: 20}).map((_, i) => (
+                                <div key={i} className="flex min-h-[4rem] h-fit items-center px-6">
+                                    {i === 12 ? (
+                                        <>
+                                            <Image src="/logo/unicorn-1-min.png" width={24} height={22} alt="Loading..."
+                                                   className="flex-shrink-0 w-6 rounded-lg"/>
+                                            <div className="ml-3 my-4 text-sm">
+                                                <p className="font-medium text-default dark:text-neutral-50">
+                                                    Originally for Yipnyap
+                                                </p>
+                                                <p className="mt-1 text-default dark:text-neutral-500">
+                                                    Reduce, Reuse, Recycle, kids.
+                                                </p>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex-shrink-0 h-6 w-6 bg-n-5 rounded-lg"/>
+                                            <div className="ml-3 my-4 text-sm" style={{
+                                                // Random between 2 and 18
+                                                width: `${Math.floor(Math.random() * 16) + 2}rem`,
+                                            }}>
+                                                <div className="h-4 bg-card border rounded-lg anim-sidenav-pole-entry"/>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {navItems.map((item, i) => (
                         <ActiveLink
