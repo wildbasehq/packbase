@@ -170,7 +170,7 @@ export default function ResourceSwitcher() {
                             <Resource name={currentResource.name} id={currentResource.id} icon={currentResource.icon}/>
                         )}
                         <div
-                            className={`absolute ${isComponentVisible ? 'top-[10px]' : 'top-[18px]'} transition-all right-0`}>
+                            className={`absolute ${isComponentVisible ? 'top-[8px]' : 'top-[18px]'} transition-all right-0`}>
                             <ExpandingArrow
                                 className={`${isComponentVisible ? '!opacity-0' : ''} rotate-90 w-6 h-6 right-0 text-neutral-500 transition-all dark:text-white`}/>
                             <XIcon
