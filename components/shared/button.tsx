@@ -1,8 +1,6 @@
-'use client';
+import {forwardRef, LegacyRef, MouseEventHandler, ReactNode, useEffect, useState} from 'react'
 
-import {ReactNode, forwardRef, LegacyRef, MouseEventHandler, useEffect, useState} from 'react';
-
-interface NGButtonType {
+export declare interface NGButtonType {
     onClick?: MouseEventHandler<HTMLButtonElement>;
     variant?: 'lighter' | 'primary' | 'secondary' | 'tertiary' | 'danger' | 'success' | 'warning' | 'info';
     type?: 'button' | 'submit' | 'reset';
@@ -16,7 +14,7 @@ interface NGButtonType {
 const Button = forwardRef((props: NGButtonType, ref: LegacyRef<HTMLButtonElement> | undefined) => {
     const [variant, setVariant] = useState<any>({
         useSystemText: true,
-    });
+    })
 
     useEffect(() => {
         switch (props.variant) {
@@ -24,12 +22,12 @@ const Button = forwardRef((props: NGButtonType, ref: LegacyRef<HTMLButtonElement
                 setVariant({
                     useSystemText: true,
                     dark: {
-                        bg: 'dark:bg-neutral-700',
+                        bg: 'bg-surface-container-lower',
                         hover: 'dark:hover:bg-neutral-800',
                     },
                 })
 
-                break;
+                break
             }
 
             case 'primary': {
@@ -44,7 +42,7 @@ const Button = forwardRef((props: NGButtonType, ref: LegacyRef<HTMLButtonElement
                     },
                 })
 
-                break;
+                break
             }
 
             case 'danger': {
@@ -59,16 +57,16 @@ const Button = forwardRef((props: NGButtonType, ref: LegacyRef<HTMLButtonElement
                     },
                 })
 
-                break;
+                break
             }
         }
-    }, [props.variant]);
+    }, [props.variant])
 
     return (
         <button
             type={props.type || 'button'}
             disabled={props.disabled || false}
-            className={`${props.className} ${variant.light?.bg || 'bg-white'} ${variant.light?.hover || 'hover:bg-neutral-50'} ${variant.useSystemText ? 'text-default' : 'text-white'} ${variant.dark?.bg || 'dark:bg-neutral-800'} ${variant.dark?.hover || 'dark:hover:bg-neutral-800/75'} w-full inline-flex justify-center rounded-md border border-default px-4 py-2 text-base font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm`}
+            className={`${props.className} ${variant.light?.bg || 'bg-white unicorn:bg-surface-container-lowest'} ${variant.light?.hover || 'hover:bg-neutral-50'} ${variant.useSystemText ? 'text-default' : 'text-white'} ${variant.dark?.bg || 'dark:bg-n-6 unicorn:dark:bg-surface-container-high'} ${variant.dark?.hover || 'dark:hover:bg-surface-variant/75'} w-full inline-flex justify-center rounded-md border px-4 py-2 text-base font-medium shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hover:ring-4 hover:ring-neutral-500/10 sm:w-auto sm:text-sm`}
             onClick={props.onClick || (
                 () => {
                 }
@@ -77,8 +75,8 @@ const Button = forwardRef((props: NGButtonType, ref: LegacyRef<HTMLButtonElement
         >
             {props.children}
         </button>
-    );
-});
+    )
+})
 
-Button.displayName = 'Button';
-export default Button;
+Button.displayName = 'button'
+export default Button
