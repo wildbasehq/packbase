@@ -1,0 +1,25 @@
+{
+  "_rootDir": "pak/badges/",
+  "name": "badges",
+  "config": {
+    "_type": "datatable",
+    "staff": {
+      "_rootDir": "staff/",
+      "default": "1.png",
+      "kingless": "1_1.png"
+    },
+    "bestow_award": {
+      "_rootDir": "bestow_award/",
+      "1": "1.png",
+      "3": "2.png",
+      "5": "3.png",
+      "10": "4.png",
+      "15": "5.png",
+      "20": "6.png",
+      "30": "7.png",
+      "35": "8.png",
+      "40": "9.png",
+      "50": "10.png"
+    }
+  }
+}
