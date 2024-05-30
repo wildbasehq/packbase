@@ -2,7 +2,7 @@
 import {useEffect} from 'react'
 import Body from '@/components/layout/body'
 import {useResourceUIStore, useUserAccountStore} from '@/lib/states'
-import {Cog6ToothIcon, WalletIcon} from '@heroicons/react/24/solid'
+import {Cog6ToothIcon} from '@heroicons/react/24/solid'
 
 export default function Settings({children}: {
     children: React.ReactNode
@@ -15,11 +15,6 @@ export default function Settings({children}: {
             description: '',
             href: '/settings',
             icon: Cog6ToothIcon,
-        }, {
-            name: 'Cards',
-            description: '',
-            href: '/settings/cards',
-            icon: WalletIcon,
         }])
     }, [])
 
