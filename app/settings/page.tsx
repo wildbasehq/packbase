@@ -164,6 +164,7 @@ export default function SettingsGeneral() {
                                 <p className="mt-3 text-sm leading-6 text-default-alt">
                                     Write a few sentences about yourself. <a href="https://commonmark.org/help/"
                                                                              target="_blank"
+                                                                             rel="noopener noreferrer"
                                                                              className="text-primary">Markdown <ArrowUpRightIcon
                                     className="h-4 w-4 inline"/></a> is supported.
                                 </p>
