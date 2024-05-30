@@ -27,28 +27,28 @@ export default function Preload({children}: {
         supabase.auth.getUser().then(async ({data: {user}}) => {
             console.log({user})
             if (user) {
+                const {data, error} = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .limit(1)
+                    .single()
+
                 if (user.user_metadata.waitlistType !== 'free') {
                     // Assume they're in the waitlist
                     const waitlistType = user.user_metadata.waitlistType || 'wait'
                     setUser({
                         id: user.id,
-                        username: user.email,
-                        displayName: user.email,
+                        username: data?.username || user.email,
+                        displayName: data?.displayName || user.email,
                         waitlistType,
                         anonUser: ['wait', 'ban'].includes(waitlistType)
                     })
                 } else {
-                    const userProfile = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', user.id)
-                        .single()
-                    console.log(userProfile)
-
                     setUser({
                         id: user.id,
-                        username: user.email,
-                        displayName: user.email
+                        username: data?.username || user.email,
+                        displayName: data?.displayName || user.email,
                     })
                 }
             }
