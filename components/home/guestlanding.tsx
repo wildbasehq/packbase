@@ -1,4 +1,6 @@
 import CrawlText from '@/components/shared/CrawlText'
+import {Heading, Text} from '@/components/shared/text'
+import {ProjectName} from '@/lib/utils'
 
 export default function GuestLanding() {
     return (
@@ -36,14 +38,28 @@ export default function GuestLanding() {
                             }}
                         >
                             <CrawlText>
-                                a random ass furry site
+                                Hey now, how are you here?
                             </CrawlText>
                             <p className="mt-4 text-lg text-alt">
                                 <CrawlText delay={700} fast>
-                                    :)
+                                    If you're reading this and you're not apart of Wolfbite, someone broke their
+                                    NDA~!
+                                    ::break:
+                                    Or you're an donor. Or friends & family. GAH, whatever man, just don't share this.
                                 </CrawlText>
                             </p>
                         </h2>
+                    </div>
+                    <div className="space-y-2 mt-12">
+                        <Heading size="xl">
+                            While you're here breaking an NDA, how about you read about {ProjectName}, 'eh?
+                        </Heading>
+                        <Text className="text-sm text-default-alt">
+                            C'monnnn, you know wanna~<br/>
+                            <a href="" className="!text-blue-500">
+                                Read the writeup &rarr;
+                            </a>
+                        </Text>
                     </div>
                 </div>
             </div>
