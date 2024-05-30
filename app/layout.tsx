@@ -9,6 +9,7 @@ import {Providers} from '@/app/provider'
 import Preload from '@/app/preload'
 import dynamic from 'next/dynamic'
 import WaitlistCheck from '@/components/layout/waitlistCheck'
+import {Analytics} from '@vercel/analytics/react'
 
 export const metadata = {
     title: 'Project 1',
@@ -90,7 +91,7 @@ export default async function RootLayout({children}: {
 
         {/*<ReportAbuse/>*/}
 
-        {/*<Analytics/>*/}
+        <Analytics/>
         </body>
         </html>
     )
