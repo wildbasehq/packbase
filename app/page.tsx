@@ -6,12 +6,13 @@ import UserAvatar from '@/components/shared/user/avatar'
 import ReactMarkdown from 'react-markdown'
 import {useState} from 'react'
 import {Heading, Text} from '@/components/shared/text'
-import GirlDogImg from '@/public/img/illustrations/girl-dog-rain.gif'
-import Image from 'next/image'
+import girlDogBusStop from '@/datasets/lottie/girl-dog-bus-stop.json'
+import dynamic from 'next/dynamic'
 
 export default function Home() {
     const {user} = useUserAccountStore()
     const [notice, setNotice] = useState<any>(null)
+    const Lottie = dynamic(() => import('lottie-react'), {ssr: false})
 
     // useEffect(() => {
     //     if (!window || !user) return
@@ -82,8 +83,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className="flex items-end justify-end">
-                                <Image src={GirlDogImg} alt="tt"
-                                       className="w-auto right-0"/>
+                                <Lottie className="h-80 w-auto right-0" animationData={girlDogBusStop}/>
                             </div>
                         </div>
                     </>

@@ -1,9 +1,13 @@
 'use client'
+import './waitlist-check.component.scss'
 import {useUserAccountStore} from '@/lib/states'
 import {useEffect, useState} from 'react'
 import {HandHeartIcon, LucideIcon, MailQuestionIcon, MailWarningIcon} from 'lucide-react'
 import {LoadingCircle} from '@/components/shared/icons'
 import {cn} from '@/lib/utils'
+import Image from 'next/image'
+import Dog from '@/public/svg/illustrate/dog.svg'
+import {usePathname} from 'next/navigation'
 
 const ServiceStates: {
     [x: string]: {
@@ -39,18 +43,19 @@ const ServiceStates: {
 }
 
 export default function WaitlistCheck() {
+    const location = usePathname()
     const {user} = useUserAccountStore()
     const [serviceStatus, setServiceStatus] = useState<'dummy' | 'free' | 'ban' | 'wait'>('dummy')
 
     useEffect(() => {
         setServiceStatus(user?.waitlistType || 'wait')
-    }, [])
+    }, [location, user])
 
     const CurrentServiceIcon = ServiceStates[serviceStatus].icon
     if (!user) return (<></>)
     return (
         <div
-            className={`relative shadow-sm flex flex-col items-start justify-between gap-x-8 gap-y-4 border-b bg-sidebar px-4 py-4 sm:flex-row sm:items-center sm:px-6 lg:px-8 ${serviceStatus === 'dummy' && 'before:animate-[shimmer_1s_linear_infinite] shimmer-template'}`}>
+            className={`relative shadow-sm flex items-start justify-between gap-x-8 gap-y-4 border-b bg-sidebar px-4 py-4 overflow-hidden sm:flex-row sm:items-center sm:px-6 lg:px-8 ${serviceStatus === 'dummy' && 'before:animate-[shimmer_1s_linear_infinite] shimmer-template'}`}>
             <div>
                 <div className="flex items-center gap-x-3">
                     <CurrentServiceIcon
@@ -65,6 +70,12 @@ export default function WaitlistCheck() {
                     {ServiceStates[serviceStatus].text}
                 </p>
             </div>
+
+            {location !== '/' && (
+                <div className="flex-none w-24 h-12 sm:w-32 elastic-bounce pointer-events-none">
+                    <Image src={Dog} alt="Dog" layout="responsive"/>
+                </div>
+            )}
         </div>
     )
 }

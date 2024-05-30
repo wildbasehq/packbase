@@ -42,6 +42,7 @@
     "focus-trap-react": "^10.0.2",
     "framer-motion": "^11.2.6",
     "jotai": "^2.3.1",
+    "lottie-react": "^2.4.0",
     "lucide-react": "^0.379.0",
     "moment": "^2.29.4",
     "ms": "^2.1.3",
