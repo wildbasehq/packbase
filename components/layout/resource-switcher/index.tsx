@@ -190,7 +190,7 @@ export default function ResourceSwitcher() {
                             <Resource name={currentResource.name} id={currentResource.id} icon={currentResource.icon}/>
                         )}
                         <div
-                            className={`absolute ${isComponentVisible ? 'top-[8px]' : 'top-[18px]'} transition-all right-0`}>
+                            className={`absolute ${isComponentVisible ? 'top-[8px]' : 'top-[20px]'} transition-all right-0`}>
                             <ExpandingArrow
                                 className={`${isComponentVisible ? '!opacity-0' : ''} rotate-90 w-6 h-6 right-0 text-neutral-500 transition-all dark:text-white`}/>
                             <XIcon
@@ -201,11 +201,11 @@ export default function ResourceSwitcher() {
                     {/* switcher */}
                     <div>
                         <div
-                            className={`absolute top-0 left-0 ${isComponentVisible ? 'h-screen' : 'opacity-0 h-full group-hover:opacity-100 group-hover:h-36'} transition-switcher bg-card/90 w-full shadow-sm pt-[64px]`}>
+                            className={`absolute top-0 left-0 ${isComponentVisible ? 'h-screen bg-card py-[64px]' : 'h-fit bg-sidebar shadow-lg group-hover:animate-slide-down-fade group-hover:block group-hover:py-[64px]'} border-b w-full shadow-sm`}>
                             {!isComponentVisible && (
                                 <div
-                                    className="hidden group-hover:flex flex-col justify-center items-center px-4 gap-4">
-                                    <div className="flex gap-4">
+                                    className="hidden group-hover:flex flex-col px-4 gap-4">
+                                    <div className="flex gap-4 justify-center items-center">
                                         {globalNavItems.map((item, i) => (
                                             <Link href={item.href} key={i}>
                                                 <Tooltip content={item.name} side="bottom">
@@ -216,11 +216,23 @@ export default function ResourceSwitcher() {
                                         ))}
                                     </div>
 
-                                    <Text size="xs" className="text-alt">
+                                    <Text size="xs" className="flex justify-center text-alt">
                                         <MousePointerClickIcon
-                                            className="inline-flex align-middle h-4 w-4 -mt-[3px] mr-1"/>
+                                            className="inline-flex align-middle h-4 w-4 mr-1"/>
                                         Change resource
                                     </Text>
+
+                                    <div className="w-full border"/>
+                                    <Heading>
+                                        Notice
+                                    </Heading>
+                                    <div
+                                        className="w-full border rounded p-3 transition-all hover:bg-n-1 dark:hover:bg-n-6/25 hover:ring-4 hover:ring-n-5/10">
+                                        <Heading size="sm">this is giga-buggy</Heading>
+                                        <Text size="xs" className="text-alt">
+                                            lol lmao
+                                        </Text>
+                                    </div>
                                 </div>
                             )}
 
