@@ -12,7 +12,7 @@ import ms from 'ms'
  * @specific v3 frontend-only rewrite experiment
  * @authors @rek
  */
-export const ProjectName = 'Project 1'
+export const ProjectName = 'Packbase'
 export const ProjectDeps = ['scalebite', 'ypnyp', 'feral']
 
 /**

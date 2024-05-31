@@ -10,14 +10,15 @@ import Preload from '@/app/preload'
 import dynamic from 'next/dynamic'
 import WaitlistCheck from '@/components/layout/waitlistCheck'
 import {Analytics} from '@vercel/analytics/react'
+import {ProjectName} from '@/lib/utils'
 
 export const metadata = {
-    title: 'Project 1',
+    title: ProjectName,
     description:
         'A furry site.',
     twitter: {
         card: 'summary_large_image',
-        title: 'Project 1',
+        title: ProjectName,
         description:
             'A furry site.',
     },
