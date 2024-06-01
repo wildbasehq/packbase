@@ -33,6 +33,7 @@ export default function Preload({children}: {
                     .eq('id', user.id)
                     .limit(1)
                     .single()
+                console.log(data)
 
                 if (user.user_metadata.waitlistType !== 'free') {
                     // Assume they're in the waitlist
@@ -40,17 +41,23 @@ export default function Preload({children}: {
                     setUser({
                         id: user.id,
                         username: data?.username || user.email,
-                        displayName: data?.displayName || user.email,
+                        displayName: data?.display_name || user.email,
+                        reqOnboard: !data || !data?.username,
                         waitlistType,
-                        anonUser: ['wait', 'ban'].includes(waitlistType)
+                        anonUser: ['wait', 'ban'].includes(waitlistType),
+                        ...data
                     })
                 } else {
                     setUser({
                         id: user.id,
                         username: data?.username || user.email,
-                        displayName: data?.displayName || user.email,
+                        displayName: data?.display_name || user.email,
+                        reqOnboard: !data || !data?.username,
+                        ...data
                     })
                 }
+            } else {
+                setUser(null)
             }
             proceed()
         })

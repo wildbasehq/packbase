@@ -9,6 +9,8 @@ import UserAvatar from '@/components/shared/user/avatar'
 import Link from 'next/link'
 import {useRouter} from 'next/navigation'
 import {createClient} from '@/lib/supabase/client'
+import {Heading, Text} from '@/components/shared/text'
+import Button from '@/components/shared/button'
 
 export default function UserDropdown() {
     const {user, setUser} = useUserAccountStore()
@@ -67,7 +69,23 @@ export default function UserDropdown() {
 
     return (
         <div
-            className="flex flex-col w-96 self-center p-4 gap-3 bg-n-1 dark:bg-n-6 unicorn:bg-surface-container low-fidelity:bg-n-1 low-fidelity:dark:bg-n-6">
+            className="flex flex-col w-96 self-center p-4 gap-3 bg-n-1 dark:bg-n-6 unicorn:bg-surface-container">
+            {user.reqOnboard && (
+                <Link href="/settings">
+                    <Button
+                        className="flex-col w-full !border-default rounded text-start !p-3 transition-all">
+                        <Heading size="sm">Finish your space</Heading>
+                        <Text size="xs" className="text-alt">
+                            For your privacy, no one can find you and your profile is non-existent until you make
+                            it.
+                            <p className="mt-2">
+                                Click to get started!
+                            </p>
+                        </Text>
+                    </Button>
+                </Link>
+            )}
+
             <div className="w-full justify-start items-center gap-4 inline-flex">
                 <div className="w-16 h-16 relative">
                     <UserAvatar user={user} size="3xl"/>

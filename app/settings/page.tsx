@@ -7,11 +7,13 @@ import {useUserAccountStore} from '@/lib/states'
 import {Heading, Text} from '@/components/shared/text'
 import {ProjectName} from '@/lib/utils'
 import ProfileHeader from '@/components/shared/user/header'
+import {createClient} from '@/lib/supabase/client'
 
 export default function SettingsGeneral() {
     const {user} = useUserAccountStore()
     const [handleInput, setHandleInput] = useState<string | null>(user?.username)
-    const [nicknameInput, setNicknameInput] = useState<string | null>(user?.display_name)
+    const [slugInput, setSlugInput] = useState<string | null>(user?.slug)
+    const [nicknameInput, setNicknameInput] = useState<string | null>(user?.displayName)
     const [aboutInput, setAboutInput] = useState<string | null>(user?.bio)
 
     // Profile pic and cover pic upload fields
@@ -45,6 +47,22 @@ export default function SettingsGeneral() {
             setCoverPicPreview(null)
         }
     }, [coverPicUpload])
+
+    const saveProfile = async () => {
+        const supabase = createClient()
+        const profile = {
+            id: user.id,
+            username: handleInput,
+            slug: slugInput,
+            display_name: nicknameInput,
+            bio: aboutInput
+        }
+        if (user?.reqOnboard) {
+            await supabase.from('profiles').insert(profile)
+        } else {
+            await supabase.from('profiles').update(profile).eq('id', user.id)
+        }
+    }
 
     return (
         <div className="max-w-6xl mx-auto">
@@ -91,8 +109,8 @@ export default function SettingsGeneral() {
                                             id="slug"
                                             autoComplete="slug"
                                             className="no-legacy block flex-1 border-0 bg-transparent py-1.5 px-3 text-default placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6"
-                                            placeholder={user?.slug}
-                                            onChange={(e) => setHandleInput(e.target.value)}
+                                            value={slugInput || ''}
+                                            onChange={(e) => setSlugInput(e.target.value)}
                                         />
                                         <span
                                             className="flex select-none items-center pr-3 text-neutral-500 sm:text-sm">.packbase.app</span>
@@ -113,7 +131,7 @@ export default function SettingsGeneral() {
                                             id="username"
                                             autoComplete="username"
                                             className="no-legacy block flex-1 border-0 bg-transparent py-1.5 pl-1 text-default placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6"
-                                            placeholder={user?.username}
+                                            value={handleInput || ''}
                                             onChange={(e) => setHandleInput(e.target.value)}
                                         />
                                     </div>
@@ -138,6 +156,7 @@ export default function SettingsGeneral() {
                                             autoComplete="display_name"
                                             className="no-legacy block flex-1 border-0 bg-transparent py-1.5 px-3 text-default placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6"
                                             placeholder="Some Display Name"
+                                            value={user?.displayName}
                                             onChange={(e) => setNicknameInput(e.target.value)}
                                         />
                                     </div>
@@ -227,7 +246,7 @@ export default function SettingsGeneral() {
                 </div>
 
                 <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <Button>
+                    <Button onClick={saveProfile}>
                         Save
                     </Button>
                 </div>
