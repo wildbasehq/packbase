@@ -176,19 +176,18 @@ export default function ResourceSwitcher() {
                               if (!isComponentVisible) playSound(initialSound)
                               setIsComponentVisible(!isComponentVisible)
                           }}>
-                        {!currentResource || currentResource.standalone ? (
-                            <div className="flex h-10 items-center space-x-2">
-                                <Logo className="w-8"/>
-                                <Text className="font-bold">
-                                    <TextTicker texts={[
+                        <div className="flex h-10 items-center space-x-2">
+                                {(!currentResource || currentResource.standalone)
+                                    ? <Logo className="w-8"/>
+                                    : <UserAvatar name={currentResource.name} size={32} avatar={currentResource.icon}
+                                                  className="inline-flex h-8 w-8 overflow-hidden"/>}
+                            <Text className="font-bold">
+                                    <TextTicker key={currentResource.name} texts={[
                                         currentResource.name,
                                         '3 unreads'
                                     ]} interval={5000}/>
                                 </Text>
                             </div>
-                        ) : (
-                            <Resource name={currentResource.name} id={currentResource.id} icon={currentResource.icon}/>
-                        )}
                         <div
                             className={`absolute ${isComponentVisible ? 'top-[8px]' : 'top-[20px]'} transition-all right-0`}>
                             <ExpandingArrow
@@ -363,14 +362,14 @@ function Resource({name, id, icon}: {
 }) {
     return (
         <span className="flex min-w-0 items-center justify-between space-x-3">
-            <UserAvatar name={name} size={40} avatar={icon} className="inline-flex h-10 w-10 overflow-hidden"/>
+            <UserAvatar name={name} size={32} avatar={icon} className="inline-flex h-8 w-8 overflow-hidden"/>
             <div className="flex-1 flex flex-col min-w-0">
                 <Text>
                     {name}
                 </Text>
-                <Text className="text-alt">
-                    {id}
-                </Text>
+                {/*<Text className="text-alt">*/}
+                {/*    {id}*/}
+                {/*</Text>*/}
             </div>
         </span>
     )
