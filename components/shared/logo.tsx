@@ -1,15 +1,13 @@
 import React from 'react'
-import {useTheme} from 'next-themes'
 import cx from 'classnames'
 import Image from 'next/image'
 import LionLogo from '@/public/img/logo.png'
 
 export const Logo = ({...props}) => {
-    const {theme} = useTheme()
     /**
      * Yipnyap Logo: Only colour modifications to logo are allowed.
      */
-    props.className = cx('ring-1 ring-inset ring-n-7/25 rounded-md w-8 h-8 flex justify-center items-center p-1.5', theme === 'dark' ? 'bg-[#6232FF]' : 'bg-[#F5F6FC]', props.className)
+    props.className = cx('ring-1 ring-inset ring-n-7/25 rounded-md w-8 h-8 flex justify-center items-center p-1.5 bg-[#F5F6FC] dark:bg-[#6232FF]', props.className)
 
     // == For Yipnyap ==
     // @ts-ignore

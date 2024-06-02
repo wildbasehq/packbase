@@ -37,9 +37,9 @@ export default function NavBar() {
                         <Search/>
 
                         <div className="flex items-center gap-5">
-                            {/*<p className="hidden md:block text-sm text-alt">*/}
-                            {/*    {process.env.NEXT_PUBLIC_SHA || process.env.VERCEL_GIT_COMMIT_SHA || 'unknown'}*/}
-                            {/*</p>*/}
+                            <p className="hidden md:block text-sm text-alt">
+                                {process.env.VERCEL_GIT_COMMIT_SHA || 'local'}
+                            </p>
                             {/*<div className="hidden md:block md:h-5 md:w-px md:bg-neutral-900/10 md:dark:bg-white/15"/>*/}
                             <div className="flex gap-4">
                                 <ThemeToggle/>

@@ -3,9 +3,10 @@
 import {ReactNode} from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 
-export default function Tooltip({children, content, side}: {
+export default function Tooltip({children, content, delayDuration, side}: {
     children: ReactNode;
     content: ReactNode | string;
+    delayDuration?: number;
     side?: 'top' | 'bottom' | 'left' | 'right';
 }) {
     if (content === null) {
@@ -17,7 +18,7 @@ export default function Tooltip({children, content, side}: {
     }
 
     return (
-        <TooltipPrimitive.Provider delayDuration={100}>
+        <TooltipPrimitive.Provider delayDuration={typeof delayDuration !== undefined ? delayDuration : 100}>
             <TooltipPrimitive.Root>
                 <TooltipPrimitive.Trigger className="hidden sm:inline-flex" asChild>
                     {children}
