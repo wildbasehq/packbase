@@ -7,7 +7,7 @@ export const Logo = ({...props}) => {
     /**
      * Yipnyap Logo: Only colour modifications to logo are allowed.
      */
-    props.className = cn(props.className, 'ring-1 ring-inset ring-n-7/25 rounded-md w-8 h-8 flex justify-center items-center p-1.5 bg-[#F5F6FC] dark:bg-[#6232FF]')
+    props.className = cn(props.className, !props.noColorTheme && 'bg-[#F5F6FC] dark:bg-primary', 'ring-1 ring-inset ring-n-7/25 rounded-md w-8 h-8 flex justify-center items-center p-1.5')
 
     // == For Yipnyap ==
     // @ts-ignore
@@ -24,7 +24,7 @@ export const Logo = ({...props}) => {
         //     <path className="fill-white" d="M14.45,9.91c-.09-.1-.05-.17,.08-.15l3.16,.45c.13,.02,.3,.13,.37,.25l.25,.4c.07,.12,.04,.27-.07,.35l-.63,.43c-.11,.08-.32,.15-.45,.16l-.77,.06c-.14,.01-.32-.06-.41-.17l-1.53-1.78Z"/>
         // </svg>
         <div {...props}>
-            <Image src={LionLogo} alt="Lion logo" className="h-fit dark:invert"/>
+            <Image src={LionLogo} alt="Lion logo" className={cn(!props.noColorTheme && 'dark:invert', 'h-fit')}/>
         </div>
 
     )

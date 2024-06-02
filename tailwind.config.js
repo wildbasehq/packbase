@@ -1,6 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 const {default: flattenColorPalette} = require('tailwindcss/lib/util/flattenColorPalette');
 const plugin = require("tailwindcss/plugin");
+const colors = require('tailwindcss/colors')
+
 module.exports = {
     darkMode: ["class"],
     content: [
@@ -53,21 +55,21 @@ module.exports = {
                     6: 'rgb(var(--color-n-6) / <alpha-value>)',
                     7: 'rgb(var(--color-n-7) / <alpha-value>)',
                     8: 'rgb(var(--color-n-8) / <alpha-value>)',
+                    9: 'rgb(var(--color-primary-midnight) / <alpha-value>)'
                 },
                 // Material Design Dynamic Color Palette
                 // https://material.io/design/color/dark-theme.html#ui-application
                 primary: {
-                    DEFAULT: "hsl(var(--primary))",
-                    foreground: "hsl(var(--primary-foreground))",
+                    DEFAULT: 'rgb(var(--color-primary-cosmos) / <alpha-value>)',
+                    foreground: 'hsl(var(--primary-foreground))',
                     // DEFAULT: 'rgb(var(--md-sys-primary) / <alpha-value>)',
                     container: 'rgb(var(--md-sys-primary-container) / <alpha-value>)',
                     inverse: 'rgb(var(--md-sys-inverse-primary) / <alpha-value>)',
-                    feral: 'rgb(var(--color-primary-1) / <alpha-value>)',
                 },
                 secondary: {
                     // DEFAULT: 'rgb(var(--md-sys-secondary) / <alpha-value>)',
                     container: 'rgb(var(--md-sys-secondary-container) / <alpha-value>)',
-                    DEFAULT: "hsl(var(--secondary))",
+                    DEFAULT: "hsl(var(--color-primary-lime))",
                     foreground: "hsl(var(--secondary-foreground))",
                 },
                 tertiary: {

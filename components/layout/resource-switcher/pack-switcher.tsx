@@ -51,12 +51,12 @@ export default function PackSwitcher() {
     }
 
     return (
-        <div className="z-50 relative flex flex-col items-center gap-4 h-full border-r w-18 p-4">
+        <div className="z-50 relative flex flex-col items-center bg-n-8 gap-4 h-full border-r w-18 p-4">
             <Tooltip content="Home" side="right">
                 <div
-                    className={cn('flex items-center cursor-pointer h-8 w-8 hover:show-pill', currentResource.id === resourceDefault.id && 'force-pill')}
+                    className={cn('flex items-center [&>div]:bg-n-1 cursor-pointer h-8 w-8 hover:show-pill', currentResource.id === resourceDefault.id ? 'force-pill [&>div]:bg-primary [&>div>*]:invert' : 'dark:[&>div]:bg-n-7 dark:[&>div>*]:invert')}
                     onClick={() => switchResource(resourceDefault)}>
-                    <Logo/>
+                    <Logo noColorTheme/>
                 </div>
             </Tooltip>
 
@@ -68,13 +68,13 @@ export default function PackSwitcher() {
                         className={cn('flex items-center h-8 w-8 hover:show-pill', currentResource.id === item.id && 'force-pill')}
                         onClick={() => switchResource(item)}>
                         <UserAvatar name={item.name} size={32} avatar={item.icon}
-                                    className="inline-flex overflow-hidden ring-1 ring-default cursor-pointer"/>
+                                    className="inline-flex overflow-hidden cursor-pointer"/>
                     </div>
                 </Tooltip>
             ))}
             <div className="grow"/>
             <Tooltip content="Settings" side="right" delayDuration={0}>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="text-white">
                     <SettingsIcon/>
                 </Button>
             </Tooltip>

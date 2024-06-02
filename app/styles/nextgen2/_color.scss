@@ -1,89 +1,3 @@
-:root {
-  --color-wplogin-header-text: #fff;
-  --color-header-background: #fff;
-  --color-header-text: #fff;
-  --color-header-icon: #8b88ff;
-  --color-header-icon-hover: #615dfa;
-  --color-header-profile-settings-icon: #9b7dff;
-  --color-header-mobilemenu-trigger-icon: #fff;
-  --color-header-divider: #7a77fd;
-  --color-header-input-placeholder: #adafca;
-  --color-header-progressbar-line-gradient-start: #41efff;
-  --color-header-progressbar-line-gradient-end: #41efff;
-  --color-header-progressbar-underline: #4a46c8;
-  --color-body: #f8f8fb;
-  --color-box-background: rgba(255, 255, 255);
-  --color-box-background-solid: #ffffff;
-  --color-box-background-alt: #fafafa;
-  --color-box-over-box-background: #e5e5e5;
-  --color-box-over-box-light-background: #fff;
-  --color-box-highlight-background: #f7f7fb;
-  --color-box-hover-background: #f2f2f9;
-  --color-box-shadow: 0 0 40px 0 rgba(94, 92, 154, .06);
-  --color-overbox-shadow: 3px 5px 20px 0 rgba(94, 92, 154, .12);
-  --color-overbox-dark-shadow: 0 0 40px 0 rgba(94, 92, 154, .12);
-  --color-overbox-big-shadow: 3px 5px 40px 0 rgba(94, 92, 154, .1);
-  --color-text: #404040;
-  --color-text-alt: #a3a3a3;
-  --color-text-alt-2: #737373;
-  --color-icon: #adafca;
-  --color-icon-highlighted: #3e3f5e;
-  --color-border: #e5e5e5;
-  --color-divider: #e5e5e5;
-  --color-progressbar-line-gradient-start: #615dfa;
-  --color-progressbar-line-gradient-end: #41efff;
-  --color-progressbar-underline: #e7e8ee;
-  --color-avatar-rank-hexagon: #45437f;
-  --color-primary: #6366f1;
-  --color-primary-hover: #4f46e5;
-  --color-primary-light: #a5b4fc;
-  --color-primary-dark: #4338ca;
-  --color-primary-shadow: 4px 7px 12px 0 rgba(67, 56, 202, .2);
-  --color-secondary: #615dfa;
-  --color-secondary-hover: #5753e4;
-  --color-secondary-dark: #45437f;
-  --color-secondary-shadow: 4px 7px 12px 0 rgba(97, 93, 250, .2);
-  --color-tertiary: #fd4350;
-  --color-tertiary-hover: #dd343f;
-  --color-tertiary-shadow: 4px 7px 12px 0 rgba(253, 67, 80, .2);
-  --color-loading-screen-background: #3e3f5e;
-  --color-overlay: rgba(23, 23, 23, .96);
-  --color-notice-overlay-background-primary: rgba(99, 102, 241, .14);
-  --color-notice-overlay-background-secondary: rgba(97, 93, 250, .14);
-  --color-notice-overlay-background-tertiary: rgba(253, 67, 80, .14);
-  --color-avatar-overlay-background: rgba(97, 93, 250, .9);
-}
-
-body.dark {
-  --color-header-background: #262626;
-  --color-header-progressbar-underline: #5538b5;
-  --color-body: #171717;
-  --color-box-background: #262626;
-  --color-box-background-solid: #262626;
-  --color-box-background-alt: #2d2d2d;
-  --color-box-over-box-background: #404040;
-  --color-box-over-box-light-background: var(--color-box-over-box-background);
-  --color-box-highlight-background: #21283b;
-  --color-box-hover-background: #293249;
-  --color-box-shadow: 0 0 40px 0 rgba(0, 0, 0, .06);
-  --color-overbox-shadow: 3px 5px 20px 0 rgba(0, 0, 0, .12);
-  --color-overbox-dark-shadow: 0 0 40px 0 rgba(0, 0, 0, .12);
-  --color-overbox-big-shadow: 3px 5px 40px 0 rgba(0, 0, 0, .1);
-  --color-text: #ffffff;
-  --color-text-alt: #525252;
-  --color-icon: #616a82;
-  --color-icon-highlighted: #ffffff;
-  --color-border: #404040;
-  --color-divider: var(--color-border);
-  --color-progressbar-underline: #293249;
-  --color-avatar-rank-hexagon: #7750f8;
-  --color-primary-light: #4338ca;
-  --color-primary-dark: #a5b4fc;
-  --color-tertiary: #fd4350;
-  --color-tertiary-hover: #dd343f;
-  --color-loading-screen-background: #1d2333;
-}
-
 /* Colours */
 .text-default {
   @apply text-neutral-700 dark:text-white;
@@ -102,11 +16,7 @@ body.dark {
 }
 
 .ring-default {
-  @apply ring-neutral-300 dark:ring-neutral-800;
-}
-
-.text-primary {
-  @apply text-indigo-500;
+  @apply ring-n-2 dark:ring-n-6/80;
 }
 
 .bg-default {
@@ -125,57 +35,28 @@ body.dark {
   @apply divide-neutral-300 dark:divide-neutral-800;
 }
 
-.ring-default {
-  @apply ring-neutral-300 dark:ring-neutral-800;
-}
-
 .dark\:border-gradient-red-dark {
   background: linear-gradient(#3d1d1d, #3d1d1d) padding-box, linear-gradient(to top, #f43f5e, #fb7185, #ef4444) border-box
 }
 
-.bg-primary {
-  background-color: var(--color-primary);
-}
-
 .bg-secondary {
-  background-color: var(--color-secondary);
-}
-
-.bg-box {
-  @apply unicorn:bg-surface-container-low;
-  background-color: var(--color-box-background);
-}
-
-.hover\:bg-box:hover {
-  background-color: var(--color-box-background)
-}
-
-.bg-box-alt {
-  background-color: var(--color-box-background-alt)
-}
-
-.hover\:bg-box-alt:hover {
-  background-color: var(--color-box-background-alt)
-}
-
-.bg-box-over {
-  background-color: var(--color-box-over-box-background)
-}
-
-.bg-box-over-light {
-  background-color: var(--color-box-over-box-light-background)
+  background-color: var(--color-primary-lime);
 }
 
 .text-primary {
-  color: var(--color-primary);
+  color: var(--color-primary-cosmos);
 }
 
 .text-secondary {
-  color: var(--color-secondary);
+  color: var(--color-primary-lime);
 }
 
 .text-alt {
-  color: var(--color-text-alt);
+  @apply text-n-4/80;
+}
+
+.fill-alt {
+  @apply fill-n-6 dark:fill-n-4/80
 }
 
 .text-alt-2 {

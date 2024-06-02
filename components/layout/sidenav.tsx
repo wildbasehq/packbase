@@ -60,8 +60,8 @@ export function SideNav({...props}: SideNavType) {
                         <ActiveLink
                             key={i}
                             href={item.href}
-                            activeClassName="bg-n-2 dark:bg-n-6"
-                            inactiveClassName="transition-all hover:ring-2 ring-default hover:bg-n-2/50 dark:hover:bg-n-6/50"
+                            activeClassName="bg-n-1/70 dark:bg-n-6"
+                            inactiveClassName="transition-all hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50"
                             className="flex rounded h-fit items-center px-3 py-1 cursor-pointer"
                         >
                             <>

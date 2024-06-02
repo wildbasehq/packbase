@@ -69,7 +69,7 @@ export default function UserDropdown() {
 
     return (
         <div
-            className="flex flex-col w-96 self-center p-4 gap-3 bg-n-1 dark:bg-n-6 unicorn:bg-surface-container">
+            className="flex flex-col w-96 self-center p-4 gap-3 bg-n-1 dark:bg-n-8 unicorn:bg-surface-container">
             {user.reqOnboard && (
                 <Link href="/settings">
                     <Button
@@ -116,7 +116,7 @@ export default function UserDropdown() {
             {/*</div>*/}
 
             <div
-                className="inline-flex flex-col w-full bg-n-2 dark:bg-n-7 unicorn:bg-surface-container-low bg-opacity-95 border rounded-xl">
+                className="inline-flex flex-col w-full bg-n-2/25 dark:bg-n-7/25 unicorn:bg-surface-container-low bg-opacity-95 border rounded-xl">
                 <Accordion.Root
                     className="w-full"
                     type="single"
@@ -125,7 +125,7 @@ export default function UserDropdown() {
                     <Accordion.Item value="status">
                         <Accordion.Header asChild>
                             <Accordion.Trigger
-                                className="AccordionTrigger w-full px-4 py-3 bg-n-2/50 dark:bg-n-6/50 bg-opacity-50 unicorn:bg-surface-container/50 rounded-tl-xl rounded-tr-xl justify-between items-start inline-flex">
+                                className="AccordionTrigger w-full px-4 py-3 bg-n-2 dark:bg-n-7 bg-opacity-50 unicorn:bg-surface-container/50 rounded-tl-xl rounded-tr-xl justify-between items-start inline-flex">
                                 <div className="justify-center items-center gap-4 flex">
                                     {currentStatus.icon && (
                                         <div className="w-6 h-6 p-0.5 justify-center items-center">
@@ -186,9 +186,9 @@ export default function UserDropdown() {
                              onClick={option.onClick || (() => {
                              })}>
                             <option.icon
-                                className={`${option.className || 'group-hover:fill-primary-feral'} w-6 h-6 fill-alt unicorn:fill-on-surface-variant/50 transition-colors`}/>
+                                className={`${option.className || 'group-hover:fill-primary'} w-6 h-6 fill-alt unicorn:fill-on-surface-variant/50 transition-colors`}/>
                             <div
-                                className={`${option.className || 'group-hover:text-primary-feral'} text-on-surface-variant text-opacity-75 text-sm transition-colors`}>{option.name}</div>
+                                className={`${option.className || 'group-hover:text-primary'} text-on-surface-variant text-opacity-75 text-sm transition-colors`}>{option.name}</div>
                         </div>
                     ))}
                 </div>

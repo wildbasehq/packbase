@@ -44,7 +44,8 @@ export default async function RootLayout({children}: {
 }) {
     return (
         <html lang="en">
-        <body className={cx('overflow-hidden', lexend.variable, lexend.className, inter.variable)}>
+        <body
+            className={cx('overflow-hidden bg-n-1 dark:bg-n-9', lexend.variable, lexend.className, inter.variable)}>
         <Providers>
             <PostHogPageView/>
             <div id="NGContentArea"
