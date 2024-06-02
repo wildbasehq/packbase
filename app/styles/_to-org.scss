@@ -28,7 +28,7 @@ a:not(.no-style) {
 
 .load-stagger > * {
   $n: 24;
-  opacity: 0;
+  opacity: 0.25;
   @apply animate-pulse;
 
   @for $x from 0 through $n {
