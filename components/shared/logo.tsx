@@ -1,13 +1,13 @@
 import React from 'react'
-import cx from 'classnames'
 import Image from 'next/image'
 import LionLogo from '@/public/img/logo.png'
+import {cn} from '@/lib/utils'
 
 export const Logo = ({...props}) => {
     /**
      * Yipnyap Logo: Only colour modifications to logo are allowed.
      */
-    props.className = cx('ring-1 ring-inset ring-n-7/25 rounded-md w-8 h-8 flex justify-center items-center p-1.5 bg-[#F5F6FC] dark:bg-[#6232FF]', props.className)
+    props.className = cn(props.className, 'ring-1 ring-inset ring-n-7/25 rounded-md w-8 h-8 flex justify-center items-center p-1.5 bg-[#F5F6FC] dark:bg-[#6232FF]')
 
     // == For Yipnyap ==
     // @ts-ignore
