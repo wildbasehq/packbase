@@ -39,7 +39,7 @@ export function SideNav({...props}: SideNavType) {
         <>
             <nav aria-label="Sections"
                  className={`${slimNavClass} hidden md:flex md:flex-col flex-shrink-0 p-6 border-r bg-sidebar h-screen overflow-y-auto`}>
-                <div className="flex-1 min-h-0 divide-y divide-default overflow-y-auto no-scrollbar">
+                <div className="flex-1 min-h-0 space-y-2 overflow-y-auto no-scrollbar">
                     {navigation.length === 0 && (
                         <div className="load-stagger">
                             {Array.from({length: 20}).map((_, i) => (

@@ -53,8 +53,9 @@ export default function PackSwitcher() {
     return (
         <div className="z-50 relative flex flex-col items-center gap-4 h-full border-r w-18 p-4">
             <Tooltip content="Home" side="right">
-                <div className="flex items-center h-8 w-8 cursor-pointer hover:show-pill"
-                     onClick={() => switchResource(resourceDefault)}>
+                <div
+                    className={cn('flex items-center cursor-pointer h-8 w-8 hover:show-pill', currentResource.id === resourceDefault.id && 'force-pill')}
+                    onClick={() => switchResource(resourceDefault)}>
                     <Logo/>
                 </div>
             </Tooltip>

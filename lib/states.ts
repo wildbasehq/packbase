@@ -1,6 +1,7 @@
 import {create} from 'zustand'
 import {persist} from 'zustand/middleware'
 import {ProjectName} from '@/lib/utils'
+import {HomeIcon} from '@heroicons/react/24/solid'
 
 interface UIStore {
     feedView: number;
@@ -104,14 +105,24 @@ export const useResourceUIStore = create<ResourceUIStore>(
     (set) => ({
         resourceDefault,
         loading: true,
-        navigation: [],
+        navigation: [{
+            name: 'Home',
+            description: '[here temp] go universe home',
+            href: '/',
+            icon: HomeIcon,
+        }],
         setLoading: (loading) => set((state) => ({
             ...state,
             loading,
         })),
         setNavigation: (navigation: any) => set((state) => ({
             ...state,
-            navigation,
+            navigation: [{
+                name: 'Home',
+                description: '[here temp] go universe home',
+                href: '/',
+                icon: HomeIcon,
+            }, ...navigation],
         })),
     })
 )
