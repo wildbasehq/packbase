@@ -38,8 +38,8 @@ export function SideNav({...props}: SideNavType) {
     return (
         <>
             <nav aria-label="Sections"
-                 className={`${slimNavClass} hidden md:flex md:flex-col flex-shrink-0 p-6 border-r bg-sidebar h-screen overflow-y-auto`}>
-                <div className="flex-1 min-h-0 space-y-2 overflow-y-auto no-scrollbar">
+                 className={`${slimNavClass} hidden md:flex md:flex-col flex-shrink-0 border-r bg-sidebar h-screen overflow-y-auto`}>
+                <div className="flex-1 min-h-0 space-y-2 p-6 overflow-y-auto overflow-x-visible no-scrollbar">
                     {navigation.length === 0 && (
                         <div className="load-stagger">
                             {Array.from({length: 20}).map((_, i) => (
@@ -60,8 +60,8 @@ export function SideNav({...props}: SideNavType) {
                         <ActiveLink
                             key={i}
                             href={item.href}
-                            activeClassName="bg-blue-50 bg-opacity-50 dark:bg-neutral-700"
-                            inactiveClassName="hover:bg-n-2 dark:hover:bg-n-6"
+                            activeClassName="bg-n-2 dark:bg-n-6"
+                            inactiveClassName="transition-all hover:ring-2 ring-default hover:bg-n-2/50 dark:hover:bg-n-6/50"
                             className="flex rounded h-fit items-center px-3 py-1 cursor-pointer"
                         >
                             <>
