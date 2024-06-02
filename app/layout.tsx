@@ -53,7 +53,7 @@ export default async function RootLayout({children}: {
                 <div className="grow">
                     <NavBar/>
 
-                    <main className="flex-1 flex overflow-hidden">
+                    <main className="h-full flex-1 flex overflow-hidden">
                         {/* If screen size is sm, set slim to true */}
                         <SideNav slim={typeof window !== 'undefined' && window.innerWidth < 640}/>
 
