@@ -90,9 +90,9 @@ export default function ResourceSwitcher() {
                                     : <UserAvatar name={currentResource.name} size={32} avatar={currentResource.icon}
                                                   className="inline-flex h-8 w-8 overflow-hidden"/>}
                             <Text className="font-bold">
-                                    <TextTicker key={currentResource.name} texts={[
+                                    <TextTicker texts={[
                                         currentResource.name,
-                                        '3 unreads'
+                                        '🎉 Prototype'
                                     ]} interval={5000}/>
                                 </Text>
                             </div>
