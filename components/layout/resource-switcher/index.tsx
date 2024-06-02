@@ -97,7 +97,7 @@ export default function ResourceSwitcher() {
                                 </Text>
                             </div>
                         <ExpandingArrow
-                            className="rotate-90 -mt-2 w-6 h-6 right-0 text-neutral-500 transition-all dark:text-white"/>
+                            className="rotate-90 -mt-1 w-6 h-6 right-0 text-neutral-500 transition-all dark:text-white"/>
                     </span>
                 </div>
             ) : (

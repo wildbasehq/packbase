@@ -6,6 +6,7 @@ import ActiveLink from '../shared/activelink'
 import {ArrowUpRightIcon, LucideIcon, Sparkles} from 'lucide-react'
 import {useResourceUIStore} from '@/lib/states'
 import Tooltip from '@/components/shared/tooltip'
+import {Text} from '@/components/shared/text'
 
 export declare interface SideNavItemType {
     name: string | JSX.Element;
@@ -32,55 +33,36 @@ export const NGContentNavigatorTheming = {
 
 export function SideNav({...props}: SideNavType) {
     const {navigation} = useResourceUIStore()
-    const slimNavClass = props.slim ? 'w-20' : 'w-96'
-
-    let navItems: any[] = navigation || []
+    const slimNavClass = props.slim ? 'w-20 items-center' : 'w-96'
 
     return (
         <>
             <nav aria-label="Sections"
-                 className={`${slimNavClass} hidden md:flex md:flex-col flex-shrink-0 border-r bg-sidebar/90 backdrop-blur-lg overflow-y-auto`}>
+                 className={`${slimNavClass} hidden md:flex md:flex-col flex-shrink-0 p-6 border-r bg-sidebar h-screen overflow-y-auto`}>
                 <div className="flex-1 min-h-0 divide-y divide-default overflow-y-auto no-scrollbar">
-                    {navItems.length === 0 && (
+                    {navigation.length === 0 && (
                         <div className="load-stagger">
                             {Array.from({length: 20}).map((_, i) => (
                                 <div key={i} className="flex min-h-[4rem] h-fit items-center px-6">
-                                    {i === 12 ? (
-                                        <>
-                                            <Image src="/logo/unicorn-1-min.png" width={24} height={22} alt="Loading..."
-                                                   className="flex-shrink-0 w-6 rounded-lg"/>
-                                            <div className="ml-3 my-4 text-sm">
-                                                <p className="font-medium text-default dark:text-neutral-50">
-                                                    Originally for Yipnyap
-                                                </p>
-                                                <p className="mt-1 text-default dark:text-neutral-500">
-                                                    Reduce, Reuse, Recycle, kids.
-                                                </p>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="flex-shrink-0 h-6 w-6 bg-n-5 rounded-lg"/>
-                                            <div className="ml-3 my-4 text-sm" style={{
-                                                // Random between 2 and 18
-                                                width: `${Math.floor(Math.random() * 16) + 2}rem`,
-                                            }}>
-                                                <div className="h-4 bg-card border rounded-lg anim-sidenav-pole-entry"/>
-                                            </div>
-                                        </>
-                                    )}
+                                    <div className="flex-shrink-0 h-6 w-6 bg-n-5 rounded-lg"/>
+                                    <div className="ml-3 my-4 text-sm" style={{
+                                        // Random between 2 and 18
+                                        width: `${Math.floor(Math.random() * 16) + 2}rem`,
+                                    }}>
+                                        <div className="h-4 bg-card border rounded-lg anim-sidenav-pole-entry"/>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     )}
 
-                    {navItems.map((item, i) => (
+                    {navigation.map((item, i) => (
                         <ActiveLink
                             key={i}
                             href={item.href}
                             activeClassName="bg-blue-50 bg-opacity-50 dark:bg-neutral-700"
-                            inactiveClassName="hover:bg-blue-50 hover:bg-opacity-50 dark:hover:bg-neutral-700"
-                            className="flex min-h-[4rem] h-fit items-center px-6 cursor-pointer"
+                            inactiveClassName="hover:bg-n-2 dark:hover:bg-n-6"
+                            className="flex rounded h-fit items-center px-3 py-1 cursor-pointer"
                         >
                             <>
                                 {item.icon && (
@@ -102,9 +84,9 @@ export function SideNav({...props}: SideNavType) {
                                 )}
 
                                 {!props.slim && (
-                                    <div className="ml-3 my-4 text-sm">
+                                    <div className="m-2 text-sm">
                                         <div className="flex items-center">
-                                            <p className="font-medium text-default dark:text-neutral-50">{item.name}</p>
+                                            <Text>{item.name}</Text>
                                             {item.contextChange && (
                                                 <Tooltip content="Changes navigator context">
                                                     <ArrowUpRightIcon className="h-5 w-5 ml-1"
@@ -122,7 +104,9 @@ export function SideNav({...props}: SideNavType) {
                                                 </div>
                                             )}
                                         </div>
-                                        <p className="mt-1 text-default dark:text-neutral-500">{item.description}</p>
+                                        <Text className="text-alt">
+                                            {item.description}
+                                        </Text>
                                     </div>
                                 )}
                             </>
@@ -144,7 +128,7 @@ export function SideNav({...props}: SideNavType) {
                 className={`h-16 fixed md:hidden flex flex-row flex-shrink-0 bg-card w-full z-10 bottom-0 left-0 border-t border-x-0 border-b-0 border-solid border-default rounded-tl-xl rounded-tr-xl overflow-x-auto no-scrollbar`
                     // Dark mode
                     + ` dark:border-neutral-600`}>
-                {navItems.map((item, i) => (
+                {navigation.map((item, i) => (
                     <ActiveLink
                         key={i}
                         href={item.href}
