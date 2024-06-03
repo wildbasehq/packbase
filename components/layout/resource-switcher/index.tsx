@@ -9,22 +9,8 @@ import {PlayFunction} from 'use-sound/dist/types'
 import {useResourceStore, useResourceUIStore} from '@/lib/states'
 import {useEffect, useState} from 'react'
 import {ExpandingArrow, LoadingCircle} from '@/components/shared/icons'
-import {HomeIcon, UsersIcon} from '@heroicons/react/24/solid'
 import {Logo} from '@/components/shared/logo'
 import TextTicker from '@/components/shared/text-ticker'
-
-const globalNavItems = [
-    {
-        icon: HomeIcon,
-        name: 'Resource Home',
-        href: '/',
-    },
-    {
-        icon: UsersIcon,
-        name: 'Members',
-        href: '/members',
-    },
-]
 
 export default function ResourceSwitcher() {
     // sound refs
@@ -44,7 +30,7 @@ export default function ResourceSwitcher() {
     const {currentResource} = useResourceStore()
 
     const {loading} = useResourceUIStore()
-    const {ref, isComponentVisible, setIsComponentVisible} = useComponentVisible({
+    const {ref} = useComponentVisible({
         soundOnClose: cancelSound
     })
     // fuck you nextjs
@@ -71,10 +57,10 @@ export default function ResourceSwitcher() {
                          ref.current?.classList.remove('[&>*>*]:animate-shake')
                      }}
                      onMouseEnter={() => {
-                         if (!isComponentVisible) playSound(hoverSound)
+                         playSound(hoverSound)
                      }}
                      onMouseLeave={() => {
-                         if (!isComponentVisible) playSound(cancelSound)
+                         playSound(cancelSound)
                      }}
                 >
                     <span className="flex z-10 w-full justify-between items-center"
@@ -90,7 +76,7 @@ export default function ResourceSwitcher() {
                                     : <UserAvatar name={currentResource.name} size={32} avatar={currentResource.icon}
                                                   className="inline-flex h-8 w-8 overflow-hidden"/>}
                             <Text className="font-bold">
-                                    <TextTicker texts={[
+                                    <TextTicker key={currentResource.name} texts={[
                                         currentResource.name,
                                         '🎉 Prototype'
                                     ]} interval={5000}/>
