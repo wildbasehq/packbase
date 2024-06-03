@@ -104,7 +104,7 @@ export default function IDLogin({searchParams}: {
                             disabled={submitting}
                             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
-                            {!submitting ? 'Register' : <LoadingCircle/>}
+                            {!submitting ? 'Sign in' : <LoadingCircle/>}
                         </Button>
                     </div>
                 </form>

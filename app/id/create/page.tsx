@@ -139,7 +139,7 @@ export default function IDCreate({searchParams}: {
                             disabled={submitting}
                             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
-                            {!submitting ? 'Sign in' : <LoadingCircle/>}
+                            {!submitting ? 'Register' : <LoadingCircle/>}
                         </Button>
                     </div>
                 </form>
