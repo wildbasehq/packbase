@@ -37,6 +37,8 @@ export default function IDCreate({searchParams}: {
             console.log(r)
             if (r.error) {
                 window.location.href = `/id/create?error=Serverland Error&error_description=${r.error.toString()}`
+            } else {
+                window.location.href = '/id/login'
             }
         })
     }

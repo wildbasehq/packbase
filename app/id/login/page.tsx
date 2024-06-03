@@ -8,6 +8,7 @@ import {Checkbox} from '@/components/shared/input/checkbox'
 import {Button} from '@/components/shared/ui/button'
 import Link from 'next/link'
 import {LoadingCircle} from '@/components/shared/icons'
+import {useUserAccountStore} from '@/lib/states'
 
 export default function IDLogin({searchParams}: {
     searchParams: {
@@ -16,12 +17,15 @@ export default function IDLogin({searchParams}: {
         redirect?: string;
     };
 }) {
+    const {user} = useUserAccountStore()
     const [submitting, setSubmitting] = useState(false)
     switch (searchParams?.error_description) {
         case 'The resource owner or authorization server denied the request': {
             searchParams.error_description = 'Login cancelled'
         }
     }
+
+    if (user) return window.location.href = '/'
 
     const loginUser = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
