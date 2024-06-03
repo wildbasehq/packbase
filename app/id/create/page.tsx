@@ -9,7 +9,6 @@ import {MailQuestion} from 'lucide-react'
 import {createClient} from '@/lib/supabase/client'
 import {FormEvent, useState} from 'react'
 import {Logo} from '@/components/shared/logo'
-import {Checkbox} from '@/components/shared/input/checkbox'
 import {LoadingCircle} from '@/components/shared/icons'
 
 export default function IDCreate({searchParams}: {
@@ -128,19 +127,9 @@ export default function IDCreate({searchParams}: {
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                            <Checkbox id="remember-me"
-                                      name="remember-me"/>
-                            <label htmlFor="remember-me" className="ml-2 block text-sm">
-                                Remember me
-                            </label>
-                        </div>
-
-                        <div className="text-sm">
-                            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                                Forgot your password?
-                            </a>
-                        </div>
+                        <Text size="xs">
+                            By continuing, you agree to our terms and privacy policy.
+                        </Text>
                     </div>
 
                     <div>

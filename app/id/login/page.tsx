@@ -4,7 +4,6 @@ import {FormEvent, useState} from 'react'
 import {Logo} from '@/components/shared/logo'
 import {Heading} from '@/components/shared/text'
 import {Input} from '@/components/shared/input/text'
-import {Checkbox} from '@/components/shared/input/checkbox'
 import {Button} from '@/components/shared/ui/button'
 import Link from 'next/link'
 import {LoadingCircle} from '@/components/shared/icons'
@@ -34,8 +33,8 @@ export default function IDLogin({searchParams}: {
 
         const formData = new FormData(event.currentTarget)
         const user = {
-            email: formData.get('login-email')?.toString() || '',
-            password: formData.get('login-password')?.toString() || ''
+            email: formData.get('email')?.toString() || '',
+            password: formData.get('password')?.toString() || '',
         }
         const supabase = createClient()
         supabase.auth.signInWithPassword(user).then(r => {
@@ -68,7 +67,7 @@ export default function IDLogin({searchParams}: {
             <div className="mt-8">
                 <form method="POST" className="space-y-6" onSubmit={loginUser}>
                     <div>
-                        <Input label="Email Address" required/>
+                        <Input id="email" type="email" label="Email Address" required/>
                     </div>
 
                     <div className="space-y-1">
@@ -82,19 +81,20 @@ export default function IDLogin({searchParams}: {
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                            <Checkbox id="remember-me"
-                                      name="remember-me"/>
-                            <label htmlFor="remember-me" className="ml-2 block text-sm">
-                                Remember me
-                            </label>
-                        </div>
+                        {/* Supabase enforces session expiry. */}
+                        {/*<div className="flex items-center">*/}
+                        {/*    <Checkbox id="remember-me"*/}
+                        {/*              name="remember-me"/>*/}
+                        {/*    <label htmlFor="remember-me" className="ml-2 block text-sm">*/}
+                        {/*        Remember me*/}
+                        {/*    </label>*/}
+                        {/*</div>*/}
 
-                        <div className="text-sm">
-                            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                                Forgot your password?
-                            </a>
-                        </div>
+                        {/*<div className="text-sm">*/}
+                        {/*    <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">*/}
+                        {/*        Forgot your password?*/}
+                        {/*    </a>*/}
+                        {/*</div>*/}
                     </div>
 
                     <div>
