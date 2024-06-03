@@ -12,7 +12,6 @@ export default function Settings({children}: {
     const router = useRouter()
     const {setNavigation} = useResourceUIStore()
 
-    if (!user) return router.push('/id/login')
     useEffect(() => {
         setNavigation([{
             name: 'General',
@@ -21,6 +20,8 @@ export default function Settings({children}: {
             icon: Cog6ToothIcon,
         }])
     }, [])
+
+    if (!user) return router.push('/id/login')
 
     return (
         <Body>
