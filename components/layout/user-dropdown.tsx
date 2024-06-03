@@ -10,7 +10,6 @@ import Link from 'next/link'
 import {useRouter} from 'next/navigation'
 import {createClient} from '@/lib/supabase/client'
 import {Heading, Text} from '@/components/shared/text'
-import Button from '@/components/shared/button'
 
 export default function UserDropdown() {
     const {user, setUser} = useUserAccountStore()
@@ -71,18 +70,16 @@ export default function UserDropdown() {
         <div
             className="flex flex-col w-96 self-center p-4 gap-3 bg-n-1 dark:bg-n-8 unicorn:bg-surface-container">
             {user.reqOnboard && (
-                <Link href="/settings">
-                    <Button
-                        className="flex-col w-full !border-default rounded text-start !p-3 transition-all">
-                        <Heading size="sm">Finish your space</Heading>
-                        <Text size="xs" className="text-alt">
-                            For your privacy, no one can find you and your profile is non-existent until you make
-                            it.
-                            <p className="mt-2">
-                                Click to get started!
-                            </p>
-                        </Text>
-                    </Button>
+                <Link href="/settings"
+                      className="flex-col w-full bg-card border border-default rounded text-start p-3 hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50 transition-all !no-underline">
+                    <Heading size="sm">Finish your space</Heading>
+                    <Text size="xs" className="text-alt">
+                        For your privacy, no one can find you and your profile is non-existent until you make
+                        it.
+                        <p className="mt-2">
+                            Click to get started!
+                        </p>
+                    </Text>
                 </Link>
             )}
 
@@ -125,7 +122,7 @@ export default function UserDropdown() {
                     <Accordion.Item value="status">
                         <Accordion.Header asChild>
                             <Accordion.Trigger
-                                className="AccordionTrigger w-full px-4 py-3 bg-n-2 dark:bg-n-7 bg-opacity-50 unicorn:bg-surface-container/50 rounded-tl-xl rounded-tr-xl justify-between items-start inline-flex">
+                                className="AccordionTrigger w-full px-4 py-3 bg-n-2 dark:bg-n-7 bg-opacity-50 unicorn:bg-surface-container/50 rounded-tl-xl rounded-tr-xl justify-between items-start inline-flex cursor-auto select-none">
                                 <div className="justify-center items-center gap-4 flex">
                                     {currentStatus.icon && (
                                         <div className="w-6 h-6 p-0.5 justify-center items-center">
@@ -145,12 +142,12 @@ export default function UserDropdown() {
                                 <ChevronDownIcon className="AccordionChevron w-5 h-5 self-center text-body"/>
                             </Accordion.Trigger>
                         </Accordion.Header>
-                        <Accordion.Content className="AccordionContent flex flex-col overflow-hidden">
+                        <Accordion.Content className="AccordionContent flex flex-col overflow-hidden select-none">
                             {/* status options, except current one */}
                             {StatusOptions.filter((option) => option.id !== user.status).map((option, i) => (
                                 <div
                                     key={i}
-                                    className="group px-4 py-3 justify-start items-center gap-4 inline-flex cursor-pointer"
+                                    className="group px-4 py-3 justify-start items-center gap-4 inline-flex"
                                     onClick={() => {
                                         setUser({
                                             ...user,

@@ -8,6 +8,7 @@ import {Button} from '@/components/shared/ui/button'
 import Link from 'next/link'
 import {LoadingCircle} from '@/components/shared/icons'
 import {useUserAccountStore} from '@/lib/states'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 
 export default function IDLogin({searchParams}: {
     searchParams: {
@@ -64,7 +65,17 @@ export default function IDLogin({searchParams}: {
                 </p>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-8 space-y-8">
+                {searchParams?.error_description && (
+                    <Alert variant="destructive">
+                        <AlertTitle>
+                            {searchParams.error}
+                        </AlertTitle>
+                        <AlertDescription>
+                            {searchParams.error_description}
+                        </AlertDescription>
+                    </Alert>
+                )}
                 <form method="POST" className="space-y-6" onSubmit={loginUser}>
                     <div>
                         <Input id="email" type="email" label="Email Address" required/>

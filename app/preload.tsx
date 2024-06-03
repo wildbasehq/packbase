@@ -9,6 +9,7 @@ import {createClient} from '@/lib/supabase/client'
 import {useResourceUIStore, useUserAccountStore} from '@/lib/states'
 import Body from '@/components/layout/body'
 import {HandRaisedIcon} from '@heroicons/react/20/solid'
+import {FetchHandler} from '@/lib/api'
 
 const supabase = createClient()
 export default function Preload({children}: {
@@ -27,12 +28,7 @@ export default function Preload({children}: {
         supabase.auth.getUser().then(async ({data: {user}}) => {
             console.log({user})
             if (user) {
-                const {data, error} = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', user.id)
-                    .limit(1)
-                    .single()
+                const data = (await FetchHandler.get('/users/@me')).data
                 console.log(data)
 
                 if (user.user_metadata.waitlistType !== 'free') {
@@ -41,7 +37,7 @@ export default function Preload({children}: {
                     setUser({
                         id: user.id,
                         username: data?.username || user.email,
-                        displayName: data?.display_name || user.email,
+                        display_name: data?.display_name || user.email,
                         reqOnboard: !data || !data?.username,
                         waitlistType,
                         anonUser: ['wait', 'ban'].includes(waitlistType),
@@ -51,7 +47,7 @@ export default function Preload({children}: {
                     setUser({
                         id: user.id,
                         username: data?.username || user.email,
-                        displayName: data?.display_name || user.email,
+                        display_name: data?.display_name || user.email,
                         reqOnboard: !data || !data?.username,
                         ...data
                     })

@@ -7,22 +7,23 @@ import {useUserAccountStore} from '@/lib/states'
 import {Heading, Text} from '@/components/shared/text'
 import {ProjectName} from '@/lib/utils'
 import ProfileHeader from '@/components/shared/user/header'
-import {createClient} from '@/lib/supabase/client'
+import {FetchHandler} from '@/lib/api'
+import {toast} from '@/lib/toast'
 
 export default function SettingsGeneral() {
     const {user} = useUserAccountStore()
-    const [handleInput, setHandleInput] = useState<string | null>(user?.username)
-    const [slugInput, setSlugInput] = useState<string | null>(user?.slug)
-    const [nicknameInput, setNicknameInput] = useState<string | null>(user?.displayName)
-    const [aboutInput, setAboutInput] = useState<string | null>(user?.bio)
+    const [handleInput, setHandleInput] = useState<string | undefined>(user?.username)
+    const [slugInput, setSlugInput] = useState<string | undefined>(user?.slug)
+    const [nicknameInput, setNicknameInput] = useState<string | undefined>(user?.display_name)
+    const [aboutInput, setAboutInput] = useState<string | undefined>(user?.bio)
 
     // Profile pic and cover pic upload fields
-    const [profilePicUpload, setProfilePicUpload] = useState<File | null>(null)
-    const [coverPicUpload, setCoverPicUpload] = useState<File | null>(null)
+    const [profilePicUpload, setProfilePicUpload] = useState<File | undefined>()
+    const [coverPicUpload, setCoverPicUpload] = useState<File | undefined>()
 
     // Profile pic and cover pic upload previews
-    const [profilePicPreview, setProfilePicPreview] = useState<string | null>(null)
-    const [coverPicPreview, setCoverPicPreview] = useState<string | null>(null)
+    const [profilePicPreview, setProfilePicPreview] = useState<string | undefined>()
+    const [coverPicPreview, setCoverPicPreview] = useState<string | undefined>()
 
     useEffect(() => {
         if (profilePicUpload) {
@@ -32,7 +33,7 @@ export default function SettingsGeneral() {
             }
             reader.readAsDataURL(profilePicUpload)
         } else {
-            setProfilePicPreview(null)
+            setProfilePicPreview(undefined)
         }
     }, [profilePicUpload])
 
@@ -44,24 +45,33 @@ export default function SettingsGeneral() {
             }
             reader.readAsDataURL(coverPicUpload)
         } else {
-            setCoverPicPreview(null)
+            setCoverPicPreview(undefined)
         }
     }, [coverPicUpload])
 
-    const saveProfile = async () => {
-        const supabase = createClient()
-        const profile = {
-            id: user.id,
-            username: handleInput,
-            slug: slugInput,
-            display_name: nicknameInput,
-            bio: aboutInput
-        }
-        if (user?.reqOnboard) {
-            await supabase.from('profiles').insert(profile)
-        } else {
-            await supabase.from('profiles').update(profile).eq('id', user.id)
-        }
+    function saveProfile() {
+        FetchHandler.post(`/users/@me`, {
+            body: JSON.stringify({
+                username: handleInput,
+                display_name: nicknameInput,
+                slug: slugInput,
+                about: {
+                    bio: aboutInput || undefined
+                },
+                images: {
+                    avatar: profilePicPreview,
+                    header: coverPicPreview,
+                }
+            })
+        }).then(({data}) => {
+            if (data) {
+                toast.success('Profile updated')
+            } else {
+                toast.success('Something went wrong')
+            }
+        }).catch(err => {
+            toast.error(err.message)
+        })
     }
 
     return (
@@ -71,7 +81,7 @@ export default function SettingsGeneral() {
                     <div className="bg-card pb-12 rounded">
                         <ProfileHeader user={{
                             username: handleInput || user?.username,
-                            displayName: nicknameInput,
+                            display_name: nicknameInput,
                             about: aboutInput,
                             images: {
                                 avatar: profilePicPreview || user?.images?.avatar,
@@ -94,7 +104,7 @@ export default function SettingsGeneral() {
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             <div className="relative sm:col-span-4">
                                 <label htmlFor="username" className="block text-sm font-medium leading-6 text-default">
-                                    Space URL & Username
+                                    <Text>Space URL & Username</Text>
                                     <Text size="xs" className="text-alt">
                                         Your username is used to find and reference you across {ProjectName}. Your Space
                                         URL holds your personal customised site.
@@ -143,7 +153,7 @@ export default function SettingsGeneral() {
 
                             <div className="sm:col-span-4">
                                 <label htmlFor="display_name"
-                                       className="block text-sm font-medium leading-6 text-default">
+                                       className="block text-sm font-medium leading-6 text-default select-none">
                                     Display Name
                                 </label>
                                 <div className="mt-2">
@@ -156,7 +166,7 @@ export default function SettingsGeneral() {
                                             autoComplete="display_name"
                                             className="no-legacy block flex-1 border-0 bg-transparent py-1.5 px-3 text-default placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6"
                                             placeholder="Some Display Name"
-                                            value={user?.displayName}
+                                            value={nicknameInput || ''}
                                             onChange={(e) => setNicknameInput(e.target.value)}
                                         />
                                     </div>
@@ -167,7 +177,8 @@ export default function SettingsGeneral() {
                             </div>
 
                             <div className="col-span-full">
-                                <label htmlFor="about" className="block text-sm font-medium leading-6 text-default">
+                                <label htmlFor="about"
+                                       className="block text-sm font-medium leading-6 text-default select-none">
                                     About
                                 </label>
                                 <div className="mt-2">
@@ -180,7 +191,7 @@ export default function SettingsGeneral() {
                                     onChange={(e) => setAboutInput(e.target.value)}
                                 />
                                 </div>
-                                <p className="mt-3 text-sm leading-6 text-default-alt">
+                                <p className="mt-3 text-sm leading-6 text-default-alt select-none">
                                     Write a few sentences about yourself. <a href="https://commonmark.org/help/"
                                                                              target="_blank"
                                                                              rel="noopener noreferrer"
@@ -190,11 +201,12 @@ export default function SettingsGeneral() {
                             </div>
 
                             <div className="col-span-full">
-                                <label htmlFor="avatar" className="block text-sm font-medium leading-6 text-default">
+                                <label htmlFor="avatar"
+                                       className="block text-sm font-medium leading-6 text-default select-none">
                                     Photo
                                 </label>
                                 <input type="file" name="avatar" id="avatar" className="hidden"
-                                       onChange={(e) => setProfilePicUpload(e.target.files?.[0] || null)}/>
+                                       onChange={(e) => setProfilePicUpload(e.target.files?.[0] || undefined)}/>
                                 <div className="mt-2 flex items-center gap-x-3">
                                     {!profilePicPreview
                                         ? <UserCircleIcon className="h-12 w-12 text-default-alt" aria-hidden="true"/>
@@ -204,14 +216,14 @@ export default function SettingsGeneral() {
                                         Upload
                                     </Button>
                                 </div>
-                                <p className="mt-3 text-sm leading-6 text-default-alt">
+                                <p className="mt-3 text-sm leading-6 text-default-alt select-none">
                                     We don't resize your photo. Scroll up to the header to see how it will look.
                                 </p>
                             </div>
 
                             <div className="col-span-full">
                                 <label htmlFor="cover-photo"
-                                       className="block text-sm font-medium leading-6 text-default">
+                                       className="block text-sm font-medium leading-6 text-default select-none">
                                     Cover photo
                                 </label>
                                 <div
@@ -223,7 +235,7 @@ export default function SettingsGeneral() {
                                     )}
                                     <div className="text-center items-center justify-center">
                                         <PhotoIcon className="mx-auto h-12 w-12 text-default-alt" aria-hidden="true"/>
-                                        <div className="mt-4 flex text-sm leading-6 text-default-alt">
+                                        <div className="mt-4 flex text-sm leading-6 select-none text-default-alt">
                                             <label
                                                 htmlFor="cover-photo"
                                                 className="relative cursor-pointer rounded-md font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
@@ -231,11 +243,12 @@ export default function SettingsGeneral() {
                                                 <span>Upload a file</span>
                                                 <input id="cover-photo" name="file-upload" type="file"
                                                        className="sr-only"
-                                                       onChange={(e) => setCoverPicUpload(e.target.files?.[0] || null)}/>
+                                                       onChange={(e) => setCoverPicUpload(e.target.files?.[0] || undefined)}/>
                                             </label>
                                             <p className="pl-1">(drag and drop not supported)</p>
                                         </div>
-                                        <p className="text-xs leading-5 text-default-alt">PNG, JPG, GIF up to 10MB,
+                                        <p className="text-xs leading-5 text-default-alt select-none">PNG, JPG, GIF up
+                                            to 10MB,
                                             Aspect
                                             Ratio 3 / 1</p>
                                     </div>

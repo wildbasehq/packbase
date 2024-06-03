@@ -3,7 +3,6 @@ import ReactMarkdown from 'react-markdown'
 
 export default function ProfileHeader({...props}: any) {
     const profile = props.user
-    const header = profile.header || props.defaults?.header
 
     return (
         <div
@@ -25,7 +24,7 @@ export default function ProfileHeader({...props}: any) {
                         className="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                         <div className="sm:hidden md:block mt-6 min-w-0 flex-1">
                             <Heading>
-                                {profile.displayName || profile.username}
+                                {profile.display_name || profile.username}
                             </Heading>
                             {/* Small @username */}
                             <div className="flex items-center">
@@ -38,7 +37,7 @@ export default function ProfileHeader({...props}: any) {
                 </div>
                 <div className="hidden sm:block md:hidden mt-6 min-w-0 flex-1">
                     <Heading>
-                        {profile.displayName || profile.username}
+                        {profile.display_name || profile.username}
                     </Heading>
                 </div>
                 <div className="block min-w-0 flex-1 text-default">

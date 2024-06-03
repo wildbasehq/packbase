@@ -24,11 +24,11 @@ export default function UserAvatar({user, size = 'lg', avatar, ...props}: {
         height: typeof size === 'number' ? size : sizes[size],
     }
 
-    if ((!user || !user.avatar) && !avatar) {
+    if ((!user || !user.images?.avatar) && !avatar) {
         return (
             <div
                 className={clsx(props.className, `inline-flex justify-center rounded-md items-center bg-n-5 text-white overflow-hidden`)}
-                style={props.style} title={`${props.displayName}'s avatar`}>
+                style={props.style} title={`${props.display_name}'s avatar`}>
                 <BoringAvatar variant="beam" square size={typeof size === 'number' ? size : sizes[size]} {...props} />
             </div>
         )
@@ -36,8 +36,8 @@ export default function UserAvatar({user, size = 'lg', avatar, ...props}: {
         return (
             <img width={1024}
                  height={1024}
-                 src={user?.avatar || avatar}
-                 alt={`${user?.username || props.displayName}'s avatar`}
+                 src={user?.images?.avatar || avatar}
+                 alt={`${user?.username || props.display_name}'s avatar`}
                  {...props}
                  className={clsx(props.className, `inline-flex justify-center rounded-md items-center bg-n-5 text-white overflow-hidden`)}
             />
