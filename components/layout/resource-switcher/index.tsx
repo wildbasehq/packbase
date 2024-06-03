@@ -64,7 +64,7 @@ export default function ResourceSwitcher() {
         <>
             {domReady ? (
                 <div ref={ref}
-                     className={`group flex flex-row items-center justify-between cursor-pointer select-none ${loading ? '!cursor-no-drop' : ''}`}
+                     className={`group flex flex-row items-center justify-between select-none ${loading ? '!cursor-no-drop' : ''}`}
                      aria-label="Switch resource"
                      title={loading ? 'Resource is still switching...' : 'Switch resource'}
                      onAnimationEnd={() => {

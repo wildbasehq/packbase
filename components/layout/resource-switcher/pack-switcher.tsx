@@ -9,6 +9,7 @@ import {SettingsIcon} from 'lucide-react'
 import useSound from 'use-sound'
 import {useResourceStore, useResourceUIStore} from '@/lib/states'
 import {cn} from '@/lib/utils'
+import Link from 'next/link'
 
 export default function PackSwitcher() {
     const [initialSound] = useSound('/sounds/switcher.ogg')
@@ -74,9 +75,12 @@ export default function PackSwitcher() {
             ))}
             <div className="grow"/>
             <Tooltip content="Settings" side="right" delayDuration={0}>
-                <Button variant="ghost" size="icon" className="text-white">
-                    <SettingsIcon/>
-                </Button>
+                <Link href="/settings"
+                      className={cn('flex items-center h-8 w-8 hover:show-pill', currentResource.id === 'settings' && 'force-pill')}>
+                    <Button variant="ghost" size="icon" className="text-white h-8 w-8">
+                        <SettingsIcon/>
+                    </Button>
+                </Link>
             </Tooltip>
         </div>
     )

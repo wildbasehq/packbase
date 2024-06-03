@@ -22,10 +22,6 @@
   font-family: var(--font-pixelify), sans-serif;
 }
 
-a:not(.no-style) {
-  color: var(--color-text-primary);
-}
-
 .load-stagger > * {
   $n: 24;
   opacity: 0.25;

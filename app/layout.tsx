@@ -43,33 +43,27 @@ export default async function RootLayout({children}: {
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en">
+        <html lang="en" className="h-full">
         <body
-            className={cx('overflow-hidden bg-n-1 dark:bg-n-9', lexend.variable, lexend.className, inter.variable)}>
+            className={cx('overflow-hidden h-full bg-n-1 dark:bg-n-9', lexend.variable, lexend.className, inter.variable)}>
         <Providers>
             <PostHogPageView/>
             <div id="NGContentArea"
-                 className="h-screen flex overflow-hidden">
+                 className="h-full flex overflow-hidden">
                 <PackSwitcher/>
                 <div className="grow">
                     <NavBar/>
 
-                    <main className="h-full flex-1 flex overflow-hidden">
+                    <main className="h-[calc(100%-4rem)] flex-1 flex overflow-hidden">
                         {/* If screen size is sm, set slim to true */}
                         <SideNav slim={typeof window !== 'undefined' && window.innerWidth < 640}/>
 
                         <div className="w-full h-full">
                             <div id="NGRoot" className="h-full overflow-y-auto">
-                                <div id="NGContent"
-                                     className="lg:mb-0 flex-1 h-full overflow-x-hidden"
-                                >
-                                    <div className="h-full">
-                                        <WaitlistCheck/>
-                                        <Preload>
-                                            {children}
-                                        </Preload>
-                                    </div>
-                                </div>
+                                <WaitlistCheck/>
+                                <Preload>
+                                    {children}
+                                </Preload>
                             </div>
                         </div>
                     </main>

@@ -1,13 +1,12 @@
 'use client'
-import UserInfoCol from '@/components/shared/user/info-col'
-import Link from 'next/link'
-import cx from 'classnames'
-import {Button, buttonVariants} from '@/components/shared/ui/button'
-import {Input} from '@/components/shared/input/text'
-import LoginGradient from '@/app/id/create/client/gradient'
-import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import {createClient} from '@/lib/supabase/client'
 import {FormEvent, useState} from 'react'
+import {Logo} from '@/components/shared/logo'
+import {Heading} from '@/components/shared/text'
+import {Input} from '@/components/shared/input/text'
+import {Checkbox} from '@/components/shared/input/checkbox'
+import {Button} from '@/components/shared/ui/button'
+import Link from 'next/link'
 import {LoadingCircle} from '@/components/shared/icons'
 
 export default function IDLogin({searchParams}: {
@@ -50,69 +49,61 @@ export default function IDLogin({searchParams}: {
 
     return (
         <>
-            {/* test */}
-            <div className="animate-slide-down-fade absolute inset-0 -z-10 dark:opacity-75" style={{
-                // fit to screen
-                background: 'url(/img/illustrations/home/fox-in-snowy-oasis.webp) center/cover no-repeat',
-            }}>
-                <LoginGradient/>
+            <div>
+                <Logo className="!h-12 !w-12"/>
+                <Heading className="mt-6" size="2xl" as="h2">Sign in</Heading>
+                <p className="mt-2 text-sm text-gray-600">
+                    Or{' '}
+                    <Link href="/id/create"
+                          className="font-medium">
+                        create a new account
+                    </Link>
+                </p>
             </div>
 
-            <div
-                className="container relative flex h-full flex-col items-center justify-center lg:max-w-none lg:px-0">
-                <Link
-                    href="/id/unlock"
-                    className={cx(
-                        buttonVariants({variant: 'ghost'}),
-                        'absolute right-4 top-4 md:right-8 md:top-8'
-                    )}
-                >
-                    Login
-                </Link>
-                <div className="absolute hidden left-0 h-full flex-col p-8 text-white lg:flex">
-                    <UserInfoCol user={{
-                        display_name: 'Rek ✨',
-                        username: 'rek',
-                        avatar: '/img/illustrations/onboarding/pfp/rekkisomo.png'
-                    }}/>
-                </div>
-                <div
-                    className="relative animate-slide-down-fade rounded bg-card-solid border shadow h-fit sm:max-w-md top-0 mx-auto">
-                    <div className="lg:p-8">
-                        <div className="flex flex-col justify-center space-y-6">
-                            <div className="flex flex-col space-y-2 text-center">
-                                <h1 className="text-2xl font-semibold tracking-tight">
-                                    Welcome Back!
-                                </h1>
-                            </div>
+            <div className="mt-8">
+                <form method="POST" className="space-y-6" onSubmit={loginUser}>
+                    <div>
+                        <Input label="Email Address" required/>
+                    </div>
 
-                            {searchParams?.error_description && (
-                                <Alert variant="destructive">
-                                    <AlertTitle>
-                                        {searchParams.error}
-                                    </AlertTitle>
-                                    <AlertDescription>
-                                        {searchParams.error_description}
-                                    </AlertDescription>
-                                </Alert>
-                            )}
+                    <div className="space-y-1">
+                        <Input
+                            id="password"
+                            label="Password"
+                            type="password"
+                            autoComplete="current-password"
+                            required
+                        />
+                    </div>
 
-                            <form className="space-y-1" onSubmit={loginUser}>
-                                <div>
-                                    <Input id="login-email" label="E-Mail" type="email"/>
-                                </div>
-                                <div>
-                                    <Input id="login-password" label="Password" type="password"/>
-                                </div>
-                                <Button type="submit" variant={!submitting ? 'default' : 'ghost'}>
-                                    {!submitting ? 'Login' : (
-                                        <LoadingCircle className="h-5 w-5"/>
-                                    )}
-                                </Button>
-                            </form>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                            <Checkbox id="remember-me"
+                                      name="remember-me"/>
+                            <label htmlFor="remember-me" className="ml-2 block text-sm">
+                                Remember me
+                            </label>
+                        </div>
+
+                        <div className="text-sm">
+                            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+                                Forgot your password?
+                            </a>
                         </div>
                     </div>
-                </div>
+
+                    <div>
+                        <Button
+                            variant="default"
+                            type="submit"
+                            disabled={submitting}
+                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            {!submitting ? 'Register' : <LoadingCircle/>}
+                        </Button>
+                    </div>
+                </form>
             </div>
         </>
     )

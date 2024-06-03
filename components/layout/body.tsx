@@ -12,7 +12,7 @@ export default function Body({...props}: BodyType) {
     return (
         <div
             id="NGBody"
-            className={`relative justify-center m-auto ${props.noPadding ? '' : 'pb-48'} overflow-hidden`}>
+            className={`relative justify-center m-auto overflow-hidden`}>
             <div
                 className={`flex flex-col py-10 px-4 sm:px-6 lg:py-12 lg:px-8 mx-auto ${props.className}`}>
                 {props.children}

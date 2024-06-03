@@ -34,12 +34,11 @@ const Button = forwardRef((props: NGButtonType, ref: LegacyRef<HTMLButtonElement
             case 'primary': {
                 setVariant({
                     dark: {
-                        bg: 'dark:bg-blue-600',
-                        hover: 'dark:hover:bg-blue-700',
+                        bg: 'bg-primary',
+                        hover: 'dark:hover:bg-primary/80',
                     },
                     light: {
-                        bg: 'bg-blue-600',
-                        hover: 'hover:bg-blue-700',
+                        hover: 'hover:bg-primary/80',
                     },
                 })
 

@@ -62,7 +62,7 @@ export function SideNav({...props}: SideNavType) {
                             href={item.href}
                             activeClassName="bg-n-1/70 dark:bg-n-6"
                             inactiveClassName="transition-all hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50"
-                            className="flex rounded h-fit items-center px-3 py-1 cursor-pointer"
+                            className="flex rounded h-fit items-center px-3 py-1 cursor-pointer !no-underline"
                         >
                             <>
                                 {item.icon && (
