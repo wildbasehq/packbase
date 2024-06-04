@@ -1,5 +1,5 @@
 'use client'
-import Button from '@/components/shared/button'
+import {Button} from '@/components/shared/ui/button'
 import Avatar from '@/components/shared/user/avatar'
 import {ArrowUpRightIcon, PhotoIcon, UserCircleIcon} from '@heroicons/react/24/solid'
 import {useEffect, useState} from 'react'
@@ -9,9 +9,11 @@ import {ProjectName} from '@/lib/utils'
 import ProfileHeader from '@/components/shared/user/header'
 import {FetchHandler} from '@/lib/api'
 import {toast} from '@/lib/toast'
+import {LoadingCircle} from '@/components/shared/icons'
 
 export default function SettingsGeneral() {
     const {user} = useUserAccountStore()
+    const [submitting, setSubmitting] = useState<boolean>(false)
     const [handleInput, setHandleInput] = useState<string | undefined>(user?.username.indexOf('@') > -1 ? undefined : user?.username)
     const [slugInput, setSlugInput] = useState<string | undefined>(user?.slug)
     const [nicknameInput, setNicknameInput] = useState<string | undefined>(user?.display_name)
@@ -49,7 +51,10 @@ export default function SettingsGeneral() {
         }
     }, [coverPicUpload])
 
-    function saveProfile() {
+    function saveProfile(e: { preventDefault: () => void }) {
+        e.preventDefault()
+        if (submitting) return
+
         FetchHandler.post(`/users/@me`, {
             body: JSON.stringify({
                 username: handleInput,
@@ -66,10 +71,13 @@ export default function SettingsGeneral() {
         }).then(({data}) => {
             if (data && !data.message) {
                 toast.success('Profile updated')
+                window.location.reload()
             } else {
+                setSubmitting(false)
                 toast.success(data.message ? `${data.at}: ${data.message}` : 'Something went wrong')
             }
         }).catch(err => {
+            setSubmitting(false)
             toast.error(err.message)
         })
     }
@@ -78,7 +86,7 @@ export default function SettingsGeneral() {
         <div className="max-w-6xl mx-auto">
             <form onSubmit={saveProfile}>
                 <div className="space-y-12 mx-auto">
-                    <div className="bg-card pb-12 rounded">
+                    <div className="bg-card pb-12 rounded border">
                         <ProfileHeader user={{
                             username: handleInput || user?.username,
                             display_name: nicknameInput,
@@ -214,8 +222,11 @@ export default function SettingsGeneral() {
                                         ? <UserCircleIcon className="h-12 w-12 text-default-alt" aria-hidden="true"/>
                                         : <Avatar avatar={profilePicPreview} size="lg"/>
                                     }
-                                    <Button onClick={() => document.getElementById('avatar')?.click()}>
-                                        Upload
+                                    <Button asChild variant="outline"
+                                            onClick={() => document.getElementById('avatar')?.click()}>
+                                        <div>
+                                            Upload
+                                        </div>
                                     </Button>
                                 </div>
                                 <p className="mt-3 text-sm leading-6 text-default-alt select-none">
@@ -229,7 +240,7 @@ export default function SettingsGeneral() {
                                     Cover photo
                                 </label>
                                 <div
-                                    className="relative aspect-banner mt-2 flex items-center justify-center bg-card rounded border border-dashed px-6 py-10 cursor-pointer overflow-hidden"
+                                    className="relative aspect-banner mt-2 flex items-center justify-center bg-card rounded border-2 border-dashed px-6 py-10 overflow-hidden"
                                     onClick={() => document.getElementById('cover-photo')?.click()}>
                                     {coverPicPreview && (
                                         <img src={coverPicPreview} alt=""
@@ -240,12 +251,9 @@ export default function SettingsGeneral() {
                                         <div className="mt-4 flex text-sm leading-6 select-none text-default-alt">
                                             <label
                                                 htmlFor="cover-photo"
-                                                className="relative cursor-pointer rounded-md font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                                                className="relative rounded-md font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
                                             >
                                                 <span>Upload a file</span>
-                                                <input id="cover-photo" name="file-upload" type="file"
-                                                       className="sr-only"
-                                                       onChange={(e) => setCoverPicUpload(e.target.files?.[0] || undefined)}/>
                                             </label>
                                             <p className="pl-1">(drag and drop not supported)</p>
                                         </div>
@@ -260,9 +268,14 @@ export default function SettingsGeneral() {
                     </div>
                 </div>
 
+                <input id="cover-photo" name="file-upload" type="file"
+                       className="sr-only"
+                       onChange={(e) => setCoverPicUpload(e.target.files?.[0] || undefined)}/>
+
                 <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <Button type="submit">
-                        Save
+                    <Button type="submit" disabled={submitting}
+                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        {!submitting ? 'Save' : <LoadingCircle/>}
                     </Button>
                 </div>
             </form>
