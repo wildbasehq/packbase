@@ -12,7 +12,7 @@ import {toast} from '@/lib/toast'
 
 export default function SettingsGeneral() {
     const {user} = useUserAccountStore()
-    const [handleInput, setHandleInput] = useState<string | undefined>(user?.username)
+    const [handleInput, setHandleInput] = useState<string | undefined>(user?.username.indexOf('@') > -1 ? undefined : user?.username)
     const [slugInput, setSlugInput] = useState<string | undefined>(user?.slug)
     const [nicknameInput, setNicknameInput] = useState<string | undefined>(user?.display_name)
     const [aboutInput, setAboutInput] = useState<string | undefined>(user?.bio)
@@ -64,10 +64,10 @@ export default function SettingsGeneral() {
                 }
             })
         }).then(({data}) => {
-            if (data) {
+            if (data && !data.message) {
                 toast.success('Profile updated')
             } else {
-                toast.success('Something went wrong')
+                toast.success(data.message ? `${data.at}: ${data.message}` : 'Something went wrong')
             }
         }).catch(err => {
             toast.error(err.message)
@@ -76,7 +76,7 @@ export default function SettingsGeneral() {
 
     return (
         <div className="max-w-6xl mx-auto">
-            <form>
+            <form onSubmit={saveProfile}>
                 <div className="space-y-12 mx-auto">
                     <div className="bg-card pb-12 rounded">
                         <ProfileHeader user={{
@@ -121,6 +121,7 @@ export default function SettingsGeneral() {
                                             className="no-legacy block flex-1 border-0 bg-transparent py-1.5 px-3 text-default placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6"
                                             value={slugInput || ''}
                                             onChange={(e) => setSlugInput(e.target.value)}
+                                            required
                                         />
                                         <span
                                             className="flex select-none items-center pr-3 text-neutral-500 sm:text-sm">.packbase.app</span>
@@ -143,6 +144,7 @@ export default function SettingsGeneral() {
                                             className="no-legacy block flex-1 border-0 bg-transparent py-1.5 pl-1 text-default placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6"
                                             value={handleInput || ''}
                                             onChange={(e) => setHandleInput(e.target.value)}
+                                            required
                                         />
                                     </div>
                                     <Text size="xs" className="mt-1 text-alt">
@@ -259,7 +261,7 @@ export default function SettingsGeneral() {
                 </div>
 
                 <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <Button onClick={saveProfile}>
+                    <Button type="submit">
                         Save
                     </Button>
                 </div>
