@@ -16,9 +16,10 @@ export default function ProfileHeader({...props}: any) {
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
                     <div className="flex">
-                        <img className="bg-default h-24 w-24 rounded-lg pointer-events-none sm:h-32 sm:w-32"
-                             src={profile.images?.avatar || '/img/default-avatar.png'}
-                             alt=""/>
+                        <img
+                            className="bg-default h-24 w-24 ring-1 ring-default rounded-lg pointer-events-none sm:h-32 sm:w-32"
+                            src={profile.images?.avatar || '/img/default-avatar.png'}
+                            alt=""/>
                     </div>
                     <div
                         className="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">

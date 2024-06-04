@@ -17,6 +17,14 @@ const nextConfig = {
     webpack: (config) => {
         return config;
     },
+    async rewrites() {
+        return [
+            {
+                source: '/@:userId([a-zA-Z0-9]+)/:id*',
+                destination: "/user/:userId/:id*",
+            }
+        ]
+    }
 };
 
 module.exports = nextConfig;
