@@ -17,7 +17,7 @@ export default function SettingsGeneral() {
     const [handleInput, setHandleInput] = useState<string | undefined>(user?.username.indexOf('@') > -1 ? undefined : user?.username)
     const [slugInput, setSlugInput] = useState<string | undefined>(user?.slug)
     const [nicknameInput, setNicknameInput] = useState<string | undefined>(user?.display_name)
-    const [aboutInput, setAboutInput] = useState<string | undefined>(user?.bio)
+    const [aboutInput, setAboutInput] = useState<string | undefined>(user?.about?.bio)
 
     // Profile pic and cover pic upload fields
     const [profilePicUpload, setProfilePicUpload] = useState<File | undefined>()
@@ -91,7 +91,9 @@ export default function SettingsGeneral() {
                         <ProfileHeader user={{
                             username: handleInput || user?.username,
                             display_name: nicknameInput,
-                            about: aboutInput,
+                            about: {
+                                bio: aboutInput
+                            },
                             images: {
                                 avatar: profilePicPreview || user?.images?.avatar,
                                 header: coverPicPreview || user?.images?.header
@@ -198,7 +200,7 @@ export default function SettingsGeneral() {
                                     name="about"
                                     rows={3}
                                     className="no-legacy block w-full rounded-md border-0 py-1.5 text-default bg-default shadow-sm ring-1 ring-inset ring-neutral-300 dark:ring-neutral-800 placeholder:text-neutral-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    defaultValue={user?.bio || ''}
+                                    defaultValue={user?.about?.bio || ''}
                                     onChange={(e) => setAboutInput(e.target.value)}
                                 />
                                 </div>

@@ -44,7 +44,7 @@ export default function ProfileHeader({...props}: any) {
                 <div className="block min-w-0 flex-1 text-default">
                     <div className="mt-6 text-sm whitespace-pre-line">
                         <ReactMarkdown>
-                            {profile.about}
+                            {profile.about?.bio}
                         </ReactMarkdown>
                     </div>
                 </div>
