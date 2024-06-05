@@ -28,16 +28,21 @@ const FETCH_BASE = async (url: string, options: RequestInit = {}) => {
     }
 
     const response = await fetch(url, defaultOptions)
-    const data = await response.json()
+    let data
+    try {
+        data = await response.json()
+    } catch (_) {
+        // cry about it, nextjs. seriously.
+    }
     switch (response.status) {
         case 401:
-            throw new Error(data.message || 'UNAUTHORIZED')
+            throw new Error(data?.message || 'UNAUTHORIZED')
         case 403:
-            throw new Error(data.message || 'FORBIDDEN')
+            throw new Error(data?.message || 'FORBIDDEN')
         // case 404:
         // throw new Error(data.message || 'NOT_FOUND')
         case 500:
-            throw new Error(data.message || 'INTERNAL_SERVER_ERROR')
+            throw new Error(data?.message || 'INTERNAL_SERVER_ERROR')
         default:
             break
     }
