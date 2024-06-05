@@ -12,6 +12,9 @@ export interface InputProps
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
     ({className, type, id, description, suffix, button, autoComplete, label, combined, ...props}, ref) => {
+        let InputElement = 'input'
+        if (type === 'textarea') InputElement = 'textarea'
+
         return (
             <>
                 {(label && !combined) && (
@@ -26,7 +29,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         className={cn(combined ? 'border-0 rounded-0 shadow-none' : 'rounded-md shadow-sm ring-1 ring-inset ring-neutral-300 dark:ring-white/10', className, 'w-full flex bg-default focus-within:ring-2 focus-within:ring-inset focus-within:!ring-indigo-600 sm:max-w-md')}>
                         {suffix && <span
                             className="flex select-none items-center pl-3 text-neutral-500 sm:text-sm">{suffix}</span>}
-                        <input
+                        <InputElement
+                            // @ts-ignore
                             type={type || 'text'}
                             ref={ref}
                             name={id}
