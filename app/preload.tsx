@@ -17,52 +17,58 @@ export default function Preload({children}: {
 }) {
     const [serviceLoading, setServiceLoading] = useState<string>('waiting for client')
     const [error, setError] = useState<any | null>(null)
-    const [dummy] = useState<any>(null)
     const {setUser} = useUserAccountStore()
-    const {setLoading} = useResourceUIStore()
+    const {setLoading, setConnecting} = useResourceUIStore()
 
     useEffect(() => {
         if (serviceLoading !== 'waiting for client') return
-        setServiceLoading('auth')
-        // @ts-ignore
-        supabase.auth.getUser().then(async ({data: {user}}) => {
-            console.log({user})
-            if (user) {
-                const data = (await FetchHandler.get('/users/@me')).data
-                console.log(data)
-
-                if (user.user_metadata.waitlistType !== 'free') {
-                    // Assume they're in the waitlist
-                    const waitlistType = user.user_metadata.waitlistType || 'wait'
-                    setUser({
-                        id: user.id,
-                        username: data?.username || user.email,
-                        display_name: data?.display_name || user.email,
-                        reqOnboard: !data || !data?.username,
-                        waitlistType,
-                        anonUser: ['wait', 'ban'].includes(waitlistType),
-                        ...data
-                    })
+        FetchHandler.get('/').then(_ => {
+            setServiceLoading('auth')
+            // @ts-ignore
+            supabase.auth.getUser().then(async ({data: {user}}) => {
+                console.log({user})
+                if (user) {
+                    const data = (await FetchHandler.get('/users/@me')).data
+                    if (user.user_metadata.waitlistType !== 'free') {
+                        // Assume they're in the waitlist
+                        const waitlistType = user.user_metadata.waitlistType || 'wait'
+                        setUser({
+                            id: user.id,
+                            username: data?.username || user.email,
+                            display_name: data?.display_name || user.email,
+                            reqOnboard: !data || !data?.username,
+                            waitlistType,
+                            anonUser: ['wait', 'ban'].includes(waitlistType),
+                            ...data
+                        })
+                    } else {
+                        setUser({
+                            id: user.id,
+                            username: data?.username || user.email,
+                            display_name: data?.display_name || user.email,
+                            reqOnboard: !data || !data?.username,
+                            ...data
+                        })
+                    }
                 } else {
-                    setUser({
-                        id: user.id,
-                        username: data?.username || user.email,
-                        display_name: data?.display_name || user.email,
-                        reqOnboard: !data || !data?.username,
-                        ...data
-                    })
+                    setUser(null)
                 }
-            } else {
-                setUser(null)
-            }
-            proceed()
+                proceed()
+            })
+        }).catch(e => {
+            if (e.message.indexOf('Failed') > -1) return setError({
+                cause: 'UI & Server could not talk together',
+                message: 'Packbase is offline, or your network is extremely unstable.'
+            })
+            return setError(e)
         })
-    }, [dummy])
+    }, [])
 
     const proceed = () => {
         if (error) return
         setServiceLoading('proceeding')
         setLoading(false)
+        setConnecting(false)
     }
 
     return (
@@ -106,7 +112,7 @@ export default function Preload({children}: {
                                     {ProjectName} can't continue
                                 </Heading>
                                 <p className="mt-1 text-sm leading-6 text-alt">
-                                    {error.cause || 'Something went wrong'}: {error.message}
+                                    {error.cause || 'Something went wrong'}: {error.message || error.stack}
                                 </p>
                             </>
                         )}
