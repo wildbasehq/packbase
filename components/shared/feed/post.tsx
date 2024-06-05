@@ -66,7 +66,7 @@ export default function FeedPost({post}: FeedPostType) {
                                     {user.display_name || user.username}
                                 </Link>
                                 {created_at && (
-                                    <a href={`/@rek/${id}`}
+                                    <a href={`/@${user.username}/${id}`}
                                        className="text-sm text-default-alt cursor-pointer hover:underline">
                                         <time
                                             dateTime={created_at}>
