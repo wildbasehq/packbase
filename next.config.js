@@ -5,7 +5,7 @@ const nextConfig = {
     reactStrictMode: false,
     swcMinify: true,
     images: {
-        domains: ['ecwxmakixjrsklydfmtl.supabase.co', 'cdn.discordapp.com', 'unavatar.io', 'localhost'],
+        domains: ['udxdytccktvaedirxooa.supabase.co', 'ecwxmakixjrsklydfmtl.supabase.co', 'cdn.discordapp.com', 'unavatar.io', 'localhost'],
     },
     env: {
         NEXT_PUBLIC_SUPABASE_URL: process.env.SUPABASE_URL,

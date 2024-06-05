@@ -5,6 +5,10 @@
     "_type": "datatable",
     "staff": {
       "_rootDir": "staff/",
+      "tooltip": {
+        "1": "Alumni",
+        "2": "Wow, I work on this!"
+      },
       "default": "1.png",
       "kingless": "1_1.png"
     },

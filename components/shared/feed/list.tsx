@@ -17,7 +17,8 @@ import UserAvatar from '@/components/shared/user/avatar'
 import FeedPost from '@/components/shared/feed/post'
 
 export default function FeedList() {
-    const feedID = '00000000-0000-0000-0000-000000000000'
+    const packID = '00000000-0000-0000-0000-000000000000'
+    const feedID = 'EVERYTHING0'
     const [postsReady, setPostsReady] = useState<boolean>(false)
     const [postsHasMore, setPostsHasMore] = useState<boolean>(false)
     const [postsCurrentPage, setPostsCurrentPage] = useState<number>(1)
@@ -105,7 +106,7 @@ export default function FeedList() {
             {postsReady && (
                 <>
                     <div className="flex justify-between items-center mb-4">
-                        feed {feedID} &mdash; {posts.length} posts &mdash; {postsHasMore ? 'has more' : 'no more'}
+                        feed {packID}/{feedID} &mdash; {posts.length} posts &mdash; {postsHasMore ? 'has more' : 'no more'}
                         <FeedViewListbox/>
                     </div>
 

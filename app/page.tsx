@@ -4,25 +4,30 @@ import GuestLanding from '@/components/home/guestlanding'
 import {useUserAccountStore} from '@/lib/states'
 import UserAvatar from '@/components/shared/user/avatar'
 import ReactMarkdown from 'react-markdown'
-import {FormEvent, useState} from 'react'
+import {FormEvent, memo, useState} from 'react'
 import {Heading, Text} from '@/components/shared/text'
 import girlDogBusStop from '@/datasets/lottie/girl-dog-bus-stop.json'
 import dynamic from 'next/dynamic'
 import FeedList from '@/components/shared/feed/list'
 import Card from '@/components/shared/card'
 import Link from 'next/link'
-import {DotIcon} from 'lucide-react'
+import {DotIcon, PartyPopperIcon} from 'lucide-react'
 import {Input} from '@/components/shared/input/text'
 import {Button} from '@/components/shared/ui/button'
 import {FetchHandler} from '@/lib/api'
 import {toast} from '@/lib/toast'
 import {LoadingCircle} from '@/components/shared/icons'
+import {CheckBadgeIcon} from '@heroicons/react/24/solid'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
+import Modal from '@/components/modal'
+import {BentoStaffBadge} from '@/lib/utils/pak'
 
 export default function Home() {
     const {user} = useUserAccountStore()
     const [notice, setNotice] = useState<any>(null)
-    const Lottie = dynamic(() => import('lottie-react'), {ssr: false})
+    const Lottie = memo(dynamic(() => import('lottie-react'), {ssr: false, suspense: true}))
     const [submitting, setSubmitting] = useState<boolean>(false)
+    const [showModal, setShowModal] = useState<boolean>(false)
 
     // useEffect(() => {
     //     if (!window || !user) return
@@ -100,7 +105,7 @@ export default function Home() {
                     </div>
                 )}
 
-                {user?.waitlistType === 'h' && (
+                {user?.waitlistType === 'wait' && (
                     <>
                         <div
                             className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mb-12 justify-center items-center">
@@ -110,16 +115,46 @@ export default function Home() {
                                 </Heading>
                                 <div className="space-y-2">
                                     <Text className="text-sm text-default-alt">
-                                        If you'd like to participate with the community, you'll need an invite from
-                                        someone. As we have no "rolling invites", we allow users to gift invites to
-                                        random (or specific) people in the waitlist~!
+                                        If you'd like to participate with the community, you'll need an invite from someone. As we have no "rolling invites", we allow
+                                        users to gift invites to random (or specific) people in the waitlist~!
                                         <br/><br/>
-                                        If you don't know anyone already in, your best bet is to wait. <span
-                                        className="text-tertiary">
-                                        If you've traded anything for an invite, you've been scammed.
-                                    </span>
+                                        If you don't know anyone already in, your best bet is to wait.
+                                        <span className="text-tertiary">
+                                            If you've traded anything for an invite, you've been scammed.
+                                        </span>
                                     </Text>
                                 </div>
+
+                                <Alert variant="success" className="select-none cursor-help hover:ring-4 ring-default transition-shadow"
+                                       onClick={() => setShowModal(true)}>
+                                    <CheckBadgeIcon
+                                        className="h-5 w-5"/>
+                                    <AlertTitle>
+                                        Users created on this version are exempt from restrictions!
+                                    </AlertTitle>
+                                    <AlertDescription className="text-default-alt">
+                                        The perks of being a test dummy. The stage's all yours, go wild! 🎉
+                                    </AlertDescription>
+                                </Alert>
+
+                                <Modal showModal={showModal} setShowModal={setShowModal}>
+                                    <div className="flex flex-col p-4 bg-card">
+                                        <Heading size="xl">
+                                            <PartyPopperIcon className="inline-flex mr-1 w-5 h-5"/>
+                                            'sup volunteer
+                                        </Heading>
+                                        <Text className="mt-2">
+                                            You work on this, nice.
+                                            <br/><br/>
+                                            On public release, you'll have a{' '} <BentoStaffBadge type="1" width={20} height={20} className="h-5 w-5 inline-flex"/>{' '}
+                                            corgi badge next to your name (or a <BentoStaffBadge type="2" width={20} height={20} className="h-5 w-5 inline-flex"/> rainbow
+                                            one if you're still with us 🫡)
+                                        </Text>
+                                        <Button variant="outline" className="mt-4" onClick={() => setShowModal(false)}>
+                                            Got it
+                                        </Button>
+                                    </div>
+                                </Modal>
                             </div>
                             <div className="flex items-end justify-end">
                                 <Lottie className="h-80 w-auto right-0" animationData={girlDogBusStop}/>
