@@ -29,7 +29,7 @@ export default function ResourceSwitcher() {
 
     const {currentResource} = useResourceStore()
 
-    const {loading} = useResourceUIStore()
+    const {loading, connecting} = useResourceUIStore()
     const {ref} = useComponentVisible({
         soundOnClose: cancelSound
     })
@@ -48,7 +48,7 @@ export default function ResourceSwitcher() {
 
     return (
         <>
-            {domReady ? (
+            {(domReady && !connecting) ? (
                 <div ref={ref}
                      className={`group flex flex-row items-center justify-between select-none ${loading ? '!cursor-no-drop' : ''}`}
                      aria-label="Switch resource"

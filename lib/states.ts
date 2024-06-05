@@ -96,8 +96,10 @@ interface ResourceUIStore {
         standalone: boolean;
     };
     loading: boolean;
+    connecting: boolean;
     navigation: any[];
     setLoading: (loading: boolean) => void;
+    setConnecting: (loading: boolean) => void;
     setNavigation: (navigation: any) => void;
 }
 
@@ -105,6 +107,7 @@ export const useResourceUIStore = create<ResourceUIStore>(
     (set) => ({
         resourceDefault,
         loading: true,
+        connecting: true,
         navigation: [{
             name: 'Home',
             description: '[here temp] go universe home',
@@ -114,6 +117,10 @@ export const useResourceUIStore = create<ResourceUIStore>(
         setLoading: (loading) => set((state) => ({
             ...state,
             loading,
+        })),
+        setConnecting: (connecting) => set((state) => ({
+            ...state,
+            connecting,
         })),
         setNavigation: (navigation: any) => set((state) => ({
             ...state,
