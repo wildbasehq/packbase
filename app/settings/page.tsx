@@ -54,6 +54,7 @@ export default function SettingsGeneral() {
     function saveProfile(e: { preventDefault: () => void }) {
         e.preventDefault()
         if (submitting) return
+        setSubmitting(true)
 
         FetchHandler.post(`/users/@me`, {
             body: JSON.stringify({
