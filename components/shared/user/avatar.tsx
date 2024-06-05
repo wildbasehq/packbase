@@ -39,7 +39,7 @@ export default function UserAvatar({user, size = 'lg', avatar, ...props}: {
                  src={user?.images?.avatar || avatar}
                  alt={`${user?.username || props.display_name}'s avatar`}
                  {...props}
-                 className={clsx(props.className, `inline-flex justify-center rounded-md items-center bg-n-5 text-white overflow-hidden`)}
+                 className={clsx(props.className, `inline-flex justify-center rounded-md items-center text-white overflow-hidden`)}
             />
         )
     }
