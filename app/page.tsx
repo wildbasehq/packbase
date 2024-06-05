@@ -130,71 +130,73 @@ export default function Home() {
             </Body>
 
             <div className="px-8">
-                <Card className="!px-0 !py-0 mx-auto mb-8">
-                    <form onSubmit={submitPost}>
-                        <div className="relative">
-                            <div className="px-4 pt-5 sm:px-6">
-                                <div className="flex space-x-3">
-                                    <div className="flex-shrink-0">
-                                        <UserAvatar user={user}/>
-                                    </div>
-                                    <div className="min-w-0 flex-1 flex flex-col justify-center">
-                                        <Link href={`/@${user.username}/`}
-                                              className="font-medium text-default">
-                                            {user.display_name || user.username}
-                                        </Link>
-                                        <Text>
-                                            New Howl
-                                        </Text>
-                                    </div>
-                                    <div className="flex-shrink-0 self-center flex space-x-2">
-                                        <DotIcon/>
+                {user && (
+                    <Card className="!px-0 !py-0 mx-auto mb-8">
+                        <form onSubmit={submitPost}>
+                            <div className="relative">
+                                <div className="px-4 pt-5 sm:px-6">
+                                    <div className="flex space-x-3">
+                                        <div className="flex-shrink-0">
+                                            <UserAvatar user={user}/>
+                                        </div>
+                                        <div className="min-w-0 flex-1 flex flex-col justify-center">
+                                            <Link href={`/@${user.username}/`}
+                                                  className="font-medium text-default">
+                                                {user.display_name || user.username}
+                                            </Link>
+                                            <Text>
+                                                New Howl
+                                            </Text>
+                                        </div>
+                                        <div className="flex-shrink-0 self-center flex space-x-2">
+                                            <DotIcon/>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div
-                                className="min-h-fit w-full py-4 px-4 sm:px-6 cursor-pointer">
                                 <div
-                                    className="text-sm text-neutral-700 space-y-4 dark:text-neutral-50">
-                                    <Input label="body" name="body" type="textarea"/>
+                                    className="min-h-fit w-full py-4 px-4 sm:px-6 cursor-pointer">
+                                    <div
+                                        className="text-sm text-neutral-700 space-y-4 dark:text-neutral-50">
+                                        <Input label="body" name="body" type="textarea"/>
+                                    </div>
+
+                                    {/* Post Objects (Images) */}
+                                    {/*{postContent?.objects && postContent.objects.length > 0 && (*/}
+                                    {/*    <MediaGrid objects={postContent.objects} selectState={[selectedMedia, setSelectedMedia]}*/}
+                                    {/*               post={postContent} truncate/>*/}
+                                    {/*)}*/}
                                 </div>
 
-                                {/* Post Objects (Images) */}
-                                {/*{postContent?.objects && postContent.objects.length > 0 && (*/}
-                                {/*    <MediaGrid objects={postContent.objects} selectState={[selectedMedia, setSelectedMedia]}*/}
-                                {/*               post={postContent} truncate/>*/}
-                                {/*)}*/}
+                                {/* Floating "User is typing..." card */}
+                                {/*<div className="absolute bottom-0 left-0 ml-4 sm:ml-6 bg-box-alt border-x border-t border-b-0 border-solid border-neutral-300 dark:border-neutral-700 rounded-tl-xl rounded-tr-xl">*/}
+                                {/*    <div className="flex items-center space-x-2 px-4 py-2">*/}
+                                {/*        <div className="flex-shrink-0">*/}
+                                {/*            <img className="h-4 w-4 rounded-full"*/}
+                                {/*                    src={postContent.user.avatar || `/img/avatar/default-avatar.png`}*/}
+                                {/*                    alt=""/>*/}
+                                {/*        </div>*/}
+                                {/*        <div className="min-w-0 flex-1">*/}
+                                {/*            <p className="text-sm font-medium text-default cursor-pointer hover:underline">*/}
+                                {/*                {postContent.user.username} is typing...*/}
+                                {/*            </p>*/}
+                                {/*        </div>*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
                             </div>
 
-                            {/* Floating "User is typing..." card */}
-                            {/*<div className="absolute bottom-0 left-0 ml-4 sm:ml-6 bg-box-alt border-x border-t border-b-0 border-solid border-neutral-300 dark:border-neutral-700 rounded-tl-xl rounded-tr-xl">*/}
-                            {/*    <div className="flex items-center space-x-2 px-4 py-2">*/}
-                            {/*        <div className="flex-shrink-0">*/}
-                            {/*            <img className="h-4 w-4 rounded-full"*/}
-                            {/*                    src={postContent.user.avatar || `/img/avatar/default-avatar.png`}*/}
-                            {/*                    alt=""/>*/}
-                            {/*        </div>*/}
-                            {/*        <div className="min-w-0 flex-1">*/}
-                            {/*            <p className="text-sm font-medium text-default cursor-pointer hover:underline">*/}
-                            {/*                {postContent.user.username} is typing...*/}
-                            {/*            </p>*/}
-                            {/*        </div>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                        </div>
-
-                        {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
-                        <div className="px-4 py-4 sm:px-6 flex justify-between space-x-8 border-t">
-                            <div className="flex items-center w-full space-x-6">
-                                <div className="flex-1"/>
-                                <Button disabled={submitting}>
-                                    {!submitting ? 'Post' : <LoadingCircle/>}
-                                </Button>
+                            {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
+                            <div className="px-4 py-4 sm:px-6 flex justify-between space-x-8 border-t">
+                                <div className="flex items-center w-full space-x-6">
+                                    <div className="flex-1"/>
+                                    <Button disabled={submitting}>
+                                        {!submitting ? 'Post' : <LoadingCircle/>}
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
-                </Card>
+                        </form>
+                    </Card>
+                )}
 
                 <FeedList/>
             </div>
