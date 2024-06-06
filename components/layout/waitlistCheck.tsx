@@ -66,7 +66,7 @@ export default function WaitlistCheck() {
                         <span className="font-semibold text-default">{ServiceStates[serviceStatus].status}</span>
                     </h1>
                 </div>
-                <p className="mt-2 text-xs leading-6 text-neutral-400">
+                <p className="mt-2 text-xs leading-6 text-default-alt">
                     {ServiceStates[serviceStatus].text}
                 </p>
             </div>

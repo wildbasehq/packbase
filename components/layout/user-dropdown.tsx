@@ -1,7 +1,6 @@
 'use client'
 
 import {Cog6ToothIcon, MinusCircleIcon, MoonIcon} from '@heroicons/react/24/solid'
-import * as Accordion from '@radix-ui/react-accordion'
 import {ChevronDownIcon} from '@heroicons/react/20/solid'
 import {useUserAccountStore} from '@/lib/states'
 import LogoutIcon from '@/components/shared/icons/logout'
@@ -10,6 +9,8 @@ import Link from 'next/link'
 import {useRouter} from 'next/navigation'
 import {createClient} from '@/lib/supabase/client'
 import {Heading, Text} from '@/components/shared/text'
+import {Dropdown, DropdownDescription, DropdownHeader, DropdownItem, DropdownLabel, DropdownMenu} from '@/components/shared/dropdown'
+import {MenuButton} from '@headlessui/react'
 
 export default function UserDropdown() {
     const {user, setUser} = useUserAccountStore()
@@ -43,32 +44,36 @@ export default function UserDropdown() {
         {
             id: 1,
             name: 'Online',
+            description: 'Everyone will see that you\'re online.',
             className: 'bg-green-400',
         },
         {
             id: 2,
             name: 'Do not disturb',
+            description: 'You won\'t receive any audible notifications.',
             icon: MinusCircleIcon,
             className: 'text-accent-1',
         },
         {
             id: 3,
             name: 'Idle',
+            description: 'Automatically switches to this when you\'re not focused in the tab or browser.',
             icon: MoonIcon,
             className: 'text-accent-5',
         },
         {
             id: 0,
             name: 'Invisible',
-            className: 'bg-n-5',
+            description: 'Disconnects from Packbase DMs. Still able to access messages, but won\'t send or receive read receipts nor receive real-time notifications.',
+            className: 'border-n-5 group-hover:border-white border-dashed border-2 w-4 h-4',
         },
     ]
 
     const currentStatus = StatusOptions.find((option) => option.id === user.status) || StatusOptions[0]
 
     return (
-        <div
-            className="flex flex-col w-96 self-center p-4 gap-3 bg-n-1 dark:bg-n-8 unicorn:bg-surface-container">
+        <DropdownHeader
+            className="flex flex-col w-96 !p-3 gap-3">
             {user.reqOnboard && (
                 <Link href="/settings"
                       className="flex-col w-full bg-card border border-default rounded text-start p-3 hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50 transition-all !no-underline">
@@ -87,9 +92,9 @@ export default function UserDropdown() {
                 <div className="w-16 h-16 relative">
                     <UserAvatar user={user} size="3xl"/>
                     <div
-                        className="w-6 h-6 p-1 left-10 top-10 rounded absolute justify-center items-center inline-flex bg-n-1 dark:bg-n-6">
+                        className="w-6 h-6 left-10 top-10 rounded absolute justify-center items-center inline-flex bg-card">
                         {currentStatus.icon && (
-                            <currentStatus.icon className={`w-full h-full ${currentStatus.className}`}/>
+                            <currentStatus.icon className={`w-full h-full p-0.5 ${currentStatus.className}`}/>
                         )}
 
                         {!currentStatus.icon && (
@@ -113,48 +118,40 @@ export default function UserDropdown() {
             {/*</div>*/}
 
             <div
-                className="inline-flex flex-col w-full bg-n-2/25 dark:bg-n-7/25 unicorn:bg-surface-container-low bg-opacity-95 border rounded-xl">
-                <Accordion.Root
-                    className="w-full"
-                    type="single"
-                    collapsible
-                >
-                    <Accordion.Item value="status">
-                        <Accordion.Header asChild>
-                            <Accordion.Trigger
-                                className="AccordionTrigger w-full px-4 py-3 bg-n-2 dark:bg-n-7 bg-opacity-50 unicorn:bg-surface-container/50 rounded-tl-xl rounded-tr-xl justify-between items-start inline-flex cursor-auto select-none">
-                                <div className="justify-center items-center gap-4 flex">
-                                    {currentStatus.icon && (
-                                        <div className="w-6 h-6 p-0.5 justify-center items-center">
-                                            <currentStatus.icon
-                                                className={`${currentStatus.className || 'fill-alt'} w-full h-full transition-colors`}/>
-                                        </div>
-                                    )}
-
-                                    {!currentStatus.icon && (
-                                        <div className="w-6 h-6 p-1 justify-center items-center">
-                                            <div
-                                                className={`w-full h-full ${currentStatus.className || 'bg-n-5'} rounded-full`}/>
-                                        </div>
-                                    )}
-                                    <div className="text-sm text-on-surface-variant">{currentStatus.name}</div>
+                className="relative inline-flex flex-col w-full bg-n-1/50 dark:bg-n-7/25 border rounded-xl">
+                <Dropdown>
+                    <MenuButton
+                        className="w-full px-4 py-3 rounded-tl-xl rounded-tr-xl border-b justify-between items-start inline-flex cursor-auto select-none">
+                        <div className="justify-center items-center gap-4 flex">
+                            {currentStatus.icon && (
+                                <div className="w-6 h-6 p-0.5 justify-center items-center">
+                                    <currentStatus.icon
+                                        className={`${currentStatus.className || 'fill-alt'} w-full h-full transition-colors`}/>
                                 </div>
-                                <ChevronDownIcon className="AccordionChevron w-5 h-5 self-center text-body"/>
-                            </Accordion.Trigger>
-                        </Accordion.Header>
-                        <Accordion.Content className="AccordionContent flex flex-col overflow-hidden select-none">
-                            {/* status options, except current one */}
-                            {StatusOptions.filter((option) => option.id !== user.status).map((option, i) => (
-                                <div
-                                    key={i}
-                                    className="group px-4 py-3 justify-start items-center gap-4 inline-flex"
-                                    onClick={() => {
-                                        setUser({
-                                            ...user,
-                                            status: option.id,
-                                        })
-                                    }}
-                                >
+                            )}
+
+                            {!currentStatus.icon && (
+                                <div className="w-6 h-6 p-1 justify-center items-center">
+                                    <div
+                                        className={`w-full h-full ${currentStatus.className || 'bg-n-5'} rounded-full`}/>
+                                </div>
+                            )}
+                            <div className="text-sm text-on-surface-variant">{currentStatus.name}</div>
+                        </div>
+                        <ChevronDownIcon className="AccordionChevron w-5 h-5 self-center text-body"/>
+                    </MenuButton>
+                    <DropdownMenu className="!w-96">
+                        {StatusOptions.filter((option) => option.id !== user.status).map((option, i) => (
+                            <DropdownItem
+                                key={i}
+                                onClick={() => {
+                                    setUser({
+                                        ...user,
+                                        status: option.id,
+                                    })
+                                }}
+                            >
+                                <DropdownLabel className="group justify-start items-center gap-3 py-1 inline-flex">
                                     {option.icon && (
                                         <div className="w-6 h-6 p-0.5 justify-center items-center">
                                             <option.icon
@@ -168,13 +165,16 @@ export default function UserDropdown() {
                                                 className={`w-full h-full ${option.className || 'bg-n-5'} rounded-full`}/>
                                         </div>
                                     )}
-                                    <div
-                                        className="text-on-surface-variant text-opacity-75 text-sm transition-colors group-hover:text-primary-feral">{option.name}</div>
-                                </div>
-                            ))}
-                        </Accordion.Content>
-                    </Accordion.Item>
-                </Accordion.Root>
+                                    {option.name}
+                                </DropdownLabel>
+                                <DropdownDescription>
+                                    {option.description}
+                                </DropdownDescription>
+                            </DropdownItem>
+                        ))}
+
+                    </DropdownMenu>
+                </Dropdown>
 
                 <div className="inline-flex flex-col w-full">
                     {UserOptions.map((option, i) => (
@@ -190,6 +190,6 @@ export default function UserDropdown() {
                     ))}
                 </div>
             </div>
-        </div>
+        </DropdownHeader>
     )
 }

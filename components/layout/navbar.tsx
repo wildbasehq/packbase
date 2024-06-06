@@ -8,8 +8,9 @@ import {Search} from '@/components/layout/search'
 import UserDropdown from '@/components/layout/user-dropdown'
 import {useResourceUIStore, useUserAccountStore} from '@/lib/states'
 import UserAvatar from '@/components/shared/user/avatar'
-import Popover from '@/components/shared/popover'
 import ResourceSwitcher from '@/components/layout/resource-switcher'
+import {Dropdown, DropdownMenu} from '@/components/shared/dropdown'
+import {MenuButton} from '@headlessui/react'
 
 export default function NavBar() {
     const {user} = useUserAccountStore()
@@ -46,16 +47,14 @@ export default function NavBar() {
                             </div>
                             <div className="hidden min-[416px]:contents">
                                 {user &&
-                                    <Popover
-                                        content={<>
-                                            {user && <UserDropdown/>}
-                                        </>}
-                                        align="end"
-                                    >
-                                        <div>
+                                    <Dropdown>
+                                        <MenuButton>
                                             <UserAvatar user={user} size="md"/>
-                                        </div>
-                                    </Popover>
+                                        </MenuButton>
+                                        <DropdownMenu>
+                                            <UserDropdown/>
+                                        </DropdownMenu>
+                                    </Dropdown>
                                 }
 
                                 {!user && (

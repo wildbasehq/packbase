@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@algolia/autocomplete-core": "^1.11.0",
-    "@headlessui/react": "^1.7.17",
+    "@headlessui/react": "^2.0.4",
     "@heroicons/react": "^2.0.18",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-checkbox": "^1.0.4",
