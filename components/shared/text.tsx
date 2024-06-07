@@ -25,12 +25,13 @@ export function Heading({as, children, size = 'base', ...props}: {
     )
 }
 
-export function Text({children, size = 'sm', ...props}: {
+export function Text({children, size = 'sm', alt, ...props}: {
     children: React.ReactNode;
     size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl';
+    alt?: boolean;
     [key: string]: any;
 }): JSX.Element {
-    props.className = cn('text-default select-none', props.className, textSize[size], '[&_p]:leading-relaxed')
+    props.className = cn('text-default select-none', props.className, textSize[size], alt && 'text-alt', '[&_p]:leading-relaxed')
 
     return (
         <p {...props}>
