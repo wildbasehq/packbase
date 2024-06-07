@@ -1,5 +1,5 @@
-import * as bentoConfig from '@/datasets/bento/conf.json'
-import * as badgeConfig from '@/datasets/bento/pak/badges/pak.json'
+import bentoConfig from '@/datasets/bento/conf.json'
+import badgeConfig from '@/datasets/bento/pak/badges/pak.json'
 import Image from 'next/image'
 import Tooltip from '@/components/shared/tooltip'
 
