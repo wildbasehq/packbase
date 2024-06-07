@@ -51,7 +51,7 @@ export default function NavBar() {
                                         <MenuButton>
                                             <UserAvatar user={user} size="md"/>
                                         </MenuButton>
-                                        <DropdownMenu>
+                                        <DropdownMenu className="mt-4 !p-0">
                                             <UserDropdown/>
                                         </DropdownMenu>
                                     </Dropdown>

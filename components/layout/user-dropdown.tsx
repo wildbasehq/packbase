@@ -1,44 +1,21 @@
 'use client'
 
-import {Cog6ToothIcon, MinusCircleIcon, MoonIcon} from '@heroicons/react/24/solid'
+import {MinusCircleIcon, MoonIcon} from '@heroicons/react/24/solid'
 import {ChevronDownIcon} from '@heroicons/react/20/solid'
 import {useUserAccountStore} from '@/lib/states'
 import LogoutIcon from '@/components/shared/icons/logout'
-import UserAvatar from '@/components/shared/user/avatar'
 import Link from 'next/link'
-import {useRouter} from 'next/navigation'
 import {createClient} from '@/lib/supabase/client'
 import {Heading, Text} from '@/components/shared/text'
 import {Dropdown, DropdownDescription, DropdownHeader, DropdownItem, DropdownLabel, DropdownMenu} from '@/components/shared/dropdown'
 import {MenuButton} from '@headlessui/react'
+import UserAvatar from '@/components/shared/user/avatar'
+import {SettingsIcon} from 'lucide-react'
+import {Button} from '@/components/shared/ui/button'
+import Tooltip from '@/components/shared/tooltip'
 
 export default function UserDropdown() {
     const {user, setUser} = useUserAccountStore()
-    const router = useRouter()
-
-    const UserOptions = [
-        {
-            name: 'Settings',
-            icon: Cog6ToothIcon,
-            onClick: () => {
-                router.push('/settings')
-            },
-        },
-        {
-            name: 'Log out',
-            icon: LogoutIcon,
-            className: 'group-hover:text-accent-1 group-hover:fill-accent-1',
-            onClick: () => {
-                const supabase = createClient()
-                supabase.auth.signOut().then(() => {
-                    // clean session
-                    window.localStorage.removeItem('token')
-                    window.localStorage.removeItem('user-account')
-                    window.location.reload()
-                })
-            },
-        }
-    ]
 
     const StatusOptions = [
         {
@@ -73,42 +50,7 @@ export default function UserDropdown() {
 
     return (
         <DropdownHeader
-            className="flex flex-col w-96 !p-3 gap-3">
-            {user.reqOnboard && (
-                <Link href="/settings"
-                      className="flex-col w-full bg-card border border-default rounded text-start p-3 hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50 transition-all !no-underline">
-                    <Heading size="sm">Finish your space</Heading>
-                    <Text size="xs" className="text-alt">
-                        For your privacy, no one can find you and your profile is non-existent until you make
-                        it.
-                        <p className="mt-2">
-                            Click to get started!
-                        </p>
-                    </Text>
-                </Link>
-            )}
-
-            <div className="w-full justify-start items-center gap-4 inline-flex">
-                <div className="w-16 h-16 relative">
-                    <UserAvatar user={user} size="3xl"/>
-                    <div
-                        className="w-6 h-6 left-10 top-10 rounded absolute justify-center items-center inline-flex bg-card">
-                        {currentStatus.icon && (
-                            <currentStatus.icon className={`w-full h-full p-0.5 ${currentStatus.className}`}/>
-                        )}
-
-                        {!currentStatus.icon && (
-                            <div className={`w-3.5 h-3.5 ${currentStatus.className} rounded-full`}/>
-                        )}
-                    </div>
-                </div>
-                <Link href={`/@${user.username}/`} className="flex-col inline-flex items-center">
-                    <div
-                        className="self-stretch text-default text-lg font-semibold">{user.display_name || user.username}</div>
-                    <div className="self-stretch text-alt text-xs font-medium leading-tight">@{user.username}</div>
-                </Link>
-            </div>
-
+            className="flex flex-col w-96 !p-0">
             {/* notice banner */}
             {/*<div className="inline-flex justify-start items-center gap-4 w-full px-4 py-2 border border-accent-1/25 bg-n-2 dark:bg-n-7 bg-opacity-50 rounded-xl">*/}
             {/*  <ExclamationTriangleIcon className="w-6 h-6 text-accent-1" />*/}
@@ -118,28 +60,61 @@ export default function UserDropdown() {
             {/*</div>*/}
 
             <div
-                className="relative inline-flex flex-col w-full bg-n-1/50 dark:bg-n-7/25 border rounded-xl">
-                <Dropdown>
-                    <MenuButton
-                        className="w-full px-4 py-3 rounded-tl-xl rounded-tr-xl border-b justify-between items-start inline-flex cursor-auto select-none">
-                        <div className="justify-center items-center gap-4 flex">
-                            {currentStatus.icon && (
-                                <div className="w-6 h-6 p-0.5 justify-center items-center">
-                                    <currentStatus.icon
-                                        className={`${currentStatus.className || 'fill-alt'} w-full h-full transition-colors`}/>
-                                </div>
-                            )}
-
-                            {!currentStatus.icon && (
-                                <div className="w-6 h-6 p-1 justify-center items-center">
-                                    <div
-                                        className={`w-full h-full ${currentStatus.className || 'bg-n-5'} rounded-full`}/>
-                                </div>
-                            )}
-                            <div className="text-sm text-on-surface-variant">{currentStatus.name}</div>
+                className="w-full h-fit bg-white/50 dark:bg-n-6/50 shadow rounded-br rounded-bl">
+                {user.reqOnboard && (
+                    <div className="p-2 border-b">
+                        <Link href="/settings"
+                              className="flex flex-col px-4 py-2 transition-all justify-center rounded hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50 !no-underline">
+                            <Heading size="sm">Finish your space</Heading>
+                            <Text size="xs" className="text-alt">
+                                For your privacy, no one can find you and your profile is non-existent until you make
+                                it.
+                                <p className="mt-2">
+                                    Click to get started!
+                                </p>
+                            </Text>
+                        </Link>
+                    </div>
+                )}
+                <div className="p-2 border-b">
+                    <div className="flex px-4 py-2 transition-all items-center rounded hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50">
+                        <UserAvatar user={user} size="2xl"/>
+                        <div className="grow ml-2">
+                            <Heading>{user.display_name || user.username}</Heading>
+                            <Text alt>{user.username}</Text>
                         </div>
-                        <ChevronDownIcon className="AccordionChevron w-5 h-5 self-center text-body"/>
-                    </MenuButton>
+                        <Link href="/settings">
+                            {/* mt-1 to offset button */}
+                            <Button variant="ghost" size="icon" className="h-5 w-5 mt-1 cursor-pointer">
+                                <SettingsIcon className="h-5 w-5"/>
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+
+                <Dropdown>
+                    <Tooltip content={currentStatus.description}>
+                        <MenuButton
+                            className="w-full px-6 py-2 justify-between items-start inline-flex cursor-auto select-none">
+                            <div className="justify-center items-center gap-4 flex">
+                                {currentStatus.icon && (
+                                    <div className="w-6 h-6 p-0.5 justify-center items-center">
+                                        <currentStatus.icon
+                                            className={`${currentStatus.className || 'fill-alt'} w-full h-full transition-colors`}/>
+                                    </div>
+                                )}
+
+                                {!currentStatus.icon && (
+                                    <div className="w-6 h-6 p-1 justify-center items-center">
+                                        <div
+                                            className={`w-full h-full ${currentStatus.className || 'bg-n-5'} rounded-full`}/>
+                                    </div>
+                                )}
+                                <div className="text-sm text-on-surface-variant">{currentStatus.name}</div>
+                            </div>
+                            <ChevronDownIcon className="AccordionChevron w-5 h-5 self-center text-body"/>
+                        </MenuButton>
+                    </Tooltip>
                     <DropdownMenu className="!w-96">
                         {StatusOptions.filter((option) => option.id !== user.status).map((option, i) => (
                             <DropdownItem
@@ -175,20 +150,27 @@ export default function UserDropdown() {
 
                     </DropdownMenu>
                 </Dropdown>
+            </div>
 
-                <div className="inline-flex flex-col w-full">
-                    {UserOptions.map((option, i) => (
-                        <div key={i}
-                             className="group px-4 py-3 justify-start items-center gap-4 inline-flex cursor-pointer"
-                             onClick={option.onClick || (() => {
-                             })}>
-                            <option.icon
-                                className={`${option.className || 'group-hover:fill-primary'} w-6 h-6 fill-alt unicorn:fill-on-surface-variant/50 transition-colors`}/>
-                            <div
-                                className={`${option.className || 'group-hover:text-primary'} text-on-surface-variant text-opacity-75 text-sm transition-colors`}>{option.name}</div>
-                        </div>
-                    ))}
+            <div className="inline-flex px-3 py-2 gap-2 flex-col w-full">
+                <div
+                    onClick={() => {
+                        const supabase = createClient()
+                        supabase.auth.signOut().then(() => {
+                            // clean session
+                            window.localStorage.removeItem('token')
+                            window.localStorage.removeItem('user-account')
+                            window.location.reload()
+                        })
+                    }}
+                    className="group px-4 py-3 justify-start items-center gap-4 inline-flex cursor-pointer w-full rounded transition-all ring-destructive/25 hover:ring-2 hover:bg-destructive/75">
+                    <LogoutIcon className="w-4 h-4 fill-alt group-hover:fill-white"/> <Text alt className="group-hover:text-white">Sign out of all accounts</Text>
                 </div>
+            </div>
+            <div className="flex flex-col w-full px-7 py-5 items-center justify-center border-t">
+                <Text size="xs" alt>
+                    Packbase &copy; Wolfbite Labs, 100% Volunteer. Funds feed back in.
+                </Text>
             </div>
         </DropdownHeader>
     )
