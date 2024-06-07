@@ -64,7 +64,7 @@ export default function UserDropdown() {
                 {user.reqOnboard && (
                     <div className="p-2 border-b">
                         <Link href="/settings"
-                              className="flex flex-col px-4 py-2 transition-all justify-center rounded hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50 !no-underline">
+                              className="flex flex-col px-4 py-4 transition-all justify-center rounded hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50 !no-underline">
                             <Heading size="sm">Finish your space</Heading>
                             <Text size="xs" className="text-alt">
                                 For your privacy, no one can find you and your profile is non-existent until you make
@@ -77,9 +77,9 @@ export default function UserDropdown() {
                     </div>
                 )}
                 <div className="p-2 border-b">
-                    <div className="flex px-4 py-2 transition-all items-center rounded hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50">
-                        <UserAvatar user={user} size="2xl"/>
-                        <div className="grow ml-2">
+                    <div className="flex px-4 py-4 transition-all items-center rounded hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50">
+                        <UserAvatar user={user} size="lg"/>
+                        <div className="grow ml-3">
                             <Heading>{user.display_name || user.username}</Heading>
                             <Text alt>{user.username}</Text>
                         </div>
