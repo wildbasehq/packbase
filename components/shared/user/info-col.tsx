@@ -7,6 +7,7 @@ import {Link} from '@/components/shared/link'
 import ReactMarkdown from 'react-markdown'
 import {Heading, Text} from '@/components/shared/text'
 import {BentoStaffBadge} from '@/lib/utils/pak'
+import Image from 'next/image'
 
 export default function UserInfoCol({user, size, tag}: {
     user: any; // object
@@ -28,11 +29,12 @@ export default function UserInfoCol({user, size, tag}: {
                     sideOffset={5}
                     collisionPadding={{left: 32}}
                 >
-                    <div className="absolute top-0 right-0 w-full h-full -z-[1]">
+                    <div className="absolute top-0 right-0 w-full h-full">
                         {/*<div className="absolute w-full h-full bg-card/90 rounded"/>*/}
-                        <img src={user.images?.header} className="w-full h-full object-cover rounded object-center opacity-10" alt="Cover image"/>
+                        <Image src={user.images?.header} width={1080} height={1080} className="w-full h-full object-cover rounded object-center opacity-10"
+                               alt="Cover image"/>
                     </div>
-                    <div className="flex flex-col gap-[7px]">
+                    <div className="flex flex-col gap-[7px] z-10">
                         <UserAvatar size="3xl" user={user}/>
                         <div className="flex flex-col gap-4">
                             <div>
