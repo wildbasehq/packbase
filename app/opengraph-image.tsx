@@ -35,7 +35,7 @@ export default async function OG() {
                     <div tw="ml-2 flex">
                         <span
                             tw="items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            ✨ Staging {process.env.NEXT_PUBLIC_SHA || process.env.VERCEL_GIT_COMMIT_SHA || 'unknown'}
+                            ✨ Staging {process.env.NEXT_PUBLIC_SHA || process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'unknown'}
                         </span>
                     </div>
                 </div>

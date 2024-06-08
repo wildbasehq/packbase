@@ -161,7 +161,8 @@ export default function UserDropdown() {
             </div>
             <div className="flex flex-col w-full px-7 py-5 items-center justify-center border-t">
                 <Text size="xs" alt>
-                    {ProjectSafeName} ("{ProjectName}") &copy; Wolfbite Labs. &mdash; Volunteer-ran, funds & spending are public, HQ in Melbourne AU
+                    {ProjectSafeName} ("{ProjectName}") &copy; Wolfbite
+                    Labs. &mdash; {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF || process.env.NEXT_PUBLIC_VERCEL_ENV || 'local'}.{process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || '0000000'}
                 </Text>
             </div>
         </DropdownHeader>
