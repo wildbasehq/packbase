@@ -7,12 +7,13 @@ import ms from 'ms'
  * outside the final product name. Should be sent with telemetry and
  * all requests to the server.
  *
- * @projectName Project 1
+ * @projectName Korat Honeybear
  * @since 24-05-2024
- * @specific v3 frontend-only rewrite experiment
+ * @specific Yipnyap (AKA Korat) v4 (Honeybear)
  * @authors @rek
  */
-export const ProjectName = 'Packbase'
+export const ProjectName = 'Korat Honeybear'
+export const ProjectSafeName = 'Yipnyap Iteration 4'
 export const ProjectDeps = ['scalebite', 'ypnyp', 'feral']
 
 /**

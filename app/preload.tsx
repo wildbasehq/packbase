@@ -58,7 +58,7 @@ export default function Preload({children}: {
         }).catch(e => {
             if (e.message.indexOf('Failed') > -1) return setError({
                 cause: 'UI & Server could not talk together',
-                message: 'Packbase is offline, or your network is extremely unstable.'
+                message: `${ProjectName} is offline, or your network is extremely unstable.`
             })
             return setError(e)
         })

@@ -13,6 +13,7 @@ import UserAvatar from '@/components/shared/user/avatar'
 import {SettingsIcon} from 'lucide-react'
 import {Button} from '@/components/shared/ui/button'
 import Tooltip from '@/components/shared/tooltip'
+import {ProjectName, ProjectSafeName} from '@/lib/utils'
 
 export default function UserDropdown() {
     const {user, setUser} = useUserAccountStore()
@@ -160,7 +161,7 @@ export default function UserDropdown() {
             </div>
             <div className="flex flex-col w-full px-7 py-5 items-center justify-center border-t">
                 <Text size="xs" alt>
-                    Packbase &copy; Wolfbite Labs. &mdash; Volunteer-ran, funds & spending are public, HQ in Melbourne AU
+                    {ProjectName} ("{ProjectSafeName}") &copy; Wolfbite Labs. &mdash; Volunteer-ran, funds & spending are public, HQ in Melbourne AU
                 </Text>
             </div>
         </DropdownHeader>
