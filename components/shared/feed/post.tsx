@@ -2,7 +2,6 @@
  * Forgive me, this is fucking horrible.
  */
 
-import moment from 'moment'
 import {ArrowUpOnSquareIcon, UserGroupIcon,} from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import UserAvatar from '@/components/shared/user/avatar'
@@ -10,6 +9,8 @@ import {UserProfileBasic} from '@/lib/defs/user'
 import ReactMarkdown from 'react-markdown'
 import Card from '@/components/shared/card'
 import {Text} from '@/components/shared/text'
+import UserInfoCol from '@/components/shared/user/info-col'
+import moment from 'moment'
 
 export declare interface FeedPostDataType {
     id: string;
@@ -57,24 +58,10 @@ export default function FeedPost({post}: FeedPostType) {
                             </div>
                         )}
                         <div className="flex space-x-3">
-                            <div className="flex-shrink-0">
-                                <UserAvatar user={user}/>
-                            </div>
-                            <div className="min-w-0 flex-1 flex flex-col justify-center">
-                                <Link href={`/@${user.username}/`}
-                                      className="font-medium text-default cursor-pointer hover:underline">
-                                    {user.display_name || user.username}
-                                </Link>
-                                {created_at && (
-                                    <a href={`/@${user.username}/${id}`}
-                                       className="text-sm text-default-alt cursor-pointer hover:underline">
-                                        <time
-                                            dateTime={created_at}>
-                                            about {moment(created_at).fromNow()}
-                                        </time>
-                                    </a>
-                                )}
-                            </div>
+                            <UserInfoCol user={user} tag={(<time
+                                dateTime={created_at}>
+                                about {moment(created_at).fromNow()}
+                            </time>)}/>
                             <div className="flex-shrink-0 self-center flex space-x-2">
                             </div>
                         </div>
