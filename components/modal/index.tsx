@@ -1,6 +1,6 @@
 'use client'
 
-import {Dispatch, SetStateAction, useCallback, useEffect, useRef} from 'react'
+import {useCallback, useEffect, useRef} from 'react'
 import FocusTrap from 'focus-trap-react'
 import {AnimatePresence, motion} from 'framer-motion'
 import Leaflet from './leaflet'
@@ -9,7 +9,7 @@ import useWindowSize from '@/lib/hooks/use-window-size'
 export default function Modal({children, showModal, setShowModal, maxWidth,}: {
     children: React.ReactNode;
     showModal: boolean;
-    setShowModal: Dispatch<SetStateAction<boolean>>;
+    setShowModal: any;
     maxWidth?: boolean;
 }) {
     const desktopModalRef = useRef(null)
@@ -42,9 +42,9 @@ export default function Modal({children, showModal, setShowModal, maxWidth,}: {
                                     ref={desktopModalRef}
                                     key="desktop-modal"
                                     className="fixed inset-0 z-50 hidden min-h-screen items-center justify-center md:py-8 md:flex"
-                                    initial={{opacity: 0, scale: 0.95}}
-                                    animate={{opacity: 1, scale: 1}}
-                                    exit={{opacity: 0, scale: 0.95}}
+                                    initial={{opacity: 0, scale: 0.95, translateY: 10}}
+                                    animate={{opacity: 1, scale: 1, rotate: 0, translateY: 0}}
+                                    exit={{opacity: 0, scale: 0.95, rotate: -1}}
                                     onMouseDown={(e) => {
                                         if (desktopModalRef.current === e.target) {
                                             setShowModal(false)
