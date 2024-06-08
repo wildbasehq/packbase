@@ -46,10 +46,10 @@ export default function UserInfoCol({user, size, tag}: {
                             </div>
                             <ReactMarkdown className="text-sm" components={{
                                 h1(props) {
-                                    return <Heading {...props} children={props.children}/>
+                                    return <Heading {...props}/>
                                 },
                                 p(props) {
-                                    return <Text {...props} children={props.children}/>
+                                    return <Text {...props}/>
                                 }
                             }}>
                                 {user.about?.bio}

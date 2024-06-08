@@ -63,6 +63,7 @@ export default function Home() {
         }
 
         const assets = formData.getAll('assets')
+        // @ts-ignore
         if (assets && assets.length > 0 && assets[0].name.length > 0) {
             const reader = new FileReader()
             // @ts-ignore
