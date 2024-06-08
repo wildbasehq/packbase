@@ -29,12 +29,12 @@ export default function UserInfoCol({user, size, tag}: {
                     sideOffset={5}
                     collisionPadding={{left: 32}}
                 >
-                    <div className="absolute top-0 right-0 w-full h-full">
+                    <div className="absolute top-0 right-0 w-full h-full pointer-events-none">
                         {/*<div className="absolute w-full h-full bg-card/90 rounded"/>*/}
                         <Image src={user.images?.header} width={1080} height={1080} className="w-full h-full object-cover rounded object-center opacity-10"
                                alt="Cover image"/>
                     </div>
-                    <div className="flex flex-col gap-[7px] z-10">
+                    <div className="flex flex-col gap-[7px] z-50">
                         <UserAvatar size="3xl" user={user}/>
                         <div className="flex flex-col gap-4">
                             <div>
