@@ -27,7 +27,7 @@ export default function UserDropdown() {
         {
             id: 2,
             name: 'Do not disturb',
-            description: 'You won\'t receive any audible notifications.',
+            description: 'Notifications are silent, all users DMing you will see a notice that you\'ve made or a generic "currently busy" message.',
             icon: MinusCircleIcon,
             className: 'text-accent-1',
         },
@@ -51,14 +51,6 @@ export default function UserDropdown() {
     return (
         <DropdownHeader
             className="flex flex-col w-96 !p-0">
-            {/* notice banner */}
-            {/*<div className="inline-flex justify-start items-center gap-4 w-full px-4 py-2 border border-accent-1/25 bg-n-2 dark:bg-n-7 bg-opacity-50 rounded-xl">*/}
-            {/*  <ExclamationTriangleIcon className="w-6 h-6 text-accent-1" />*/}
-            {/*  <div className="px-4 py-3 text-alt text-opacity-75 text-sm">*/}
-            {/*    Feral is still WIP. This is not a real account.*/}
-            {/*  </div>*/}
-            {/*</div>*/}
-
             <div
                 className="w-full h-fit bg-white/50 dark:bg-n-6/50 shadow rounded-br rounded-bl">
                 {user.reqOnboard && (
