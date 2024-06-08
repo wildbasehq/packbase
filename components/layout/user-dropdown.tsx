@@ -161,7 +161,7 @@ export default function UserDropdown() {
             </div>
             <div className="flex flex-col w-full px-7 py-5 items-center justify-center border-t">
                 <Text size="xs" alt>
-                    {ProjectName} ("{ProjectSafeName}") &copy; Wolfbite Labs. &mdash; Volunteer-ran, funds & spending are public, HQ in Melbourne AU
+                    {ProjectSafeName} ("{ProjectName}") &copy; Wolfbite Labs. &mdash; Volunteer-ran, funds & spending are public, HQ in Melbourne AU
                 </Text>
             </div>
         </DropdownHeader>

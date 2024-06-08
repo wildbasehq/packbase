@@ -1,6 +1,6 @@
 import CrawlText from '@/components/shared/CrawlText'
 import {Heading, Text} from '@/components/shared/text'
-import {ProjectName} from '@/lib/utils'
+import {ProjectSafeName} from '@/lib/utils'
 
 export default function GuestLanding() {
     return (
@@ -52,7 +52,7 @@ export default function GuestLanding() {
                     </div>
                     <div className="space-y-2 mt-12">
                         <Heading size="xl">
-                            While you're here breaking an NDA, how about you read about {ProjectName}, 'eh?
+                            While you're here breaking an NDA, how about you read about {ProjectSafeName}, 'eh?
                         </Heading>
                         <Text className="text-sm text-default-alt">
                             C'monnnn, you know wanna~<br/>

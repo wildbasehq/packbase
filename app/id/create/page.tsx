@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import {Button} from '@/components/shared/ui/button'
 import {Heading, Text} from '@/components/shared/text'
-import {ProjectName} from '@/lib/utils'
+import {ProjectSafeName} from '@/lib/utils'
 import {Input} from '@/components/shared/input/text'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import {MailQuestion} from 'lucide-react'
@@ -63,7 +63,7 @@ export default function IDCreate({searchParams}: {
                             Registration is closed.
                         </Heading>
                         <Text>
-                            {ProjectName} is not open for public registration.
+                            {ProjectSafeName} is not open for public registration.
                         </Text>
                     </div>
                 )}

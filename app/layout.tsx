@@ -6,18 +6,18 @@ import Preload from '@/app/preload'
 import dynamic from 'next/dynamic'
 import WaitlistCheck from '@/components/layout/waitlistCheck'
 import {Analytics} from '@vercel/analytics/react'
-import {ProjectName} from '@/lib/utils'
+import {ProjectSafeName} from '@/lib/utils'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
 import NavBar from '@/components/layout/navbar'
 import {SideNav} from '@/components/layout/sidenav'
 
 export const metadata = {
-    title: ProjectName,
+    title: ProjectSafeName,
     description:
         'A furry site.',
     twitter: {
         card: 'summary_large_image',
-        title: ProjectName,
+        title: ProjectSafeName,
         description:
             'A furry site.',
     },

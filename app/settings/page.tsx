@@ -5,7 +5,7 @@ import {ArrowUpRightIcon, PhotoIcon, UserCircleIcon} from '@heroicons/react/24/s
 import {useEffect, useState} from 'react'
 import {useUserAccountStore} from '@/lib/states'
 import {Heading, Text} from '@/components/shared/text'
-import {ProjectName} from '@/lib/utils'
+import {ProjectSafeName} from '@/lib/utils'
 import ProfileHeader from '@/components/shared/user/header'
 import {FetchHandler} from '@/lib/api'
 import {toast} from '@/lib/toast'
@@ -117,7 +117,7 @@ export default function SettingsGeneral() {
                                 <label htmlFor="username" className="block text-sm font-medium leading-6 text-default">
                                     <Text>Space URL & Username</Text>
                                     <Text size="xs" className="text-alt">
-                                        Your username is used to find and reference you across {ProjectName}. Your Space
+                                        Your username is used to find and reference you across {ProjectSafeName}. Your Space
                                         URL holds your personal customised site.
                                     </Text>
                                 </label>

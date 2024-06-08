@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import {LoadingDots} from '@/components/shared/icons'
 import {useEffect, useState} from 'react'
-import {ProjectName} from '@/lib/utils'
+import {ProjectSafeName} from '@/lib/utils'
 import {Heading} from '@/components/shared/text'
 import {createClient} from '@/lib/supabase/client'
 import {useResourceUIStore, useUserAccountStore} from '@/lib/states'
@@ -58,7 +58,7 @@ export default function Preload({children}: {
         }).catch(e => {
             if (e.message.indexOf('Failed') > -1) return setError({
                 cause: 'UI & Server could not talk together',
-                message: `${ProjectName} is offline, or your network is extremely unstable.`
+                message: `${ProjectSafeName} is offline, or your network is extremely unstable.`
             })
             return setError(e)
         })
@@ -93,7 +93,7 @@ export default function Preload({children}: {
                                     Preparing...
                                 </Heading>
                                 <p className="mt-1 text-sm leading-6 text-alt">
-                                    {ProjectName} is asking the server for information about you &amp; the service. This
+                                    {ProjectSafeName} is asking the server for information about you &amp; the service. This
                                     will get saved in your browser{'\''}s <a
                                     href="https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage"
                                     target="_blank" rel="noopener noreferrer">session storage</a>.
@@ -109,7 +109,7 @@ export default function Preload({children}: {
                             <>
                                 <Heading className="items-center">
                                     <HandRaisedIcon className="h-6 w-6 mr-1 text-default inline-block"/>
-                                    {ProjectName} can't continue
+                                    {ProjectSafeName} can't continue
                                 </Heading>
                                 <p className="mt-1 text-sm leading-6 text-alt">
                                     {error.cause || 'Something went wrong'}: {error.message || error.stack}

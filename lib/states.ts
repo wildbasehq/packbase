@@ -1,6 +1,6 @@
 import {create} from 'zustand'
 import {persist} from 'zustand/middleware'
-import {ProjectName} from '@/lib/utils'
+import {ProjectSafeName} from '@/lib/utils'
 import {HomeIcon} from '@heroicons/react/24/solid'
 
 interface UIStore {
@@ -65,7 +65,7 @@ interface ResourceStore {
 
 const resourceDefault = {
     id: 'p1',
-    name: ProjectName,
+    name: ProjectSafeName,
     icon: '/logo.png',
     standalone: true,
 }

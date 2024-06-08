@@ -12,8 +12,8 @@ import ms from 'ms'
  * @specific Yipnyap (AKA Korat) v4 (Honeybear)
  * @authors @rek
  */
-export const ProjectName = 'Korat Honeybear'
-export const ProjectSafeName = 'Yipnyap Iteration 4'
+export const ProjectName = 'Yipnyap Iteration 4'
+export const ProjectSafeName = 'Packbase'
 export const ProjectDeps = ['scalebite', 'ypnyp', 'feral']
 
 /**
