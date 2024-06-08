@@ -12,15 +12,17 @@ import FeedList from '@/components/shared/feed/list'
 import Card from '@/components/shared/card'
 import Link from 'next/link'
 import {DotIcon, PartyPopperIcon} from 'lucide-react'
-import {Input} from '@/components/shared/input/text'
 import {Button} from '@/components/shared/ui/button'
 import {FetchHandler} from '@/lib/api'
 import {toast} from '@/lib/toast'
 import {LoadingCircle} from '@/components/shared/icons'
-import {CheckBadgeIcon} from '@heroicons/react/24/solid'
+import {CheckBadgeIcon, LinkIcon} from '@heroicons/react/24/solid'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import Modal from '@/components/modal'
 import {BentoStaffBadge} from '@/lib/utils/pak'
+import {Tab, TabGroup, TabList, TabPanel, TabPanels} from '@headlessui/react'
+import {clsx} from 'clsx'
+import {Input} from '@/components/shared/input/text'
 
 export default function Home() {
     const {user} = useUserAccountStore()
@@ -28,6 +30,7 @@ export default function Home() {
     const Lottie = memo(dynamic(() => import('lottie-react'), {ssr: false, suspense: true}))
     const [submitting, setSubmitting] = useState<boolean>(false)
     const [showModal, setShowModal] = useState<boolean>(false)
+    const [willUpload, setWillUpload] = useState<number>(0)
 
     // useEffect(() => {
     //     if (!window || !user) return
@@ -50,11 +53,34 @@ export default function Home() {
         if (submitting) return
         setSubmitting(true)
         const formData = new FormData(event.currentTarget)
-        const post = {
+        const post: {
+            body: string
+            content_type: string
+            assets?: any[]
+        } = {
             body: formData.get('body')?.toString() || '',
             content_type: 'markdown'
         }
 
+        const assets = formData.getAll('assets')
+        if (assets && assets.length > 0) {
+            const reader = new FileReader()
+            // @ts-ignore
+            reader.readAsDataURL(assets[0])
+            reader.onloadend = () => {
+                post.assets = [{
+                    name: 'test',
+                    data: reader.result
+                }]
+
+                uploadPost(post)
+            }
+        } else {
+            uploadPost(post)
+        }
+    }
+
+    const uploadPost = (post: any) => {
         FetchHandler.post('/content/post', {
             body: JSON.stringify(post)
         }).then(({data}) => {
@@ -192,32 +218,83 @@ export default function Home() {
                                 <div
                                     className="min-h-fit w-full py-4 px-4 sm:px-6 cursor-pointer">
                                     <div
-                                        className="text-sm text-neutral-700 space-y-4 dark:text-neutral-50">
-                                        <Input label="body" name="body" type="textarea"/>
+                                        className="text-sm space-y-4">
+                                        <TabGroup>
+                                            {({selectedIndex}) => (
+                                                <>
+                                                    <TabList className="flex items-center">
+                                                        <Tab
+                                                            className={({selected}) =>
+                                                                clsx(
+                                                                    selected
+                                                                        ? 'bg-n-1/70 dark:bg-n-6'
+                                                                        : 'transition-all hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50',
+                                                                    'rounded-md px-3 py-1.5 text-sm font-medium'
+                                                                )
+                                                            }
+                                                        >
+                                                            Write
+                                                        </Tab>
+                                                        <Tab
+                                                            className={({selected}) =>
+                                                                clsx(
+                                                                    selected
+                                                                        ? 'bg-n-1/70 dark:bg-n-6'
+                                                                        : 'transition-all hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50',
+                                                                    'ml-2 rounded-md px-3 py-1.5 text-sm font-medium'
+                                                                )
+                                                            }
+                                                        >
+                                                            Preview
+                                                        </Tab>
+
+                                                        {selectedIndex === 0 ? (
+                                                            <div className="ml-auto flex items-center space-x-5">
+                                                                {willUpload ? `dbg: will upload ${willUpload}` : ''}
+                                                                <div className="flex items-center">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="-m-2.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
+                                                                        onClick={() => document.getElementById('assets')?.click()}
+                                                                    >
+                                                                        <span className="sr-only">Insert link</span>
+                                                                        <LinkIcon className="h-5 w-5" aria-hidden="true"/>
+                                                                    </button>
+                                                                </div>
+                                                                <input type="file" name="assets" id="assets" className="hidden" accept="image/*" onChange={(e) => {
+                                                                    setWillUpload(e.target.files?.length || 0)
+                                                                }}/>
+                                                            </div>
+                                                        ) : null}
+                                                    </TabList>
+                                                    <TabPanels className="mt-2">
+                                                        <TabPanel className="-m-0.5 rounded-lg p-0.5">
+                                                            <label htmlFor="comment" className="sr-only">
+                                                                Comment
+                                                            </label>
+                                                            <div>
+                                                                <Input
+                                                                    type="textarea"
+                                                                    rows={5}
+                                                                    name="body"
+                                                                    id="body"
+                                                                    placeholder="Add your comment..."
+                                                                />
+                                                            </div>
+                                                        </TabPanel>
+                                                        <TabPanel className="-m-0.5 rounded-lg p-0.5">
+                                                            <div className="border-b pb-4">
+                                                                <ReactMarkdown>
+                                                                    Cannot render :(
+                                                                </ReactMarkdown>
+                                                            </div>
+                                                        </TabPanel>
+                                                    </TabPanels>
+                                                </>
+                                            )}
+                                        </TabGroup>
                                     </div>
-
-                                    {/* Post Objects (Images) */}
-                                    {/*{postContent?.objects && postContent.objects.length > 0 && (*/}
-                                    {/*    <MediaGrid objects={postContent.objects} selectState={[selectedMedia, setSelectedMedia]}*/}
-                                    {/*               post={postContent} truncate/>*/}
-                                    {/*)}*/}
                                 </div>
-
-                                {/* Floating "User is typing..." card */}
-                                {/*<div className="absolute bottom-0 left-0 ml-4 sm:ml-6 bg-box-alt border-x border-t border-b-0 border-solid border-neutral-300 dark:border-neutral-700 rounded-tl-xl rounded-tr-xl">*/}
-                                {/*    <div className="flex items-center space-x-2 px-4 py-2">*/}
-                                {/*        <div className="flex-shrink-0">*/}
-                                {/*            <img className="h-4 w-4 rounded-full"*/}
-                                {/*                    src={postContent.user.avatar || `/img/avatar/default-avatar.png`}*/}
-                                {/*                    alt=""/>*/}
-                                {/*        </div>*/}
-                                {/*        <div className="min-w-0 flex-1">*/}
-                                {/*            <p className="text-sm font-medium text-default cursor-pointer hover:underline">*/}
-                                {/*                {postContent.user.username} is typing...*/}
-                                {/*            </p>*/}
-                                {/*        </div>*/}
-                                {/*    </div>*/}
-                                {/*</div>*/}
                             </div>
 
                             {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
