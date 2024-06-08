@@ -108,7 +108,7 @@ export default function UserDropdown() {
                         </MenuButton>
                     </Tooltip>
                     <DropdownMenu className="!w-96">
-                        {StatusOptions.filter((option) => option.id !== user.status).map((option, i) => (
+                        {StatusOptions.filter((option) => option.id !== currentStatus.id).map((option, i) => (
                             <DropdownItem
                                 key={i}
                                 onClick={() => {
