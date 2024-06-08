@@ -139,7 +139,6 @@ export default function UserDropdown() {
                                 </DropdownDescription>
                             </DropdownItem>
                         ))}
-
                     </DropdownMenu>
                 </Dropdown>
             </div>
@@ -161,7 +160,7 @@ export default function UserDropdown() {
             </div>
             <div className="flex flex-col w-full px-7 py-5 items-center justify-center border-t">
                 <Text size="xs" alt>
-                    Packbase &copy; Wolfbite Labs, 100% Volunteer. Funds feed back in.
+                    Packbase &copy; Wolfbite Labs. &mdash; Volunteer-ran, funds & spending are public, HQ in Melbourne AU
                 </Text>
             </div>
         </DropdownHeader>
