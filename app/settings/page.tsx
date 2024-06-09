@@ -56,7 +56,7 @@ export default function SettingsGeneral() {
         if (submitting) return
         setSubmitting(true)
 
-        FetchHandler.post(`/users/@me`, {
+        FetchHandler.post(`/xrpc/app.packbase.id.me`, {
             body: JSON.stringify({
                 username: handleInput,
                 display_name: nicknameInput,

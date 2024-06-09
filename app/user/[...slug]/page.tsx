@@ -12,7 +12,7 @@ export default function UserProfile({params}: { params: { slug: string } }) {
     const [loading, setLoading] = useState<boolean>(true)
 
     useEffect(() => {
-        FetchHandler.get(`/users/@${params.slug}`)
+        FetchHandler.get(`/xrpc/app.packbase.id.get?username=${params.slug}`)
             .then(({data}) => {
                 if (!data || data.message) return setError('failed')
                 setLoading(false)

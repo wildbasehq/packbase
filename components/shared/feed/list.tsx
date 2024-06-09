@@ -4,7 +4,6 @@ import {useEffect, useState} from 'react'
 import Image from 'next/image'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Masonry, {ResponsiveMasonry} from 'react-responsive-masonry'
-import {fetcher} from '@/lib/utils'
 import {Heading, Text} from '@/components/shared/text'
 import GridBody from '@/components/layout/grid-body'
 import {LayoutDashboard, MegaphoneIcon} from 'lucide-react'
@@ -15,6 +14,7 @@ import Popover from '@/components/shared/popover'
 import {useUIStore} from '@/lib/states'
 import UserAvatar from '@/components/shared/user/avatar'
 import FeedPost from '@/components/shared/feed/post'
+import {FetchHandler} from '@/lib/api'
 
 export default function FeedList() {
     const packID = '00000000-0000-0000-0000-000000000000'
@@ -59,16 +59,16 @@ export default function FeedList() {
     }, [FeedViewConfig])
 
     const fetchPosts = (feed: string = '', clearPosts = false) => {
-        fetcher(`${process.env.NEXT_PUBLIC_YAPOCK_URL}/content/feed`).then((res: any) => {
+        FetchHandler.get(`/xrpc/app.packbase.feed.get`).then(({data}) => {
             if (clearPosts) {
-                setPosts(res.posts)
+                setPosts(data.posts)
                 setPostsCurrentPage(1)
             } else {
-                setPosts([...posts, ...res.posts])
+                setPosts([...posts, ...data.posts])
                 setPostsCurrentPage(postsCurrentPage + 1)
             }
             setPostsReady(true)
-            setPostsHasMore(res.hasMore)
+            setPostsHasMore(data.hasMore)
         })
     }
 

@@ -1,4 +1,7 @@
-const {resolve} = require('path');
+const iteration = require('child_process')
+    .execSync('git rev-list --count HEAD')
+    .toString()
+    .trim();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -10,6 +13,8 @@ const nextConfig = {
     env: {
         NEXT_PUBLIC_SUPABASE_URL: process.env.SUPABASE_URL,
         NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+
+        NEXT_PUBLIC_ITERATION_COUNT: iteration,
 
         NEXT_PUBLIC_POSTHOG_KEY: process.env.POSTHOG_KEY,
         NEXT_PUBLIC_POSTHOG_HOST: process.env.POSTHOG_HOST,

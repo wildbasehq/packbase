@@ -28,7 +28,7 @@ export default function Preload({children}: {
             supabase.auth.getUser().then(async ({data: {user}}) => {
                 console.log({user})
                 if (user) {
-                    const data = (await FetchHandler.get('/users/@me')).data
+                    const data = (await FetchHandler.get('/xrpc/app.packbase.id.me')).data
                     if (user.user_metadata.waitlistType !== 'free') {
                         // Assume they're in the waitlist
                         const waitlistType = user.user_metadata.waitlistType || 'wait'

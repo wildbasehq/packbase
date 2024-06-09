@@ -82,7 +82,7 @@ export default function Home() {
     }
 
     const uploadPost = (post: any) => {
-        FetchHandler.post('/content/post', {
+        FetchHandler.post('/xrpc/app.packbase.howl.create', {
             body: JSON.stringify(post)
         }).then(({data}) => {
             if (data?.message) {
