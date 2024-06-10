@@ -8,9 +8,16 @@ import UserAvatar from '@/components/shared/user/avatar'
 import {UserProfileBasic} from '@/lib/defs/user'
 import ReactMarkdown from 'react-markdown'
 import Card from '@/components/shared/card'
-import {Text} from '@/components/shared/text'
 import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
+import SmileIcon from '@/components/shared/icons/dazzle/smile'
+import {useState} from 'react'
+import {LoadingCircle} from '@/components/shared/icons'
+import {FetchHandler} from '@/lib/api'
+import {toast} from '@/lib/toast'
+import {useUserAccountStore} from '@/lib/states'
+import XMarkIcon from '@/components/shared/icons/dazzle/xmark'
+import Tooltip from '@/components/shared/tooltip'
 
 export declare interface FeedPostDataType {
     id: string;
@@ -20,6 +27,9 @@ export declare interface FeedPostDataType {
     pack?: any;
     howling: 'echo' | 'alongside';
     howlingUser: UserProfileBasic;
+    reactions?: {
+        [x: string]: string[]
+    };
 }
 
 export declare interface FeedPostType {
@@ -102,24 +112,66 @@ export default function FeedPost({post}: FeedPostType) {
 
                 {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
                 <div className="px-4 py-4 sm:px-6 flex justify-between space-x-8 border-t">
-                    <div className="flex space-x-6">
-                        {/*{user && (*/}
-                        {/*    <span*/}
-                        {/*        className="inline-flex items-center text-sm cursor-pointer hover:underline"*/}
-                        {/*        onClick={() => {*/}
-                        {/*            console.log('like')*/}
-                        {/*        }}*/}
-                        {/*    >*/}
-                        {/*        <ChatBubbleBottomCenterTextIcon className="h-5 w-5 text-neutral-400"/>*/}
-                        {/*    </span>*/}
-                        {/*)}*/}
-                        <Text size="xs">
-                            🤷 No functions
-                        </Text>
+                    <div className="flex">
+                        {user && (
+                            <React post={post}/>
+                        )}
                     </div>
                 </div>
             </Card>
         </>
+    )
+}
+
+function React({post}: FeedPostType) {
+    const {user} = useUserAccountStore()
+    const [submitting, setSubmitting] = useState(false)
+
+    const hasCurrentUser = post.reactions?.['0']?.includes(user.id)
+
+    const react = () => {
+        if (submitting) return
+        setSubmitting(true)
+
+        const FetchAction = hasCurrentUser ? FetchHandler.delete : FetchHandler.post
+        FetchAction('/xrpc/app.packbase.howl.react', {
+            body: JSON.stringify({
+                id: post.id,
+                ...(!hasCurrentUser ? {slot: 0} : {})
+            })
+        }).then(({data}) => {
+            setSubmitting(false)
+            if (data?.message) {
+                return toast.error(data.message ? `${data.at}: ${data.message}` : 'Something went wrong')
+            } else {
+                if (!post.reactions) post.reactions = {
+                    '0': []
+                }
+
+                if (hasCurrentUser) {
+                    post.reactions['0'] = post.reactions['0'].filter(id => id !== user.id)
+                    return toast.error('Removed reaction.')
+                }
+
+                post.reactions['0'].push(user.id)
+                return toast.error('Liked!')
+            }
+        })
+    }
+
+    return (
+        <Tooltip content={hasCurrentUser ? 'Remove Reaction' : 'React'} delayDuration={0}>
+            <span
+                className="inline-flex items-center text-sm cursor-pointer hover:underline"
+                onClick={react}
+            >
+            {!submitting
+                ? (hasCurrentUser ? <XMarkIcon className="h-5 w-5 text-alt hover:text-accent-1"/> :
+                    <SmileIcon className="h-5 w-5 text-alt hover:text-inherit"/>)
+                : <LoadingCircle className="h-5 w-5"/>
+            }
+        </span>
+        </Tooltip>
     )
 }
 
