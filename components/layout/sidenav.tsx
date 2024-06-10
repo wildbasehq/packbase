@@ -32,9 +32,10 @@ export const NGContentNavigatorTheming = {
 }
 
 export function SideNav({...props}: SideNavType) {
-    const {navigation} = useResourceUIStore()
+    const {hidden, navigation} = useResourceUIStore()
     const slimNavClass = props.slim ? 'w-20 items-center' : 'w-96'
 
+    if (hidden) return <></>
     return (
         <>
             <nav aria-label="Sections"

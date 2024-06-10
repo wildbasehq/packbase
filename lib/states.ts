@@ -95,17 +95,20 @@ interface ResourceUIStore {
         icon: string;
         standalone: boolean;
     };
+    hidden: boolean;
     loading: boolean;
     connecting: boolean;
     navigation: any[];
+    setHidden: (hidden: boolean) => void;
     setLoading: (loading: boolean) => void;
-    setConnecting: (loading: boolean) => void;
+    setConnecting: (connecting: boolean) => void;
     setNavigation: (navigation: any) => void;
 }
 
 export const useResourceUIStore = create<ResourceUIStore>(
     (set) => ({
         resourceDefault,
+        hidden: false,
         loading: true,
         connecting: true,
         navigation: [{
@@ -114,6 +117,10 @@ export const useResourceUIStore = create<ResourceUIStore>(
             href: '/',
             icon: HomeIcon,
         }],
+        setHidden: (hidden) => set((state) => ({
+            ...state,
+            hidden,
+        })),
         setLoading: (loading) => set((state) => ({
             ...state,
             loading,
