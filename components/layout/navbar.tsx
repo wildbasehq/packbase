@@ -56,9 +56,9 @@ export default function NavBar() {
 
                                 {!user && (
                                     <>
-                                        <Link href="/id/login">
-                                            <Button variant="ghost" size="self" className="flex h-6 w-6">
-                                                <ScanFaceIcon className="h-4 w-4"/>
+                                        <Link href="/id/login" className="!no-underline">
+                                            <Button variant="ghost" className="flex justify-center items-center">
+                                                <ScanFaceIcon className="h-4 w-4 mr-1"/> Sign In
                                             </Button>
                                         </Link>
                                     </>
