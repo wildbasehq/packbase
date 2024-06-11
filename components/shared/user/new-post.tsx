@@ -132,24 +132,22 @@ export default function NewPost() {
                                                 Preview
                                             </Tab>
 
-                                            {selectedIndex === 0 ? (
-                                                <div className="ml-auto flex items-center space-x-5">
-                                                    {willUpload ? `dbg: will upload ${willUpload}` : ''}
-                                                    <div className="flex items-center">
-                                                        <button
-                                                            type="button"
-                                                            className="-m-2.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
-                                                            onClick={() => document.getElementById('assets')?.click()}
-                                                        >
-                                                            <span className="sr-only">Insert link</span>
-                                                            <LinkIcon className="h-5 w-5" aria-hidden="true"/>
-                                                        </button>
-                                                    </div>
-                                                    <input type="file" name="assets" id="assets" className="hidden" accept="image/*" onChange={(e) => {
-                                                        setWillUpload(e.target.files?.length || 0)
-                                                    }}/>
+                                            <div className="ml-auto flex items-center space-x-5">
+                                                {willUpload ? `dbg: will upload ${willUpload}` : ''}
+                                                <div className="flex items-center">
+                                                    <button
+                                                        type="button"
+                                                        className="-m-2.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
+                                                        onClick={() => document.getElementById('assets')?.click()}
+                                                    >
+                                                        <span className="sr-only">Insert link</span>
+                                                        <LinkIcon className="h-5 w-5" aria-hidden="true"/>
+                                                    </button>
                                                 </div>
-                                            ) : null}
+                                                <input type="file" name="assets" id="assets" className="hidden" accept="image/*" onChange={(e) => {
+                                                    setWillUpload(e.target.files?.length || 0)
+                                                }}/>
+                                            </div>
                                         </TabList>
                                         <TabPanels className="mt-2">
                                             <TabPanel className="-m-0.5 rounded-lg p-0.5">
