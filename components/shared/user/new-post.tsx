@@ -6,7 +6,6 @@ import {Tab, TabGroup, TabList, TabPanel, TabPanels} from '@headlessui/react'
 import {clsx} from 'clsx'
 import {LinkIcon} from '@heroicons/react/24/solid'
 import {Input} from '@/components/shared/input/text'
-import ReactMarkdown from 'react-markdown'
 import {Button} from '@/components/shared/ui/button'
 import {LoadingCircle} from '@/components/shared/icons'
 import Card from '@/components/shared/card'
@@ -14,11 +13,14 @@ import {FormEvent, useState} from 'react'
 import {FetchHandler} from '@/lib/api'
 import {toast} from '@/lib/toast'
 import {useUserAccountStore} from '@/lib/states'
+import Markdown from '@/components/shared/markdown'
 
 export default function NewPost() {
     const {user} = useUserAccountStore()
     const [submitting, setSubmitting] = useState<boolean>(false)
     const [willUpload, setWillUpload] = useState<number>(0)
+
+    const [body, setBody] = useState<string>('')
 
     const submitPost = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -30,7 +32,7 @@ export default function NewPost() {
             content_type: string
             assets?: any[]
         } = {
-            body: formData.get('body')?.toString() || '',
+            body: body,
             content_type: 'markdown'
         }
 
@@ -161,14 +163,16 @@ export default function NewPost() {
                                                         name="body"
                                                         id="body"
                                                         placeholder="Add your comment..."
+                                                        value={body}
+                                                        onChange={e => setBody(e.target.value)}
                                                     />
                                                 </div>
                                             </TabPanel>
                                             <TabPanel className="-m-0.5 rounded-lg p-0.5">
                                                 <div className="border-b pb-4">
-                                                    <ReactMarkdown>
-                                                        Cannot render :(
-                                                    </ReactMarkdown>
+                                                    <Markdown>
+                                                        {body}
+                                                    </Markdown>
                                                 </div>
                                             </TabPanel>
                                         </TabPanels>
