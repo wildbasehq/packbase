@@ -1,5 +1,5 @@
 import {Heading} from '@/components/shared/text'
-import ReactMarkdown from 'react-markdown'
+import Markdown from '@/components/shared/markdown'
 
 export default function ProfileHeader({...props}: any) {
     const profile = props.user
@@ -43,9 +43,9 @@ export default function ProfileHeader({...props}: any) {
                 </div>
                 <div className="block min-w-0 flex-1 text-default">
                     <div className="mt-6 text-sm whitespace-pre-line">
-                        <ReactMarkdown>
+                        <Markdown>
                             {profile.about?.bio}
-                        </ReactMarkdown>
+                        </Markdown>
                     </div>
                 </div>
             </div>

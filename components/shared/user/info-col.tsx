@@ -4,10 +4,9 @@ import UserAvatar from '@/components/shared/user/avatar'
 // @ts-ignore
 import * as HoverCard from '@radix-ui/react-hover-card'
 import {Link} from '@/components/shared/link'
-import ReactMarkdown from 'react-markdown'
-import {Heading, Text} from '@/components/shared/text'
 import {BentoStaffBadge} from '@/lib/utils/pak'
 import Image from 'next/image'
+import Markdown from '@/components/shared/markdown'
 
 export default function UserInfoCol({user, size, tag}: {
     user: any; // object
@@ -49,16 +48,9 @@ export default function UserInfoCol({user, size, tag}: {
                                 </div>
                                 <div className="text-sm text-alt">@{user.username}</div>
                             </div>
-                            <ReactMarkdown className="text-sm" components={{
-                                h1(props) {
-                                    return <Heading {...props}/>
-                                },
-                                p(props) {
-                                    return <Text {...props}/>
-                                }
-                            }}>
+                            <Markdown className="text-sm">
                                 {user.about?.bio}
-                            </ReactMarkdown>
+                            </Markdown>
                             <div className="flex gap-4">
                                 <div className="flex gap-1">
                                     <div className="text-sm font-medium">-1</div>

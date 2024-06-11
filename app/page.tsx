@@ -3,7 +3,6 @@ import Body from '@/components/layout/body'
 import GuestLanding from '@/components/home/guestlanding'
 import {useResourceUIStore, useUserAccountStore} from '@/lib/states'
 import UserAvatar from '@/components/shared/user/avatar'
-import ReactMarkdown from 'react-markdown'
 import {memo, useEffect, useState} from 'react'
 import {Heading, Text} from '@/components/shared/text'
 import girlDogBusStop from '@/datasets/lottie/girl-dog-bus-stop.json'
@@ -16,6 +15,7 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import Modal from '@/components/modal'
 import {BentoStaffBadge} from '@/lib/utils/pak'
 import NewPost from '@/components/shared/user/new-post'
+import Markdown from '@/components/shared/markdown'
 
 export default function Home() {
     const {user} = useUserAccountStore()
@@ -68,9 +68,9 @@ export default function Home() {
                         {notice.title && (
                             <Heading size="2xl">{notice.title}</Heading>
                         )}
-                        <ReactMarkdown>
+                        <Markdown>
                             {notice?.content}
-                        </ReactMarkdown>
+                        </Markdown>
                     </div>
                 )}
 
@@ -84,7 +84,8 @@ export default function Home() {
                                 </Heading>
                                 <div className="space-y-2">
                                     <Text className="text-sm text-default-alt">
-                                        If you'd like to participate with the community, you'll need an invite from someone. As we have no "rolling invites", we allow
+                                        If you'd like to participate with the community, you'll need an invite from
+                                        someone. As we have no "rolling invites", we allow
                                         users to gift invites to random (or specific) people in the waitlist~!
                                         <br/><br/>
                                         If you don't know anyone already in, your best bet is to wait.
@@ -94,7 +95,8 @@ export default function Home() {
                                     </Text>
                                 </div>
 
-                                <Alert variant="success" className="select-none cursor-help hover:ring-4 ring-default transition-shadow"
+                                <Alert variant="success"
+                                       className="select-none cursor-help hover:ring-4 ring-default transition-shadow"
                                        onClick={() => setShowModal(true)}>
                                     <CheckBadgeIcon
                                         className="h-5 w-5"/>

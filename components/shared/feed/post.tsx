@@ -6,7 +6,6 @@ import {ArrowUpOnSquareIcon, UserGroupIcon,} from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import UserAvatar from '@/components/shared/user/avatar'
 import {UserProfileBasic} from '@/lib/defs/user'
-import ReactMarkdown from 'react-markdown'
 import Card from '@/components/shared/card'
 import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
@@ -18,6 +17,7 @@ import {toast} from '@/lib/toast'
 import {useUserAccountStore} from '@/lib/states'
 import XMarkIcon from '@/components/shared/icons/dazzle/xmark'
 import Tooltip from '@/components/shared/tooltip'
+import Markdown from '@/components/shared/markdown'
 
 export declare interface FeedPostDataType {
     id: string;
@@ -81,9 +81,9 @@ export default function FeedPost({post}: FeedPostType) {
                         className="min-h-fit w-full py-4 px-4 sm:px-6 cursor-pointer">
                         <div
                             className="text-sm text-neutral-700 space-y-4 dark:text-neutral-50">
-                            <ReactMarkdown>
+                            <Markdown>
                                 {body}
-                            </ReactMarkdown>
+                            </Markdown>
                         </div>
 
                         {/* Post Objects (Images) */}
