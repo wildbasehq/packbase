@@ -70,19 +70,21 @@ export default function UserDropdown() {
                     </div>
                 )}
                 <div className="p-2 border-b">
-                    <div className="flex px-4 py-4 transition-all items-center rounded hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50">
-                        <UserAvatar user={user} size="lg"/>
-                        <div className="grow ml-3">
-                            <Heading>{user.display_name || user.username}</Heading>
-                            <Text alt>{user.username}</Text>
+                    <Link href={`@${user.username}`} className="!no-underline">
+                        <div className="flex px-4 py-4 transition-all items-center rounded hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50">
+                            <UserAvatar user={user} size="lg"/>
+                            <div className="grow ml-3">
+                                <Heading>{user.display_name || user.username}</Heading>
+                                <Text alt>{user.username}</Text>
+                            </div>
+                            <Link href="/settings">
+                                {/* mt-1 to offset button */}
+                                <Button variant="ghost" size="icon" className="h-5 w-5 mt-1 cursor-pointer">
+                                    <SettingsIcon className="h-5 w-5"/>
+                                </Button>
+                            </Link>
                         </div>
-                        <Link href="/settings">
-                            {/* mt-1 to offset button */}
-                            <Button variant="ghost" size="icon" className="h-5 w-5 mt-1 cursor-pointer">
-                                <SettingsIcon className="h-5 w-5"/>
-                            </Button>
-                        </Link>
-                    </div>
+                    </Link>
                 </div>
 
                 <Dropdown>
