@@ -1,68 +1,98 @@
-import CrawlText from '@/components/shared/CrawlText'
-import {Heading, Text} from '@/components/shared/text'
-import {ProjectSafeName} from '@/lib/utils'
+import LoginGradient from "@/app/id/create/client/gradient";
+import CrawlText from "@/components/shared/CrawlText";
+import { Heading, Text } from "@/components/shared/text";
+import { ProjectSafeName } from "@/lib/utils";
+import { OctagonAlertIcon } from "lucide-react";
+import Body from "../layout/body";
+import UserInfoCol from "../shared/user/info-col";
 
 export default function GuestLanding() {
+    const people = [
+        {
+            username: "Rek",
+            role: "Team Lead",
+            images: {
+                avatar: "https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/3e133370-0ec2-4825-b546-77de3804c8b1/0/avatar.png",
+            },
+        },
+        // More people...
+    ];
+
     return (
-        <div className="flex flex-col">
-            <div className="relative isolate py-24 sm:py-32">
-                <div
-                    className="hidden snapanim-hue-blur sm:absolute sm:-top-32 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu"
-                    aria-hidden="true"
-                >
-                    <div
-                        className="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-20"
-                        style={{
-                            clipPath:
-                                'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                        }}
-                    />
-                </div>
-                <div
-                    className="absolute snapanim-hue-blur-reverse -top-52 left-1/2 -z-10 -translate-x-1/2 transform-gpu sm:top-[-28rem] sm:ml-16 sm:translate-x-0 sm:transform-gpu"
-                    aria-hidden="true"
-                >
-                    <div
-                        className="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-tr from-[#ff4694] to-[#776fff] opacity-20"
-                        style={{
-                            clipPath:
-                                'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                        }}
-                    />
-                </div>
-                <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <div className="mx-auto max-w-2xl lg:mx-0">
-                        <h2 className="text-4xl font-bold tracking-tight text-default sm:text-6xl"
-                            style={{
-                                whiteSpace: 'break-spaces',
-                            }}
-                        >
-                            <CrawlText>
-                                Hey now, how are you here?
-                            </CrawlText>
-                            <p className="mt-4 text-lg text-alt">
-                                <CrawlText delay={700} fast>
-                                    If you're reading this and you're not apart of Wolfbite, someone broke their
-                                    NDA~!
-                                    ::break:
-                                    Or you're an donor. Or friends & family. GAH, whatever man, just don't share this.
-                                </CrawlText>
-                            </p>
-                        </h2>
+        <Body className="space-y-8">
+            <div className="relative isolate overflow-hidden rounded-2xl border-2 bg-n-5 shadow-md dark:bg-n-7">
+                <div className="flex py-24 sm:py-32">
+                    <div className="-z-10">
+                        <LoginGradient
+                            // opacity={0.5}
+                            grainBlending={0.15}
+                            cDistance={2.5}
+                            positionX={0}
+                            positionY={1}
+                            positionZ={0.3}
+                            rotationX={0}
+                            rotationY={0}
+                            rotationZ={0}
+                            color1="#CEFF1C"
+                            color2="#22BCE9"
+                            color3="#FFFFFF"
+                            cAzimuthAngle={0}
+                            uSpeed={0.05}
+                            uStrength={2}
+                            enableTransition={false}
+                        />
                     </div>
-                    <div className="space-y-2 mt-12">
-                        <Heading size="xl">
-                            While you're here breaking an NDA, how about you read about {ProjectSafeName}, 'eh?
-                        </Heading>
-                        <Text className="text-sm text-default-alt">
-                            C'monnnn, you know wanna~<br/>
-                            <a href="" className="!text-blue-500">
-                                Read the writeup &rarr;
-                            </a>
-                        </Text>
+                    <div className="z-10 mx-auto w-full max-w-7xl px-6 lg:px-8">
+                        <div className="mx-auto max-w-3xl lg:mx-0">
+                            <h2
+                                className="text-4xl font-bold tracking-tight text-white sm:text-6xl"
+                                style={{
+                                    whiteSpace: "break-spaces",
+                                }}
+                            >
+                                <CrawlText>Thigh-high socks, paw-printed gloves.</CrawlText>
+                                <div className="mt-4 text-lg">
+                                    <p className="mb-4">
+                                        <OctagonAlertIcon className="-mt-px inline-flex h-5 w-5" /> HEY! This ain't
+                                        ready for 'ya fuzzface, we're still QA'ing shit! We won't stop you from signing
+                                        up and viewing the feed, but we're only caring about internal feedback for now.
+                                        <Text className="text-sm text-white/80">
+                                            While you're here breaking an NDA, how about you read about{" "}
+                                            {ProjectSafeName}, 'eh?
+                                            <br />
+                                            <a href="" className="!text-blue-500">
+                                                Read the writeup &rarr;
+                                            </a>
+                                        </Text>
+                                    </p>
+                                    <CrawlText delay={700} fast>
+                                        Find your pack that shares that oddly specific interest, share it with everone
+                                        in the Universe, or maybe just keep it to yourself. You control your feed, your
+                                        pack leader controls the view.
+                                    </CrawlText>
+                                </div>
+                            </h2>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    )
+
+            <div className="mx-auto flex w-full max-w-7xl flex-col px-8">
+                <Heading size="2xl">
+                    The pack leader for {process.env.NEXT_PUBLIC_PACKBASE_UNIVERSE || "???"} doesn't let you view the
+                    feed while signed out.
+                </Heading>
+                <ul role="list" className="mt-4 grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
+                    {people.map((person) => (
+                        <li key={person.username}>
+                            <UserInfoCol
+                                user={person}
+                                tag={<p className="text-sm font-semibold leading-6 text-indigo-600">{person.role}</p>}
+                            />
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </Body>
+    );
 }
