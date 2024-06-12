@@ -133,7 +133,7 @@ export const defaultExtensions = [
     //     nested: true,
     // }),
     Markdown.configure({
-        html: true,
+        html: false,
         transformCopiedText: true,
         transformPastedText: true,
     }),
