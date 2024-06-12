@@ -65,7 +65,7 @@ export default function GuestLanding() {
                                         </Text>
                                     </p>
                                     <CrawlText delay={700} fast>
-                                        Find your pack that shares that oddly specific interest, share it with everone in the Universe, or
+                                        Find your pack that shares that oddly specific interest, share it with everyone in the Universe, or
                                         maybe just keep it to yourself. You control your feed, your pack leader controls the view.
                                     </CrawlText>
                                 </div>
