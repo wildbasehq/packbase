@@ -69,7 +69,7 @@ module.exports = {
                 secondary: {
                     // DEFAULT: 'rgb(var(--md-sys-secondary) / <alpha-value>)',
                     container: 'rgb(var(--md-sys-secondary-container) / <alpha-value>)',
-                    DEFAULT: "hsl(var(--color-primary-lime))",
+                    DEFAULT: "rgb(var(--color-primary-lime) / <alpha-value>)",
                     foreground: "hsl(var(--secondary-foreground))",
                 },
                 tertiary: {

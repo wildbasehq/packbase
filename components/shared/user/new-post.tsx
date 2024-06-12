@@ -1,196 +1,143 @@
-import UserAvatar from '@/components/shared/user/avatar'
-import Link from 'next/link'
-import {Text} from '@/components/shared/text'
-import {DotIcon} from 'lucide-react'
-import {Tab, TabGroup, TabList, TabPanel, TabPanels} from '@headlessui/react'
-import {clsx} from 'clsx'
-import {LinkIcon} from '@heroicons/react/24/solid'
-import {Input} from '@/components/shared/input/text'
-import {Button} from '@/components/shared/ui/button'
-import {LoadingCircle} from '@/components/shared/icons'
-import Card from '@/components/shared/card'
-import {FormEvent, useState} from 'react'
-import {FetchHandler} from '@/lib/api'
-import {toast} from '@/lib/toast'
-import {useUserAccountStore} from '@/lib/states'
-import Markdown from '@/components/shared/markdown'
+import UserAvatar from "@/components/shared/user/avatar";
+import Link from "next/link";
+import { Text } from "@/components/shared/text";
+import { DotIcon } from "lucide-react";
+import { Button } from "@/components/shared/ui/button";
+import { LoadingCircle } from "@/components/shared/icons";
+import Card from "@/components/shared/card";
+import { FormEvent, useState } from "react";
+import { FetchHandler } from "@/lib/api";
+import { toast } from "@/lib/toast";
+import { useUserAccountStore } from "@/lib/states";
+import { Editor } from "@/components/novel";
+import { LinkIcon } from "@heroicons/react/24/solid";
 
 export default function NewPost() {
-    const {user} = useUserAccountStore()
-    const [submitting, setSubmitting] = useState<boolean>(false)
-    const [willUpload, setWillUpload] = useState<number>(0)
+    const { user } = useUserAccountStore();
+    const [submitting, setSubmitting] = useState<boolean>(false);
+    const [willUpload, setWillUpload] = useState<number>(0);
 
-    const [body, setBody] = useState<string>('')
+    const [body, setBody] = useState<string>("");
 
     const submitPost = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault()
-        if (submitting) return
-        setSubmitting(true)
-        const formData = new FormData(event.currentTarget)
+        event.preventDefault();
+        if (submitting) return;
+        setSubmitting(true);
+        const formData = new FormData(event.currentTarget);
         const post: {
-            body: string
-            content_type: string
-            assets?: any[]
+            body: string;
+            content_type: string;
+            assets?: any[];
         } = {
             body: body,
-            content_type: 'markdown'
-        }
+            content_type: "markdown",
+        };
 
-        const assets = formData.getAll('assets')
+        const assets = formData.getAll("assets");
         // @ts-ignore
         if (assets && assets.length > 0 && assets[0].name.length > 0) {
-            const reader = new FileReader()
+            const reader = new FileReader();
             // @ts-ignore
-            reader.readAsDataURL(assets[0])
+            reader.readAsDataURL(assets[0]);
             reader.onloadend = () => {
-                post.assets = [{
-                    name: 'test',
-                    data: reader.result
-                }]
+                post.assets = [
+                    {
+                        name: "test",
+                        data: reader.result,
+                    },
+                ];
 
-                uploadPost(post)
-            }
+                uploadPost(post);
+            };
         } else {
-            uploadPost(post)
+            uploadPost(post);
         }
-    }
+    };
 
     const uploadPost = (post: any) => {
-        FetchHandler.post('/xrpc/app.packbase.howl.create', {
-            body: JSON.stringify(post)
-        }).then(({data}) => {
-            if (data?.message) {
-                setSubmitting(false)
-                return toast.error(data.message ? `${data.at}: ${data.message}` : 'Something went wrong')
-            } else {
-                toast.success('created!')
-
-                // @todo just add the post to the feed
-                return window.location.reload()
-            }
-        }).catch(error => {
-            console.log(error)
-            setSubmitting(false)
-            toast.error('Something went wrong')
+        FetchHandler.post("/xrpc/app.packbase.howl.create", {
+            body: JSON.stringify(post),
         })
-    }
+            .then(({ data }) => {
+                if (data?.message) {
+                    setSubmitting(false);
+                    return toast.error(data.message ? `${data.at}: ${data.message}` : "Something went wrong");
+                } else {
+                    toast.success("created!");
+
+                    // @todo just add the post to the feed
+                    return window.location.reload();
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                setSubmitting(false);
+                toast.error("Something went wrong");
+            });
+    };
 
     return (
-        <Card className="!px-0 !py-0 mx-auto mb-8">
+        <Card className="mx-auto mb-8 !px-0 !py-0">
             <form onSubmit={submitPost}>
                 <div className="relative">
                     <div className="px-4 pt-5 sm:px-6">
                         <div className="flex space-x-3">
                             <div className="flex-shrink-0">
-                                <UserAvatar user={user}/>
+                                <UserAvatar user={user} />
                             </div>
-                            <div className="min-w-0 flex-1 flex flex-col justify-center">
-                                <Link href={`/@${user.username}/`}
-                                      className="font-medium text-default">
+                            <div className="flex min-w-0 flex-1 flex-col justify-center">
+                                <Link href={`/@${user.username}/`} className="text-default font-medium">
                                     {user.display_name || user.username}
                                 </Link>
-                                <Text>
-                                    New Howl
-                                </Text>
+                                <Text>New Howl</Text>
                             </div>
-                            <div className="flex-shrink-0 self-center flex space-x-2">
-                                <DotIcon/>
+                            <div className="flex flex-shrink-0 space-x-2 self-center">
+                                <DotIcon />
                             </div>
                         </div>
                     </div>
 
-                    <div
-                        className="min-h-fit w-full py-4 px-4 sm:px-6 cursor-pointer">
-                        <div
-                            className="text-sm space-y-4">
-                            <TabGroup>
-                                {({selectedIndex}) => (
-                                    <>
-                                        <TabList className="flex items-center">
-                                            <Tab
-                                                className={({selected}) =>
-                                                    clsx(
-                                                        selected
-                                                            ? 'bg-n-1/70 dark:bg-n-6'
-                                                            : 'transition-all hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50',
-                                                        'rounded-md px-3 py-1.5 text-sm font-medium'
-                                                    )
-                                                }
-                                            >
-                                                Write
-                                            </Tab>
-                                            <Tab
-                                                className={({selected}) =>
-                                                    clsx(
-                                                        selected
-                                                            ? 'bg-n-1/70 dark:bg-n-6'
-                                                            : 'transition-all hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50',
-                                                        'ml-2 rounded-md px-3 py-1.5 text-sm font-medium'
-                                                    )
-                                                }
-                                            >
-                                                Preview
-                                            </Tab>
-
-                                            <div className="ml-auto flex items-center space-x-5">
-                                                {willUpload ? `dbg: will upload ${willUpload}` : ''}
-                                                <div className="flex items-center">
-                                                    <button
-                                                        type="button"
-                                                        className="-m-2.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
-                                                        onClick={() => document.getElementById('assets')?.click()}
-                                                    >
-                                                        <span className="sr-only">Insert link</span>
-                                                        <LinkIcon className="h-5 w-5" aria-hidden="true"/>
-                                                    </button>
-                                                </div>
-                                                <input type="file" name="assets" id="assets" className="hidden" accept="image/*" onChange={(e) => {
-                                                    setWillUpload(e.target.files?.length || 0)
-                                                }}/>
-                                            </div>
-                                        </TabList>
-                                        <TabPanels className="mt-2">
-                                            <TabPanel className="-m-0.5 rounded-lg p-0.5">
-                                                <label htmlFor="comment" className="sr-only">
-                                                    Comment
-                                                </label>
-                                                <div>
-                                                    <Input
-                                                        type="textarea"
-                                                        rows={5}
-                                                        name="body"
-                                                        id="body"
-                                                        placeholder="Add your comment..."
-                                                        value={body}
-                                                        onChange={e => setBody(e.target.value)}
-                                                    />
-                                                </div>
-                                            </TabPanel>
-                                            <TabPanel className="-m-0.5 rounded-lg p-0.5">
-                                                <div className="border-b pb-4">
-                                                    <Markdown>
-                                                        {body}
-                                                    </Markdown>
-                                                </div>
-                                            </TabPanel>
-                                        </TabPanels>
-                                    </>
-                                )}
-                            </TabGroup>
-                        </div>
+                    <div className="min-h-fit w-full px-4 py-4 sm:px-6">
+                        <Editor
+                            onUpdate={(e) => {
+                                setBody(e?.storage.markdown.getMarkdown());
+                                console.log(e?.storage.markdown.getMarkdown());
+                            }}
+                        />
                     </div>
                 </div>
 
                 {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
-                <div className="px-4 py-4 sm:px-6 flex justify-between space-x-8 border-t">
-                    <div className="flex items-center w-full space-x-6">
-                        <div className="flex-1"/>
-                        <Button disabled={submitting}>
-                            {!submitting ? 'Post' : <LoadingCircle/>}
-                        </Button>
+                <div className="flex justify-between space-x-8 border-t px-4 py-4 sm:px-6">
+                    <div className="flex w-full items-center space-x-6">
+                        <div className="ml-auto flex items-center space-x-5">
+                            {willUpload ? `dbg: will upload ${willUpload}` : ""}
+                            <div className="flex items-center">
+                                <button
+                                    type="button"
+                                    className="-m-2.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
+                                    onClick={() => document.getElementById("assets")?.click()}
+                                >
+                                    <span className="sr-only">Insert link</span>
+                                    <LinkIcon className="h-5 w-5" aria-hidden="true" />
+                                </button>
+                            </div>
+                            <input
+                                type="file"
+                                name="assets"
+                                id="assets"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={(e) => {
+                                    setWillUpload(e.target.files?.length || 0);
+                                }}
+                            />
+                        </div>
+                        <div className="flex-1" />
+                        <Button disabled={submitting}>{!submitting ? "Post" : <LoadingCircle />}</Button>
                     </div>
                 </div>
             </form>
         </Card>
-    )
+    );
 }

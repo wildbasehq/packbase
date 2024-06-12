@@ -1,16 +1,20 @@
-'use client'
+"use client";
 
-import UserAvatar from '@/components/shared/user/avatar'
+import UserAvatar from "@/components/shared/user/avatar";
 // @ts-ignore
-import * as HoverCard from '@radix-ui/react-hover-card'
-import {Link} from '@/components/shared/link'
-import {BentoStaffBadge} from '@/lib/utils/pak'
-import Image from 'next/image'
-import Markdown from '@/components/shared/markdown'
+import * as HoverCard from "@radix-ui/react-hover-card";
+import { Link } from "@/components/shared/link";
+import { BentoStaffBadge } from "@/lib/utils/pak";
+import Image from "next/image";
+import Markdown from "@/components/shared/markdown";
 
-export default function UserInfoCol({user, size, tag}: {
+export default function UserInfoCol({
+    user,
+    size,
+    tag,
+}: {
     user: any; // object
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+    size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
     tag?: React.ReactNode;
 }) {
     // const [snap, setSnap] = useState<number | string | null>('148px')
@@ -19,73 +23,84 @@ export default function UserInfoCol({user, size, tag}: {
 
     return (
         <HoverCard.Root>
-            <HoverCard.Trigger className="!no-underline select-none">
-                <UserInfo user={user} size={size} tag={tag}/>
+            <HoverCard.Trigger className="select-none !no-underline">
+                <UserInfo user={user} size={size} tag={tag} />
             </HoverCard.Trigger>
             <HoverCard.Portal>
                 <HoverCard.Content
-                    className="relative data-[side=bottom]:animate-slide-up-fade-snapper data-[side=right]:animate-slideLeftAndFade data-[side=left]:animate-slideRightAndFade data-[side=top]:animate-slide-down-fade w-96 bg-card rounded p-5 shadow border data-[state=open]:transition-all overflow-hidden"
+                    className="data-[side=right]:animate-slideLeftAndFade data-[side=left]:animate-slideRightAndFade relative w-96 overflow-hidden rounded border bg-card p-5 shadow data-[side=bottom]:animate-slide-up-fade-snapper data-[side=top]:animate-slide-down-fade data-[state=open]:transition-all"
                     sideOffset={5}
-                    collisionPadding={{left: 32}}
+                    collisionPadding={{ left: 32 }}
                 >
                     {user.images?.header && (
-                        <div className="absolute top-0 right-0 w-full h-full pointer-events-none">
+                        <div className="pointer-events-none absolute right-0 top-0 h-full w-full">
                             {/*<div className="absolute w-full h-full bg-card/90 rounded"/>*/}
-                            <Image src={user.images?.header} width={1080} height={1080} className="w-full h-full object-cover rounded object-center opacity-10"
-                                   alt="Cover image"/>
+                            <Image
+                                src={user.images?.header}
+                                width={1080}
+                                height={1080}
+                                className="h-full w-full rounded object-cover object-center opacity-10"
+                                alt="Cover image"
+                            />
                         </div>
                     )}
 
-                    <div className="flex flex-col gap-[7px] z-50">
-                        <UserAvatar size="3xl" user={user}/>
+                    <div className="z-50 flex flex-col gap-[7px]">
+                        <UserAvatar size="3xl" user={user} />
                         <div className="flex flex-col gap-4">
                             <div>
                                 <div className="text-md">
                                     {user.display_name || user.username}
                                     {user.type && (
-                                        <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20}/>
+                                        <BentoStaffBadge
+                                            type={user.type}
+                                            className="ml-1 inline-flex h-5 w-5"
+                                            width={20}
+                                            height={20}
+                                        />
                                     )}
                                 </div>
-                                <div className="text-sm text-alt">@{user.username}</div>
+                                <div className="text-alt text-sm">@{user.username}</div>
                             </div>
-                            <Markdown className="text-sm">
-                                {user.about?.bio}
-                            </Markdown>
+                            <Markdown className="text-sm">{user.about?.bio}</Markdown>
                             <div className="flex gap-4">
                                 <div className="flex gap-1">
-                                    <div className="text-sm font-medium">-1</div>
-                                    {' '}
-                                    <div className="text-sm">Mutuals</div>
+                                    <div className="text-sm font-medium">-1</div> <div className="text-sm">Mutuals</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <HoverCard.Arrow className="fill-white"/>
+                    <HoverCard.Arrow className="fill-white" />
                 </HoverCard.Content>
             </HoverCard.Portal>
         </HoverCard.Root>
-    )
+    );
 }
 
-export function UserInfo({user, size, tag}: {
+export function UserInfo({
+    user,
+    size,
+    tag,
+}: {
     user: any; // object
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+    size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
     tag?: React.ReactNode;
 }) {
     return (
         <div className="flex flex-row items-center gap-2">
-            <UserAvatar user={user} size={size || 'md'}/>
+            <UserAvatar user={user} size={size} />
             <div className="flex flex-col">
-                <Link href={`/@${user.username}`} className="text-sm text-default font-semibold">
+                <Link href={`/@${user.username}`} className="text-default text-sm font-semibold">
                     {user.display_name || user.username}
                     {user.type && (
-                        <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20}/>
+                        <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />
                     )}
                 </Link>
-                <span
-                    className="self-baseline text-xs text-alt unicorn:text-on-surface-variant/50">{tag || user.tag || 'piss'}</span>
+                <span className="text-alt self-baseline text-xs unicorn:text-on-surface-variant/50">
+                    {tag || user.tag || "piss"}
+                </span>
             </div>
         </div>
-    )
+    );
 }

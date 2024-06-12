@@ -1,19 +1,20 @@
-'use client'
+"use client";
 
-import {ShaderGradient, ShaderGradientCanvas} from 'shadergradient'
+import { ShaderGradient, ShaderGradientCanvas } from "shadergradient";
 
-export default function LoginGradient() {
+export default function LoginGradient({ opacity, ...props }: any) {
     return (
         <ShaderGradientCanvas
             style={{
-                position: 'absolute',
+                position: "absolute",
                 top: 0,
-                opacity: 0.85,
+                opacity: opacity || 0.85,
+                pointerEvents: "none",
                 // backdropFilter: 'blur(1em)'
             }}
         >
             <ShaderGradient
-                control='props'
+                control="props"
                 animate="on"
                 color1="#606080"
                 color2="#a78bfa"
@@ -25,7 +26,7 @@ export default function LoginGradient() {
                 cPolarAngle={80}
                 cameraZoom={9}
                 envPreset="city"
-                frameRate={1}
+                // frameRate={1}
                 grainBlending={0.2}
                 lightType="3d"
                 positionX={-1}
@@ -41,7 +42,8 @@ export default function LoginGradient() {
                 uStrength={1.1}
                 uTime={0}
                 // enableTransition={false}
+                {...props}
             />
         </ShaderGradientCanvas>
-    )
+    );
 }
