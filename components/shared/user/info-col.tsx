@@ -1,21 +1,21 @@
-"use client";
+'use client'
 
-import UserAvatar from "@/components/shared/user/avatar";
+import UserAvatar from '@/components/shared/user/avatar'
 // @ts-ignore
-import * as HoverCard from "@radix-ui/react-hover-card";
-import { Link } from "@/components/shared/link";
-import { BentoStaffBadge } from "@/lib/utils/pak";
-import Image from "next/image";
-import Markdown from "@/components/shared/markdown";
+import * as HoverCard from '@radix-ui/react-hover-card'
+import { Link } from '@/components/shared/link'
+import { BentoStaffBadge } from '@/lib/utils/pak'
+import Image from 'next/image'
+import Markdown from '@/components/shared/markdown'
 
 export default function UserInfoCol({
     user,
     size,
     tag,
 }: {
-    user: any; // object
-    size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
-    tag?: React.ReactNode;
+    user: any // object
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+    tag?: React.ReactNode
 }) {
     // const [snap, setSnap] = useState<number | string | null>('148px')
 
@@ -52,12 +52,7 @@ export default function UserInfoCol({
                                 <div className="text-md">
                                     {user.display_name || user.username}
                                     {user.type && (
-                                        <BentoStaffBadge
-                                            type={user.type}
-                                            className="ml-1 inline-flex h-5 w-5"
-                                            width={20}
-                                            height={20}
-                                        />
+                                        <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />
                                     )}
                                 </div>
                                 <div className="text-alt text-sm">@{user.username}</div>
@@ -75,7 +70,7 @@ export default function UserInfoCol({
                 </HoverCard.Content>
             </HoverCard.Portal>
         </HoverCard.Root>
-    );
+    )
 }
 
 export function UserInfo({
@@ -83,9 +78,9 @@ export function UserInfo({
     size,
     tag,
 }: {
-    user: any; // object
-    size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
-    tag?: React.ReactNode;
+    user: any // object
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+    tag?: React.ReactNode
 }) {
     return (
         <div className="flex flex-row items-center gap-2">
@@ -93,14 +88,12 @@ export function UserInfo({
             <div className="flex flex-col">
                 <Link href={`/@${user.username}`} className="text-default text-sm font-semibold">
                     {user.display_name || user.username}
-                    {user.type && (
-                        <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />
-                    )}
+                    {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />}
                 </Link>
-                <span className="text-alt self-baseline text-xs unicorn:text-on-surface-variant/50">
-                    {tag || user.tag || "piss"}
+                <span className="text-alt w-32 self-baseline overflow-hidden text-ellipsis whitespace-nowrap text-xs unicorn:text-on-surface-variant/50">
+                    {tag || user.tag || user.about?.bio || 'piss'}
                 </span>
             </div>
         </div>
-    );
+    )
 }
