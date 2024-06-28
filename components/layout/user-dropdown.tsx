@@ -1,28 +1,28 @@
 'use client'
 
-import {MinusCircleIcon, MoonIcon} from '@heroicons/react/24/solid'
-import {ChevronDownIcon} from '@heroicons/react/20/solid'
-import {useUserAccountStore} from '@/lib/states'
+import { MinusCircleIcon, MoonIcon } from '@heroicons/react/24/solid'
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { useUserAccountStore } from '@/lib/states'
 import LogoutIcon from '@/components/shared/icons/logout'
 import Link from 'next/link'
-import {createClient} from '@/lib/supabase/client'
-import {Heading, Text} from '@/components/shared/text'
-import {Dropdown, DropdownDescription, DropdownHeader, DropdownItem, DropdownLabel, DropdownMenu} from '@/components/shared/dropdown'
-import {MenuButton} from '@headlessui/react'
+import { createClient } from '@/lib/supabase/client'
+import { Heading, Text } from '@/components/shared/text'
+import { Dropdown, DropdownDescription, DropdownHeader, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/shared/dropdown'
+import { MenuButton } from '@headlessui/react'
 import UserAvatar from '@/components/shared/user/avatar'
-import {SettingsIcon} from 'lucide-react'
-import {Button} from '@/components/shared/ui/button'
+import { SettingsIcon } from 'lucide-react'
+import { Button } from '@/components/shared/ui/button'
 import Tooltip from '@/components/shared/tooltip'
-import {ProjectName, ProjectSafeName} from '@/lib/utils'
+import { ProjectName, ProjectSafeName } from '@/lib/utils'
 
 export default function UserDropdown() {
-    const {user, setUser} = useUserAccountStore()
+    const { user, setUser } = useUserAccountStore()
 
     const StatusOptions = [
         {
             id: 1,
             name: 'Online',
-            description: 'Everyone will see that you\'re online.',
+            description: "Everyone will see that you're online.",
             className: 'bg-green-400',
         },
         {
@@ -35,14 +35,14 @@ export default function UserDropdown() {
         {
             id: 3,
             name: 'Idle',
-            description: 'Automatically switches to this when you\'re not focused in the tab or browser.',
+            description: "Automatically switches to this when you're not focused in the tab or browser.",
             icon: MoonIcon,
             className: 'text-accent-5',
         },
         {
             id: 0,
             name: 'Invisible',
-            description: 'Disconnects from Packbase DMs. Still able to access messages, but won\'t send or receive read receipts nor receive real-time notifications.',
+            description: "Disconnects from Packbase DMs. Still able to access messages, but won't send or receive read receipts nor receive real-time notifications.",
             className: 'border-n-5 group-hover:border-white border-dashed border-2 w-4 h-4',
         },
     ]
@@ -50,37 +50,34 @@ export default function UserDropdown() {
     const currentStatus = StatusOptions.find((option) => option.id === user.status) || StatusOptions[0]
 
     return (
-        <DropdownHeader
-            className="flex flex-col w-96 !p-0">
-            <div
-                className="w-full h-fit bg-white/50 dark:bg-n-6/50 shadow rounded-br rounded-bl">
+        <DropdownHeader className="flex w-96 flex-col !p-0">
+            <div className="h-fit w-full rounded-bl rounded-br bg-white/50 shadow dark:bg-n-6/50">
                 {user.reqOnboard && (
-                    <div className="p-2 border-b">
-                        <Link href="/settings"
-                              className="flex flex-col px-4 py-4 transition-all justify-center rounded hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50 !no-underline">
+                    <div className="border-b p-2">
+                        <Link
+                            href="/settings"
+                            className="ring-default flex flex-col justify-center rounded px-4 py-4 !no-underline transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"
+                        >
                             <Heading size="sm">Finish your space</Heading>
                             <Text size="xs" className="text-alt">
-                                For your privacy, no one can find you and your profile is non-existent until you make
-                                it.
-                                <p className="mt-2">
-                                    Click to get started!
-                                </p>
+                                For your privacy, no one can find you and your profile is non-existent until you make it.
+                                <p className="mt-2">Click to get started!</p>
                             </Text>
                         </Link>
                     </div>
                 )}
-                <div className="p-2 border-b">
-                    <Link href={`@${user.username}`} className="!no-underline">
-                        <div className="flex px-4 py-4 transition-all items-center rounded hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50">
-                            <UserAvatar user={user} size="lg"/>
-                            <div className="grow ml-3">
+                <div className="border-b p-2">
+                    <Link href={`/@${user.username}`} className="!no-underline">
+                        <div className="ring-default flex items-center rounded px-4 py-4 transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50">
+                            <UserAvatar user={user} size="lg" />
+                            <div className="ml-3 grow">
                                 <Heading>{user.display_name || user.username}</Heading>
                                 <Text alt>{user.username}</Text>
                             </div>
                             <Link href="/settings">
                                 {/* mt-1 to offset button */}
-                                <Button variant="ghost" size="icon" className="h-5 w-5 mt-1 cursor-pointer">
-                                    <SettingsIcon className="h-5 w-5"/>
+                                <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer">
+                                    <SettingsIcon className="h-5 w-5" />
                                 </Button>
                             </Link>
                         </div>
@@ -89,25 +86,22 @@ export default function UserDropdown() {
 
                 <Dropdown>
                     <Tooltip content={currentStatus.description}>
-                        <MenuButton
-                            className="w-full px-6 py-2 justify-between items-start inline-flex cursor-auto select-none">
-                            <div className="justify-center items-center gap-4 flex">
+                        <MenuButton className="inline-flex w-full cursor-auto select-none items-start justify-between px-6 py-2">
+                            <div className="flex items-center justify-center gap-4">
                                 {currentStatus.icon && (
-                                    <div className="w-6 h-6 p-0.5 justify-center items-center">
-                                        <currentStatus.icon
-                                            className={`${currentStatus.className || 'fill-alt'} w-full h-full transition-colors`}/>
+                                    <div className="h-6 w-6 items-center justify-center p-0.5">
+                                        <currentStatus.icon className={`${currentStatus.className || 'fill-alt'} h-full w-full transition-colors`} />
                                     </div>
                                 )}
 
                                 {!currentStatus.icon && (
-                                    <div className="w-6 h-6 p-1 justify-center items-center">
-                                        <div
-                                            className={`w-full h-full ${currentStatus.className || 'bg-n-5'} rounded-full`}/>
+                                    <div className="h-6 w-6 items-center justify-center p-1">
+                                        <div className={`h-full w-full ${currentStatus.className || 'bg-n-5'} rounded-full`} />
                                     </div>
                                 )}
                                 <div className="text-sm text-on-surface-variant">{currentStatus.name}</div>
                             </div>
-                            <ChevronDownIcon className="AccordionChevron w-5 h-5 self-center text-body"/>
+                            <ChevronDownIcon className="AccordionChevron text-body h-5 w-5 self-center" />
                         </MenuButton>
                     </Tooltip>
                     <DropdownMenu className="!w-96">
@@ -121,32 +115,28 @@ export default function UserDropdown() {
                                     })
                                 }}
                             >
-                                <DropdownLabel className="group justify-start items-center gap-3 py-1 inline-flex">
+                                <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1">
                                     {option.icon && (
-                                        <div className="w-6 h-6 p-0.5 justify-center items-center">
-                                            <option.icon
-                                                className={`${option.className || 'fill-alt'} w-full h-full transition-colors`}/>
+                                        <div className="h-6 w-6 items-center justify-center p-0.5">
+                                            <option.icon className={`${option.className || 'fill-alt'} h-full w-full transition-colors`} />
                                         </div>
                                     )}
 
                                     {!option.icon && (
-                                        <div className="w-6 h-6 p-1 justify-center items-center">
-                                            <div
-                                                className={`w-full h-full ${option.className || 'bg-n-5'} rounded-full`}/>
+                                        <div className="h-6 w-6 items-center justify-center p-1">
+                                            <div className={`h-full w-full ${option.className || 'bg-n-5'} rounded-full`} />
                                         </div>
                                     )}
                                     {option.name}
                                 </DropdownLabel>
-                                <DropdownDescription>
-                                    {option.description}
-                                </DropdownDescription>
+                                <DropdownDescription>{option.description}</DropdownDescription>
                             </DropdownItem>
                         ))}
                     </DropdownMenu>
                 </Dropdown>
             </div>
 
-            <div className="inline-flex px-3 py-2 gap-2 flex-col w-full">
+            <div className="inline-flex w-full flex-col gap-2 px-3 py-2">
                 <div
                     onClick={() => {
                         const supabase = createClient()
@@ -157,14 +147,19 @@ export default function UserDropdown() {
                             window.location.reload()
                         })
                     }}
-                    className="group px-4 py-3 justify-start items-center gap-4 inline-flex cursor-pointer w-full rounded transition-all ring-destructive/25 hover:ring-2 hover:bg-destructive/75">
-                    <LogoutIcon className="w-4 h-4 fill-alt group-hover:fill-white"/> <Text alt className="group-hover:text-white">Sign out of all accounts</Text>
+                    className="group inline-flex w-full cursor-pointer items-center justify-start gap-4 rounded px-4 py-3 ring-destructive/25 transition-all hover:bg-destructive/75 hover:ring-2"
+                >
+                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white" />{' '}
+                    <Text alt className="group-hover:text-white">
+                        Sign out of all accounts
+                    </Text>
                 </div>
             </div>
-            <div className="flex flex-col w-full px-7 py-5 items-center justify-center border-t">
+            <div className="flex w-full flex-col items-center justify-center border-t px-7 py-5">
                 <Text size="xs" alt>
-                    {ProjectSafeName} ("{ProjectName}") &copy; Wolfbite
-                    Labs. &mdash; {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF || process.env.NEXT_PUBLIC_VERCEL_ENV || 'local'}.{process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || '0000000'}
+                    {ProjectSafeName} (Name isn't final. {ProjectName}) &copy; Wolfbite Labs. &mdash;{' '}
+                    {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF || process.env.NEXT_PUBLIC_VERCEL_ENV || 'local'}.
+                    {process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || '0000000'}
                 </Text>
             </div>
         </DropdownHeader>

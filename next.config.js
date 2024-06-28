@@ -27,6 +27,14 @@ const nextConfig = {
             {
                 source: '/@:userId([a-zA-Z0-9]+)/:id*',
                 destination: "/user/:userId/:id*",
+            },
+            {
+                source: '/p/:packId([a-zA-Z0-9]+)/:id*',
+                destination: "/pack/:packId/:id*",
+            },
+            {
+                source: '/',
+                destination: "/pack/universe",
             }
         ]
     }

@@ -7,7 +7,8 @@
 }
 
 .bg-sidebar {
-  @apply bg-white dark:bg-n-7;
+//   @apply bg-white dark:bg-n-7;
+  @apply bg-gradient-to-b from-white to-neutral-50 dark:from-n-7 dark:to-n-7/80 unicorn:bg-surface-variant/95;
 }
 
 .bg-sidebar\/90 {

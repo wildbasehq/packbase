@@ -1,28 +1,28 @@
-"use client";
-import Body from "@/components/layout/body";
-import GuestLanding from "@/components/home/guestlanding";
-import { useResourceUIStore, useUserAccountStore } from "@/lib/states";
-import UserAvatar from "@/components/shared/user/avatar";
-import { memo, useEffect, useState } from "react";
-import { Heading, Text } from "@/components/shared/text";
-import girlDogBusStop from "@/datasets/lottie/girl-dog-bus-stop.json";
-import dynamic from "next/dynamic";
-import FeedList from "@/components/shared/feed/list";
-import { PartyPopperIcon } from "lucide-react";
-import { Button } from "@/components/shared/ui/button";
-import { CheckBadgeIcon } from "@heroicons/react/24/solid";
-import { Alert, AlertDescription, AlertTitle } from "@/components/shared/ui/alert";
-import Modal from "@/components/modal";
-import { BentoStaffBadge } from "@/lib/utils/pak";
-import NewPost from "@/components/shared/user/new-post";
-import Markdown from "@/components/shared/markdown";
+'use client'
+import Body from '@/components/layout/body'
+import GuestLanding from '@/components/home/guestlanding'
+import { useResourceUIStore, useUserAccountStore } from '@/lib/states'
+import UserAvatar from '@/components/shared/user/avatar'
+import { memo, useEffect, useState } from 'react'
+import { Heading, Text } from '@/components/shared/text'
+import girlDogBusStop from '@/datasets/lottie/girl-dog-bus-stop.json'
+import dynamic from 'next/dynamic'
+import FeedList from '@/components/shared/feed/list'
+import { PartyPopperIcon } from 'lucide-react'
+import { Button } from '@/components/shared/ui/button'
+import { CheckBadgeIcon } from '@heroicons/react/24/solid'
+import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
+import Modal from '@/components/modal'
+import { BentoStaffBadge } from '@/lib/utils/pak'
+import NewPost from '@/components/shared/user/new-post'
+import Markdown from '@/components/shared/markdown'
 
 export default function Home() {
-    const { user } = useUserAccountStore();
-    const { setHidden } = useResourceUIStore();
-    const [notice, setNotice] = useState<any>(null);
-    const Lottie = memo(dynamic(() => import("lottie-react"), { ssr: false, suspense: true }));
-    const [showModal, setShowModal] = useState<boolean>(false);
+    const { user } = useUserAccountStore()
+    const { setHidden } = useResourceUIStore()
+    const [notice, setNotice] = useState<any>(null)
+    const Lottie = memo(dynamic(() => import('lottie-react'), { ssr: false, suspense: true }))
+    const [showModal, setShowModal] = useState<boolean>(false)
 
     // useEffect(() => {
     //     if (!window || !user) return
@@ -41,8 +41,9 @@ export default function Home() {
     // }, [])
 
     useEffect(() => {
-        if (!user) setHidden(true);
-    }, [user]);
+        if (!user) setHidden(true)
+    }, [user])
+
     return (
         <>
             {!user && <GuestLanding />}
@@ -69,22 +70,19 @@ export default function Home() {
                     </div>
                 )}
 
-                {user?.waitlistType === "wait" && (
+                {user?.waitlistType === 'wait' && (
                     <>
                         <div className="mb-12 grid max-w-6xl grid-cols-1 items-center justify-center gap-8 lg:grid-cols-2">
                             <div className="flex flex-col space-y-4">
                                 <Heading size="xl">So you've registered on the waitlist. Now what??</Heading>
                                 <div className="space-y-2">
                                     <Text className="text-default-alt text-sm">
-                                        If you'd like to participate with the community, you'll need an invite from
-                                        someone. As we have no "rolling invites", we allow users to gift invites to
-                                        random (or specific) people in the waitlist~!
+                                        If you'd like to participate with the community, you'll need an invite from someone. As we have no
+                                        "rolling invites", we allow users to gift invites to random (or specific) people in the waitlist~!
                                         <br />
                                         <br />
                                         If you don't know anyone already in, your best bet is to wait.
-                                        <span className="text-tertiary">
-                                            If you've traded anything for an invite, you've been scammed.
-                                        </span>
+                                        <span className="text-tertiary">If you've traded anything for an invite, you've been scammed.</span>
                                     </Text>
                                 </div>
 
@@ -110,21 +108,11 @@ export default function Home() {
                                             You work on this, nice.
                                             <br />
                                             <br />
-                                            On public release, you'll have a{" "}
-                                            <BentoStaffBadge
-                                                type="1"
-                                                width={20}
-                                                height={20}
-                                                className="inline-flex h-5 w-5"
-                                            />{" "}
-                                            corgi badge next to your name (or a{" "}
-                                            <BentoStaffBadge
-                                                type="2"
-                                                width={20}
-                                                height={20}
-                                                className="inline-flex h-5 w-5"
-                                            />{" "}
-                                            rainbow one if you're still with us 🫡)
+                                            On public release, you'll have a{' '}
+                                            <BentoStaffBadge type="1" width={20} height={20} className="inline-flex h-5 w-5" /> corgi badge
+                                            next to your name (or a{' '}
+                                            <BentoStaffBadge type="2" width={20} height={20} className="inline-flex h-5 w-5" /> rainbow one
+                                            if you're still with us 🫡)
                                         </Text>
                                         <Button variant="outline" className="mt-4" onClick={() => setShowModal(false)}>
                                             Got it
@@ -149,5 +137,5 @@ export default function Home() {
                 </>
             )}
         </>
-    );
+    )
 }

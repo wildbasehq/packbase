@@ -1,0 +1,131 @@
+'use client'
+import { LoadingDots } from '@/components/shared/icons'
+import { FetchHandler } from '@/lib/api'
+import { useResourceStore, useResourceUIStore } from '@/lib/states'
+import { useEffect, useState } from 'react'
+import { FaceFrownIcon, HomeIcon } from '@heroicons/react/24/solid'
+import { OrbitIcon } from 'lucide-react'
+import Body from '@/components/layout/body'
+import { Heading } from '@/components/shared/text'
+import Image from 'next/image'
+import { ProjectSafeName } from '@/lib/utils'
+
+export default function PackLayout({ children, params }: { children: React.ReactNode; params: { slug: string } }) {
+    const { resourceDefault, loading, setLoading, setNavigation } = useResourceUIStore()
+    const { resources, currentResource, setCurrentResource } = useResourceStore()
+    const [error, setError] = useState<any>(null)
+    const { slug } = params
+
+    useEffect(() => {
+        if (currentResource.id !== slug) {
+            // Search resources for id that matches slug
+            const resource = resources.find((r) => r.id === slug)
+            if (resource) {
+                setCurrentResource(resource)
+            } else {
+                setCurrentResource(resourceDefault)
+            }
+        }
+
+        if (slug) {
+            setLoading(true)
+            setError(null)
+            const timeout = setTimeout(() => {
+                FetchHandler.get(`/xrpc/app.packbase.pack.get?id=${slug}`)
+                    .then((data) => {
+                        console.log(data)
+                        setLoading(false)
+
+                        if (data.status === 404) {
+                            setError({ cause: 404, message: 'Not Found' })
+                            setNavigation([
+                                {
+                                    name: 'Back to the Universe',
+                                    description: '',
+                                    href: '/p/universe',
+                                    icon: OrbitIcon,
+                                },
+                            ])
+                        } else {
+                            setNavigation([
+                                {
+                                    name: 'Home',
+                                    description: '',
+                                    href: `/p/${slug}`,
+                                    icon: HomeIcon,
+                                },
+                            ])
+                        }
+                    })
+                    .catch((e) => {
+                        setNavigation([
+                            {
+                                name: 'Back to the Universe',
+                                description: '',
+                                href: '/p/universe',
+                                icon: OrbitIcon,
+                            },
+                        ])
+                        setError(error)
+                        setLoading(false)
+                    })
+            }, 3000)
+
+            return () => clearTimeout(timeout)
+        }
+    }, [slug])
+
+    if (error || loading)
+        return (
+            <Body className="h-full items-center justify-center">
+                <div className="flex max-w-md flex-col">
+                    {!error && (
+                        <>
+                            <Heading className="items-center">
+                                <Image
+                                    src="/img/ghost-dog-in-box.gif"
+                                    alt="Animated pixel dog in box panting before falling over, then looping."
+                                    height={32}
+                                    width={38}
+                                    style={{
+                                        imageRendering: 'pixelated',
+                                        display: 'inline-block',
+                                        marginTop: '-1px',
+                                        marginRight: '4px',
+                                    }}
+                                />
+                                Entering {slug}...
+                            </Heading>
+                            <p className="text-alt mt-1 items-center align-middle text-sm leading-6">
+                                <LoadingDots className="-mt-1 mr-1 inline-block" />
+                                Locating {slug} in the universe, hang tight!
+                            </p>
+                        </>
+                    )}
+
+                    {error && (
+                        <>
+                            <Heading className="items-center">
+                                <FaceFrownIcon className="text-default mr-1 inline-block h-6 w-6" />
+                                {error.cause === 404 ? `The universe can't find ${slug}` : `${ProjectSafeName} can\'t continue`}
+                            </Heading>
+                            <p className="text-alt mt-1 text-sm leading-6">
+                                {error.cause === 404 ? (
+                                    <span>
+                                        This pack may no longer exist as it isn't in our database.
+                                        <br />
+                                        <br />
+                                        If you came here from your pack list, please reload to update it &mdash; they might've changed their @name.
+                                    </span>
+                                ) : (
+                                    `${error.cause || 'Something went wrong'}: ${error.message || error.stack}`
+                                )}
+                            </p>
+                        </>
+                    )}
+                </div>
+            </Body>
+        )
+
+    return children
+}
