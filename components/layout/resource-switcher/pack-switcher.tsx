@@ -1,17 +1,21 @@
 'use client'
 
 import './pack-switcher.component.scss'
-import Tooltip from '@/components/shared/tooltip'
+import Tooltip, { TooltipContent } from '@/components/shared/tooltip'
 import { Logo } from '@/components/shared/logo'
 import UserAvatar from '@/components/shared/user/avatar'
 import { Button } from '@/components/shared/ui/button'
 import { SettingsIcon } from 'lucide-react'
 import useSound from 'use-sound'
-import { useResourceStore, useResourceUIStore } from '@/lib/states'
+import { useResourceStore, useUIStore } from '@/lib/states'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { Text } from '@/components/shared/text'
+import ECGIcon from '@/components/shared/icons/dazzle/ecg'
+import { UsersIcon } from '@heroicons/react/20/solid'
+import { PlusIcon } from '@heroicons/react/24/solid'
 
 export default function PackSwitcher() {
     const [initialSound] = useSound('/sounds/switcher.ogg')
@@ -21,7 +25,7 @@ export default function PackSwitcher() {
     })
 
     const { currentResource, setCurrentResource, resources, setResources } = useResourceStore()
-    const { resourceDefault, loading, setLoading } = useResourceUIStore()
+    const { resourceDefault, loading, setLoading } = useUIStore()
     const router = useRouter()
 
     const switchResource = (resource: any) => {
@@ -33,25 +37,7 @@ export default function PackSwitcher() {
     }
 
     useEffect(() => {
-        setResources([
-            {
-                id: 'floodchat',
-                name: 'The Flood Chat',
-                icon: 'https://cdn.discordapp.com/icons/333623134152294401/4352917374ecb07503ef9022a75de44d.webp?size=96',
-                possiblyUnavailable: true,
-            },
-            {
-                id: 'bradesu',
-                name: "Bra's Corner",
-                icon: 'https://cdn.discordapp.com/icons/1079320989718028399/742261f5d8e46e22a304893d4afc674d.webp?size=96',
-                possiblyUnavailable: true,
-            },
-            {
-                id: 'sozlol',
-                name: "These aren't real",
-                possiblyUnavailable: true,
-            },
-        ])
+        setResources([])
     }, [])
 
     return (
@@ -71,13 +57,49 @@ export default function PackSwitcher() {
             <div className="h-0.5 w-full bg-n-5/20"></div>
 
             {resources.map((item) => (
-                <Tooltip key={item.id} content={item.name} side="right" delayDuration={0}>
+                <Tooltip
+                    key={item.id}
+                    content={
+                        <div>
+                            <TooltipContent>
+                                <Text>{item.name}</Text>
+                            </TooltipContent>
+                            <div className="mt-1 grid grid-rows-1 divide-y border-t">
+                                <div className="grid grid-cols-2 gap-2 divide-x px-2 [&>*:not(:first-child)]:pl-2 [&>*]:py-1">
+                                    <Text alt>
+                                        <ECGIcon className="-mt-0.5 inline-flex h-4 w-4" /> 12,420
+                                    </Text>
+                                    <Text alt>
+                                        <UsersIcon className="-mt-0.5 inline-flex h-4 w-4" /> 1,827
+                                    </Text>
+                                </div>
+                                {/*<div className="px-2 py-1 opacity-75">*/}
+                                {/*    <Text alt>*/}
+                                {/*        <QuestionMarkCircleIcon className="-mt-0.5 inline-flex h-4 w-4" /> Hold alt for more*/}
+                                {/*    </Text>*/}
+                                {/*</div>*/}
+                            </div>
+                        </div>
+                    }
+                    side="right"
+                    delayDuration={0}
+                >
                     <div className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === item.id && 'force-pill')} onClick={() => switchResource(item)}>
                         <UserAvatar name={item.name} size={32} icon={item.icon} className="inline-flex cursor-pointer overflow-hidden" />
                     </div>
                 </Tooltip>
             ))}
+
+            <Tooltip content="Create/Join Pack" side="right" delayDuration={0}>
+                <Link href="/p/new" className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === 'new' && 'force-pill')}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 p-1 text-white">
+                        <PlusIcon />
+                    </Button>
+                </Link>
+            </Tooltip>
+
             <div className="grow" />
+
             <Tooltip content="Settings" side="right" delayDuration={0}>
                 <Link href="/settings" className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === 'settings' && 'force-pill')}>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-white">

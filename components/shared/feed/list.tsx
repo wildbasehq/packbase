@@ -6,15 +6,17 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import { Heading, Text } from '@/components/shared/text'
 import GridBody from '@/components/layout/grid-body'
-import { LayoutDashboard, MegaphoneIcon } from 'lucide-react'
+import { HelpCircleIcon, LayoutDashboard, MegaphoneIcon } from 'lucide-react'
 import WireframeGrid from '@/components/shared/icons/wireframe-grid'
 import WireframeList from '@/components/shared/icons/wireframe-list'
 import Card from '@/components/shared/card'
 import Popover from '@/components/shared/popover'
-import { useUIStore } from '@/lib/states'
+import { useUISettingsStore } from '@/lib/states'
 import UserAvatar from '@/components/shared/user/avatar'
 import FeedPost from '@/components/shared/feed/post'
 import { FetchHandler } from '@/lib/api'
+import SelectMenu from '@/components/shared/input/select'
+import { Button } from '@/components/shared/ui/button'
 
 export default function FeedList() {
     const packID = '00000000-0000-0000-0000-000000000000'
@@ -23,11 +25,12 @@ export default function FeedList() {
     const [postsHasMore, setPostsHasMore] = useState<boolean>(false)
     const [postsCurrentPage, setPostsCurrentPage] = useState<number>(1)
     const [posts, setPosts] = useState<any>([])
+    const [changingView, setChangingView] = useState<boolean>(false)
     const [masonryColumns, setMasonryColumns] = useState<{
         [key: number]: number
     }>({ 750: 1, 900: 2, 1460: 4 })
 
-    const FeedViewConfig = useUIStore((state) => state.feedView)
+    const FeedViewConfig = useUISettingsStore((state) => state.feedView)
 
     useEffect(() => {
         let timeout: NodeJS.Timeout
@@ -112,8 +115,40 @@ export default function FeedList() {
                 <>
                     <div className="mb-4 flex items-center justify-between">
                         feed {packID}/{feedID} &mdash; {posts.length} posts &mdash; {postsHasMore ? 'has more' : 'no more'}
-                        <FeedViewListbox />
+                        <Button className="items-center" onClick={() => setChangingView(true)}>
+                            <LayoutDashboard className="mr-1 h-6 w-6" />
+                            Change view
+                        </Button>
                     </div>
+
+                    {changingView && (
+                        <Card
+                            className={`${
+                                FeedViewConfig === 2 ? 'lg:left-[31vw]' : 'lg:left-[50vw]'
+                            } ease-[cubic-bezier(0.32,0.72,0,1)] absolute top-1/4 z-50 m-auto mt-48 gap-2 shadow-2xl transition-all`}
+                        >
+                            <Heading size="lg" className="flex items-center">
+                                <HelpCircleIcon className="mr-2 inline-block h-5 w-5" />
+                                Feed View
+                                <span className="flex-1" />
+                                {/*<MagicElement numSparkles={2}>*/}
+                                {/*    <span className="text-sm text-primary">new!</span>*/}
+                                {/*</MagicElement>*/}
+                            </Heading>
+                            <Text>
+                                You can switch the feed view anytime you want. This may affect some user-made experiences, i.e. comics, stories, etc, that are designed
+                                for a specific view.
+                            </Text>
+                            {/*<Text>*/}
+                            {/*    You can plug-in custom made views by other people, or even make your own!**/}
+                            {/*</Text>*/}
+                            {/*<Text className="text-xs text-on-surface-variant/75">*/}
+                            {/*    * Wolfbite Labs aren&apos;t responsible for any damages caused by third-party scripts.*/}
+                            {/*    Always check the source code before installing.*/}
+                            {/*</Text>*/}
+                            <FeedListViewControls callback={() => setChangingView(false)} />
+                        </Card>
+                    )}
 
                     {/* Center feed */}
                     <div className={FeedViewConfig !== 1 ? 'sm:flex sm:justify-center' : ''}>
@@ -158,8 +193,8 @@ export default function FeedList() {
                                             </Text>
                                         </Card>
 
-                                        {posts.map((post: any) => (
-                                            <FeedListItem key={post.id} post={post} />
+                                        {posts.map((post: any, i: number) => (
+                                            <FeedListItem key={post.id} post={post} gridTutorialID={changingView ? i : undefined} />
                                         ))}
                                     </Masonry>
                                 </ResponsiveMasonry>
@@ -177,6 +212,27 @@ export default function FeedList() {
                 </>
             )}
         </div>
+    )
+}
+
+function FeedListViewControls({ callback }: { callback?: () => void }) {
+    const uiOptions = useUISettingsStore((state) => state)
+
+    return (
+        <Card className="flex justify-center">
+            <SelectMenu
+                title="View Style"
+                selected={views[uiOptions.feedView - 1]}
+                onChange={(i) => {
+                    uiOptions.setOptions({ feedView: views.indexOf(i) + 1 })
+                }}
+                options={views}
+            />
+
+            <Button className="mt-4" onClick={() => callback?.()}>
+                Done
+            </Button>
+        </Card>
     )
 }
 
@@ -232,7 +288,7 @@ const views = [
 ]
 
 function FeedViewListbox() {
-    const setUIOptions = useUIStore((state) => state.setOptions)
+    const setUIOptions = useUISettingsStore((state) => state.setOptions)
 
     return (
         <div className="relative">
@@ -261,12 +317,34 @@ function FeedViewListbox() {
     )
 }
 
-function FeedListItem({ post }: { post: any }) {
-    return (
-        <FeedPost
-            key={post.id}
-            post={post}
-            // onDelete={() => posts = posts.filter((p: any) => p.id !== post.id)}
-        ></FeedPost>
-    )
+function FeedListItem({ post, gridTutorialID }: { post: any; gridTutorialID?: number }) {
+    if (gridTutorialID !== undefined) {
+        return (
+            <Card
+                style={{
+                    height: `${Math.floor(Math.random() * 75) + 150}px`,
+                    backgroundColor: `hsl(${gridTutorialID * 15} 50% 50% / 0.05)`,
+                }}
+            >
+                <div className="flex items-center gap-2">
+                    <div className="h-10 w-10 rounded-full bg-surface-variant" />
+                    <div className="flex flex-col gap-1">
+                        <div className="h-4 w-20 rounded bg-surface-variant" />
+                        <div className="h-4 w-10 rounded bg-surface-variant" />
+                    </div>
+                </div>
+
+                {/* Large number using gridTutorialID */}
+                <h1 className="m-auto text-6xl font-bold text-surface-variant">{gridTutorialID + 1}</h1>
+            </Card>
+        )
+    } else {
+        return (
+            <FeedPost
+                key={post.id}
+                post={post}
+                // onDelete={() => posts = posts.filter((p: any) => p.id !== post.id)}
+            ></FeedPost>
+        )
+    }
 }

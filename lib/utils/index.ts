@@ -12,7 +12,7 @@ import ms from 'ms'
  * @specific Yipnyap (AKA Korat) v4 (Honeybear)
  * @authors @rek
  */
-export const ProjectName = `Project Korat #${process.env.NEXT_PUBLIC_ITERATION_COUNT}`
+export const ProjectName = `Project Korat`
 export const ProjectSafeName = 'Packbase'
 export const ProjectDeps = ['scalebite', 'ypnyp', 'feral']
 

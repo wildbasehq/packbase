@@ -1,7 +1,6 @@
-const iteration = require('child_process')
-    .execSync('git rev-list --count HEAD')
-    .toString()
-    .trim();
+const utwm = require('unplugin-tailwindcss-mangle/webpack')
+const iteration = require('child_process').execSync('git rev-list --count HEAD').toString().trim()
+const nextBuildId = require('next-build-id')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -18,26 +17,35 @@ const nextConfig = {
 
         NEXT_PUBLIC_POSTHOG_KEY: process.env.POSTHOG_KEY,
         NEXT_PUBLIC_POSTHOG_HOST: process.env.POSTHOG_HOST,
+
+        NEXT_PUBLIC_BUILD_ID: nextBuildId.sync({
+            dir: __dirname,
+            describe: true,
+        }),
     },
     webpack: (config) => {
-        return config;
+        if (process.env.NODE_ENV === 'production') {
+            config.plugins.push(utwm())
+        }
+
+        return config
     },
     async rewrites() {
         return [
             {
                 source: '/@:userId([a-zA-Z0-9]+)/:id*',
-                destination: "/user/:userId/:id*",
+                destination: '/user/:userId/:id*',
             },
             {
                 source: '/p/:packId([a-zA-Z0-9]+)/:id*',
-                destination: "/pack/:packId/:id*",
+                destination: '/pack/:packId/:id*',
             },
             {
                 source: '/',
-                destination: "/pack/universe",
-            }
+                destination: '/pack/universe',
+            },
         ]
-    }
-};
+    },
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

@@ -6,7 +6,7 @@ import UserAvatar from '@/components/shared/user/avatar'
 import useComponentVisible from '@/lib/hooks/use-component-visible'
 import useSound from 'use-sound'
 import { PlayFunction } from 'use-sound/dist/types'
-import { useResourceStore, useResourceUIStore } from '@/lib/states'
+import { useResourceStore, useUIStore } from '@/lib/states'
 import { useEffect, useState } from 'react'
 import { ExpandingArrow, LoadingCircle } from '@/components/shared/icons'
 import { Logo } from '@/components/shared/logo'
@@ -28,7 +28,7 @@ export default function ResourceSwitcher() {
 
     const { currentResource } = useResourceStore()
 
-    const { loading, connecting } = useResourceUIStore()
+    const { loading, connecting } = useUIStore()
     const { ref } = useComponentVisible({
         soundOnClose: cancelSound,
     })

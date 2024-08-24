@@ -1,17 +1,17 @@
 'use client'
 import { LoadingDots } from '@/components/shared/icons'
 import { FetchHandler } from '@/lib/api'
-import { useResourceStore, useResourceUIStore } from '@/lib/states'
+import { useResourceStore, useUIStore } from '@/lib/states'
 import { useEffect, useState } from 'react'
 import { FaceFrownIcon, HomeIcon } from '@heroicons/react/24/solid'
 import { OrbitIcon } from 'lucide-react'
 import Body from '@/components/layout/body'
 import { Heading } from '@/components/shared/text'
 import Image from 'next/image'
-import { ProjectSafeName } from '@/lib/utils'
+import { ProjectName, ProjectSafeName } from '@/lib/utils'
 
 export default function PackLayout({ children, params }: { children: React.ReactNode; params: { slug: string } }) {
-    const { resourceDefault, loading, setLoading, setNavigation } = useResourceUIStore()
+    const { resourceDefault, loading, setLoading, setNavigation } = useUIStore()
     const { resources, currentResource, setCurrentResource } = useResourceStore()
     const [error, setError] = useState<any>(null)
     const { slug } = params
@@ -69,7 +69,7 @@ export default function PackLayout({ children, params }: { children: React.React
                         setError(error)
                         setLoading(false)
                     })
-            }, 3000)
+            }, 500)
 
             return () => clearTimeout(timeout)
         }
@@ -108,6 +108,7 @@ export default function PackLayout({ children, params }: { children: React.React
                             <Heading className="items-center">
                                 <FaceFrownIcon className="text-default mr-1 inline-block h-6 w-6" />
                                 {error.cause === 404 ? `The universe can't find ${slug}` : `${ProjectSafeName} can\'t continue`}
+                                {error.cause === 404 && slug === 'universe' && `. Someone setup ${ProjectSafeName} wrong :/`}
                             </Heading>
                             <p className="text-alt mt-1 text-sm leading-6">
                                 {error.cause === 404 ? (
@@ -115,7 +116,20 @@ export default function PackLayout({ children, params }: { children: React.React
                                         This pack may no longer exist as it isn't in our database.
                                         <br />
                                         <br />
-                                        If you came here from your pack list, please reload to update it &mdash; they might've changed their @name.
+                                        {slug === 'universe' ? (
+                                            <>
+                                                Someone internally screwed something up, it ain't your fault! If the universe pack is missing, chances are *a lot* of
+                                                other post data is missing as well. Or someone accidentally changed the universe slug, either way, you'll have to wait.
+                                                Sorry!
+                                                <br />
+                                                <br />
+                                                If you're a developer and this is your first time running {ProjectName}, you'll need to create a new pack with the{' '}
+                                                <code>universe</code> slug. You can do this with the site public, as the user needs the <code>GLOBAL_ADMIN</code>{' '}
+                                                permission to create a pack with that slug, but users will see this screen...
+                                            </>
+                                        ) : (
+                                            <>If you came here from your pack list, please reload to update it &mdash; they might've changed their @name.</>
+                                        )}
                                     </span>
                                 ) : (
                                     `${error.cause || 'Something went wrong'}: ${error.message || error.stack}`

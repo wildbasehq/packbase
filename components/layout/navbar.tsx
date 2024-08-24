@@ -1,64 +1,64 @@
 'use client'
 
 import Link from 'next/link'
-import {Button} from '@/components/shared/ui/button'
-import {ScanFaceIcon} from 'lucide-react'
-import {ThemeToggle} from '@/components/shared/theme-toggle'
-import {Search} from '@/components/layout/search'
+import { Button } from '@/components/shared/ui/button'
+import { ScanFaceIcon } from 'lucide-react'
+import { ThemeToggle } from '@/components/shared/theme-toggle'
+import { Search } from '@/components/layout/search'
 import UserDropdown from '@/components/layout/user-dropdown'
-import {useResourceUIStore, useUserAccountStore} from '@/lib/states'
+import { useUIStore, useUserAccountStore } from '@/lib/states'
 import UserAvatar from '@/components/shared/user/avatar'
 import ResourceSwitcher from '@/components/layout/resource-switcher'
-import {Dropdown, DropdownMenu} from '@/components/shared/dropdown'
-import {MenuButton} from '@headlessui/react'
+import { Dropdown, DropdownMenu } from '@/components/shared/dropdown'
+import { MenuButton } from '@headlessui/react'
 
 export default function NavBar() {
-    const {user} = useUserAccountStore()
-    const {loading} = useResourceUIStore()
+    const { user } = useUserAccountStore()
+    const { loading } = useUIStore()
 
     return (
         <>
-            <div
-                className="flex sticky top-0 z-30 h-16 bg-sidebar shadow-sm border-0 border-b border-default border-solid">
-                <nav
-                    aria-label="Sections"
-                    className="hidden lg:flex lg:flex-col h-16">
+            <div className="bg-sidebar border-default sticky top-0 z-30 flex h-16 border-0 border-b border-solid shadow-sm">
+                <nav aria-label="Sections" className="hidden h-16 lg:flex lg:flex-col">
                     <div
-                        className={`relative flex items-center w-96 h-full py-2 px-5 border-r border-default shimmer-template ${loading ? 'before:animate-shimmer-fast overflow-hidden' : ''}`}>
+                        className={`border-default shimmer-template relative flex h-full w-96 items-center border-r px-5 py-2 ${
+                            loading ? 'overflow-hidden before:animate-shimmer-fast' : ''
+                        }`}
+                    >
                         <div className="w-full">
-                            <ResourceSwitcher/>
+                            <ResourceSwitcher />
                         </div>
                     </div>
                 </nav>
 
-                <div className="max-w-7xl h-16 w-full mx-auto px-2 sm:px-4">
-                    <div className="relative h-full flex items-center justify-between">
+                <div className="mx-auto h-16 w-full max-w-7xl px-2 sm:px-4">
+                    <div className="relative flex h-full items-center justify-between">
                         <div className="relative"></div>
 
-                        <Search/>
+                        <Search />
 
                         <div className="flex items-center gap-5">
                             {/*<div className="hidden md:block md:h-5 md:w-px md:bg-neutral-900/10 md:dark:bg-white/15"/>*/}
                             <div className="flex gap-4">
-                                <ThemeToggle/>
+                                <ThemeToggle />
                             </div>
                             <div className="hidden min-[416px]:contents">
-                                {user &&
+                                {user && (
                                     <Dropdown>
                                         <MenuButton>
-                                            <UserAvatar user={user} size="md"/>
+                                            <UserAvatar user={user} size="md" />
                                         </MenuButton>
                                         <DropdownMenu className="mt-4 !p-0">
-                                            <UserDropdown/>
+                                            <UserDropdown />
                                         </DropdownMenu>
                                     </Dropdown>
-                                }
+                                )}
 
                                 {!user && (
                                     <>
                                         <Link href="/id/login" className="!no-underline">
-                                            <Button variant="ghost" className="flex justify-center items-center">
-                                                <ScanFaceIcon className="h-4 w-4 mr-1"/> Sign In
+                                            <Button variant="ghost" className="flex items-center justify-center">
+                                                <ScanFaceIcon className="mr-1 h-4 w-4" /> Sign In
                                             </Button>
                                         </Link>
                                     </>

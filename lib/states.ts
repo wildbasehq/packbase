@@ -9,7 +9,7 @@ interface UIStore {
 }
 
 // UI Settings Store
-export const useUIStore = create(
+export const useUISettingsStore = create(
     persist<UIStore>(
         (set) => ({
             feedView: 1,
@@ -118,7 +118,7 @@ interface ResourceUIStore {
     setNavigation: (navigation: any) => void
 }
 
-export const useResourceUIStore = create<ResourceUIStore>((set) => ({
+export const useUIStore = create<ResourceUIStore>((set) => ({
     resourceDefault,
     hidden: false,
     loading: true,
