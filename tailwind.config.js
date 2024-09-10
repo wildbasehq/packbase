@@ -1,50 +1,47 @@
 /** @type {import('tailwindcss').Config} */
-const {default: flattenColorPalette} = require('tailwindcss/lib/util/flattenColorPalette');
-const plugin = require("tailwindcss/plugin");
+const { default: flattenColorPalette } = require('tailwindcss/lib/util/flattenColorPalette')
+const plugin = require('tailwindcss/plugin')
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-    darkMode: ["class"],
-    content: [
-        './components/**/*.{ts,tsx}',
-        './app/**/*.{ts,tsx}',
-    ],
+    darkMode: ['class'],
+    content: ['./components/**/*.{ts,tsx}', './app/**/*.{ts,tsx}'],
     theme: {
         container: {
             center: true,
-            padding: "2rem",
+            padding: '2rem',
             screens: {
-                "2xl": "1400px",
+                '2xl': '1400px',
             },
         },
         extend: {
             colors: {
                 // border: "hsl(var(--border))",
-                input: "hsl(var(--input))",
-                ring: "hsl(var(--ring))",
-                background: "hsl(var(--background))",
-                foreground: "hsl(var(--foreground))",
+                input: 'hsl(var(--input))',
+                ring: 'hsl(var(--ring))',
+                background: 'hsl(var(--background))',
+                foreground: 'hsl(var(--foreground))',
                 destructive: {
-                    DEFAULT: "rgb(var(--destructive) / <alpha-value>)",
-                    foreground: "hsl(var(--destructive-foreground))",
+                    DEFAULT: 'rgb(var(--destructive) / <alpha-value>)',
+                    foreground: 'hsl(var(--destructive-foreground))',
                 },
                 muted: {
-                    DEFAULT: "hsl(var(--muted))",
-                    foreground: "hsl(var(--muted-foreground))",
+                    DEFAULT: 'hsl(var(--muted))',
+                    foreground: 'hsl(var(--muted-foreground))',
                 },
                 accent: {
-                    DEFAULT: "hsl(var(--accent))",
-                    foreground: "hsl(var(--accent-foreground))",
+                    DEFAULT: 'hsl(var(--accent))',
+                    foreground: 'hsl(var(--accent-foreground))',
                     1: 'rgb(var(--color-accent-1) / <alpha-value>)',
                     5: 'rgb(var(--color-accent-5) / <alpha-value>)',
                 },
                 popover: {
-                    DEFAULT: "hsl(var(--popover))",
-                    foreground: "hsl(var(--popover-foreground))",
+                    DEFAULT: 'hsl(var(--popover))',
+                    foreground: 'hsl(var(--popover-foreground))',
                 },
                 card: {
-                    DEFAULT: "hsl(var(--card))",
-                    foreground: "hsl(var(--card-foreground))",
+                    DEFAULT: 'hsl(var(--card))',
+                    foreground: 'hsl(var(--card-foreground))',
                 },
                 n: {
                     1: 'rgb(var(--color-n-1) / <alpha-value>)',
@@ -55,7 +52,7 @@ module.exports = {
                     6: 'rgb(var(--color-n-6) / <alpha-value>)',
                     7: 'rgb(var(--color-n-7) / <alpha-value>)',
                     8: 'rgb(var(--color-n-8) / <alpha-value>)',
-                    9: 'rgb(var(--color-primary-midnight) / <alpha-value>)'
+                    9: 'rgb(var(--color-primary-midnight) / <alpha-value>)',
                 },
                 // Material Design Dynamic Color Palette
                 // https://material.io/design/color/dark-theme.html#ui-application
@@ -69,8 +66,8 @@ module.exports = {
                 secondary: {
                     // DEFAULT: 'rgb(var(--md-sys-secondary) / <alpha-value>)',
                     container: 'rgb(var(--md-sys-secondary-container) / <alpha-value>)',
-                    DEFAULT: "rgb(var(--color-primary-lime) / <alpha-value>)",
-                    foreground: "hsl(var(--secondary-foreground))",
+                    DEFAULT: 'rgb(var(--color-primary-lime) / <alpha-value>)',
+                    foreground: 'hsl(var(--secondary-foreground))',
                 },
                 tertiary: {
                     DEFAULT: 'rgb(var(--md-sys-tertiary) / <alpha-value>)',
@@ -95,7 +92,7 @@ module.exports = {
                         DEFAULT: 'rgb(var(--md-sys-surface-container) / <alpha-value>)',
                         high: 'rgb(var(--md-sys-surface-container-high) / <alpha-value>)',
                         highest: 'rgb(var(--md-sys-surface-container-highest) / <alpha-value>)',
-                    }
+                    },
                 },
                 outline: {
                     DEFAULT: 'rgb(var(--md-sys-outline) / <alpha-value>)',
@@ -130,7 +127,7 @@ module.exports = {
                     surface: {
                         DEFAULT: 'rgb(var(--md-sys-on-surface) / <alpha-value>)',
                         variant: 'rgb(var(--md-sys-on-surface-variant) / <alpha-value>)',
-                    }
+                    },
                 },
             },
             borderRadius: {
@@ -139,35 +136,38 @@ module.exports = {
                 // sm: "calc(var(--radius) - 4px)",
                 DEFAULT: '0.75rem',
             },
+            transitionTimingFunction: {
+                snapper: 'cubic-bezier(0,1.25,0,1)',
+            },
             aspectRatio: {
-                'banner': '3 / 1',
+                banner: '3 / 1',
             },
             animation: {
                 logoHue: 'logoHue 1s ease-out, logoHue 30s ease-out 1s infinite',
                 // Hue rotate
-                hue: "hue 1s ease-out",
+                hue: 'hue 1s ease-out',
                 // Shimmer
-                shimmer: "shimmer 1s ease-out infinite",
-                "shimmer-fast": "shimmer 0.5s ease-in-out infinite",
-                "pulse-inverse": "pulse-inverse 0.2s ease-out",
-                shake: "shake 50ms",
+                shimmer: 'shimmer 1s ease-out infinite',
+                'shimmer-fast': 'shimmer 0.5s ease-in-out infinite',
+                'pulse-inverse': 'pulse-inverse 0.2s ease-out',
+                shake: 'shake 50ms',
                 // Fade up and down
-                "fade-up": "fade-up 0.5s",
-                "fade-down": "fade-down 0.5s",
+                'fade-up': 'fade-up 0.5s',
+                'fade-down': 'fade-down 0.5s',
                 // Tooltip
-                "slide-up-fade": "slide-up-fade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-                "slide-down-fade": "slide-down-fade 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                "slide-up-fade-snapper": "slide-up-fade 0.3s cubic-bezier(0, 1.25, 0, 1) forwards",
-                "slide-down-fade-snapper": "slide-down-fade 0.3s cubic-bezier(0, 1.25, 0, 1)",
+                'slide-up-fade': 'slide-up-fade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                'slide-down-fade': 'slide-down-fade 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                'slide-up-fade-snapper': 'slide-up-fade 0.3s cubic-bezier(0, 1.25, 0, 1) forwards',
+                'slide-down-fade-snapper': 'slide-down-fade 0.3s cubic-bezier(0, 1.25, 0, 1)',
                 // Charm
-                "magic-sparkle": "magic-sparkle 1.5s forwards",
-                "accordion-down": "accordion-down 0.2s ease-out",
-                "accordion-up": "accordion-up 0.2s ease-out",
+                'magic-sparkle': 'magic-sparkle 1.5s forwards',
+                'accordion-down': 'accordion-down 0.2s ease-out',
+                'accordion-up': 'accordion-up 0.2s ease-out',
             },
             keyframes: {
                 hue: {
-                    "0%": {filter: "hue-rotate(0deg)"},
-                    "100%": {filter: "hue-rotate(360deg)"},
+                    '0%': { filter: 'hue-rotate(0deg)' },
+                    '100%': { filter: 'hue-rotate(360deg)' },
                 },
                 shimmer: {
                     '100%': {
@@ -184,85 +184,85 @@ module.exports = {
                 },
                 // horizontal quick
                 shake: {
-                    '0%': {transform: 'translateX(0)'},
-                    '25%': {transform: 'translateX(5px)'},
-                    '50%': {transform: 'translateX(-5px)'},
-                    '75%': {transform: 'translateX(5px)'},
-                    '100%': {transform: 'translateX(0)'},
+                    '0%': { transform: 'translateX(0)' },
+                    '25%': { transform: 'translateX(5px)' },
+                    '50%': { transform: 'translateX(-5px)' },
+                    '75%': { transform: 'translateX(5px)' },
+                    '100%': { transform: 'translateX(0)' },
                 },
                 // Fade up and down
-                "fade-up": {
-                    "0%": {
+                'fade-up': {
+                    '0%': {
                         opacity: 0,
-                        transform: "translateY(10px)",
+                        transform: 'translateY(10px)',
                     },
-                    "80%": {
+                    '80%': {
                         opacity: 0.6,
                     },
-                    "100%": {
+                    '100%': {
                         opacity: 1,
-                        transform: "translateY(0px)",
+                        transform: 'translateY(0px)',
                     },
                 },
-                "fade-down": {
-                    "0%": {
+                'fade-down': {
+                    '0%': {
                         opacity: 0,
-                        transform: "translateY(-10px)",
+                        transform: 'translateY(-10px)',
                     },
-                    "80%": {
+                    '80%': {
                         opacity: 0.6,
                     },
-                    "100%": {
+                    '100%': {
                         opacity: 1,
-                        transform: "translateY(0px)",
+                        transform: 'translateY(0px)',
                     },
                 },
                 // Tooltip
-                "slide-up-fade": {
-                    "0%": {opacity: 0, transform: "translateY(6px)"},
-                    "100%": {opacity: 1, transform: "translateY(0)"},
+                'slide-up-fade': {
+                    '0%': { opacity: 0, transform: 'translateY(6px)' },
+                    '100%': { opacity: 1, transform: 'translateY(0)' },
                 },
-                "slide-down-fade": {
-                    "0%": {opacity: 0, transform: "translateY(-6px)"},
-                    "100%": {opacity: 1, transform: "translateY(0)"},
+                'slide-down-fade': {
+                    '0%': { opacity: 0, transform: 'translateY(-6px)' },
+                    '100%': { opacity: 1, transform: 'translateY(0)' },
                 },
                 // Charm
-                "magic-sparkle": {
-                    "0%": {
-                        transform: "scale(0)",
+                'magic-sparkle': {
+                    '0%': {
+                        transform: 'scale(0)',
                     },
-                    "50%": {
-                        transform: "scale(1)",
+                    '50%': {
+                        transform: 'scale(1)',
                     },
-                    "100%": {
-                        transform: "scale(0)",
+                    '100%': {
+                        transform: 'scale(0)',
                     },
                 },
-                "accordion-down": {
-                    from: {height: "0"},
-                    to: {height: "var(--radix-accordion-content-height)"},
+                'accordion-down': {
+                    from: { height: '0' },
+                    to: { height: 'var(--radix-accordion-content-height)' },
                 },
-                "accordion-up": {
-                    from: {height: "var(--radix-accordion-content-height)"},
-                    to: {height: "0"},
+                'accordion-up': {
+                    from: { height: 'var(--radix-accordion-content-height)' },
+                    to: { height: '0' },
                 },
             },
         },
     },
     plugins: [
-        plugin(({addVariant}) => {
-            addVariant("radix-side-top", '&[data-side="top"]')
-            addVariant("radix-side-bottom", '&[data-side="bottom"]')
+        plugin(({ addVariant }) => {
+            addVariant('radix-side-top', '&[data-side="top"]')
+            addVariant('radix-side-bottom', '&[data-side="bottom"]')
             addVariant('low-fidelity', 'html.low-fidelity &')
             addVariant('unicorn', 'html[data-unicorn-engine] &')
         }),
-        require("tailwindcss-animate"),
+        require('tailwindcss-animate'),
         require('@tailwindcss/forms'),
-        require("tailwindcss-inner-border"),
-        function ({matchUtilities, theme,}) {
+        require('tailwindcss-inner-border'),
+        function ({ matchUtilities, theme }) {
             matchUtilities(
                 {
-                    highlight: (value) => ({boxShadow: `inset 0 1px 0 0 ${value}`}),
+                    highlight: (value) => ({ boxShadow: `inset 0 1px 0 0 ${value}` }),
                 },
                 {
                     values: flattenColorPalette(theme('backgroundColor')),
