@@ -10,7 +10,6 @@ import { HelpCircleIcon, LayoutDashboard, MegaphoneIcon } from 'lucide-react'
 import WireframeGrid from '@/components/shared/icons/wireframe-grid'
 import WireframeList from '@/components/shared/icons/wireframe-list'
 import Card from '@/components/shared/card'
-import Popover from '@/components/shared/popover'
 import { useUISettingsStore } from '@/lib/states'
 import UserAvatar from '@/components/shared/user/avatar'
 import FeedPost from '@/components/shared/feed/post'
@@ -215,6 +214,11 @@ export default function FeedList() {
     )
 }
 
+const views = [
+    { id: 1, name: 'Grid', icon: WireframeGrid, unavailable: false },
+    { id: 2, name: 'List', icon: WireframeList, unavailable: false },
+]
+
 function FeedListViewControls({ callback }: { callback?: () => void }) {
     const uiOptions = useUISettingsStore((state) => state)
 
@@ -279,41 +283,6 @@ export function LoadingCard({
                 ))}
             </Masonry>
         </ResponsiveMasonry>
-    )
-}
-
-const views = [
-    { id: 1, name: 'Grid', icon: WireframeGrid, unavailable: false },
-    { id: 2, name: 'List', icon: WireframeList, unavailable: false },
-]
-
-function FeedViewListbox() {
-    const setUIOptions = useUISettingsStore((state) => state.setOptions)
-
-    return (
-        <div className="relative">
-            <Popover
-                content={
-                    <div className="flex gap-4 rounded bg-card px-3 py-4">
-                        {views.map((view) => (
-                            <div
-                                key={view.id}
-                                className={`flex cursor-pointer flex-col items-center gap-2 p-2`}
-                                onClick={() => {
-                                    setUIOptions({ feedView: view.id })
-                                }}
-                            >
-                                <view.icon className="rounded-default w-24 border" />
-                                <span>{view.name}</span>
-                            </div>
-                        ))}
-                    </div>
-                }
-                align="end"
-            >
-                <LayoutDashboard className="h-8 w-8 cursor-pointer" />
-            </Popover>
-        </div>
     )
 }
 
