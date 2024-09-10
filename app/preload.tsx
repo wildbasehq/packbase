@@ -9,17 +9,17 @@ import { createClient } from '@/lib/supabase/client'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
 import Body from '@/components/layout/body'
 import { HandRaisedIcon } from '@heroicons/react/20/solid'
-import { FetchHandler } from '@/lib/api'
+import { API_URL, FetchHandler } from '@/lib/api'
 
 const supabase = createClient()
 export default function Preload({ children }: { children: React.ReactNode }) {
-    const [serviceLoading, setServiceLoading] = useState<string>('waiting for client')
+    const [serviceLoading, setServiceLoading] = useState<string>(`polling ${API_URL}`)
     const [error, setError] = useState<any | null>(null)
     const { setUser } = useUserAccountStore()
     const { setLoading, setConnecting } = useUIStore()
 
     useEffect(() => {
-        if (serviceLoading !== 'waiting for client') return
+        if (!serviceLoading.startsWith('polling')) return
         FetchHandler.get('/')
             .then((_) => {
                 setServiceLoading('auth')
