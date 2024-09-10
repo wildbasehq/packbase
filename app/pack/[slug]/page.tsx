@@ -11,6 +11,12 @@ import FeedList from '@/components/shared/feed/list'
 import NewPost from '@/components/shared/user/new-post'
 import Markdown from '@/components/shared/markdown'
 import { createClient } from '@/lib/supabase/client'
+import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
+import { CheckBadgeIcon } from '@heroicons/react/20/solid'
+import Modal from '@/components/modal'
+import { PartyPopperIcon } from 'lucide-react'
+import { BentoStaffBadge } from '@/lib/utils/pak'
+import { Button } from '@/components/shared/ui/button'
 
 export default function Home() {
     const { user } = useUserAccountStore()
@@ -69,21 +75,51 @@ export default function Home() {
                     </div>
                 )}
 
-                {user?.reqOnboard && (
+                {user?.waitlistType === 'wait' && (
                     <>
                         <div className="mb-12 grid max-w-6xl grid-cols-1 items-center justify-center gap-8 lg:grid-cols-2">
                             <div className="flex flex-col space-y-4">
-                                <Heading size="xl">You haven't finished your profile {'>'}:(</Heading>
+                                <Heading size="xl">So you've registered on the waitlist. Now what??</Heading>
                                 <div className="space-y-2">
                                     <Text className="text-default-alt text-sm">
                                         If you'd like to participate with the community, you'll need an invite from someone. As we have no "rolling invites", we allow
                                         users to gift invites to random (or specific) people in the waitlist~!
                                         <br />
                                         <br />
-                                        If you don't know anyone already in, your best bet is to wait.
+                                        If you don't know anyone already in, your best bet is to wait.{' '}
                                         <span className="text-tertiary">If you've traded anything for an invite, you've been scammed.</span>
                                     </Text>
                                 </div>
+
+                                <Alert
+                                    variant="success"
+                                    className="ring-default cursor-help select-none transition-shadow hover:ring-4"
+                                    onClick={() => setShowModal(true)}
+                                >
+                                    <CheckBadgeIcon className="h-5 w-5" />
+                                    <AlertTitle>Users created on this version are exempt from restrictions!</AlertTitle>
+                                    <AlertDescription className="text-default-alt">The perks of being a test dummy. The stage's all yours, go wild! 🎉</AlertDescription>
+                                </Alert>
+
+                                <Modal showModal={showModal} setShowModal={setShowModal}>
+                                    <div className="flex flex-col bg-card p-4">
+                                        <Heading size="xl">
+                                            <PartyPopperIcon className="mr-1 inline-flex h-5 w-5" />
+                                            'sup volunteer
+                                        </Heading>
+                                        <Text className="mt-2">
+                                            You work on this, nice.
+                                            <br />
+                                            <br />
+                                            On public release, you'll have a <BentoStaffBadge type="1" width={20} height={20} className="inline-flex h-5 w-5" /> corgi
+                                            badge next to your name (or a <BentoStaffBadge type="2" width={20} height={20} className="inline-flex h-5 w-5" /> rainbow one
+                                            if you're still with us 🫡)
+                                        </Text>
+                                        <Button variant="outline" className="mt-4" onClick={() => setShowModal(false)}>
+                                            Got it
+                                        </Button>
+                                    </div>
+                                </Modal>
                             </div>
                             <div className="flex items-end justify-end">
                                 <Lottie className="right-0 h-80 w-auto" animationData={girlDogBusStop} />
@@ -91,62 +127,6 @@ export default function Home() {
                         </div>
                     </>
                 )}
-                {/*{user?.waitlistType === 'wait' && (*/}
-                {/*    <>*/}
-                {/*        <div className="mb-12 grid max-w-6xl grid-cols-1 items-center justify-center gap-8 lg:grid-cols-2">*/}
-                {/*            <div className="flex flex-col space-y-4">*/}
-                {/*                <Heading size="xl">So you've registered on the waitlist. Now what??</Heading>*/}
-                {/*                <div className="space-y-2">*/}
-                {/*                    <Text className="text-default-alt text-sm">*/}
-                {/*                        If you'd like to participate with the community, you'll need an invite from someone. As we have no*/}
-                {/*                        "rolling invites", we allow users to gift invites to random (or specific) people in the waitlist~!*/}
-                {/*                        <br />*/}
-                {/*                        <br />*/}
-                {/*                        If you don't know anyone already in, your best bet is to wait.*/}
-                {/*                        <span className="text-tertiary">If you've traded anything for an invite, you've been scammed.</span>*/}
-                {/*                    </Text>*/}
-                {/*                </div>*/}
-
-                {/*                <Alert*/}
-                {/*                    variant="success"*/}
-                {/*                    className="ring-default cursor-help select-none transition-shadow hover:ring-4"*/}
-                {/*                    onClick={() => setShowModal(true)}*/}
-                {/*                >*/}
-                {/*                    <CheckBadgeIcon className="h-5 w-5" />*/}
-                {/*                    <AlertTitle>Users created on this version are exempt from restrictions!</AlertTitle>*/}
-                {/*                    <AlertDescription className="text-default-alt">*/}
-                {/*                        The perks of being a test dummy. The stage's all yours, go wild! 🎉*/}
-                {/*                    </AlertDescription>*/}
-                {/*                </Alert>*/}
-
-                {/*                <Modal showModal={showModal} setShowModal={setShowModal}>*/}
-                {/*                    <div className="flex flex-col bg-card p-4">*/}
-                {/*                        <Heading size="xl">*/}
-                {/*                            <PartyPopperIcon className="mr-1 inline-flex h-5 w-5" />*/}
-                {/*                            'sup volunteer*/}
-                {/*                        </Heading>*/}
-                {/*                        <Text className="mt-2">*/}
-                {/*                            You work on this, nice.*/}
-                {/*                            <br />*/}
-                {/*                            <br />*/}
-                {/*                            On public release, you'll have a{' '}*/}
-                {/*                            <BentoStaffBadge type="1" width={20} height={20} className="inline-flex h-5 w-5" /> corgi badge*/}
-                {/*                            next to your name (or a{' '}*/}
-                {/*                            <BentoStaffBadge type="2" width={20} height={20} className="inline-flex h-5 w-5" /> rainbow one*/}
-                {/*                            if you're still with us 🫡)*/}
-                {/*                        </Text>*/}
-                {/*                        <Button variant="outline" className="mt-4" onClick={() => setShowModal(false)}>*/}
-                {/*                            Got it*/}
-                {/*                        </Button>*/}
-                {/*                    </div>*/}
-                {/*                </Modal>*/}
-                {/*            </div>*/}
-                {/*            <div className="flex items-end justify-end">*/}
-                {/*                <Lottie className="right-0 h-80 w-auto" animationData={girlDogBusStop} />*/}
-                {/*            </div>*/}
-                {/*        </div>*/}
-                {/*    </>*/}
-                {/*)}*/}
             </Body>
 
             {user && (
