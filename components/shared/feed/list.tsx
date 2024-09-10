@@ -335,7 +335,7 @@ function FeedListItem({ post, gridTutorialID }: { post: any; gridTutorialID?: nu
                 </div>
 
                 {/* Large number using gridTutorialID */}
-                <h1 className="m-auto text-6xl font-bold text-surface-variant">{gridTutorialID + 1}</h1>
+                <h1 className="text-alt m-auto text-6xl font-bold text-surface-variant">{gridTutorialID + 1}</h1>
             </Card>
         )
     } else {
