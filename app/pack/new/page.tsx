@@ -6,7 +6,7 @@ import { Dialog, RadioGroup, Transition } from '@headlessui/react'
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
 import { Input } from '@/components/shared/input/text'
-import { Text } from '@/components/shared/text'
+import { Heading, Text } from '@/components/shared/text'
 import { LoadingCircle } from '@/components/shared/icons'
 
 export default function PackAdd() {
@@ -55,15 +55,18 @@ export function CreateGroupSidebar() {
             <Transition.Root show={onboardOpen} as={Fragment}>
                 <Dialog as="div" className="fixed inset-0 z-50 overflow-hidden" onClose={setOnboardOpen}>
                     <Transition.Child
-                        as={Fragment}
+                        as="div"
                         enter="ease-in-out duration-500"
                         enterFrom="opacity-0"
                         enterTo="opacity-100"
                         leave="ease-in-out duration-500"
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
+                        className="fixed inset-0 p-8 backdrop-blur-[0.15rem]"
                     >
-                        <div className="fixed inset-0 backdrop-blur-[0.15rem] transition-opacity" />
+                        <Heading size="3xl">Something will show here. Probably templates, or a live theme editor, who knows.</Heading>
+                        <Text className="mt-4">For now just take this i guess.</Text>
+                        {/*<Image src={PackDefaultHeader} className="fixed inset-0 -z-[1] h-screen w-screen opacity-90 transition-opacity" alt="Default pack header" />*/}
                     </Transition.Child>
 
                     <div className="absolute inset-0 overflow-hidden">
@@ -88,7 +91,7 @@ export function CreateGroupSidebar() {
                                         <div className="h-0 flex-1 overflow-y-auto">
                                             <div className="rounded-bl rounded-br bg-white/50 px-4 py-6 shadow dark:bg-n-6/50 sm:px-6">
                                                 <div className="flex items-center justify-between">
-                                                    <Dialog.Title className="text-default text-lg font-medium"> Create a Pack </Dialog.Title>
+                                                    <Dialog.Title className="text-default select-none text-lg font-medium"> Create a Pack </Dialog.Title>
                                                     <div className="ml-3 flex h-7 items-center">
                                                         <Button disabled={submitting} type="reset" variant="ghost" size="self" onClick={() => setOnboardOpen(false)}>
                                                             <span className="sr-only">Close panel</span>
@@ -96,8 +99,16 @@ export function CreateGroupSidebar() {
                                                         </Button>
                                                     </div>
                                                 </div>
-                                                <div className="mt-1">
-                                                    <Text alt>Packs are a group of people with self-elected leaders.</Text>
+                                                <div className="mt-1 space-y-1">
+                                                    <Text alt>Packs are a group of people with self-elected leaders and customisable UI.</Text>
+                                                    <Text alt>
+                                                        Making edits to critical components that directly affect public perception (i.e. name, tagline, etc.) and some UI
+                                                        changes costs "trinkets", a meaningless currency your pack can earn monthly.{' '}
+                                                        <span className="text-destructive/90">
+                                                            Changing the @slug later resets all data, including posts, and users will receive a notification re-confirming
+                                                            if they want to stay.
+                                                        </span>
+                                                    </Text>
                                                 </div>
                                             </div>
 
@@ -105,10 +116,16 @@ export function CreateGroupSidebar() {
                                                 <div className="divide-y divide-neutral-200 px-4 dark:divide-neutral-700 sm:px-6">
                                                     <div className="space-y-6 pb-5 pt-6">
                                                         <div>
-                                                            <Input label="Pack Name" name="display_name" />
+                                                            <Input label="Pack Name" name="display_name" description="Minor edits (up to 5T/month) can be done later." />
                                                         </div>
                                                         <div>
-                                                            <Input label="Pack Slug" name="slug" suffix="packbase.app/p/" inputClassName="lowercase" />
+                                                            <Input
+                                                                label="Pack Slug"
+                                                                description="Changing this later will reset the pack!"
+                                                                name="slug"
+                                                                suffix="packbase.app/p/"
+                                                                inputClassName="lowercase"
+                                                            />
                                                         </div>
                                                         <div>
                                                             <Input
@@ -123,18 +140,18 @@ export function CreateGroupSidebar() {
                                                             />
                                                         </div>
                                                         <fieldset>
-                                                            <legend className="text-default text-sm font-medium">Privacy</legend>
+                                                            <legend className="text-default select-none text-sm font-medium">Privacy</legend>
                                                             <div className="mt-2 space-y-5">
                                                                 <RadioGroup value={selected} onChange={setSelected}>
-                                                                    <RadioGroup.Label className="sr-only">Privacy</RadioGroup.Label>
+                                                                    <RadioGroup.Label className="sr-only select-none">Privacy</RadioGroup.Label>
                                                                     <div className="space-y-2">
                                                                         {postPrivacy.map((privacyOption) => (
                                                                             <RadioGroup.Option
                                                                                 key={privacyOption.name}
                                                                                 value={privacyOption}
-                                                                                className={({ active, checked }) =>
+                                                                                className={({ focus, checked }) =>
                                                                                     `${
-                                                                                        active
+                                                                                        focus
                                                                                             ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-neutral-300'
                                                                                             : ''
                                                                                     }
