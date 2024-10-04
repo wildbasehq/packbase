@@ -19,7 +19,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         return (
             <>
                 {label && !combined && (
-                    <label htmlFor={id} className="text-default block text-sm font-medium leading-6">
+                    <label htmlFor={id} className="text-default mb-1 block select-none text-sm font-medium leading-6">
                         {label}
                         {description && <p className="text-alt mt-1 text-xs leading-5">{description}</p>}
                     </label>
