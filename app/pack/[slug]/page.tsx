@@ -2,10 +2,8 @@
 import Body from '@/components/layout/body'
 import GuestLanding from '@/components/home/guestlanding'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
-import { memo, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Heading, Text } from '@/components/shared/text'
-import girlDogBusStop from '@/datasets/lottie/girl-dog-bus-stop.json'
-import dynamic from 'next/dynamic'
 import FeedList from '@/components/shared/feed/list'
 import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
 import { CheckBadgeIcon } from '@heroicons/react/20/solid'
@@ -20,10 +18,10 @@ import PackHeader from '@/components/shared/pack/header'
 export default function Home({ params }: { params: { slug: string } }) {
     const { user } = useUserAccountStore()
     const { setHidden } = useUIStore()
-    const Lottie = memo(dynamic(() => import('lottie-react'), { ssr: false, suspense: true }))
+    // const Lottie = memo(dynamic(() => import('lottie-react'), { ssr: false, suspense: true }))
     const [showModal, setShowModal] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(true)
-    const [error, setError] = useState<string | null>(null)
+    const [, setError] = useState<string | null>(null)
     const [pack, setPack] = useState()
 
     useEffect(() => {
@@ -111,7 +109,8 @@ export default function Home({ params }: { params: { slug: string } }) {
                                         </Modal>
                                     </div>
                                     <div className="flex items-end justify-end">
-                                        <Lottie className="right-0 h-80 w-auto" animationData={girlDogBusStop} />
+                                        some dog animation
+                                        {/*<Lottie className="right-0 h-80 w-auto" animationData={LottieAnimationData} />*/}
                                     </div>
                                 </div>
                             </>
