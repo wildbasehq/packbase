@@ -31,7 +31,7 @@ export default function PackLayout({ children, params }: { children: React.React
             setLoading(true)
             setError(null)
             const timeout = setTimeout(() => {
-                FetchHandler.get(`/xrpc/app.packbase.pack.get?id=${slug}`)
+                FetchHandler.get(`/xrpc/app.packbase.pack.get?id=${slug}&scope=nav`)
                     .then((data) => {
                         console.log(data)
                         setLoading(false)
@@ -66,7 +66,7 @@ export default function PackLayout({ children, params }: { children: React.React
                                 icon: OrbitIcon,
                             },
                         ])
-                        setError(error)
+                        setError(e)
                         setLoading(false)
                     })
             }, 500)
