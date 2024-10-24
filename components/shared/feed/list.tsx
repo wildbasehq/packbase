@@ -17,8 +17,7 @@ import { FetchHandler } from '@/lib/api'
 import SelectMenu from '@/components/shared/input/select'
 import { Button } from '@/components/shared/ui/button'
 
-export default function FeedList() {
-    const packID = '00000000-0000-0000-0000-000000000000'
+export default function FeedList({ packID = '00000000-0000-0000-0000-000000000000' }: { packID?: string }) {
     const feedID = 'EVERYTHING0'
     const [postsReady, setPostsReady] = useState<boolean>(false)
     const [postsHasMore, setPostsHasMore] = useState<boolean>(false)
