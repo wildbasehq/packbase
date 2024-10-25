@@ -29,13 +29,7 @@ export default function Tooltip({
                     side={side || 'top'}
                     className="border-default z-30 hidden max-w-[20rem] items-center rounded-md border bg-card drop-shadow-lg sm:block"
                 >
-                    {typeof content === 'string' ? (
-                        <TooltipContent>
-                            <span className="block text-center text-xs font-light">{content}</span>
-                        </TooltipContent>
-                    ) : (
-                        content
-                    )}
+                    {typeof content === 'string' ? <span className="block px-2 py-1.5 text-center text-xs font-light">{content}</span> : content}
                     <TooltipPrimitive.Arrow className="fill-n-1 dark:fill-n-7" />
                 </TooltipPrimitive.Content>
             </TooltipPrimitive.Root>
@@ -44,5 +38,5 @@ export default function Tooltip({
 }
 
 export function TooltipContent({ children }: { children: ReactNode }) {
-    return <div className="px-2 py-1.5">{children}</div>
+    return <p className="px-2 py-1.5">{children}</p>
 }
