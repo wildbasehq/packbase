@@ -22,16 +22,6 @@ export const metadata = {
     themeColor: '#FFF',
 }
 
-declare global {
-    interface Window {
-        YipnyapStateCache: any
-    }
-}
-
-if (typeof window !== 'undefined') {
-    window.YipnyapStateCache = {}
-}
-
 const PostHogPageView = dynamic(() => import('./PostHogPageView'), {
     ssr: false,
 })
