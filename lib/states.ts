@@ -73,7 +73,8 @@ interface ResourceStore {
 
 const resourceDefault = {
     id: 'universe',
-    name: ProjectSafeName,
+    slug: 'universe',
+    display_name: ProjectSafeName,
     standalone: true,
 }
 
@@ -104,7 +105,7 @@ export const settingsResource = {
 interface ResourceUIStore {
     resourceDefault: {
         id: string | number
-        name: string
+        display_name: string
         icon?: string
         standalone: boolean
     }
