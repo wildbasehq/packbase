@@ -12,10 +12,10 @@ import { BentoStaffBadge } from '@/lib/utils/pak'
 import { Button } from '@/components/shared/ui/button'
 import { LoadingCircle } from '@/components/shared/icons'
 import { FetchHandler } from '@/lib/api'
-import PackHeader from '@/components/shared/pack/header'
 import dynamic from 'next/dynamic'
 
 const GuestLanding = dynamic(() => import('@/components/home/guestlanding'))
+const PackHeader = dynamic(() => import('@/components/shared/pack/header'))
 
 export default function Home({ params }: { params: { slug: string } }) {
     const { user } = useUserAccountStore()
@@ -24,7 +24,7 @@ export default function Home({ params }: { params: { slug: string } }) {
     const [showModal, setShowModal] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(true)
     const [, setError] = useState<string | null>(null)
-    const [pack, setPack] = useState()
+    const [pack, setPack] = useState<any>()
 
     useEffect(() => {
         if (!user) setHidden(true)
@@ -54,7 +54,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
             {!loading && (
                 <>
-                    <PackHeader pack={pack} />
+                    {pack?.slug !== 'universe' && <PackHeader pack={pack} />}
                     <Body className="max-w-6xl">
                         {user?.waitlistType === 'wait' && (
                             <>
