@@ -26,13 +26,13 @@ const postPrivacy = [
         desc: 'Everyone in the world can see this',
     },
     {
-        name: 'Friends Only',
-        desc: 'Only your friends can see this',
-    },
-    {
         name: 'Followers Only',
         desc: 'Only your followers can see this',
         warn: 'Your friends are counted as followers',
+    },
+    {
+        name: 'Friends Only',
+        desc: 'Only your friends can see this',
     },
     {
         name: 'Private',
