@@ -57,7 +57,6 @@ export function CreateGroupSidebar() {
                 description: event.currentTarget.description.value,
             }),
         }).then(({ data }) => {
-            console.log(data)
             if (data.message) {
                 // handle error
                 toast.error(`${data.name}: ${data.message}`)

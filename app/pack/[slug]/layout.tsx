@@ -33,7 +33,6 @@ export default function PackLayout({ children, params }: { children: React.React
             const timeout = setTimeout(() => {
                 FetchHandler.get(`/xrpc/app.packbase.pack.get?id=${slug}&scope=nav`)
                     .then((data) => {
-                        console.log(data)
                         setLoading(false)
 
                         if (data.status === 404) {

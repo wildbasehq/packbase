@@ -31,7 +31,6 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
         }
         const supabase = createClient()
         supabase.auth.signUp(user).then((r) => {
-            console.log(r)
             if (r.error) {
                 window.location.href = `/id/create?error=Serverland Error&error_description=${r.error.toString()}`
             } else {

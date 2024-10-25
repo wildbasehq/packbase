@@ -22,7 +22,6 @@ export default function IDArtistShowcase() {
                 if (error) {
                     console.error(error)
                 } else {
-                    console.log(data)
                     if (data && data.length !== 0) {
                         setNotice(data[0])
                     }

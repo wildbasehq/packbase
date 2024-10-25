@@ -25,7 +25,6 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                 setServiceLoading('auth')
                 // @ts-ignore
                 supabase.auth.getUser().then(async ({ data: { user } }) => {
-                    console.log({ user })
                     if (user) {
                         const data = (await FetchHandler.get('/xrpc/app.packbase.id.me')).data
                         if (user.user_metadata.waitlistType !== 'free') {
