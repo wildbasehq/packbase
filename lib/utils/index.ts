@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge'
 import ms from 'ms'
 
 /**
- * The name of the project. All Wolfbite projects should have a name
+ * The name of the project. All Wildbase projects should have a name
  * outside the final product name. Should be sent with telemetry and
  * all requests to the server.
  *

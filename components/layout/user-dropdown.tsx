@@ -157,7 +157,7 @@ export default function UserDropdown() {
             </div>
             <div className="flex w-full flex-col items-center justify-center border-t px-7 py-5">
                 <Text size="xs" alt>
-                    {ProjectSafeName} (Name isn't final. {ProjectName}) &copy; Wolfbite Labs. &mdash;{' '}
+                    {ProjectSafeName} (Name isn't final. {ProjectName}) &copy; *base. &mdash;{' '}
                     {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF || process.env.NEXT_PUBLIC_VERCEL_ENV || 'local'} - {process.env.NEXT_PUBLIC_BUILD_ID || '0000000'}
                 </Text>
             </div>
