@@ -42,7 +42,6 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
         }
 
         return () => {
-            console.log('nope')
             if (timeout) clearTimeout(timeout)
         }
     }, [feedID])
