@@ -1,6 +1,6 @@
 import UserAvatar from '@/components/shared/user/avatar'
 import Link from 'next/link'
-import { Text } from '@/components/shared/text'
+import { Heading, Text } from '@/components/shared/text'
 import { DotIcon } from 'lucide-react'
 import { Button } from '@/components/shared/ui/button'
 import { LoadingCircle } from '@/components/shared/icons'
@@ -12,6 +12,7 @@ import { useResourceStore, useUserAccountStore } from '@/lib/states'
 import { Editor } from '@/components/novel'
 import { LinkIcon } from '@heroicons/react/24/solid'
 import Modal from '@/components/modal'
+import { Alert } from '@/components/shared/ui/alert'
 
 export default function NewPost() {
     const { user } = useUserAccountStore()
@@ -82,11 +83,14 @@ export default function NewPost() {
     return (
         <>
             <Button size="sm" variant="outline" className="w-full" onClick={() => setShowModal(true)}>
-                + Howl {!currentResource.standalone && `in ${currentResource.name}`}
+                + Howl {!currentResource.standalone && `in ${currentResource.display_name}`}
             </Button>
 
             <Modal showModal={showModal} setShowModal={setShowModal}>
                 <Card className="!px-0 !py-0">
+                    <Alert>
+                        <Heading>This needs touch up. Whatever.</Heading>
+                    </Alert>
                     <form onSubmit={submitPost}>
                         <div className="relative">
                             <div className="px-4 pt-5 sm:px-6">
@@ -95,7 +99,7 @@ export default function NewPost() {
                                         <UserAvatar user={user} />
                                     </div>
                                     <div className="flex min-w-0 flex-1 flex-col justify-center">
-                                        <Link href={`/@${user.username}/`} className="text-default font-medium">
+                                        <Link href={`/@${user?.username}/`} className="text-default font-medium">
                                             {user.display_name || user.username}
                                         </Link>
                                         <Text>New Howl</Text>

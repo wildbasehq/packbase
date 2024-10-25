@@ -12,30 +12,22 @@ import { ProjectName, ProjectSafeName } from '@/lib/utils'
 
 export default function PackLayout({ children, params }: { children: React.ReactNode; params: { slug: string } }) {
     const { resourceDefault, loading, setLoading, setNavigation } = useUIStore()
-    const { resources, currentResource, setCurrentResource } = useResourceStore()
+    const { resources, currentResource, setCurrentResource, setResources } = useResourceStore()
     const [error, setError] = useState<any>(null)
     const { slug } = params
 
     useEffect(() => {
-        if (currentResource.id !== slug) {
-            // Search resources for id that matches slug
-            const resource = resources.find((r) => r.id === slug)
-            if (resource) {
-                setCurrentResource(resource)
-            } else {
-                setCurrentResource(resourceDefault)
-            }
-        }
+        const tempResources = resources.slice()
 
         if (slug) {
             setLoading(true)
             setError(null)
             const timeout = setTimeout(() => {
                 FetchHandler.get(`/xrpc/app.packbase.pack.get?id=${slug}&scope=nav`)
-                    .then((data) => {
+                    .then((res) => {
                         setLoading(false)
 
-                        if (data.status === 404) {
+                        if (res.status === 404) {
                             setError({ cause: 404, message: 'Not Found' })
                             setNavigation([
                                 {
@@ -54,6 +46,14 @@ export default function PackLayout({ children, params }: { children: React.React
                                     icon: HomeIcon,
                                 },
                             ])
+
+                            const resource = tempResources.find((r) => r.id === res.data.id)
+                            if (!resource) {
+                                res.data.temporary = true
+                                tempResources.push(res.data)
+                                setResources(tempResources)
+                                if (currentResource.slug !== slug) setCurrentResource(res.data)
+                            }
                         }
                     })
                     .catch((e) => {
@@ -71,6 +71,16 @@ export default function PackLayout({ children, params }: { children: React.React
             }, 500)
 
             return () => clearTimeout(timeout)
+        }
+
+        if (currentResource.slug !== slug) {
+            // Search resources for id that matches slug
+            const resource = tempResources.find((r) => r.slug === slug)
+            if (resource) {
+                setCurrentResource(resource)
+            } else {
+                setCurrentResource(resourceDefault)
+            }
         }
     }, [slug])
 

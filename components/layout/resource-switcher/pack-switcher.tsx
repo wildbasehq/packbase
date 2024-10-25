@@ -5,13 +5,12 @@ import Tooltip, { TooltipContent } from '@/components/shared/tooltip'
 import { Logo } from '@/components/shared/logo'
 import UserAvatar from '@/components/shared/user/avatar'
 import { Button } from '@/components/shared/ui/button'
-import { SettingsIcon } from 'lucide-react'
+import { SettingsIcon, TentTreeIcon } from 'lucide-react'
 import useSound from 'use-sound'
 import { useResourceStore, useUIStore } from '@/lib/states'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
 import { Text } from '@/components/shared/text'
 import ECGIcon from '@/components/shared/icons/dazzle/ecg'
 import { UsersIcon } from '@heroicons/react/20/solid'
@@ -33,12 +32,8 @@ export default function PackSwitcher() {
         resource.id === resourceDefault.id ? initialSound() : switchedSound()
         setCurrentResource(resource)
         setLoading(true)
-        router.push(`/p/${resource.id}`)
+        router.push(`/p/${resource.slug}`)
     }
-
-    useEffect(() => {
-        setResources([])
-    }, [])
 
     return (
         <div className="w-18 relative z-50 flex h-full flex-col items-center gap-4 border-r bg-n-8 p-4">
@@ -62,10 +57,10 @@ export default function PackSwitcher() {
                     content={
                         <div>
                             <TooltipContent>
-                                <Text>{item.name}</Text>
+                                <Text>{item.display_name}</Text>
                             </TooltipContent>
-                            <div className="mt-1 grid grid-rows-1 divide-y border-t">
-                                <div className="grid grid-cols-2 gap-2 divide-x px-2 [&>*:not(:first-child)]:pl-2 [&>*]:py-1">
+                            <div className="mt-1 grid grid-rows-2 divide-y border-t">
+                                <div className="flex flex-row justify-evenly [&>*]:py-1">
                                     <Text alt>
                                         <ECGIcon className="-mt-0.5 inline-flex h-4 w-4" /> 12,420
                                     </Text>
@@ -73,11 +68,14 @@ export default function PackSwitcher() {
                                         <UsersIcon className="-mt-0.5 inline-flex h-4 w-4" /> 1,827
                                     </Text>
                                 </div>
-                                {/*<div className="px-2 py-1 opacity-75">*/}
-                                {/*    <Text alt>*/}
-                                {/*        <QuestionMarkCircleIcon className="-mt-0.5 inline-flex h-4 w-4" /> Hold alt for more*/}
-                                {/*    </Text>*/}
-                                {/*</div>*/}
+
+                                {item.temporary && (
+                                    <div className="px-2 py-1 opacity-75">
+                                        <Text alt>
+                                            <TentTreeIcon className="-mt-0.5 inline-flex h-4 w-4" /> Not a pack member
+                                        </Text>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     }
@@ -85,7 +83,7 @@ export default function PackSwitcher() {
                     delayDuration={0}
                 >
                     <div className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === item.id && 'force-pill')} onClick={() => switchResource(item)}>
-                        <UserAvatar name={item.name} size={32} icon={item.icon} className="inline-flex cursor-pointer overflow-hidden" />
+                        <UserAvatar name={item.display_name} size={32} icon={item.images?.avatar} className="inline-flex cursor-pointer overflow-hidden" />
                     </div>
                 </Tooltip>
             ))}

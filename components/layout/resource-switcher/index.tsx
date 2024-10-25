@@ -76,9 +76,9 @@ export default function ResourceSwitcher() {
                             {!currentResource || (currentResource.standalone && !currentResource.icon) ? (
                                 <Logo className="w-8" />
                             ) : (
-                                <UserAvatar name={currentResource.name} size={32} icon={currentResource.icon} className="inline-flex h-8 w-8 overflow-hidden" />
+                                <UserAvatar name={currentResource.display_name} size={32} icon={currentResource.icon} className="inline-flex h-8 w-8 overflow-hidden" />
                             )}
-                            <Text className="font-bold">{currentResource.name}</Text>
+                            <Text className="font-bold">{currentResource.display_name}</Text>
                         </div>
                         <ExpandingArrow className="right-0 -mt-1 h-6 w-6 rotate-90 text-neutral-500 transition-all dark:text-white" />
                     </span>
