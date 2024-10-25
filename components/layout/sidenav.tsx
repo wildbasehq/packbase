@@ -7,7 +7,7 @@ import { ArrowUpRightIcon, LucideIcon, Sparkles } from 'lucide-react'
 import { useResourceStore, useUIStore } from '@/lib/states'
 import Tooltip from '@/components/shared/tooltip'
 import { Text } from '@/components/shared/text'
-import { Button } from '@/components/shared/ui/button'
+import NewPost from '@/components/shared/user/new-post'
 
 export declare interface SideNavItemType {
     name: string | JSX.Element
@@ -42,9 +42,7 @@ export function SideNav({ ...props }: SideNavType) {
         <>
             <nav aria-label="Sections" className={`${slimNavClass} bg-sidebar hidden h-screen flex-shrink-0 overflow-y-auto border-r md:flex md:flex-col`}>
                 <div className="no-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-visible p-6">
-                    <Button size="sm" variant="outline" className="w-full">
-                        + Howl {!currentResource.standalone && `in ${currentResource.name}`}
-                    </Button>
+                    <NewPost />
                     {navigation.length === 0 && (
                         <div className="load-stagger">
                             {Array.from({ length: 20 }).map((_, i) => (
