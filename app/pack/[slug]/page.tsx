@@ -1,6 +1,5 @@
 'use client'
 import Body from '@/components/layout/body'
-import GuestLanding from '@/components/home/guestlanding'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
 import { useEffect, useState } from 'react'
 import { Heading, Text } from '@/components/shared/text'
@@ -14,6 +13,9 @@ import { Button } from '@/components/shared/ui/button'
 import { LoadingCircle } from '@/components/shared/icons'
 import { FetchHandler } from '@/lib/api'
 import PackHeader from '@/components/shared/pack/header'
+import dynamic from 'next/dynamic'
+
+const GuestLanding = dynamic(() => import('@/components/home/guestlanding'))
 
 export default function Home({ params }: { params: { slug: string } }) {
     const { user } = useUserAccountStore()
