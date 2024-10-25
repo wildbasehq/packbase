@@ -22,6 +22,7 @@ export default function GuestLanding() {
             <div className="relative isolate overflow-hidden rounded-2xl border-2 bg-[#8cd605] shadow-md">
                 <div className="flex py-24 sm:py-32">
                     <div className="-z-10">
+                        {/* @TODO: THIS IS CPU GPU & MEM EXPENSIVE!!!!1! */}
                         <LoginGradient
                             // opacity={0.5}
                             grainBlending={0.15}
