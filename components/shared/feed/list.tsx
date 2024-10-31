@@ -59,7 +59,7 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
     }, [FeedViewConfig])
 
     const fetchPosts = (feed: string = '', clearPosts = false) => {
-        FetchHandler.get(`/xrpc/app.packbase.feed.get`).then(({ data }) => {
+        FetchHandler.get(`/xrpc/app.packbase.feed.get?s=${packID}`).then(({ data }) => {
             if (clearPosts) {
                 setPosts(data.posts)
                 setPostsCurrentPage(1)
