@@ -19,6 +19,16 @@ export default function PackLayout({ children, params }: { children: React.React
     useEffect(() => {
         const tempResources = resources.slice()
 
+        if (currentResource.slug !== slug) {
+            // Search resources for id that matches slug
+            const resource = tempResources.find((r) => r.slug === slug)
+            if (resource) {
+                setCurrentResource(resource)
+            } else {
+                setCurrentResource(resourceDefault)
+            }
+        }
+
         if (slug) {
             setLoading(true)
             setError(null)
@@ -48,7 +58,7 @@ export default function PackLayout({ children, params }: { children: React.React
                             ])
 
                             const resource = tempResources.find((r) => r.id === res.data.id)
-                            if (!resource) {
+                            if (!resource && slug !== 'universe') {
                                 res.data.temporary = true
                                 tempResources.push(res.data)
                                 setResources(tempResources)
@@ -71,16 +81,6 @@ export default function PackLayout({ children, params }: { children: React.React
             }, 500)
 
             return () => clearTimeout(timeout)
-        }
-
-        if (currentResource.slug !== slug) {
-            // Search resources for id that matches slug
-            const resource = tempResources.find((r) => r.slug === slug)
-            if (resource) {
-                setCurrentResource(resource)
-            } else {
-                setCurrentResource(resourceDefault)
-            }
         }
     }, [slug])
 
