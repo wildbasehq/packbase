@@ -1,5 +1,8 @@
 import { Heading } from '@/components/shared/text'
 import Markdown from '@/components/shared/markdown'
+import { Button } from '@/components/shared/ui/button'
+import { FetchHandler } from '@/lib/api'
+import { toast } from '@/lib/toast'
 
 export default function PackHeader({ ...props }: any) {
     const pack = props.pack
@@ -31,6 +34,9 @@ export default function PackHeader({ ...props }: any) {
                             </div>
                         </div>
                     </div>
+                    <div>
+                        <PackMembershipButton pack={pack} />
+                    </div>
                 </div>
                 <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
                     <Heading>{pack.display_name || pack.slug}</Heading>
@@ -43,4 +49,24 @@ export default function PackHeader({ ...props }: any) {
             </div>
         </div>
     )
+}
+
+function PackMembershipButton({ pack }: { pack: any }) {
+    const packJoin = () => {
+        FetchHandler.post(`/xrpc/app.packbase.pack.join?id=${pack.id}`)
+            .then(({ data }) => {
+                if (data?.error) return toast.error(data.message)
+                return toast.success('Joined!')
+            })
+            .catch((e) => {
+                console.error(e)
+                return toast.error('Failed to join')
+            })
+    }
+    if (!pack.embership)
+        return (
+            <Button size="sm" onClick={packJoin}>
+                + Join
+            </Button>
+        )
 }
