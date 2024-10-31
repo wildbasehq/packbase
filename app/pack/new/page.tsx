@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, Fragment, useState } from 'react'
+import { FormEvent, Fragment, useEffect, useState } from 'react'
 import { Button } from '@/components/shared/ui/button'
 import { Dialog, RadioGroup, Transition } from '@headlessui/react'
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
@@ -10,8 +10,15 @@ import { Heading, Text } from '@/components/shared/text'
 import { LoadingCircle } from '@/components/shared/icons'
 import { FetchHandler } from '@/lib/api'
 import { toast } from '@/lib/toast'
+import { useResourceStore } from '@/lib/states'
 
 export default function PackAdd() {
+    const { setCurrentResource } = useResourceStore()
+
+    useEffect(() => {
+        setCurrentResource({ id: 'new', slug: 'new', display_name: 'Create a Pack' })
+    }, [])
+
     return (
         <>
             woops hey look a button
