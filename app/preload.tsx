@@ -26,28 +26,33 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                 // @ts-ignore
                 supabase.auth.getUser().then(async ({ data: { user } }) => {
                     if (user) {
-                        const data = (await FetchHandler.get('/xrpc/app.packbase.id.me')).data
-                        if (user.user_metadata.waitlistType !== 'free') {
-                            // Assume they're in the waitlist
-                            const waitlistType = user.user_metadata.waitlistType || 'wait'
-                            setUser({
-                                id: user.id,
-                                username: data?.username || user.email,
-                                display_name: data?.display_name || user.email,
-                                reqOnboard: !data || !data?.username,
-                                waitlistType,
-                                anonUser: ['wait', 'ban'].includes(waitlistType),
-                                ...data,
+                        FetchHandler.get('/xrpc/app.packbase.id.me')
+                            .then(({ data }) => {
+                                if (user.user_metadata.waitlistType !== 'free') {
+                                    // Assume they're in the waitlist
+                                    const waitlistType = user.user_metadata.waitlistType || 'wait'
+                                    setUser({
+                                        id: user.id,
+                                        username: data?.username || user.email,
+                                        display_name: data?.display_name || user.email,
+                                        reqOnboard: !data || !data?.username,
+                                        waitlistType,
+                                        anonUser: ['wait', 'ban'].includes(waitlistType),
+                                        ...data,
+                                    })
+                                } else {
+                                    setUser({
+                                        id: user.id,
+                                        username: data?.username || user.email,
+                                        display_name: data?.display_name || user.email,
+                                        reqOnboard: !data || !data?.username,
+                                        ...data,
+                                    })
+                                }
                             })
-                        } else {
-                            setUser({
-                                id: user.id,
-                                username: data?.username || user.email,
-                                display_name: data?.display_name || user.email,
-                                reqOnboard: !data || !data?.username,
-                                ...data,
+                            .catch((e) => {
+                                supabase.auth.signOut()
                             })
-                        }
                     } else {
                         setUser(null)
                     }
