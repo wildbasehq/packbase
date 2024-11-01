@@ -47,7 +47,7 @@ const postPrivacy = [
     },
 ]
 
-export function CreateGroupSidebar() {
+function CreateGroupSidebar() {
     const [onboardOpen, setOnboardOpen] = useState(false)
     const [selected, setSelected] = useState(postPrivacy[0])
     const [submitting, setSubmitting] = useState(false)

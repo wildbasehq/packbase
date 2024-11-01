@@ -63,10 +63,12 @@ function PackMembershipButton({ pack }: { pack: any }) {
                 return toast.error('Failed to join')
             })
     }
-    if (!pack.embership)
+    if (!pack.embership) {
         return (
             <Button size="sm" onClick={packJoin}>
                 + Join
             </Button>
         )
+    }
+    return <>'I DONT KNOW WHAT TO RETURN'</>
 }
