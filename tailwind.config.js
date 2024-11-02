@@ -70,7 +70,8 @@ module.exports = {
                     foreground: 'hsl(var(--secondary-foreground))',
                 },
                 tertiary: {
-                    DEFAULT: 'rgb(var(--md-sys-tertiary) / <alpha-value>)',
+                    // DEFAULT: 'rgb(var(--md-sys-tertiary) / <alpha-value>)',
+                    DEFAULT: 'rgb(var(--destructive) / <alpha-value>)',
                     container: 'rgb(var(--md-sys-tertiary-container) / <alpha-value>)',
                 },
                 error: {
@@ -135,6 +136,9 @@ module.exports = {
                 // md: "calc(var(--radius) - 2px)",
                 // sm: "calc(var(--radius) - 4px)",
                 DEFAULT: '0.75rem',
+            },
+            fontFamily: {
+                wildbase: ['var(--font-wildbase)'],
             },
             transitionTimingFunction: {
                 snapper: 'cubic-bezier(0,1.25,0,1)',

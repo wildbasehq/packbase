@@ -9,6 +9,28 @@ import { ProjectSafeName } from '@/lib/utils'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
 import NavBar from '@/components/layout/navbar'
 import { SideNav } from '@/components/layout/sidenav'
+import localFont from 'next/font/local'
+
+const wildbaseRemix = localFont({
+    src: [
+        {
+            path: '../public/fonts/wildbase-regular.woff2',
+            weight: '300',
+            style: 'normal',
+        },
+        {
+            path: '../public/fonts/wildbase-medium.woff2',
+            weight: '400',
+            style: 'normal',
+        },
+        {
+            path: '../public/fonts/wildbase-bold.woff2',
+            weight: '600',
+            style: 'normal',
+        },
+    ],
+    variable: '--font-wildbase',
+})
 
 export const metadata = {
     title: ProjectSafeName,
@@ -29,7 +51,7 @@ const PostHogPageView = dynamic(() => import('./PostHogPageView'), {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en" className="h-full">
-            <body className={cx('h-full overflow-hidden bg-n-1 dark:bg-n-9', lexend.variable, lexend.className, inter.variable)}>
+            <body className={cx('h-full overflow-hidden bg-n-1 dark:bg-n-9', lexend.variable, lexend.className, inter.variable, wildbaseRemix.variable)}>
                 <Providers>
                     <PostHogPageView />
                     <div id="NGContentArea" className="flex h-full overflow-hidden">
