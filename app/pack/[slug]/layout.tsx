@@ -107,7 +107,7 @@ export default function PackLayout({ children, params }: { children: React.React
                             </Heading>
                             <p className="text-alt mt-1 items-center align-middle text-sm leading-6">
                                 <LoadingDots className="-mt-1 mr-1 inline-block" />
-                                Locating {slug} in the universe, hang tight!
+                                Locating {slug} in the Cosmos, hang tight!
                             </p>
                         </>
                     )}
