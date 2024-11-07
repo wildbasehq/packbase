@@ -116,7 +116,7 @@ export default function PackLayout({ children, params }: { children: React.React
                         <>
                             <Heading className="items-center">
                                 <FaceFrownIcon className="text-default mr-1 inline-block h-6 w-6" />
-                                {error.cause === 404 ? `The universe can't find ${slug}` : `${ProjectSafeName} can\'t continue`}
+                                {error.cause === 404 ? `The Cosmos can't find ${slug}` : `${ProjectSafeName} can\'t continue`}
                                 {error.cause === 404 && slug === 'universe' && `. Someone setup ${ProjectSafeName} wrong :/`}
                             </Heading>
                             <p className="text-alt mt-1 text-sm leading-6">
