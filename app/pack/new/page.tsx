@@ -2,7 +2,7 @@
 
 import { FormEvent, Fragment, useEffect, useState } from 'react'
 import { Button } from '@/components/shared/ui/button'
-import { Dialog, RadioGroup, Transition } from '@headlessui/react'
+import { Description, Dialog, DialogTitle, Label, Radio, RadioGroup, Transition, TransitionChild } from '@headlessui/react'
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
 import { Input } from '@/components/shared/input/text'
@@ -63,11 +63,13 @@ function CreateGroupSidebar() {
                 slug: event.currentTarget.slug.value,
                 description: event.currentTarget.description.value,
             })
-            .then(({ data }) => {
-                if (data.message) {
-                    // handle error
-                    toast.error(`${data.name}: ${data.message}`)
+            .then(({ data, error }) => {
+                if (error) {
+                    setSubmitting(false)
+                    toast.error(error.value.message)
+                    return
                 }
+
                 setOnboardOpen(false)
                 setSubmitting(false)
             })
@@ -76,9 +78,9 @@ function CreateGroupSidebar() {
     return (
         <>
             <Button onClick={() => setOnboardOpen(true)}>Create a Pack</Button>
-            <Transition.Root show={onboardOpen} as={Fragment}>
+            <Transition show={onboardOpen} as={Fragment}>
                 <Dialog as="div" className="fixed inset-0 z-50 overflow-hidden" onClose={setOnboardOpen}>
-                    <Transition.Child
+                    <TransitionChild
                         as="div"
                         enter="ease-in-out duration-500"
                         enterFrom="opacity-0"
@@ -91,13 +93,13 @@ function CreateGroupSidebar() {
                         <Heading size="3xl">Something will show here. Probably templates, or a live theme editor, who knows.</Heading>
                         <Text className="mt-4">For now just take this i guess.</Text>
                         {/*<Image src={PackDefaultHeader} className="fixed inset-0 -z-[1] h-screen w-screen opacity-90 transition-opacity" alt="Default pack header" />*/}
-                    </Transition.Child>
+                    </TransitionChild>
 
                     <div className="absolute inset-0 overflow-hidden">
                         {/*<Dialog.Overlay className="absolute inset-0" />*/}
 
                         <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
-                            <Transition.Child
+                            <TransitionChild
                                 as={Fragment}
                                 enter="transform transition ease-snapper duration-300"
                                 enterFrom="translate-x-full"
@@ -115,7 +117,7 @@ function CreateGroupSidebar() {
                                         <div className="h-0 flex-1 overflow-y-auto">
                                             <div className="rounded-bl rounded-br bg-white/50 px-4 py-6 shadow dark:bg-n-6/50 sm:px-6">
                                                 <div className="flex items-center justify-between">
-                                                    <Dialog.Title className="text-default select-none text-lg font-medium"> Create a Pack </Dialog.Title>
+                                                    <DialogTitle className="text-default select-none text-lg font-medium"> Create a Pack </DialogTitle>
                                                     <div className="ml-3 flex h-7 items-center">
                                                         <Button disabled={submitting} type="reset" variant="ghost" size="self" onClick={() => setOnboardOpen(false)}>
                                                             <span className="sr-only">Close panel</span>
@@ -167,10 +169,10 @@ function CreateGroupSidebar() {
                                                             <legend className="text-default select-none text-sm font-medium">Privacy</legend>
                                                             <div className="mt-2 space-y-5">
                                                                 <RadioGroup value={selected} onChange={setSelected}>
-                                                                    <RadioGroup.Label className="sr-only select-none">Privacy</RadioGroup.Label>
+                                                                    <Label className="sr-only select-none">Privacy</Label>
                                                                     <div className="space-y-2">
                                                                         {postPrivacy.map((privacyOption) => (
-                                                                            <RadioGroup.Option
+                                                                            <Radio
                                                                                 key={privacyOption.name}
                                                                                 value={privacyOption}
                                                                                 className={({ focus, checked }) =>
@@ -192,15 +194,15 @@ function CreateGroupSidebar() {
                                                                                         <div className="flex w-full items-center justify-between">
                                                                                             <div className="flex items-center">
                                                                                                 <div className="text-sm">
-                                                                                                    <RadioGroup.Label
+                                                                                                    <Label
                                                                                                         as="p"
                                                                                                         className={`font-medium  ${
                                                                                                             checked ? 'text-default' : 'text-default-alt'
                                                                                                         }`}
                                                                                                     >
                                                                                                         {privacyOption.name}
-                                                                                                    </RadioGroup.Label>
-                                                                                                    <RadioGroup.Description as="span" className="text-alt inline">
+                                                                                                    </Label>
+                                                                                                    <Description as="span" className="text-alt inline">
                                                                                                         <span>{privacyOption.desc}</span>{' '}
                                                                                                         {privacyOption.warn && (
                                                                                                             <p className="inline-flex items-center">
@@ -208,7 +210,7 @@ function CreateGroupSidebar() {
                                                                                                                 <span className="ml-1">{privacyOption.warn}</span>
                                                                                                             </p>
                                                                                                         )}
-                                                                                                    </RadioGroup.Description>
+                                                                                                    </Description>
                                                                                                 </div>
                                                                                             </div>
                                                                                             {checked && (
@@ -219,7 +221,7 @@ function CreateGroupSidebar() {
                                                                                         </div>
                                                                                     </>
                                                                                 )}
-                                                                            </RadioGroup.Option>
+                                                                            </Radio>
                                                                         ))}
                                                                     </div>
                                                                 </RadioGroup>
@@ -238,11 +240,11 @@ function CreateGroupSidebar() {
                                         </div>
                                     </form>
                                 </div>
-                            </Transition.Child>
+                            </TransitionChild>
                         </div>
                     </div>
                 </Dialog>
-            </Transition.Root>
+            </Transition>
         </>
     )
 }
