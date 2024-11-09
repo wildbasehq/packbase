@@ -107,7 +107,7 @@
     "use-sound": "^4.0.1",
     "utf-8-validate": "^6.0.3",
     "vaul": "^0.9.1",
-    "voyagesdk-ts": "https://github.com/Wolfbite-Labs/voyagesdk-ts.git",
+    "voyagesdk-ts": "git@github.com:Wolfbite-Labs/voyagesdk-ts.git",
     "zod": "^3.23.8",
     "zustand": "^4.5.2"
   },
