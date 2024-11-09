@@ -5,7 +5,7 @@ import { LoadingDots } from '@/components/shared/icons'
 import { useEffect, useState } from 'react'
 import { ProjectSafeName } from '@/lib/utils'
 import { Heading } from '@/components/shared/text'
-import { useUIStore, useUserAccountStore } from '@/lib/states'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
 import Body from '@/components/layout/body'
 import { HandRaisedIcon } from '@heroicons/react/20/solid'
 import { API_URL, setToken, vg } from '@/lib/api'
@@ -17,6 +17,7 @@ export default function Preload({ children }: { children: React.ReactNode }) {
     const [error, setError] = useState<any | null>(null)
     const { setUser } = useUserAccountStore()
     const { setLoading, setConnecting } = useUIStore()
+    const { setResources } = useResourceStore()
 
     useEffect(() => {
         if (!serviceLoading.startsWith('polling')) return
@@ -28,38 +29,42 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                 supabase.auth.getUser().then(async ({ data: { user } }) => {
                     if (user) {
                         setToken(await supabase.auth.getSession().then(({ data }) => data?.session?.access_token))
+                        setServiceLoading('auth:@me')
                         vg.user.me
                             .get()
-                            .then(({ data }) => {
+                            .then(async ({ data }) => {
+                                setServiceLoading('auth:@me:packs')
+                                const packs = (await vg.user.me.packs.get()).data || []
+                                let userBuild = {
+                                    id: user.id,
+                                    username: data?.username || user.email,
+                                    display_name: data?.display_name || user.email,
+                                    reqOnboard: !data || !data?.username,
+                                    ...data,
+                                }
+
+                                setResources(packs)
+
                                 if (user.user_metadata.waitlistType !== 'free') {
                                     // Assume they're in the waitlist
                                     const waitlistType = user.user_metadata.waitlistType || 'wait'
-                                    setUser({
-                                        id: user.id,
-                                        username: data?.username || user.email,
-                                        display_name: data?.display_name || user.email,
-                                        reqOnboard: !data || !data?.username,
+                                    userBuild = {
+                                        ...userBuild,
                                         waitlistType,
                                         anonUser: ['wait', 'ban'].includes(waitlistType),
-                                        ...data,
-                                    })
-                                } else {
-                                    setUser({
-                                        id: user.id,
-                                        username: data?.username || user.email,
-                                        display_name: data?.display_name || user.email,
-                                        reqOnboard: !data || !data?.username,
-                                        ...data,
-                                    })
+                                    }
                                 }
+
+                                setUser(userBuild)
+                                proceed()
                             })
                             .catch((e) => {
                                 supabase.auth.signOut()
                             })
                     } else {
                         setUser(null)
+                        proceed()
                     }
-                    proceed()
                 })
             })
             .catch((e) => {
