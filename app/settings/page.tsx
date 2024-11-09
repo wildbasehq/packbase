@@ -1,63 +1,63 @@
-"use client";
-import { Button } from "@/components/shared/ui/button";
-import Avatar from "@/components/shared/user/avatar";
-import { ArrowUpRightIcon, PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
-import { useEffect, useState } from "react";
-import { useUserAccountStore } from "@/lib/states";
-import { Heading, Text } from "@/components/shared/text";
-import { ProjectSafeName } from "@/lib/utils";
-import ProfileHeader from "@/components/shared/user/header";
-import { FetchHandler } from "@/lib/api";
-import { toast } from "@/lib/toast";
-import { LoadingCircle } from "@/components/shared/icons";
+'use client'
+import { Button } from '@/components/shared/ui/button'
+import Avatar from '@/components/shared/user/avatar'
+import { ArrowUpRightIcon, PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
+import { useEffect, useState } from 'react'
+import { useUserAccountStore } from '@/lib/states'
+import { Heading, Text } from '@/components/shared/text'
+import { ProjectSafeName } from '@/lib/utils'
+import ProfileHeader from '@/components/shared/user/header'
+import { vg } from '@/lib/api'
+import { toast } from '@/lib/toast'
+import { LoadingCircle } from '@/components/shared/icons'
 
 export default function SettingsGeneral() {
-    const { user } = useUserAccountStore();
-    const [submitting, setSubmitting] = useState<boolean>(false);
-    const [handleInput, setHandleInput] = useState<string | undefined>(user?.username.indexOf("@") > -1 ? undefined : user?.username);
-    const [slugInput, setSlugInput] = useState<string | undefined>(user?.slug);
-    const [nicknameInput, setNicknameInput] = useState<string | undefined>(user?.display_name);
-    const [aboutInput, setAboutInput] = useState<string | undefined>(user?.about?.bio);
+    const { user } = useUserAccountStore()
+    const [submitting, setSubmitting] = useState<boolean>(false)
+    const [handleInput, setHandleInput] = useState<string | undefined>(user?.username.indexOf('@') > -1 ? undefined : user?.username)
+    const [slugInput, setSlugInput] = useState<string | undefined>(user?.slug)
+    const [nicknameInput, setNicknameInput] = useState<string | undefined>(user?.display_name)
+    const [aboutInput, setAboutInput] = useState<string | undefined>(user?.about?.bio)
 
     // Profile pic and cover pic upload fields
-    const [profilePicUpload, setProfilePicUpload] = useState<File | undefined>();
-    const [coverPicUpload, setCoverPicUpload] = useState<File | undefined>();
+    const [profilePicUpload, setProfilePicUpload] = useState<File | undefined>()
+    const [coverPicUpload, setCoverPicUpload] = useState<File | undefined>()
 
     // Profile pic and cover pic upload previews
-    const [profilePicPreview, setProfilePicPreview] = useState<string | undefined>();
-    const [coverPicPreview, setCoverPicPreview] = useState<string | undefined>();
+    const [profilePicPreview, setProfilePicPreview] = useState<string | undefined>()
+    const [coverPicPreview, setCoverPicPreview] = useState<string | undefined>()
 
     useEffect(() => {
         if (profilePicUpload) {
-            const reader = new FileReader();
+            const reader = new FileReader()
             reader.onloadend = () => {
-                setProfilePicPreview(reader.result as string);
-            };
-            reader.readAsDataURL(profilePicUpload);
+                setProfilePicPreview(reader.result as string)
+            }
+            reader.readAsDataURL(profilePicUpload)
         } else {
-            setProfilePicPreview(undefined);
+            setProfilePicPreview(undefined)
         }
-    }, [profilePicUpload]);
+    }, [profilePicUpload])
 
     useEffect(() => {
         if (coverPicUpload) {
-            const reader = new FileReader();
+            const reader = new FileReader()
             reader.onloadend = () => {
-                setCoverPicPreview(reader.result as string);
-            };
-            reader.readAsDataURL(coverPicUpload);
+                setCoverPicPreview(reader.result as string)
+            }
+            reader.readAsDataURL(coverPicUpload)
         } else {
-            setCoverPicPreview(undefined);
+            setCoverPicPreview(undefined)
         }
-    }, [coverPicUpload]);
+    }, [coverPicUpload])
 
     function saveProfile(e: { preventDefault: () => void }) {
-        e.preventDefault();
-        if (submitting) return;
-        setSubmitting(true);
+        e.preventDefault()
+        if (submitting) return
+        setSubmitting(true)
 
-        FetchHandler.post(`/xrpc/app.packbase.id.me`, {
-            body: JSON.stringify({
+        vg.user.me
+            .post({
                 username: handleInput,
                 display_name: nicknameInput,
                 slug: slugInput,
@@ -68,21 +68,20 @@ export default function SettingsGeneral() {
                     avatar: profilePicPreview,
                     header: coverPicPreview,
                 },
-            }),
-        })
+            })
             .then(({ data }) => {
                 if (data && !data.message) {
-                    toast.success("Profile updated");
-                    window.location.reload();
+                    toast.success('Profile updated')
+                    window.location.reload()
                 } else {
-                    setSubmitting(false);
-                    toast.error("Couldn't save: " + (data.message ? `${data.at}: ${data.message}` : "Something went wrong"));
+                    setSubmitting(false)
+                    toast.error("Couldn't save: " + (data.message ? `${data.at}: ${data.message}` : 'Something went wrong'))
                 }
             })
             .catch((err) => {
-                setSubmitting(false);
-                toast.error("Couldn't save: " + (err.message ? `${err.cause}: ${err.message}` : "Something went wrong"));
-            });
+                setSubmitting(false)
+                toast.error("Couldn't save: " + (err.message ? `${err.cause}: ${err.message}` : 'Something went wrong'))
+            })
     }
 
     return (
@@ -118,8 +117,7 @@ export default function SettingsGeneral() {
                                 <label htmlFor="username" className="text-default block text-sm font-medium leading-6">
                                     <Text>Space URL & Username</Text>
                                     <Text size="xs" className="text-alt">
-                                        Your username is used to find and reference you across {ProjectSafeName}. Your Space URL holds your
-                                        personal customised site.
+                                        Your username is used to find and reference you across {ProjectSafeName}. Your Space URL holds your personal customised site.
                                     </Text>
                                 </label>
                                 <div className="mt-2">
@@ -130,13 +128,11 @@ export default function SettingsGeneral() {
                                             id="slug"
                                             autoComplete="slug"
                                             className="no-legacy text-default block flex-1 border-0 bg-transparent px-3 py-1.5 placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6"
-                                            value={slugInput || ""}
+                                            value={slugInput || ''}
                                             onChange={(e) => setSlugInput(e.target.value)}
                                             required
                                         />
-                                        <span className="flex select-none items-center pr-3 text-neutral-500 sm:text-sm">
-                                            .packbase.app
-                                        </span>
+                                        <span className="flex select-none items-center pr-3 text-neutral-500 sm:text-sm">.packbase.app</span>
                                     </div>
                                     <Text size="xs" className="text-alt mt-1">
                                         This is used to access your personal space - not your main profile.
@@ -152,7 +148,7 @@ export default function SettingsGeneral() {
                                             id="username"
                                             autoComplete="username"
                                             className="no-legacy text-default block flex-1 border-0 bg-transparent py-1.5 pl-1 placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6"
-                                            value={handleInput || ""}
+                                            value={handleInput || ''}
                                             onChange={(e) => setHandleInput(e.target.value)}
                                             required
                                         />
@@ -176,7 +172,7 @@ export default function SettingsGeneral() {
                                             autoComplete="display_name"
                                             className="no-legacy text-default block flex-1 border-0 bg-transparent px-3 py-1.5 placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6"
                                             placeholder="Some Display Name"
-                                            value={nicknameInput || ""}
+                                            value={nicknameInput || ''}
                                             onChange={(e) => setNicknameInput(e.target.value)}
                                         />
                                     </div>
@@ -196,20 +192,15 @@ export default function SettingsGeneral() {
                                         name="about"
                                         rows={3}
                                         className="no-legacy text-default bg-default block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-neutral-300 placeholder:text-neutral-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:ring-neutral-800 sm:text-sm sm:leading-6"
-                                        defaultValue={user?.about?.bio || ""}
+                                        defaultValue={user?.about?.bio || ''}
                                         onChange={(e) => setAboutInput(e.target.value)}
                                     />
                                 </div>
                                 <p className="text-default-alt mt-3 select-none text-sm leading-6">
-                                    Write a few sentences about yourself.{" "}
-                                    <a
-                                        href="https://commonmark.org/help/"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-primary"
-                                    >
+                                    Write a few sentences about yourself.{' '}
+                                    <a href="https://commonmark.org/help/" target="_blank" rel="noopener noreferrer" className="text-primary">
                                         Markdown <ArrowUpRightIcon className="inline h-4 w-4" />
-                                    </a>{" "}
+                                    </a>{' '}
                                     is supported.
                                 </p>
                             </div>
@@ -218,20 +209,14 @@ export default function SettingsGeneral() {
                                 <label htmlFor="avatar" className="text-default block select-none text-sm font-medium leading-6">
                                     Photo
                                 </label>
-                                <input
-                                    type="file"
-                                    name="avatar"
-                                    id="avatar"
-                                    className="hidden"
-                                    onChange={(e) => setProfilePicUpload(e.target.files?.[0] || undefined)}
-                                />
+                                <input type="file" name="avatar" id="avatar" className="hidden" onChange={(e) => setProfilePicUpload(e.target.files?.[0] || undefined)} />
                                 <div className="mt-2 flex items-center gap-x-3">
                                     {!profilePicPreview ? (
                                         <UserCircleIcon className="text-default-alt h-12 w-12" aria-hidden="true" />
                                     ) : (
                                         <Avatar icon={profilePicPreview} size="lg" />
                                     )}
-                                    <Button asChild variant="outline" onClick={() => document.getElementById("avatar")?.click()}>
+                                    <Button asChild variant="outline" onClick={() => document.getElementById('avatar')?.click()}>
                                         <div>Upload</div>
                                     </Button>
                                 </div>
@@ -246,14 +231,10 @@ export default function SettingsGeneral() {
                                 </label>
                                 <div
                                     className="relative mt-2 flex aspect-banner items-center justify-center overflow-hidden rounded border-2 border-dashed bg-card px-6 py-10"
-                                    onClick={() => document.getElementById("cover-photo")?.click()}
+                                    onClick={() => document.getElementById('cover-photo')?.click()}
                                 >
                                     {coverPicPreview && (
-                                        <img
-                                            src={coverPicPreview}
-                                            alt=""
-                                            className="absolute inset-0 h-full w-full rounded-lg object-cover opacity-50 blur-lg"
-                                        />
+                                        <img src={coverPicPreview} alt="" className="absolute inset-0 h-full w-full rounded-lg object-cover opacity-50 blur-lg" />
                                     )}
                                     <div className="items-center justify-center text-center">
                                         <PhotoIcon className="text-default-alt mx-auto h-12 w-12" aria-hidden="true" />
@@ -266,9 +247,7 @@ export default function SettingsGeneral() {
                                             </label>
                                             <p className="pl-1">(drag and drop not supported)</p>
                                         </div>
-                                        <p className="text-default-alt select-none text-xs leading-5">
-                                            PNG, JPG, GIF up to 10MB, Aspect Ratio 3 / 1
-                                        </p>
+                                        <p className="text-default-alt select-none text-xs leading-5">PNG, JPG, GIF up to 10MB, Aspect Ratio 3 / 1</p>
                                     </div>
                                 </div>
                             </div>
@@ -276,13 +255,7 @@ export default function SettingsGeneral() {
                     </div>
                 </div>
 
-                <input
-                    id="cover-photo"
-                    name="file-upload"
-                    type="file"
-                    className="sr-only"
-                    onChange={(e) => setCoverPicUpload(e.target.files?.[0] || undefined)}
-                />
+                <input id="cover-photo" name="file-upload" type="file" className="sr-only" onChange={(e) => setCoverPicUpload(e.target.files?.[0] || undefined)} />
 
                 <div className="mt-6 flex items-center justify-end gap-x-6">
                     <Button
@@ -290,10 +263,10 @@ export default function SettingsGeneral() {
                         disabled={submitting}
                         className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
-                        {!submitting ? "Save" : <LoadingCircle />}
+                        {!submitting ? 'Save' : <LoadingCircle />}
                     </Button>
                 </div>
             </form>
         </div>
-    );
+    )
 }

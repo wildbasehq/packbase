@@ -6,7 +6,7 @@ import { Button } from '@/components/shared/ui/button'
 import { LoadingCircle } from '@/components/shared/icons'
 import Card from '@/components/shared/card'
 import React, { FormEvent, useState } from 'react'
-import { FetchHandler } from '@/lib/api'
+import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
 import { useResourceStore, useUserAccountStore } from '@/lib/states'
 import { Editor } from '@/components/novel'
@@ -59,9 +59,8 @@ export default function NewPost() {
     }
 
     const uploadPost = (post: any) => {
-        FetchHandler.post('/xrpc/app.packbase.howl.create', {
-            body: JSON.stringify(post),
-        })
+        vg.howl.create
+            .post(post)
             .then(({ data }) => {
                 if (data?.message) {
                     setSubmitting(false)

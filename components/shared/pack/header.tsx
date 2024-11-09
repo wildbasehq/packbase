@@ -1,7 +1,7 @@
 import { Heading } from '@/components/shared/text'
 import Markdown from '@/components/shared/markdown'
 import { Button } from '@/components/shared/ui/button'
-import { FetchHandler } from '@/lib/api'
+import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
 
 export default function PackHeader({ ...props }: any) {
@@ -53,9 +53,10 @@ export default function PackHeader({ ...props }: any) {
 
 function PackMembershipButton({ pack }: { pack: any }) {
     const packJoin = () => {
-        FetchHandler.post(`/xrpc/app.packbase.pack.join?id=${pack.id}`)
+        vg.pack({ id: pack.id })
+            .join.post()
             .then(({ data }) => {
-                if (data?.error) return toast.error(data.message)
+                if (data?.message || data?.at) return toast.error(data.message)
                 return toast.success('Joined!')
             })
             .catch((e) => {
@@ -63,7 +64,7 @@ function PackMembershipButton({ pack }: { pack: any }) {
                 return toast.error('Failed to join')
             })
     }
-    if (!pack.embership) {
+    if (!pack.membership) {
         return (
             <Button size="sm" onClick={packJoin}>
                 + Join

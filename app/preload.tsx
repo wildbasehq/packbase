@@ -5,11 +5,11 @@ import { LoadingDots } from '@/components/shared/icons'
 import { useEffect, useState } from 'react'
 import { ProjectSafeName } from '@/lib/utils'
 import { Heading } from '@/components/shared/text'
-import { createClient } from '@/lib/supabase/client'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
 import Body from '@/components/layout/body'
 import { HandRaisedIcon } from '@heroicons/react/20/solid'
-import { API_URL, FetchHandler } from '@/lib/api'
+import { API_URL, setToken, vg } from '@/lib/api'
+import { createClient } from '@/lib/supabase/client'
 
 const supabase = createClient()
 export default function Preload({ children }: { children: React.ReactNode }) {
@@ -20,13 +20,16 @@ export default function Preload({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (!serviceLoading.startsWith('polling')) return
-        FetchHandler.get('/')
+        vg.server.describeServer
+            .get()
             .then((_) => {
                 setServiceLoading('auth')
                 // @ts-ignore
                 supabase.auth.getUser().then(async ({ data: { user } }) => {
                     if (user) {
-                        FetchHandler.get('/xrpc/app.packbase.id.me')
+                        setToken(await supabase.auth.getSession().then(({ data }) => data?.session?.access_token))
+                        vg.user.me
+                            .get()
                             .then(({ data }) => {
                                 if (user.user_metadata.waitlistType !== 'free') {
                                     // Assume they're in the waitlist
@@ -60,7 +63,8 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                 })
             })
             .catch((e) => {
-                if (e.message.indexOf('Failed') > -1)
+                console.log(e)
+                if (e?.message.indexOf('Failed') > -1)
                     return setError({
                         cause: 'UI & Server could not talk together',
                         message: `${ProjectSafeName} is offline, or your network is extremely unstable.`,

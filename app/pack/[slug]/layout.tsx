@@ -1,6 +1,6 @@
 'use client'
 import { LoadingDots } from '@/components/shared/icons'
-import { FetchHandler } from '@/lib/api'
+import { vg } from '@/lib/api'
 import { useResourceStore, useUIStore } from '@/lib/states'
 import { useEffect, useState } from 'react'
 import { FaceFrownIcon, HomeIcon } from '@heroicons/react/24/solid'
@@ -33,7 +33,8 @@ export default function PackLayout({ children, params }: { children: React.React
             setLoading(true)
             setError(null)
             const timeout = setTimeout(() => {
-                FetchHandler.get(`/xrpc/app.packbase.pack.get?id=${slug}&scope=nav`)
+                vg.pack({ id: slug })
+                    .get({ query: { scope: 'nav' } })
                     .then((res) => {
                         setLoading(false)
 

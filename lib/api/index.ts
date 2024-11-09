@@ -5,13 +5,30 @@
 //         : `${window.location.protocol}//api.${window.location.hostname.replace('www.', '')}/api/`) : '/api/') + 'v2/';
 import { ProjectDeps, ProjectName } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import VoyageSDK from 'voyagesdk-ts'
 
 export const API_URL = process.env.NEXT_PUBLIC_YAPOCK_URL
 let TOKEN: string | undefined
 
+export let vg = new VoyageSDK(API_URL, {
+    supabase: {
+        client: createClient(),
+    },
+}).vg
+
+export const setToken = (token?: string) => {
+    TOKEN = token
+    vg = new VoyageSDK(API_URL, {
+        token,
+        supabase: {
+            client: createClient(),
+        },
+    }).vg
+}
+
+// KILLING MYSELF
+
 const FETCH_BASE = async (url: string, options: RequestInit = {}) => {
-    const supabase = createClient()
-    TOKEN = (await supabase.auth.getSession()).data.session?.access_token
     const headers = new Headers({
         'Content-Type': 'application/json',
         Accept: 'application/json',

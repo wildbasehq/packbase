@@ -13,7 +13,7 @@ import Card from '@/components/shared/card'
 import { useUISettingsStore } from '@/lib/states'
 import UserAvatar from '@/components/shared/user/avatar'
 import FeedPost from '@/components/shared/feed/post'
-import { FetchHandler } from '@/lib/api'
+import { vg } from '@/lib/api'
 import SelectMenu from '@/components/shared/input/select'
 import { Button } from '@/components/shared/ui/button'
 
@@ -59,17 +59,19 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
     }, [FeedViewConfig])
 
     const fetchPosts = (feed: string = '', clearPosts = false) => {
-        FetchHandler.get(`/xrpc/app.packbase.feed.get?s=${packID}`).then(({ data }) => {
-            if (clearPosts) {
-                setPosts(data.posts)
-                setPostsCurrentPage(1)
-            } else {
-                setPosts([...posts, ...data.posts])
-                setPostsCurrentPage(postsCurrentPage + 1)
-            }
-            setPostsReady(true)
-            setPostsHasMore(data.hasMore)
-        })
+        vg.feed({ id: packID })
+            .get()
+            .then(({ data }) => {
+                if (clearPosts) {
+                    setPosts(data.posts)
+                    setPostsCurrentPage(1)
+                } else {
+                    setPosts([...posts, ...data.posts])
+                    setPostsCurrentPage(postsCurrentPage + 1)
+                }
+                setPostsReady(true)
+                setPostsHasMore(data.hasMore)
+            })
     }
 
     const LoadingCardSmall = () => {

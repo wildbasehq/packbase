@@ -11,7 +11,7 @@ const buttonVariants = cva(
             variant: {
                 default: 'bg-card text-default ring-default border !no-underline transition-all hover:bg-n-2/25 hover:ring-4 dark:hover:bg-n-6/50',
                 primary: 'bg-primary text-white hover:bg-primary/90',
-                destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+                destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/75 hover:ring-destructive/25',
                 outline: 'ring-default border !no-underline transition-all hover:bg-n-2/25 hover:ring-4 dark:hover:bg-n-6/50',
                 secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
                 grey: 'bg-card border hover:bg-zinc-900/5 dark:hover:bg-white/5',

@@ -8,7 +8,7 @@ import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
 import { Input } from '@/components/shared/input/text'
 import { Heading, Text } from '@/components/shared/text'
 import { LoadingCircle } from '@/components/shared/icons'
-import { FetchHandler } from '@/lib/api'
+import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
 import { useResourceStore } from '@/lib/states'
 
@@ -57,20 +57,20 @@ function CreateGroupSidebar() {
         if (submitting) return
         setSubmitting(true)
 
-        FetchHandler.post('/xrpc/app.packbase.pack.create', {
-            body: JSON.stringify({
+        vg.pack.create
+            .post({
                 display_name: event.currentTarget.display_name.value,
                 slug: event.currentTarget.slug.value,
                 description: event.currentTarget.description.value,
-            }),
-        }).then(({ data }) => {
-            if (data.message) {
-                // handle error
-                toast.error(`${data.name}: ${data.message}`)
-            }
-            setOnboardOpen(false)
-            setSubmitting(false)
-        })
+            })
+            .then(({ data }) => {
+                if (data.message) {
+                    // handle error
+                    toast.error(`${data.name}: ${data.message}`)
+                }
+                setOnboardOpen(false)
+                setSubmitting(false)
+            })
     }
 
     return (

@@ -11,7 +11,7 @@ import { PartyPopperIcon } from 'lucide-react'
 import { BentoStaffBadge } from '@/lib/utils/pak'
 import { Button } from '@/components/shared/ui/button'
 import { LoadingCircle } from '@/components/shared/icons'
-import { FetchHandler } from '@/lib/api'
+import { vg } from '@/lib/api'
 import dynamic from 'next/dynamic'
 
 const GuestLanding = dynamic(() => import('@/components/home/guestlanding'))
@@ -31,7 +31,8 @@ export default function Home({ params }: { params: { slug: string } }) {
     }, [user])
 
     useEffect(() => {
-        FetchHandler.get(`/xrpc/app.packbase.pack.get?id=${params.slug}`)
+        vg.pack({ id: params.slug })
+            .get()
             .then(({ data }) => {
                 if (!data || data.message) return setError('failed')
                 setLoading(false)

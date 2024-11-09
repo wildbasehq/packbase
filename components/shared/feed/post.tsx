@@ -11,7 +11,7 @@ import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
 import { useState } from 'react'
 import { LoadingCircle } from '@/components/shared/icons'
-import { FetchHandler } from '@/lib/api'
+import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
 import { useUserAccountStore } from '@/lib/states'
 import XMarkIcon from '@/components/shared/icons/dazzle/xmark'
@@ -115,13 +115,8 @@ function React({ post }: FeedPostType) {
         if (submitting) return
         setSubmitting(true)
 
-        const FetchAction = hasCurrentUser ? FetchHandler.delete : FetchHandler.post
-        FetchAction('/xrpc/app.packbase.howl.react', {
-            body: JSON.stringify({
-                id: post.id,
-                ...(!hasCurrentUser ? { slot: 0 } : {}),
-            }),
-        }).then(({ data }) => {
+        const howlReact = vg.howl({ id: post.id }).react
+        ;(hasCurrentUser ? howlReact.delete({ slot: 0 }) : howlReact.post({ slot: 0 })).then(({ data }) => {
             setSubmitting(false)
             if (data?.message) {
                 return toast.error(data.message ? `${data.at}: ${data.message}` : 'Something went wrong')

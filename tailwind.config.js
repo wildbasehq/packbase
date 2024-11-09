@@ -147,7 +147,7 @@ module.exports = {
                 banner: '3 / 1',
             },
             animation: {
-                logoHue: 'logoHue 1s ease-out, logoHue 30s ease-out 1s infinite',
+                logoHue: 'hue 1s ease-out, hue 30s ease-out 1s infinite',
                 // Hue rotate
                 hue: 'hue 1s ease-out',
                 // Shimmer
