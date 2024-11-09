@@ -4,7 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import ActiveLink from '../shared/activelink'
 import { ArrowUpRightIcon, LucideIcon, Sparkles } from 'lucide-react'
-import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
+import { useUIStore, useUserAccountStore } from '@/lib/states'
 import Tooltip from '@/components/shared/tooltip'
 import { Text } from '@/components/shared/text'
 import NewPost from '@/components/shared/user/new-post'
@@ -28,14 +28,9 @@ export declare interface SideNavType {
     children?: React.ReactNode
 }
 
-export const NGContentNavigatorTheming = {
-    main: [],
-}
-
 export function SideNav({ ...props }: SideNavType) {
     const { hidden, navigation } = useUIStore()
     const { user } = useUserAccountStore()
-    const { currentResource } = useResourceStore()
     const slimNavClass = props.slim ? 'w-20 items-center' : 'w-96'
 
     if (hidden) return <></>
@@ -47,7 +42,7 @@ export function SideNav({ ...props }: SideNavType) {
                     {navigation.length === 0 && (
                         <div className="load-stagger">
                             {Array.from({ length: 20 }).map((_, i) => (
-                                <div key={i} className="flex h-fit min-h-[4rem] items-center px-6">
+                                <div key={i} className="flex h-fit min-h-[4rem] items-center px-3">
                                     <div className="h-6 w-6 flex-shrink-0 rounded-lg bg-n-5" />
                                     <div
                                         className="my-4 ml-3 text-sm"
