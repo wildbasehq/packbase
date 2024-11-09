@@ -23,7 +23,7 @@ export default function PackSwitcher() {
         playbackRate: 0.3,
     })
 
-    const { currentResource, setCurrentResource, resources, setResources } = useResourceStore()
+    const { currentResource, setCurrentResource, resources } = useResourceStore()
     const { resourceDefault, loading, setLoading } = useUIStore()
     const router = useRouter()
 
@@ -59,8 +59,8 @@ export default function PackSwitcher() {
                             <TooltipContent>
                                 <Text>{item.display_name}</Text>
                             </TooltipContent>
-                            <div className="mt-1 grid grid-rows-2 divide-y border-t">
-                                <div className="flex flex-row justify-evenly [&>*]:py-1">
+                            <div className="mt-1 grid grid-rows-1 divide-y border-t">
+                                <div className="grid grid-cols-2 gap-2 divide-x px-2 [&>*:not(:first-child)]:pl-2 [&>*]:py-1">
                                     <Text alt>
                                         <ECGIcon className="-mt-0.5 inline-flex h-4 w-4" /> 12,420
                                     </Text>
