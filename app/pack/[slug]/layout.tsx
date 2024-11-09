@@ -34,7 +34,7 @@ export default function PackLayout({ children, params }: { children: React.React
             setError(null)
             const timeout = setTimeout(() => {
                 vg.pack({ id: slug })
-                    .get({ query: { scope: 'nav' } })
+                    .get({ query: { scope: 'exists' } })
                     .then((res) => {
                         setLoading(false)
 
