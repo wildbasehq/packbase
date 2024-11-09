@@ -9,8 +9,8 @@ import { ProjectSafeName } from '@/lib/utils'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
 import NavBar from '@/components/layout/navbar'
 import { SideNav } from '@/components/layout/sidenav'
-import ConnectionIssue from '@/components/modal/connection'
 import localFont from 'next/font/local'
+import ReportAbuse from '@/components/modal/report'
 
 const wildbaseRemix = localFont({
     src: [
@@ -88,9 +88,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     {/*</div>*/}
                 </Providers>
 
-                {/*<ReportAbuse/>*/}
+                <ReportAbuse />
 
-                <ConnectionIssue />
+                {/*<ConnectionIssue />*/}
 
                 <Analytics />
             </body>

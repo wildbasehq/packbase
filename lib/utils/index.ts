@@ -1,6 +1,5 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import ms from 'ms'
 
 /**
  * The name of the project. All Wildbase projects should have a name
@@ -15,11 +14,6 @@ import ms from 'ms'
 export const ProjectName = `Project Korat`
 export const ProjectSafeName = 'Packbase'
 export const ProjectDeps = ['scalebite', 'ypnyp', 'feral']
-
-export const timeAgo = (timestamp: Date, timeOnly?: boolean): string => {
-    if (!timestamp) return 'never'
-    return `${ms(Date.now() - new Date(timestamp).getTime())}${timeOnly ? '' : ' ago'}`
-}
 
 export async function fetcher<JSON = any>(input: RequestInfo, init?: RequestInit): Promise<JSON> {
     const res = await fetch(input, init)
