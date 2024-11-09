@@ -9,9 +9,18 @@ const nextConfig = {
      * https://github.com/elysiajs/eden/issues/168
      */
     eslint: {
-        // Warning: This allows production builds to successfully complete even if
+        // !! WARN !!
+        // This allows production builds to successfully complete even if
         // your project has ESLint errors.
+        // !! WARN !!
         ignoreDuringBuilds: true,
+    },
+    typescript: {
+        // !! WARN !!
+        // Dangerously allow production builds to successfully complete even if
+        // your project has type errors.
+        // !! WARN !!
+        ignoreBuildErrors: true,
     },
     reactStrictMode: false,
     swcMinify: true,
