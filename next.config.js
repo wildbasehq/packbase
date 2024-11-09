@@ -4,6 +4,15 @@ const nextBuildId = require('next-build-id')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    /**
+     * PLEASE REMOVE ME WHEN THIS CLOSES PLEASE GOD PLEASEEE UGHHH PLEASE DADDY PLEASE
+     * https://github.com/elysiajs/eden/issues/168
+     */
+    eslint: {
+        // Warning: This allows production builds to successfully complete even if
+        // your project has ESLint errors.
+        ignoreDuringBuilds: true,
+    },
     reactStrictMode: false,
     swcMinify: true,
     images: {
