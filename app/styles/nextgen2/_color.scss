@@ -3,10 +3,6 @@
   @apply text-neutral-700 dark:text-white;
 }
 
-.text-default-alt {
-  @apply text-n-5;
-}
-
 .border-default {
   @apply border-neutral-300 dark:border-neutral-800;
 }
@@ -44,15 +40,11 @@
 }
 
 .text-alt {
-  @apply text-n-5;
+  @apply text-n-4;
 }
 
 .fill-alt {
-  @apply fill-n-5/80;
-}
-
-.text-alt-2 {
-  @apply text-neutral-400;
+  @apply fill-n-4/80;
 }
 
 .text-tertiary {

@@ -1,16 +1,15 @@
-import './styles/globals.scss'
-import cx from 'classnames'
-import { inter, lexend } from './fonts'
-import { Providers } from '@/app/provider'
 import Preload from '@/app/preload'
-import dynamic from 'next/dynamic'
-import { Analytics } from '@vercel/analytics/react'
-import { ProjectSafeName } from '@/lib/utils'
-import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
+import { Providers } from '@/app/provider'
 import NavBar from '@/components/layout/navbar'
-import { SideNav } from '@/components/layout/sidenav'
+import { PackChannels } from '@/components/layout/pack-channels'
+import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
+import { ProjectSafeName } from '@/lib/utils'
+import { Analytics } from '@vercel/analytics/react'
+import cx from 'classnames'
+import dynamic from 'next/dynamic'
 import localFont from 'next/font/local'
-import ReportAbuse from '@/components/modal/report'
+import { inter, lexend } from './fonts'
+import './styles/globals.scss'
 
 const wildbaseRemix = localFont({
     src: [
@@ -42,7 +41,6 @@ export const metadata = {
         description: 'A furry site.',
     },
     metadataBase: new URL('https://ypnyp-dev-nextjs-ui.vercel.app/'),
-    themeColor: '#FFF',
 }
 
 const PostHogPageView = dynamic(() => import('./PostHogPageView'), {
@@ -62,7 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
                             <main className="flex h-[calc(100%-4rem)] flex-1 overflow-hidden">
                                 {/* If screen size is sm, set slim to true */}
-                                <SideNav slim={typeof window !== 'undefined' && window.innerWidth < 640} />
+                                <PackChannels slim={typeof window !== 'undefined' && window.innerWidth < 640} />
 
                                 <div className="h-full w-full">
                                     <div id="NGRoot" className="h-full overflow-y-auto">
@@ -88,9 +86,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     {/*</div>*/}
                 </Providers>
 
-                <ReportAbuse />
+                {/* <ReportAbuse /> */}
 
-                {/*<ConnectionIssue />*/}
+                {/* <ConnectionIssue /> */}
 
                 <Analytics />
             </body>

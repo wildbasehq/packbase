@@ -1,15 +1,15 @@
 'use client'
 
-import Image from 'next/image'
-import { LoadingDots } from '@/components/shared/icons'
-import { useEffect, useState } from 'react'
-import { ProjectSafeName } from '@/lib/utils'
-import { Heading } from '@/components/shared/text'
-import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
 import Body from '@/components/layout/body'
-import { HandRaisedIcon } from '@heroicons/react/20/solid'
+import { LoadingDots } from '@/components/shared/icons'
+import { Heading } from '@/components/shared/text'
 import { API_URL, setToken, vg } from '@/lib/api'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
 import { createClient } from '@/lib/supabase/client'
+import { ProjectSafeName } from '@/lib/utils'
+import { HandRaisedIcon } from '@heroicons/react/20/solid'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
 
 const supabase = createClient()
 export default function Preload({ children }: { children: React.ReactNode }) {
@@ -100,6 +100,7 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                                         alt="Animated pixel dog in box panting before falling over, then looping."
                                         height={32}
                                         width={38}
+                                        unoptimized
                                         style={{
                                             imageRendering: 'pixelated',
                                             display: 'inline-block',

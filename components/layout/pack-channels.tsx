@@ -1,13 +1,13 @@
 'use client'
-import './sidenav.component.css'
-import React from 'react'
-import Image from 'next/image'
-import ActiveLink from '../shared/activelink'
-import { ArrowUpRightIcon, LucideIcon, Sparkles } from 'lucide-react'
-import { useUIStore, useUserAccountStore } from '@/lib/states'
-import Tooltip from '@/components/shared/tooltip'
 import { Text } from '@/components/shared/text'
+import Tooltip from '@/components/shared/tooltip'
 import NewPost from '@/components/shared/user/new-post'
+import { useUIStore, useUserAccountStore } from '@/lib/states'
+import { ArrowUpRightIcon, LucideIcon, Sparkles } from 'lucide-react'
+import Image from 'next/image'
+import React from 'react'
+import ActiveLink from '../shared/active-link'
+import './sidenav.component.css'
 
 export declare interface SideNavItemType {
     name: string | JSX.Element
@@ -28,7 +28,7 @@ export declare interface SideNavType {
     children?: React.ReactNode
 }
 
-export function SideNav({ ...props }: SideNavType) {
+export function PackChannels({ ...props }: SideNavType) {
     const { hidden, navigation } = useUIStore()
     const { user } = useUserAccountStore()
     const slimNavClass = props.slim ? 'w-20 items-center' : 'w-96'
@@ -138,7 +138,7 @@ export function SideNav({ ...props }: SideNavType) {
 
                                     {typeof item.icon === 'string' && (
                                         <div className="-mt-0.5 h-6 w-6 flex-shrink-0">
-                                            <img
+                                            <Image
                                                 className={`h-6 w-6 ${item.description?.startsWith('@') ? 'rounded-full' : 'rounded-lg'}`}
                                                 src={item.icon}
                                                 alt={`Icon for ${item.name}`}

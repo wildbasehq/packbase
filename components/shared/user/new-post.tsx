@@ -81,9 +81,11 @@ export default function NewPost() {
 
     return (
         <>
-            <Button size="sm" variant="outline" className="w-full" onClick={() => setShowModal(true)}>
-                + Howl {!currentResource.standalone && `in ${currentResource.display_name}`}
-            </Button>
+            {!user.reqOnboard && (
+                <Button size="sm" variant="outline" className="w-full" onClick={() => setShowModal(true)}>
+                    + Howl {!currentResource.standalone && `in ${currentResource.display_name}`}
+                </Button>
+            )}
 
             <Modal showModal={showModal} setShowModal={setShowModal}>
                 <Card className="!px-0 !py-0">

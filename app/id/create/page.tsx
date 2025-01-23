@@ -82,7 +82,7 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
                         </p>
                         <p className="text-tertiary">
                             <br />
-                            If you've traded anything for an invite, whether it be an art trade (or any digital asset), or even money, you've been scammed.
+                            If you've traded anything for an invite, whether it be an art trade, or even money, you've been scammed.
                         </p>
                     </AlertDescription>
                 </Alert>
@@ -104,6 +104,7 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
                                 id="password"
                                 label="Password"
                                 type="password"
+                                placeholder="anything but a name"
                                 required
                             />
                             <Input
@@ -127,7 +128,7 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
                             variant="default"
                             type="submit"
                             disabled={submitting}
-                            className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
                             {!submitting ? 'Register' : <LoadingCircle />}
                         </Button>

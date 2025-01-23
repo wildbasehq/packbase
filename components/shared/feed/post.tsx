@@ -47,7 +47,7 @@ export default function FeedPost({ post }: FeedPostType) {
                         {howling && (
                             <div className="mb-6 flex items-center text-sm">
                                 <ArrowUpOnSquareIcon className="mr-2 h-4 w-4" />
-                                <Link href={`/@${actor?.username}/`} className="text-default-alt flex items-center">
+                                <Link href={`/@${actor?.username}/`} className="text-alt flex items-center">
                                     <UserAvatar size="xs" image={actor?.images?.avatar || ''} className="mr-2" />
                                     {actor?.username} rehowled
                                 </Link>

@@ -1,23 +1,29 @@
 'use client'
 
-import Link from 'next/link'
-import { Button } from '@/components/shared/ui/button'
-import { ScanFaceIcon } from 'lucide-react'
-import { ThemeToggle } from '@/components/shared/theme-toggle'
+import ResourceSwitcher from '@/components/layout/resource-switcher'
 import { Search } from '@/components/layout/search'
 import UserDropdown from '@/components/layout/user-dropdown'
-import { useUIStore, useUserAccountStore } from '@/lib/states'
-import UserAvatar from '@/components/shared/user/avatar'
-import ResourceSwitcher from '@/components/layout/resource-switcher'
 import { Dropdown, DropdownMenu } from '@/components/shared/dropdown'
+import { ThemeToggle } from '@/components/shared/theme-toggle'
+import { Button } from '@/components/shared/ui/button'
+import UserAvatar from '@/components/shared/user/avatar'
+import { useUIStore, useUserAccountStore } from '@/lib/states'
 import { MenuButton } from '@headlessui/react'
+import { ScanFaceIcon } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import UserOnboardingModal from '../modal/user-onboarding-modal'
 
 export default function NavBar() {
     const { user } = useUserAccountStore()
     const { loading } = useUIStore()
 
+    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(true)
+
     return (
         <>
+            {user && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]} />}
+
             <div className="bg-sidebar border-default sticky top-0 z-30 flex h-16 border-0 border-b border-solid shadow-sm">
                 <nav aria-label="Sections" className="hidden h-16 lg:flex lg:flex-col">
                     <div
@@ -46,10 +52,10 @@ export default function NavBar() {
                                 {user && (
                                     <Dropdown>
                                         <MenuButton>
-                                            <UserAvatar user={user} size="md" />
+                                            <UserAvatar user={user} size="md" className={`${user.reqOnboard && 'animate-pulse'}`} />
                                         </MenuButton>
                                         <DropdownMenu className="mt-4 !p-0">
-                                            <UserDropdown />
+                                            <UserDropdown showOnboardingModal={setShowOnboardingModal} />
                                         </DropdownMenu>
                                     </Dropdown>
                                 )}

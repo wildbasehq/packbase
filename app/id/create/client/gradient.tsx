@@ -1,15 +1,15 @@
-"use client";
+'use client'
 
-import { ShaderGradient, ShaderGradientCanvas } from "shadergradient";
+import { ShaderGradient, ShaderGradientCanvas } from 'shadergradient'
 
 export default function LoginGradient({ opacity, ...props }: any) {
     return (
         <ShaderGradientCanvas
             style={{
-                position: "absolute",
+                position: 'absolute',
                 top: 0,
                 opacity: opacity || 0.85,
-                pointerEvents: "none",
+                pointerEvents: 'none',
                 // backdropFilter: 'blur(1em)'
             }}
         >
@@ -45,5 +45,5 @@ export default function LoginGradient({ opacity, ...props }: any) {
                 {...props}
             />
         </ShaderGradientCanvas>
-    );
+    )
 }

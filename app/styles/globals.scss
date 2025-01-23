@@ -41,6 +41,7 @@
 
     --color-primary-ice-white: 245 246 252;
     --color-primary-cosmos: 88 40 245;
+    --color-primary-text-cosmos: var(--color-primary-cosmos);
     --color-primary-midnight: 20 20 26;
     --color-primary-lime: 206 255 28;
 
@@ -50,7 +51,7 @@
     --color-n-1: 237 239 247;
     --color-n-2: 211 214 224;
     --color-n-3: 188 191 204;
-    --color-n-4: 157 162 179;
+    --color-n-4: 164 169 187;
     --color-n-5: 110 113 128;
     --color-n-6: 64 66 77;
     --color-n-7: 30 30 36;
@@ -58,6 +59,8 @@
   }
 
   .dark {
+    --color-primary-text-cosmos: 190 155 255;
+
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 

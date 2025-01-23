@@ -196,7 +196,7 @@ export default function SettingsGeneral() {
                                         onChange={(e) => setAboutInput(e.target.value)}
                                     />
                                 </div>
-                                <p className="text-default-alt mt-3 select-none text-sm leading-6">
+                                <p className="text-alt mt-3 select-none text-sm leading-6">
                                     Write a few sentences about yourself.{' '}
                                     <a href="https://commonmark.org/help/" target="_blank" rel="noopener noreferrer" className="text-primary">
                                         Markdown <ArrowUpRightIcon className="inline h-4 w-4" />
@@ -212,7 +212,7 @@ export default function SettingsGeneral() {
                                 <input type="file" name="avatar" id="avatar" className="hidden" onChange={(e) => setProfilePicUpload(e.target.files?.[0] || undefined)} />
                                 <div className="mt-2 flex items-center gap-x-3">
                                     {!profilePicPreview ? (
-                                        <UserCircleIcon className="text-default-alt h-12 w-12" aria-hidden="true" />
+                                        <UserCircleIcon className="text-alt h-12 w-12" aria-hidden="true" />
                                     ) : (
                                         <Avatar icon={profilePicPreview} size="lg" />
                                     )}
@@ -220,7 +220,7 @@ export default function SettingsGeneral() {
                                         <div>Upload</div>
                                     </Button>
                                 </div>
-                                <p className="text-default-alt mt-3 select-none text-sm leading-6">
+                                <p className="text-alt mt-3 select-none text-sm leading-6">
                                     We don't resize your photo. Scroll up to the header to see how it will look.
                                 </p>
                             </div>
@@ -237,8 +237,8 @@ export default function SettingsGeneral() {
                                         <img src={coverPicPreview} alt="" className="absolute inset-0 h-full w-full rounded-lg object-cover opacity-50 blur-lg" />
                                     )}
                                     <div className="items-center justify-center text-center">
-                                        <PhotoIcon className="text-default-alt mx-auto h-12 w-12" aria-hidden="true" />
-                                        <div className="text-default-alt mt-4 flex select-none text-sm leading-6">
+                                        <PhotoIcon className="text-alt mx-auto h-12 w-12" aria-hidden="true" />
+                                        <div className="text-alt mt-4 flex select-none text-sm leading-6">
                                             <label
                                                 htmlFor="cover-photo"
                                                 className="relative rounded-md font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
@@ -247,7 +247,7 @@ export default function SettingsGeneral() {
                                             </label>
                                             <p className="pl-1">(drag and drop not supported)</p>
                                         </div>
-                                        <p className="text-default-alt select-none text-xs leading-5">PNG, JPG, GIF up to 10MB, Aspect Ratio 3 / 1</p>
+                                        <p className="text-alt select-none text-xs leading-5">PNG, JPG, GIF up to 10MB, Aspect Ratio 3 / 1</p>
                                     </div>
                                 </div>
                             </div>

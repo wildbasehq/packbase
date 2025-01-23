@@ -95,10 +95,11 @@ export const useResourceStore = create<ResourceStore>((set) => ({
 
 export const settingsResource = {
     id: 'settings',
-    name: 'Configure',
+    display_name: 'Configure',
     icon: '/svg/settings.svg',
     standalone: true,
 }
+
 /**
  * Resource UI store, not persistent
  */

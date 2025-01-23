@@ -1,5 +1,5 @@
 import LoginGradient from '@/app/id/create/client/gradient'
-import CrawlText from '@/components/shared/CrawlText'
+import CrawlText from '@/components/shared/crawl-text'
 import { Heading } from '@/components/shared/text'
 import { OctagonAlertIcon } from 'lucide-react'
 import Body from '../layout/body'
@@ -24,8 +24,8 @@ export default function GuestLanding() {
                     <div className="-z-10">
                         {/* @TODO: THIS IS CPU GPU & MEM EXPENSIVE!!!!1! */}
                         <LoginGradient
-                            // opacity={0.5}
-                            grainBlending={0.15}
+                            opacity={0.3}
+                            grainBlending={0.13}
                             cDistance={2.5}
                             positionX={0}
                             positionY={1}
@@ -38,7 +38,7 @@ export default function GuestLanding() {
                             color3="#FFFFFF"
                             cAzimuthAngle={0}
                             uSpeed={0.05}
-                            uStrength={2}
+                            uStrength={3}
                             enableTransition={false}
                         />
                     </div>
@@ -58,7 +58,8 @@ export default function GuestLanding() {
                                     </p>
                                     <CrawlText delay={700} fast>
                                         The internet doesn't have to be boring everywhere; Find your pack that shares that oddly specific interest, share it with everyone
-                                        in the Universe, or maybe just keep it to yourself. You control your feed and profile, your pack leader controls the view.
+                                        in the Universe, or maybe just keep it to yourself. ::break: ::break: While other sites are struggling to give you colour
+                                        customisation to your profile, we just gave you full HTML/CSS control.
                                     </CrawlText>
                                 </div>
                             </h2>

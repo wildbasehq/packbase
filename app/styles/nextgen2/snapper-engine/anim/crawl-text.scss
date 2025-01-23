@@ -5,76 +5,77 @@
 $snapper-crawl-text-cubic-bezier: cubic-bezier(0.87, 0, 0.04, 1);
 
 .snapanim-crawl {
-  &.u-rise {
-    display: inline-block;
-    transform: translateY(30%);
-    opacity: 0;
-    filter: blur(0.5px);
-  }
-
-  &.u-rise.risen {
-    animation: rise 0.3s $snapper-crawl-text-cubic-bezier 1 forwards;
-  }
-
-  // While it's possible to do this with @angular/animations, i just simply hate
-  // angular's animation stagger, like i don't like wishing death on some things,
-  // but...
-  &.child-rise {
-    @for $x from 1 through 50 {
-      &:nth-child(#{$x}) {
-        animation-delay: 100ms + (50 * $x);
-      }
+    &.u-rise {
+        display: inline-block;
+        transform: translateY(30%);
+        opacity: 0;
+        filter: blur(0.5px);
     }
-  }
 
-  &.child-rise-fast {
-    @for $x from 1 through 50 {
-      &:nth-child(#{$x}) {
-        animation-delay: 10ms + (15 * $x);
-      }
+    &.u-rise.risen {
+        animation: rise 0.3s $snapper-crawl-text-cubic-bezier 1 forwards;
     }
-  }
 
-  &.u-above {
-    position: relative;
-    z-index: 100;
-  }
+    // While it's possible to do this with @angular/animations, i just simply hate
+    // angular's animation stagger, like i don't like wishing death on some things,
+    // but...
+    &.child-rise {
+        @for $x from 1 through 100 {
+            &:nth-child(#{$x}) {
+                animation-delay: 100ms + (50 * $x);
+            }
+        }
+    }
 
-  &.u-noclip {
-    clip-path: unset !important;
-  }
+    &.child-rise-fast {
+        @for $x from 1 through 100 {
+            &:nth-child(#{$x}) {
+                animation-delay: 10ms + (15 * $x);
+            }
+        }
+    }
 
-  &.u-fix-margins::after, &.u-fix-margins::before {
-    clear: both;
-    content: '';
-    display: table;
-    margin-top: -1px;
-    height: 0;
-  }
+    &.u-above {
+        position: relative;
+        z-index: 100;
+    }
+
+    &.u-noclip {
+        clip-path: unset !important;
+    }
+
+    &.u-fix-margins::after,
+    &.u-fix-margins::before {
+        clear: both;
+        content: '';
+        display: table;
+        margin-top: -1px;
+        height: 0;
+    }
 }
 
 @keyframes rise {
-  0% {
-    opacity: 0.65;
-    transform: translateY(30%);
-    filter: blur(0.5px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0%);
-    filter: blur(0px);
-  }
+    0% {
+        opacity: 0.65;
+        transform: translateY(30%);
+        filter: blur(0.5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0%);
+        filter: blur(0px);
+    }
 }
 
 @keyframes sink {
-  0% {
-    opacity: 1;
-    transform: translateY(0%);
-    filter: blur(0px);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(30%);
-    filter: blur(2px);
-  }
+    0% {
+        opacity: 1;
+        transform: translateY(0%);
+        filter: blur(0px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(30%);
+        filter: blur(2px);
+    }
 }

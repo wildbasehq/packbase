@@ -2,11 +2,11 @@
 
 import UserAvatar from '@/components/shared/user/avatar'
 // @ts-ignore
-import * as HoverCard from '@radix-ui/react-hover-card'
-import { Link } from '@/components/shared/link'
-import { BentoStaffBadge } from '@/lib/utils/pak'
-import Image from 'next/image'
+import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
+import { BentoStaffBadge } from '@/lib/utils/pak'
+import * as HoverCard from '@radix-ui/react-hover-card'
+import Image from 'next/image'
 
 export default function UserInfoCol({
     user,
@@ -51,9 +51,7 @@ export default function UserInfoCol({
                             <div>
                                 <div className="text-md">
                                     {user.display_name || user.username}
-                                    {user.type && (
-                                        <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />
-                                    )}
+                                    {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />}
                                 </div>
                                 <div className="text-alt text-sm">@{user.username}</div>
                             </div>

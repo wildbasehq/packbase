@@ -1,47 +1,69 @@
 'use client'
 
-import { FormEvent, Fragment, useEffect, useState } from 'react'
-import { Button } from '@/components/shared/ui/button'
-import { Description, Dialog, DialogTitle, Label, Radio, RadioGroup, Transition, TransitionChild } from '@headlessui/react'
-import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
-import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
+import Body from '@/components/layout/body'
+import { CTA, CTABody, CTASideImage } from '@/components/shared/cta'
+import { LoadingCircle } from '@/components/shared/icons'
 import { Input } from '@/components/shared/input/text'
 import { Heading, Text } from '@/components/shared/text'
-import { LoadingCircle } from '@/components/shared/icons'
+import { Button } from '@/components/shared/ui/button'
 import { vg } from '@/lib/api'
-import { toast } from '@/lib/toast'
 import { useResourceStore } from '@/lib/states'
+import { toast } from '@/lib/toast'
+import { Description, Dialog, DialogTitle, Label, Radio, RadioGroup, Transition, TransitionChild } from '@headlessui/react'
+import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
+import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import { FormEvent, Fragment, useEffect, useState } from 'react'
 
 export default function PackAdd() {
     const { setCurrentResource } = useResourceStore()
 
     useEffect(() => {
-        setCurrentResource({ id: 'new', slug: 'new', display_name: 'Create a Pack' })
+        setCurrentResource({ id: 'new', slug: 'new', display_name: 'Create a Pack', standalone: true })
     }, [])
 
     return (
-        <>
-            woops hey look a button
-            <CreateGroupSidebar />
-        </>
+        <div className="divide-default grid grid-cols-1 space-y-12 divide-y pb-48">
+            <Body noPadding>
+                <CTA>
+                    <CTABody>
+                        <Heading>A pack for your pack~</Heading>
+                        <p className="text-alt text-sm">
+                            They're groups of people like you, who share the same interests. There's no limit to how many you can join, and they appear in your home feed,
+                            so go wild!
+                        </p>
+                        <div className="flex flex-col space-y-4">
+                            <CreateGroupSidebar />
+                        </div>
+                    </CTABody>
+
+                    <CTASideImage src="/img/illustrations/settings/friends.svg" alt="" />
+                </CTA>
+            </Body>
+
+            <div className="flex flex-col space-y-12 px-4 pt-12 sm:px-6 lg:px-12">{/*<SearchablePackList />*/}</div>
+        </div>
     )
 }
 
 const postPrivacy = [
     {
+        id: 'everyone',
         name: 'Public',
         desc: 'Everyone in the world can see this',
     },
     {
+        id: 'followers',
         name: 'Followers Only',
         desc: 'Only your followers can see this',
         warn: 'Your friends are counted as followers',
     },
     {
+        id: 'friends',
         name: 'Friends Only',
         desc: 'Only your friends can see this',
     },
     {
+        id: 'private',
         name: 'Private',
         desc: 'Just for you and people you invite',
     },
@@ -62,6 +84,7 @@ function CreateGroupSidebar() {
                 display_name: event.currentTarget.display_name.value,
                 slug: event.currentTarget.slug.value,
                 description: event.currentTarget.description.value,
+                privacy: selected.id,
             })
             .then(({ data, error }) => {
                 if (error) {
@@ -72,6 +95,7 @@ function CreateGroupSidebar() {
 
                 setOnboardOpen(false)
                 setSubmitting(false)
+                window.location.href = `/p/${data.slug}`
             })
     }
 
@@ -130,10 +154,10 @@ function CreateGroupSidebar() {
                                                     <Text alt>
                                                         Making edits to critical components that directly affect public perception (i.e. name, tagline, etc.) and some UI
                                                         changes costs "trinkets", a meaningless currency your pack can earn monthly.{' '}
-                                                        <span className="text-destructive/90">
-                                                            Changing the @slug later resets all data, including posts, and users will receive a notification re-confirming
-                                                            if they want to stay.
-                                                        </span>
+                                                        {/*<span className="text-destructive/90">*/}
+                                                        {/*    Changing the @slug later resets all data, including posts, and users will receive a notification re-confirming*/}
+                                                        {/*    if they want to stay.*/}
+                                                        {/*</span>*/}
                                                     </Text>
                                                 </div>
                                             </div>
@@ -197,7 +221,7 @@ function CreateGroupSidebar() {
                                                                                                     <Label
                                                                                                         as="p"
                                                                                                         className={`font-medium  ${
-                                                                                                            checked ? 'text-default' : 'text-default-alt'
+                                                                                                            checked ? 'text-default' : 'text-alt'
                                                                                                         }`}
                                                                                                     >
                                                                                                         {privacyOption.name}
@@ -206,7 +230,7 @@ function CreateGroupSidebar() {
                                                                                                         <span>{privacyOption.desc}</span>{' '}
                                                                                                         {privacyOption.warn && (
                                                                                                             <p className="inline-flex items-center">
-                                                                                                                <QuestionMarkCircleIcon className="text-default-alt h-4 w-4" />
+                                                                                                                <QuestionMarkCircleIcon className="text-alt h-4 w-4" />
                                                                                                                 <span className="ml-1">{privacyOption.warn}</span>
                                                                                                             </p>
                                                                                                         )}

@@ -64,11 +64,11 @@ export default function WaitlistCheck() {
                     <CurrentServiceIcon className={cn('h-7 w-7 flex-none rounded-md p-1', ServiceStates[serviceStatus].color || '')} />
                     <h1 className="flex gap-x-3 text-base leading-7">
                         <span className="text-default font-semibold">Status</span>
-                        <span className="text-default-alt">:</span>
+                        <span className="text-alt">:</span>
                         <span className="text-default font-semibold">{ServiceStates[serviceStatus].status}</span>
                     </h1>
                 </div>
-                <p className="text-default-alt mt-2 text-xs leading-6">{ServiceStates[serviceStatus].text}</p>
+                <p className="text-alt mt-2 text-xs leading-6">{ServiceStates[serviceStatus].text}</p>
             </div>
 
             {location !== '/' && (

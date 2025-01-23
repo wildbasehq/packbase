@@ -1,5 +1,5 @@
-import { Heading } from '@/components/shared/text'
 import Markdown from '@/components/shared/markdown'
+import { Heading } from '@/components/shared/text'
 import { Button } from '@/components/shared/ui/button'
 import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
@@ -52,6 +52,7 @@ export default function PackHeader({ ...props }: any) {
 }
 
 function PackMembershipButton({ pack }: { pack: any }) {
+    console.log(pack)
     const packJoin = () => {
         vg.pack({ id: pack.id })
             .join.post()
@@ -71,5 +72,9 @@ function PackMembershipButton({ pack }: { pack: any }) {
             </Button>
         )
     }
-    return <>'I DONT KNOW WHAT TO RETURN'</>
+    return (
+        <Button size="sm" disabled>
+            - Leave
+        </Button>
+    )
 }

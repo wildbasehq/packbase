@@ -15,6 +15,9 @@ module.exports = {
             },
         },
         extend: {
+            textColor: {
+                primary: 'rgb(var(--color-primary-text-cosmos) / <alpha-value>)',
+            },
             colors: {
                 // border: "hsl(var(--border))",
                 input: 'hsl(var(--input))',
@@ -165,10 +168,21 @@ module.exports = {
                 'slide-down-fade-snapper': 'slide-down-fade 0.3s cubic-bezier(0, 1.25, 0, 1)',
                 // Charm
                 'magic-sparkle': 'magic-sparkle 1.5s forwards',
+                'god-rays': 'god-rays var(--duration) cubic-bezier(0.15, 0, 0.85, 1) infinite alternate',
                 'accordion-down': 'accordion-down 0.2s ease-out',
                 'accordion-up': 'accordion-up 0.2s ease-out',
+                'gradient-move-x': 'gradient-move-x 2s linear infinite reverse',
             },
             keyframes: {
+                // Move gradient seamlessly
+                'gradient-move-x': {
+                    '0%': {
+                        backgroundPositionX: '0%',
+                    },
+                    '100%': {
+                        backgroundPositionX: '150%',
+                    },
+                },
                 hue: {
                     '0%': { filter: 'hue-rotate(0deg)' },
                     '100%': { filter: 'hue-rotate(360deg)' },
@@ -230,6 +244,16 @@ module.exports = {
                     '0%': { opacity: 0, transform: 'translateY(-6px)' },
                     '100%': { opacity: 1, transform: 'translateY(0)' },
                 },
+
+                'accordion-down': {
+                    from: { height: '0' },
+                    to: { height: 'var(--radix-accordion-content-height)' },
+                },
+                'accordion-up': {
+                    from: { height: 'var(--radix-accordion-content-height)' },
+                    to: { height: '0' },
+                },
+
                 // Charm
                 'magic-sparkle': {
                     '0%': {
@@ -242,13 +266,13 @@ module.exports = {
                         transform: 'scale(0)',
                     },
                 },
-                'accordion-down': {
-                    from: { height: '0' },
-                    to: { height: 'var(--radix-accordion-content-height)' },
-                },
-                'accordion-up': {
-                    from: { height: 'var(--radix-accordion-content-height)' },
-                    to: { height: '0' },
+                'god-rays': {
+                    from: {
+                        transform: 'translateX(0)',
+                    },
+                    to: {
+                        transform: 'translateX(-50%)',
+                    },
                 },
             },
         },

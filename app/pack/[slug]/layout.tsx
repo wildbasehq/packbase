@@ -1,14 +1,14 @@
 'use client'
+import Body from '@/components/layout/body'
 import { LoadingDots } from '@/components/shared/icons'
+import { Heading } from '@/components/shared/text'
 import { vg } from '@/lib/api'
 import { useResourceStore, useUIStore } from '@/lib/states'
-import { useEffect, useState } from 'react'
+import { ProjectName, ProjectSafeName } from '@/lib/utils'
 import { FaceFrownIcon, HomeIcon } from '@heroicons/react/24/solid'
 import { OrbitIcon } from 'lucide-react'
-import Body from '@/components/layout/body'
-import { Heading } from '@/components/shared/text'
 import Image from 'next/image'
-import { ProjectName, ProjectSafeName } from '@/lib/utils'
+import { useEffect, useState } from 'react'
 
 export default function PackLayout({ children, params }: { children: React.ReactNode; params: { slug: string } }) {
     const { resourceDefault, loading, setLoading, setNavigation } = useUIStore()
@@ -67,7 +67,7 @@ export default function PackLayout({ children, params }: { children: React.React
                             }
                         }
                     })
-                    .catch((e) => {
+                    .catch((e: any) => {
                         setNavigation([
                             {
                                 name: 'Back to the Universe',
@@ -97,6 +97,7 @@ export default function PackLayout({ children, params }: { children: React.React
                                     alt="Animated pixel dog in box panting before falling over, then looping."
                                     height={32}
                                     width={38}
+                                    unoptimized
                                     style={{
                                         imageRendering: 'pixelated',
                                         display: 'inline-block',

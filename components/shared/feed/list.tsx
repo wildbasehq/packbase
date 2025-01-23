@@ -1,21 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import Image from 'next/image'
-import InfiniteScroll from 'react-infinite-scroll-component'
-import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
-import { Heading, Text } from '@/components/shared/text'
 import GridBody from '@/components/layout/grid-body'
-import { HelpCircleIcon, LayoutDashboard, MegaphoneIcon } from 'lucide-react'
+import Card from '@/components/shared/card'
+import FeedPost from '@/components/shared/feed/post'
 import WireframeGrid from '@/components/shared/icons/wireframe-grid'
 import WireframeList from '@/components/shared/icons/wireframe-list'
-import Card from '@/components/shared/card'
-import { useUISettingsStore } from '@/lib/states'
-import UserAvatar from '@/components/shared/user/avatar'
-import FeedPost from '@/components/shared/feed/post'
-import { vg } from '@/lib/api'
-import SelectMenu from '@/components/shared/input/select'
+import SelectMenu from '@/components/shared/input/select-dropdown'
+import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/ui/button'
+import UserAvatar from '@/components/shared/user/avatar'
+import { vg } from '@/lib/api'
+import { useUISettingsStore } from '@/lib/states'
+import { HelpCircleIcon, MegaphoneIcon } from 'lucide-react'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 
 export default function FeedList({ packID = '00000000-0000-0000-0000-000000000000' }: { packID?: string }) {
     const feedID = 'EVERYTHING0'
@@ -26,7 +26,7 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
     const [changingView, setChangingView] = useState<boolean>(false)
     const [masonryColumns, setMasonryColumns] = useState<{
         [key: number]: number
-    }>({ 750: 1, 900: 2, 1460: 4 })
+    }>({ 350: 1 })
 
     const FeedViewConfig = useUISettingsStore((state) => state.feedView)
 
@@ -83,6 +83,7 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                         alt="Animated pixel dog in box panting before falling over, then looping."
                         height={128}
                         width={168}
+                        unoptimized
                         style={{
                             imageRendering: 'pixelated',
                             display: 'inline-block',
@@ -112,13 +113,13 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
 
             {postsReady && (
                 <>
-                    <div className="mb-4 flex items-center justify-between">
-                        feed {packID}/{feedID} &mdash; {posts.length} posts &mdash; {postsHasMore ? 'has more' : 'no more'}
-                        <Button className="items-center" onClick={() => setChangingView(true)}>
-                            <LayoutDashboard className="mr-1 h-6 w-6" />
-                            Change view
-                        </Button>
-                    </div>
+                    {/*<div className="mb-4 flex items-center justify-between">*/}
+                    {/*    feed {packID}/{feedID} &mdash; {posts.length} posts &mdash; {postsHasMore ? 'has more' : 'no more'}*/}
+                    {/*    <Button className="items-center" onClick={() => setChangingView(true)}>*/}
+                    {/*        <LayoutDashboard className="mr-1 h-6 w-6" />*/}
+                    {/*        Change view*/}
+                    {/*    </Button>*/}
+                    {/*</div>*/}
 
                     {changingView && (
                         <Card
@@ -260,6 +261,7 @@ export function LoadingCard({
                         alt="Animated pixel dog in box panting before falling over, then looping."
                         height={128}
                         width={168}
+                        unoptimized
                         style={{
                             imageRendering: 'pixelated',
                             display: 'inline-block',

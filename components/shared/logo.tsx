@@ -17,6 +17,7 @@ export const Logo = ({ ...props }) => {
     // const color500 = colors['blue']['400']
     // @ts-ignore
     // const color600 = colors['blue']['500']
+    delete props.noColorTheme
     return (
         // <svg width="27" viewBox="0 0 27 22" aria-hidden="true" {...props}>
         //     <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">

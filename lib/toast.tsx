@@ -54,6 +54,6 @@ export const toast = {
         // })
         // errorPlay(audio)
 
-        return SonnerToast.success(arguments)
+        return SonnerToast.error(arguments)
     },
 }

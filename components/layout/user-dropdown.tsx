@@ -1,21 +1,22 @@
 'use client'
 
-import { MinusCircleIcon, MoonIcon } from '@heroicons/react/24/solid'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { useUserAccountStore } from '@/lib/states'
-import LogoutIcon from '@/components/shared/icons/logout'
-import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
-import { Heading, Text } from '@/components/shared/text'
 import { Dropdown, DropdownDescription, DropdownHeader, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/shared/dropdown'
-import { MenuButton } from '@headlessui/react'
-import UserAvatar from '@/components/shared/user/avatar'
-import { SettingsIcon } from 'lucide-react'
-import { Button } from '@/components/shared/ui/button'
+import LogoutIcon from '@/components/shared/icons/logout'
+import { Heading, Text } from '@/components/shared/text'
 import Tooltip from '@/components/shared/tooltip'
+import { Button } from '@/components/shared/ui/button'
+import UserAvatar from '@/components/shared/user/avatar'
+import { useUserAccountStore } from '@/lib/states'
+import { createClient } from '@/lib/supabase/client'
 import { ProjectName, ProjectSafeName } from '@/lib/utils'
+import { MenuButton } from '@headlessui/react'
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { MinusCircleIcon, MoonIcon } from '@heroicons/react/24/solid'
+import { SettingsIcon } from 'lucide-react'
+import Link from 'next/link'
+import { Dispatch, SetStateAction } from 'react'
 
-export default function UserDropdown() {
+export default function UserDropdown({ showOnboardingModal }: { showOnboardingModal: Dispatch<SetStateAction<boolean>> | (() => void) }) {
     const { user, setUser } = useUserAccountStore()
 
     const StatusOptions = [
@@ -52,10 +53,10 @@ export default function UserDropdown() {
     return (
         <DropdownHeader className="flex w-96 flex-col !p-0">
             <div className="h-fit w-full rounded-bl rounded-br bg-white/50 shadow dark:bg-n-6/50">
-                {user.reqOnboard && (
-                    <div className="border-b p-2">
-                        <Link
-                            href="/settings"
+                <div className="border-b p-2">
+                    {user.reqOnboard && (
+                        <div
+                            onClick={() => showOnboardingModal(true)}
                             className="ring-default flex flex-col justify-center rounded px-4 py-4 !no-underline transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"
                         >
                             <Heading size="sm">Finish your space</Heading>
@@ -63,25 +64,26 @@ export default function UserDropdown() {
                                 For your privacy, no one can find you and your profile is non-existent until you make it.
                                 <p className="mt-2">Click to get started!</p>
                             </Text>
-                        </Link>
-                    </div>
-                )}
-                <div className="border-b p-2">
-                    <Link href={`/@${user.username}`} className="!no-underline">
-                        <div className="ring-default flex items-center rounded px-4 py-4 transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50">
-                            <UserAvatar user={user} size="lg" />
-                            <div className="ml-3 grow">
-                                <Heading>{user.display_name || user.username}</Heading>
-                                <Text alt>{user.username}</Text>
-                            </div>
-                            <Link href="/settings">
-                                {/* mt-1 to offset button */}
-                                <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer">
-                                    <SettingsIcon className="h-5 w-5" />
-                                </Button>
-                            </Link>
                         </div>
-                    </Link>
+                    )}
+
+                    {!user.reqOnboard && (
+                        <Link href={`/@${user.username}`} className="!no-underline">
+                            <div className="ring-default flex items-center rounded px-4 py-4 transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50">
+                                <UserAvatar user={user} size="lg" />
+                                <div className="ml-3 grow">
+                                    <Heading>{user.display_name || user.username}</Heading>
+                                    <Text alt>{user.username}</Text>
+                                </div>
+                                <Link href="/settings">
+                                    {/* mt-1 to offset button */}
+                                    <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer">
+                                        <SettingsIcon className="h-5 w-5" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        </Link>
+                    )}
                 </div>
 
                 <Dropdown>
