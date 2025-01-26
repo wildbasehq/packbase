@@ -348,7 +348,7 @@ const steps: {
                                 {
                                     id: 'none',
                                     name: 'Wildbase (Us)',
-                                    desc: '1GB hard storage on us.',
+                                    desc: '1GB storage on us. Not sure what to pick? This is the best option.',
                                 },
                                 {
                                     id: 'pixeldrain',
@@ -356,15 +356,20 @@ const steps: {
                                     desc: 'However much you have on your Pixeldrain account',
                                 },
                                 {
-                                    id: 'sftp',
-                                    name: 'Secure File Transfer Protocol (SFTP)',
-                                    desc: "A high performance server recommended, as we don't cache your data this way.",
+                                    id: 'none',
+                                    name: 'More soon!',
+                                    disabled: true,
                                 },
-                                {
-                                    id: 'supabase',
-                                    name: 'Supabase',
-                                    desc: 'Used internally, but extremely overkill compared to other options.',
-                                },
+                                // {
+                                //     id: 'sftp',
+                                //     name: 'Secure File Transfer Protocol (SFTP)',
+                                //     desc: "A high performance server recommended, as we don't cache your data this way.",
+                                // },
+                                // {
+                                //     id: 'supabase',
+                                //     name: 'Supabase',
+                                //     desc: 'Used internally, but extremely overkill compared to other options.',
+                                // },
                             ]}
                         />
                         <Text alt size="sm">
@@ -418,7 +423,10 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
         const formData = new FormData(event.target as HTMLFormElement)
         const newStep = currentStep + 1
 
-        if (currentStep === steps.length - 1) return setShowOnboardingModal(false)
+        if (currentStep === steps.length - 1) {
+            vg.dipswitch.post({ dpk: 'uod', dpv: '' })
+            return setShowOnboardingModal(false)
+        }
 
         if (steps[currentStep].func) {
             setSubmitting(true)
