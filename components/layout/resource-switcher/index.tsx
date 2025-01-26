@@ -1,23 +1,24 @@
 'use client'
 
-import './resource-switcher.component.scss'
+import { ExpandingArrow, LoadingCircle } from '@/components/shared/icons'
+import { Logo } from '@/components/shared/logo'
 import { Text } from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 import useComponentVisible from '@/lib/hooks/use-component-visible'
-import useSound from 'use-sound'
-import { PlayFunction } from 'use-sound/dist/types'
 import { useResourceStore, useUIStore } from '@/lib/states'
 import { useEffect, useState } from 'react'
-import { ExpandingArrow, LoadingCircle } from '@/components/shared/icons'
-import { Logo } from '@/components/shared/logo'
+import useSound from 'use-sound'
+import { PlayFunction } from 'use-sound/dist/types'
+import './resource-switcher.component.scss'
 
 export default function ResourceSwitcher() {
+    const hoverCancelSFX = '/sounds/switch-hover-s.ogg'
     // sound refs
-    const [cancelSound] = useSound('/sounds/switch-hover-s.ogg', {
+    const [cancelSound] = useSound(hoverCancelSFX, {
         volume: 0.35,
         playbackRate: 0.25,
     })
-    const [hoverSound] = useSound('/sounds/switch-hover-s.ogg', {
+    const [hoverSound] = useSound(hoverCancelSFX, {
         volume: 0.25,
         playbackRate: 0.5,
         interrupt: true,
