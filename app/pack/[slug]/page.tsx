@@ -1,10 +1,10 @@
 'use client'
-import { useUIStore, useUserAccountStore } from '@/lib/states'
-import { useEffect, useState } from 'react'
 import FeedList from '@/components/shared/feed/list'
 import { LoadingCircle } from '@/components/shared/icons'
 import { vg } from '@/lib/api'
+import { useUIStore, useUserAccountStore } from '@/lib/states'
 import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
 
 const GuestLanding = dynamic(() => import('@/components/home/guestlanding'))
 const PackHeader = dynamic(() => import('@/components/shared/pack/header'))
@@ -26,12 +26,16 @@ export default function Home({ params }: { params: { slug: string } }) {
         vg.pack({ id: params.slug })
             .get()
             .then(({ data }) => {
-                if (!data || data.message) return setError('failed')
+                if (!data || data.message) {
+                    setLoading(false)
+                    return setError('failed')
+                }
                 setLoading(false)
                 setPack(data)
             })
             .catch((e) => {
                 setError(e)
+                setLoading(false)
             })
     }, [])
 
@@ -47,7 +51,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
             {!loading && (
                 <>
-                    {pack?.slug !== 'universe' && <PackHeader pack={pack} />}
+                    {pack && pack?.slug !== 'universe' && <PackHeader pack={pack} />}
 
                     {user && (
                         <div className="p-8">
