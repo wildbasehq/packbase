@@ -35,11 +35,13 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                             .then(async ({ data }) => {
                                 setServiceLoading('auth:@me:packs')
                                 const packs = (await vg.user.me.packs.get()).data || []
+                                const dipswitch = (await vg.dipswitch.get()).data || []
                                 let userBuild = {
                                     id: user.id,
                                     username: data?.username || user.email,
                                     display_name: data?.display_name || user.email,
                                     reqOnboard: !data || !data?.username,
+                                    dp: dipswitch,
                                     ...data,
                                 }
 
