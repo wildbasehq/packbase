@@ -26,8 +26,6 @@ export const setToken = (token?: string) => {
     }).vg
 }
 
-// KILLING MYSELF
-
 const FETCH_BASE = async (url: string, options: RequestInit = {}) => {
     const headers = new Headers({
         'Content-Type': 'application/json',

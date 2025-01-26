@@ -1,15 +1,15 @@
 'use client'
-import Link from 'next/link'
-import { Button } from '@/components/shared/ui/button'
-import { Heading, Text } from '@/components/shared/text'
-import { ProjectSafeName } from '@/lib/utils'
-import { Input } from '@/components/shared/input/text'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
-import { MailQuestion } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
-import { FormEvent, useState } from 'react'
-import { Logo } from '@/components/shared/logo'
 import { LoadingCircle } from '@/components/shared/icons'
+import { Input } from '@/components/shared/input/text'
+import { Logo } from '@/components/shared/logo'
+import { Heading, Text } from '@/components/shared/text'
+import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
+import { Button } from '@/components/shared/ui/button'
+import { createClient } from '@/lib/supabase/client'
+import { ProjectSafeName } from '@/lib/utils'
+import { MailQuestion } from 'lucide-react'
+import Link from 'next/link'
+import { FormEvent, useState } from 'react'
 
 export default function IDCreate({ searchParams }: { searchParams: { error_description: string; error: string } }) {
     const [submitting, setSubmitting] = useState(false)
@@ -34,7 +34,7 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
             if (r.error) {
                 window.location.href = `/id/create?error=Serverland Error&error_description=${r.error.toString()}`
             } else {
-                window.location.href = '/settings'
+                window.location.href = '/'
             }
         })
     }
