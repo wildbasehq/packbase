@@ -11,14 +11,18 @@ import { useUIStore, useUserAccountStore } from '@/lib/states'
 import { MenuButton } from '@headlessui/react'
 import { ScanFaceIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import UserOnboardingModal from '../modal/user-onboarding-modal'
 
 export default function NavBar() {
     const { user } = useUserAccountStore()
     const { loading } = useUIStore()
 
-    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(true)
+    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false)
+
+    useEffect(() => {
+        setShowOnboardingModal(!user?.dp.uod)
+    }, [user])
 
     return (
         <>
