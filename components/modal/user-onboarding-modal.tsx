@@ -167,14 +167,14 @@ const steps: {
                     username,
                     slug,
                 })
-                .then(({ data }) => {
-                    if (data && !data.message) {
+                .then(({ data, error }) => {
+                    if (data && !error) {
                         toast.success('Profile updated')
                         setUser({ ...user, username, slug })
                         callback()
                     } else {
                         setSubmitting(false)
-                        toast.error("Couldn't save: " + (data.message ? `${data.at}: ${data.message}` : 'Something went wrong'))
+                        toast.error("Couldn't save: " + (error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'))
                     }
                 })
                 .catch((err) => {
@@ -230,14 +230,14 @@ const steps: {
                 .post({
                     space_type,
                 })
-                .then(({ data }) => {
-                    if (data && !data.message) {
+                .then(({ data, error }) => {
+                    if (data && !error) {
                         toast.success('Profile updated')
                         setUser({ ...user, space_type })
                         callback()
                     } else {
                         setSubmitting(false)
-                        toast.error("Couldn't save: " + (data.message ? `${data.at}: ${data.message}` : 'Something went wrong'))
+                        toast.error("Couldn't save: " + (error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'))
                     }
                 })
                 .catch((err) => {
@@ -307,14 +307,14 @@ const steps: {
                 .post({
                     post_privacy,
                 })
-                .then(({ data }) => {
-                    if (data && !data.message) {
+                .then(({ data, error }) => {
+                    if (data && !error) {
                         toast.success('Profile updated')
                         setUser({ ...user, post_privacy })
                         callback()
                     } else {
                         setSubmitting(false)
-                        toast.error("Couldn't save: " + (data.message ? `${data.at}: ${data.message}` : 'Something went wrong'))
+                        toast.error("Couldn't save: " + (error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'))
                     }
                 })
                 .catch((err) => {

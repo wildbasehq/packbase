@@ -61,10 +61,10 @@ export default function NewPost() {
     const uploadPost = (post: any) => {
         vg.howl.create
             .post(post)
-            .then(({ data }) => {
-                if (data?.message) {
+            .then(({ data, error }) => {
+                if (error) {
                     setSubmitting(false)
-                    return toast.error(data.message ? `${data.at}: ${data.message}` : 'Something went wrong')
+                    return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 } else {
                     toast.success('created!')
 

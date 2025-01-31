@@ -116,10 +116,10 @@ function React({ post }: FeedPostType) {
         setSubmitting(true)
 
         const howlReact = vg.howl({ id: post.id }).react
-        ;(hasCurrentUser ? howlReact.delete({ slot: 0 }) : howlReact.post({ slot: 0 })).then(({ data }) => {
+        ;(hasCurrentUser ? howlReact.delete({ slot: 0 }) : howlReact.post({ slot: 0 })).then(({ data, error }) => {
             setSubmitting(false)
-            if (data?.message) {
-                return toast.error(data.message ? `${data.at}: ${data.message}` : 'Something went wrong')
+            if (error) {
+                return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
             } else {
                 if (!post.reactions)
                     post.reactions = {

@@ -56,8 +56,8 @@ function PackMembershipButton({ pack }: { pack: any }) {
     const packJoin = () => {
         vg.pack({ id: pack.id })
             .join.post()
-            .then(({ data }) => {
-                if (data?.message || data?.at) return toast.error(data.message)
+            .then(({ error }) => {
+                if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 return toast.success('Joined!')
             })
             .catch((e) => {

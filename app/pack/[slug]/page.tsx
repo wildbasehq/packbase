@@ -26,7 +26,7 @@ export default function Home({ params }: { params: { slug: string } }) {
         vg.pack({ id: params.slug })
             .get()
             .then(({ data }) => {
-                if (!data || data.message) {
+                if (!data || data?.message) {
                     setLoading(false)
                     return setError('failed')
                 }

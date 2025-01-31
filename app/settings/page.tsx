@@ -69,13 +69,13 @@ export default function SettingsGeneral() {
                     header: coverPicPreview,
                 },
             })
-            .then(({ data }) => {
-                if (data && !data.message) {
+            .then(({ data, error }) => {
+                if (data && !error) {
                     toast.success('Profile updated')
                     window.location.reload()
                 } else {
                     setSubmitting(false)
-                    toast.error("Couldn't save: " + (data.message ? `${data.at}: ${data.message}` : 'Something went wrong'))
+                    toast.error("Couldn't save: " + (error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'))
                 }
             })
             .catch((err) => {
