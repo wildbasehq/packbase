@@ -1,6 +1,6 @@
 import UserAvatar from '@/components/shared/user/avatar'
 import Link from 'next/link'
-import { Heading, Text } from '@/components/shared/text'
+import { Text } from '@/components/shared/text'
 import { DotIcon } from 'lucide-react'
 import { Button } from '@/components/shared/ui/button'
 import { LoadingCircle } from '@/components/shared/icons'
@@ -10,9 +10,9 @@ import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
 import { useResourceStore, useUserAccountStore } from '@/lib/states'
 import { Editor } from '@/components/novel'
-import { LinkIcon } from '@heroicons/react/24/solid'
+import { ExclamationTriangleIcon, LinkIcon } from '@heroicons/react/24/solid'
 import Modal from '@/components/modal'
-import { Alert } from '@/components/shared/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
 
 export default function NewPost() {
     const { user } = useUserAccountStore()
@@ -89,11 +89,14 @@ export default function NewPost() {
 
             <Modal showModal={showModal} setShowModal={setShowModal}>
                 <Card className="!px-0 !py-0">
-                    <Alert>
-                        <Heading>This needs touch up. Whatever.</Heading>
+                    <Alert className="!rounded-none !border-0">
+                        <AlertTitle>
+                            <ExclamationTriangleIcon className="inline-flex h-5 w-5" /> Prototype
+                        </AlertTitle>
+                        <AlertDescription>HowlCreator isn't done, far from it. It'll change a lot, break a lot, maybe even scream a lot.</AlertDescription>
                     </Alert>
                     <form onSubmit={submitPost}>
-                        <div className="relative">
+                        <div className="relative border-t">
                             <div className="px-4 pt-5 sm:px-6">
                                 <div className="flex space-x-3">
                                     <div className="flex-shrink-0">
