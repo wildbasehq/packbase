@@ -53,10 +53,10 @@ export default function FeedPost({ post }: FeedPostType) {
                                 </Link>
                             </div>
                         )}
-                        {pack && (
+                        {pack && pack.slug !== 'universe' && (
                             <div className="mb-6 flex items-center text-sm">
                                 {/* <UserGroupIcon className="mr-2 h-4 w-4" /> */}
-                                <Link href={`/pack/@${pack?.domain}/`} className="text-alt flex items-center justify-center !no-underline hover:text-inherit">
+                                <Link href={`/p/${pack?.slug}/`} className="text-alt flex items-center justify-center !no-underline hover:text-inherit">
                                     <UserAvatar size="xs" icon={pack?.avatar || ''} className="mr-2 rounded-sm" />
                                     <span>{pack?.display_name}</span>
                                 </Link>
