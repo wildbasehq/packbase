@@ -14,7 +14,7 @@ import { ExclamationTriangleIcon, LinkIcon } from '@heroicons/react/24/solid'
 import Modal from '@/components/modal'
 import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
 
-export default function NewPost() {
+export default function HowlCreator() {
     const { user } = useUserAccountStore()
     const { currentResource } = useResourceStore()
     const [submitting, setSubmitting] = useState<boolean>(false)
@@ -59,6 +59,7 @@ export default function NewPost() {
     }
 
     const uploadPost = (post: any) => {
+        post.to = currentResource.id
         vg.howl.create
             .post(post)
             .then(({ data, error }) => {

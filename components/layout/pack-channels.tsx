@@ -1,7 +1,7 @@
 'use client'
 import { Text } from '@/components/shared/text'
 import Tooltip from '@/components/shared/tooltip'
-import NewPost from '@/components/shared/user/new-post'
+import HowlCreator from '@/components/shared/user/howl-creator'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
 import { ArrowUpRightIcon, LucideIcon, Sparkles } from 'lucide-react'
 import Image from 'next/image'
@@ -38,7 +38,7 @@ export function PackChannels({ ...props }: SideNavType) {
         <>
             <nav aria-label="Sections" className={`${slimNavClass} bg-sidebar hidden h-screen flex-shrink-0 overflow-y-auto border-r md:flex md:flex-col`}>
                 <div className="no-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-visible p-6">
-                    {user && <NewPost />}
+                    {user && <HowlCreator />}
                     {navigation.length === 0 && (
                         <div className="load-stagger">
                             {Array.from({ length: 20 }).map((_, i) => (
