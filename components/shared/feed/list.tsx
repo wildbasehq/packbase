@@ -16,9 +16,13 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
+import { toast } from '@/lib/toast'
+import { HandRaisedIcon } from '@heroicons/react/20/solid'
+import { ProjectSafeName } from '@/lib/utils'
 
 export default function FeedList({ packID = '00000000-0000-0000-0000-000000000000' }: { packID?: string }) {
     const feedID = 'EVERYTHING0'
+    const [error, setError] = useState<Error | null>(null)
     const [postsReady, setPostsReady] = useState<boolean>(false)
     const [postsHasMore, setPostsHasMore] = useState<boolean>(false)
     const [postsCurrentPage, setPostsCurrentPage] = useState<number>(1)
@@ -61,7 +65,15 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
     const fetchPosts = (feed: string = '', clearPosts = false) => {
         vg.feed({ id: packID })
             .get()
-            .then(({ data }) => {
+            .then(({ data, error }) => {
+                if (error) {
+                    console.error(data) // @TODO: This returns [object Object] no matter what? Why?
+                    setPosts([])
+                    toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+                    setError(new Error(error.status))
+                    return
+                }
+
                 if (clearPosts) {
                     setPosts(data.posts)
                     setPostsCurrentPage(1)
@@ -69,6 +81,7 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                     setPosts([...posts, ...data.posts])
                     setPostsCurrentPage(postsCurrentPage + 1)
                 }
+
                 setPostsReady(true)
                 setPostsHasMore(data.hasMore)
             })
@@ -96,6 +109,20 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                     </Text>
                 </Card>
             </GridBody>
+        )
+    }
+
+    if (error) {
+        return (
+            <>
+                <Heading className="items-center">
+                    <HandRaisedIcon className="text-default mr-1 inline-block h-6 w-6" />
+                    {ProjectSafeName} can't continue
+                </Heading>
+                <p className="text-alt mt-1 text-sm leading-6">
+                    {(error.cause as string) || 'Something went wrong'}: {error.message || error.stack}
+                </p>
+            </>
         )
     }
 

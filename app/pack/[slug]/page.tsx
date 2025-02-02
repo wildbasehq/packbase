@@ -55,7 +55,7 @@ export default function Home({ params }: { params: { slug: string } }) {
 
                     {user && (
                         <div className="p-8">
-                            <FeedList packID={params.slug} />
+                            <FeedList packID={pack.id} />
                         </div>
                     )}
                 </>
