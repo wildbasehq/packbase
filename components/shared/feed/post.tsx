@@ -13,7 +13,7 @@ import { useState } from 'react'
 import { LoadingCircle } from '@/components/shared/icons'
 import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
-import { useUserAccountStore } from '@/lib/states'
+import { useUIStore, useUserAccountStore } from '@/lib/states'
 import XMarkIcon from '@/components/shared/icons/dazzle/xmark'
 import Markdown from '@/components/shared/markdown'
 import { HandThumbUpIcon } from '@heroicons/react/20/solid'
@@ -29,6 +29,12 @@ export declare interface FeedPostDataType {
     reactions?: {
         [x: string]: string[]
     }
+    assets?: {
+        type: string
+        data: {
+            [x: string]: any
+        }
+    }[]
 }
 
 export declare interface FeedPostType {
@@ -36,7 +42,7 @@ export declare interface FeedPostType {
 }
 
 export default function FeedPost({ post }: FeedPostType) {
-    const { id, user, body, created_at, pack, howling, actor } = post
+    const { id, user, body, created_at, pack, howling, actor, assets } = post
 
     return (
         <>
@@ -73,10 +79,7 @@ export default function FeedPost({ post }: FeedPostType) {
                         </div>
 
                         {/* Post Objects (Images) */}
-                        {/*{postContent?.objects && postContent.objects.length > 0 && (*/}
-                        {/*    <MediaGrid objects={postContent.objects} selectState={[selectedMedia, setSelectedMedia]}*/}
-                        {/*               post={postContent} truncate/>*/}
-                        {/*)}*/}
+                        {assets && assets.length > 0 && <MediaGrid assets={assets} post={post} truncate />}
                     </div>
                     {/* <div className="bg-box-alt absolute bottom-0 left-0 ml-4 rounded-tl-xl rounded-tr-xl border-x border-b-0 border-t border-solid border-neutral-300 dark:border-neutral-700 sm:ml-6">
                         <div className="flex items-center space-x-2 px-4 py-2">
@@ -169,9 +172,9 @@ function React({ post }: FeedPostType) {
 }
 
 function MediaGrid({ ...props }: any) {
-    const { objects, truncate } = props
-    const [, setSelectedMedia] = props.selectState
+    const { assets, truncate } = props
 
+    const bucketRoot = useUIStore((state) => state.bucketRoot)
     // IMPORTANT!
     /*
      *      (()__(()
@@ -193,21 +196,28 @@ function MediaGrid({ ...props }: any) {
 
     return (
         <div className="mt-4">
-            <div className={objects.length > 1 ? 'flex flex-col' : ''}>
+            <div className={assets.length > 1 ? 'flex flex-col' : ''}>
                 <div className="aspect-w-10 aspect-h-7 rounded-default block w-full overflow-hidden">
                     {/* @todo: CLEANNNN */}
-                    {objects[0]?.id?.split(':')[1].substring(2, 4) === 'C1' && <img src={objects[0].url} alt="" className="aspect-w-10 aspect-h-7 w-full object-cover" />}
+                    {assets[0].type === 'image' && (
+                        <img src={`${bucketRoot}/profiles/${assets[0].data.url}`} alt="" className="aspect-w-10 aspect-h-7 w-full rounded object-cover" />
+                    )}
 
-                    {objects[0]?.id?.split(':')[1].substring(2, 4) === 'C2' && <video src={objects[0].url} className="aspect-w-10 aspect-h-7 object-cover" controls />}
+                    {assets[0].type === 'video' && (
+                        <video src={`${bucketRoot}/profiles/${assets[0].data.url}`} className="aspect-w-10 aspect-h-7 rounded object-cover" controls />
+                    )}
                 </div>
 
-                {objects.length >= 2 && (
-                    <div className={`mt-2 grid ${objects.length >= 2 ? 'grid-cols-3' : ''} gap-2`}>
-                        {objects.slice(1).map(
+                {assets.length >= 2 && (
+                    <div className={`mt-2 grid ${assets.length >= 2 ? 'grid-cols-3' : ''} gap-2`}>
+                        {assets.slice(1).map(
                             (
                                 object: {
-                                    url: string | undefined
-                                    id: string
+                                    type: string
+                                    data: {
+                                        url: string
+                                        name: string
+                                    }
                                 },
                                 objectIndex: number,
                             ) => {
@@ -215,12 +225,7 @@ function MediaGrid({ ...props }: any) {
                                     return (
                                         <div key={objectIndex} className="rounded-default w-full overflow-hidden">
                                             <div className="relative aspect-square">
-                                                <img
-                                                    src={object.url}
-                                                    alt=""
-                                                    className="aspect-square h-full w-full object-cover"
-                                                    onClick={/* @ts-ignore */ () => setSelectedMedia(object)}
-                                                />
+                                                <img src={`${bucketRoot}/profiles/${object.data.url}`} alt="" className="aspect-square h-full w-full object-cover" />
 
                                                 {/* @ts-ignore - postContent.objects is very obviously defined :| */}
                                                 {objects.length > 4 && (
@@ -237,16 +242,11 @@ function MediaGrid({ ...props }: any) {
 
                                 if (truncate && objectIndex >= 3) return null
                                 // Check E2 for object variant
-                                switch (object.id.split(':')[1].substring(2, 4)) {
-                                    case 'C1':
+                                switch (object.type) {
+                                    case 'image':
                                         return (
                                             <div key={objectIndex} className={`rounded-default aspect-square w-full overflow-hidden`}>
-                                                <img
-                                                    src={object.url}
-                                                    alt=""
-                                                    className="aspect-square h-full w-full object-cover"
-                                                    onClick={/* @ts-ignore */ () => setSelectedMedia(object)}
-                                                />
+                                                <img src={`${bucketRoot}/profiles/${object.data.url}`} alt="" className="aspect-square h-full w-full object-cover" />
                                             </div>
                                         )
                                 }
