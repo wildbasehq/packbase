@@ -16,14 +16,15 @@ export default function Preload({ children }: { children: React.ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`polling ${API_URL}`)
     const [error, setError] = useState<any | null>(null)
     const { setUser } = useUserAccountStore()
-    const { setLoading, setConnecting } = useUIStore()
+    const { setLoading, setConnecting, setBucketRoot } = useUIStore()
     const { setResources } = useResourceStore()
 
     useEffect(() => {
         if (!serviceLoading.startsWith('polling')) return
         vg.server.describeServer
             .get()
-            .then((_) => {
+            .then((server) => {
+                setBucketRoot(server.data.bucketRoot)
                 setServiceLoading('auth')
                 // @ts-ignore
                 supabase.auth.getUser().then(async ({ data: { user } }) => {

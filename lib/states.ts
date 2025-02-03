@@ -114,10 +114,12 @@ interface ResourceUIStore {
     loading: boolean
     connecting: boolean
     navigation: any[]
+    bucketRoot: string
     setHidden: (hidden: boolean) => void
     setLoading: (loading: boolean) => void
     setConnecting: (connecting: boolean) => void
     setNavigation: (navigation: any) => void
+    setBucketRoot: (bucketRoot: string) => void
 }
 
 export const useUIStore = create<ResourceUIStore>((set) => ({
@@ -126,6 +128,7 @@ export const useUIStore = create<ResourceUIStore>((set) => ({
     loading: true,
     connecting: true,
     navigation: [],
+    bucketRoot: '',
     setHidden: (hidden) =>
         set((state) => ({
             ...state,
@@ -145,5 +148,10 @@ export const useUIStore = create<ResourceUIStore>((set) => ({
         set((state) => ({
             ...state,
             navigation,
+        })),
+    setBucketRoot: (bucketRoot: string) =>
+        set((state) => ({
+            ...state,
+            bucketRoot,
         })),
 }))
