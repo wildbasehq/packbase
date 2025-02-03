@@ -32,42 +32,13 @@ export default function PackLayout({ children, params }: { children: React.React
         if (slug) {
             setLoading(true)
             setError(null)
-            const timeout = setTimeout(() => {
-                vg.pack({ id: slug })
-                    .get({ query: { scope: 'exists' } })
-                    .then((res) => {
-                        setLoading(false)
+            vg.pack({ id: slug })
+                .get({ query: { scope: 'exists' } })
+                .then((res) => {
+                    setLoading(false)
 
-                        if (res.status === 404) {
-                            setError({ cause: 404, message: 'Not Found' })
-                            setNavigation([
-                                {
-                                    name: 'Back to the Universe',
-                                    description: '',
-                                    href: '/p/universe',
-                                    icon: OrbitIcon,
-                                },
-                            ])
-                        } else {
-                            setNavigation([
-                                {
-                                    name: 'Home',
-                                    description: '',
-                                    href: `/p/${slug}`,
-                                    icon: HomeIcon,
-                                },
-                            ])
-
-                            const resource = tempResources.find((r) => r.id === res.data.id)
-                            if (!resource && slug !== 'universe') {
-                                res.data.temporary = true
-                                tempResources.push(res.data)
-                                setResources(tempResources)
-                                if (currentResource.slug !== slug) setCurrentResource(res.data)
-                            }
-                        }
-                    })
-                    .catch((e: any) => {
+                    if (res.status === 404) {
+                        setError({ cause: 404, message: 'Not Found' })
                         setNavigation([
                             {
                                 name: 'Back to the Universe',
@@ -76,12 +47,37 @@ export default function PackLayout({ children, params }: { children: React.React
                                 icon: OrbitIcon,
                             },
                         ])
-                        setError(e)
-                        setLoading(false)
-                    })
-            }, 500)
+                    } else {
+                        setNavigation([
+                            {
+                                name: 'Home',
+                                description: '',
+                                href: `/p/${slug}`,
+                                icon: HomeIcon,
+                            },
+                        ])
 
-            return () => clearTimeout(timeout)
+                        const resource = tempResources.find((r) => r.id === res.data.id)
+                        if (!resource && slug !== 'universe') {
+                            res.data.temporary = true
+                            tempResources.push(res.data)
+                            setResources(tempResources)
+                            if (currentResource.slug !== slug) setCurrentResource(res.data)
+                        }
+                    }
+                })
+                .catch((e: any) => {
+                    setNavigation([
+                        {
+                            name: 'Back to the Universe',
+                            description: '',
+                            href: '/p/universe',
+                            icon: OrbitIcon,
+                        },
+                    ])
+                    setError(e)
+                    setLoading(false)
+                })
         }
     }, [slug])
 
