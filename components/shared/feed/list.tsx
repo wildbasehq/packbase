@@ -221,7 +221,7 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                                         </Card>
 
                                         {posts.map((post: any, i: number) => (
-                                            <FeedListItem key={post.id} post={post} gridTutorialID={changingView ? i : undefined} />
+                                            <FeedListItem key={post.id} post={post} gridTutorialID={changingView ? i : undefined} postState={[posts, setPosts]} />
                                         ))}
                                     </Masonry>
                                 </ResponsiveMasonry>
@@ -315,7 +315,7 @@ export function LoadingCard({
     )
 }
 
-function FeedListItem({ post, gridTutorialID }: { post: any; gridTutorialID?: number }) {
+function FeedListItem({ post, gridTutorialID, postState }: { post: any; gridTutorialID?: number; postState: [any, any] }) {
     if (gridTutorialID !== undefined) {
         return (
             <Card
@@ -341,7 +341,9 @@ function FeedListItem({ post, gridTutorialID }: { post: any; gridTutorialID?: nu
             <FeedPost
                 key={post.id}
                 post={post}
-                // onDelete={() => posts = posts.filter((p: any) => p.id !== post.id)}
+                onDelete={() => {
+                    postState[1]((posts: any) => posts.filter((p: any) => p.id !== post.id))
+                }}
             ></FeedPost>
         )
     }

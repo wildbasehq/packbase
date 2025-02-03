@@ -2,7 +2,7 @@
  * Forgive me, this is fucking horrible.
  */
 
-import { ArrowUpOnSquareIcon } from '@heroicons/react/24/solid'
+import { ArrowUpOnSquareIcon, TrashIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import UserAvatar from '@/components/shared/user/avatar'
 import { UserProfileBasic } from '@/lib/defs/user'
@@ -16,7 +16,9 @@ import { toast } from '@/lib/toast'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
 import XMarkIcon from '@/components/shared/icons/dazzle/xmark'
 import Markdown from '@/components/shared/markdown'
-import { HandThumbUpIcon } from '@heroicons/react/20/solid'
+import { EllipsisHorizontalIcon, HandThumbUpIcon } from '@heroicons/react/20/solid'
+import { MenuButton } from '@headlessui/react'
+import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/shared/dropdown'
 
 export declare interface FeedPostDataType {
     id: string
@@ -39,10 +41,24 @@ export declare interface FeedPostDataType {
 
 export declare interface FeedPostType {
     post: FeedPostDataType
+    onDelete?: () => void
 }
 
-export default function FeedPost({ post }: FeedPostType) {
+export default function FeedPost({ post, onDelete }: FeedPostType) {
     const { id, user, body, created_at, pack, howling, actor, assets } = post
+
+    const deletePost = () => {
+        vg.howl({ id })
+            .delete()
+            .then(({ data, error }) => {
+                if (error) {
+                    return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+                } else {
+                    onDelete && onDelete()
+                    return toast.error('Post deleted.')
+                }
+            })
+    }
 
     return (
         <>
@@ -69,8 +85,28 @@ export default function FeedPost({ post }: FeedPostType) {
                             </div>
                         )}
                         <div className="flex space-x-3">
-                            <UserInfoCol user={user} tag={<time dateTime={created_at}>about {moment(created_at).fromNow()}</time>} />
-                            <div className="flex flex-shrink-0 space-x-2 self-center"></div>
+                            <div className="flex-1">
+                                <UserInfoCol user={user} tag={<time dateTime={created_at}>about {moment(created_at).fromNow()}</time>} />
+                            </div>
+                            <div className="flex flex-shrink-0 space-x-2 self-center">
+                                {user && user.id === useUserAccountStore.getState().user.id && (
+                                    <Dropdown>
+                                        <MenuButton>
+                                            <EllipsisHorizontalIcon className="w-5" />
+                                        </MenuButton>
+                                        <DropdownMenu className="mt-4 !w-36 !p-0">
+                                            <DropdownItem onClick={deletePost}>
+                                                <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1">
+                                                    <div className="h-6 w-6 items-center justify-center p-0.5">
+                                                        <TrashIcon className="h-full w-full fill-tertiary transition-colors" />
+                                                    </div>
+                                                    <span className="text-sm">Delete</span>
+                                                </DropdownLabel>
+                                            </DropdownItem>
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <div className="min-h-fit w-full cursor-pointer px-4 py-4 sm:px-6">
