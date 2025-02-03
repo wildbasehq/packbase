@@ -56,11 +56,14 @@ export default function UserInfoCol({
                                 <div className="text-alt text-sm">@{user.username}</div>
                             </div>
                             <Markdown className="text-sm">{user.about?.bio}</Markdown>
-                            <div className="flex gap-4">
-                                <div className="flex gap-1">
-                                    <div className="text-sm font-medium">-1</div> <div className="text-sm">Mutuals</div>
+                            {user.mutuals && (
+                                <div className="flex gap-4">
+                                    <div className="flex gap-1">
+                                        <div className="text-sm font-medium">{user.mutuals}</div>
+                                        <div className="text-sm">Mutuals</div>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
 
