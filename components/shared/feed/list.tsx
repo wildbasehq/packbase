@@ -8,10 +8,9 @@ import WireframeList from '@/components/shared/icons/wireframe-list'
 import SelectMenu from '@/components/shared/input/select-dropdown'
 import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/ui/button'
-import UserAvatar from '@/components/shared/user/avatar'
 import { vg } from '@/lib/api'
 import { useUISettingsStore } from '@/lib/states'
-import { HelpCircleIcon, MegaphoneIcon } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -199,26 +198,26 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                                 <ResponsiveMasonry columnsCountBreakPoints={masonryColumns}>
                                     {/* @ts-ignore */}
                                     <Masonry className="list-stagger" gutter="24px">
-                                        <Card>
-                                            <Heading size="xs" className="mb-1 flex items-center">
-                                                <MegaphoneIcon className="mr-2 inline-block h-5 w-5" />
-                                                <span>PACK ANNOUNCEMENT</span>
-                                            </Heading>
-                                            <Text size="sm">🎉 thx for testing pookies. Go wild!</Text>
-                                            <Text className="mt-2 flex items-center justify-end">
-                                                <UserAvatar
-                                                    user={{
-                                                        username: 'rek',
-                                                        images: {
-                                                            avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/3e133370-0ec2-4825-b546-77de3804c8b1/0/avatar.jpeg',
-                                                        },
-                                                    }}
-                                                    size="sm"
-                                                    className="mr-1"
-                                                />
-                                                Rek
-                                            </Text>
-                                        </Card>
+                                        {/*<Card>*/}
+                                        {/*    <Heading size="xs" className="mb-1 flex items-center">*/}
+                                        {/*        <MegaphoneIcon className="mr-2 inline-block h-5 w-5" />*/}
+                                        {/*        <span>PACK ANNOUNCEMENT</span>*/}
+                                        {/*    </Heading>*/}
+                                        {/*    <Text size="sm">🎉 thx for testing pookies. Go wild!</Text>*/}
+                                        {/*    <Text className="mt-2 flex items-center justify-end">*/}
+                                        {/*        <UserAvatar*/}
+                                        {/*            user={{*/}
+                                        {/*                username: 'rek',*/}
+                                        {/*                images: {*/}
+                                        {/*                    avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/3e133370-0ec2-4825-b546-77de3804c8b1/0/avatar.jpeg',*/}
+                                        {/*                },*/}
+                                        {/*            }}*/}
+                                        {/*            size="sm"*/}
+                                        {/*            className="mr-1"*/}
+                                        {/*        />*/}
+                                        {/*        Rek*/}
+                                        {/*    </Text>*/}
+                                        {/*</Card>*/}
 
                                         {posts.map((post: any, i: number) => (
                                             <FeedListItem key={post.id} post={post} gridTutorialID={changingView ? i : undefined} postState={[posts, setPosts]} />
