@@ -148,6 +148,7 @@ export const useUIStore = create<ResourceUIStore>((set) => ({
         set((state) => ({
             ...state,
             navigation,
+            hidden: false,
         })),
     setBucketRoot: (bucketRoot: string) =>
         set((state) => ({
