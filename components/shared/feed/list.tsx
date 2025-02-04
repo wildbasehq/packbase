@@ -187,11 +187,9 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                                 hasMore={postsHasMore}
                                 loader={<LoadingCardSmall />}
                                 endMessage={
-                                    <p className="text-center text-sm text-neutral-500">
+                                    <Text alt className="text-center">
                                         And just like that, you've reached the end of it all.
-                                        <br />
-                                        <span className="font-bold">No more posts to show.</span>
-                                    </p>
+                                    </Text>
                                 }
                             >
                                 {/* @ts-ignore */}
