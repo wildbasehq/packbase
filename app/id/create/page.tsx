@@ -13,6 +13,7 @@ import { FormEvent, useState } from 'react'
 
 export default function IDCreate({ searchParams }: { searchParams: { error_description: string; error: string } }) {
     const [submitting, setSubmitting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
     switch (searchParams?.error_description) {
         case 'The resource owner or authorization server denied the request': {
             searchParams.error_description = 'Login cancelled'
@@ -32,7 +33,7 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
         const supabase = createClient()
         supabase.auth.signUp(user).then((r) => {
             if (r.error) {
-                window.location.href = `/id/create?error=Serverland Error&error_description=${r.error.toString()}`
+                setError(r.error.toString())
             } else {
                 window.location.href = '/'
             }
@@ -64,10 +65,10 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
                     </div>
                 )}
 
-                {searchParams?.error_description && (
+                {error && (
                     <Alert variant="destructive">
-                        <AlertTitle>{searchParams.error}</AlertTitle>
-                        <AlertDescription>{searchParams.error_description}</AlertDescription>
+                        <AlertTitle>Sign up failed!</AlertTitle>
+                        <AlertDescription>{error.indexOf('server denied the request') > -1 ? 'cancelled!' : error}</AlertDescription>
                     </Alert>
                 )}
 

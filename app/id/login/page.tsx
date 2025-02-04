@@ -21,6 +21,7 @@ export default function IDLogin({
 }) {
     const { user } = useUserAccountStore()
     const [submitting, setSubmitting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
     switch (searchParams?.error_description) {
         case 'The resource owner or authorization server denied the request': {
             searchParams.error_description = 'Login cancelled'
@@ -44,14 +45,15 @@ export default function IDLogin({
             .signInWithPassword(user)
             .then((r) => {
                 if (r.error) {
-                    window.location.href = `/id/login?error=Serverland Error&error_description=${r.error.toString()}`
+                    setSubmitting(false)
+                    setError(r.error.toString())
                 } else {
                     window.location.href = searchParams?.redirect || '/'
                 }
             })
             .catch((e) => {
                 setSubmitting(false)
-                window.location.href = `/id/login?error=Serverland Error&error_description=${e.toString()}`
+                setError(e.toString())
             })
     }
 
@@ -71,10 +73,10 @@ export default function IDLogin({
             </div>
 
             <div className="mt-8 space-y-8">
-                {searchParams?.error_description && (
+                {error && (
                     <Alert variant="destructive">
-                        <AlertTitle>{searchParams.error}</AlertTitle>
-                        <AlertDescription>{searchParams.error_description}</AlertDescription>
+                        <AlertTitle>Login failed!</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
                     </Alert>
                 )}
                 <form method="POST" className="space-y-6" onSubmit={loginUser}>
