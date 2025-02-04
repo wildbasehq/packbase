@@ -235,7 +235,7 @@ function MediaGrid({ ...props }: any) {
     return (
         <div className="mt-4">
             <div className={assets.length > 1 ? 'flex flex-col' : ''}>
-                <div className="aspect-w-10 aspect-h-7 rounded-default block w-full overflow-hidden">
+                <div className="aspect-w-10 aspect-h-7 block w-full overflow-hidden rounded">
                     {/* @todo: CLEANNNN */}
                     {assets[0].type === 'image' && (
                         <img src={`${bucketRoot}/profiles/${assets[0].data.url}`} alt="" className="aspect-w-10 aspect-h-7 w-full rounded object-cover" />
@@ -261,14 +261,14 @@ function MediaGrid({ ...props }: any) {
                             ) => {
                                 if (truncate && objectIndex === 2)
                                     return (
-                                        <div key={objectIndex} className="rounded-default w-full overflow-hidden">
+                                        <div key={objectIndex} className="w-full overflow-hidden rounded">
                                             <div className="relative aspect-square">
                                                 <img src={`${bucketRoot}/profiles/${object.data.url}`} alt="" className="aspect-square h-full w-full object-cover" />
 
                                                 {/* @ts-ignore - postContent.objects is very obviously defined :| */}
                                                 {objects.length > 4 && (
                                                     <div className="absolute right-0 top-0 mr-2 mt-2 flex items-center justify-center">
-                                                        <div className="bg-box rounded-default p-2">
+                                                        <div className="bg-box rounded p-2">
                                                             {/* @ts-ignore - for fuck sake. */}
                                                             <span className="text-defualt-alt text-sm">+{objects.length - 4}</span>
                                                         </div>
@@ -283,7 +283,7 @@ function MediaGrid({ ...props }: any) {
                                 switch (object.type) {
                                     case 'image':
                                         return (
-                                            <div key={objectIndex} className={`rounded-default aspect-square w-full overflow-hidden`}>
+                                            <div key={objectIndex} className={`aspect-square w-full overflow-hidden rounded`}>
                                                 <img src={`${bucketRoot}/profiles/${object.data.url}`} alt="" className="aspect-square h-full w-full object-cover" />
                                             </div>
                                         )
