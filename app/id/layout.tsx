@@ -1,7 +1,17 @@
+'use client'
+
 import LoginGradient from '@/app/id/create/client/gradient'
 import IDArtistShowcase from './artist-showcase'
+import { useUIStore } from '@/lib/states'
+import { ReactNode, useEffect } from 'react'
 
-export default function IDLayout({ children }: { children: React.ReactNode }) {
+export default function IDLayout({ children }: { children: ReactNode }) {
+    const { setHidden } = useUIStore()
+
+    useEffect(() => {
+        setHidden(true)
+    }, [])
+
     return (
         <>
             {/* test */}
