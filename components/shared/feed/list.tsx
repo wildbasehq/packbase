@@ -187,7 +187,7 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                                 hasMore={postsHasMore}
                                 loader={<LoadingCardSmall />}
                                 endMessage={
-                                    <Text alt className="text-center">
+                                    <Text alt className="pt-8 text-center">
                                         And just like that, you've reached the end of it all.
                                     </Text>
                                 }
