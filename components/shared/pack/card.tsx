@@ -32,7 +32,7 @@ export default function PackCard({ pack }) {
                         <div className="flex flex-grow flex-row items-center space-x-2 border-t">
                             <div className="flex flex-col px-4 py-2">
                                 <p className="text-default text-sm">Members</p>
-                                <p className="text-default-alt text-sm">1</p>
+                                <p className="text-default-alt text-sm">{pack.statistics?.members}</p>
                             </div>
                         </div>
                     </div>
