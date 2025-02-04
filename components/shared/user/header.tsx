@@ -1,6 +1,7 @@
 import { Heading } from '@/components/shared/text'
 import Markdown from '@/components/shared/markdown'
 import UserAvatar from '@/components/shared/user/avatar'
+import Image from 'next/image'
 
 // @TODO: Unify user and pack headers.
 export default function ProfileHeader({ ...props }: any) {
@@ -9,9 +10,11 @@ export default function ProfileHeader({ ...props }: any) {
     return (
         <div className="relative">
             <div>
-                <img
+                <Image
+                    height={1080}
+                    width={1920}
                     className="pointer-events-none aspect-banner w-full rounded-bl rounded-br object-cover"
-                    src={profile.images?.header + `?v=${new Date().getTime()}` || '/img/background/generic-generated.png'}
+                    src={(profile.images?.header || '/img/background/generic-generated.png') + `?v=${new Date().getTime()}`}
                     alt="Profile cover"
                 />
             </div>
