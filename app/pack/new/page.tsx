@@ -7,7 +7,7 @@ import { Input } from '@/components/shared/input/text'
 import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/ui/button'
 import { vg } from '@/lib/api'
-import { useResourceStore } from '@/lib/states'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
 import { toast } from '@/lib/toast'
 import { Description, Dialog, DialogTitle, Label, Radio, RadioGroup, Transition, TransitionChild } from '@headlessui/react'
 import { BarsArrowUpIcon, ChevronDownIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
@@ -17,29 +17,34 @@ import PackCard from '@/components/shared/pack/card'
 
 export default function PackAdd() {
     const { setCurrentResource } = useResourceStore()
+    const { setHidden } = useUIStore()
+    const user = useUserAccountStore((state) => state.user)
 
     useEffect(() => {
+        setHidden(true)
         setCurrentResource({ id: 'new', slug: 'new', display_name: 'Create a Pack', standalone: true })
     }, [])
 
     return (
         <div className="divide-default grid grid-cols-1 space-y-12 divide-y pb-48">
-            <Body noPadding>
-                <CTA>
-                    <CTABody>
-                        <Heading>A pack for your pack~</Heading>
-                        <p className="text-alt text-sm">
-                            They're groups of people like you, who share the same interests. There's no limit to how many you can join, and they appear in your home feed,
-                            so go wild!
-                        </p>
-                        <div className="flex flex-col space-y-4">
-                            <CreateGroupSidebar />
-                        </div>
-                    </CTABody>
+            {user && (
+                <Body noPadding>
+                    <CTA>
+                        <CTABody>
+                            <Heading>A pack for your pack~</Heading>
+                            <p className="text-alt text-sm">
+                                They're groups of people like you, who share the same interests. There's no limit to how many you can join, and they appear in your home
+                                feed, so go wild!
+                            </p>
+                            <div className="flex flex-col space-y-4">
+                                <CreateGroupSidebar />
+                            </div>
+                        </CTABody>
 
-                    <CTASideImage src="/img/illustrations/settings/friends.svg" alt="" />
-                </CTA>
-            </Body>
+                        <CTASideImage src="/img/illustrations/settings/friends.svg" alt="" />
+                    </CTA>
+                </Body>
+            )}
 
             <div className="flex flex-col space-y-12 px-4 pt-12 sm:px-6 lg:px-12">
                 <SearchablePackList />
@@ -283,7 +288,7 @@ function SearchablePackList() {
     useEffect(() => {
         vg.packs.get().then(({ data }) => {
             // Set packs except for 'universe' slug
-            setPacks(data.filter((pack) => pack.slug !== 'universe'))
+            setPacks(data?.filter((pack) => pack.slug !== 'universe') || [])
         })
     }, [])
 
