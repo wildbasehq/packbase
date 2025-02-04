@@ -89,7 +89,7 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                                 <UserInfoCol user={user} tag={<time dateTime={created_at}>about {moment(created_at).fromNow()}</time>} />
                             </div>
                             <div className="flex flex-shrink-0 space-x-2 self-center">
-                                {user && user.id === useUserAccountStore.getState().user.id && (
+                                {user && user.id === useUserAccountStore.getState().user?.id && (
                                     <Dropdown>
                                         <MenuButton>
                                             <EllipsisHorizontalIcon className="w-5" />
@@ -148,7 +148,7 @@ function React({ post }: FeedPostType) {
     const { user } = useUserAccountStore()
     const [submitting, setSubmitting] = useState(false)
 
-    const hasCurrentUser = post.reactions?.['0']?.includes(user.id)
+    const hasCurrentUser = post.reactions?.['0']?.includes(user?.id)
 
     const react = () => {
         if (submitting) return
@@ -166,7 +166,7 @@ function React({ post }: FeedPostType) {
                     }
 
                 if (hasCurrentUser) {
-                    post.reactions['0'] = post.reactions['0'].filter((id) => id !== user.id)
+                    post.reactions['0'] = post.reactions['0'].filter((id) => id !== user?.id)
                     return toast.error('Removed reaction.')
                 }
 
