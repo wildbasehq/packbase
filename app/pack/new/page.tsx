@@ -10,9 +10,10 @@ import { vg } from '@/lib/api'
 import { useResourceStore } from '@/lib/states'
 import { toast } from '@/lib/toast'
 import { Description, Dialog, DialogTitle, Label, Radio, RadioGroup, Transition, TransitionChild } from '@headlessui/react'
-import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
+import { BarsArrowUpIcon, ChevronDownIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import { FormEvent, Fragment, useEffect, useState } from 'react'
+import PackCard from '@/components/shared/pack/card'
 
 export default function PackAdd() {
     const { setCurrentResource } = useResourceStore()
@@ -40,7 +41,9 @@ export default function PackAdd() {
                 </CTA>
             </Body>
 
-            <div className="flex flex-col space-y-12 px-4 pt-12 sm:px-6 lg:px-12">{/*<SearchablePackList />*/}</div>
+            <div className="flex flex-col space-y-12 px-4 pt-12 sm:px-6 lg:px-12">
+                <SearchablePackList />
+            </div>
         </div>
     )
 }
@@ -269,6 +272,64 @@ function CreateGroupSidebar() {
                     </div>
                 </Dialog>
             </Transition>
+        </>
+    )
+}
+
+function SearchablePackList() {
+    // from the dummy wireframe figma
+    const [packs, setPacks] = useState([])
+
+    useEffect(() => {
+        vg.packs.get().then(({ data }) => {
+            // Set packs except for 'universe' slug
+            setPacks(data.filter((pack) => pack.slug !== 'universe'))
+        })
+    }, [])
+
+    return (
+        <>
+            <div className="sm:flex sm:items-center sm:justify-between">
+                <div>
+                    <h2 className="text-default text-base font-semibold leading-7">Search Packs</h2>
+                </div>
+                <div className="mt-3 sm:ml-4 sm:mt-0">
+                    <label htmlFor="desktop-search-pack" className="sr-only">
+                        Search
+                    </label>
+                    <div className="flex rounded-md shadow-sm">
+                        <div className="relative flex-grow focus-within:z-10">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <MagnifyingGlassIcon className="text-default-alt h-5 w-5" aria-hidden="true" />
+                            </div>
+                            <div className="flex rounded-md rounded-br-none rounded-tr-none bg-white shadow-sm ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:!ring-indigo-600 dark:bg-white/5 dark:ring-white/10 sm:max-w-md">
+                                <input
+                                    type="text"
+                                    name="desktop-search-pack"
+                                    id="desktop-search-pack"
+                                    autoComplete="none"
+                                    className="no-legacy text-default block flex-1 border-0 bg-transparent py-2.5 pl-10 pr-3 placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                    placeholder="Search packs"
+                                />
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            className="bg-default text-default hover:bg-default-alt relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-neutral-300 dark:ring-white/10"
+                        >
+                            <BarsArrowUpIcon className="text-default-alt -ml-0.5 h-5 w-5" aria-hidden="true" />
+                            Sort
+                            <ChevronDownIcon className="text-default-alt -mr-1 h-5 w-5" aria-hidden="true" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {packs.map((pack) => (
+                    <PackCard key={pack.id} pack={pack} />
+                ))}
+            </div>
         </>
     )
 }
