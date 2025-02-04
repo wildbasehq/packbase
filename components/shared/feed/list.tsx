@@ -229,11 +229,9 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                     </div>
 
                     {posts.length === 0 && (
-                        <p className="text-center text-sm text-neutral-500">
+                        <Text alt className="pt-8 text-center">
                             Oddly enough, there's nothing to show you here.
-                            <br />
-                            <span className="font-bold">Try following someone!</span>
-                        </p>
+                        </Text>
                     )}
                 </>
             )}

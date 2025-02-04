@@ -47,6 +47,8 @@ export declare interface FeedPostType {
 export default function FeedPost({ post, onDelete }: FeedPostType) {
     const { id, user, body, created_at, pack, howling, actor, assets } = post
 
+    const signedInUser = useUserAccountStore((state) => state.user)
+
     const deletePost = () => {
         vg.howl({ id })
             .delete()
@@ -89,7 +91,7 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                                 <UserInfoCol user={user} tag={<time dateTime={created_at}>about {moment(created_at).fromNow()}</time>} />
                             </div>
                             <div className="flex flex-shrink-0 space-x-2 self-center">
-                                {user && user.id === useUserAccountStore.getState().user?.id && (
+                                {user && user.id === signedInUser?.id && (
                                     <Dropdown>
                                         <MenuButton>
                                             <EllipsisHorizontalIcon className="w-5" />
@@ -137,7 +139,7 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
 
                 {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
                 <div className="flex justify-between space-x-8 border-t px-4 py-4 sm:px-6">
-                    <div className="flex">{user && <React post={post} />}</div>
+                    <div className="flex">{signedInUser && <React post={post} />}</div>
                 </div>
             </Card>
         </>
