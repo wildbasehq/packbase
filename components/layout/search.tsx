@@ -47,7 +47,7 @@ export function Search() {
         <div className="hidden lg:block lg:max-w-md lg:flex-auto">
             <div className="ui-not-focus-visible:outline-none pointer-events-none hidden h-8 w-full select-none items-center gap-2 rounded-md bg-white pl-2 pr-3 text-sm text-zinc-500 ring-1 ring-zinc-900/10 transition hover:ring-zinc-900/20 dark:bg-white/5 dark:text-zinc-400 dark:ring-inset dark:ring-white/10 dark:hover:ring-white/20 lg:flex">
                 <KoratIcon className="h-5 w-5" />
-                Korat shows events here
+                Nothing's on right now!
                 {/*<kbd className="text-2xs ml-auto text-zinc-400 dark:text-zinc-500">*/}
                 {/*    <kbd className="font-sans">CTRL+</kbd>*/}
                 {/*    <kbd className="font-sans">K</kbd>*/}

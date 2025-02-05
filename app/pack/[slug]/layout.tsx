@@ -63,7 +63,7 @@ export default function PackLayout({ children, params }: { children: React.React
                                 name: page.title,
                                 description: page.description,
                                 href: `/p/${slug}/${page.slug}`,
-                                icon: page.icon,
+                                icon: page.icon || OrbitIcon,
                             })
                         }
                         setNavigation(naviBuild)
