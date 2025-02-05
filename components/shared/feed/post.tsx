@@ -5,6 +5,7 @@
 import { ArrowUpOnSquareIcon, TrashIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import UserAvatar from '@/components/shared/user/avatar'
+import Avatar from '@/components/shared/user/avatar'
 import { UserProfileBasic } from '@/lib/defs/user'
 import Card from '@/components/shared/card'
 import UserInfoCol from '@/components/shared/user/info-col'
@@ -16,7 +17,7 @@ import { toast } from '@/lib/toast'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
 import XMarkIcon from '@/components/shared/icons/dazzle/xmark'
 import Markdown from '@/components/shared/markdown'
-import { EllipsisHorizontalIcon, HandThumbUpIcon, PaperAirplaneIcon } from '@heroicons/react/20/solid'
+import { ChatBubbleLeftIcon, EllipsisHorizontalIcon, HandThumbUpIcon, PaperAirplaneIcon } from '@heroicons/react/20/solid'
 import { MenuButton } from '@headlessui/react'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/shared/dropdown'
 import clsx from 'clsx'
@@ -38,15 +39,19 @@ export declare interface FeedPostDataType {
             [x: string]: any
         }
     }[]
+    forceRender?: boolean
+    comments?: FeedPostDataType[]
 }
 
 export declare interface FeedPostType {
     post: FeedPostDataType
     onDelete?: () => void
+    onComment?: (comment: any) => void
 }
 
 export default function FeedPost({ post, onDelete }: FeedPostType) {
-    const { id, user, body, created_at, pack, howling, actor, assets } = post
+    const [postContent, setPostContent] = useState<FeedPostDataType>(post)
+    const { id, user, body, created_at, pack, howling, actor, assets } = postContent
 
     const signedInUser = useUserAccountStore((state) => state.user)
 
@@ -62,6 +67,15 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                 }
             })
     }
+
+    const onComment = (comment: any) => {
+        const newPostContent = { ...postContent }
+        if (!newPostContent.comments) newPostContent.comments = []
+        newPostContent.comments.push(comment)
+        setPostContent(newPostContent)
+    }
+
+    let alreadyAnnouncedMore = false
 
     return (
         <>
@@ -141,9 +155,203 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                 {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
                 <div className="flex justify-between space-x-8 border-t px-4 py-4 sm:px-6">
                     <div className="flex">{signedInUser && <React post={post} />}</div>
-                    <CommentBox className="flex-1" truncate originalPost={post} />
+                    <CommentBox className="flex-1" truncate originalPost={post} onComment={onComment} />
                 </div>
+
+                {post?.comments && post.comments.length > 0 && (
+                    <div className="px-4 py-4 sm:px-6">
+                        <div className="flow-root">
+                            <ul role="list" className="-mb-8">
+                                {post.comments.map((comment) => (
+                                    <>
+                                        <FeedListItem
+                                            key={comment.id}
+                                            comment={comment}
+                                            showLine={comment.comments && comment.comments.length > 0}
+                                            originalPost={[postContent, setPostContent]}
+                                            // onClick={() => setSlideoverOpen(true)}
+                                        />
+                                        {comment.comments && comment.comments.length > 0 && (
+                                            <>
+                                                {/* @ts-ignore - fuck sake. */}
+                                                <FeedListItem
+                                                    key={comment.comments[comment.comments.length - 1].id}
+                                                    comment={comment.comments[comment.comments.length - 1]}
+                                                    showLine={comment.comments[comment.comments.length - 1].forceRender}
+                                                    post={[postContent, setPostContent]}
+                                                    // onClick={() => setSlideoverOpen(true)}
+                                                />
+
+                                                {/* almost there: check if any replies from here have 'forceRender', then, well, force render it */}
+                                                {comment.comments[comment.comments.length - 1].comments?.map((replyInsideAgain) => {
+                                                    /* @ts-ignore - hey, its right this time! but it's a one-off thing. */
+                                                    if (replyInsideAgain.forceRender) {
+                                                        return (
+                                                            <FeedListItem
+                                                                key={replyInsideAgain.id}
+                                                                comment={replyInsideAgain}
+                                                                showLineReverse
+                                                                post={[postContent, setPostContent]}
+                                                                // onClick={() => setSlideoverOpen(true)}
+                                                            />
+                                                        )
+                                                    } else if (!alreadyAnnouncedMore) {
+                                                        alreadyAnnouncedMore = true
+                                                        // Return a "+ more" text
+                                                        return (
+                                                            <li className="relative -mt-8 px-12 pb-8">
+                                                                <div
+                                                                    className="text-default-alt cursor-pointer pl-1 text-sm font-medium hover:underline"
+                                                                    // onClick={() => setSlideoverOpen(true)}
+                                                                >
+                                                                    {/* @ts-ignore */}+ {comment.comments[comment.comments.length - 1].comments.length} more
+                                                                </div>
+                                                            </li>
+                                                        )
+                                                    }
+                                                })}
+                                            </>
+                                        )}
+                                    </>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                )}
             </Card>
+        </>
+    )
+}
+
+function FeedListItem({ ...props }: any) {
+    const { comment, showLine, originalPost } = props
+    const [likes, setLikes] = useState(comment.likes || 0)
+    const [showReplyBox, setShowReplyBox] = useState(false)
+    const [postContent, setPostContent] = originalPost
+
+    const handleReplySubmit = (commentBody: any, newPostContent: any, commentID: string) => {
+        setShowReplyBox(false)
+
+        // we need to append the comment to the replies to the reply
+        newPostContent.replies.forEach((reply: any) => {
+            // if we're replying to a reply, we need to find the reply we're replying to inside the replies of the reply
+            if (reply.replies) {
+                reply.replies.forEach((replyReply: any) => {
+                    // just one more
+                    if (replyReply.replies && replyReply.id === commentBody.parent) {
+                        replyReply.replies.forEach((replyReplyReply: any) => {
+                            console.log(replyReplyReply.id, commentID)
+                            if (replyReplyReply.id === commentID) {
+                                // we just need to change forceRender to true.
+                                replyReplyReply.forceRender = true
+                                replyReply.forceRender = true
+                            }
+                        })
+                    }
+                })
+            }
+        })
+
+        setPostContent(newPostContent)
+    }
+
+    return (
+        <li>
+            <div className="relative pb-8">
+                {showLine ? <span className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-neutral-300 dark:bg-neutral-700" aria-hidden="true" /> : null}
+                <div className="rounded-default hover:bg-box group relative flex cursor-pointer flex-col items-start space-x-3">
+                    <div className="relative flex flex-row items-start space-x-3">
+                        <div className="relative">
+                            <Avatar user={comment.user} className="bg-box-alt flex items-center justify-center rounded-full ring-8 ring-surface-container-high" />
+
+                            {comment.likedParent && (
+                                <span className="bg-box-alt rounded-default absolute -bottom-0.5 -right-1 px-0.5 py-px">
+                                    <HandThumbUpIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                </span>
+                            )}
+                        </div>
+                        <div className="relative min-w-0 flex-1">
+                            <div>
+                                <div className="text-sm">
+                                    <Link href={`/@${comment.user.username}/`} className="text-default font-medium">
+                                        {comment.user.display_name || comment.user.username}
+                                    </Link>
+                                </div>
+                                <p className="text-default-alt text-sm">
+                                    {comment.created_at ? (
+                                        <time dateTime={comment.created_at.toString()}>{moment(comment.created_at).fromNow()}</time>
+                                    ) : (
+                                        comment.user.username
+                                    )}
+                                </p>
+                            </div>
+
+                            <div
+                                className="text-default mt-2 break-words text-sm"
+                                style={{ wordBreak: 'break-word' }} // fix for long links
+                                onClick={props.onClick}
+                            >
+                                {comment.body}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Settings on hover */}
+                    <div className="absolute right-0 top-0 -mr-2 -mt-2 hidden group-hover:block">
+                        <div className="relative z-10 flex items-center space-x-4">
+                            {/* Reply & Like */}
+                            <div className="bg-box-alt rounded-default flex flex-row items-center justify-between">
+                                <div className="flex flex-row items-center">
+                                    <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2">
+                                        <HandThumbUpIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                        {likes > 0 && <span className="text-default-alt text-sm">{likes}</span>}
+                                    </div>
+                                    <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2" onClick={() => setShowReplyBox(!showReplyBox)}>
+                                        <ChatBubbleLeftIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                className="bg-box-alt text-default hover:bg-box flex h-8 w-8 items-center justify-center rounded-full"
+                                aria-expanded="false"
+                                aria-haspopup="true"
+                            >
+                                <span className="sr-only">Open options</span>
+                                <EllipsisHorizontalIcon className="h-5 w-5" aria-hidden="true" />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Comment box to reply */}
+                    {showReplyBox && (
+                        <div className="mt-2 flex flex-row items-center">
+                            <CommentBox originalPost={postContent} onSubmit={handleReplySubmit} />
+                        </div>
+                    )}
+                </div>
+            </div>
+        </li>
+    )
+}
+
+// Goes through replies, and calls itself again with padding if there are replies within replies.
+function RecursiveCommentThread({ ...props }: any) {
+    const { reply, showLine, post } = props
+
+    return (
+        <>
+            <FeedListItem reply={reply} showLine={showLine || false} post={post} />
+            {reply.replies &&
+                reply.replies.length > 0 &&
+                reply.replies.map((replyInside: any, replyInsideIdx: any) => (
+                    <>
+                        <div className="pl-12">
+                            <RecursiveCommentThread key={replyInsideIdx} reply={replyInside} showLine={replyInsideIdx !== reply.replies.length - 1} post={post} />
+                        </div>
+                    </>
+                ))}
         </>
     )
 }
@@ -300,7 +508,7 @@ function MediaGrid({ ...props }: any) {
 }
 
 function CommentBox({ ...props }: any) {
-    const { originalPost } = props
+    const { originalPost, onComment } = props
     const [commentSubmitting, setCommentSubmitting] = useState(false)
     const commentRef = useRef<HTMLInputElement>(null)
     const { user } = useUserAccountStore()
@@ -310,9 +518,24 @@ function CommentBox({ ...props }: any) {
         setCommentSubmitting(true)
 
         const commentBody = {
-            content: commentRef.current?.value,
-            ...(props.parent && { parent: props.parent }),
+            body: commentRef.current?.value,
         }
+
+        vg.howl({ id: originalPost.id })
+            .comment.post(commentBody)
+            .then(({ data, error }) => {
+                setCommentSubmitting(false)
+                if (error) {
+                    return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+                } else {
+                    commentRef.current.value = ''
+                    onComment({
+                        ...commentBody,
+                        user: user,
+                    })
+                    return toast.error('Commented!')
+                }
+            })
     }
 
     return (
