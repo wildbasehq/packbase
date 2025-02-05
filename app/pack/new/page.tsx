@@ -284,11 +284,13 @@ function CreateGroupSidebar() {
 function SearchablePackList() {
     // from the dummy wireframe figma
     const [packs, setPacks] = useState([])
+    const [packsHidden, setPacksHidden] = useState<number>(0)
 
     useEffect(() => {
         vg.packs.get().then(({ data }) => {
             // Set packs except for 'universe' slug
-            setPacks(data?.filter((pack) => pack.slug !== 'universe') || [])
+            setPacks(data?.packs.filter((pack) => pack.slug !== 'universe') || [])
+            setPacksHidden(data?.hidden)
         })
     }, [])
 
@@ -296,7 +298,12 @@ function SearchablePackList() {
         <>
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
-                    <h2 className="text-default text-base font-semibold leading-7">Search Packs</h2>
+                    <Heading size="lg">Search Packs</Heading>
+                    {packsHidden > 0 && (
+                        <Text size="sm" alt>
+                            {packsHidden} pack already apart of
+                        </Text>
+                    )}
                 </div>
                 <div className="mt-3 sm:ml-4 sm:mt-0">
                     <label htmlFor="desktop-search-pack" className="sr-only">
