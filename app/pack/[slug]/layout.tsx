@@ -33,7 +33,7 @@ export default function PackLayout({ children, params }: { children: React.React
             setLoading(true)
             setError(null)
             vg.pack({ id: slug })
-                .get({ query: { scope: 'exists' } })
+                .get({ query: { scope: 'pages' } })
                 .then((res) => {
                     setLoading(false)
 
@@ -48,14 +48,25 @@ export default function PackLayout({ children, params }: { children: React.React
                             },
                         ])
                     } else {
-                        setNavigation([
+                        // Builds the navigation menu for the pack. Forces 'Home' to be the first item, then adds the rest from API.
+                        let naviBuild = [
                             {
                                 name: 'Home',
                                 description: '',
                                 href: `/p/${slug}`,
                                 icon: HomeIcon,
                             },
-                        ])
+                        ]
+
+                        for (const page of res.data.pages || []) {
+                            naviBuild.push({
+                                name: page.title,
+                                description: page.description,
+                                href: `/p/${slug}/${page.slug}`,
+                                icon: page.icon,
+                            })
+                        }
+                        setNavigation(naviBuild)
 
                         const resource = tempResources.find((r) => r.id === res.data.id)
                         if (!resource && slug !== 'universe') {

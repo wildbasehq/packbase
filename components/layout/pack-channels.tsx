@@ -8,6 +8,13 @@ import Image from 'next/image'
 import React from 'react'
 import ActiveLink from '../shared/active-link'
 import './sidenav.component.css'
+import { FireIcon, SparklesIcon } from '@heroicons/react/24/solid'
+
+const availableIcons = {
+    ArrowUpRight: ArrowUpRightIcon,
+    Sparkles: SparklesIcon,
+    Fire: FireIcon,
+}
 
 export declare interface SideNavItemType {
     name: string | JSX.Element
@@ -78,11 +85,25 @@ export function PackChannels({ ...props }: SideNavType) {
                                         )}
 
                                         {typeof item.icon === 'string' && (
-                                            <Image
-                                                className={`h-6 w-6 flex-shrink-0 ${item.description?.startsWith('@') ? 'rounded-full' : 'rounded-lg'}`}
-                                                src={item.icon}
-                                                alt={`Icon for ${item.name}`}
-                                            />
+                                            <>
+                                                {/* Get from availableIcons */}
+                                                {item.icon.startsWith('icon://') && (
+                                                    <DynamicIcon name={item.icon.split('://')[1]} className="text-default h-6 w-6 flex-shrink-0" aria-hidden="true" />
+                                                )}
+
+                                                {/* Get from next/image */}
+                                                {!item.icon.startsWith('icon://') && (
+                                                    <>
+                                                        <div className="h-6 w-6 flex-shrink-0">
+                                                            <Image
+                                                                className={`h-6 w-6 ${item.description?.startsWith('@') ? 'rounded-full' : 'rounded-lg'}`}
+                                                                src={item.icon}
+                                                                alt={`Icon for ${item.name}`}
+                                                            />
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </>
                                         )}
                                     </>
                                 )}
@@ -138,11 +159,17 @@ export function PackChannels({ ...props }: SideNavType) {
 
                                     {typeof item.icon === 'string' && (
                                         <div className="-mt-0.5 h-6 w-6 flex-shrink-0">
-                                            <Image
-                                                className={`h-6 w-6 ${item.description?.startsWith('@') ? 'rounded-full' : 'rounded-lg'}`}
-                                                src={item.icon}
-                                                alt={`Icon for ${item.name}`}
-                                            />
+                                            {item.icon.startsWith('icon://') && (
+                                                <DynamicIcon name={item.icon.split('://')[1]} className="text-default h-6 w-6" aria-hidden="true" />
+                                            )}
+
+                                            {!item.icon.startsWith('icon://') && (
+                                                <Image
+                                                    className={`h-6 w-6 ${item.description?.startsWith('@') ? 'rounded-full' : 'rounded-lg'}`}
+                                                    src={item.icon}
+                                                    alt={`Icon for ${item.name}`}
+                                                />
+                                            )}
                                         </div>
                                     )}
                                 </>
@@ -153,4 +180,9 @@ export function PackChannels({ ...props }: SideNavType) {
             </nav>
         </>
     )
+}
+
+function DynamicIcon({ name, ...props }) {
+    const Icon = availableIcons[name]
+    return <Icon {...props} />
 }
