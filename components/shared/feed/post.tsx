@@ -9,16 +9,17 @@ import { UserProfileBasic } from '@/lib/defs/user'
 import Card from '@/components/shared/card'
 import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { LoadingCircle } from '@/components/shared/icons'
 import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
 import XMarkIcon from '@/components/shared/icons/dazzle/xmark'
 import Markdown from '@/components/shared/markdown'
-import { EllipsisHorizontalIcon, HandThumbUpIcon } from '@heroicons/react/20/solid'
+import { EllipsisHorizontalIcon, HandThumbUpIcon, PaperAirplaneIcon } from '@heroicons/react/20/solid'
 import { MenuButton } from '@headlessui/react'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/shared/dropdown'
+import clsx from 'clsx'
 
 export declare interface FeedPostDataType {
     id: string
@@ -140,6 +141,7 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                 {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
                 <div className="flex justify-between space-x-8 border-t px-4 py-4 sm:px-6">
                     <div className="flex">{signedInUser && <React post={post} />}</div>
+                    <CommentBox className="flex-1" truncate originalPost={post} />
                 </div>
             </Card>
         </>
@@ -292,6 +294,69 @@ function MediaGrid({ ...props }: any) {
                         )}
                     </div>
                 )}
+            </div>
+        </div>
+    )
+}
+
+function CommentBox({ ...props }: any) {
+    const { originalPost } = props
+    const [commentSubmitting, setCommentSubmitting] = useState(false)
+    const commentRef = useRef<HTMLInputElement>(null)
+    const { user } = useUserAccountStore()
+
+    const createComment = (e?: { preventDefault: () => void }) => {
+        if (e) e.preventDefault()
+        setCommentSubmitting(true)
+
+        const commentBody = {
+            content: commentRef.current?.value,
+            ...(props.parent && { parent: props.parent }),
+        }
+    }
+
+    return (
+        <div className={props.className}>
+            {/* "Replying to [user]" text */}
+            {!props.truncate && (
+                <div className="mb-4 flex items-center space-x-2">
+                    <div className="flex-shrink-0">
+                        <img className="h-8 w-8 rounded-full" src={user.images?.avatar || `/img/avatar/default-avatar.png`} alt="" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="text-default cursor-pointer text-sm font-medium hover:underline">
+                            Replying to {originalPost.user.display_name || originalPost.user.username}
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            <div
+                className={clsx(
+                    commentSubmitting
+                        ? 'relative isolate overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:border before:border-x-0 before:border-b-0 before:border-t before:border-solid before:border-neutral-100/10 before:bg-gradient-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent'
+                        : '',
+                    'relative flex items-center rounded',
+                )}
+            >
+                <input
+                    type="text"
+                    name="comment"
+                    id="comment"
+                    className="border-default block w-full rounded bg-card px-10 placeholder:text-neutral-400 focus:border-primary focus:ring-primary sm:text-sm"
+                    placeholder="Comment"
+                    ref={commentRef}
+                />
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <img className="h-5 w-5 rounded-full" src={user.images?.avatar || `/img/avatar/default-avatar.png`} alt="" />
+                </div>
+                <div className="absolute inset-y-0 right-0 flex cursor-pointer items-center py-2 pr-2">
+                    {commentSubmitting ? (
+                        <img className="h-5 w-5 animate-spin dark:invert" src={`/img/symbolic/process-working.symbolic.png`} alt="Process working spinner" />
+                    ) : (
+                        <PaperAirplaneIcon className="text-default h-5 w-5" onClick={createComment} />
+                    )}
+                </div>
             </div>
         </div>
     )
