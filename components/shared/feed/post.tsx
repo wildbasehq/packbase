@@ -201,7 +201,7 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                                                         return (
                                                             <li className="relative -mt-8 px-12 pb-8">
                                                                 <div
-                                                                    className="text-default-alt cursor-pointer pl-1 text-sm font-medium hover:underline"
+                                                                    className="text-alt cursor-pointer pl-1 text-sm font-medium hover:underline"
                                                                     // onClick={() => setSlideoverOpen(true)}
                                                                 >
                                                                     {/* @ts-ignore */}+ {comment.comments[comment.comments.length - 1].comments.length} more
@@ -277,7 +277,7 @@ function FeedListItem({ ...props }: any) {
                                         {comment.user.display_name || comment.user.username}
                                     </Link>
                                 </div>
-                                <p className="text-default-alt text-sm">
+                                <p className="text-alt text-sm">
                                     {comment.created_at ? (
                                         <time dateTime={comment.created_at.toString()}>{moment(comment.created_at).fromNow()}</time>
                                     ) : (
@@ -304,7 +304,7 @@ function FeedListItem({ ...props }: any) {
                     {/*            <div className="flex flex-row items-center">*/}
                     {/*                <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2">*/}
                     {/*                    <HandThumbUpIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />*/}
-                    {/*                    {likes > 0 && <span className="text-default-alt text-sm">{likes}</span>}*/}
+                    {/*                    {likes > 0 && <span className="text-alt text-sm">{likes}</span>}*/}
                     {/*                </div>*/}
                     {/*                <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2" onClick={() => setShowReplyBox(!showReplyBox)}>*/}
                     {/*                    <ChatBubbleLeftIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />*/}
