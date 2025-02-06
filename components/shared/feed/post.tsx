@@ -17,7 +17,7 @@ import { toast } from '@/lib/toast'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
 import XMarkIcon from '@/components/shared/icons/dazzle/xmark'
 import Markdown from '@/components/shared/markdown'
-import { ChatBubbleLeftIcon, EllipsisHorizontalIcon, HandThumbUpIcon, PaperAirplaneIcon } from '@heroicons/react/20/solid'
+import { EllipsisHorizontalIcon, HandThumbUpIcon, PaperAirplaneIcon } from '@heroicons/react/20/solid'
 import { MenuButton } from '@headlessui/react'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/shared/dropdown'
 import clsx from 'clsx'
@@ -297,32 +297,32 @@ function FeedListItem({ ...props }: any) {
                     </div>
 
                     {/* Settings on hover */}
-                    <div className="absolute right-0 top-0 -mr-2 -mt-2 hidden group-hover:block">
-                        <div className="relative z-10 flex items-center space-x-4">
-                            {/* Reply & Like */}
-                            <div className="bg-box-alt rounded-default flex flex-row items-center justify-between">
-                                <div className="flex flex-row items-center">
-                                    <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2">
-                                        <HandThumbUpIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                                        {likes > 0 && <span className="text-default-alt text-sm">{likes}</span>}
-                                    </div>
-                                    <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2" onClick={() => setShowReplyBox(!showReplyBox)}>
-                                        <ChatBubbleLeftIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                                    </div>
-                                </div>
-                            </div>
+                    {/*<div className="absolute right-0 top-0 -mr-2 -mt-2 hidden group-hover:block">*/}
+                    {/*    <div className="relative z-10 flex items-center space-x-4">*/}
+                    {/*        /!* Reply & Like *!/*/}
+                    {/*        <div className="bg-box-alt rounded-default flex flex-row items-center justify-between">*/}
+                    {/*            <div className="flex flex-row items-center">*/}
+                    {/*                <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2">*/}
+                    {/*                    <HandThumbUpIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />*/}
+                    {/*                    {likes > 0 && <span className="text-default-alt text-sm">{likes}</span>}*/}
+                    {/*                </div>*/}
+                    {/*                <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2" onClick={() => setShowReplyBox(!showReplyBox)}>*/}
+                    {/*                    <ChatBubbleLeftIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />*/}
+                    {/*                </div>*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
 
-                            <button
-                                type="button"
-                                className="bg-box-alt text-default hover:bg-box flex h-8 w-8 items-center justify-center rounded-full"
-                                aria-expanded="false"
-                                aria-haspopup="true"
-                            >
-                                <span className="sr-only">Open options</span>
-                                <EllipsisHorizontalIcon className="h-5 w-5" aria-hidden="true" />
-                            </button>
-                        </div>
-                    </div>
+                    {/*        <button*/}
+                    {/*            type="button"*/}
+                    {/*            className="bg-box-alt text-default hover:bg-box flex h-8 w-8 items-center justify-center rounded-full"*/}
+                    {/*            aria-expanded="false"*/}
+                    {/*            aria-haspopup="true"*/}
+                    {/*        >*/}
+                    {/*            <span className="sr-only">Open options</span>*/}
+                    {/*            <EllipsisHorizontalIcon className="h-5 w-5" aria-hidden="true" />*/}
+                    {/*        </button>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
 
                     {/* Comment box to reply */}
                     {showReplyBox && (
