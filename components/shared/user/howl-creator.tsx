@@ -10,11 +10,12 @@ import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
 import { useResourceStore, useUserAccountStore } from '@/lib/states'
 import { Editor } from '@/components/novel'
-import { ExclamationTriangleIcon, LinkIcon } from '@heroicons/react/24/solid'
+import { LinkIcon } from '@heroicons/react/24/solid'
 import Modal from '@/components/modal'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
-import { XCircleIcon } from '@heroicons/react/20/solid'
+import { Alert, AlertTitle } from '@/components/shared/ui/alert'
+import { QuestionMarkCircleIcon, XCircleIcon } from '@heroicons/react/20/solid'
 import clsx from 'clsx'
+import Tooltip from '@/components/shared/tooltip'
 
 export default function HowlCreator() {
     const { user } = useUserAccountStore()
@@ -144,12 +145,20 @@ export default function HowlCreator() {
 
             <Modal showModal={showModal} setShowModal={setShowModal}>
                 <Card className="!px-0 !py-0">
-                    <Alert className="!rounded-none !border-0">
-                        <AlertTitle>
-                            <ExclamationTriangleIcon className="inline-flex h-5 w-5" /> Prototype
-                        </AlertTitle>
-                        <AlertDescription>HowlCreator isn't done, far from it. It'll change a lot, break a lot, maybe even scream a lot.</AlertDescription>
-                    </Alert>
+                    {!currentResource.standalone && (
+                        <Alert className="!rounded-none !border-0">
+                            <AlertTitle className="flex items-center">
+                                <UserAvatar name={currentResource.display_name} size={24} user={currentResource} className="mr-2 inline-flex" />
+                                {currentResource.display_name}
+                                <Tooltip
+                                    content={`Howling into ${currentResource.display_name}. This howl will be visible to all members of this pack regardless of your settings.`}
+                                    side="right"
+                                >
+                                    <QuestionMarkCircleIcon className="text-alt ml-1 h-4 w-4" />
+                                </Tooltip>
+                            </AlertTitle>
+                        </Alert>
+                    )}
                     <form onSubmit={submitPost}>
                         <div className="relative border-t">
                             <div className="px-4 pt-5 sm:px-6">
