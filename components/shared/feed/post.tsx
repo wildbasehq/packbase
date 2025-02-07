@@ -204,7 +204,7 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                                                                     className="text-alt cursor-pointer pl-1 text-sm font-medium hover:underline"
                                                                     // onClick={() => setSlideoverOpen(true)}
                                                                 >
-                                                                    {/* @ts-ignore */}+ {comment.comments[comment.comments.length - 1].comments.length} more
+                                                                    + {comment.comments[comment.comments.length - 1].comments.length} more
                                                                 </div>
                                                             </li>
                                                         )
