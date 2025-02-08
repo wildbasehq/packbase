@@ -39,8 +39,8 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                                 const dipswitch = (await vg.dipswitch.get()).data || []
                                 let userBuild = {
                                     id: user.id,
-                                    username: data?.username || user.email,
-                                    display_name: data?.display_name || user.email,
+                                    username: data?.username || 'new_here_' + new Date().getTime(),
+                                    display_name: data?.display_name || 'new_here_' + new Date().getTime(),
                                     reqOnboard: !data || !data?.username,
                                     dp: dipswitch,
                                     ...data,
