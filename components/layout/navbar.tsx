@@ -13,6 +13,7 @@ import { ScanFaceIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import UserOnboardingModal from '../modal/user-onboarding-modal'
+import { FaDiscord } from 'react-icons/fa6'
 
 export default function NavBar() {
     const { user } = useUserAccountStore()
@@ -48,10 +49,19 @@ export default function NavBar() {
                         <Search />
 
                         <div className="flex items-center gap-5">
-                            {/*<div className="hidden md:block md:h-5 md:w-px md:bg-neutral-900/10 md:dark:bg-white/15"/>*/}
                             <div className="flex gap-4">
                                 <ThemeToggle />
                             </div>
+                            <div className="flex gap-4">
+                                <Link href="https://discord.gg/StuuK55gYA" target="_blank" className="!no-underline">
+                                    <Button variant="ghost" className="flex items-center justify-center">
+                                        <FaDiscord className="mr-1 h-4 w-4" /> Discord
+                                    </Button>
+                                </Link>
+                            </div>
+
+                            <div className="md:dark:bg-white/15 hidden md:block md:h-5 md:w-px md:bg-n-8/10" />
+
                             <div className="hidden min-[416px]:contents">
                                 {user && (
                                     <Dropdown>
