@@ -29,7 +29,10 @@ export default function PackSwitcher() {
     const router = useRouter()
 
     const switchResource = (resource: any) => {
-        if (loading || currentResource.id === resource.id) return heavyHoverSound()
+        if (loading || currentResource.id === resource.id) {
+            if (resource.slug === 'universe') router.push('/p/universe')
+            return heavyHoverSound()
+        }
         resource.id === resourceDefault.id ? initialSound() : switchedSound()
         setCurrentResource(resource)
         setLoading(true)
