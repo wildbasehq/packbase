@@ -325,8 +325,8 @@ export default function TermsPage() {
                         <Heading className="mb-4">2.2 Data Collection</Heading>
                         <Text className="mb-4">
                             We collect the following data to provide and improve Packbase. By using Packbase, you agree to the collection and use of information in
-                            accordance with this policy. 2 types of data pools exist; A WildID ("✱ID") and a Packbase Account ("Account"). When you create a Packbase
-                            Account, you are also creating a ✱ID. Sensitive data is only stored in ✱ID.
+                            accordance with this policy. 2 types of data pools exist; A WildID ("✱ID") and a Packbase Account ("Account", "Profile"). When you create a
+                            Packbase Account, you are also creating a ✱ID. Sensitive data is only stored in ✱ID.
                         </Text>
                         <div className="overflow-x-auto rounded border">
                             <table className="min-w-full">
