@@ -120,9 +120,9 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                        <Text size="xs">By continuing, you agree to our terms and privacy policy.</Text>
-                    </div>
+                    <Link href="/terms" className="flex items-center justify-between">
+                        <Text size="xs">By continuing, you agree to the Packbase Usage Policy & Data Handling terms.</Text>
+                    </Link>
 
                     <div>
                         <Button
