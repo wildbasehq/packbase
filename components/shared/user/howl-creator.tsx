@@ -137,7 +137,7 @@ export default function HowlCreator() {
 
     return (
         <>
-            {!user.reqOnboard && (
+            {!user.reqOnboard && !currentResource.temporary && (
                 <Button size="sm" variant="outline" className="w-full" onClick={() => setShowModal(true)}>
                     + Howl {!currentResource.standalone && `in ${currentResource.display_name}`}
                 </Button>
