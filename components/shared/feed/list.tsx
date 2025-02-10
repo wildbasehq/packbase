@@ -16,8 +16,9 @@ import { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import { toast } from '@/lib/toast'
-import { HandRaisedIcon } from '@heroicons/react/20/solid'
+import { HandRaisedIcon, MegaphoneIcon } from '@heroicons/react/20/solid'
 import { ProjectSafeName } from '@/lib/utils'
+import UserAvatar from '@/components/shared/user/avatar'
 
 export default function FeedList({ packID = '00000000-0000-0000-0000-000000000000' }: { packID?: string }) {
     const feedID = 'EVERYTHING0'
@@ -196,26 +197,31 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                                 <ResponsiveMasonry columnsCountBreakPoints={masonryColumns}>
                                     {/* @ts-ignore */}
                                     <Masonry className="list-stagger" gutter="24px">
-                                        {/*<Card>*/}
-                                        {/*    <Heading size="xs" className="mb-1 flex items-center">*/}
-                                        {/*        <MegaphoneIcon className="mr-2 inline-block h-5 w-5" />*/}
-                                        {/*        <span>PACK ANNOUNCEMENT</span>*/}
-                                        {/*    </Heading>*/}
-                                        {/*    <Text size="sm">🎉 thx for testing pookies. Go wild!</Text>*/}
-                                        {/*    <Text className="mt-2 flex items-center justify-end">*/}
-                                        {/*        <UserAvatar*/}
-                                        {/*            user={{*/}
-                                        {/*                username: 'rek',*/}
-                                        {/*                images: {*/}
-                                        {/*                    avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/3e133370-0ec2-4825-b546-77de3804c8b1/0/avatar.jpeg',*/}
-                                        {/*                },*/}
-                                        {/*            }}*/}
-                                        {/*            size="sm"*/}
-                                        {/*            className="mr-1"*/}
-                                        {/*        />*/}
-                                        {/*        Rek*/}
-                                        {/*    </Text>*/}
-                                        {/*</Card>*/}
+                                        {/*{(packID === '00000000-0000-0000-0000-000000000000' || packID === 'universe') ? (*/}
+                                        <Card>
+                                            <Heading size="xs" className="mb-1 flex items-center">
+                                                <MegaphoneIcon className="mr-2 inline-block h-5 w-5" />
+                                                <span>PACK ANNOUNCEMENT</span>
+                                            </Heading>
+                                            <Text size="sm">
+                                                🎉 You're testing SUPER early, so much that the waitlist hasn't even begun yet. Things will break, please report them in
+                                                the Discord instead of posting them publicly. Thank you!
+                                            </Text>
+                                            <Text className="mt-2 flex items-center justify-end">
+                                                <UserAvatar
+                                                    user={{
+                                                        username: 'rek',
+                                                        images: {
+                                                            avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/3e133370-0ec2-4825-b546-77de3804c8b1/0/avatar.png',
+                                                        },
+                                                    }}
+                                                    size="sm"
+                                                    className="mr-1"
+                                                />
+                                                Rek
+                                            </Text>
+                                        </Card>
+                                        {/*)}*/}
 
                                         {posts.map((post: any, i: number) => (
                                             <FeedListItem key={post.id} post={post} gridTutorialID={changingView ? i : undefined} postState={[posts, setPosts]} />
