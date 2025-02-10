@@ -7,6 +7,7 @@ import {toast} from 'sonner'
 import {LoadingDots} from '@/components/shared/icons'
 import {Input} from '@/components/shared/input/text'
 import Button from '@/components/shared/button'
+import {ProjectSafeName} from '@/lib/utils'
 
 export default function ReportAbuse() {
     const [open, setOpen] = useState(false)
@@ -27,14 +28,14 @@ export default function ReportAbuse() {
         setSubmitting(false)
         setOpen(false)
         toast.success(
-            'We got it! Thanks for making Yipnyap even better. Click here to see your report.',
+            `We got it! Thanks for making ${ProjectSafeName} even better. Click here to see your report.`,
         )
     }
 
     return (
         <div className="fixed bottom-5 right-5">
             <button
-                className="rounded-default bg-default p-4 text-default shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl active:translate-y-0 active:shadow-sm"
+                className="rounded bg-default p-4 text-default shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl active:translate-y-0 active:shadow-sm"
                 onClick={() => setOpen(!open)}
             >
                 {open ? <XCircleIcon size={24}/> : <AlertTriangle size={24}/>}

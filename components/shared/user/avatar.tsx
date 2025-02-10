@@ -1,11 +1,16 @@
 import BoringAvatar from 'boring-avatars'
-import {clsx} from 'clsx'
+import { clsx } from 'clsx'
 
-export default function UserAvatar({user, size = 'lg', avatar, ...props}: {
-    user?: any; // object - @todo: type this
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | number;
-    icon?: string;
-    [x: string]: any;
+export default function UserAvatar({
+    user,
+    size = 'lg',
+    icon,
+    ...props
+}: {
+    user?: any // object - @todo: type this
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | number
+    icon?: string
+    [x: string]: any
 }) {
     const sizes = {
         xs: 16,
@@ -24,22 +29,25 @@ export default function UserAvatar({user, size = 'lg', avatar, ...props}: {
         height: typeof size === 'number' ? size : sizes[size],
     }
 
-    if ((!user || !user.avatar) && !avatar) {
+    if ((!user || !user.images?.avatar) && !icon) {
         return (
             <div
-                className={clsx(props.className, `inline-flex justify-center rounded items-center bg-n-5 text-white overflow-hidden`)}
-                style={props.style} title={`${props.name}'s avatar`}>
-                <BoringAvatar variant="beam" square size={typeof size === 'number' ? size : sizes[size]} {...props} />
+                className={clsx(props.className, `items-center justify-center overflow-hidden rounded-md bg-n-5 text-white`)}
+                style={props.style}
+                title={`${props.display_name}'s avatar`}
+            >
+                <BoringAvatar variant="beam" square size={typeof size === 'number' ? size : sizes[size]} name={user?.username || props.name || 'packbase'} {...props} />
             </div>
         )
     } else {
         return (
-            <img width={1024}
-                 height={1024}
-                 src={user?.avatar || avatar}
-                 alt={`${user?.username || props.name}'s avatar`}
-                 {...props}
-                 className={clsx(props.className, `inline-flex justify-center rounded items-center bg-n-5 text-white overflow-hidden`)}
+            <img
+                width={1024}
+                height={1024}
+                src={user?.images?.avatar || icon}
+                alt={`${user?.username || props.display_name}'s avatar`}
+                {...props}
+                className={clsx(props.className, `inline-flex items-center justify-center overflow-hidden rounded-md text-white`)}
             />
         )
     }

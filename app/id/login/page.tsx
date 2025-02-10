@@ -1,155 +1,121 @@
 'use client'
-// @ts-ignore
-import * as HoverCard from '@radix-ui/react-hover-card'
-import {createClientComponentClient} from '@supabase/auth-helpers-nextjs'
-import UserAvatar from '@/components/shared/user/avatar'
-import {UserInfo} from '@/components/shared/user/info-col'
+import { createClient } from '@/lib/supabase/client'
+import { FormEvent, useState } from 'react'
+import { Logo } from '@/components/shared/logo'
+import { Heading } from '@/components/shared/text'
+import { Input } from '@/components/shared/input/text'
+import { Button } from '@/components/shared/ui/button'
 import Link from 'next/link'
-import cx from 'classnames'
-import {buttonVariants} from '@/components/shared/buttonUI'
-import {Heading, Text} from '@/components/shared/text'
-import {ProjectName} from '@/lib/utils'
+import { LoadingCircle } from '@/components/shared/icons'
+import { useUserAccountStore } from '@/lib/states'
+import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
 
-export default function IDLogin({searchParams}: {
-    searchParams: { error_description: string; error: string; };
+export default function IDLogin({
+    searchParams,
+}: {
+    searchParams: {
+        error_description?: string
+        error?: string
+        redirect?: string
+    }
 }) {
-    const supabase = createClientComponentClient({
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_KEY,
-    })
-
+    const { user } = useUserAccountStore()
+    const [submitting, setSubmitting] = useState(false)
+    const [error, setError] = useState<string | null>(null)
     switch (searchParams?.error_description) {
         case 'The resource owner or authorization server denied the request': {
             searchParams.error_description = 'Login cancelled'
         }
     }
 
-    async function signInWithDiscord() {
-        await supabase.auth.signInWithOAuth({
-            provider: 'discord',
-            options: {
-                scopes: 'identify guilds',
-                redirectTo: `${window.location.origin}/auth/callback`
-            }
-        })
+    if (user) return (window.location.href = '/')
+
+    const loginUser = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        if (submitting) return
+        setSubmitting(true)
+
+        const formData = new FormData(event.currentTarget)
+        const user = {
+            email: formData.get('email')?.toString() || '',
+            password: formData.get('password')?.toString() || '',
+        }
+        const supabase = createClient()
+        supabase.auth
+            .signInWithPassword(user)
+            .then((r) => {
+                if (r.error) {
+                    setSubmitting(false)
+                    setError(r.error.toString())
+                } else {
+                    window.location.href = searchParams?.redirect || '/'
+                }
+            })
+            .catch((e) => {
+                setSubmitting(false)
+                setError(e.toString())
+            })
     }
 
     return (
         <>
-            {/* test */}
-            <div className="animate-slide-down-fade absolute inset-0 bg-surface-container-low -z-10" style={{
-                // fit to screen
-                background: 'url(/img/illustrations/home/fox-in-snowy-oasis.webp) center/cover no-repeat',
-            }}/>
+            <div>
+                <Logo className="!h-12 !w-12" />
+                <Heading className="mt-6" size="2xl" as="h2">
+                    Sign in
+                </Heading>
+                <p className="mt-2 text-sm text-gray-600">
+                    Or{' '}
+                    <Link href="/id/create" className="font-medium">
+                        create a new account
+                    </Link>
+                </p>
+            </div>
 
-            <div
-                className="container grid relative h-full flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
-                <Link
-                    href="/id/unlock"
-                    className={cx(
-                        buttonVariants({variant: 'ghost'}),
-                        'absolute right-4 top-4 md:right-8 md:top-8'
-                    )}
-                >
-                    Login
-                </Link>
-                <div className="relative hidden h-full flex-col bg-muted p-8 text-white lg:flex dark:border-r">
-                    <HoverCard.Root>
-                        <HoverCard.Trigger className="w-fit">
-                            <div
-                                className="z-20 flex pointer-events-none items-center text-lg p-2 font-medium bg-background rounded">
-                                <UserInfo size="lg" user={{
-                                    display_name: 'Dutss',
-                                    username: 'dutssz',
-                                    avatar: '/img/illustrations/onboarding/pfp/bernie_burr.png'
-                                }}/>
-                            </div>
-                        </HoverCard.Trigger>
-                        <HoverCard.Portal>
-                            <HoverCard.Content
-                                className="relative data-[side=bottom]:animate-slide-up-fade-snapper data-[side=right]:animate-slideLeftAndFade data-[side=left]:animate-slideRightAndFade data-[side=top]:animate-slide-down-fade w-96 bg-background rounded-md p-5 shadow-md border data-[state=open]:transition-all"
-                                sideOffset={5}
-                                collisionPadding={{left: 32}}
-                            >
-                                {/*<div className="absolute top-0 right-0 w-full h-full -z-[1]">*/}
-                                {/*    <div className="absolute w-full h-full bg-background/90 rounded" />*/}
-                                {/*    <img src="https://api.yipnyap.me/vault/@server/uploads/members/256/cover-image/6378402f65b8b-yp-cover-image.jpg" className="w-full h-full object-cover rounded object-center" alt="Cover image" />*/}
-                                {/*</div>*/}
-                                <div className="flex flex-col gap-[7px]">
-                                    <UserAvatar size="3xl" user={{
-                                        display_name: 'Dutss',
-                                        username: 'dutssz',
-                                        avatar: 'https://api.yipnyap.me/vault/@server/uploads/members/256/avatars/1668891639-bpfull.png'
-                                    }}/>
-                                    <div className="flex flex-col gap-4">
-                                        <div>
-                                            <div className="text-md">Dutss</div>
-                                            <div className="text-sm text-alt">@dutssz</div>
-                                        </div>
-                                        <div className="text-sm">
-                                            I draw
-                                        </div>
-                                        <div className="flex gap-4">
-                                            <div className="flex gap-1">
-                                                <div className="text-sm font-medium">2</div>
-                                                {' '}
-                                                <div className="text-sm">Following</div>
-                                            </div>
-                                            <div className="flex gap-1">
-                                                <div className="text-sm font-medium">1</div>
-                                                {' '}
-                                                <div className="text-sm">Followers</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <HoverCard.Arrow className="fill-white"/>
-                            </HoverCard.Content>
-                        </HoverCard.Portal>
-                    </HoverCard.Root>
-                </div>
-                <div
-                    className="relative animate-slide-down-fade rounded bg-card h-fit justify-self-end sm:w-[350px] top-0 mr-[8.5rem]">
-                    <div className="lg:p-8">
-                        <div className="flex flex-col justify-center space-y-6">
-                            <div className="flex flex-col space-y-2 text-center">
-                                <Heading size="2xl" className="text-2xl">
-                                    Registration is closed.
-                                </Heading>
-                                <Text>
-                                    {ProjectName} is not open for public registration.
-                                </Text>
-                            </div>
-                            {/*<div className="flex flex-col space-y-2 text-center">*/}
-                            {/*    <h1 className="text-2xl font-semibold tracking-tight">*/}
-                            {/*        Create an account*/}
-                            {/*    </h1>*/}
-                            {/*    <p className="text-sm text-muted-foreground">*/}
-                            {/*        Enter your email below to create your account*/}
-                            {/*    </p>*/}
-                            {/*</div>*/}
-                            {/*<UserCreateForm/>*/}
-                            {/*<p className="px-8 text-center text-sm text-muted-foreground">*/}
-                            {/*    By clicking continue, you agree to our{" "}*/}
-                            {/*    <Link*/}
-                            {/*        to="/terms"*/}
-                            {/*        className="underline underline-offset-4 hover:text-primary"*/}
-                            {/*    >*/}
-                            {/*        Terms of Service*/}
-                            {/*    </Link>{" "}*/}
-                            {/*    and{" "}*/}
-                            {/*    <Link*/}
-                            {/*        to="/privacy"*/}
-                            {/*        className="underline underline-offset-4 hover:text-primary"*/}
-                            {/*    >*/}
-                            {/*        Privacy Policy*/}
-                            {/*    </Link>*/}
-                            {/*    .*/}
-                            {/*</p>*/}
-                        </div>
+            <div className="mt-8 space-y-8">
+                {error && (
+                    <Alert variant="destructive">
+                        <AlertTitle>Login failed!</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                )}
+                <form method="POST" className="space-y-6" onSubmit={loginUser}>
+                    <div>
+                        <Input id="email" type="email" label="Email Address" required />
                     </div>
-                </div>
+
+                    <div className="space-y-1">
+                        <Input id="password" label="Password" type="password" autoComplete="current-password" required />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                        {/* Supabase enforces session expiry. */}
+                        {/*<div className="flex items-center">*/}
+                        {/*    <Checkbox id="remember-me"*/}
+                        {/*              name="remember-me"/>*/}
+                        {/*    <label htmlFor="remember-me" className="ml-2 block text-sm">*/}
+                        {/*        Remember me*/}
+                        {/*    </label>*/}
+                        {/*</div>*/}
+
+                        {/*<div className="text-sm">*/}
+                        {/*    <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">*/}
+                        {/*        Forgot your password?*/}
+                        {/*    </a>*/}
+                        {/*</div>*/}
+                    </div>
+
+                    <div>
+                        <Button
+                            variant="default"
+                            type="submit"
+                            disabled={submitting}
+                            className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                            {!submitting ? 'Sign in' : <LoadingCircle />}
+                        </Button>
+                    </div>
+                </form>
             </div>
         </>
     )

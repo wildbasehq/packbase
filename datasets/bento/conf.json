@@ -1,0 +1,7 @@
+{
+  "_rootDir": "https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/ui/",
+  "load": [
+    "badges",
+    "default_emote"
+  ]
+}

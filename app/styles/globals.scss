@@ -5,5 +5,217 @@
 @import 'to-org';
 @import 'nextgen2/main';
 @import 'unicorn/texture';
-@import 'maimai-buddies';
-@import 'snapper/deluxe-shimmer';
+@import 'nextgen2/snapper-engine/deluxe-shimmer';
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+
+    --destructive: 233 38 58;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+
+    --radius: 0.75rem;
+
+    --color-primary-ice-white: 245 246 252;
+    --color-primary-cosmos: 88 40 245;
+    --color-primary-text-cosmos: var(--color-primary-cosmos);
+    --color-primary-midnight: 20 20 26;
+    --color-primary-lime: 206 255 28;
+
+    --color-accent-1: 216 76 16;
+    --color-accent-5: 221 167 63;
+
+    --color-n-1: 237 239 247;
+    --color-n-2: 211 214 224;
+    --color-n-3: 188 191 204;
+    --color-n-4: 164 169 187;
+    --color-n-5: 110 113 128;
+    --color-n-6: 64 66 77;
+    --color-n-7: 30 30 36;
+    --color-n-8: var(--color-primary-midnight);
+  }
+
+  .dark {
+    --color-primary-text-cosmos: 190 155 255;
+
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+
+  *,
+  ::before,
+  ::after {
+    //font-family: 'Lexend Variable', sans-serif;
+    @apply border-default unicorn:border-[rgb(var(--md-sys-outline)/.25)];
+  }
+}
+
+@layer base {
+  * {
+    @apply border-default;
+  }
+
+  body {
+    //@apply bg-background text-foreground;
+  }
+}
+
+#snap-UniverseEntryTest {
+  transform: translateY(100%);
+  animation: slideUpUniverse 400ms cubic-bezier(0.32, 0.72, 0, 1);
+  animation-fill-mode: forwards;
+  animation-delay: 5s;
+}
+
+#NGContentArea.EntryTest {
+  animation: slideUpUniverseBody 400ms cubic-bezier(0.32, 0.72, 0, 1);
+  animation-fill-mode: forwards;
+  animation-delay: 5s;
+}
+
+.EntryPointTestStage2 {
+  animation: slideUpUniverseStage2 400ms cubic-bezier(0.32, 0.72, 0, 1) !important;
+  animation-fill-mode: forwards !important;
+}
+
+.EntryPointTestStage2Body {
+  animation: slideUpUniverseBodyStage2 400ms cubic-bezier(0.32, 0.72, 0, 1) !important;
+  animation-fill-mode: forwards !important;
+}
+
+.AccordionChevron {
+  color: var(--violet-10);
+  transition: transform 300ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.AccordionTrigger[data-state='open'] > .AccordionChevron {
+  transform: rotate(180deg);
+}
+
+.AccordionContent[data-state='open'] {
+  @apply border-b;
+  animation: slideDown 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.AccordionContent[data-state='closed'] {
+  animation: slideUp 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes slide-up-fade-out {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes slideUpUniverse {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpUniverseStage2 {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(0%);
+    height: 100%;
+  }
+}
+
+@keyframes slideUpUniverseBody {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-5%);
+    filter: blur(0.15rem);
+  }
+}
+
+@keyframes slideUpUniverseBodyStage2 {
+  0% {
+    transform: translateY(-5%);
+  }
+  100% {
+    transform: translateY(-15%);
+    filter: blur(0.5rem);
+  }
+}

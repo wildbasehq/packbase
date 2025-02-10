@@ -1,1 +1,0 @@
-export { NGCTA, NGCTABody, NGCTASideImage } from "./NGCTA";

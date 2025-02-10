@@ -1,21 +1,24 @@
 'use client'
 
-import {Dispatch, SetStateAction, useCallback, useEffect, useRef,} from 'react'
-import FocusTrap from 'focus-trap-react'
-import {AnimatePresence, motion} from 'framer-motion'
-import Leaflet from './leaflet'
 import useWindowSize from '@/lib/hooks/use-window-size'
+import clsx from 'clsx'
+import FocusTrap from 'focus-trap-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useCallback, useEffect, useRef } from 'react'
+import Leaflet from './leaflet'
 
 export default function Modal({
-                                  children,
-                                  showModal,
-                                  setShowModal,
-                                  maxWidth,
-                              }: {
-    children: React.ReactNode;
-    showModal: boolean;
-    setShowModal: Dispatch<SetStateAction<boolean>>;
-    maxWidth?: boolean;
+    children,
+    showModal,
+    setShowModal,
+    maxWidth,
+    className,
+}: {
+    children: React.ReactNode
+    showModal: boolean
+    setShowModal: any
+    maxWidth?: boolean
+    className?: string
 }) {
     const desktopModalRef = useRef(null)
 
@@ -33,7 +36,7 @@ export default function Modal({
         return () => document.removeEventListener('keydown', onKeyDown)
     }, [onKeyDown])
 
-    const {isMobile, isDesktop} = useWindowSize()
+    const { isMobile, isDesktop } = useWindowSize()
 
     return (
         <AnimatePresence>
@@ -42,14 +45,14 @@ export default function Modal({
                     {isMobile && <Leaflet setShow={setShowModal}>{children}</Leaflet>}
                     {isDesktop && (
                         <>
-                            <FocusTrap focusTrapOptions={{initialFocus: false}}>
+                            <FocusTrap focusTrapOptions={{ initialFocus: false }}>
                                 <motion.div
                                     ref={desktopModalRef}
                                     key="desktop-modal"
-                                    className="fixed inset-0 z-50 hidden min-h-screen items-center justify-center md:py-8 md:flex"
-                                    initial={{scale: 0.95}}
-                                    animate={{scale: 1}}
-                                    exit={{scale: 0.95}}
+                                    className="fixed inset-0 z-50 hidden min-h-screen items-center justify-center md:flex md:py-8"
+                                    initial={{ opacity: 0, scale: 0.95, translateY: 10 }}
+                                    animate={{ opacity: 1, scale: 1, rotate: 0, translateY: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95, rotate: -1 }}
                                     onMouseDown={(e) => {
                                         if (desktopModalRef.current === e.target) {
                                             setShowModal(false)
@@ -57,7 +60,11 @@ export default function Modal({
                                     }}
                                 >
                                     <div
-                                        className={`overflow-hidden shadow-xl bg-white dark:bg-neutral-900 ${maxWidth ? '' : 'w-full md:max-w-md'} md:rounded-2xl md:border border-default`}>
+                                        className={clsx(
+                                            className,
+                                            `overflow-hidden bg-card shadow-xl ${maxWidth ? '' : 'w-full md:max-w-md'} border-default md:rounded-2xl md:border`,
+                                        )}
+                                    >
                                         {children}
                                     </div>
                                 </motion.div>
@@ -65,9 +72,9 @@ export default function Modal({
                             <motion.div
                                 key="desktop-backdrop"
                                 className="fixed inset-0 z-40 bg-gray-100 bg-opacity-10 backdrop-blur"
-                                initial={{opacity: 0}}
-                                animate={{opacity: 1}}
-                                exit={{opacity: 0}}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
                                 onClick={() => setShowModal(false)}
                             />
                         </>

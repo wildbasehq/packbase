@@ -3,5 +3,13 @@
  */
 
 .bg-card {
-  @apply bg-gradient-to-b from-white to-n-1 dark:from-n-6 dark:to-n-7 unicorn:bg-surface-variant/95;
+  @apply bg-n-1 dark:bg-n-7;
+}
+
+.bg-card\/75 {
+  @apply bg-n-1/75 dark:bg-n-7/75;
+}
+
+.bg-card-solid {
+  @apply bg-white dark:bg-n-7;
 }

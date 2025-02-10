@@ -2,67 +2,98 @@
 
 import UserAvatar from '@/components/shared/user/avatar'
 // @ts-ignore
+import Link from '@/components/shared/link'
+import Markdown from '@/components/shared/markdown'
+import { BentoStaffBadge } from '@/lib/utils/pak'
 import * as HoverCard from '@radix-ui/react-hover-card'
-import {Drawer} from 'vaul'
-import {useState} from 'react'
-import clsx from 'clsx'
+import Image from 'next/image'
 
-export default function UserInfoCol({user, size, inDrawer}: {
-    user: any; // object
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-    inDrawer?: boolean;
+export default function UserInfoCol({
+    user,
+    size,
+    tag,
+}: {
+    user: any // object
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+    tag?: React.ReactNode
 }) {
-    const [snap, setSnap] = useState<number | string | null>('148px')
+    // const [snap, setSnap] = useState<number | string | null>('148px')
 
-    const DrawerRoot = inDrawer ? Drawer.NestedRoot : Drawer.Root
+    // const DrawerRoot = inDrawer ? Drawer.NestedRoot : Drawer.Root
 
     return (
-        <DrawerRoot
-            snapPoints={['355px', '640px', 1]}
-            activeSnapPoint={snap}
-            setActiveSnapPoint={setSnap}
-            shouldScaleBackground
-        >
-            <Drawer.Trigger>
-                <HoverCard.Root>
-                    <HoverCard.Trigger asChild>
-                        <UserInfo user={user} size={size}/>
-                    </HoverCard.Trigger>
-                    <HoverCard.Portal>
-                        <HoverCard.Content side="bottom" align="start" sideOffset={5}>
-                            <div className="max-w-md w-fit h-fit">
+        <HoverCard.Root>
+            <HoverCard.Trigger className="select-none !no-underline">
+                <UserInfo user={user} size={size} tag={tag} />
+            </HoverCard.Trigger>
+            <HoverCard.Portal>
+                <HoverCard.Content
+                    className="data-[side=right]:animate-slideLeftAndFade data-[side=left]:animate-slideRightAndFade relative w-96 overflow-hidden rounded border bg-card p-5 shadow data-[side=bottom]:animate-slide-up-fade-snapper data-[side=top]:animate-slide-down-fade data-[state=open]:transition-all"
+                    sideOffset={5}
+                    collisionPadding={{ left: 32 }}
+                >
+                    {user.images?.header && (
+                        <div className="pointer-events-none absolute right-0 top-0 h-full w-full">
+                            {/*<div className="absolute w-full h-full bg-card/90 rounded"/>*/}
+                            <Image
+                                src={user.images?.header}
+                                width={1080}
+                                height={1080}
+                                className="h-full w-full rounded object-cover object-center opacity-10"
+                                alt="Cover image"
+                            />
+                        </div>
+                    )}
+
+                    <div className="z-50 flex flex-col gap-[7px]">
+                        <UserAvatar size="3xl" user={user} />
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <div className="text-md">
+                                    {user.display_name || user.username}
+                                    {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />}
+                                </div>
+                                <div className="text-alt text-sm">@{user.username}</div>
                             </div>
-                        </HoverCard.Content>
-                    </HoverCard.Portal>
-                </HoverCard.Root>
-            </Drawer.Trigger>
-            <Drawer.Portal>
-                <Drawer.Content
-                    className="fixed flex flex-col bg-card border border-b-none rounded-t-[10px] bottom-0 left-0 right-0 h-full max-h-[97%] mx-[-1px] md:mx-auto md:max-w-sm lg:max-w-md xl:max-w-lg">
-                    <div
-                        className={clsx('flex flex-col w-full', {
-                            'overflow-y-auto': snap === 1,
-                            'overflow-hidden': snap !== 1,
-                        })}
-                    >
+                            <Markdown className="text-sm">{user.about?.bio}</Markdown>
+                            {user.mutuals && (
+                                <div className="flex gap-4">
+                                    <div className="flex gap-1">
+                                        <div className="text-sm font-medium">{user.mutuals}</div>
+                                        <div className="text-sm">Mutuals</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </Drawer.Content>
-            </Drawer.Portal>
-        </DrawerRoot>
+
+                    <HoverCard.Arrow className="fill-white" />
+                </HoverCard.Content>
+            </HoverCard.Portal>
+        </HoverCard.Root>
     )
 }
 
-export function UserInfo({user, size}: {
-    user: any; // object
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+export function UserInfo({
+    user,
+    size,
+    tag,
+}: {
+    user: any // object
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+    tag?: React.ReactNode
 }) {
     return (
         <div className="flex flex-row items-center gap-2">
-            <UserAvatar user={user} size={size || 'md'}/>
+            <UserAvatar user={user} size={size} />
             <div className="flex flex-col">
-                <span className="text-sm font-semibold">{user.username || user.avatar}</span>
-                <span
-                    className="self-baseline text-xs text-alt unicorn:text-on-surface-variant/50">{user.tag || 'piss'}</span>
+                <Link href={`/@${user.username}`} className="text-default text-sm font-semibold">
+                    {user.display_name || user.username}
+                    {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />}
+                </Link>
+                <span className="text-alt w-32 self-baseline overflow-hidden text-ellipsis whitespace-nowrap text-xs unicorn:text-on-surface-variant/50">
+                    {tag || user.tag || user.about?.bio || 'piss'}
+                </span>
             </div>
         </div>
     )

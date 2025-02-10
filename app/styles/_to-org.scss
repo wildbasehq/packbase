@@ -6,30 +6,9 @@
   background: rgba($color, $opacity);
 }
 
-$colors: (
-  //'bg-body': theme('colors.n.1'),
-  //'bg-body-acrylic': theme('colors.n.1/50'),
-        'bg-card-alt': #f5f5f5,
-        'bg-hover': rgb(243, 243, 243),
-        'text-body': theme('colors.n.6'),
-        'text-alt': theme('colors.n.4'),
-        'fill-alt': theme('colors.n.4'),
-        'border-default': #e5e5e5,
-);
-
-$colors-dark: (
-  //'bg-body': theme('colors.n.7'),
-  //'bg-body-acrylic': theme('colors.n.7/50'),
-        'bg-card-alt': theme('colors.n.5'),
-        'bg-hover': rgb(36, 36, 36),
-        'text-body': #FFF,
-        'text-alt': theme('colors.n.4'),
-        'fill-alt': theme('colors.n.4'),
-        'border-default': #2e2e2e,
-);
-
 .bg-sidebar {
-  @apply bg-gradient-to-b from-white to-n-1 dark:from-n-7 dark:to-[#1b1b1c];
+//   @apply bg-white dark:bg-n-7;
+  @apply bg-gradient-to-b from-white to-neutral-50 dark:from-n-7 dark:to-n-7/80 unicorn:bg-surface-variant/95;
 }
 
 .bg-sidebar\/90 {
@@ -40,74 +19,13 @@ $colors-dark: (
   @apply bg-n-1/95 dark:bg-n-7/95;
 }
 
-html:not(.dark) {
-  @each $color, $value in $colors {
-    --color-#{$color}: #{$value};
-  }
-}
-
-html.dark {
-  @each $color, $value in $colors-dark {
-    --color-#{$color}: #{$value};
-  }
-}
-
 .font-pixel {
-  font-family: var(--font-pixelify);
-}
-
-@layer base {
-  *,
-  ::before,
-  ::after {
-    //font-family: 'Lexend Variable', sans-serif;
-    @apply border-default unicorn:border-[rgb(var(--md-sys-outline)/.25)];
-  }
-
-  :root {
-    --color-primary-1: 0 132 255;
-
-    --color-accent-1: 216 76 16;
-    --color-accent-5: 221 167 63;
-
-    --color-n-1: 250 250 250;
-    --color-n-2: 245 245 245;
-    --color-n-3: 229 229 229;
-    --color-n-4: 108 114 117;
-    --color-n-5: 74 74 74;
-    --color-n-6: 42 42 42;
-    --color-n-7: 30 30 30;
-    --color-n-8: 20 20 20;
-  }
-
-  // hover
-  .bg-hover {
-    background-color: var(--color-bg-hover);
-  }
-}
-
-//a:not(.no-style) {
-//  color: var(--color-text-primary);
-//}
-
-@each $color, $value in $colors {
-  // check if starts with bg
-  .#{$color} {
-    @if str-slice($color, 0, 2) == 'bg' {
-      background-color: var(--color-#{$color});
-    } @else if str-slice($color, 0, 4) == 'text' {
-      color: var(--color-#{$color});
-    } @else if str-slice($color, 0, 6) == 'border' {
-      border-color: var(--color-#{$color});
-    } @else if str-slice($color, 0, 4) == 'fill' {
-      fill: var(--color-#{$color});
-    }
-  }
+  font-family: var(--font-pixelify), sans-serif;
 }
 
 .load-stagger > * {
   $n: 24;
-  opacity: 0;
+  opacity: 0.25;
   @apply animate-pulse;
 
   @for $x from 0 through $n {
@@ -144,7 +62,7 @@ html.dark {
 
     @for $x from 0 through $n {
       &:nth-child(#{$x}) {
-        animation-delay: 15ms * ($x - 1) !important;
+        animation-delay: 25ms * ($x - 1) !important;
       }
     }
   }
@@ -205,29 +123,6 @@ html.dark {
   @apply before:absolute before:border-neutral-300 before:dark:border-neutral-800 before:inset-0 before:border before:border-solid before:border-x-0 before:border-b-0 before:border-t before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent;
 }
 
-.snapanim-hue-blur {
-  filter: blur(64px) hue-rotate(0);
-  animation: logoHueBlur 1s ease-out, logoHueBlur 120s linear 1s infinite;
-}
-
-.snapanim-hue-blur-reverse {
-  filter: blur(64px) hue-rotate(0);
-  animation: logoHueBlur 1s ease-out reverse, logoHueBlur 120s linear 1s infinite reverse;
-}
-
-.snapanim-elastic {
-  // Transform to zoom in
-  &.snapanim-in {
-    transform: scale(0); // Should start at 0
-    transition: transform 0.25s cubic-bezier(0, 1.25, 0, 1);
-    animation: zoomIn 0.25s cubic-bezier(0, 1.25, 0, 1) forwards;
-  }
-}
-
-.snapanim-shake {
-  animation: shake infinite 100ms;
-}
-
 @keyframes sidenav-pole-entry {
   0% {
     width: 100%;
@@ -237,24 +132,6 @@ html.dark {
   }
   100% {
     width: 100%;
-  }
-}
-
-@keyframes shake {
-  0% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-4px);
-  }
-  50% {
-    transform: translateX(4px);
-  }
-  75% {
-    transform: translateY(-4px);
-  }
-  100% {
-    transform: translateY(4px);
   }
 }
 
