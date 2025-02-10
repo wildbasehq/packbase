@@ -479,12 +479,11 @@ function MediaGrid({ ...props }: any) {
                                             <div className="relative aspect-square">
                                                 <img src={`${bucketRoot}/profiles/${object.data.url}`} alt="" className="aspect-square h-full w-full object-cover" />
 
-                                                {/* @ts-ignore - postContent.objects is very obviously defined :| */}
-                                                {objects.length > 4 && (
+                                                {assets.length > 4 && (
                                                     <div className="absolute right-0 top-0 mr-2 mt-2 flex items-center justify-center">
                                                         <div className="bg-box rounded p-2">
                                                             {/* @ts-ignore - for fuck sake. */}
-                                                            <span className="text-defualt-alt text-sm">+{objects.length - 4}</span>
+                                                            <span className="text-defualt-alt text-sm">+{assets.length - 4}</span>
                                                         </div>
                                                     </div>
                                                 )}
