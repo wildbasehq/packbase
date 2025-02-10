@@ -209,7 +209,14 @@ export default function SettingsGeneral() {
                                 <label htmlFor="avatar" className="text-default block select-none text-sm font-medium leading-6">
                                     Photo
                                 </label>
-                                <input type="file" name="avatar" id="avatar" className="hidden" onChange={(e) => setProfilePicUpload(e.target.files?.[0] || undefined)} />
+                                <input
+                                    type="file"
+                                    name="avatar"
+                                    accept="image/*"
+                                    id="avatar"
+                                    className="hidden"
+                                    onChange={(e) => setProfilePicUpload(e.target.files?.[0] || undefined)}
+                                />
                                 <div className="mt-2 flex items-center gap-x-3">
                                     {!profilePicPreview ? (
                                         <UserCircleIcon className="text-alt h-12 w-12" aria-hidden="true" />
@@ -255,7 +262,14 @@ export default function SettingsGeneral() {
                     </div>
                 </div>
 
-                <input id="cover-photo" name="file-upload" type="file" className="sr-only" onChange={(e) => setCoverPicUpload(e.target.files?.[0] || undefined)} />
+                <input
+                    id="cover-photo"
+                    name="file-upload"
+                    type="file"
+                    className="sr-only"
+                    accept="image/*"
+                    onChange={(e) => setCoverPicUpload(e.target.files?.[0] || undefined)}
+                />
 
                 <div className="mt-6 flex items-center justify-end gap-x-6">
                     <Button
