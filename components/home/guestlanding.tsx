@@ -5,6 +5,7 @@ import { Button } from '@/components/shared/ui/button'
 import Tooltip from '@/components/shared/tooltip'
 import { HelpCircleIcon } from 'lucide-react'
 import Link from '@/components/shared/link'
+import Countdown from '@/components/home/countdown'
 
 const links = [
     { name: 'Join Packbase', href: '/id/create/' },
@@ -71,6 +72,8 @@ export default function GuestLanding() {
                         </div>
                     </div>
                 </div>
+
+                <Countdown />
 
                 {/* Groups */}
                 <div className="overflow-hidden lg:py-24">
