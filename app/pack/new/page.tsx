@@ -92,7 +92,7 @@ function CreateGroupSidebar() {
                 display_name: event.currentTarget.display_name.value,
                 slug: event.currentTarget.slug.value,
                 description: event.currentTarget.description.value,
-                privacy: selected.id,
+                // privacy: selected.id,
             })
             .then(({ data, error }) => {
                 if (error) {

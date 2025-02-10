@@ -53,7 +53,7 @@ export default function Countdown() {
                     Packbase begins waitlist flow in {countdown.days}:{countdown.hours}:{countdown.minutes}:{countdown.seconds}
                 </Heading>
                 <div className="space-y-2">
-                    <Text size="md">
+                    <Text>
                         Well, we're meeting again.{' '}
                         <b>
                             <u>Packbase will start in an invite-only alpha</u>
