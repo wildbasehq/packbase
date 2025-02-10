@@ -58,13 +58,25 @@ function PackMembershipButton({ pack }: { pack: any }) {
             .join.post()
             .then(({ error }) => {
                 if (error) return toast.error(error.value ? `${error.status}: ${error.value.message}` : 'Something went wrong')
-                return toast.success('Joined!')
+                window.location.reload()
             })
             .catch((e) => {
                 console.error(e)
                 return toast.error('Failed to join')
             })
     }
+
+    const packLeave = () => {
+        vg.pack({ id: pack.id })
+            .join.delete()
+            .then(() => {
+                window.location.reload()
+            })
+            .catch((e) => {
+                toast.error(e.message)
+            })
+    }
+
     if (!pack.membership) {
         return (
             <Button size="sm" onClick={packJoin}>
@@ -73,7 +85,7 @@ function PackMembershipButton({ pack }: { pack: any }) {
         )
     }
     return (
-        <Button size="sm" disabled>
+        <Button size="sm" onClick={packLeave}>
             - Leave
         </Button>
     )
