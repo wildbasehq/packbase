@@ -21,6 +21,8 @@ import { EllipsisHorizontalIcon, HandThumbUpIcon, PaperAirplaneIcon } from '@her
 import { MenuButton } from '@headlessui/react'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/shared/dropdown'
 import clsx from 'clsx'
+import { Text } from '@/components/shared/text'
+import { Button } from '@/components/shared/ui/button'
 
 export declare interface FeedPostDataType {
     id: string
@@ -421,17 +423,18 @@ function React({ post }: FeedPostType) {
     return (
         // <HoverCard.Root>
         //     <HoverCard.Trigger>
-        <span className="inline-flex cursor-pointer items-center text-sm hover:underline" onClick={react}>
+        <Button variant="ghost" className="inline-flex !h-fit cursor-pointer items-center px-2 text-sm" onClick={react}>
             {!submitting ? (
                 hasCurrentUser ? (
-                    <XMarkIcon className="text-alt h-5 w-5 hover:text-accent-1" />
+                    <XMarkIcon className="text-alt h-4 w-4 hover:text-accent-1" />
                 ) : (
-                    <HandThumbUpIcon className="text-alt h-5 w-5 hover:text-inherit" />
+                    <HandThumbUpIcon className="text-alt h-4 w-4 hover:text-inherit" />
                 )
             ) : (
-                <LoadingCircle className="h-5 w-5" />
+                <LoadingCircle className="h-4 w-4" />
             )}
-        </span>
+            {post.reactions?.['0']?.length > 0 && <Text className="text-alt ml-2 text-sm">{post.reactions['0'].length}</Text>}
+        </Button>
         //     </HoverCard.Trigger>
         //     <HoverCard.Portal>
         //         <HoverCard.Content side="top">
