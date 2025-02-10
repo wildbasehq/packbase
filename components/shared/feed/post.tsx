@@ -53,7 +53,7 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
     const [postContent, setPostContent] = useState<FeedPostDataType>(post)
     const { id, user, body, created_at, pack, howling, actor, assets } = postContent
 
-    const signedInUser = useUserAccountStore((state) => state.user)
+    const { user: signedInUser } = useUserAccountStore()
 
     const deletePost = () => {
         vg.howl({ id })
@@ -153,10 +153,14 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                 </div>
 
                 {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
-                <div className="flex justify-between space-x-8 border-t px-4 py-4 sm:px-6">
-                    <div className="flex">{signedInUser && <React post={post} />}</div>
-                    <CommentBox className="flex-1" truncate originalPost={post} onComment={onComment} />
-                </div>
+                {signedInUser && !signedInUser.anonUser && (
+                    <div className="flex justify-between space-x-8 border-t px-4 py-4 sm:px-6">
+                        <div className="flex">
+                            <React post={post} />
+                        </div>
+                        <CommentBox className="flex-1" truncate originalPost={post} onComment={onComment} />
+                    </div>
+                )}
 
                 {post?.comments && post.comments.length > 0 && (
                     <div className="px-4 py-4 sm:px-6">
