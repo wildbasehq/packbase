@@ -10,7 +10,7 @@ import { UserProfileBasic } from '@/lib/defs/user'
 import Card from '@/components/shared/card'
 import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
-import { useRef, useState } from 'react'
+import { Dispatch, useRef, useState } from 'react'
 import { LoadingCircle } from '@/components/shared/icons'
 import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
@@ -45,18 +45,18 @@ export declare interface FeedPostDataType {
 
 export declare interface FeedPostType {
     post: FeedPostDataType
+    postState?: [Dispatch<any>, any]
     onDelete?: () => void
     onComment?: (comment: any) => void
 }
 
-export default function FeedPost({ post, onDelete }: FeedPostType) {
+export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
     const [postContent, setPostContent] = useState<FeedPostDataType>(post)
-    const { id, user, body, created_at, pack, howling, actor, assets } = postContent
 
     const { user: signedInUser } = useUserAccountStore()
 
     const deletePost = () => {
-        vg.howl({ id })
+        vg.howl({ id: postContent.id })
             .delete()
             .then(({ data, error }) => {
                 if (error) {
@@ -83,30 +83,33 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                 <div className="relative">
                     <div className="px-4 pt-5 sm:px-6">
                         {/* "___ Rehowled" */}
-                        {howling && (
+                        {postContent.howling && (
                             <div className="mb-6 flex items-center text-sm">
                                 <ArrowUpOnSquareIcon className="mr-2 h-4 w-4" />
-                                <Link href={`/@${actor?.username}/`} className="text-alt flex items-center">
-                                    <UserAvatar size="xs" image={actor?.images?.avatar || ''} className="mr-2" />
-                                    {actor?.username} rehowled
+                                <Link href={`/@${postContent.actor?.username}/`} className="text-alt flex items-center">
+                                    <UserAvatar size="xs" image={postContent.actor?.images?.avatar || ''} className="mr-2" />
+                                    {postContent.actor?.username} rehowled
                                 </Link>
                             </div>
                         )}
-                        {pack && pack.slug !== 'universe' && (
+                        {postContent.pack && postContent.pack.slug !== 'universe' && (
                             <div className="mb-6 flex items-center text-sm">
                                 {/* <UserGroupIcon className="mr-2 h-4 w-4" /> */}
-                                <Link href={`/p/${pack?.slug}/`} className="text-alt flex items-center justify-center !no-underline hover:text-inherit">
-                                    <UserAvatar size="xs" icon={pack?.avatar || ''} className="mr-2 rounded-sm" />
-                                    <span>{pack?.display_name}</span>
+                                <Link href={`/p/${postContent.pack?.slug}/`} className="text-alt flex items-center justify-center !no-underline hover:text-inherit">
+                                    <UserAvatar size="xs" icon={postContent.pack?.avatar || ''} className="mr-2 rounded-sm" />
+                                    <span>{postContent.pack?.display_name}</span>
                                 </Link>
                             </div>
                         )}
                         <div className="flex space-x-3">
                             <div className="flex-1">
-                                <UserInfoCol user={user} tag={<time dateTime={created_at}>about {moment(created_at).fromNow()}</time>} />
+                                <UserInfoCol
+                                    user={postContent.user}
+                                    tag={<time dateTime={postContent.created_at}>about {moment(postContent.created_at).fromNow()}</time>}
+                                />
                             </div>
                             <div className="flex flex-shrink-0 space-x-2 self-center">
-                                {user && user.id === signedInUser?.id && (
+                                {postContent.user && postContent.user.id === signedInUser?.id && (
                                     <Dropdown>
                                         <MenuButton>
                                             <EllipsisHorizontalIcon className="w-5" />
@@ -128,11 +131,11 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                     </div>
                     <div className="min-h-fit w-full cursor-pointer px-4 py-4 sm:px-6">
                         <div className="space-y-4 text-sm text-neutral-700 dark:text-neutral-50">
-                            <Markdown>{body}</Markdown>
+                            <Markdown>{postContent.body}</Markdown>
                         </div>
 
                         {/* Post Objects (Images) */}
-                        {assets && assets.length > 0 && <MediaGrid assets={assets} post={post} truncate />}
+                        {postContent.assets && postContent.assets.length > 0 && <MediaGrid assets={postContent.assets} post={post} truncate />}
                     </div>
                     {/* <div className="bg-box-alt absolute bottom-0 left-0 ml-4 rounded-tl-xl rounded-tr-xl border-x border-b-0 border-t border-solid border-neutral-300 dark:border-neutral-700 sm:ml-6">
                         <div className="flex items-center space-x-2 px-4 py-2">
@@ -173,6 +176,7 @@ export default function FeedPost({ post, onDelete }: FeedPostType) {
                                             comment={comment}
                                             showLine={comment.comments && comment.comments.length > 0}
                                             originalPost={[postContent, setPostContent]}
+                                            postState={postState}
                                             // onClick={() => setSlideoverOpen(true)}
                                         />
                                         {comment.comments && comment.comments.length > 0 && (
@@ -232,6 +236,8 @@ function FeedListItem({ ...props }: any) {
     const [likes, setLikes] = useState(comment.likes || 0)
     const [showReplyBox, setShowReplyBox] = useState(false)
     const [postContent, setPostContent] = originalPost
+    const [postList, setPostList] = props.postState
+    const { user } = useUserAccountStore()
 
     const handleReplySubmit = (commentBody: any, newPostContent: any, commentID: string) => {
         setShowReplyBox(false)
@@ -257,6 +263,23 @@ function FeedListItem({ ...props }: any) {
         })
 
         setPostContent(newPostContent)
+    }
+
+    const deleteComment = () => {
+        vg.howl({ id: comment.id })
+            .delete()
+            .then(({ data, error }) => {
+                if (error) {
+                    return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+                } else {
+                    const newPostContent = { ...postContent }
+                    newPostContent.comments = newPostContent.comments.filter((c: any) => c.id !== comment.id)
+                    let newPostList = postList.filter((c: any) => c.id !== postContent.id)
+                    newPostList.push(newPostContent)
+                    setPostList(newPostList)
+                    return toast.error('Comment deleted.')
+                }
+            })
     }
 
     return (
@@ -301,32 +324,35 @@ function FeedListItem({ ...props }: any) {
                     </div>
 
                     {/* Settings on hover */}
-                    {/*<div className="absolute right-0 top-0 -mr-2 -mt-2 hidden group-hover:block">*/}
-                    {/*    <div className="relative z-10 flex items-center space-x-4">*/}
-                    {/*        /!* Reply & Like *!/*/}
-                    {/*        <div className="bg-box-alt rounded-default flex flex-row items-center justify-between">*/}
-                    {/*            <div className="flex flex-row items-center">*/}
-                    {/*                <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2">*/}
-                    {/*                    <HandThumbUpIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />*/}
-                    {/*                    {likes > 0 && <span className="text-alt text-sm">{likes}</span>}*/}
-                    {/*                </div>*/}
-                    {/*                <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2" onClick={() => setShowReplyBox(!showReplyBox)}>*/}
-                    {/*                    <ChatBubbleLeftIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />*/}
-                    {/*                </div>*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
+                    <div className="absolute right-0 top-0 -mr-2 -mt-2 hidden group-hover:block">
+                        <div className="relative z-10 flex items-center space-x-4">
+                            {/* Reply & Like */}
+                            {/*<div className="bg-box-alt rounded-default flex flex-row items-center justify-between">*/}
+                            {/*    <div className="flex flex-row items-center">*/}
+                            {/*        <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2">*/}
+                            {/*            <HandThumbUpIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />*/}
+                            {/*            {likes > 0 && <span className="text-alt text-sm">{likes}</span>}*/}
+                            {/*        </div>*/}
+                            {/*        <div className="rounded-default hover:bg-box flex flex-row items-center space-x-2 p-2" onClick={() => setShowReplyBox(!showReplyBox)}>*/}
+                            {/*            <ChatBubbleLeftIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />*/}
+                            {/*        </div>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
 
-                    {/*        <button*/}
-                    {/*            type="button"*/}
-                    {/*            className="bg-box-alt text-default hover:bg-box flex h-8 w-8 items-center justify-center rounded-full"*/}
-                    {/*            aria-expanded="false"*/}
-                    {/*            aria-haspopup="true"*/}
-                    {/*        >*/}
-                    {/*            <span className="sr-only">Open options</span>*/}
-                    {/*            <EllipsisHorizontalIcon className="h-5 w-5" aria-hidden="true" />*/}
-                    {/*        </button>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
+                            {comment.user.id === user.id && (
+                                <button
+                                    type="button"
+                                    className="bg-box-alt text-default hover:bg-box flex h-8 w-8 items-center justify-center rounded-full"
+                                    aria-expanded="false"
+                                    aria-haspopup="true"
+                                    onClick={() => deleteComment()}
+                                >
+                                    <span className="sr-only">Open options</span>
+                                    <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                                </button>
+                            )}
+                        </div>
+                    </div>
 
                     {/* Comment box to reply */}
                     {showReplyBox && (
