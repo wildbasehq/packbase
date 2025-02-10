@@ -58,7 +58,7 @@ export default function PackLayout({ children, params }: { children: React.React
                             },
                         ]
 
-                        for (const page of res.data.pages || []) {
+                        for (const page of res.data?.pages || []) {
                             naviBuild.push({
                                 name: page.title,
                                 description: page.description,

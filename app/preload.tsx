@@ -43,21 +43,11 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                                     display_name: data?.display_name || 'new_here_' + new Date().getTime(),
                                     reqOnboard: !data || !data?.username,
                                     dp: dipswitch,
+                                    anonUser: !data,
                                     ...data,
                                 }
 
                                 setResources(packs)
-
-                                if (user.user_metadata.waitlistType !== 'free') {
-                                    // Assume they're in the waitlist
-                                    const waitlistType = user.user_metadata.waitlistType || 'wait'
-                                    userBuild = {
-                                        ...userBuild,
-                                        waitlistType,
-                                        anonUser: ['wait', 'ban'].includes(waitlistType),
-                                    }
-                                }
-
                                 setUser(userBuild)
                                 proceed()
                             })

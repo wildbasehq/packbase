@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
+import { Text } from '@/components/shared/text'
 
 export default function Tooltip({
     children,
@@ -29,7 +30,13 @@ export default function Tooltip({
                     side={side || 'top'}
                     className="border-default z-30 hidden max-w-[20rem] items-center rounded-md border bg-card drop-shadow-lg sm:block"
                 >
-                    {typeof content === 'string' ? <span className="block px-2 py-1.5 text-center text-xs font-light">{content}</span> : content}
+                    {typeof content === 'string' ? (
+                        <Text size="xs" className="px-2 py-1.5 text-center">
+                            {content}
+                        </Text>
+                    ) : (
+                        content
+                    )}
                     <TooltipPrimitive.Arrow className="fill-n-1 dark:fill-n-7" />
                 </TooltipPrimitive.Content>
             </TooltipPrimitive.Root>

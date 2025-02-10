@@ -356,7 +356,7 @@ const steps: {
                                     desc: 'However much you have on your Pixeldrain account',
                                 },
                                 {
-                                    id: 'none',
+                                    id: 'dummy',
                                     name: 'More soon!',
                                     disabled: true,
                                 },

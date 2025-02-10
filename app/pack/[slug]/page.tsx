@@ -53,7 +53,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                 <>
                     {pack && pack?.slug !== 'universe' && <PackHeader pack={pack} />}
 
-                    {user && (
+                    {user && !user.anonUser && (
                         <div className="p-8">
                             <FeedList packID={pack.id} />
                         </div>

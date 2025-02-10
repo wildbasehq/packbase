@@ -54,7 +54,19 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
         <DropdownHeader className="flex w-96 flex-col !p-0">
             <div className="h-fit w-full rounded-bl rounded-br bg-white/50 shadow dark:bg-n-6/50">
                 <div className="border-b p-2">
-                    {user.reqOnboard && (
+                    {user?.anonUser && (
+                        <Link
+                            href="/settings"
+                            className="ring-default flex flex-col justify-center rounded px-4 py-4 !no-underline transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"
+                        >
+                            <Heading size="sm">You need an invite</Heading>
+                            <Text size="xs" className="text-alt">
+                                You'll need an invite code to join Packbase. If you have one, click here! Otherwise, ask a friend or wait and see if you get lucky on our
+                                weekly rounds.
+                            </Text>
+                        </Link>
+                    )}
+                    {user.reqOnboard && !user.anonUser && (
                         <div
                             onClick={() => showOnboardingModal(true)}
                             className="ring-default flex flex-col justify-center rounded px-4 py-4 !no-underline transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"

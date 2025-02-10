@@ -52,7 +52,7 @@ export default function WaitlistCheck() {
     }, [location, user])
 
     const CurrentServiceIcon = ServiceStates[serviceStatus].icon
-    if (!user) return <></>
+    if (!user || !user.anonUser) return <></>
     return (
         <div
             className={`bg-sidebar relative flex select-none items-start justify-between gap-x-8 gap-y-4 overflow-hidden border-b px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:px-6 lg:px-8 ${

@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic'
 import localFont from 'next/font/local'
 import { inter, lexend } from './fonts'
 import './styles/globals.scss'
+import WaitlistCheck from '@/components/layout/waitlist-check'
 
 const wildbaseRemix = localFont({
     src: [
@@ -64,7 +65,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
                                 <div className="h-full w-full">
                                     <div id="NGRoot" className="h-full overflow-y-auto">
-                                        {/*<WaitlistCheck/>*/}
+                                        <WaitlistCheck />
                                         <Preload>{children}</Preload>
                                     </div>
                                 </div>

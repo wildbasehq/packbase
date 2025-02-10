@@ -6,7 +6,7 @@ import { Text } from '@/components/shared/text'
 import Tooltip, { TooltipContent } from '@/components/shared/tooltip'
 import { Button } from '@/components/shared/ui/button'
 import UserAvatar from '@/components/shared/user/avatar'
-import { useResourceStore, useUIStore } from '@/lib/states'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
 import { cn } from '@/lib/utils'
 import { UsersIcon } from '@heroicons/react/20/solid'
 import { PlusIcon } from '@heroicons/react/24/solid'
@@ -24,6 +24,7 @@ export default function PackSwitcher() {
     })
 
     const { currentResource, setCurrentResource, resources } = useResourceStore()
+    const { user } = useUserAccountStore()
     const { resourceDefault, loading, setLoading } = useUIStore()
     const router = useRouter()
 
@@ -88,13 +89,15 @@ export default function PackSwitcher() {
                 </Tooltip>
             ))}
 
-            <Tooltip content="Create/Join Pack" side="right" delayDuration={0}>
-                <Link href="/p/new" className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === 'new' && 'force-pill')}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 p-1 text-white">
-                        <PlusIcon />
-                    </Button>
-                </Link>
-            </Tooltip>
+            {user && !user.anonUser && (
+                <Tooltip content="Create/Join Pack" side="right" delayDuration={0}>
+                    <Link href="/p/new" className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === 'new' && 'force-pill')}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 p-1 text-white">
+                            <PlusIcon />
+                        </Button>
+                    </Link>
+                </Tooltip>
+            )}
 
             <div className="grow" />
 

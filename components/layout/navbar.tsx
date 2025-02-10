@@ -27,7 +27,7 @@ export default function NavBar() {
 
     return (
         <>
-            {user && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]} />}
+            {user && !user.anonUser && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]} />}
 
             <div className="bg-sidebar border-default sticky top-0 z-30 flex h-16 border-0 border-b border-solid shadow-sm">
                 <nav aria-label="Sections" className="hidden h-16 lg:flex lg:flex-col">

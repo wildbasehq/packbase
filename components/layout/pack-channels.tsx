@@ -45,7 +45,7 @@ export function PackChannels({ ...props }: SideNavType) {
         <>
             <nav aria-label="Sections" className={`${slimNavClass} bg-sidebar hidden h-screen flex-shrink-0 overflow-y-auto border-r md:flex md:flex-col`}>
                 <div className="no-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-visible p-6">
-                    {user && <HowlCreator />}
+                    {user && !user.anonUser && <HowlCreator />}
                     {navigation.length === 0 && (
                         <div className="load-stagger">
                             {Array.from({ length: 20 }).map((_, i) => (

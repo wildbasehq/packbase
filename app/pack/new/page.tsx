@@ -27,7 +27,7 @@ export default function PackAdd() {
 
     return (
         <div className="divide-default grid grid-cols-1 space-y-12 divide-y pb-48">
-            {user && (
+            {user && !user.anonUser && (
                 <Body noPadding>
                     <CTA>
                         <CTABody>
