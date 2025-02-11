@@ -1,43 +1,43 @@
-"use client";
+'use client'
 
-import Modal from ".";
-import { ReactNode, createContext, useContext, useState } from "react";
+import Modal from '.'
+import { createContext, ReactNode, useContext, useState } from 'react'
 
 interface ModalContextProps {
-    show: (content: ReactNode) => void;
-    hide: () => void;
+    show: (content: ReactNode) => void
+    hide: () => void
 }
 
-const ModalContext = createContext<ModalContextProps | undefined>(undefined);
+const ModalContext = createContext<ModalContextProps | undefined>(undefined)
 
 export function ModalProvider({ children }: { children: ReactNode }) {
-    const [modalContent, setModalContent] = useState<ReactNode | null>(null);
-    const [showModal, setShowModal] = useState(false);
+    const [modalContent, setModalContent] = useState<ReactNode | null>(null)
+    const [showModal, setShowModal] = useState(false)
 
     const show = (content: ReactNode) => {
-        setModalContent(content);
-        setShowModal(true);
-    };
+        setModalContent(content)
+        setShowModal(true)
+    }
 
     const hide = () => {
-        setShowModal(false);
+        setShowModal(false)
         setTimeout(() => {
-            setModalContent(null);
-        }, 300); // Adjust this timeout as per your transition duration
-    };
+            setModalContent(null)
+        }, 300) // Adjust this timeout as per your transition duration
+    }
 
     return (
         <ModalContext.Provider value={{ show, hide }}>
             {children}
-            {showModal && (
+            {modalContent && (
                 <Modal showModal={showModal} setShowModal={setShowModal}>
                     {modalContent}
                 </Modal>
             )}
         </ModalContext.Provider>
-    );
+    )
 }
 
 export function useModal() {
-    return useContext(ModalContext);
+    return useContext(ModalContext)
 }

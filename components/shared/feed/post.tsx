@@ -89,7 +89,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                             <div className="mb-6 flex items-center text-sm">
                                 <ArrowUpOnSquareIcon className="mr-2 h-4 w-4" />
                                 <Link href={`/@${postContent.actor?.username}/`} className="text-alt flex items-center">
-                                    <UserAvatar size="xs" image={postContent.actor?.images?.avatar || ''} className="mr-2" />
+                                    <UserAvatar size="xs" icon={postContent.actor?.images?.avatar || ''} className="mr-2" />
                                     {postContent.actor?.username} rehowled
                                 </Link>
                             </div>
@@ -98,7 +98,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                             <div className="mb-6 flex items-center text-sm">
                                 {/* <UserGroupIcon className="mr-2 h-4 w-4" /> */}
                                 <Link href={`/p/${postContent.pack?.slug}/`} className="text-alt flex items-center justify-center !no-underline hover:text-inherit">
-                                    <UserAvatar size="xs" icon={postContent.pack?.avatar || ''} className="mr-2 rounded-sm" />
+                                    <UserAvatar size="xs" icon={postContent.pack?.images?.avatar || ''} className="mr-2 rounded-sm" />
                                     <span>{postContent.pack?.display_name}</span>
                                 </Link>
                             </div>

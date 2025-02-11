@@ -97,7 +97,11 @@ function CreateGroupSidebar() {
             .then(({ data, error }) => {
                 if (error) {
                     setSubmitting(false)
-                    toast.error(error.value.message)
+                    toast.error(
+                        `Whoops! ${error.status}: ${
+                            (error.status as unknown as number) === 403 ? 'You are not authorized to perform this action.' : error.value.summary
+                        }${error.value.property ? ` (/${error.value.on}${error.value.property})` : ''}`,
+                    )
                     return
                 }
 

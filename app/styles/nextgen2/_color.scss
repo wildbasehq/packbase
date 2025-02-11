@@ -15,6 +15,10 @@
   @apply ring-n-2 dark:ring-n-6/80;
 }
 
+.ring-shadow {
+  @apply ring-n-2/50 dark:ring-n-6/80;
+}
+
 .bg-default {
   @apply bg-white dark:bg-neutral-800;
 }
