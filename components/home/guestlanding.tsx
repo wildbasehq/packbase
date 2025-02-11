@@ -199,9 +199,9 @@ export default function GuestLanding() {
                                     colours, we just gave you complete HTML/CSS control and even the ability to set your own custom domain, with no ads nor tracking.
                                     <br />
                                     <br />
-                                    Oh... and infinite storage. And Storage & Database SOC2 T2 & HIPAA compliance
+                                    Oh... and infinite storage for your site
                                     <Tooltip
-                                        content="Our storage and database provider including the tools our APIs use to interact with it is fully compliant. While we still work and guarantee the whole data flow (Our API -> Provider) follows the same rules, verifying and getting the whole stack certified is not possible for us at the moment."
+                                        content="You have unlimited storage, but each file cannot exceed 10MB. This only affects our storage, so if you need more space you can always use a third-party service."
                                         side="right"
                                     >
                                         <HelpCircleIcon className="-mt-2 h-4 w-4" />
