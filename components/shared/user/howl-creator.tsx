@@ -21,7 +21,6 @@ export default function HowlCreator() {
     const { user } = useUserAccountStore()
     const { currentResource } = useResourceStore()
     const [submitting, setSubmitting] = useState<boolean>(false)
-    const [willUpload, setWillUpload] = useState<number>(0)
     const [showModal, setShowModal] = useState<boolean>(false)
     const [attachments, setAttachments] = useState<{ bright: boolean; data: string }[]>([])
     const [body, setBody] = useState<string>('')
@@ -38,7 +37,7 @@ export default function HowlCreator() {
             content_type: string
             assets?: any[]
         } = {
-            body: body,
+            body: body || null,
             content_type: 'markdown',
         }
 
@@ -190,7 +189,6 @@ export default function HowlCreator() {
                         <div className="justify-between space-y-4 border-t px-4 py-4 sm:px-6">
                             <div className="flex w-full items-center space-x-6">
                                 <div className="ml-auto flex items-center space-x-5">
-                                    {willUpload ? `dbg: will upload ${willUpload}` : ''}
                                     <div className="flex items-center">
                                         <button
                                             type="button"
