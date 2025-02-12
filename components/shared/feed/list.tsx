@@ -9,16 +9,19 @@ import SelectMenu from '@/components/shared/input/select-dropdown'
 import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/ui/button'
 import { vg } from '@/lib/api'
-import { useUISettingsStore } from '@/lib/states'
+import { useUISettingsStore, useUIStore } from '@/lib/states'
 import { HelpCircleIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import { toast } from '@/lib/toast'
-import { HandRaisedIcon, MegaphoneIcon } from '@heroicons/react/20/solid'
+import { HandRaisedIcon, MegaphoneIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid'
 import { ProjectSafeName } from '@/lib/utils'
 import UserAvatar from '@/components/shared/user/avatar'
+import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
+import WrenchCharacter from '@/public/svg/wrench-character.svg'
+import Link from '@/components/shared/link'
 
 export default function FeedList({
     packID = '00000000-0000-0000-0000-000000000000',
@@ -29,6 +32,37 @@ export default function FeedList({
     changingView?: boolean
     setChangingView?: any
 }) {
+    const { maintenance } = useUIStore()
+
+    if (maintenance) {
+        return (
+            <div className="flex flex-col items-center justify-center">
+                <Alert className="max-w-4xl">
+                    <AlertTitle>
+                        <WrenchScrewdriverIcon className="text-default -mt-1 mr-1 inline-block h-4 w-4" />
+                        Feed Maintenance
+                    </AlertTitle>
+                    <AlertDescription className="grid grid-cols-2">
+                        <span>
+                            The feed is currently under maintenance and can't be used. Please check again later!
+                            <br />
+                            <br />
+                            {maintenance}
+                            <br />
+                            <br />
+                            <Link href="https://discord.gg/StuuK55gYA" target="_blank" className="underline">
+                                <Button variant="primary">Discord</Button>
+                            </Link>{' '}
+                        </span>
+                        <div className="flex items-center justify-end">
+                            <Image src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto" />
+                        </div>
+                    </AlertDescription>
+                </Alert>
+            </div>
+        )
+    }
+
     const feedID = 'EVERYTHING0'
     const [error, setError] = useState<Error | null>(null)
     const [postsReady, setPostsReady] = useState<boolean>(false)

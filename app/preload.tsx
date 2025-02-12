@@ -16,7 +16,7 @@ export default function Preload({ children }: { children: React.ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`polling ${API_URL}`)
     const [error, setError] = useState<any | null>(null)
     const { setUser } = useUserAccountStore()
-    const { setLoading, setConnecting, setBucketRoot } = useUIStore()
+    const { setLoading, setConnecting, setBucketRoot, setMaintenance } = useUIStore()
     const { setResources } = useResourceStore()
 
     useEffect(() => {
@@ -25,6 +25,7 @@ export default function Preload({ children }: { children: React.ReactNode }) {
             .get()
             .then((server) => {
                 setBucketRoot(server.data.bucketRoot)
+                setMaintenance(server.data.maintenance)
                 setServiceLoading('auth')
                 // @ts-ignore
                 supabase.auth.getUser().then(async ({ data: { user } }) => {
