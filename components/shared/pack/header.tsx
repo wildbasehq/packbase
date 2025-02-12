@@ -52,7 +52,6 @@ export default function PackHeader({ ...props }: any) {
 }
 
 function PackMembershipButton({ pack }: { pack: any }) {
-    console.log(pack)
     const packJoin = () => {
         vg.pack({ id: pack.id })
             .join.post()
@@ -84,8 +83,9 @@ function PackMembershipButton({ pack }: { pack: any }) {
             </Button>
         )
     }
+
     return (
-        <Button size="sm" onClick={packLeave}>
+        <Button size="sm" onClick={packLeave} disabled={(pack.membership?.permissions & 1) === 1}>
             - Leave
         </Button>
     )
