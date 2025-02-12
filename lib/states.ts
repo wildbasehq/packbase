@@ -72,7 +72,7 @@ interface ResourceStore {
 }
 
 const resourceDefault = {
-    id: 'universe',
+    id: '00000000-0000-0000-0000-000000000000',
     slug: 'universe',
     display_name: ProjectSafeName,
     standalone: true,
