@@ -55,8 +55,9 @@ export declare interface FeedPostType {
 export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
     const [postContent, setPostContent] = useState<FeedPostDataType>(post)
     const [slideoverOpen, setSlideoverOpen] = useState(false)
+    const [slideoverDecal, setSlideoverDecal] = useState(false)
     const [slideoverMediaOpen, setSlideoverMediaOpen] = useState(false)
-    const [selectedMedia, setSelectedMedia] = useState()
+    const [selectedMedia, setSelectedMedia] = useState<any>()
 
     const { user: signedInUser } = useUserAccountStore()
     const bucketRoot = useUIStore((state) => state.bucketRoot)
@@ -93,49 +94,114 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                 setAspectRatio(rounded)
             }
         }
+
+        setSlideoverDecal(slideoverOpen)
     }, [slideoverOpen])
+
+    useEffect(() => {
+        if (!slideoverDecal) setTimeout(() => setSlideoverOpen(false), 100)
+    }, [slideoverDecal])
+
+    useEffect(() => {
+        setSlideoverMediaOpen(!!selectedMedia)
+    }, [selectedMedia])
+
+    useEffect(() => {
+        if (!slideoverMediaOpen) setTimeout(() => setSelectedMedia(null), 100)
+    }, [slideoverMediaOpen])
 
     let alreadyAnnouncedMore = false
 
     return (
         <>
-            <Slideover
-                expandNatural={aspectRatio > 1.2}
-                className={`${
-                    slideoverMediaOpen ? '-translate-x-24 transition-transform duration-150 will-change-transform' : ''
-                } transition-transform duration-150 will-change-transform`}
-                open={[slideoverOpen, setSlideoverOpen]}
-            >
-                <div className="px-4 py-4 sm:px-6">
-                    <div className="rounded-default bg-default sticky top-0 z-50 flex space-x-3 py-2">
-                        <UserInfoCol user={postContent.user} tag={<time dateTime={postContent.created_at}>about {moment(postContent.created_at).fromNow()}</time>} />
-                    </div>
-
-                    <div className="text-default mt-4 space-y-4 break-words text-sm">
-                        <Markdown>{postContent.body}</Markdown>
-                    </div>
-
-                    {postContent?.assets && postContent.assets.length > 0 && <MediaGrid objects={postContent.assets} selectState={[selectedMedia, setSelectedMedia]} />}
-                </div>
-
-                <div className="bg-default-alt flex flex-col justify-between space-y-8 overflow-hidden rounded px-4 py-4 highlight-white/5 sm:px-6">
-                    <div className="flex space-x-6">{signedInUser && !signedInUser.anonUser && <React post={postContent} />}</div>
-
-                    {postContent?.comments && postContent.comments.length > 0 && (
-                        <>
-                            {signedInUser && !signedInUser.anonUser && <CommentBox className="flex-1" truncate originalPost={postContent} onComment={onComment} />}
-
-                            <div className="flow-root">
-                                <ul role="list" className="-mb-8">
-                                    {postContent.comments.map((comment) => (
-                                        <RecursiveCommentThread key={comment.id} comment={comment} originalPost={[postContent, setPostContent]} postState={postState} />
-                                    ))}
-                                </ul>
+            {selectedMedia && (
+                <Slideover expandNatural={true} open={[slideoverMediaOpen, setSlideoverMediaOpen]}>
+                    <div className="px-4 py-4 sm:px-6">
+                        <div className="flex h-auto max-h-full flex-col">
+                            <div>
+                                <div className="aspect-w-10 aspect-h-7 rounded-default block w-full overflow-hidden">
+                                    <img src={`${bucketRoot}/profiles/${selectedMedia?.data.url}`} alt="" className="object-cover" />
+                                </div>
+                                <div className="mt-4 flex items-start justify-between">
+                                    <div>
+                                        <h2 className="text-default text-lg font-medium">@{postContent.user.username}'s Image Details</h2>
+                                    </div>
+                                </div>
                             </div>
-                        </>
-                    )}
-                </div>
-            </Slideover>
+                            <div>
+                                <h3 className="text-default font-medium">Information</h3>
+                                <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                                    <div className="flex justify-between py-3 text-sm font-medium">
+                                        <dt className="text-default-alt">Key</dt>
+                                        <dd className="text-default">E2User:{selectedMedia?.id}</dd>
+                                    </div>
+
+                                    {postContent?.created_at && (
+                                        <div className="flex justify-between py-3 text-sm font-medium">
+                                            <dt className="text-default-alt">Post Upload Date</dt>
+                                            <dd className="text-default">{new Date(postContent.created_at).toLocaleDateString()}</dd>
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-between py-3 text-sm font-medium">
+                                        <dt className="text-default-alt">Lives On</dt>
+                                        <dd className="text-default">
+                                            {selectedMedia?.data.url.indexOf('supabase') > -1 ? 'Fenra (High Availability)' : 'Dyre (Long-term)'}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </Slideover>
+            )}
+
+            {slideoverOpen && (
+                <Slideover
+                    expandNatural={aspectRatio > 1.2}
+                    className={`${
+                        slideoverMediaOpen ? '-translate-x-24 transition-transform duration-150 will-change-transform' : ''
+                    } transition-transform duration-150 will-change-transform`}
+                    open={[slideoverDecal, setSlideoverDecal]}
+                >
+                    <div className="px-4 py-4 sm:px-6">
+                        <div className="sticky top-0 z-50 flex space-x-3 rounded bg-neutral-50 p-4 dark:bg-n-6/50">
+                            <UserInfoCol user={postContent.user} tag={<time dateTime={postContent.created_at}>about {moment(postContent.created_at).fromNow()}</time>} />
+                        </div>
+
+                        <div className="text-default mt-4 space-y-4 break-words text-sm">
+                            <Markdown>{postContent.body}</Markdown>
+                        </div>
+
+                        {postContent?.assets && postContent.assets.length > 0 && (
+                            <MediaGrid assets={postContent.assets} selectState={[selectedMedia, setSelectedMedia]} />
+                        )}
+                    </div>
+
+                    <div className="flex flex-col justify-between space-y-8 overflow-hidden rounded bg-neutral-50 px-4 py-4 highlight-white/5 dark:bg-n-6/50 sm:px-6">
+                        <div className="flex space-x-6">{signedInUser && !signedInUser.anonUser && <React post={postContent} />}</div>
+
+                        {postContent?.comments && postContent.comments.length > 0 && (
+                            <>
+                                {signedInUser && !signedInUser.anonUser && <CommentBox className="flex-1" truncate originalPost={postContent} onComment={onComment} />}
+
+                                <div className="flow-root">
+                                    <ul role="list" className="-mb-8">
+                                        {postContent.comments.map((comment) => (
+                                            <RecursiveCommentThread
+                                                key={comment.id}
+                                                comment={comment}
+                                                originalPost={[postContent, setPostContent]}
+                                                postState={postState}
+                                            />
+                                        ))}
+                                    </ul>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </Slideover>
+            )}
 
             <Card className="!px-0 !py-0">
                 <div className="relative">
@@ -193,7 +259,9 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                         </div>
 
                         {/* Post Objects (Images) */}
-                        {postContent.assets && postContent.assets.length > 0 && <MediaGrid assets={postContent.assets} post={post} truncate />}
+                        {postContent.assets && postContent.assets.length > 0 && (
+                            <MediaGrid assets={postContent.assets} post={post} selectState={[selectedMedia, setSelectedMedia]} truncate />
+                        )}
                     </div>
                     {/* <div className="bg-box-alt absolute bottom-0 left-0 ml-4 rounded-tl-xl rounded-tr-xl border-x border-b-0 border-t border-solid border-neutral-300 dark:border-neutral-700 sm:ml-6">
                         <div className="flex items-center space-x-2 px-4 py-2">
@@ -235,7 +303,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                             showLine={comment.comments && comment.comments.length > 0}
                                             originalPost={[postContent, setPostContent]}
                                             postState={postState}
-                                            // onClick={() => setSlideoverOpen(true)}
+                                            onClick={() => setSlideoverOpen(true)}
                                         />
                                         {comment.comments && comment.comments.length > 0 && (
                                             <>
@@ -246,7 +314,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                                     showLine={comment.comments[comment.comments.length - 1].forceRender}
                                                     originalPost={[postContent, setPostContent]}
                                                     postState={postState}
-                                                    // onClick={() => setSlideoverOpen(true)}
+                                                    onClick={() => setSlideoverOpen(true)}
                                                 />
 
                                                 {/* almost there: check if any replies from here have 'forceRender', then, well, force render it */}
@@ -260,7 +328,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                                                 showLineReverse
                                                                 originalPost={[postContent, setPostContent]}
                                                                 postState={postState}
-                                                                // onClick={() => setSlideoverOpen(true)}
+                                                                onClick={() => setSlideoverOpen(true)}
                                                             />
                                                         )
                                                     } else if (!alreadyAnnouncedMore) {
@@ -522,6 +590,7 @@ function React({ post }: FeedPostType) {
 
 function MediaGrid({ ...props }: any) {
     const { assets, truncate } = props
+    const [, setSelectedMedia] = props.selectState
 
     const bucketRoot = useUIStore((state) => state.bucketRoot)
     // IMPORTANT!
@@ -549,7 +618,12 @@ function MediaGrid({ ...props }: any) {
                 <div className="aspect-w-10 aspect-h-7 block w-full overflow-hidden rounded">
                     {/* @todo: CLEANNNN */}
                     {assets[0].type === 'image' && (
-                        <img src={`${bucketRoot}/profiles/${assets[0].data.url}`} alt="" className="aspect-w-10 aspect-h-7 w-full rounded object-cover" />
+                        <img
+                            src={`${bucketRoot}/profiles/${assets[0].data.url}`}
+                            alt=""
+                            className="aspect-w-10 aspect-h-7 w-full rounded object-cover"
+                            onClick={() => setSelectedMedia(assets[0])}
+                        />
                     )}
 
                     {assets[0].type === 'video' && (
@@ -574,7 +648,12 @@ function MediaGrid({ ...props }: any) {
                                     return (
                                         <div key={objectIndex} className="w-full overflow-hidden rounded">
                                             <div className="relative aspect-square">
-                                                <img src={`${bucketRoot}/profiles/${object.data.url}`} alt="" className="aspect-square h-full w-full object-cover" />
+                                                <img
+                                                    src={`${bucketRoot}/profiles/${object.data.url}`}
+                                                    alt=""
+                                                    className="aspect-square h-full w-full object-cover"
+                                                    onClick={() => setSelectedMedia(object)}
+                                                />
 
                                                 {assets.length > 4 && (
                                                     <div className="absolute right-0 top-0 mr-2 mt-2 flex items-center justify-center">
@@ -593,7 +672,7 @@ function MediaGrid({ ...props }: any) {
                                 switch (object.type) {
                                     case 'image':
                                         return (
-                                            <div key={objectIndex} className={`aspect-square w-full overflow-hidden rounded`}>
+                                            <div key={objectIndex} className={`aspect-square w-full overflow-hidden rounded`} onClick={() => setSelectedMedia(object)}>
                                                 <img src={`${bucketRoot}/profiles/${object.data.url}`} alt="" className="aspect-square h-full w-full object-cover" />
                                             </div>
                                         )

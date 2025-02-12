@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 
 export function Slideover({
@@ -13,10 +13,10 @@ export function Slideover({
     const [open, setOpen] = props.open
 
     return (
-        <Transition.Root show={open} as={Fragment}>
-            <Dialog as="div" className="fixed inset-0 z-40 overflow-hidden" onClose={setOpen}>
+        <Transition show={open} as={Fragment}>
+            <Dialog as="div" className="fixed inset-0 z-40 overflow-hidden" onClose={() => setOpen(false)}>
                 <div className="absolute inset-0 overflow-hidden">
-                    <Transition.Child
+                    <TransitionChild
                         as={Fragment}
                         enter="transition-opacity ease-linear duration-100"
                         enterFrom="opacity-0"
@@ -25,14 +25,14 @@ export function Slideover({
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                     >
-                        <div className="fixed inset-0 bg-neutral-500/25 bg-opacity-75 transition-opacity" onClick={() => setOpen(false)} />
-                    </Transition.Child>
-                    <div
+                        <div className="fixed inset-0 bg-neutral-500/25 bg-opacity-75 transition-opacity" />
+                    </TransitionChild>
+                    <DialogPanel
                         className={`pointer-events-none fixed inset-y-0 right-0 flex ${
                             props.expandNatural ? '-10 min-w-full md:min-w-[50%] md:max-w-screen-md lg:min-w-[25%]' : 'lg:w-[25%]'
                         }`}
                     >
-                        <Transition.Child
+                        <TransitionChild
                             as={Fragment}
                             enter="transition ease-out duration-150 sm:ease-snapper sm:duration-300"
                             enterFrom="transform opacity-0 scale-110 sm:translate-x-full sm:scale-100 sm:opacity-100"
@@ -42,7 +42,7 @@ export function Slideover({
                             leaveTo="transform opacity-0 scale-110  sm:translate-x-full sm:scale-100 sm:opacity-100"
                         >
                             <div className="pointer-events-auto relative grid w-full">
-                                <Transition.Child
+                                <TransitionChild
                                     as={Fragment}
                                     enter="ease-in-out duration-500"
                                     enterFrom="opacity-0"
@@ -61,15 +61,15 @@ export function Slideover({
                                             <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                                         </button>
                                     </div>
-                                </Transition.Child>
-                                <div className={`${props.className} bg-default h-full overflow-y-auto`}>
+                                </TransitionChild>
+                                <div className={`${props.className} h-full overflow-y-auto bg-card`}>
                                     <div className="space-y-6 pb-16">{props.children}</div>
                                 </div>
                             </div>
-                        </Transition.Child>
-                    </div>
+                        </TransitionChild>
+                    </DialogPanel>
                 </div>
             </Dialog>
-        </Transition.Root>
+        </Transition>
     )
 }
