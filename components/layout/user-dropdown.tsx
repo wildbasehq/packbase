@@ -118,7 +118,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                             <ChevronDownIcon className="AccordionChevron text-body h-5 w-5 self-center" />
                         </MenuButton>
                     </Tooltip>
-                    <DropdownMenu className="!w-96">
+                    <DropdownMenu className="z-20 !w-96">
                         {StatusOptions.filter((option) => option.id !== currentStatus.id).map((option, i) => (
                             <DropdownItem
                                 key={i}

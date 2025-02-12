@@ -68,7 +68,7 @@ export default function NavBar() {
                                         <MenuButton>
                                             <UserAvatar user={user} size="md" className={`${user.reqOnboard && 'animate-pulse'}`} />
                                         </MenuButton>
-                                        <DropdownMenu className="mt-4 !p-0">
+                                        <DropdownMenu className="z-20 mt-4 !p-0">
                                             <UserDropdown showOnboardingModal={setShowOnboardingModal} />
                                         </DropdownMenu>
                                     </Dropdown>
