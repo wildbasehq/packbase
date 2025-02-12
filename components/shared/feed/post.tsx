@@ -132,7 +132,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                         </div>
                     </div>
                     <div className="min-h-fit w-full cursor-pointer px-4 py-4 sm:px-6">
-                        <div className="space-y-4 text-sm text-neutral-700 dark:text-neutral-50">
+                        <div className="text-default space-y-4 break-words text-sm">
                             <Markdown>{postContent.body}</Markdown>
                         </div>
 
