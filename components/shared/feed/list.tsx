@@ -346,8 +346,17 @@ function FeedListItem({ post, gridTutorialID, postState }: { post: any; gridTuto
                 onDelete={() => {
                     postState[1]((posts: any) => posts.filter((p: any) => p.id !== post.id))
                 }}
-                onComment={() => {
-                    postState[1]((posts: any) => posts.map((p: any) => (p.id === post.id ? { ...p, comments: p.comments + 1 } : p)))
+                onComment={(comment) => {
+                    postState[1]((posts: any) =>
+                        posts.map((p: any) =>
+                            p.id === post.id
+                                ? {
+                                      ...p,
+                                      comments: [...p.comments, comment],
+                                  }
+                                : p,
+                        ),
+                    )
                 }}
             ></FeedPost>
         )

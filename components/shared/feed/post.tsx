@@ -47,9 +47,8 @@ export declare interface FeedPostDataType {
 
 export declare interface FeedPostType {
     post: FeedPostDataType
-    postState?: [Dispatch<any>, any]
+    postState?: [any, Dispatch<any>]
     onDelete?: () => void
-    onComment?: (comment: any) => void
 }
 
 export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
@@ -75,6 +74,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
         if (!newPostContent.comments) newPostContent.comments = []
         newPostContent.comments.push(comment)
         setPostContent(newPostContent)
+        postState && postState[1](postState[0].map((p: any) => (p.id === postContent.id ? newPostContent : p)))
     }
 
     let alreadyAnnouncedMore = false
@@ -276,10 +276,15 @@ function FeedListItem({ ...props }: any) {
                 } else {
                     const newPostContent = { ...postContent }
                     newPostContent.comments = newPostContent.comments.filter((c: any) => c.id !== comment.id)
-                    let newPostList = postList.filter((c: any) => c.id !== postContent.id)
-                    newPostList.push(newPostContent)
+                    let newPostList = postList.map((post: any) => {
+                        if (post.id === postContent.id) {
+                            return newPostContent
+                        }
+                        return post
+                    })
                     setPostList(newPostList)
-                    return toast.error('Comment deleted.')
+                    setPostContent(newPostContent)
+                    return toast.success('Comment deleted.')
                 }
             })
     }
@@ -556,16 +561,18 @@ function CommentBox({ ...props }: any) {
         vg.howl({ id: originalPost.id })
             .comment.post(commentBody)
             .then(({ data, error }) => {
+                console.log(data, error)
                 setCommentSubmitting(false)
                 if (error) {
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 } else {
                     commentRef.current.value = ''
                     onComment({
+                        id: data.id,
                         ...commentBody,
                         user: user,
                     })
-                    return toast.error('Commented!')
+                    return toast.success('Commented!')
                 }
             })
     }
