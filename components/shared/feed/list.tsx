@@ -42,7 +42,7 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
             setPostsReady(false)
             setPostsHasMore(false)
             setPostsCurrentPage(1)
-            fetchPosts()
+            fetchPosts('pack_update')
         }
 
         return () => {
@@ -62,7 +62,8 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
         }
     }, [FeedViewConfig])
 
-    const fetchPosts = (feed: string = '', clearPosts = false) => {
+    const fetchPosts = (source?: string, clearPosts = false) => {
+        if (source) console.log(`Fetching posts for ${packID} from ${source}...`)
         vg.feed({ id: packID })
             .get()
             .then(({ data, error }) => {
@@ -184,7 +185,7 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                                 key={feedID}
                                 className={FeedViewConfig !== 1 ? 'sm:w-screen sm:max-w-md' : ''}
                                 dataLength={posts.length}
-                                next={fetchPosts}
+                                next={() => fetchPosts('infinite_scroll')}
                                 hasMore={postsHasMore}
                                 loader={<LoadingCardSmall />}
                                 endMessage={
