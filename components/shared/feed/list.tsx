@@ -72,7 +72,7 @@ export default function FeedList({
     const fetchPosts = (source?: string, clearPosts = false) => {
         if (source) console.log(`Fetching posts for ${packID} from ${source}...`)
         vg.feed({ id: packID })
-            .get()
+            .get({ query: { page: postsCurrentPage } })
             .then(({ data, error }) => {
                 if (error) {
                     console.error(data) // @TODO: This returns [object Object] no matter what? Why?
@@ -185,7 +185,9 @@ export default function FeedList({
                     <div className={FeedViewConfig !== 1 ? 'sm:flex sm:justify-center' : ''}>
                         {posts.length !== 0 && (
                             <InfiniteScroll
+                                scrollableTarget="NGRoot"
                                 key={feedID}
+                                scrollThreshold={0.5}
                                 className={FeedViewConfig !== 1 ? 'sm:w-screen sm:max-w-md' : ''}
                                 dataLength={posts.length}
                                 next={() => fetchPosts('infinite_scroll')}
