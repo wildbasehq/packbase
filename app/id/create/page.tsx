@@ -96,7 +96,7 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
                     <div>
                         <label htmlFor="password" className="text-default mb-1 block text-sm font-medium">
                             Password
-                            <p className="text-alt text-xs leading-5">at least 8 characters, 1 uppercase, 1 special character</p>
+                            <p className="text-alt text-xs leading-5">at least 8 characters, 1 uppercase, 1 digit, and 1 special character</p>
                         </label>
                         <div className="overflow-visible rounded-md shadow-sm ring-1 ring-neutral-300 dark:ring-white/20">
                             <Input
@@ -106,6 +106,7 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
                                 label="Password"
                                 type="password"
                                 placeholder="anything but a name"
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$"
                                 required
                             />
                             <Input
