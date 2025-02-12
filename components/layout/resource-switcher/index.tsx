@@ -330,7 +330,7 @@ function ResourceSettingsModal() {
             </div>
 
             {/* Main settings portion with buttons on bottom-right at all times*/}
-            <form className="flex h-full flex-1 flex-col gap-4 p-6" onSubmit={aggregateSubmit}>
+            <form className="flex h-full flex-1 flex-col gap-4 overflow-auto p-6" onSubmit={aggregateSubmit}>
                 <div className="flex flex-1 flex-col gap-4">
                     <div>
                         <Heading>Settings</Heading>
