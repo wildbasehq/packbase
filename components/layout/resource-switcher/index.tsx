@@ -191,6 +191,8 @@ function ResourceSettingsModal() {
     // For pack avatar upload
     const [profilePicUpload, setProfilePicUpload] = useState<File | undefined>()
     const [profilePicPreview, setProfilePicPreview] = useState<string | undefined>()
+    const [headerPicUpload, setHeaderPicUpload] = useState<File | undefined>()
+    const [headerPicPreview, setHeaderPicPreview] = useState<string | undefined>()
 
     useEffect(() => {
         if (profilePicUpload) {
@@ -202,7 +204,17 @@ function ResourceSettingsModal() {
         } else {
             setProfilePicPreview(undefined)
         }
-    }, [profilePicUpload])
+
+        if (headerPicUpload) {
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setHeaderPicPreview(reader.result as string)
+            }
+            reader.readAsDataURL(headerPicUpload)
+        } else {
+            setHeaderPicPreview(undefined)
+        }
+    }, [profilePicUpload, headerPicUpload])
 
     const fields = {
         display_name: {
@@ -258,11 +270,15 @@ function ResourceSettingsModal() {
 
     const aggregateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        const packUpdate = {
-            images: {
-                avatar: profilePicPreview,
-            },
+        let packUpdate: any = {}
+        if (profilePicPreview) {
+            packUpdate.images = { avatar: profilePicPreview }
         }
+
+        if (headerPicPreview) {
+            packUpdate.images = { ...packUpdate.images, header: headerPicPreview }
+        }
+
         for (let field in fields) {
             if (fields[field].api) {
                 // 'about.bio' -> { about: { bio: value } }
@@ -277,6 +293,14 @@ function ResourceSettingsModal() {
                 packUpdate[field] = fields[field].ref?.current.value
             }
         }
+
+        // Remove undefined, null, empty strings
+        for (let key in packUpdate) {
+            if (!packUpdate[key] || packUpdate[key] === '') {
+                delete packUpdate[key]
+            }
+        }
+        console.log(packUpdate)
         vg.pack({ id: currentResource.id })
             .post(packUpdate)
             .then(({ data, error }) => {
@@ -289,6 +313,10 @@ function ResourceSettingsModal() {
                 } else {
                     toast.success('Settings saved!')
                     // Set resources to reflect changes
+                    if (packUpdate.images) {
+                        packUpdate.images.avatar = packUpdate.images.avatar || currentResource.images.avatar
+                        packUpdate.images.header = packUpdate.images.header || currentResource.images.header
+                    }
                     const newResources = resources.map((r) => (r.id === currentResource.id ? { ...r, ...packUpdate } : r))
                     setResources(newResources)
                     setCurrentResource(newResources.find((r) => r.id === currentResource.id))
@@ -346,7 +374,7 @@ function ResourceSettingsModal() {
                     </Alert>
 
                     {/* form */}
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-4">
                         <div className="col-span-full">
                             <label htmlFor="avatar" className="text-default block select-none text-sm font-medium leading-6">
                                 Photo
@@ -369,7 +397,38 @@ function ResourceSettingsModal() {
                                     <div>Upload</div>
                                 </Button>
                             </div>
-                            <p className="text-alt mt-3 select-none text-sm leading-6">We don't resize your photo. Scroll up to the header to see how it will look.</p>
+                        </div>
+
+                        <div className="grid grid-cols-2">
+                            {/* Header image */}
+                            <div>
+                                <label htmlFor="header" className="text-default block select-none text-sm font-medium leading-6">
+                                    Header
+                                </label>
+                                <input
+                                    type="file"
+                                    name="header"
+                                    accept="image/*"
+                                    id="header"
+                                    className="hidden"
+                                    onChange={(e) => setHeaderPicUpload(e.target.files?.[0] || undefined)}
+                                />
+                                <div className="mt-2 flex items-center gap-x-3">
+                                    <Button asChild variant="outline" onClick={() => document.getElementById('header')?.click()}>
+                                        <div>Upload</div>
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="aspect-[3/1] rounded-lg bg-n-2/25">
+                                {headerPicPreview ? (
+                                    <img src={headerPicPreview} alt="Header preview" className="rounded-lg object-cover" />
+                                ) : (
+                                    <div className="text-default flex h-full items-center justify-center">
+                                        <Text alt>Upload a header image</Text>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {Object.keys(fields).map((key, i) => (
