@@ -96,7 +96,7 @@ export default function ResourceSwitcher() {
                                         <UserAvatar
                                             name={currentResource.display_name}
                                             size={32}
-                                            icon={currentResource.icon}
+                                            icon={currentResource.icon || currentResource.images?.avatar}
                                             className="inline-flex h-8 w-8 overflow-hidden"
                                         />
                                     )}
