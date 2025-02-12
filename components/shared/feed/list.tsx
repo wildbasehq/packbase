@@ -20,14 +20,21 @@ import { HandRaisedIcon, MegaphoneIcon } from '@heroicons/react/20/solid'
 import { ProjectSafeName } from '@/lib/utils'
 import UserAvatar from '@/components/shared/user/avatar'
 
-export default function FeedList({ packID = '00000000-0000-0000-0000-000000000000' }: { packID?: string }) {
+export default function FeedList({
+    packID = '00000000-0000-0000-0000-000000000000',
+    changingView,
+    setChangingView,
+}: {
+    packID?: string
+    changingView?: boolean
+    setChangingView?: any
+}) {
     const feedID = 'EVERYTHING0'
     const [error, setError] = useState<Error | null>(null)
     const [postsReady, setPostsReady] = useState<boolean>(false)
     const [postsHasMore, setPostsHasMore] = useState<boolean>(false)
     const [postsCurrentPage, setPostsCurrentPage] = useState<number>(1)
     const [posts, setPosts] = useState<any>([])
-    const [changingView, setChangingView] = useState<boolean>(false)
     const [masonryColumns, setMasonryColumns] = useState<{
         [key: number]: number
     }>({ 350: 1 })
@@ -150,15 +157,11 @@ export default function FeedList({ packID = '00000000-0000-0000-0000-00000000000
                     {/*</div>*/}
 
                     {changingView && (
-                        <Card
-                            className={`${
-                                FeedViewConfig === 2 ? 'lg:left-[31vw]' : 'lg:left-[50vw]'
-                            } ease-[cubic-bezier(0.32,0.72,0,1)] absolute top-1/4 z-50 m-auto mt-48 gap-2 shadow-2xl transition-all`}
-                        >
-                            <Heading size="lg" className="flex items-center">
+                        <Card className="absolute right-0 top-0 z-50 mr-12 mt-40 gap-2 shadow-2xl">
+                            <Heading size="lg" className="flex !w-full items-center">
                                 <HelpCircleIcon className="mr-2 inline-block h-5 w-5" />
                                 Feed View
-                                <span className="flex-1" />
+                                {/*<span className="flex-1" />*/}
                                 {/*<MagicElement numSparkles={2}>*/}
                                 {/*    <span className="text-sm text-primary">new!</span>*/}
                                 {/*</MagicElement>*/}
