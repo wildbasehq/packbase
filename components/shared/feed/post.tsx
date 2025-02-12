@@ -583,7 +583,7 @@ function CommentBox({ ...props }: any) {
             {!props.truncate && (
                 <div className="mb-4 flex items-center space-x-2">
                     <div className="flex-shrink-0">
-                        <img className="h-8 w-8 rounded-full" src={user.images?.avatar || `/img/avatar/default-avatar.png`} alt="" />
+                        <img className="h-8 w-8 rounded-full" src={user.images?.avatar || `/img/default-avatar.png`} alt="" />
                     </div>
                     <div className="min-w-0 flex-1">
                         <p className="text-default cursor-pointer text-sm font-medium hover:underline">
@@ -610,7 +610,7 @@ function CommentBox({ ...props }: any) {
                     ref={commentRef}
                 />
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <img className="h-5 w-5 rounded-full" src={user.images?.avatar || `/img/avatar/default-avatar.png`} alt="" />
+                    <img className="h-5 w-5 rounded-full" src={user.images?.avatar || `/img/default-avatar.png`} alt="" />
                 </div>
                 <div className="absolute inset-y-0 right-0 flex cursor-pointer items-center py-2 pr-2">
                     {commentSubmitting ? (

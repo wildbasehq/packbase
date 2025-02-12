@@ -11,6 +11,9 @@ import localFont from 'next/font/local'
 import { inter, lexend } from './fonts'
 import './styles/globals.scss'
 import WaitlistCheck from '@/components/layout/waitlist-check'
+import { FaceFrownIcon } from '@heroicons/react/20/solid'
+import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
+import Link from 'next/link'
 
 const wildbaseRemix = localFont({
     src: [
@@ -54,7 +57,26 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <body className={cx('h-full overflow-hidden bg-n-1 dark:bg-n-9', lexend.variable, lexend.className, inter.variable, wildbaseRemix.variable)}>
                 <Providers>
                     <PostHogPageView />
-                    <div id="NGContentArea" className="flex h-full overflow-hidden">
+                    {/* "Mobile is unsupported" notice */}
+                    <div className="flex h-full items-center justify-center px-8 sm:hidden">
+                        <div className="flex flex-col gap-4">
+                            <Alert>
+                                <AlertTitle>
+                                    <FaceFrownIcon className="inline-flex h-5 w-5" /> Mobile is unsupported
+                                </AlertTitle>
+                                <AlertDescription>
+                                    During the early stages of private alpha, Packbase is only available on desktop. Please use a desktop browser to access Packbase.
+                                    <br />
+                                    <br />
+                                    <Link href="https://discord.gg/StuuK55gYA" target="_blank" className="underline">
+                                        Join our Discord
+                                    </Link>{' '}
+                                    to be notified when mobile support is available.
+                                </AlertDescription>
+                            </Alert>
+                        </div>
+                    </div>
+                    <div id="NGContentArea" className="hidden h-full overflow-hidden sm:flex">
                         <PackSwitcher />
                         <div className="grow">
                             <NavBar />
