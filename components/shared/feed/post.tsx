@@ -24,6 +24,7 @@ import clsx from 'clsx'
 import { Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/ui/button'
 import { Slideover } from '@/components/modal/slideover'
+import PostFullSlideover from '@/components/shared/feed/post-full-slideover'
 
 export declare interface FeedPostDataType {
     id: string
@@ -157,50 +158,19 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
             )}
 
             {slideoverOpen && (
-                <Slideover
-                    expandNatural={aspectRatio > 1.2}
-                    className={`${
-                        slideoverMediaOpen ? '-translate-x-24 transition-transform duration-150 will-change-transform' : ''
-                    } transition-transform duration-150 will-change-transform`}
-                    open={[slideoverDecal, setSlideoverDecal]}
-                >
-                    <div className="px-4 py-4 sm:px-6">
-                        <div className="sticky top-0 z-50 flex space-x-3 rounded bg-neutral-50 p-4 dark:bg-n-6/50">
-                            <UserInfoCol user={postContent.user} tag={<time dateTime={postContent.created_at}>about {moment(postContent.created_at).fromNow()}</time>} />
-                        </div>
-
-                        <div className="text-default mt-4 space-y-4 break-words text-sm">
-                            <Markdown>{postContent.body}</Markdown>
-                        </div>
-
-                        {postContent?.assets && postContent.assets.length > 0 && (
-                            <MediaGrid assets={postContent.assets} selectState={[selectedMedia, setSelectedMedia]} />
-                        )}
-                    </div>
-
-                    <div className="flex flex-col justify-between space-y-8 overflow-hidden rounded bg-neutral-50 px-4 py-4 highlight-white/5 dark:bg-n-6/50 sm:px-6">
-                        <div className="flex space-x-6">{signedInUser && !signedInUser.anonUser && <React post={postContent} />}</div>
-
-                        {postContent?.comments && postContent.comments.length > 0 && (
-                            <>
-                                {signedInUser && !signedInUser.anonUser && <CommentBox className="flex-1" truncate originalPost={postContent} onComment={onComment} />}
-
-                                <div className="flow-root">
-                                    <ul role="list" className="-mb-8">
-                                        {postContent.comments.map((comment) => (
-                                            <RecursiveCommentThread
-                                                key={comment.id}
-                                                comment={comment}
-                                                originalPost={[postContent, setPostContent]}
-                                                postState={postState}
-                                            />
-                                        ))}
-                                    </ul>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </Slideover>
+                <PostFullSlideover
+                    postContent={postContent}
+                    setPostContent={setPostContent}
+                    signedInUser={signedInUser}
+                    slideoverMediaOpen={slideoverMediaOpen}
+                    slideoverOpen={slideoverDecal}
+                    setSlideoverOpen={setSlideoverDecal}
+                    selectedMedia={selectedMedia}
+                    setSelectedMedia={setSelectedMedia}
+                    aspectRatio={aspectRatio}
+                    onComment={onComment}
+                    postState={postState}
+                />
             )}
 
             <Card className="!px-0 !py-0">
@@ -359,7 +329,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
     )
 }
 
-function FeedListItem({ ...props }: any) {
+export function FeedListItem({ ...props }: any) {
     const { comment, showLine, originalPost } = props
     const [likes, setLikes] = useState(comment.likes || 0)
     const [showReplyBox, setShowReplyBox] = useState(false)
@@ -500,7 +470,7 @@ function FeedListItem({ ...props }: any) {
 }
 
 // Goes through replies, and calls itself again with padding if there are replies within replies.
-function RecursiveCommentThread({ ...props }: any) {
+export function RecursiveCommentThread({ ...props }: any) {
     const { comment, showLine, originalPost, postState } = props
 
     return (
@@ -524,7 +494,7 @@ function RecursiveCommentThread({ ...props }: any) {
     )
 }
 
-function React({ post }: FeedPostType) {
+export function React({ post }: FeedPostType) {
     const { user } = useUserAccountStore()
     const [submitting, setSubmitting] = useState(false)
 
@@ -588,7 +558,7 @@ function React({ post }: FeedPostType) {
     )
 }
 
-function MediaGrid({ ...props }: any) {
+export function MediaGrid({ ...props }: any) {
     const { assets, truncate } = props
     const [, setSelectedMedia] = props.selectState
 
@@ -686,7 +656,7 @@ function MediaGrid({ ...props }: any) {
     )
 }
 
-function CommentBox({ ...props }: any) {
+export function CommentBox({ ...props }: any) {
     const { originalPost, onComment } = props
     const [commentSubmitting, setCommentSubmitting] = useState(false)
     const commentRef = useRef<HTMLInputElement>(null)
