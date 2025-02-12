@@ -131,7 +131,7 @@ export default function TermsPage() {
                                 <Text className="mb-4">Standard accounts must maintain PG-13 appropriate content. The following are prohibited:</Text>
                                 <ul className="text-default list-disc space-y-2 pl-6">
                                     <li>
-                                        <Text>Adult or sexually explicit content</Text>
+                                        <Text>Adult or sexually explicit content outside of an Afterdark Account</Text>
                                     </li>
                                     <li>
                                         <Text>Extreme violence or gore</Text>
@@ -143,10 +143,10 @@ export default function TermsPage() {
                                         <Text>Harassment or bullying</Text>
                                     </li>
                                     <li>
-                                        <Text>Illegal substances or activities</Text>
+                                        <Text>Condoning, advocating, or displaying the use of illegal substances or activities</Text>
                                     </li>
                                     <li>
-                                        <Text>Personal information without consent</Text>
+                                        <Text>Personal information 5without consent</Text>
                                     </li>
                                     <li>
                                         <Text>Spam or unauthorized advertising</Text>
@@ -164,7 +164,7 @@ export default function TermsPage() {
                                         <Text>Real-life sexually explicit content</Text>
                                     </li>
                                     <li>
-                                        <Text>Any content depicting underage characters or people, whether fictional or not.</Text>
+                                        <Text>Any suggestive content depicting underage characters or people, whether fictional or not.</Text>
                                     </li>
                                     <li>
                                         <Text>Non-consensual content</Text>
