@@ -10,7 +10,7 @@ import { UserProfileBasic } from '@/lib/defs/user'
 import Card from '@/components/shared/card'
 import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
-import { Dispatch, useRef, useState } from 'react'
+import { Dispatch, useEffect, useRef, useState } from 'react'
 import { LoadingCircle } from '@/components/shared/icons'
 import { vg } from '@/lib/api'
 import { toast } from '@/lib/toast'
@@ -23,6 +23,7 @@ import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu } from '@/component
 import clsx from 'clsx'
 import { Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/ui/button'
+import { Slideover } from '@/components/modal/slideover'
 
 export declare interface FeedPostDataType {
     id: string
@@ -53,8 +54,12 @@ export declare interface FeedPostType {
 
 export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
     const [postContent, setPostContent] = useState<FeedPostDataType>(post)
+    const [slideoverOpen, setSlideoverOpen] = useState(false)
+    const [slideoverMediaOpen, setSlideoverMediaOpen] = useState(false)
+    const [selectedMedia, setSelectedMedia] = useState()
 
     const { user: signedInUser } = useUserAccountStore()
+    const bucketRoot = useUIStore((state) => state.bucketRoot)
 
     const deletePost = () => {
         vg.howl({ id: postContent.id })
@@ -77,10 +82,61 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
         postState && postState[1](postState[0].map((p: any) => (p.id === postContent.id ? newPostContent : p)))
     }
 
+    const [aspectRatio, setAspectRatio] = useState(1)
+    useEffect(() => {
+        if (slideoverOpen && postContent.assets && postContent.assets.length > 0) {
+            const img = new Image()
+            img.src = `${bucketRoot}/profiles/${postContent.assets[0].data.url}`
+            img.onload = () => {
+                const rounded = Math.round((img.width / img.height) * 100) / 100
+                console.log(`[📰 Feed Processor] Aspect ratio calc for natural expand: ${rounded} (${img.width}x${img.height})`)
+                setAspectRatio(rounded)
+            }
+        }
+    }, [slideoverOpen])
+
     let alreadyAnnouncedMore = false
 
     return (
         <>
+            <Slideover
+                expandNatural={aspectRatio > 1.2}
+                className={`${
+                    slideoverMediaOpen ? '-translate-x-24 transition-transform duration-150 will-change-transform' : ''
+                } transition-transform duration-150 will-change-transform`}
+                open={[slideoverOpen, setSlideoverOpen]}
+            >
+                <div className="px-4 py-4 sm:px-6">
+                    <div className="rounded-default bg-default sticky top-0 z-50 flex space-x-3 py-2">
+                        <UserInfoCol user={postContent.user} tag={<time dateTime={postContent.created_at}>about {moment(postContent.created_at).fromNow()}</time>} />
+                    </div>
+
+                    <div className="text-default mt-4 space-y-4 break-words text-sm">
+                        <Markdown>{postContent.body}</Markdown>
+                    </div>
+
+                    {postContent?.assets && postContent.assets.length > 0 && <MediaGrid objects={postContent.assets} selectState={[selectedMedia, setSelectedMedia]} />}
+                </div>
+
+                <div className="bg-default-alt flex flex-col justify-between space-y-8 overflow-hidden rounded px-4 py-4 highlight-white/5 sm:px-6">
+                    <div className="flex space-x-6">{signedInUser && !signedInUser.anonUser && <React post={postContent} />}</div>
+
+                    {postContent?.comments && postContent.comments.length > 0 && (
+                        <>
+                            {signedInUser && !signedInUser.anonUser && <CommentBox className="flex-1" truncate originalPost={postContent} onComment={onComment} />}
+
+                            <div className="flow-root">
+                                <ul role="list" className="-mb-8">
+                                    {postContent.comments.map((comment) => (
+                                        <RecursiveCommentThread key={comment.id} comment={comment} originalPost={[postContent, setPostContent]} postState={postState} />
+                                    ))}
+                                </ul>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </Slideover>
+
             <Card className="!px-0 !py-0">
                 <div className="relative">
                     <div className="px-4 pt-5 sm:px-6">
@@ -132,7 +188,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                         </div>
                     </div>
                     <div className="min-h-fit w-full cursor-pointer px-4 py-4 sm:px-6">
-                        <div className="text-default space-y-4 break-words text-sm">
+                        <div className="text-default space-y-4 break-words text-sm" onClick={() => setSlideoverOpen(true)}>
                             <Markdown>{postContent.body}</Markdown>
                         </div>
 
@@ -163,7 +219,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                         <div className="flex">
                             <React post={post} />
                         </div>
-                        <CommentBox className="flex-1" truncate originalPost={post} onComment={onComment} />
+                        <CommentBox className="flex-1" truncate originalPost={postContent} onComment={onComment} />
                     </div>
                 )}
 
@@ -188,7 +244,8 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                                     key={comment.comments[comment.comments.length - 1].id}
                                                     comment={comment.comments[comment.comments.length - 1]}
                                                     showLine={comment.comments[comment.comments.length - 1].forceRender}
-                                                    post={[postContent, setPostContent]}
+                                                    originalPost={[postContent, setPostContent]}
+                                                    postState={postState}
                                                     // onClick={() => setSlideoverOpen(true)}
                                                 />
 
@@ -201,7 +258,8 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                                                 key={replyInsideAgain.id}
                                                                 comment={replyInsideAgain}
                                                                 showLineReverse
-                                                                post={[postContent, setPostContent]}
+                                                                originalPost={[postContent, setPostContent]}
+                                                                postState={postState}
                                                                 // onClick={() => setSlideoverOpen(true)}
                                                             />
                                                         )
@@ -245,18 +303,18 @@ function FeedListItem({ ...props }: any) {
         setShowReplyBox(false)
 
         // we need to append the comment to the replies to the reply
-        newPostContent.replies.forEach((reply: any) => {
+        newPostContent.comments.forEach((comment: any) => {
             // if we're replying to a reply, we need to find the reply we're replying to inside the replies of the reply
-            if (reply.replies) {
-                reply.replies.forEach((replyReply: any) => {
+            if (comment.comments) {
+                comment.comments.forEach((commentInside: any) => {
                     // just one more
-                    if (replyReply.replies && replyReply.id === commentBody.parent) {
-                        replyReply.replies.forEach((replyReplyReply: any) => {
-                            console.log(replyReplyReply.id, commentID)
-                            if (replyReplyReply.id === commentID) {
+                    if (commentInside.comments && commentInside.id === commentBody.parent) {
+                        commentInside.comments.forEach((commentInsideAgain: any) => {
+                            console.log(commentInsideAgain.id, commentID)
+                            if (commentInsideAgain.id === commentID) {
                                 // we just need to change forceRender to true.
-                                replyReplyReply.forceRender = true
-                                replyReply.forceRender = true
+                                commentInsideAgain.forceRender = true
+                                commentInside.forceRender = true
                             }
                         })
                     }
@@ -375,17 +433,22 @@ function FeedListItem({ ...props }: any) {
 
 // Goes through replies, and calls itself again with padding if there are replies within replies.
 function RecursiveCommentThread({ ...props }: any) {
-    const { reply, showLine, post } = props
+    const { comment, showLine, originalPost, postState } = props
 
     return (
         <>
-            <FeedListItem reply={reply} showLine={showLine || false} post={post} />
-            {reply.replies &&
-                reply.replies.length > 0 &&
-                reply.replies.map((replyInside: any, replyInsideIdx: any) => (
+            <FeedListItem comment={comment} showLine={showLine || false} originalPost={originalPost} postState={postState} />
+            {comment.comments &&
+                comment.comments.length > 0 &&
+                comment.comments.map((commentInside: any, commentInsideIdx: any) => (
                     <>
                         <div className="pl-12">
-                            <RecursiveCommentThread key={replyInsideIdx} reply={replyInside} showLine={replyInsideIdx !== reply.replies.length - 1} post={post} />
+                            <RecursiveCommentThread
+                                key={commentInsideIdx}
+                                comment={commentInside}
+                                showLine={commentInsideIdx !== comment.comments.length - 1}
+                                originalPost={originalPost}
+                            />
                         </div>
                     </>
                 ))}
