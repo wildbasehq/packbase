@@ -135,19 +135,22 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
             <div className="h-fit w-full rounded-bl rounded-br bg-white/50 shadow dark:bg-n-6/50">
                 <div className="p-2">
                     <Link href={`/p/${pack.slug}`} className="!no-underline">
-                        <div className="ring-default flex items-center rounded px-4 py-4 transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50">
+                        <div
+                            className="ring-default flex items-center rounded px-4 py-4 transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"
+                            onClick={() => {
+                                if (user.id === pack.owner_id) {
+                                    close()
+                                    show(<ResourceSettingsModal />)
+                                }
+                            }}
+                        >
                             <UserAvatar user={pack} size="lg" />
                             <div className="ml-3 grow">
                                 <Heading>{pack.display_name || pack.slug}</Heading>
                                 <Text alt>{pack.slug}</Text>
                             </div>
                             {user.id === pack.owner_id && (
-                                <div
-                                    onClick={() => {
-                                        close()
-                                        show(<ResourceSettingsModal />)
-                                    }}
-                                >
+                                <div>
                                     {/* mt-1 to offset button */}
                                     <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer">
                                         <SettingsIcon className="h-5 w-5" />
