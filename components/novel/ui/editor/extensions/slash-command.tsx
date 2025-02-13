@@ -1,16 +1,16 @@
-import React, { ReactNode, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Editor, Extension, Range } from '@tiptap/core'
+import React, {ReactNode, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState} from 'react'
+import {Editor, Extension, Range} from '@tiptap/core'
 import Suggestion from '@tiptap/suggestion'
-import { ReactRenderer } from '@tiptap/react'
-import { useCompletion } from '@ai-sdk/react'
+import {ReactRenderer} from '@tiptap/react'
+import {useCompletion} from '@ai-sdk/react'
 import tippy from 'tippy.js'
-import { Code, Heading1, Heading2, Heading3, MessageSquarePlus, Text, TextQuote } from 'lucide-react'
-import { Magic } from '@/components/novel/ui/icons'
-import { toast } from 'sonner'
+import {Code, Heading1, Heading2, Heading3, MessageSquarePlus, Text, TextQuote} from 'lucide-react'
+import {Magic} from '@/components/novel/ui/icons'
+import {toast} from 'sonner'
 import va from '@vercel/analytics'
-import { getPrevText } from '@/components/novel/lib/editor'
-import { NovelContext } from '../provider'
-import { LoadingCircle } from '@/components/shared/icons'
+import {getPrevText} from '@/components/novel/lib/editor'
+import {NovelContext} from '../provider'
+import {LoadingCircle} from '@/components/shared/icons'
 
 interface CommandItemProps {
     title: string
@@ -287,8 +287,8 @@ const CommandList = ({ items, command, editor, range }: { items: CommandItemProp
             {items.map((item: CommandItemProps, index: number) => {
                 return (
                     <button
-                        className={`hover:bg-hover flex w-full items-center space-x-2 rounded-md px-2 py-1 text-left text-sm hover:unicorn:bg-surface-variant ${
-                            index === selectedIndex ? 'bg-hover unicorn:bg-surface-variant' : ''
+                        className={`hover:bg-n-2/25 dark:hover:bg-n-6/50 flex w-full items-center space-x-2 rounded-md px-2 py-1 text-left text-sm ${
+                            index === selectedIndex ? 'bg-n-2/25 dark:bg-n-6/50' : ''
                         }`}
                         key={index}
                         onClick={() => selectItem(index)}

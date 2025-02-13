@@ -703,7 +703,7 @@ export function CommentBox({ ...props }: any) {
                     type="text"
                     name="comment"
                     id="comment"
-                    className="border-default block w-full rounded bg-card px-10 placeholder:text-neutral-400 focus:border-primary focus:ring-primary sm:text-sm"
+                    className="border block w-full rounded bg-card py-2 px-10 placeholder:text-neutral-400 focus:border-primary focus:ring-primary sm:text-sm"
                     placeholder="Comment"
                     ref={commentRef}
                 />

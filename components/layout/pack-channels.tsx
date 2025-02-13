@@ -149,7 +149,7 @@ export function PackChannels({ ...props }: SideNavType) {
                     <ActiveLink
                         key={i}
                         href={item.href}
-                        activeClassName="bg-blue-50 bg-opacity-50 dark:bg-neutral-700"
+                        activeClassName="bg-n-1 dark:bg-neutral-700"
                         inactiveClassName="hover:bg-blue-50 hover:bg-opacity-50 dark:hover:bg-neutral-700"
                         className="border-default flex cursor-pointer border-b p-6"
                     >

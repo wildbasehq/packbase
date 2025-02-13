@@ -1,19 +1,19 @@
 'use client'
 
 import ResourceSwitcher from '@/components/layout/resource-switcher'
-import { Search } from '@/components/layout/search'
+import {Search} from '@/components/layout/search'
 import UserDropdown from '@/components/layout/user-dropdown'
-import { Dropdown, DropdownMenu } from '@/components/shared/dropdown'
-import { ThemeToggle } from '@/components/shared/theme-toggle'
-import { Button } from '@/components/shared/ui/button'
+import {Dropdown, DropdownMenu} from '@/components/shared/dropdown'
+import {ThemeToggle} from '@/components/shared/theme-toggle'
+import {Button} from '@/components/shared/ui/button'
 import UserAvatar from '@/components/shared/user/avatar'
-import { useUIStore, useUserAccountStore } from '@/lib/states'
-import { MenuButton } from '@headlessui/react'
-import { ScanFaceIcon } from 'lucide-react'
+import {useUIStore, useUserAccountStore} from '@/lib/states'
+import {MenuButton} from '@headlessui/react'
+import {ScanFaceIcon} from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 import UserOnboardingModal from '../modal/user-onboarding-modal'
-import { FaDiscord } from 'react-icons/fa6'
+import {FaDiscord} from 'react-icons/fa6'
 
 export default function NavBar() {
     const { user } = useUserAccountStore()
@@ -33,7 +33,7 @@ export default function NavBar() {
                 <nav aria-label="Sections" className="hidden h-16 lg:flex lg:flex-col">
                     <div
                         className={`border-default shimmer-template relative flex h-full w-96 items-center border-r px-5 py-2 ${
-                            loading ? 'overflow-hidden before:animate-shimmer-fast' : ''
+                            true ? 'overflow-hidden before:animate-shimmer-fast' : ''
                         }`}
                     >
                         <div className="w-full">

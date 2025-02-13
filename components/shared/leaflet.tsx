@@ -1,5 +1,5 @@
-import { useEffect, useRef, ReactNode, Dispatch, SetStateAction } from "react";
-import { AnimatePresence, motion, useAnimation } from "framer-motion";
+import {Dispatch, ReactNode, SetStateAction, useEffect, useRef} from 'react'
+import {AnimatePresence, motion, useAnimation} from 'framer-motion'
 
 export default function Leaflet({
   setShow,
@@ -57,7 +57,7 @@ export default function Leaflet({
       </motion.div>
       <motion.div
         key="leaflet-backdrop"
-        className="fixed inset-0 z-40 bg-gray-100 bg-opacity-10 backdrop-blur-sm"
+        className="fixed inset-0 z-40 bg-gray-100/10 backdrop-blur-sm"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

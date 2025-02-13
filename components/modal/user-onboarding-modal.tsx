@@ -1,25 +1,25 @@
-import { vg } from '@/lib/api'
-import { UserProfileBasic } from '@/lib/defs/user'
-import { useUserAccountStore } from '@/lib/states'
-import { toast } from 'sonner'
-import { ProjectSafeName } from '@/lib/utils'
+import {vg} from '@/lib/api'
+import {UserProfileBasic} from '@/lib/defs/user'
+import {useUserAccountStore} from '@/lib/states'
+import {toast} from 'sonner'
+import {ProjectSafeName} from '@/lib/utils'
 import WolfoxDrawing from '@/public/img/illustrations/wolfox-drawing.png'
 import PuzzleCharacters from '@/public/svg/3-puzzle-characters.svg'
 import CharacterHoldingPencil from '@/public/svg/character-holding-pencil.svg'
 import CursorCharacterSorting from '@/public/svg/cursor-character-sorting.svg'
 import MusicMutedCharacters from '@/public/svg/music-muted-characters.svg'
 import clsx from 'clsx'
-import { CheckIcon } from 'lucide-react'
+import {CheckIcon} from 'lucide-react'
 import Image from 'next/image'
-import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from 'react'
+import {Dispatch, FormEvent, SetStateAction, useEffect, useState} from 'react'
 import Modal from '.'
 import GodRays from '../charm/god-rays'
-import { LoadingCircle } from '../shared/icons'
+import {LoadingCircle} from '../shared/icons'
 import XMarkIcon from '../shared/icons/dazzle/xmark'
 import SelectPills from '../shared/input/select-pills'
 import Link from '../shared/link'
-import { Heading, Text } from '../shared/text'
-import { Button } from '../shared/ui/button'
+import {Heading, Text} from '../shared/text'
+import {Button} from '../shared/ui/button'
 
 type StepFuncType = {
     setSubmitting: Dispatch<SetStateAction<boolean>>
@@ -460,7 +460,7 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
                 <>
                     {/* Loading overlay */}
                     {submitting && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-25 backdrop-blur-lg dark:bg-black">
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/25 backdrop-blur-lg dark:bg-black">
                             <div className="flex items-center justify-center">
                                 <LoadingCircle />
                                 <span className="text-default ml-2">Please wait...</span>
