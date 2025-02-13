@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
+import React, {forwardRef} from 'react'
+import {cn} from '@/lib/utils'
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     description?: string
@@ -30,7 +30,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         className={cn(
                             combined ? 'rounded-0 border-0 shadow-none' : 'rounded shadow-xs ring-1 ring-inset ring-neutral-300 dark:ring-white/10',
                             className,
-                            'bg-default flex w-full focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600! sm:max-w-md',
+                            'bg-default rounded flex w-full focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600! sm:max-w-md',
                         )}
                     >
                         {suffix && <span className="-mr-2.5 flex select-none items-center pl-3 text-neutral-500 sm:text-sm">{suffix}</span>}
@@ -43,7 +43,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             autoComplete={autoComplete || 'off'}
                             className={cn(
                                 inputClassName,
-                                'text-default block flex-1 border-0 bg-transparent px-3 py-2 placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6',
+                                'text-default rounded block flex-1 border-0 bg-transparent px-3 py-2 placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6 focus:outline-none',
                             )}
                             {...props}
                         />
