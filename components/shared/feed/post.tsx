@@ -72,7 +72,9 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 } else {
                     onDelete && onDelete()
-                    return toast.error('Post deleted.')
+                    return toast.success('Howl deleted.', {
+                        icon: <TrashIcon />,
+                    })
                 }
             })
     }
@@ -359,7 +361,9 @@ export function FeedListItem({ ...props }: any) {
                     })
                     setPostList(newPostList)
                     setPostContent(newPostContent)
-                    return toast.success('Comment deleted.')
+                    return toast.success('Comment deleted.', {
+                        icon: <TrashIcon />,
+                    })
                 }
             })
     }
@@ -496,7 +500,9 @@ export function React({ post }: FeedPostType) {
 
                 if (hasCurrentUser) {
                     post.reactions['0'] = post.reactions['0'].filter((id) => id !== user?.id)
-                    return toast.success('Removed reaction.')
+                    return toast.success('Removed reaction.', {
+                        icon: <TrashIcon />,
+                    })
                 }
 
                 post.reactions['0'].push(user.id)
