@@ -33,7 +33,7 @@ export default function NavBar() {
                 <nav aria-label="Sections" className="hidden h-16 lg:flex lg:flex-col">
                     <div
                         className={`border-default shimmer-template relative flex h-full w-96 items-center border-r px-5 py-2 ${
-                            true ? 'overflow-hidden before:animate-shimmer-fast' : ''
+                            loading ? 'overflow-hidden before:animate-shimmer-fast' : ''
                         }`}
                     >
                         <div className="w-full">
