@@ -14,7 +14,7 @@ import { Dropdown, DropdownHeader, DropdownMenu } from '@/components/shared/drop
 import { MenuButton, MenuItem } from '@headlessui/react'
 import LogoutIcon from '@/components/shared/icons/logout'
 import { vg } from '@/lib/api'
-import { toast } from '@/lib/toast'
+import { toast } from 'sonner'
 import { useModal } from '@/components/modal/provider'
 import { SettingsIcon } from 'lucide-react'
 import { Button } from '@/components/shared/ui/button'

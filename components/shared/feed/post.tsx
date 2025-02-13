@@ -13,7 +13,7 @@ import moment from 'moment'
 import { Dispatch, useEffect, useRef, useState } from 'react'
 import { LoadingCircle } from '@/components/shared/icons'
 import { vg } from '@/lib/api'
-import { toast } from '@/lib/toast'
+import { toast } from 'sonner'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
 import XMarkIcon from '@/components/shared/icons/dazzle/xmark'
 import Markdown from '@/components/shared/markdown'
@@ -496,11 +496,13 @@ export function React({ post }: FeedPostType) {
 
                 if (hasCurrentUser) {
                     post.reactions['0'] = post.reactions['0'].filter((id) => id !== user?.id)
-                    return toast.error('Removed reaction.')
+                    return toast.success('Removed reaction.')
                 }
 
                 post.reactions['0'].push(user.id)
-                return toast.error('Liked!')
+                return toast.success('Liked!', {
+                    icon: <HandThumbUpIcon />,
+                })
             }
         })
     }

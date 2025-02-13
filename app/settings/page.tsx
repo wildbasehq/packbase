@@ -8,7 +8,7 @@ import { Heading, Text } from '@/components/shared/text'
 import { ProjectSafeName } from '@/lib/utils'
 import ProfileHeader from '@/components/shared/user/header'
 import { vg } from '@/lib/api'
-import { toast } from '@/lib/toast'
+import { toast } from 'sonner'
 import { LoadingCircle } from '@/components/shared/icons'
 
 export default function SettingsGeneral() {

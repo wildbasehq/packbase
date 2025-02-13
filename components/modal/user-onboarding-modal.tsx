@@ -1,7 +1,7 @@
 import { vg } from '@/lib/api'
 import { UserProfileBasic } from '@/lib/defs/user'
 import { useUserAccountStore } from '@/lib/states'
-import { toast } from '@/lib/toast'
+import { toast } from 'sonner'
 import { ProjectSafeName } from '@/lib/utils'
 import WolfoxDrawing from '@/public/img/illustrations/wolfox-drawing.png'
 import PuzzleCharacters from '@/public/svg/3-puzzle-characters.svg'
