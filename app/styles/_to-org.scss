@@ -107,7 +107,7 @@
 }
 
 .shimmer-template {
-  @apply before:absolute before:border-n-5 before:inset-0 before:border before:border-x-0 before:border-b-0 before:border-t before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent;
+  @apply before:absolute before:border-n-5 before:inset-0 before:border-t before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent;
 }
 
 @keyframes sidenav-pole-entry {
