@@ -24,7 +24,8 @@ import clsx from 'clsx'
 import { Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/ui/button'
 import { Slideover } from '@/components/modal/slideover'
-import PostFullSlideover from '@/components/shared/feed/post-full-slideover'
+import PostModal from '@/components/shared/feed/post-full-slideover'
+import { useModal } from '@/components/modal/provider'
 
 export declare interface FeedPostDataType {
     id: string
@@ -55,10 +56,10 @@ export declare interface FeedPostType {
 
 export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
     const [postContent, setPostContent] = useState<FeedPostDataType>(post)
-    const [slideoverOpen, setSlideoverOpen] = useState(false)
-    const [slideoverDecal, setSlideoverDecal] = useState(false)
     const [slideoverMediaOpen, setSlideoverMediaOpen] = useState(false)
     const [selectedMedia, setSelectedMedia] = useState<any>()
+
+    const { show } = useModal()
 
     const { user: signedInUser } = useUserAccountStore()
     const bucketRoot = useUIStore((state) => state.bucketRoot)
@@ -84,25 +85,6 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
         postState && postState[1](postState[0].map((p: any) => (p.id === postContent.id ? newPostContent : p)))
     }
 
-    const [aspectRatio, setAspectRatio] = useState(1)
-    useEffect(() => {
-        if (slideoverOpen && postContent.assets && postContent.assets.length > 0) {
-            const img = new Image()
-            img.src = `${bucketRoot}/profiles/${postContent.assets[0].data.url}`
-            img.onload = () => {
-                const rounded = Math.round((img.width / img.height) * 100) / 100
-                console.log(`[📰 Feed Processor] Aspect ratio calc for natural expand: ${rounded} (${img.width}x${img.height})`)
-                setAspectRatio(rounded)
-            }
-        }
-
-        setSlideoverDecal(slideoverOpen)
-    }, [slideoverOpen])
-
-    useEffect(() => {
-        if (!slideoverDecal) setTimeout(() => setSlideoverOpen(false), 100)
-    }, [slideoverDecal])
-
     useEffect(() => {
         setSlideoverMediaOpen(!!selectedMedia)
     }, [selectedMedia])
@@ -111,6 +93,19 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
         if (!slideoverMediaOpen) setTimeout(() => setSelectedMedia(null), 100)
     }, [slideoverMediaOpen])
 
+    const openPost = () => {
+        show(
+            <PostModal
+                postContent={postContent}
+                setPostContent={setPostContent}
+                signedInUser={signedInUser}
+                selectedMedia={selectedMedia}
+                setSelectedMedia={setSelectedMedia}
+                onComment={onComment}
+                postState={postState}
+            />,
+        )
+    }
     let alreadyAnnouncedMore = false
 
     return (
@@ -155,22 +150,6 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                         </div>
                     </div>
                 </Slideover>
-            )}
-
-            {slideoverOpen && (
-                <PostFullSlideover
-                    postContent={postContent}
-                    setPostContent={setPostContent}
-                    signedInUser={signedInUser}
-                    slideoverMediaOpen={slideoverMediaOpen}
-                    slideoverOpen={slideoverDecal}
-                    setSlideoverOpen={setSlideoverDecal}
-                    selectedMedia={selectedMedia}
-                    setSelectedMedia={setSelectedMedia}
-                    aspectRatio={aspectRatio}
-                    onComment={onComment}
-                    postState={postState}
-                />
             )}
 
             <Card className="!px-0 !py-0">
@@ -224,7 +203,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                         </div>
                     </div>
                     <div className="min-h-fit w-full cursor-pointer px-4 py-4 sm:px-6">
-                        <div className="text-default space-y-4 break-words text-sm" onClick={() => setSlideoverOpen(true)}>
+                        <div className="text-default space-y-4 break-words text-sm" onClick={() => openPost()}>
                             <Markdown>{postContent.body}</Markdown>
                         </div>
 
@@ -273,7 +252,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                             showLine={comment.comments && comment.comments.length > 0}
                                             originalPost={[postContent, setPostContent]}
                                             postState={postState}
-                                            onClick={() => setSlideoverOpen(true)}
+                                            onClick={() => openPost()}
                                         />
                                         {comment.comments && comment.comments.length > 0 && (
                                             <>
@@ -284,7 +263,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                                     showLine={comment.comments[comment.comments.length - 1].forceRender}
                                                     originalPost={[postContent, setPostContent]}
                                                     postState={postState}
-                                                    onClick={() => setSlideoverOpen(true)}
+                                                    onClick={() => openPost()}
                                                 />
 
                                                 {/* almost there: check if any replies from here have 'forceRender', then, well, force render it */}
@@ -298,7 +277,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                                                 showLineReverse
                                                                 originalPost={[postContent, setPostContent]}
                                                                 postState={postState}
-                                                                onClick={() => setSlideoverOpen(true)}
+                                                                onClick={() => openPost()}
                                                             />
                                                         )
                                                     } else if (!alreadyAnnouncedMore) {

@@ -59,7 +59,9 @@ export default function Modal({
                                         }
                                     }}
                                 >
-                                    <div className={clsx(className, `border-default overflow-hidden bg-card shadow-xl md:rounded-2xl md:border`)}>{children}</div>
+                                    <div className={clsx(className, `border-default max-h-full overflow-auto bg-card shadow-xl md:rounded-2xl md:border`)}>
+                                        {children}
+                                    </div>
                                 </motion.div>
                             </FocusTrap>
                             <motion.div
