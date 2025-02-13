@@ -7,7 +7,7 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/solid'
 export default function ConnectionIssue() {
     return (
         <div className="fixed right-5 top-20">
-            <div className="flex max-w-sm select-none flex-col items-start justify-start rounded bg-tertiary px-5 py-4 font-wildbase text-white ring-4 ring-destructive/25 transition-all active:translate-y-0 active:shadow-sm">
+            <div className="flex max-w-sm select-none flex-col items-start justify-start rounded bg-tertiary px-5 py-4 font-wildbase text-white ring-4 ring-destructive/25 transition-all active:translate-y-0 active:shadow-xs">
                 <div className="flex items-center">
                     <ExclamationTriangleIcon className="mr-1 h-6 w-6" />
                     <div className="text-lg">

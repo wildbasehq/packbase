@@ -4,7 +4,7 @@ import UserAvatar from '@/components/shared/user/avatar'
 // @ts-ignore
 import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
-import { BentoStaffBadge } from '@/lib/utils/pak'
+import {BentoStaffBadge} from '@/lib/utils/pak'
 import * as HoverCard from '@radix-ui/react-hover-card'
 import Image from 'next/image'
 
@@ -23,12 +23,12 @@ export default function UserInfoCol({
 
     return (
         <HoverCard.Root>
-            <HoverCard.Trigger className="select-none !no-underline">
+            <HoverCard.Trigger className="select-none no-underline!" asChild>
                 <UserInfo user={user} size={size} tag={tag} />
             </HoverCard.Trigger>
             <HoverCard.Portal>
                 <HoverCard.Content
-                    className="data-[side=right]:animate-slideLeftAndFade data-[side=left]:animate-slideRightAndFade relative w-96 overflow-hidden rounded border bg-card p-5 shadow data-[side=bottom]:animate-slide-up-fade-snapper data-[side=top]:animate-slide-down-fade data-[state=open]:transition-all"
+                    className="data-[side=right]:animate-slideLeftAndFade data-[side=left]:animate-slideRightAndFade relative w-96 overflow-hidden rounded border bg-card p-5 shadow-sm data-[side=bottom]:animate-slide-up-fade-snapper data-[side=top]:animate-slide-down-fade data-[state=open]:transition-all"
                     sideOffset={5}
                     collisionPadding={{ left: 32 }}
                 >

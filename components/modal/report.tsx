@@ -35,7 +35,7 @@ export default function ReportAbuse() {
     return (
         <div className="fixed bottom-5 right-5">
             <button
-                className="rounded bg-default p-4 text-default shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl active:translate-y-0 active:shadow-sm"
+                className="rounded bg-default p-4 text-default shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl active:translate-y-0 active:shadow-xs"
                 onClick={() => setOpen(!open)}
             >
                 {open ? <XCircleIcon size={24}/> : <AlertTriangle size={24}/>}
@@ -65,7 +65,7 @@ export default function ReportAbuse() {
                     </div>
 
                     <div>
-                        <input type="checkbox" id="screenshot" className="rounded-sm bg-default"/>
+                        <input type="checkbox" id="screenshot" className="rounded-xs bg-default"/>
                         <label htmlFor="screenshot" className="ml-2 text-sm leading-5 text-alt">
                             Include a screenshot
                         </label>

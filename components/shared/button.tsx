@@ -66,7 +66,7 @@ const Button = forwardRef((props: NGButtonType, ref: LegacyRef<HTMLButtonElement
         <button
             type={props.type || 'button'}
             disabled={props.disabled || false}
-            className={cn(props.className, `select-none ${variant.light?.bg || 'bg-white unicorn:bg-surface-container-lowest'} ${variant.light?.hover || 'hover:bg-neutral-50'} ${variant.useSystemText ? 'text-default' : 'text-white'} ${variant.dark?.bg || 'dark:bg-n-6 unicorn:dark:bg-surface-container-high'} ${variant.dark?.hover || 'dark:hover:bg-surface-variant/75'} w-full inline-flex justify-center rounded-md border px-4 py-2 text-base font-medium shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hover:ring-4 hover:ring-neutral-500/10 sm:w-auto sm:text-sm`)}
+            className={cn(props.className, `select-none ${variant.light?.bg || 'bg-white unicorn:bg-surface-container-lowest'} ${variant.light?.hover || 'hover:bg-neutral-50'} ${variant.useSystemText ? 'text-default' : 'text-white'} ${variant.dark?.bg || 'dark:bg-n-6 unicorn:dark:bg-surface-container-high'} ${variant.dark?.hover || 'dark:hover:bg-surface-variant/75'} w-full inline-flex justify-center rounded-md border px-4 py-2 text-base font-medium shadow-xs transition-all focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hover:ring-4 hover:ring-neutral-500/10 sm:w-auto sm:text-sm`)}
             onClick={props.onClick || (
                 () => {
                 }

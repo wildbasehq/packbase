@@ -1,14 +1,14 @@
 'use client'
-import { Text } from '@/components/shared/text'
+import {Text} from '@/components/shared/text'
 import Tooltip from '@/components/shared/tooltip'
 import HowlCreator from '@/components/shared/user/howl-creator'
-import { useUIStore, useUserAccountStore } from '@/lib/states'
-import { ArrowUpRightIcon, LucideIcon, Sparkles } from 'lucide-react'
+import {useUIStore, useUserAccountStore} from '@/lib/states'
+import {ArrowUpRightIcon, LucideIcon, Sparkles} from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
 import ActiveLink from '../shared/active-link'
 import './sidenav.component.css'
-import { FireIcon, SparklesIcon } from '@heroicons/react/24/solid'
+import {FireIcon, SparklesIcon} from '@heroicons/react/24/solid'
 
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon,
@@ -43,20 +43,21 @@ export function PackChannels({ ...props }: SideNavType) {
     if (hidden) return <></>
     return (
         <>
-            <nav aria-label="Sections" className={`${slimNavClass} bg-sidebar hidden h-screen flex-shrink-0 overflow-y-auto border-r md:flex md:flex-col`}>
+            <nav aria-label="Sections" className={`${slimNavClass} bg-sidebar hidden h-screen shrink-0 overflow-y-auto border-r md:flex md:flex-col`}>
                 <div className="no-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto overflow-x-visible p-6">
                     {user && !user.anonUser && <HowlCreator />}
                     {navigation.length === 0 && (
                         <div className="load-stagger">
                             {Array.from({ length: 20 }).map((_, i) => (
                                 <div key={i} className="flex h-fit min-h-[4rem] items-center px-3">
-                                    <div className="h-6 w-6 flex-shrink-0 rounded-lg bg-n-5" />
+                                    <div className="h-6 w-6 shrink-0 rounded-lg bg-n-5" />
                                     <div
                                         className="my-4 ml-3 text-sm"
                                         style={{
                                             // Random between 2 and 18
                                             width: `${Math.floor(Math.random() * 16) + 2}rem`,
                                         }}
+                                        suppressHydrationWarning
                                     >
                                         <div className="anim-sidenav-pole-entry h-4 rounded-lg border bg-card" />
                                     </div>
@@ -71,14 +72,14 @@ export function PackChannels({ ...props }: SideNavType) {
                             href={item.href}
                             activeClassName="bg-n-1/70 dark:bg-n-6"
                             inactiveClassName="transition-all hover:ring-2 ring-default hover:bg-n-2/25 dark:hover:bg-n-6/50"
-                            className="flex h-fit cursor-pointer items-center rounded px-3 py-1 !no-underline"
+                            className="flex h-fit cursor-pointer items-center rounded px-3 py-1 no-underline!"
                         >
                             <>
                                 {item.icon && (
                                     <>
                                         {typeof item.icon !== 'string' && (
                                             <item.icon
-                                                className="text-default h-6 w-6 flex-shrink-0"
+                                                className="text-default h-6 w-6 shrink-0"
                                                 // fill="currentColor"
                                                 aria-hidden="true"
                                             />
@@ -88,13 +89,13 @@ export function PackChannels({ ...props }: SideNavType) {
                                             <>
                                                 {/* Get from availableIcons */}
                                                 {item.icon.startsWith('icon://') && (
-                                                    <DynamicIcon name={item.icon.split('://')[1]} className="text-default h-6 w-6 flex-shrink-0" aria-hidden="true" />
+                                                    <DynamicIcon name={item.icon.split('://')[1]} className="text-default h-6 w-6 shrink-0" aria-hidden="true" />
                                                 )}
 
                                                 {/* Get from next/image */}
                                                 {!item.icon.startsWith('icon://') && (
                                                     <>
-                                                        <div className="h-6 w-6 flex-shrink-0">
+                                                        <div className="h-6 w-6 shrink-0">
                                                             <Image
                                                                 className={`h-6 w-6 ${item.description?.startsWith('@') ? 'rounded-full' : 'rounded-lg'}`}
                                                                 src={item.icon}
@@ -132,14 +133,14 @@ export function PackChannels({ ...props }: SideNavType) {
                     ))}
                 </div>
 
-                {props.footer && <div className="text-alt flex flex-shrink-0 items-center text-sm">{props.footer}</div>}
+                {props.footer && <div className="text-alt flex shrink-0 items-center text-sm">{props.footer}</div>}
             </nav>
 
             {/* Bottom horizontal navigator */}
             <nav
                 aria-label="Sections"
                 className={
-                    `border-default no-scrollbar fixed bottom-0 left-0 z-10 flex h-16 w-full flex-shrink-0 flex-row overflow-x-auto rounded-tl-xl rounded-tr-xl border-x-0 border-b-0 border-t border-solid bg-card md:hidden` +
+                    `border-default no-scrollbar fixed bottom-0 left-0 z-10 flex h-16 w-full shrink-0 flex-row overflow-x-auto rounded-tl-xl rounded-tr-xl border-x-0 border-b-0 border-t border-solid bg-card md:hidden` +
                     // Dark mode
                     ` dark:border-neutral-600`
                 }
@@ -155,10 +156,10 @@ export function PackChannels({ ...props }: SideNavType) {
                         <>
                             {item.icon && (
                                 <>
-                                    {typeof item.icon !== 'string' && <item.icon className="text-default -mt-0.5 h-6 w-6 flex-shrink-0" aria-hidden="true" />}
+                                    {typeof item.icon !== 'string' && <item.icon className="text-default -mt-0.5 h-6 w-6 shrink-0" aria-hidden="true" />}
 
                                     {typeof item.icon === 'string' && (
-                                        <div className="-mt-0.5 h-6 w-6 flex-shrink-0">
+                                        <div className="-mt-0.5 h-6 w-6 shrink-0">
                                             {item.icon.startsWith('icon://') && (
                                                 <DynamicIcon name={item.icon.split('://')[1]} className="text-default h-6 w-6" aria-hidden="true" />
                                             )}

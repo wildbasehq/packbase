@@ -29,7 +29,7 @@ export default function NavBar() {
         <>
             {user && !user.anonUser && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]} />}
 
-            <div className="bg-sidebar border-default sticky top-0 z-30 flex h-16 border-0 border-b border-solid shadow-sm">
+            <div className="bg-sidebar border-default sticky top-0 z-30 flex h-16 border-0 border-b border-solid shadow-xs">
                 <nav aria-label="Sections" className="hidden h-16 lg:flex lg:flex-col">
                     <div
                         className={`border-default shimmer-template relative flex h-full w-96 items-center border-r px-5 py-2 ${
@@ -53,7 +53,7 @@ export default function NavBar() {
                                 <ThemeToggle />
                             </div>
                             <div className="flex gap-4">
-                                <Link href="https://discord.gg/StuuK55gYA" target="_blank" className="!no-underline">
+                                <Link href="https://discord.gg/StuuK55gYA" target="_blank" className="no-underline!">
                                     <Button variant="ghost" className="flex items-center justify-center">
                                         <FaDiscord className="mr-1 h-4 w-4" /> Discord
                                     </Button>
@@ -68,7 +68,7 @@ export default function NavBar() {
                                         <MenuButton>
                                             <UserAvatar user={user} size="md" className={`${user.reqOnboard && 'animate-pulse'}`} />
                                         </MenuButton>
-                                        <DropdownMenu className="z-20 mt-4 !p-0">
+                                        <DropdownMenu className="z-20 mt-4 p-0!">
                                             <UserDropdown showOnboardingModal={setShowOnboardingModal} />
                                         </DropdownMenu>
                                     </Dropdown>
@@ -76,7 +76,7 @@ export default function NavBar() {
 
                                 {!user && (
                                     <>
-                                        <Link href="/id/login" className="!no-underline">
+                                        <Link href="/id/login" className="no-underline!">
                                             <Button variant="ghost" className="flex items-center justify-center">
                                                 <ScanFaceIcon className="mr-1 h-4 w-4" /> Sign In
                                             </Button>

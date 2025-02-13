@@ -1,22 +1,9 @@
-@import 'unicorn/monet-to-class';
+@reference './globals.css';
 @import 'unicorn/texture';
 
 @mixin background-opacity($color, $opacity: 0.3) {
   background: $color; /* The Fallback */
   background: rgba($color, $opacity);
-}
-
-.bg-sidebar {
-//   @apply bg-white dark:bg-n-7;
-  @apply bg-gradient-to-b from-white to-neutral-50 dark:from-n-7 dark:to-n-7/80 unicorn:bg-surface-variant/95;
-}
-
-.bg-sidebar\/90 {
-  @apply bg-gradient-to-b from-white/90 to-n-1/90 dark:from-n-7/90 dark:to-[#1b1b1c]/90;
-}
-
-.bg-body-acrylic {
-  @apply bg-n-1/95 dark:bg-n-7/95;
 }
 
 .font-pixel {
@@ -98,7 +85,7 @@
 }
 
 .drawer {
-  @apply fixed flex flex-col bg-surface border border-b-0 rounded-t-[10px] bottom-0 left-0 right-0 h-fit max-h-[97%] mx-[-1px] md:mx-auto md:max-w-sm lg:max-w-md xl:max-w-lg;
+  @apply fixed flex flex-col border border-b-0 rounded-t-[10px] bottom-0 left-0 right-0 h-fit max-h-[97%] mx-[-1px] md:mx-auto md:max-w-sm lg:max-w-md xl:max-w-lg;
 }
 
 .AccordionChevron {

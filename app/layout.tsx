@@ -1,19 +1,21 @@
-import Preload from '@/app/preload'
-import { Providers } from '@/app/provider'
+import {Providers} from '@/app/provider'
 import NavBar from '@/components/layout/navbar'
-import { PackChannels } from '@/components/layout/pack-channels'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
-import { ProjectSafeName } from '@/lib/utils'
-import { Analytics } from '@vercel/analytics/react'
+import {ProjectSafeName} from '@/lib/utils'
+import {Analytics} from '@vercel/analytics/react'
 import cx from 'classnames'
 import dynamic from 'next/dynamic'
 import localFont from 'next/font/local'
-import { inter, lexend } from './fonts'
-import './styles/globals.scss'
-import WaitlistCheck from '@/components/layout/waitlist-check'
-import { FaceFrownIcon } from '@heroicons/react/20/solid'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
+import {inter, lexend} from './fonts'
+import './styles/globals.css'
+import './styles/_to-org.scss'
+import {FaceFrownIcon} from '@heroicons/react/20/solid'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import Link from 'next/link'
+import {PackChannels} from '@/components/layout/pack-channels'
+import WaitlistCheck from '@/components/layout/waitlist-check'
+import Preload from '@/app/preload'
+import {Suspense} from 'react'
 
 const wildbaseRemix = localFont({
     src: [
@@ -47,16 +49,16 @@ export const metadata = {
     metadataBase: new URL('https://ypnyp-dev-nextjs-ui.vercel.app/'),
 }
 
-const PostHogPageView = dynamic(() => import('./PostHogPageView'), {
-    ssr: false,
-})
+const PostHogPageView = dynamic(() => import('./PostHogPageView'))
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en" className="h-full">
+        <html lang="en" className="h-full" suppressHydrationWarning>
             <body className={cx('h-full overflow-hidden bg-n-1 dark:bg-n-9', lexend.variable, lexend.className, inter.variable, wildbaseRemix.variable)}>
                 <Providers>
-                    <PostHogPageView />
+                    <Suspense>
+                        <PostHogPageView />
+                    </Suspense>
                     {/* "Mobile is unsupported" notice */}
                     <div className="flex h-full items-center justify-center px-8 sm:hidden">
                         <div className="flex flex-col gap-4">

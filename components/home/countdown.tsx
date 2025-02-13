@@ -49,7 +49,7 @@ export default function Countdown() {
     return (
         <div className="mx-auto mb-12 grid max-w-7xl grid-cols-1 items-center justify-center gap-8 lg:grid-cols-2">
             <div className="flex flex-col space-y-4">
-                <Heading size="3xl" className="!font-bold !text-green-500">
+                <Heading size="3xl" className="font-bold! text-green-500!">
                     Packbase begins waitlist flow in {countdown.days}:{countdown.hours}:{countdown.minutes}:{countdown.seconds}
                 </Heading>
                 <div className="space-y-2">

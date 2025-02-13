@@ -1,20 +1,24 @@
 'use client'
 import Body from '@/components/layout/body'
-import { LoadingDots } from '@/components/shared/icons'
-import { Heading } from '@/components/shared/text'
-import { vg } from '@/lib/api'
-import { useResourceStore, useUIStore } from '@/lib/states'
-import { ProjectName, ProjectSafeName } from '@/lib/utils'
-import { FaceFrownIcon, HomeIcon } from '@heroicons/react/24/solid'
-import { OrbitIcon } from 'lucide-react'
+import {LoadingDots} from '@/components/shared/icons'
+import {Heading} from '@/components/shared/text'
+import {vg} from '@/lib/api'
+import {useResourceStore, useUIStore} from '@/lib/states'
+import {ProjectName, ProjectSafeName} from '@/lib/utils'
+import {FaceFrownIcon, HomeIcon} from '@heroicons/react/24/solid'
+import {OrbitIcon} from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
+import {useParams} from 'next/navigation'
 
-export default function PackLayout({ children, params }: { children: React.ReactNode; params: { slug: string } }) {
+export default function PackLayout({ children }: {
+    children: React.ReactNode
+}) {
     const { resourceDefault, loading, setLoading, setNavigation } = useUIStore()
     const { resources, currentResource, setCurrentResource, setResources } = useResourceStore()
     const [error, setError] = useState<any>(null)
-    const { slug } = params
+
+    const {slug} = useParams<{ slug: string }>()
 
     useEffect(() => {
         const tempResources = resources.slice()

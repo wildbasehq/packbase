@@ -192,7 +192,7 @@ export default function FeedList({
 
                     {changingView && (
                         <Card className="absolute right-0 top-0 z-50 mr-10 mt-40 gap-2 shadow-2xl">
-                            <Heading size="lg" className="flex !w-full items-center">
+                            <Heading size="lg" className="flex w-full! items-center">
                                 <HelpCircleIcon className="mr-2 inline-block h-5 w-5" />
                                 Feed View
                                 {/*<span className="flex-1" />*/}

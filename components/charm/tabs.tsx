@@ -68,7 +68,7 @@ export default function CharmingTabs({items, tabComponent: TabComponent = "a", s
                 <>
                     <div
                         ref={ref}
-                        className="group relative overflow-hidden rounded-full bg-[#60a5fa44] p-[2px] shadow-sm"
+                        className="group relative overflow-hidden rounded-full bg-[#60a5fa44] p-[2px] shadow-xs"
                         style={{
                             transform: "translateZ(0)",
                             backfaceVisibility: "hidden",
@@ -131,13 +131,13 @@ export default function CharmingTabs({items, tabComponent: TabComponent = "a", s
                             <>
                                 <Menu.Button
                                     ref={refs.setReference}
-                                    className="group peer relative flex rounded-full bg-white/90 p-2 outline-none transition-colors active:bg-white/80 md:hidden"
+                                    className="group peer relative flex rounded-full bg-white/90 p-2 outline-hidden transition-colors active:bg-white/80 md:hidden"
                                 >
                                     <MenuIcon isOpen={open} />
                                 </Menu.Button>
 
                                 {/* Focus/hover background */}
-                                <div className="absolute inset-0 -z-[1] block bg-[#af91ff] opacity-20 transition-opacity duration-100 group-hover:opacity-70 peer-focus:opacity-100 md:hidden"></div>
+                                <div className="absolute inset-0 -z-1 block bg-[#af91ff] opacity-20 transition-opacity duration-100 group-hover:opacity-70 peer-focus:opacity-100 md:hidden"></div>
                             </>
                         </div>
                     </div>
@@ -146,7 +146,7 @@ export default function CharmingTabs({items, tabComponent: TabComponent = "a", s
                     {open && (
                         <FloatingPortal>
                             <Menu.Items
-                                className="group focus:outline-none md:hidden"
+                                className="group focus:outline-hidden md:hidden"
                                 ref={refs.setFloating}
                                 style={floatingStyles}
                             >
@@ -205,7 +205,7 @@ function DesktopTab({as: Component, label, isActive, setActiveElement, ...rest}:
         <Component
             ref={ref}
             className={classNames(
-                "group flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium outline-none transition-colors duration-200 lg:px-6",
+                "group flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium outline-hidden transition-colors duration-200 lg:px-6",
                 isActive
                     ? "text-indigo-900 focus:text-indigo-950"
                     : "text-slate-500 hover:text-slate-700 focus:text-slate-700",
@@ -235,7 +235,7 @@ function MobileTab({ as, label, isActive, ...rest }: {
         <Menu.Item
             as={as}
             className={classNames(
-                "group/item flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium outline-none transition-colors duration-200 lg:px-6",
+                "group/item flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium outline-hidden transition-colors duration-200 lg:px-6",
                 isActive
                     ? "text-indigo-900 focus:text-indigo-950"
                     : "text-slate-500 hover:text-slate-700 focus:text-slate-700",

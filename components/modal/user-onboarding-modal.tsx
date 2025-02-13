@@ -46,14 +46,14 @@ function PackSelectForSetting() {
             {!packs ? (
                 <div className="flex gap-1">
                     <LoadingCircle />{' '}
-                    <span className="animate-gradient-move-x bg-gradient-to-r from-neutral-100 via-neutral-500 to-neutral-100 bg-clip-text text-transparent [background-size:300%]">
+                    <span className="animate-gradient-move-x bg-linear-to-r from-neutral-100 via-neutral-500 to-neutral-100 bg-clip-text text-transparent [background-size:300%]">
                         Loading packs...
                     </span>
                 </div>
             ) : !packs.length ? (
                 <p className="flex">
                     <XMarkIcon className="text-alt mr-1 h-5 w-6 text-tertiary" />
-                    <Text alt size="sm" className="!text-tertiary">
+                    <Text alt size="sm" className="text-tertiary!">
                         You don't have any packs yet, you can join one and set it as default later. Your default pack for now will be the Universe.
                     </Text>
                 </p>
@@ -113,7 +113,7 @@ const steps: {
                                 </Text>
                             </label>
                             <div className="mt-2">
-                                <div className="bg-default flex rounded-md shadow-sm ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800">
+                                <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800">
                                     <input
                                         type="text"
                                         name="slug"
@@ -136,7 +136,7 @@ const steps: {
                             </div>
 
                             <div className="mt-2">
-                                <div className="bg-default flex rounded-md shadow-sm ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800">
+                                <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800">
                                     <span className="flex select-none items-center pl-3 text-neutral-500 sm:text-sm">@</span>
                                     <input
                                         type="text"
@@ -455,7 +455,7 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
                 showModal={showOnboardingModal}
                 setShowModal={setShowOnboardingModal}
                 maxWidth
-                className="h-full w-full max-w-screen-2xl !overflow-auto lg:max-h-[80%]"
+                className="h-full w-full max-w-(--breakpoint-2xl) overflow-auto! lg:max-h-[80%]"
             >
                 <>
                     {/* Loading overlay */}
@@ -469,7 +469,7 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
                     )}
 
                     {/* Steps Header */}
-                    <div className="border-default sticky top-0 z-30 border-0 border-b border-solid bg-white backdrop-blur dark:bg-neutral-700/10 md:w-full md:overflow-x-auto">
+                    <div className="border-default sticky top-0 z-30 border-0 border-b border-solid bg-white backdrop-blur-sm dark:bg-neutral-700/10 md:w-full md:overflow-x-auto">
                         <nav className="mx-auto overflow-x-auto px-4 sm:px-6 md:w-full lg:px-8" aria-label="Progress">
                             <ol role="list" className="border-default overflow-hidden rounded-md border-0 lg:flex lg:rounded-none lg:border-l lg:border-r">
                                 {steps.map((step, stepIdx) => (
@@ -487,7 +487,7 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
                                                     aria-hidden="true"
                                                 />
                                                 <span className={clsx(stepIdx !== 0 ? 'lg:pl-9' : '', 'flex items-start px-6 py-5 text-sm font-medium')}>
-                                                    <span className="flex-shrink-0">
+                                                    <span className="shrink-0">
                                                         <span
                                                             className={`flex h-10 w-10 items-center justify-center rounded-full ${
                                                                 stepIdx < currentStep ? 'bg-primary' : stepIdx == currentStep ? 'border border-primary' : 'border'

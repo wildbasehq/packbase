@@ -113,7 +113,7 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
           onClick={() => setIsOpen(!isOpen)}
         >
           <span
-            className="rounded-sm px-1"
+            className="rounded-xs px-1"
             style={{
               color: activeColorItem?.color,
               backgroundColor: activeHighlightItem?.color,
@@ -127,7 +127,7 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
 
         <Popover.Content
           align="start"
-          className="z-[99999] my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded border border-stone-200 bg-white p-1 shadow-xl animate-in fade-in slide-in-from-top-1"
+          className="z-99999 my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded border border-stone-200 bg-white p-1 shadow-xl animate-in fade-in slide-in-from-top-1"
         >
           <div className="my-1 px-2 text-sm text-stone-500">
             Color
@@ -145,12 +145,12 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
                     .run();
                 setIsOpen(false);
               }}
-              className="flex items-center justify-between rounded-sm px-2 py-1 text-sm text-stone-600 hover:bg-stone-100"
+              className="flex items-center justify-between rounded-xs px-2 py-1 text-sm text-stone-600 hover:bg-stone-100"
               type="button"
             >
               <div className="flex items-center space-x-2">
                 <div
-                  className="rounded-sm border border-stone-200 px-1 py-px font-medium"
+                  className="rounded-xs border border-stone-200 px-1 py-px font-medium"
                   style={{ color }}
                 >
                   A
@@ -175,12 +175,12 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
                 name !== "Default" && editor.commands.setHighlight({ color });
                 setIsOpen(false);
               }}
-              className="flex items-center justify-between rounded-sm px-2 py-1 text-sm text-stone-600 hover:bg-stone-100"
+              className="flex items-center justify-between rounded-xs px-2 py-1 text-sm text-stone-600 hover:bg-stone-100"
               type="button"
             >
               <div className="flex items-center space-x-2">
                 <div
-                  className="rounded-sm border border-stone-200 px-1 py-px font-medium"
+                  className="rounded-xs border border-stone-200 px-1 py-px font-medium"
                   style={{ backgroundColor: color }}
                 >
                   A

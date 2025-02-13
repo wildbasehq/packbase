@@ -128,7 +128,7 @@ function CreateGroupSidebar() {
                     >
                         <Heading size="3xl">Something will show here. Probably templates, or a live theme editor, who knows.</Heading>
                         <Text className="mt-4">For now just take this i guess.</Text>
-                        {/*<Image src={PackDefaultHeader} className="fixed inset-0 -z-[1] h-screen w-screen opacity-90 transition-opacity" alt="Default pack header" />*/}
+                        {/*<Image src={PackDefaultHeader} className="fixed inset-0 -z-1 h-screen w-screen opacity-90 transition-opacity" alt="Default pack header" />*/}
                     </TransitionChild>
 
                     <div className="absolute inset-0 overflow-hidden">
@@ -151,7 +151,7 @@ function CreateGroupSidebar() {
                                         className="flex h-full flex-col divide-y divide-neutral-200 bg-card/75 shadow-xl backdrop-blur-xl dark:divide-neutral-700"
                                     >
                                         <div className="h-0 flex-1 overflow-y-auto">
-                                            <div className="rounded-bl rounded-br bg-white/50 px-4 py-6 shadow dark:bg-n-6/50 sm:px-6">
+                                            <div className="rounded-bl rounded-br bg-white/50 px-4 py-6 shadow-sm dark:bg-n-6/50 sm:px-6">
                                                 <div className="flex items-center justify-between">
                                                     <DialogTitle className="text-default select-none text-lg font-medium"> Create a Pack </DialogTitle>
                                                     <div className="ml-3 flex h-7 items-center">
@@ -268,7 +268,7 @@ function CreateGroupSidebar() {
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-shrink-0 justify-end space-x-2 px-4 py-4">
+                                        <div className="flex shrink-0 justify-end space-x-2 px-4 py-4">
                                             <Button disabled={submitting} type="reset" variant="grey" onClick={() => setOnboardOpen(false)}>
                                                 Cancel
                                             </Button>
@@ -313,12 +313,12 @@ function SearchablePackList() {
                     <label htmlFor="desktop-search-pack" className="sr-only">
                         Search
                     </label>
-                    <div className="flex rounded-md shadow-sm">
-                        <div className="relative flex-grow focus-within:z-10">
+                    <div className="flex rounded-md shadow-xs">
+                        <div className="relative grow focus-within:z-10">
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                 <MagnifyingGlassIcon className="text-default-alt h-5 w-5" aria-hidden="true" />
                             </div>
-                            <div className="flex rounded-md rounded-br-none rounded-tr-none bg-white shadow-sm ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:!ring-indigo-600 dark:bg-white/5 dark:ring-white/10 sm:max-w-md">
+                            <div className="flex rounded-md rounded-br-none rounded-tr-none bg-white shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600! dark:bg-white/5 dark:ring-white/10 sm:max-w-md">
                                 <input
                                     type="text"
                                     name="desktop-search-pack"

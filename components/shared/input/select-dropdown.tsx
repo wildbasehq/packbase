@@ -22,7 +22,7 @@ export default function SelectMenu({ ...props }: SelectMenuType) {
                 <>
                     <Listbox.Label className="block text-sm font-medium unicorn:text-on-surface-variant">{props.title}</Listbox.Label>
                     <div className={`relative mt-1 ${props.displayAbove ? 'flex flex-col-reverse' : ''}`}>
-                        <Listbox.Button className="relative w-full cursor-default rounded border py-2 pl-3 pr-10 text-left focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                        <Listbox.Button className="relative w-full cursor-default rounded border py-2 pl-3 pr-10 text-left focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                             <span className="text-default flex gap-1 truncate">
                                 {props.selected?.name}
                                 {props.selected?.verified && <CheckBadgeIcon className="h-5 w-5 text-primary-inverse" aria-hidden="true" />}
@@ -35,7 +35,7 @@ export default function SelectMenu({ ...props }: SelectMenuType) {
                         <Transition show={open} as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
                             <Listbox.Options
                                 key={props.selected}
-                                className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded bg-card py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                                className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded bg-card py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-hidden sm:text-sm"
                             >
                                 {props.options.map((option, optionIdx) => (
                                     <Listbox.Option

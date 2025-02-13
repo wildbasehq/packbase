@@ -43,7 +43,7 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
     return (
         <>
             <div>
-                <Logo className="!h-12 !w-12" />
+                <Logo className="h-12! w-12!" />
                 <Heading className="mt-6" size="2xl" as="h2">
                     Create a new account
                 </Heading>
@@ -98,7 +98,7 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
                             Password
                             <p className="text-alt text-xs leading-5">at least 8 characters, 1 uppercase, 1 digit, and 1 special character</p>
                         </label>
-                        <div className="overflow-visible rounded-md shadow-sm ring-1 ring-neutral-300 dark:ring-white/20">
+                        <div className="overflow-visible rounded-md shadow-xs ring-1 ring-neutral-300 dark:ring-white/20">
                             <Input
                                 combined
                                 className="rounded-tl-md rounded-tr-md border-b border-n-3 dark:border-white/20"
@@ -130,7 +130,7 @@ export default function IDCreate({ searchParams }: { searchParams: { error_descr
                             variant="default"
                             type="submit"
                             disabled={submitting}
-                            className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
                             {!submitting ? 'Register' : <LoadingCircle />}
                         </Button>

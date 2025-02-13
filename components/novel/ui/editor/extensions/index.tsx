@@ -43,7 +43,7 @@ export const defaultExtensions = [
         // codeBlock: {
         //   HTMLAttributes: {
         //     class:
-        //       "rounded-sm bg-stone-100 p-5 font-mono font-medium text-stone-800",
+        //       "rounded-xs bg-stone-100 p-5 font-mono font-medium text-stone-800",
         //   },
         // },
         code: {

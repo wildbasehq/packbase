@@ -64,7 +64,7 @@ export default function ResourceSwitcher() {
             {domReady && !connecting ? (
                 <div
                     ref={ref}
-                    className={`group flex select-none flex-row items-center justify-between ${loading ? '!cursor-no-drop' : ''}`}
+                    className={`group flex select-none flex-row items-center justify-between ${loading ? 'cursor-no-drop!' : ''}`}
                     aria-label="Switch resource"
                     title={loading ? 'Resource is still switching...' : 'Switch resource'}
                     onAnimationEnd={() => {
@@ -105,7 +105,7 @@ export default function ResourceSwitcher() {
                                 <ExpandingArrow className="right-0 -mt-1 h-6 w-6 rotate-90 text-neutral-500 transition-all dark:text-white" />
                             </span>
                         </MenuButton>
-                        <DropdownMenu className="z-50 -mt-16 rounded-tl-none rounded-tr-none !p-0">
+                        <DropdownMenu className="z-50 -mt-16 rounded-tl-none rounded-tr-none p-0!">
                             <MenuItem>{({ close }) => <ResourceSwitcherMenu close={close} />}</MenuItem>
                         </DropdownMenu>
                     </Dropdown>
@@ -130,8 +130,8 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
     const { show, hide } = useModal()
 
     return (
-        <DropdownHeader className="flex w-96 flex-col !p-0">
-            <div className="h-fit w-full rounded-bl rounded-br bg-white/50 shadow dark:bg-n-6/50">
+        <DropdownHeader className="flex w-96 flex-col p-0!">
+            <div className="h-fit w-full rounded-bl rounded-br bg-white/50 shadow-sm dark:bg-n-6/50">
                 <div className="p-2">
                     <div
                         className="ring-default flex items-center rounded px-4 py-4 transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"
@@ -329,7 +329,7 @@ function ResourceSettingsModal() {
 
     return (
         <div className="flex h-[50vh] max-h-full w-[50vw] gap-4">
-            <div className="flex w-80 flex-col !p-0">
+            <div className="flex w-80 flex-col p-0!">
                 <div className="h-fit w-full rounded-br bg-white/50 ring-2 ring-shadow dark:bg-n-6/50">
                     <div className="flex items-center rounded px-6 py-6">
                         <UserAvatar user={currentResource} size="lg" />
@@ -342,7 +342,7 @@ function ResourceSettingsModal() {
 
                 <div className="inline-flex h-full w-72 flex-col gap-2 border-r-2 border-n-2/50 px-3 py-2 dark:border-n-6/80">
                     {pages.map((page, i) => (
-                        <div key={i} className="text-default !no-underline" onClick={() => setCurrentPage(page.title)}>
+                        <div key={i} className="text-default no-underline!" onClick={() => setCurrentPage(page.title)}>
                             <div
                                 className={clsx(
                                     page.title === currentPage ? 'bg-n-2/25 dark:bg-n-6/50' : 'hover:bg-n-2/25 dark:hover:bg-n-6/50',
@@ -420,7 +420,7 @@ function ResourceSettingsModal() {
                                 </div>
                             </div>
 
-                            <div className="aspect-[3/1] rounded-lg bg-n-2/25">
+                            <div className="aspect-3/1 rounded-lg bg-n-2/25">
                                 {headerPicPreview ? (
                                     <img src={headerPicPreview} alt="Header preview" className="rounded-lg object-cover" />
                                 ) : (

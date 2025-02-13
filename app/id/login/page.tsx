@@ -60,7 +60,7 @@ export default function IDLogin({
     return (
         <>
             <div>
-                <Logo className="!h-12 !w-12" />
+                <Logo className="h-12! w-12!" />
                 <Heading className="mt-6" size="2xl" as="h2">
                     Sign in
                 </Heading>
@@ -110,7 +110,7 @@ export default function IDLogin({
                             variant="default"
                             type="submit"
                             disabled={submitting}
-                            className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
                             {!submitting ? 'Sign in' : <LoadingCircle />}
                         </Button>

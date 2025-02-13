@@ -1,12 +1,14 @@
+@reference '../../../app/styles/globals.css';
+
 .ProseMirror .is-editor-empty:first-child::before {
-  @apply text-n-5 dark:text-n-4 unicorn:text-on-surface-variant;
+  @apply text-n-5 dark:text-n-4;
   content: attr(data-placeholder);
   float: left;
   pointer-events: none;
   height: 0;
 }
 .ProseMirror .is-empty::before {
-  @apply text-n-5 dark:text-n-4 unicorn:text-on-surface-variant;
+  @apply text-n-5 dark:text-n-4;
   content: attr(data-placeholder);
   float: left;
   pointer-events: none;
@@ -104,7 +106,7 @@ ul[data-type="taskList"] li > label input[type="checkbox"] {
 }
 
 ul[data-type="taskList"] li[data-checked="true"] > div > p {
-  @apply text-n-5 dark:text-n-4 unicorn:text-on-surface-variant;
+  @apply text-n-5 dark:text-n-4;
   text-decoration: line-through;
   text-decoration-thickness: 2px;
 }

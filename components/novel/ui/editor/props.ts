@@ -3,7 +3,7 @@ import { startImageUpload } from "@/components/novel/ui/editor/plugins/upload-im
 
 export const defaultEditorProps: EditorProps = {
   attributes: {
-    class: `prose-sm dark:prose-invert prose-headings:font-title font-default focus:outline-none max-w-full`,
+    class: `prose-sm dark:prose-invert prose-headings:font-title font-default focus:outline-hidden max-w-full`,
   },
   handleDOMEvents: {
     keydown: (_view, event) => {

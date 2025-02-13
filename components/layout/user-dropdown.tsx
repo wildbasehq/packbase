@@ -51,13 +51,13 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
     const currentStatus = StatusOptions.find((option) => option.id === user.status) || StatusOptions[0]
 
     return (
-        <DropdownHeader className="flex w-96 flex-col !p-0">
-            <div className="h-fit w-full rounded-bl rounded-br bg-white/50 shadow dark:bg-n-6/50">
+        <DropdownHeader className="flex w-96 flex-col p-0!">
+            <div className="h-fit w-full rounded-bl rounded-br bg-white/50 shadow-sm dark:bg-n-6/50">
                 <div className="border-b p-2">
                     {user?.anonUser && (
                         <Link
                             href="/settings"
-                            className="ring-default flex flex-col justify-center rounded px-4 py-4 !no-underline transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"
+                            className="ring-default flex flex-col justify-center rounded px-4 py-4 no-underline! transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"
                         >
                             <Heading size="sm">You need an invite</Heading>
                             <Text size="xs" className="text-alt">
@@ -69,7 +69,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                     {user.reqOnboard && !user.anonUser && (
                         <div
                             onClick={() => showOnboardingModal(true)}
-                            className="ring-default flex flex-col justify-center rounded px-4 py-4 !no-underline transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"
+                            className="ring-default flex flex-col justify-center rounded px-4 py-4 no-underline! transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"
                         >
                             <Heading size="sm">Finish your space</Heading>
                             <Text size="xs" className="text-alt">
@@ -80,7 +80,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                     )}
 
                     {!user.reqOnboard && (
-                        <Link href={`/@${user.username}`} className="!no-underline">
+                        <Link href={`/@${user.username}`} className="no-underline!">
                             <div className="ring-default flex items-center rounded px-4 py-4 transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50">
                                 <UserAvatar user={user} size="lg" />
                                 <div className="ml-3 grow">
@@ -118,7 +118,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                             <ChevronDownIcon className="AccordionChevron text-body h-5 w-5 self-center" />
                         </MenuButton>
                     </Tooltip>
-                    <DropdownMenu className="z-20 !w-96">
+                    <DropdownMenu className="z-20 w-96!">
                         {StatusOptions.filter((option) => option.id !== currentStatus.id).map((option, i) => (
                             <DropdownItem
                                 key={i}

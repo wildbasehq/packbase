@@ -143,9 +143,9 @@ export default function HowlCreator() {
             )}
 
             <Modal showModal={showModal} setShowModal={setShowModal}>
-                <Card className="!px-0 !py-0">
+                <Card className="px-0! py-0!">
                     {!currentResource.standalone && (
-                        <Alert className="!rounded-none !border-0">
+                        <Alert className="rounded-none! border-0!">
                             <AlertTitle className="flex items-center">
                                 <UserAvatar name={currentResource.display_name} size={24} user={currentResource} className="mr-2 inline-flex" />
                                 {currentResource.display_name}
@@ -162,7 +162,7 @@ export default function HowlCreator() {
                         <div className="relative border-t">
                             <div className="px-4 pt-5 sm:px-6">
                                 <div className="flex space-x-3">
-                                    <div className="flex-shrink-0">
+                                    <div className="shrink-0">
                                         <UserAvatar user={user} />
                                     </div>
                                     <div className="flex min-w-0 flex-1 flex-col justify-center">
@@ -171,7 +171,7 @@ export default function HowlCreator() {
                                         </Link>
                                         <Text>New Howl</Text>
                                     </div>
-                                    <div className="flex flex-shrink-0 space-x-2 self-center">
+                                    <div className="flex shrink-0 space-x-2 self-center">
                                         <DotIcon />
                                     </div>
                                 </div>

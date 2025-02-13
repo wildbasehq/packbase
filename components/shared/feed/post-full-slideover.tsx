@@ -11,7 +11,7 @@ export default function PostModal({ postContent, setPostContent, signedInUser, s
                 <UserInfoCol user={postContent.user} tag={<time dateTime={postContent.created_at}>about {moment(postContent.created_at).fromNow()}</time>} />
             </div>
 
-            <Card className="relative z-20 !max-w-full space-y-4 !p-0 dark:border-2">
+            <Card className="relative z-20 max-w-full! space-y-4 p-0! dark:border-2">
                 <div className="px-4 py-4 sm:px-6">
                     <div className="text-default mt-4 break-words text-sm">
                         <Markdown>{postContent.body}</Markdown>

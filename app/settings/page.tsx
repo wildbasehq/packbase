@@ -121,7 +121,7 @@ export default function SettingsGeneral() {
                                     </Text>
                                 </label>
                                 <div className="mt-2">
-                                    <div className="bg-default flex rounded-md shadow-sm ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
+                                    <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
                                         <input
                                             type="text"
                                             name="slug"
@@ -140,7 +140,7 @@ export default function SettingsGeneral() {
                                 </div>
 
                                 <div className="mt-2">
-                                    <div className="bg-default flex rounded-md shadow-sm ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
+                                    <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
                                         <span className="flex select-none items-center pl-3 text-neutral-500 sm:text-sm">@</span>
                                         <input
                                             type="text"
@@ -164,7 +164,7 @@ export default function SettingsGeneral() {
                                     Display Name
                                 </label>
                                 <div className="mt-2">
-                                    <div className="bg-default flex rounded-md shadow-sm ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
+                                    <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
                                         <input
                                             type="text"
                                             name="display_name"
@@ -191,7 +191,7 @@ export default function SettingsGeneral() {
                                         id="about"
                                         name="about"
                                         rows={3}
-                                        className="no-legacy text-default bg-default block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-neutral-300 placeholder:text-neutral-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:ring-neutral-800 sm:text-sm sm:leading-6"
+                                        className="no-legacy text-default bg-default block w-full rounded-md border-0 py-1.5 shadow-xs ring-1 ring-inset ring-neutral-300 placeholder:text-neutral-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:ring-neutral-800 sm:text-sm sm:leading-6"
                                         defaultValue={user?.about?.bio || ''}
                                         onChange={(e) => setAboutInput(e.target.value)}
                                     />
@@ -248,7 +248,7 @@ export default function SettingsGeneral() {
                                         <div className="text-alt mt-4 flex select-none text-sm leading-6">
                                             <label
                                                 htmlFor="cover-photo"
-                                                className="relative rounded-md font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                                                className="relative rounded-md font-semibold text-primary focus-within:outline-hidden focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
                                             >
                                                 <span>Upload a file</span>
                                             </label>
@@ -275,7 +275,7 @@ export default function SettingsGeneral() {
                     <Button
                         type="submit"
                         disabled={submitting}
-                        className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
                         {!submitting ? 'Save' : <LoadingCircle />}
                     </Button>

@@ -185,17 +185,17 @@ export default function TermsPage() {
                             </div>
 
                             <div className="rounded-lg border border-gray-700 bg-gray-900 p-6">
-                                <Heading size="xl" className="mb-4 font-medium !text-white">
+                                <Heading size="xl" className="mb-4 font-medium text-white!">
                                     Afterdark Account Guidelines
                                 </Heading>
-                                <Text className="mb-2 !text-white">Afterdark accounts allow mature content with the following requirements:</Text>
+                                <Text className="mb-2 text-white!">Afterdark accounts allow mature content with the following requirements:</Text>
 
                                 <div className="space-y-4">
                                     <div>
-                                        <Heading size="lg" className="mb-2 !text-white">
+                                        <Heading size="lg" className="mb-2 text-white!">
                                             Age Verification
                                         </Heading>
-                                        <ul className="list-disc space-y-2 pl-6 [&>*>*]:text-white [&>*]:!text-white">
+                                        <ul className="list-disc space-y-2 pl-6 [&>*>*]:text-white *:text-white!">
                                             <li>
                                                 <Text>Users must be 18+ and verify their age</Text>
                                             </li>
@@ -209,10 +209,10 @@ export default function TermsPage() {
                                     </div>
 
                                     <div>
-                                        <Heading size="lg" className="mb-2 !text-white">
+                                        <Heading size="lg" className="mb-2 text-white!">
                                             Permitted Content
                                         </Heading>
-                                        <ul className="list-disc space-y-2 pl-6 [&>*>*]:text-white [&>*]:!text-white">
+                                        <ul className="list-disc space-y-2 pl-6 [&>*>*]:text-white *:text-white!">
                                             <li>
                                                 <Text>Adult content must be properly tagged</Text>
                                             </li>

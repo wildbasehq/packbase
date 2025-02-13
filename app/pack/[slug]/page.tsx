@@ -48,7 +48,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                     {/* Header */}
                     {currentResource && currentResource?.slug === 'universe' && (
                         <div
-                            className="bg-sidebar sticky top-0 z-10 flex items-center justify-between border-b px-8 py-3 backdrop-blur"
+                            className="bg-sidebar sticky top-0 z-10 flex items-center justify-between border-b px-8 py-3 backdrop-blur-sm"
                             // shadow based on shadowSize value
                             style={{ boxShadow: `0 0 ${shadowSize}px 0 rgba(0, 0, 0, 0.1)` }}
                         >

@@ -2,30 +2,30 @@
  * Forgive me, this is fucking horrible.
  */
 
-import { ArrowUpOnSquareIcon, TrashIcon } from '@heroicons/react/24/solid'
+import {ArrowUpOnSquareIcon, TrashIcon} from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import UserAvatar from '@/components/shared/user/avatar'
 import Avatar from '@/components/shared/user/avatar'
-import { UserProfileBasic } from '@/lib/defs/user'
+import {UserProfileBasic} from '@/lib/defs/user'
 import Card from '@/components/shared/card'
 import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
-import { Dispatch, useEffect, useRef, useState } from 'react'
-import { LoadingCircle } from '@/components/shared/icons'
-import { vg } from '@/lib/api'
-import { toast } from 'sonner'
-import { useUIStore, useUserAccountStore } from '@/lib/states'
+import {Dispatch, useEffect, useRef, useState} from 'react'
+import {LoadingCircle} from '@/components/shared/icons'
+import {vg} from '@/lib/api'
+import {toast} from 'sonner'
+import {useUIStore, useUserAccountStore} from '@/lib/states'
 import XMarkIcon from '@/components/shared/icons/dazzle/xmark'
 import Markdown from '@/components/shared/markdown'
-import { EllipsisHorizontalIcon, HandThumbUpIcon, PaperAirplaneIcon } from '@heroicons/react/20/solid'
-import { MenuButton } from '@headlessui/react'
-import { Dropdown, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/shared/dropdown'
+import {EllipsisHorizontalIcon, HandThumbUpIcon, PaperAirplaneIcon} from '@heroicons/react/20/solid'
+import {MenuButton} from '@headlessui/react'
+import {Dropdown, DropdownItem, DropdownLabel, DropdownMenu} from '@/components/shared/dropdown'
 import clsx from 'clsx'
-import { Text } from '@/components/shared/text'
-import { Button } from '@/components/shared/ui/button'
-import { Slideover } from '@/components/modal/slideover'
+import {Text} from '@/components/shared/text'
+import {Button} from '@/components/shared/ui/button'
+import {Slideover} from '@/components/modal/slideover'
 import PostModal from '@/components/shared/feed/post-full-slideover'
-import { useModal } from '@/components/modal/provider'
+import {useModal} from '@/components/modal/provider'
 
 export declare interface FeedPostDataType {
     id: string
@@ -154,7 +154,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                 </Slideover>
             )}
 
-            <Card className="!px-0 !py-0">
+            <Card className="px-0! py-0!">
                 <div className="relative">
                     <div className="px-4 pt-5 sm:px-6">
                         {/* "___ Rehowled" */}
@@ -170,8 +170,8 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                         {postContent.pack && postContent.pack.slug !== 'universe' && (
                             <div className="mb-6 flex items-center text-sm">
                                 {/* <UserGroupIcon className="mr-2 h-4 w-4" /> */}
-                                <Link href={`/p/${postContent.pack?.slug}/`} className="text-alt flex items-center justify-center !no-underline hover:text-inherit">
-                                    <UserAvatar size="xs" icon={postContent.pack?.images?.avatar || ''} className="mr-2 rounded-sm" />
+                                <Link href={`/p/${postContent.pack?.slug}/`} className="text-alt flex items-center justify-center no-underline! hover:text-inherit">
+                                    <UserAvatar size="xs" icon={postContent.pack?.images?.avatar || ''} className="mr-2 rounded-xs" />
                                     <span>{postContent.pack?.display_name}</span>
                                 </Link>
                             </div>
@@ -183,13 +183,13 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                     tag={<time dateTime={postContent.created_at}>about {moment(postContent.created_at).fromNow()}</time>}
                                 />
                             </div>
-                            <div className="flex flex-shrink-0 space-x-2 self-center">
+                            <div className="flex shrink-0 space-x-2 self-center">
                                 {postContent.user && postContent.user.id === signedInUser?.id && (
                                     <Dropdown>
                                         <MenuButton>
                                             <EllipsisHorizontalIcon className="w-5" />
                                         </MenuButton>
-                                        <DropdownMenu className="mt-4 !w-36 !p-0">
+                                        <DropdownMenu className="mt-4 w-36! p-0!">
                                             <DropdownItem onClick={deletePost}>
                                                 <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1">
                                                     <div className="h-6 w-6 items-center justify-center p-0.5">
@@ -216,7 +216,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                     </div>
                     {/* <div className="bg-box-alt absolute bottom-0 left-0 ml-4 rounded-tl-xl rounded-tr-xl border-x border-b-0 border-t border-solid border-neutral-300 dark:border-neutral-700 sm:ml-6">
                         <div className="flex items-center space-x-2 px-4 py-2">
-                            <div className="flex-shrink-0"> 
+                            <div className="shrink-0"> 
                                 <img
                                     className="h-4 w-4 rounded-full"
                                     src={user.images?.avatar || `/img/avatar/default-avatar.png`}
@@ -247,9 +247,8 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                         <div className="flow-root">
                             <ul role="list" className="-mb-8">
                                 {post.comments.map((comment) => (
-                                    <>
+                                    <div key={comment.id}>
                                         <FeedListItem
-                                            key={comment.id}
                                             comment={comment}
                                             showLine={comment.comments && comment.comments.length > 0}
                                             originalPost={[postContent, setPostContent]}
@@ -299,7 +298,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                                 })}
                                             </>
                                         )}
-                                    </>
+                                    </div>
                                 ))}
                             </ul>
                         </div>
@@ -375,7 +374,7 @@ export function FeedListItem({ ...props }: any) {
                 <div className="rounded-default hover:bg-box group relative flex cursor-pointer flex-col items-start space-x-3">
                     <div className="relative flex flex-row items-start space-x-3">
                         <div className="relative">
-                            <Avatar user={comment.user} className="bg-box-alt flex items-center justify-center rounded-full ring-8 ring-surface-container-high" />
+                            <Avatar user={comment.user} className="bg-box-alt flex items-center justify-center rounded-full ring-8 ring-white dark:ring-n-7" />
 
                             {comment.likedParent && (
                                 <span className="bg-box-alt rounded-default absolute -bottom-0.5 -right-1 px-0.5 py-px">
@@ -516,7 +515,7 @@ export function React({ post }: FeedPostType) {
     return (
         // <HoverCard.Root>
         //     <HoverCard.Trigger>
-        <Button variant="ghost" className="inline-flex !h-fit cursor-pointer items-center px-2 text-sm" onClick={react}>
+        <Button variant="ghost" className="inline-flex h-fit! cursor-pointer items-center px-2 text-sm" onClick={react}>
             {!submitting ? (
                 hasCurrentUser ? (
                     <XMarkIcon className="text-alt h-4 w-4 hover:text-accent-1" />
@@ -681,7 +680,7 @@ export function CommentBox({ ...props }: any) {
             {/* "Replying to [user]" text */}
             {!props.truncate && (
                 <div className="mb-4 flex items-center space-x-2">
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                         <img className="h-8 w-8 rounded-full" src={user.images?.avatar || `/img/default-avatar.png`} alt="" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -695,7 +694,7 @@ export function CommentBox({ ...props }: any) {
             <div
                 className={clsx(
                     commentSubmitting
-                        ? 'relative isolate overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:border before:border-x-0 before:border-b-0 before:border-t before:border-solid before:border-neutral-100/10 before:bg-gradient-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent'
+                        ? 'relative isolate overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:border before:border-x-0 before:border-b-0 before:border-t before:border-solid before:border-neutral-100/10 before:bg-linear-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent'
                         : '',
                     'relative flex items-center rounded',
                 )}

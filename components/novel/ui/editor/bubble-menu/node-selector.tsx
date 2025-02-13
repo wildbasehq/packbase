@@ -98,7 +98,7 @@ export const NodeSelector: FC<NodeSelectorProps> = ({ editor, isOpen, setIsOpen 
 
                 <Popover.Content
                     align="start"
-                    className="z-[99999] my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded border border-stone-200 bg-white p-1 shadow-xl animate-in fade-in slide-in-from-top-1"
+                    className="z-99999 my-1 flex max-h-80 w-48 flex-col overflow-hidden overflow-y-auto rounded border border-stone-200 bg-white p-1 shadow-xl animate-in fade-in slide-in-from-top-1"
                 >
                     {items.map((item, index) => (
                         <button
@@ -107,7 +107,7 @@ export const NodeSelector: FC<NodeSelectorProps> = ({ editor, isOpen, setIsOpen 
                                 item.command();
                                 setIsOpen(false);
                             }}
-                            className="flex items-center justify-between rounded-sm px-2 py-1 text-sm text-stone-600 hover:bg-stone-100"
+                            className="flex items-center justify-between rounded-xs px-2 py-1 text-sm text-stone-600 hover:bg-stone-100"
                             type="button"
                         >
                             <div className="flex items-center space-x-2">

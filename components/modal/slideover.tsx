@@ -29,7 +29,7 @@ export function Slideover({
                     </TransitionChild>
                     <DialogPanel
                         className={`pointer-events-none fixed inset-y-0 right-0 flex ${
-                            props.expandNatural ? '-10 min-w-full md:min-w-[50%] md:max-w-screen-md lg:min-w-[25%]' : 'lg:w-[25%]'
+                            props.expandNatural ? '-10 min-w-full md:min-w-[50%] md:max-w-(--breakpoint-md) lg:min-w-[25%]' : 'lg:w-[25%]'
                         }`}
                     >
                         <TransitionChild
@@ -54,7 +54,7 @@ export function Slideover({
                                     <div className="absolute right-0 top-0 z-50 flex p-4 lg:left-0 lg:-ml-10 lg:pb-0 lg:pl-0 lg:pr-4 lg:pt-4">
                                         <button
                                             type="button"
-                                            className="text-default rounded-md hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                                            className="text-default rounded-md hover:text-white focus:outline-hidden focus:ring-2 focus:ring-white"
                                             onClick={() => setOpen(false)}
                                         >
                                             <span className="sr-only">Close panel</span>
