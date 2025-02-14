@@ -1,24 +1,21 @@
 'use client'
-import { LoadingCircle } from '@/components/shared/icons'
-import { Input } from '@/components/shared/input/text'
-import { Logo } from '@/components/shared/logo'
-import { Heading, Text } from '@/components/shared/text'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
-import { Button } from '@/components/shared/ui/button'
-import { createClient } from '@/lib/supabase/client'
-import { ProjectSafeName } from '@/lib/utils'
-import { MailQuestion } from 'lucide-react'
+import {LoadingCircle} from '@/components/shared/icons'
+import {Input} from '@/components/shared/input/text'
+import {Logo} from '@/components/shared/logo'
+import {Heading, Text} from '@/components/shared/text'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
+import {Button} from '@/components/shared/ui/button'
+import {createClient} from '@/lib/supabase/client'
+import {ProjectSafeName} from '@/lib/utils'
+import {MailQuestion} from 'lucide-react'
 import Link from 'next/link'
-import { FormEvent, useState } from 'react'
+import {FormEvent, useState} from 'react'
+import {useSearchParams} from 'next/navigation'
 
-export default function IDCreate({ searchParams }: { searchParams: { error_description: string; error: string } }) {
+export default function IDCreate() {
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    switch (searchParams?.error_description) {
-        case 'The resource owner or authorization server denied the request': {
-            searchParams.error_description = 'Login cancelled'
-        }
-    }
+    const searchParams = useSearchParams()
 
     const createUser = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()

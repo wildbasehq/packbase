@@ -2,6 +2,7 @@ const plugin = require('tailwindcss/plugin')
 const flattenColorPalette = require("tailwindcss/lib/util/flattenColorPalette");
 
 module.exports = {
+    content: ['./components/**/*.{ts,tsx}', './app/**/*.{ts,tsx}'],
     plugins: [
         plugin(({ addVariant }) => {
             addVariant('radix-side-top', '&[data-side="top"]')

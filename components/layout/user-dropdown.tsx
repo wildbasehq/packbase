@@ -1,20 +1,20 @@
 'use client'
 
-import { Dropdown, DropdownDescription, DropdownHeader, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/shared/dropdown'
+import {Dropdown, DropdownDescription, DropdownHeader, DropdownItem, DropdownLabel, DropdownMenu} from '@/components/shared/dropdown'
 import LogoutIcon from '@/components/shared/icons/logout'
-import { Heading, Text } from '@/components/shared/text'
+import {Heading, Text} from '@/components/shared/text'
 import Tooltip from '@/components/shared/tooltip'
-import { Button } from '@/components/shared/ui/button'
+import {Button} from '@/components/shared/ui/button'
 import UserAvatar from '@/components/shared/user/avatar'
-import { useUserAccountStore } from '@/lib/states'
-import { createClient } from '@/lib/supabase/client'
-import { ProjectName, ProjectSafeName } from '@/lib/utils'
-import { MenuButton } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { MinusCircleIcon, MoonIcon } from '@heroicons/react/24/solid'
-import { SettingsIcon } from 'lucide-react'
+import {useUserAccountStore} from '@/lib/states'
+import {createClient} from '@/lib/supabase/client'
+import {ProjectName, ProjectSafeName} from '@/lib/utils'
+import {MenuButton} from '@headlessui/react'
+import {ChevronDownIcon} from '@heroicons/react/20/solid'
+import {MinusCircleIcon, MoonIcon} from '@heroicons/react/24/solid'
+import {SettingsIcon} from 'lucide-react'
 import Link from 'next/link'
-import { Dispatch, SetStateAction } from 'react'
+import {Dispatch, SetStateAction} from 'react'
 
 export default function UserDropdown({ showOnboardingModal }: { showOnboardingModal: Dispatch<SetStateAction<boolean>> | (() => void) }) {
     const { user, setUser } = useUserAccountStore()
@@ -163,8 +163,8 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                     }}
                     className="group inline-flex w-full cursor-pointer items-center justify-start gap-4 rounded px-4 py-3 ring-destructive/25 transition-all hover:bg-destructive/75 hover:ring-2"
                 >
-                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white" />{' '}
-                    <Text alt className="group-hover:text-white">
+                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:!fill-white" />{' '}
+                    <Text alt className="group-hover:!text-white">
                         Sign out of all accounts
                     </Text>
                 </div>
