@@ -1,6 +1,6 @@
 'use client'
 
-import { ShaderGradient, ShaderGradientCanvas } from 'shadergradient'
+import {ShaderGradient, ShaderGradientCanvas} from 'shadergradient'
 
 export default function LoginGradient({ opacity, ...props }: any) {
     return (
@@ -20,12 +20,12 @@ export default function LoginGradient({ opacity, ...props }: any) {
                 color2="#a78bfa"
                 color3="#212121"
                 grain="on"
-                brightness={1}
+                brightness={0.5}
                 cAzimuthAngle={100}
                 cDistance={4.5}
                 cPolarAngle={80}
                 cameraZoom={9}
-                envPreset="city"
+                // envPreset="city"
                 // frameRate={1}
                 grainBlending={0.2}
                 lightType="3d"
