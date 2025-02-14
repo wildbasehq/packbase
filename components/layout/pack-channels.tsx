@@ -140,7 +140,7 @@ export function PackChannels({ ...props }: SideNavType) {
             <nav
                 aria-label="Sections"
                 className={
-                    `border-default no-scrollbar fixed bottom-0 left-0 z-10 flex h-16 w-full shrink-0 flex-row overflow-x-auto rounded-tl-xl rounded-tr-xl border-x-0 border-b-0 border-t border-solid bg-card md:hidden` +
+                    `no-scrollbar fixed bottom-0 left-0 z-10 flex h-16 w-full shrink-0 flex-row overflow-x-auto rounded-tl-xl rounded-tr-xl border-x-0 border-b-0 border-t border-solid bg-card md:hidden` +
                     // Dark mode
                     ` dark:border-neutral-600`
                 }
@@ -151,7 +151,7 @@ export function PackChannels({ ...props }: SideNavType) {
                         href={item.href}
                         activeClassName="bg-n-1 dark:bg-neutral-700"
                         inactiveClassName="hover:bg-blue-50 hover:bg-opacity-50 dark:hover:bg-neutral-700"
-                        className="border-default flex cursor-pointer border-b p-6"
+                        className="flex cursor-pointer border-b p-6"
                     >
                         <>
                             {item.icon && (

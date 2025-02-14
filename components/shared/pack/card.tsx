@@ -1,10 +1,10 @@
 import Link from '@/components/shared/link'
-import { Heading, Text } from '@/components/shared/text'
+import {Heading, Text} from '@/components/shared/text'
 
 export default function PackCard({ pack }) {
     return (
         <div>
-            <div className="border-default flex select-none flex-col rounded border bg-card highlight-white/5">
+            <div className="flex select-none flex-col rounded border bg-card highlight-white/5">
                 {/* Banner */}
                 <div
                     className="aspect-banner rounded bg-card"

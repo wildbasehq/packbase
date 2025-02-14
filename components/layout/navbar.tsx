@@ -29,10 +29,10 @@ export default function NavBar() {
         <>
             {user && !user.anonUser && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]} />}
 
-            <div className="bg-sidebar border-default sticky top-0 z-30 flex h-16 border-0 border-b border-solid shadow-xs">
+            <div className="bg-sidebar sticky top-0 z-30 flex h-16 border-0 border-b border-solid shadow-xs">
                 <nav aria-label="Sections" className="hidden h-16 lg:flex lg:flex-col">
                     <div
-                        className={`border-default shimmer-template relative flex h-full w-96 items-center border-r px-5 py-2 ${
+                        className={`shimmer-template relative flex h-full w-96 items-center border-r px-5 py-2 ${
                             loading ? 'overflow-hidden before:animate-shimmer-fast' : ''
                         }`}
                     >

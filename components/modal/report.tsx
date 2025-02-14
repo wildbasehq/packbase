@@ -42,7 +42,7 @@ export default function ReportAbuse() {
             </button>
             {open && (
                 <form onSubmit={submit}
-                      className="absolute bottom-20 right-2 flex w-96 flex-col space-y-6 rounded-lg border border-default bg-default p-8 shadow-lg animate-in slide-in-from-bottom-5"
+                      className="absolute bottom-20 right-2 flex w-96 flex-col space-y-6 rounded-lg border bg-default p-8 shadow-lg animate-in slide-in-from-bottom-5"
                 >
                     <div>
                         <h3 className="font-display text-2xl font-bold">

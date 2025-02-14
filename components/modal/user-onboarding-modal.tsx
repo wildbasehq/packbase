@@ -469,16 +469,16 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
                     )}
 
                     {/* Steps Header */}
-                    <div className="border-default sticky top-0 z-30 border-0 border-b border-solid bg-white backdrop-blur-sm dark:bg-neutral-700/10 md:w-full md:overflow-x-auto">
+                    <div className="sticky top-0 z-30 border-0 border-b border-solid bg-white backdrop-blur-sm dark:bg-neutral-700/10 md:w-full md:overflow-x-auto">
                         <nav className="mx-auto overflow-x-auto px-4 sm:px-6 md:w-full lg:px-8" aria-label="Progress">
-                            <ol role="list" className="border-default overflow-hidden rounded-md border-0 lg:flex lg:rounded-none lg:border-l lg:border-r">
+                            <ol role="list" className="overflow-hidden rounded-md border-0 lg:flex lg:rounded-none lg:border-l lg:border-r">
                                 {steps.map((step, stepIdx) => (
                                     <li key={step.id} className="relative select-none overflow-hidden lg:flex-1">
                                         <div
                                             className={clsx(
                                                 stepIdx === 0 ? 'rounded-t-md border-b-0' : '',
                                                 stepIdx === steps.length - 1 ? 'rounded-b-md border-t-0' : '',
-                                                'border-default overflow-hidden border lg:border-0',
+                                                'overflow-hidden border lg:border-0',
                                             )}
                                         >
                                             <div className="group">

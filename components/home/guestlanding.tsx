@@ -1,9 +1,9 @@
 import CrawlText from '@/components/shared/crawl-text'
 import Body from '../layout/body'
-import { Heading, Text } from '@/components/shared/text'
-import { Button } from '@/components/shared/ui/button'
+import {Heading, Text} from '@/components/shared/text'
+import {Button} from '@/components/shared/ui/button'
 import Tooltip from '@/components/shared/tooltip'
-import { HelpCircleIcon } from 'lucide-react'
+import {HelpCircleIcon} from 'lucide-react'
 import Link from '@/components/shared/link'
 import Countdown from '@/components/home/countdown'
 
@@ -92,13 +92,13 @@ export default function GuestLanding() {
                             {/* Group card with fake outlines of a stack behind */}
                             <div className="relative h-fit">
                                 <div className="absolute inset-0 flex flex-col">
-                                    <div className="border-default h-full w-full flex-1 -rotate-3 rounded border border-solid shadow-md transition-transform hover:-rotate-2" />
+                                    <div className="h-full w-full flex-1 -rotate-3 rounded border border-solid shadow-md transition-transform hover:-rotate-2" />
                                 </div>
                                 <div className="absolute inset-0 flex flex-col">
-                                    <div className="border-default h-full w-full flex-1 rotate-6 rounded border border-solid bg-card shadow-lg transition-transform hover:rotate-[5deg]" />
+                                    <div className="h-full w-full flex-1 rotate-6 rounded border border-solid bg-card shadow-lg transition-transform hover:rotate-[5deg]" />
                                 </div>
 
-                                <div className="bg-default border-default relative rotate-2 rounded border border-solid p-6 shadow-xl transition-transform hover:rotate-1">
+                                <div className="bg-default relative rotate-2 rounded border border-solid p-6 shadow-xl transition-transform hover:rotate-1">
                                     <div className="flex">
                                         <div className="shrink-0">
                                             <img
