@@ -1,15 +1,15 @@
 'use client'
 
 import Body from '@/components/layout/body'
-import { LoadingDots } from '@/components/shared/icons'
-import { Heading } from '@/components/shared/text'
-import { API_URL, setToken, vg } from '@/lib/api'
-import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
-import { createClient } from '@/lib/supabase/client'
-import { ProjectSafeName } from '@/lib/utils'
-import { HandRaisedIcon } from '@heroicons/react/20/solid'
+import {LoadingDots} from '@/components/shared/icons'
+import {Heading} from '@/components/shared/text'
+import {API_URL, setToken, vg} from '@/lib/api'
+import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
+import {createClient} from '@/lib/supabase/client'
+import {ProjectSafeName} from '@/lib/utils'
+import {HandRaisedIcon} from '@heroicons/react/20/solid'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 
 const supabase = createClient()
 export default function Preload({ children }: { children: React.ReactNode }) {

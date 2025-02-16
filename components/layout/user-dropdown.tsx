@@ -7,7 +7,6 @@ import Tooltip from '@/components/shared/tooltip'
 import {Button} from '@/components/shared/ui/button'
 import UserAvatar from '@/components/shared/user/avatar'
 import {useUserAccountStore} from '@/lib/states'
-import {createClient} from '@/lib/supabase/client'
 import {ProjectName, ProjectSafeName} from '@/lib/utils'
 import {MenuButton} from '@headlessui/react'
 import {ChevronDownIcon} from '@heroicons/react/20/solid'
@@ -15,6 +14,7 @@ import {MinusCircleIcon, MoonIcon} from '@heroicons/react/24/solid'
 import {SettingsIcon} from 'lucide-react'
 import Link from 'next/link'
 import {Dispatch, SetStateAction} from 'react'
+import {supabase} from '@/lib/api'
 
 export default function UserDropdown({ showOnboardingModal }: { showOnboardingModal: Dispatch<SetStateAction<boolean>> | (() => void) }) {
     const { user, setUser } = useUserAccountStore()
@@ -129,7 +129,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                                     })
                                 }}
                             >
-                                <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1">
+                                <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1 hover:text-white">
                                     {option.icon && (
                                         <div className="h-6 w-6 items-center justify-center p-0.5">
                                             <option.icon className={`${option.className || 'fill-alt'} h-full w-full transition-colors`} />
@@ -153,7 +153,6 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
             <div className="inline-flex w-full flex-col gap-2 px-3 py-2">
                 <div
                     onClick={() => {
-                        const supabase = createClient()
                         supabase.auth.signOut().then(() => {
                             // clean session
                             window.localStorage.removeItem('token')

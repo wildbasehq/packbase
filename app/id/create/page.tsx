@@ -5,12 +5,12 @@ import {Logo} from '@/components/shared/logo'
 import {Heading, Text} from '@/components/shared/text'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import {Button} from '@/components/shared/ui/button'
-import {createClient} from '@/lib/supabase/client'
 import {ProjectSafeName} from '@/lib/utils'
 import {MailQuestion} from 'lucide-react'
 import Link from 'next/link'
 import {FormEvent, useState} from 'react'
 import {useSearchParams} from 'next/navigation'
+import {supabase} from '@/lib/api'
 
 export default function IDCreate() {
     const [submitting, setSubmitting] = useState(false)
@@ -27,7 +27,6 @@ export default function IDCreate() {
             email: formData.get('email')?.toString() || '',
             password: formData.get('password')?.toString() || '',
         }
-        const supabase = createClient()
         supabase.auth.signUp(user).then((r) => {
             if (r.error) {
                 setError(r.error.toString())

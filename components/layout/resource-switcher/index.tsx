@@ -1,28 +1,28 @@
 'use client'
 
-import { ExpandingArrow, LoadingCircle } from '@/components/shared/icons'
-import { Logo } from '@/components/shared/logo'
-import { Heading, Text } from '@/components/shared/text'
+import {ExpandingArrow, LoadingCircle} from '@/components/shared/icons'
+import {Logo} from '@/components/shared/logo'
+import {Heading, Text} from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 import useComponentVisible from '@/lib/hooks/use-component-visible'
-import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
-import { createRef, useEffect, useState } from 'react'
+import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
+import {createRef, useEffect, useState} from 'react'
 import useSound from 'use-sound'
-import { PlayFunction } from 'use-sound/dist/types'
+import {PlayFunction} from 'use-sound/dist/types'
 import './resource-switcher.component.scss'
-import { Dropdown, DropdownHeader, DropdownMenu } from '@/components/shared/dropdown'
-import { MenuButton, MenuItem } from '@headlessui/react'
+import {Dropdown, DropdownHeader, DropdownMenu} from '@/components/shared/dropdown'
+import {MenuButton, MenuItem} from '@headlessui/react'
 import LogoutIcon from '@/components/shared/icons/logout'
-import { vg } from '@/lib/api'
-import { toast } from 'sonner'
-import { useModal } from '@/components/modal/provider'
-import { SettingsIcon } from 'lucide-react'
-import { Button } from '@/components/shared/ui/button'
+import {vg} from '@/lib/api'
+import {toast} from 'sonner'
+import {useModal} from '@/components/modal/provider'
+import {SettingsIcon} from 'lucide-react'
+import {Button} from '@/components/shared/ui/button'
 import clsx from 'clsx'
-import { Input } from '@/components/shared/input/text'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
-import { ClipboardIcon } from '@heroicons/react/20/solid'
-import { UserCircleIcon } from '@heroicons/react/24/solid'
+import {Input} from '@/components/shared/input/text'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
+import {ClipboardIcon} from '@heroicons/react/20/solid'
+import {UserCircleIcon} from '@heroicons/react/24/solid'
 
 export default function ResourceSwitcher() {
     const hoverCancelSFX = '/sounds/switch-hover-s.ogg'
@@ -173,8 +173,8 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
                             })
                     }}
                 >
-                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white" />{' '}
-                    <Text alt className="group-hover:text-white">
+                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white!" />{' '}
+                    <Text alt className="group-hover:text-white!">
                         Leave pack
                     </Text>
                 </div>

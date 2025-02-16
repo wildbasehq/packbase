@@ -6,20 +6,20 @@ import FeedPost from '@/components/shared/feed/post'
 import WireframeGrid from '@/components/shared/icons/wireframe-grid'
 import WireframeList from '@/components/shared/icons/wireframe-list'
 import SelectMenu from '@/components/shared/input/select-dropdown'
-import { Heading, Text } from '@/components/shared/text'
-import { Button } from '@/components/shared/ui/button'
-import { vg } from '@/lib/api'
-import { useUISettingsStore, useUIStore } from '@/lib/states'
-import { HelpCircleIcon } from 'lucide-react'
+import {Heading, Text} from '@/components/shared/text'
+import {Button} from '@/components/shared/ui/button'
+import {vg} from '@/lib/api'
+import {useUISettingsStore, useUIStore} from '@/lib/states'
+import {HelpCircleIcon} from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
-import { toast } from 'sonner'
-import { HandRaisedIcon, MegaphoneIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid'
-import { ProjectSafeName } from '@/lib/utils'
+import Masonry, {ResponsiveMasonry} from 'react-responsive-masonry'
+import {toast} from 'sonner'
+import {HandRaisedIcon, MegaphoneIcon, WrenchScrewdriverIcon} from '@heroicons/react/20/solid'
+import {ProjectSafeName} from '@/lib/utils'
 import UserAvatar from '@/components/shared/user/avatar'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import WrenchCharacter from '@/public/svg/wrench-character.svg'
 import Link from '@/components/shared/link'
 
@@ -117,10 +117,10 @@ export default function FeedList({
                 }
 
                 if (clearPosts) {
-                    setPosts(data.posts)
+                    setPosts(data.data)
                     setPostsCurrentPage(1)
                 } else {
-                    setPosts([...posts, ...data.posts])
+                    setPosts([...posts, ...data.data])
                     setPostsCurrentPage(postsCurrentPage + 1)
                 }
 

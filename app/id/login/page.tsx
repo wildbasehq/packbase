@@ -1,14 +1,14 @@
 'use client'
-import { createClient } from '@/lib/supabase/client'
-import { FormEvent, useState } from 'react'
-import { Logo } from '@/components/shared/logo'
-import { Heading } from '@/components/shared/text'
-import { Input } from '@/components/shared/input/text'
-import { Button } from '@/components/shared/ui/button'
+import {FormEvent, useState} from 'react'
+import {Logo} from '@/components/shared/logo'
+import {Heading} from '@/components/shared/text'
+import {Input} from '@/components/shared/input/text'
+import {Button} from '@/components/shared/ui/button'
 import Link from 'next/link'
-import { LoadingCircle } from '@/components/shared/icons'
-import { useUserAccountStore } from '@/lib/states'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert'
+import {LoadingCircle} from '@/components/shared/icons'
+import {useUserAccountStore} from '@/lib/states'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
+import {supabase} from '@/lib/api'
 
 export default function IDLogin({
     searchParams,
@@ -40,7 +40,6 @@ export default function IDLogin({
             email: formData.get('email')?.toString() || '',
             password: formData.get('password')?.toString() || '',
         }
-        const supabase = createClient()
         supabase.auth
             .signInWithPassword(user)
             .then((r) => {
