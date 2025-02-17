@@ -125,7 +125,7 @@ export default function FeedList({
                 }
 
                 setPostsReady(true)
-                setPostsHasMore(data.hasMore)
+                setPostsHasMore(data.has_more)
             })
     }
 
