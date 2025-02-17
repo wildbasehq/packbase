@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import { Heading, Text } from '@/components/shared/text'
+'use client'
+import {useEffect, useState} from 'react'
+import {Heading, Text} from '@/components/shared/text'
 import IkikaiServing from '@/public/img/ikigai-serving.png'
 import Image from 'next/image'
 
