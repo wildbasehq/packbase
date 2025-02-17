@@ -35,8 +35,7 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                         vg.user.me
                             .get()
                             .then(async ({ data }) => {
-                                setServiceLoading('auth:@me:packs')
-                                const packs = (await vg.user.me.packs.get()).data || []
+                                setServiceLoading('auth:@me:metadata')
                                 const dipswitch = (await vg.dipswitch.get()).data || []
                                 let userBuild = {
                                     id: user.id,
@@ -48,7 +47,13 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                                     ...data,
                                 }
 
-                                setResources(packs)
+                                if (!userBuild.anonUser) {
+                                    const packs = (await vg.user.me.packs.get()).data || []
+                                    setResources(packs)
+                                } else {
+                                    setResources([])
+                                }
+
                                 setUser(userBuild)
                                 proceed()
                             })
