@@ -102,7 +102,7 @@ export default function IDCreate() {
                                 label="Password"
                                 type="password"
                                 placeholder="anything but a name"
-                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$"
+                                // pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$"
                                 required
                             />
                             <Input
