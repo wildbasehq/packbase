@@ -249,7 +249,7 @@ const steps: {
     {
         id: '03',
         name: 'Privacy & Default Pack',
-        description: 'Specify who sees your posts, and where it goes.',
+        description: 'Specify who sees your howls, and where it goes.',
         component: () => {
             return (
                 <>
@@ -257,12 +257,12 @@ const steps: {
                         <Heading>Where should we send your global howls, and who should see them?</Heading>
                         <div className="mt-2 space-y-2">
                             <Text alt size="sm">
-                                Every post belongs to a pack - even global ones. You can choose your default pack ('Universe' by default), and who specifically sees your
-                                posts. <b>Your post privacy only affects howls to the Universe and visibility on your profile!</b> They'll always be public in the pack
+                                Every howl belongs to a pack - even global ones. You can choose your default pack ('Universe' by default), and who specifically sees your
+                                howls. <b>Your post privacy only affects howls to the Universe and visibility on your profile!</b> They'll always be public in the pack
                                 they're in.
                             </Text>
                             <Text alt size="sm">
-                                Changing the default pack causes your posts to no longer appear in the Universe & Explore feeds, unless someone rehowls them into it.
+                                Changing the default pack causes your howl to no longer appear in the Universe & Explore feeds, unless someone rehowls them into it.
                             </Text>
                             <Text alt size="sm">
                                 <b>In other words</b>: If a howl doesn't have a pack selected, it'll go to the following pack instead.
@@ -272,7 +272,7 @@ const steps: {
                             <PackSelectForSetting />
 
                             <SelectPills
-                                label="Who Sees Your Posts"
+                                label="Who Sees Your Howls"
                                 id="post_privacy"
                                 options={[
                                     {

@@ -95,7 +95,7 @@ export default function FeedList({
         switch (FeedViewConfig) {
             default:
             case 1:
-                setMasonryColumns({ 750: 1, 900: 2, 1460: 4 })
+                setMasonryColumns({ 750: 1, 1080: 2, 1360: 3, 1640: 4 })
                 break
             case 2:
                 setMasonryColumns({ 350: 1 })
@@ -104,7 +104,7 @@ export default function FeedList({
     }, [FeedViewConfig])
 
     const fetchPosts = (source?: string, clearPosts = false) => {
-        if (source) console.log(`Fetching posts for ${packID} from ${source}...`)
+        if (source) console.log(`Fetching howls for ${packID} from ${source}...`)
         vg.feed({ id: packID })
             .get({ query: { page: postsCurrentPage } })
             .then(({ data, error }) => {
@@ -147,7 +147,7 @@ export default function FeedList({
                         }}
                     />
                     <Text size="sm">
-                        Loading posts for @<span className="font-bold">{feedID}</span>
+                        Speeding through the howls...
                     </Text>
                 </Card>
             </GridBody>
@@ -174,7 +174,7 @@ export default function FeedList({
                 <LoadingCard
                     title={
                         <>
-                            Loading posts for @<span className="font-bold">{feedID}</span>
+                            Speeding through the howls...
                         </>
                     }
                 />
