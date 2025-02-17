@@ -1,5 +1,6 @@
 import Body from '@/components/layout/body'
 import {Heading, Text} from '@/components/shared/text'
+import Link from '@/components/shared/link'
 
 const retentionOrder = [
     'Until ✱ID deletion',
@@ -14,6 +15,7 @@ const retentionOrder = [
     '90 days',
     '30 days',
     'Until profile deletion or as required by law',
+    'Never - Stored in browser, but sent to API & disposed of after processing',
 ]
 
 const dataCollection = [
@@ -59,13 +61,13 @@ const dataCollection = [
     { type: 'Session tokens', purpose: 'User authentication', retention: 'Until session expiration' },
     { type: 'Device information', purpose: 'Security monitoring', retention: '90 days' },
     { type: 'Error logs', purpose: 'Debugging and troubleshooting', retention: '30 days' },
-    { type: 'Activity logs', purpose: 'User activity tracking', retention: '90 days' },
+    { type: 'Activity logs', purpose: 'Fraud prevention', retention: '90 days' },
     { type: 'Payment information', purpose: 'Transaction processing', retention: 'Until profile deletion or as required by law' },
     { type: 'Subscription details', purpose: 'Service management', retention: 'Until profile deletion' },
     { type: 'Support tickets', purpose: 'Customer support', retention: 'Until resolved or ✱ID deletion' },
     { type: 'Preferences', purpose: 'User experience customization', retention: 'Until profile deletion' },
     { type: 'Notification settings', purpose: 'User experience customization', retention: 'Until profile deletion' },
-    { type: 'Search history', purpose: 'User experience customization', retention: '30 days' },
+    { type: 'Search history', purpose: 'User experience customization', retention: 'Never - Stored in browser, but sent to API & disposed of after processing' },
 ].sort((a, b) => {
     return retentionOrder.indexOf(a.retention) - retentionOrder.indexOf(b.retention)
 })
@@ -75,7 +77,7 @@ export default function TermsPage() {
         <Body className="max-w-7xl space-y-12">
             <header>
                 <Heading size="3xl">Packbase Usage Policy and Data Handling</Heading>
-                <Text alt>Last Updated: February 10, 2025</Text>
+                <Text alt>Last Updated: February 17, 2025</Text>
             </header>
 
             <section>
@@ -403,7 +405,7 @@ export default function TermsPage() {
                                 <Text>Right to object to processing</Text>
                             </li>
                         </ul>
-                        <Text className="mt-4">To exercise these rights, go to your profile settings then "Data Access", or email rek@packbase.app.</Text>
+                        <Text className="mt-4">To exercise these rights, go to your profile settings then "Data Access", or email support@packbase.app.</Text>
                     </div>
 
                     <div>
@@ -481,10 +483,7 @@ export default function TermsPage() {
 
                     <div>
                         <Heading className="mb-4 text-2xl font-semibold">2.7 Contact Information</Heading>
-                        <Text className="mb-4">For any questions about these terms or our privacy practices:</Text>
-                        <ul className="text-default list-none space-y-2">
-                            <li>Email: rek@packbase.app</li>
-                        </ul>
+                        <Text className="mb-4">For any questions about these terms or our privacy practices, email support@packbase.app OR contact us on our official <Link href="https://discord.gg/StuuK55gYA">Discord support channel</Link>.</Text>
                     </div>
                 </div>
             </section>
