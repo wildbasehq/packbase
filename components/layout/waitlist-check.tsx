@@ -1,13 +1,13 @@
 'use client'
 import './waitlist-check.component.scss'
-import { useUserAccountStore } from '@/lib/states'
-import { useEffect, useState } from 'react'
-import { HandHeartIcon, LucideIcon, MailQuestionIcon, MailWarningIcon } from 'lucide-react'
-import { LoadingCircle } from '@/components/shared/icons'
-import { cn } from '@/lib/utils'
+import {useUserAccountStore} from '@/lib/states'
+import {useEffect, useState} from 'react'
+import {HandHeartIcon, LucideIcon, MailQuestionIcon, MailWarningIcon} from 'lucide-react'
+import {LoadingCircle} from '@/components/shared/icons'
+import {cn} from '@/lib/utils'
 import Image from 'next/image'
 import Dog from '@/public/svg/illustrate/dog.svg'
-import { usePathname } from 'next/navigation'
+import {usePathname} from 'next/navigation'
 
 const ServiceStates: {
     [x: string]: {
@@ -71,7 +71,7 @@ export default function WaitlistCheck() {
                 <p className="text-alt mt-2 text-xs leading-6">{ServiceStates[serviceStatus].text}</p>
             </div>
 
-            {location !== '/' && (
+            {(location !== '/' && location !== '/p/universe') && (
                 <div className="elastic-bounce pointer-events-none h-12 w-24 flex-none sm:w-32">
                     <Image src={Dog} alt="Dog" layout="responsive" />
                 </div>
