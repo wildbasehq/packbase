@@ -1,17 +1,17 @@
 'use client'
-import { useEffect } from 'react'
+import {useEffect} from 'react'
 import Body from '@/components/layout/body'
-import { settingsResource, useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
-import { Cog6ToothIcon } from '@heroicons/react/24/solid'
-import { useRouter } from 'next/navigation'
-import { Heading, Text } from '@/components/shared/text'
+import {settingsResource, useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
+import {Cog6ToothIcon} from '@heroicons/react/24/solid'
+import {useRouter} from 'next/navigation'
+import {Heading, Text} from '@/components/shared/text'
 import Link from '@/components/shared/link'
 import Image from 'next/image'
 import WolfoxDrawing from '@/public/img/illustrations/wolfox-drawing.png'
+import {Input} from '@/components/shared/input/text'
+import {Button} from '@/components/shared/ui/button'
+import {vg} from '@/lib/api'
 import GridBody from '@/components/layout/grid-body'
-import { Input } from '@/components/shared/input/text'
-import { Button } from '@/components/shared/ui/button'
-import { vg } from '@/lib/api'
 
 export default function Settings({ children }: { children: React.ReactNode }) {
     const { user } = useUserAccountStore()
@@ -60,7 +60,7 @@ export default function Settings({ children }: { children: React.ReactNode }) {
 
     if (user.anonUser)
         return (
-            <GridBody className="grid-cols-2">
+            <GridBody className="max-w-6xl sm:grid-cols-2">
                 <div className="flex flex-col">
                     <Heading>Got a code?!?</Heading>
                     <div className="mt-2 space-y-2">
