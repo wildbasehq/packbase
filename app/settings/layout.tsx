@@ -48,6 +48,11 @@ export default function Settings({ children }: { children: React.ReactNode }) {
             .then(({ status, data, error }) => {
                 if (status === 200) window.location.reload()
                 else {
+                    if (status === 422) {
+                        alert('Invalid invite code or unacceptable username!')
+                        return
+                    }
+
                     alert(data?.message || data?.error || error.value.summary || JSON.stringify(error) || 'An error occurred')
                 }
             })
