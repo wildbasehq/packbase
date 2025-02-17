@@ -7,15 +7,15 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import {Button} from '@/components/shared/ui/button'
 import {ProjectSafeName} from '@/lib/utils'
 import {MailQuestion} from 'lucide-react'
-import Link from 'next/link'
-import {FormEvent, useState} from 'react'
-import {useSearchParams} from 'next/navigation'
+import {FormEvent, useRef, useState} from 'react'
 import {supabase} from '@/lib/api'
+import Link from '@/components/shared/link'
 
 export default function IDCreate() {
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const searchParams = useSearchParams()
+    const password = useRef<HTMLInputElement>()
+    const passwordRepeat = useRef<HTMLInputElement>()
 
     const createUser = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -30,10 +30,21 @@ export default function IDCreate() {
         supabase.auth.signUp(user).then((r) => {
             if (r.error) {
                 setError(r.error.toString())
+                setSubmitting(false)
             } else {
                 window.location.href = '/'
             }
         })
+    }
+
+    // Validates password repeat
+    const validatePassword = () => {
+        console.log(password.current.value, passwordRepeat.current.value)
+        if (password.current.value !== passwordRepeat.current.value) {
+            passwordRepeat.current.setCustomValidity('Passwords must match')
+        } else {
+            passwordRepeat.current.setCustomValidity('')
+        }
     }
 
     return (
@@ -74,8 +85,7 @@ export default function IDCreate() {
                     </AlertTitle>
                     <AlertDescription>
                         <p>
-                            It's required in the next step. Don't have one? Generous users who have access can see a list of users without an invite (like you) and gift
-                            one to them!~
+                            It's required in the next step. Don't have one? If a friend of yours does, they can generate one for you!
                         </p>
                         <p className="text-tertiary">
                             <br />
@@ -92,20 +102,22 @@ export default function IDCreate() {
                     <div>
                         <label htmlFor="password" className="text-default mb-1 block text-sm font-medium">
                             Password
-                            <p className="text-alt text-xs leading-5">at least 8 characters, 1 uppercase, 1 digit, and 1 special character</p>
+                            <p className="text-alt text-xs leading-5">at least 6 characters, 1 uppercase, 1 digit, and 1 special character</p>
                         </label>
                         <div className="overflow-visible rounded-md shadow-xs ring-1 ring-neutral-300 dark:ring-white/20">
                             <Input
+                                ref={password}
                                 combined
                                 className="rounded-tl-md rounded-tr-md border-b border-n-3 dark:border-white/20"
                                 id="password"
                                 label="Password"
                                 type="password"
                                 placeholder="anything but a name"
-                                // pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$"
                                 required
+                                onChange={validatePassword}
                             />
                             <Input
+                                ref={passwordRepeat}
                                 combined
                                 className="rounded-bl-md rounded-br-md"
                                 id="password-again"
@@ -113,12 +125,13 @@ export default function IDCreate() {
                                 type="password"
                                 placeholder="one more time, now"
                                 required
+                                onChange={validatePassword}
                             />
                         </div>
                     </div>
 
                     <Link href="/terms" className="flex items-center justify-between">
-                        <Text size="xs">By continuing, you agree to the Packbase Usage Policy & Data Handling terms.</Text>
+                        <Text size="xs" className="text-primary">By continuing, you agree to the Packbase Usage Policy & Data Handling terms &rarr;</Text>
                     </Link>
 
                     <div>
