@@ -129,7 +129,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                                     })
                                 }}
                             >
-                                <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1 hover:text-white">
+                                <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1 group-hover:!text-white">
                                     {option.icon && (
                                         <div className="h-6 w-6 items-center justify-center p-0.5">
                                             <option.icon className={`${option.className || 'fill-alt'} h-full w-full transition-colors`} />
