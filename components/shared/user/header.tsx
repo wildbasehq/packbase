@@ -39,7 +39,7 @@ export default function ProfileHeader({ ...props }: any) {
                             </div>
                         </div>
                     </div>
-                    {user && user.anonUser && user.id !== profile.id && <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0">
+                    {user && !user.anonUser && user.id !== profile.id && <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0">
                         <UserFollowButton user={profile}/>
                     </div>}
                 </div>
