@@ -1,5 +1,5 @@
 'use client'
-import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
+import {useResourceStore, useUserAccountStore} from '@/lib/states'
 import {memo, useEffect, useState} from 'react'
 import dynamic from 'next/dynamic'
 import Body from '@/components/layout/body'
@@ -14,7 +14,6 @@ const PackHeader = dynamic(() => import('@/components/shared/pack/header'))
 
 export default function PackFeedController({ overrideFeedID }: { overrideFeedID?: string }) {
     const { user } = useUserAccountStore()
-    const { setHidden } = useUIStore()
     const { currentResource } = useResourceStore()
 
     const [showFeed, setShowFeed] = useState(false)
@@ -23,7 +22,6 @@ export default function PackFeedController({ overrideFeedID }: { overrideFeedID?
     const Lottie = memo(dynamic(() => import('lottie-react'), { ssr: false }))
 
     useEffect(() => {
-        if (!user || user?.anonUser) setHidden(true)
         if (user && !user.anonUser) setShowFeed(true)
     }, [user])
 
