@@ -3,7 +3,7 @@ export default function GridBody({ children, className }: {
     className?: string
 }) {
     return (
-        <div className={`${className} grid justify-center items-center px-12 py-lg`}>
+        <div className={`${className} grid justify-center items-center px-12 py-lg mx-auto`}>
             {children}
         </div>
     )
