@@ -9,7 +9,9 @@ import VoyageSDK from 'voyagesdk-ts'
 export const API_URL = process.env.NEXT_PUBLIC_YAPOCK_URL
 let TOKEN: string | undefined
 
-export let {vg, supabase} = new VoyageSDK(API_URL, {
+export const supabase = createClient()
+
+export let {vg} = new VoyageSDK(API_URL, {
     supabase: {
         client: createClient(),
     },
@@ -24,5 +26,4 @@ export const setToken = (token?: string) => {
         },
     })
     vg = newClient.vg
-    supabase = newClient.supabase
 }
