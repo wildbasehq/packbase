@@ -25,7 +25,7 @@
 }
 
 .ring-default {
-  @apply ring-n-2 dark:ring-n-6/80;
+  @apply ring-n-2/80 dark:ring-n-6/80;
 }
 
 .ring-shadow {

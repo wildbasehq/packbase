@@ -1,78 +1,105 @@
 import CrawlText from '@/components/shared/crawl-text'
-import Body from '../layout/body'
 import {Heading, Text} from '@/components/shared/text'
 import {Button} from '@/components/shared/ui/button'
 import Tooltip from '@/components/shared/tooltip'
 import {HelpCircleIcon} from 'lucide-react'
 import Link from '@/components/shared/link'
 import Countdown from '@/components/home/countdown'
+import {Gradient} from '@/components/shared/gradient'
+import {Container} from '@/components/layout/container'
+import Image from 'next/image'
 
 const links = [
     { name: 'Join Packbase', href: '/id/create/' },
     { name: 'Volunteer', href: 'https://discord.gg/StuuK55gYA' },
 ]
 
-export default function GuestLanding() {
+function Hero() {
+    const taglines = [
+        // default
+        'This is a place ::break: where people meet',
+        'This is a place ::break: where creativity thrives',
+
+        // Packs
+        {
+            pack: {
+                name: 'Rhythm Gamers!',
+                slug: 'rhythm',
+                image: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/packs/19753a52-27a0-43d0-817b-d9b41218342b/avatar.png',
+            },
+            tagline: 'A place where ::break: you feel the rhythm',
+        },
+        {
+            pack: {
+                name: 'Final Fantasy XIV',
+                slug: 'ffxiv',
+                image: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/packs/8ab9e313-e9fa-476f-993e-4cba6f32ca31/avatar.png',
+            },
+            tagline: 'A place for Scions ::break: of the Seventh Dawn',
+        },
+        {
+            pack: {
+                name: 'Packbase Support',
+                slug: 'support',
+                image: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/549329ff-74dd-4ac9-85b1-d33f5c73d8ac/0/avatar.png',
+            },
+            tagline: 'A place to ::break: support each other',
+        }
+    ].sort(() => Math.random() - 0.5)
+
+    const tagline = taglines[0]
+
     return (
-        <Body className="space-y-8">
-            <div className="mx-auto flex w-full max-w-7xl flex-col px-8">
-                <div className="relative isolate py-24 sm:py-32">
-                    <div className="snapanim-hue-blur hidden sm:absolute sm:-top-32 sm:right-1/2 sm:-z-10 sm:mr-10 sm:block sm:transform-gpu" aria-hidden="true">
-                        <div
-                            className="aspect-1097/845 w-[68.5625rem] bg-linear-to-tr from-[#ff4694] to-[#776fff] opacity-20"
-                            style={{
-                                clipPath:
-                                    'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                            }}
-                        />
-                    </div>
-                    <div
-                        className="snapanim-hue-blur-reverse absolute -top-52 left-1/2 -z-10 -translate-x-1/2 transform-gpu sm:top-[-28rem] sm:ml-16 sm:translate-x-0 sm:transform-gpu"
-                        aria-hidden="true"
-                    >
-                        <div
-                            className="aspect-1097/845 w-[68.5625rem] bg-linear-to-tr from-[#ff4694] to-[#776fff] opacity-20"
-                            style={{
-                                clipPath:
-                                    'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                            }}
-                        />
-                    </div>
-                    <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                        <div className="mx-auto max-w-2xl lg:mx-0">
-                            <h2
-                                className="text-4xl font-bold tracking-tight sm:text-6xl"
-                                style={{
-                                    whiteSpace: 'break-spaces',
-                                }}
-                            >
-                                <CrawlText>::c:blue-500: This is a place ::break: ::c:yellow-500 where people meet</CrawlText>
-                            </h2>
-                            <p
-                                className="mt-6 text-lg leading-8"
-                                style={{
-                                    whiteSpace: 'break-spaces',
-                                }}
-                            >
-                                <CrawlText delay={300 + 50 * 7} fast>
-                                    The internet doesn't have to be boring everywhere; Find your pack that shares that oddly specific interest, share it with everyone in
-                                    the Universe, or maybe just keep it to yourself. ::break: ::break: While other sites are struggling to give you colour customisation
-                                    to your profile, we just gave you full HTML/CSS control.
-                                </CrawlText>
-                            </p>
+        <div className="relative">
+            <Gradient className="absolute inset-2 bottom-0 rounded-4xl ring-1 ring-inset ring-black/5" />
+            <Container className="relative">
+                <div className="pb-24 pt-16 sm:pb-32 sm:pt-24 md:pb-48 md:pt-32">
+                    <Heading className="font-display text-n-7 text-6xl font-medium tracking-tight sm:text-7xl whitespace-break-spaces">
+                        "
+                        <CrawlText fast>
+                            {typeof tagline === 'string' ? tagline : tagline.tagline}
+                        </CrawlText>
+                        "
+                    </Heading>
+                    {typeof tagline !== 'string' && (
+                        <div className="flex items-center mt-4">
+                            <Image src={tagline.pack.image}
+                                   alt=""
+                                   className="h-7 w-7 rounded-md"
+                                   width={28}
+                                   height={28}
+                            />
+                            <Link href={`/p/${tagline.pack.slug}`}>
+                                <Text size="lg" className="ml-2">
+                                    {tagline.pack.name} Pack &rarr;
+                                </Text>
+                            </Link>
                         </div>
-                        <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
-                            <div className="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 sm:grid-cols-2 md:flex lg:gap-x-10">
-                                {links.map((link) => (
-                                    <Link key={link.name} href={link.href}>
-                                        {link.name} <span aria-hidden="true">&rarr;</span>
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
+                    )}
+                    <Text size="lg" className="mt-8 max-w-2xl font-medium">
+                        Putting fun back into the internet. We're a community of creators, artists, gamers, hobbyists, and whatever you are.
+                        <br/><br/>
+                        Why settle for a
+                        multi-billion dollar corp that can't give you customisation, when you have full HTML/CSS control here and owned by you 'eh?
+                    </Text>
+                    <div className="mt-12 flex flex-col gap-x-6 gap-y-4 sm:flex-row">
+                        {links.map((link) => (
+                            <Link key={link.name} href={link.href}>
+                                <Button>{link.name}</Button>
+                            </Link>
+                        ))}
                     </div>
                 </div>
+            </Container>
+        </div>
+    )
+}
 
+export default function GuestLanding() {
+    return (
+        <div className="overflow-hidden space-y-8">
+            <Hero />
+            <div className="mx-auto flex w-full max-w-7xl flex-col px-8">
                 <Countdown />
 
                 {/* Groups */}
@@ -231,7 +258,7 @@ export default function GuestLanding() {
                 </Text>
 
                 {/* copyright */}
-                <div className="mt-12 border-t pt-8">
+                <div className="my-12 border-t pt-8">
                     <Text alt>
                         &copy; 2025 ✱base. All rights reserved to their respective owners. We acknowledges the Wurundjeri people of the Kulin Nation as the Traditional
                         Custodians of the land on which we work and live, and recognise their continuing connection to land, water and community. We pay respect to Elders
@@ -239,6 +266,6 @@ export default function GuestLanding() {
                     </Text>
                 </div>
             </div>
-        </Body>
+        </div>
     )
 }

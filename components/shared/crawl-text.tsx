@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from 'react'
 
 export default function CrawlText({ children, delay, fast }: { children: any; delay?: number; fast?: boolean }) {
     // const [message] = useState(props.children);
@@ -78,7 +78,7 @@ export default function CrawlText({ children, delay, fast }: { children: any; de
                                 current.i.indexOf("<br") > -1 ? "span-break" : ""
                             }`}
                         >
-                            {current.i + " "}
+                            { index === textDOM.length - 1 ? current.i : current.i + " "}
                         </span>
                     )}
                 </React.Fragment>
