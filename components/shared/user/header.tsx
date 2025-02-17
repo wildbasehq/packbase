@@ -59,22 +59,27 @@ export default function ProfileHeader({ ...props }: any) {
 
 function UserFollowButton({ user }: { user: any }) {
     const [following, setFollowing] = useState(user.following)
+    const [submitting, setSubmitting] = useState(false)
     const follow = () => {
+        setSubmitting(true)
         vg.user({username: user.username}).follow.post().then(({error}) => {
+            setSubmitting(false)
             if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
             setFollowing(true)
         })
     }
 
     const unfollow = () => {
+        setSubmitting(true)
         vg.user({username: user.username}).follow.delete().then(({error}) => {
+            setSubmitting(false)
             if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
             setFollowing(false)
         })
     }
 
     return (
-        <Button onClick={following ? unfollow : follow} variant={following ? 'destructive' : 'primary'}>
+        <Button onClick={following ? unfollow : follow} variant={following ? 'destructive' : 'primary'} disabled={submitting}>
             {following ? 'Unfollow' : 'Follow'}
         </Button>
     )
