@@ -4,11 +4,11 @@ import {Logo} from '@/components/shared/logo'
 import {Heading} from '@/components/shared/text'
 import {Input} from '@/components/shared/input/text'
 import {Button} from '@/components/shared/ui/button'
-import Link from 'next/link'
 import {LoadingCircle} from '@/components/shared/icons'
 import {useUserAccountStore} from '@/lib/states'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import {supabase} from '@/lib/api'
+import Link from '@/components/shared/link'
 
 export default function IDLogin({
     searchParams,
