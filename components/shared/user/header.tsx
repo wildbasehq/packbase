@@ -1,11 +1,18 @@
-import { Heading } from '@/components/shared/text'
+'use client'
+import {Heading} from '@/components/shared/text'
 import Markdown from '@/components/shared/markdown'
 import UserAvatar from '@/components/shared/user/avatar'
 import Image from 'next/image'
+import {vg} from '@/lib/api'
+import {toast} from 'sonner'
+import Button from '@/components/shared/button'
+import {useUserAccountStore} from '@/lib/states'
 
 // @TODO: Unify user and pack headers.
 export default function ProfileHeader({ ...props }: any) {
     const profile = props.user
+
+    const {user} = useUserAccountStore()
 
     return (
         <div className="relative">
@@ -32,6 +39,9 @@ export default function ProfileHeader({ ...props }: any) {
                             </div>
                         </div>
                     </div>
+                    {user && user.anonUser && user.id !== profile.id && <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0">
+                        <UserFollowButton user={profile}/>
+                    </div>}
                 </div>
                 <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
                     <Heading>{profile.display_name || profile.username}</Heading>
@@ -43,5 +53,27 @@ export default function ProfileHeader({ ...props }: any) {
                 </div>
             </div>
         </div>
+    )
+}
+
+function UserFollowButton({ user }: { user: any }) {
+    const follow = () => {
+        vg.user({username: user.username}).follow.post().then(({error}) => {
+            if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+            window.location.reload()
+        })
+    }
+
+    const unfollow = () => {
+        vg.user({username: user.username}).follow.delete().then(({error}) => {
+            if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+            window.location.reload()
+        })
+    }
+
+    return (
+        <Button onClick={user.is_following ? unfollow : follow} variant={user.is_following ? 'tertiary' : 'primary'}>
+            {user.is_following ? 'Unfollow' : 'Follow'}
+        </Button>
     )
 }
