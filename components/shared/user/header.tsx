@@ -72,8 +72,8 @@ function UserFollowButton({ user }: { user: any }) {
     }
 
     return (
-        <Button onClick={user.is_following ? unfollow : follow} variant={user.is_following ? 'tertiary' : 'primary'}>
-            {user.is_following ? 'Unfollow' : 'Follow'}
+        <Button onClick={user.following ? unfollow : follow} variant={user.following ? 'destructive' : 'primary'}>
+            {user.following ? 'Unfollow' : 'Follow'}
         </Button>
     )
 }
