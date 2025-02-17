@@ -4,8 +4,6 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --text-color-primary: rgb(var(--color-primary-text-cosmos));
-
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --color-background: hsl(var(--background));
@@ -28,7 +26,6 @@
 
   --color-primary-ice-white: rgb(245 246 252);
   --color-primary-cosmos: rgb(88 40 245);
-  --color-primary-text-cosmos: var(--color-primary-cosmos);
   --color-primary-midnight: rgb(20 20 26);
   --color-primary-lime: rgb(206 255 28);
 
