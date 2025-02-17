@@ -9,24 +9,14 @@ import {useUserAccountStore} from '@/lib/states'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
 import {supabase} from '@/lib/api'
 import Link from '@/components/shared/link'
+import {useSearchParams} from 'next/navigation'
 
-export default function IDLogin({
-    searchParams,
-}: {
-    searchParams: {
-        error_description?: string
-        error?: string
-        redirect?: string
-    }
-}) {
+export default function IDLogin() {
     const { user } = useUserAccountStore()
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    switch (searchParams?.error_description) {
-        case 'The resource owner or authorization server denied the request': {
-            searchParams.error_description = 'Login cancelled'
-        }
-    }
+
+    const searchParams = useSearchParams()
 
     if (user) return (window.location.href = '/')
 
@@ -47,7 +37,7 @@ export default function IDLogin({
                     setSubmitting(false)
                     setError(r.error.toString())
                 } else {
-                    window.location.href = searchParams?.redirect || '/'
+                    window.location.href = searchParams.get('redirect') || '/'
                 }
             })
             .catch((e) => {
