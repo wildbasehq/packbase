@@ -1,5 +1,5 @@
 import Body from '@/components/layout/body'
-import { Heading, Text } from '@/components/shared/text'
+import {Heading, Text} from '@/components/shared/text'
 
 const retentionOrder = [
     'Until ✱ID deletion',
@@ -195,7 +195,7 @@ export default function TermsPage() {
                                         <Heading size="lg" className="mb-2 text-white!">
                                             Age Verification
                                         </Heading>
-                                        <ul className="list-disc space-y-2 pl-6 [&>*>*]:text-white *:text-white!">
+                                        <ul className="list-disc space-y-2 pl-6 [&>*>*]:!text-white *:text-white!">
                                             <li>
                                                 <Text>Users must be 18+ and verify their age</Text>
                                             </li>
@@ -212,7 +212,7 @@ export default function TermsPage() {
                                         <Heading size="lg" className="mb-2 text-white!">
                                             Permitted Content
                                         </Heading>
-                                        <ul className="list-disc space-y-2 pl-6 [&>*>*]:text-white *:text-white!">
+                                        <ul className="list-disc space-y-2 pl-6 [&>*>*]:!text-white *:text-white!">
                                             <li>
                                                 <Text>Adult content must be properly tagged</Text>
                                             </li>
