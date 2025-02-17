@@ -7,6 +7,7 @@ import {vg} from '@/lib/api'
 import {toast} from 'sonner'
 import {Button} from '@/components/shared/ui/button'
 import {useUserAccountStore} from '@/lib/states'
+import {useState} from 'react'
 
 // @TODO: Unify user and pack headers.
 export default function ProfileHeader({ ...props }: any) {
@@ -57,23 +58,24 @@ export default function ProfileHeader({ ...props }: any) {
 }
 
 function UserFollowButton({ user }: { user: any }) {
+    const [following, setFollowing] = useState(user.following)
     const follow = () => {
         vg.user({username: user.username}).follow.post().then(({error}) => {
             if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
-            window.location.reload()
+            setFollowing(true)
         })
     }
 
     const unfollow = () => {
         vg.user({username: user.username}).follow.delete().then(({error}) => {
             if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
-            window.location.reload()
+            setFollowing(false)
         })
     }
 
     return (
-        <Button onClick={user.following ? unfollow : follow} variant={user.following ? 'destructive' : 'primary'}>
-            {user.following ? 'Unfollow' : 'Follow'}
+        <Button onClick={following ? unfollow : follow} variant={following ? 'destructive' : 'primary'}>
+            {following ? 'Unfollow' : 'Follow'}
         </Button>
     )
 }
