@@ -1,19 +1,19 @@
 import UserAvatar from '@/components/shared/user/avatar'
 import Link from 'next/link'
-import { Text } from '@/components/shared/text'
-import { DotIcon } from 'lucide-react'
-import { Button } from '@/components/shared/ui/button'
-import { LoadingCircle } from '@/components/shared/icons'
+import {Text} from '@/components/shared/text'
+import {DotIcon} from 'lucide-react'
+import {Button} from '@/components/shared/ui/button'
+import {LoadingCircle} from '@/components/shared/icons'
 import Card from '@/components/shared/card'
-import React, { FormEvent, useRef, useState } from 'react'
-import { vg } from '@/lib/api'
-import { toast } from 'sonner'
-import { useResourceStore, useUserAccountStore } from '@/lib/states'
-import { Editor } from '@/components/novel'
-import { LinkIcon } from '@heroicons/react/24/solid'
+import React, {FormEvent, useRef, useState} from 'react'
+import {vg} from '@/lib/api'
+import {toast} from 'sonner'
+import {useResourceStore, useUserAccountStore} from '@/lib/states'
+import {Editor} from '@/components/novel'
+import {LinkIcon} from '@heroicons/react/24/solid'
 import Modal from '@/components/modal'
-import { Alert, AlertTitle } from '@/components/shared/ui/alert'
-import { QuestionMarkCircleIcon, XCircleIcon } from '@heroicons/react/20/solid'
+import {Alert, AlertTitle} from '@/components/shared/ui/alert'
+import {QuestionMarkCircleIcon, XCircleIcon} from '@heroicons/react/20/solid'
 import clsx from 'clsx'
 import Tooltip from '@/components/shared/tooltip'
 
@@ -57,7 +57,7 @@ export default function HowlCreator() {
     }
 
     const uploadPost = (post: any) => {
-        post.to = currentResource.id
+        post.tenant_id = currentResource.id
         vg.howl.create
             .post(post)
             .then(({ data, error }) => {
