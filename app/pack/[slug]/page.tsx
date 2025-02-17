@@ -92,7 +92,7 @@ export default function Home({ params }: { params: { slug: string } }) {
                     )}
 
                     <div className="p-8">
-                        <FeedList packID={currentResource.id} changingView={changingView} setChangingView={setChangingView} />
+                        <FeedList packID={currentResource?.slug === 'universe' ? 'universe:home' : currentResource?.id} changingView={changingView} setChangingView={setChangingView} />
                     </div>
                 </div>
             )}
