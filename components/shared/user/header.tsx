@@ -5,7 +5,7 @@ import UserAvatar from '@/components/shared/user/avatar'
 import Image from 'next/image'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
-import Button from '@/components/shared/button'
+import {Button} from '@/components/shared/ui/button'
 import {useUserAccountStore} from '@/lib/states'
 
 // @TODO: Unify user and pack headers.
@@ -39,7 +39,7 @@ export default function ProfileHeader({ ...props }: any) {
                             </div>
                         </div>
                     </div>
-                    {user && !user.anonUser && user.id !== profile.id && <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0">
+                    {(user && !user.anonUser && user.id !== profile.id) && <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0">
                         <UserFollowButton user={profile}/>
                     </div>}
                 </div>
