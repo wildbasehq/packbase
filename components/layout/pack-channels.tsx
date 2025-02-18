@@ -5,6 +5,7 @@ import React from 'react'
 import {Sidebar, SidebarBody, SidebarFooter, SidebarHeader, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection, SidebarSpacer} from '@/components/shared/sidebar'
 import {FireIcon, HomeIcon, InboxIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
 import ResourceSwitcher from '@/components/layout/resource-switcher'
+import HowlCreator from '@/components/shared/user/howl-creator'
 
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon, Sparkles: SparklesIcon, Fire: FireIcon,
@@ -49,6 +50,7 @@ export function PackChannels({...props}: SideNavType) {
             <Sidebar className="bg-sidebar w-full max-w-[320px]">
                 <SidebarHeader>
                     <SidebarSection>
+                        <HowlCreator/>
                         <SidebarItem href="/search">
                             <MagnifyingGlassIcon/>
                             <SidebarLabel>Search</SidebarLabel>

@@ -96,7 +96,7 @@ export default function IDLogin() {
 
                     <div>
                         <Button
-                            color="violet"
+                            color="indigo"
                             type="submit"
                             disabled={submitting}
                             className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"

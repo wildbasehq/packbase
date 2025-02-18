@@ -2,7 +2,7 @@ import UserAvatar from '@/components/shared/user/avatar'
 import Link from 'next/link'
 import {Text} from '@/components/shared/text'
 import {DotIcon} from 'lucide-react'
-import {Button} from '@/components/shared/button'
+import {Button} from '@/components/shared/experimental-button-rework'
 import {LoadingCircle} from 'components/icons'
 import Card from '@/components/shared/card'
 import React, {FormEvent, useRef, useState} from 'react'
@@ -18,8 +18,8 @@ import clsx from 'clsx'
 import Tooltip from '@/components/shared/tooltip'
 
 export default function HowlCreator() {
-    const { user } = useUserAccountStore()
-    const { currentResource } = useResourceStore()
+    const {user} = useUserAccountStore()
+    const {currentResource} = useResourceStore()
     const [submitting, setSubmitting] = useState<boolean>(false)
     const [showModal, setShowModal] = useState<boolean>(false)
     const [attachments, setAttachments] = useState<{ bright: boolean; data: string }[]>([])
@@ -60,7 +60,7 @@ export default function HowlCreator() {
         post.tenant_id = currentResource.id
         vg.howl.create
             .post(post)
-            .then(({ data, error }) => {
+            .then(({data, error}) => {
                 if (error) {
                     setSubmitting(false)
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
@@ -137,7 +137,7 @@ export default function HowlCreator() {
     return (
         <>
             {!user.reqOnboard && !currentResource.temporary && (
-                <Button size="sm" variant="outline" className="w-full" onClick={() => setShowModal(true)}>
+                <Button outline className="w-full" onClick={() => setShowModal(true)}>
                     + Howl {!currentResource.standalone && `in ${currentResource.display_name}`}
                 </Button>
             )}
@@ -147,13 +147,13 @@ export default function HowlCreator() {
                     {!currentResource.standalone && (
                         <Alert className="rounded-none! border-0!">
                             <AlertTitle className="flex items-center">
-                                <UserAvatar name={currentResource.display_name} size={24} user={currentResource} className="mr-2 inline-flex" />
+                                <UserAvatar name={currentResource.display_name} size={24} user={currentResource} className="mr-2 inline-flex"/>
                                 {currentResource.display_name}
                                 <Tooltip
                                     content={`Howling into ${currentResource.display_name}. This howl will be visible to all members of this pack regardless of your settings.`}
                                     side="right"
                                 >
-                                    <QuestionMarkCircleIcon className="text-alt ml-1 h-4 w-4" />
+                                    <QuestionMarkCircleIcon className="text-alt ml-1 h-4 w-4"/>
                                 </Tooltip>
                             </AlertTitle>
                         </Alert>
@@ -163,7 +163,7 @@ export default function HowlCreator() {
                             <div className="px-4 pt-5 sm:px-6">
                                 <div className="flex space-x-3">
                                     <div className="shrink-0">
-                                        <UserAvatar user={user} />
+                                        <UserAvatar user={user}/>
                                     </div>
                                     <div className="flex min-w-0 flex-1 flex-col justify-center">
                                         <Link href={`/@${user?.username}/`} className="text-default font-medium">
@@ -172,7 +172,7 @@ export default function HowlCreator() {
                                         <Text>New Howl</Text>
                                     </div>
                                     <div className="flex shrink-0 space-x-2 self-center">
-                                        <DotIcon />
+                                        <DotIcon/>
                                     </div>
                                 </div>
                             </div>
@@ -196,7 +196,7 @@ export default function HowlCreator() {
                                             onClick={() => fileInputRef.current?.click()}
                                         >
                                             <span className="sr-only">Insert link</span>
-                                            <LinkIcon className="h-5 w-5" aria-hidden="true" />
+                                            <LinkIcon className="h-5 w-5" aria-hidden="true"/>
                                         </button>
                                     </div>
                                     <input
@@ -209,24 +209,23 @@ export default function HowlCreator() {
                                         onChange={(e) => addAttachment(e.target.files?.[0] || null)}
                                     />
                                 </div>
-                                <div className="flex-1" />
-                                <Button disabled={submitting}>{!submitting ? 'Post' : <LoadingCircle />}</Button>
+                                <div className="flex-1"/>
+                                <Button color="indigo" disabled={submitting}>{!submitting ? 'Post' : <LoadingCircle/>}</Button>
                             </div>
 
                             {attachments.length > 0 && (
                                 <div className="flex flex-wrap gap-7">
                                     {attachments.map((attachment: any, idx: number) => (
                                         <div key={idx} className="relative">
-                                            <img src={attachment.data} alt="" className="h-20 w-20 rounded object-cover" />
+                                            <img src={attachment.data} alt="" className="h-20 w-20 rounded object-cover"/>
                                             <Button
                                                 type="button"
-                                                variant="ghost"
-                                                size="icon"
+                                                outline
                                                 className={clsx('absolute right-0 top-0 h-5 w-5', attachment.bright ? 'text-alt' : 'text-white')}
                                                 onClick={() => removeAttachment(idx)}
                                             >
                                                 <span className="sr-only">Remove</span>
-                                                <XCircleIcon className="h-5 w-5" aria-hidden="true" />
+                                                <XCircleIcon className="h-5 w-5" aria-hidden="true"/>
                                             </Button>
                                         </div>
                                     ))}
