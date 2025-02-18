@@ -1,10 +1,10 @@
 'use client'
 
 import {Dropdown, DropdownDescription, DropdownHeader, DropdownItem, DropdownLabel, DropdownMenu} from '@/components/shared/dropdown'
-import LogoutIcon from '@/components/shared/icons/logout'
+import LogoutIcon from '@/components/icons/logout'
 import {Heading, Text} from '@/components/shared/text'
 import Tooltip from '@/components/shared/tooltip'
-import {Button} from '@/components/shared/ui/button'
+import {Button} from '@/components/shared/button'
 import UserAvatar from '@/components/shared/user/avatar'
 import {useUserAccountStore} from '@/lib/states'
 import {ProjectName, ProjectSafeName} from '@/lib/utils'
@@ -16,14 +16,14 @@ import Link from 'next/link'
 import {Dispatch, SetStateAction} from 'react'
 import {supabase} from '@/lib/api'
 
-export default function UserDropdown({ showOnboardingModal }: { showOnboardingModal: Dispatch<SetStateAction<boolean>> | (() => void) }) {
-    const { user, setUser } = useUserAccountStore()
+export default function UserDropdown({showOnboardingModal}: { showOnboardingModal: Dispatch<SetStateAction<boolean>> | (() => void) }) {
+    const {user, setUser} = useUserAccountStore()
 
     const StatusOptions = [
         {
             id: 1,
             name: 'Online',
-            description: "Everyone will see that you're online.",
+            description: 'Everyone will see that you\'re online.',
             className: 'bg-green-400',
         },
         {
@@ -36,14 +36,14 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
         {
             id: 3,
             name: 'Idle',
-            description: "Automatically switches to this when you're not focused in the tab or browser.",
+            description: 'Automatically switches to this when you\'re not focused in the tab or browser.',
             icon: MoonIcon,
             className: 'text-accent-5',
         },
         {
             id: 0,
             name: 'Invisible',
-            description: "Disconnects from Packbase DMs. Still able to access messages, but won't send or receive read receipts nor receive real-time notifications.",
+            description: 'Disconnects from Packbase DMs. Still able to access messages, but won\'t send or receive read receipts nor receive real-time notifications.',
             className: 'border-n-5 group-hover:border-white border-dashed border-2 w-4 h-4',
         },
     ]
@@ -82,7 +82,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                     {!user.reqOnboard && (
                         <Link href={`/@${user.username}`} className="no-underline!">
                             <div className="ring-default flex items-center rounded px-4 py-4 transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50">
-                                <UserAvatar user={user} size="lg" />
+                                <UserAvatar user={user} size="lg"/>
                                 <div className="ml-3 grow">
                                     <Heading>{user.display_name || user.username}</Heading>
                                     <Text alt>{user.username}</Text>
@@ -90,7 +90,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                                 <Link href="/settings">
                                     {/* mt-1 to offset button */}
                                     <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer">
-                                        <SettingsIcon className="h-5 w-5" />
+                                        <SettingsIcon className="h-5 w-5"/>
                                     </Button>
                                 </Link>
                             </div>
@@ -104,18 +104,18 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                             <div className="flex items-center justify-center gap-4">
                                 {currentStatus.icon && (
                                     <div className="h-6 w-6 items-center justify-center p-0.5">
-                                        <currentStatus.icon className={`${currentStatus.className || 'fill-alt'} h-full w-full transition-colors`} />
+                                        <currentStatus.icon className={`${currentStatus.className || 'fill-alt'} h-full w-full transition-colors`}/>
                                     </div>
                                 )}
 
                                 {!currentStatus.icon && (
                                     <div className="h-6 w-6 items-center justify-center p-1">
-                                        <div className={`h-full w-full ${currentStatus.className || 'bg-n-5'} rounded-full`} />
+                                        <div className={`h-full w-full ${currentStatus.className || 'bg-n-5'} rounded-full`}/>
                                     </div>
                                 )}
                                 <div className="text-sm text-on-surface-variant">{currentStatus.name}</div>
                             </div>
-                            <ChevronDownIcon className="AccordionChevron text-body h-5 w-5 self-center" />
+                            <ChevronDownIcon className="AccordionChevron text-body h-5 w-5 self-center"/>
                         </MenuButton>
                     </Tooltip>
                     <DropdownMenu className="z-20 w-96!">
@@ -132,13 +132,13 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                                 <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1 group-hover:!text-white">
                                     {option.icon && (
                                         <div className="h-6 w-6 items-center justify-center p-0.5">
-                                            <option.icon className={`${option.className || 'fill-alt'} h-full w-full transition-colors`} />
+                                            <option.icon className={`${option.className || 'fill-alt'} h-full w-full transition-colors`}/>
                                         </div>
                                     )}
 
                                     {!option.icon && (
                                         <div className="h-6 w-6 items-center justify-center p-1">
-                                            <div className={`h-full w-full ${option.className || 'bg-n-5'} rounded-full`} />
+                                            <div className={`h-full w-full ${option.className || 'bg-n-5'} rounded-full`}/>
                                         </div>
                                     )}
                                     {option.name}
@@ -162,7 +162,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                     }}
                     className="group inline-flex w-full cursor-pointer items-center justify-start gap-4 rounded px-4 py-3 ring-destructive/25 transition-all hover:bg-destructive/75 hover:ring-2"
                 >
-                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:!fill-white" />{' '}
+                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:!fill-white"/>{' '}
                     <Text alt className="group-hover:!text-white">
                         Sign out of all accounts
                     </Text>
@@ -170,7 +170,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
             </div>
             <div className="flex w-full flex-col items-center justify-center border-t px-7 py-5">
                 <Text size="xs" alt>
-                    {ProjectSafeName} (Name isn't final. {ProjectName}) &copy; *base. &mdash;{' '}
+                    {ProjectSafeName} (Name isn't final. {ProjectName}) &copy; ✱base. &mdash;{' '}
                     {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF || process.env.NEXT_PUBLIC_VERCEL_ENV || 'local'} - {process.env.NEXT_PUBLIC_BUILD_ID || '0000000'}
                 </Text>
             </div>

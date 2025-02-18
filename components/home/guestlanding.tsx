@@ -1,6 +1,6 @@
 import CrawlText from '@/components/shared/crawl-text'
 import {Heading, Text} from '@/components/shared/text'
-import {Button} from '@/components/shared/ui/button'
+import {Button} from '@/components/shared/button'
 import Tooltip from '@/components/shared/tooltip'
 import {HelpCircleIcon} from 'lucide-react'
 import Link from '@/components/shared/link'
@@ -10,8 +10,8 @@ import {Container} from '@/components/layout/container'
 import Image from 'next/image'
 
 const links = [
-    { name: 'Join Packbase', href: '/id/create/' },
-    { name: 'Volunteer', href: 'https://discord.gg/StuuK55gYA' },
+    {name: 'Join Packbase', href: '/id/create/'},
+    {name: 'Volunteer', href: 'https://discord.gg/StuuK55gYA'},
 ]
 
 function Hero() {
@@ -51,10 +51,10 @@ function Hero() {
 
     return (
         <div className="relative">
-            <Gradient className="absolute inset-2 bottom-0 rounded-4xl ring-1 ring-inset ring-black/5" />
+            <Gradient className="absolute inset-2 bottom-0 rounded-4xl ring-1 ring-inset ring-black/5"/>
             <Container className="relative">
                 <div className="pb-24 pt-16 sm:pb-32 sm:pt-24 md:pb-48 md:pt-32">
-                    <Heading className="font-display text-n-7 text-6xl font-medium tracking-tight sm:text-7xl whitespace-break-spaces">
+                    <Heading className="font-display text-6xl font-medium tracking-tight sm:text-7xl whitespace-break-spaces">
                         "
                         <CrawlText fast>
                             {typeof tagline === 'string' ? tagline : tagline.tagline}
@@ -98,9 +98,9 @@ function Hero() {
 export default function GuestLanding() {
     return (
         <div className="overflow-hidden space-y-8">
-            <Hero />
+            <Hero/>
             <div className="mx-auto flex w-full max-w-7xl flex-col px-8">
-                <Countdown />
+                <Countdown/>
 
                 {/* Groups */}
                 <div className="overflow-hidden lg:py-24">
@@ -119,10 +119,11 @@ export default function GuestLanding() {
                             {/* Group card with fake outlines of a stack behind */}
                             <div className="relative h-fit">
                                 <div className="absolute inset-0 flex flex-col">
-                                    <div className="h-full w-full flex-1 -rotate-3 rounded border border-solid shadow-md transition-transform hover:-rotate-2" />
+                                    <div className="h-full w-full flex-1 -rotate-3 rounded border border-solid shadow-md transition-transform hover:-rotate-2"/>
                                 </div>
                                 <div className="absolute inset-0 flex flex-col">
-                                    <div className="h-full w-full flex-1 rotate-6 rounded border border-solid bg-card shadow-lg transition-transform hover:rotate-[5deg]" />
+                                    <div
+                                        className="h-full w-full flex-1 rotate-6 rounded border border-solid bg-card shadow-lg transition-transform hover:rotate-[5deg]"/>
                                 </div>
 
                                 <div className="bg-default relative rotate-2 rounded border border-solid p-6 shadow-xl transition-transform hover:rotate-1">
@@ -224,14 +225,14 @@ export default function GuestLanding() {
                                 <Text size="lg" className="mt-4">
                                     You're not just limited to your avatar and header. While other sites struggle to give you the most basic control of your profile's
                                     colours, we just gave you complete HTML/CSS control and even the ability to set your own custom domain, with no ads nor tracking.
-                                    <br />
-                                    <br />
+                                    <br/>
+                                    <br/>
                                     Oh... and infinite storage for your site
                                     <Tooltip
                                         content="You have unlimited storage, but each file cannot exceed 10MB. This only affects our storage, so if you need more space you can always use a third-party service."
                                         side="right"
                                     >
-                                        <HelpCircleIcon className="-mt-2 h-4 w-4" />
+                                        <HelpCircleIcon className="-mt-2 h-4 w-4"/>
                                     </Tooltip>
                                 </Text>
                             </div>

@@ -4,9 +4,9 @@ import {AlertTriangle, XCircleIcon} from 'lucide-react'
 import {useParams} from 'next/navigation'
 import {FormEvent, useState} from 'react'
 import {toast} from 'sonner'
-import {LoadingDots} from '@/components/shared/icons'
+import {LoadingDots} from 'components/icons'
 import {Input} from '@/components/shared/input/text'
-import Button from '@/components/shared/button'
+import {Button} from '@/components/shared/button'
 import {ProjectSafeName} from '@/lib/utils'
 
 export default function ReportAbuse() {

@@ -1,8 +1,8 @@
 import Markdown from '@/components/shared/markdown'
-import { Heading } from '@/components/shared/text'
-import { Button } from '@/components/shared/ui/button'
-import { vg } from '@/lib/api'
-import { toast } from 'sonner'
+import {Heading} from '@/components/shared/text'
+import {Button} from '@/components/shared/button'
+import {vg} from '@/lib/api'
+import {toast} from 'sonner'
 
 export default function PackHeader({ ...props }: any) {
     const pack = props.pack

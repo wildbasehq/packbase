@@ -9,7 +9,7 @@ import Link from '@/components/shared/link'
 import Image from 'next/image'
 import WolfoxDrawing from '@/public/img/illustrations/wolfox-drawing.png'
 import {Input} from '@/components/shared/input/text'
-import {Button} from '@/components/shared/ui/button'
+import {Button} from '@/components/shared/button'
 import {vg} from '@/lib/api'
 import GridBody from '@/components/layout/grid-body'
 

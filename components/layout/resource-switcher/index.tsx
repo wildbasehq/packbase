@@ -1,6 +1,6 @@
 'use client'
 
-import {ExpandingArrow, LoadingCircle} from '@/components/shared/icons'
+import {ExpandingArrow, LoadingCircle} from 'components/icons'
 import {Logo} from '@/components/shared/logo'
 import {Heading, Text} from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
@@ -12,17 +12,18 @@ import {PlayFunction} from 'use-sound/dist/types'
 import './resource-switcher.component.scss'
 import {Dropdown, DropdownHeader, DropdownMenu} from '@/components/shared/dropdown'
 import {MenuButton, MenuItem} from '@headlessui/react'
-import LogoutIcon from '@/components/shared/icons/logout'
+import LogoutIcon from '@/components/icons/logout'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
 import {useModal} from '@/components/modal/provider'
 import {SettingsIcon} from 'lucide-react'
-import {Button} from '@/components/shared/ui/button'
+import {Button} from '@/components/shared/button'
 import clsx from 'clsx'
 import {Input} from '@/components/shared/input/text'
-import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import {ClipboardIcon} from '@heroicons/react/20/solid'
 import {UserCircleIcon} from '@heroicons/react/24/solid'
+import {Avatar} from '@/components/shared/avatar'
 
 export default function ResourceSwitcher() {
     const hoverCancelSFX = '/sounds/switch-hover-s.ogg'
@@ -40,10 +41,10 @@ export default function ResourceSwitcher() {
         playbackRate: 0.3,
     })
 
-    const { currentResource } = useResourceStore()
+    const {currentResource} = useResourceStore()
 
-    const { loading, connecting } = useUIStore()
-    const { ref } = useComponentVisible({
+    const {loading, connecting} = useUIStore()
+    const {ref} = useComponentVisible({
         soundOnClose: cancelSound,
     })
     // fuck you nextjs
@@ -91,7 +92,7 @@ export default function ResourceSwitcher() {
                             <span className="z-10 flex w-full items-center justify-between">
                                 <div className="flex h-10 items-center space-x-2">
                                     {!currentResource || (currentResource.standalone && !currentResource.icon) ? (
-                                        <Logo className="w-8" />
+                                        <Logo className="w-8"/>
                                     ) : (
                                         <UserAvatar
                                             name={currentResource.display_name}
@@ -102,11 +103,11 @@ export default function ResourceSwitcher() {
                                     )}
                                     <Text className="font-bold">{currentResource.display_name}</Text>
                                 </div>
-                                <ExpandingArrow className="right-0 -mt-1 h-6 w-6 rotate-90 text-neutral-500 transition-all dark:text-white" />
+                                <ExpandingArrow className="right-0 -mt-1 h-6 w-6 rotate-90 text-neutral-500 transition-all dark:text-white"/>
                             </span>
                         </MenuButton>
                         <DropdownMenu className="z-50 -mt-16 rounded-tl-none rounded-tr-none p-0!">
-                            <MenuItem>{({ close }) => <ResourceSwitcherMenu close={close} />}</MenuItem>
+                            <MenuItem>{({close}) => <ResourceSwitcherMenu close={close}/>}</MenuItem>
                         </DropdownMenu>
                     </Dropdown>
                 </div>
@@ -114,7 +115,7 @@ export default function ResourceSwitcher() {
                 <div className="shimmer-template flex cursor-pointer select-none flex-row items-center justify-between">
                     <span className="z-10 flex w-full items-center justify-between">
                         <div className="flex h-10 items-center space-x-2">
-                            <LoadingCircle />
+                            <LoadingCircle/>
                             <Text className="font-bold">Connecting</Text>
                         </div>
                     </span>
@@ -124,10 +125,10 @@ export default function ResourceSwitcher() {
     )
 }
 
-function ResourceSwitcherMenu({ close }: { close: () => void }) {
-    const { currentResource: pack } = useResourceStore()
-    const { user } = useUserAccountStore()
-    const { show, hide } = useModal()
+function ResourceSwitcherMenu({close}: { close: () => void }) {
+    const {currentResource: pack} = useResourceStore()
+    const {user} = useUserAccountStore()
+    const {show, hide} = useModal()
 
     return (
         <DropdownHeader className="flex w-96 flex-col p-0!">
@@ -138,11 +139,11 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
                         onClick={() => {
                             if (user.id === pack.owner_id) {
                                 close()
-                                show(<ResourceSettingsModal />)
+                                show(<ResourceSettingsModal/>)
                             }
                         }}
                     >
-                        <UserAvatar user={pack} size="lg" />
+                        <UserAvatar user={pack} size="lg"/>
                         <div className="ml-3 grow">
                             <Heading>{pack.display_name || pack.slug}</Heading>
                             <Text alt>{pack.slug}</Text>
@@ -151,7 +152,7 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
                             <div>
                                 {/* mt-1 to offset button */}
                                 <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer">
-                                    <SettingsIcon className="h-5 w-5" />
+                                    <SettingsIcon className="h-5 w-5"/>
                                 </Button>
                             </div>
                         )}
@@ -163,7 +164,7 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
                 <div
                     className="group inline-flex w-full cursor-pointer items-center justify-start gap-4 rounded px-4 py-3 ring-destructive/25 transition-all hover:bg-destructive/75 hover:ring-2"
                     onClick={() => {
-                        vg.pack({ id: pack.id })
+                        vg.pack({id: pack.id})
                             .join.delete()
                             .then(() => {
                                 window.location.reload()
@@ -173,7 +174,7 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
                             })
                     }}
                 >
-                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white!" />{' '}
+                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white!"/>{' '}
                     <Text alt className="group-hover:text-white!">
                         Leave pack
                     </Text>
@@ -186,7 +187,7 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
 function ResourceSettingsModal() {
     const [currentPage, setCurrentPage] = useState('General Information')
 
-    const { currentResource, resources, setResources, setCurrentResource } = useResourceStore()
+    const {currentResource, resources, setResources, setCurrentResource} = useResourceStore()
 
     // For pack avatar upload
     const [profilePicUpload, setProfilePicUpload] = useState<File | undefined>()
@@ -272,11 +273,11 @@ function ResourceSettingsModal() {
         e.preventDefault()
         let packUpdate: any = {}
         if (profilePicPreview) {
-            packUpdate.images = { avatar: profilePicPreview }
+            packUpdate.images = {avatar: profilePicPreview}
         }
 
         if (headerPicPreview) {
-            packUpdate.images = { ...packUpdate.images, header: headerPicPreview }
+            packUpdate.images = {...packUpdate.images, header: headerPicPreview}
         }
 
         for (let field in fields) {
@@ -301,9 +302,9 @@ function ResourceSettingsModal() {
             }
         }
         console.log(packUpdate)
-        vg.pack({ id: currentResource.id })
+        vg.pack({id: currentResource.id})
             .post(packUpdate)
-            .then(({ data, error }) => {
+            .then(({data, error}) => {
                 if (error) {
                     toast.error(
                         `Whoops! ${error.status}: ${
@@ -317,7 +318,7 @@ function ResourceSettingsModal() {
                         packUpdate.images.avatar = packUpdate.images.avatar || currentResource.images.avatar
                         packUpdate.images.header = packUpdate.images.header || currentResource.images.header
                     }
-                    const newResources = resources.map((r) => (r.id === currentResource.id ? { ...r, ...packUpdate } : r))
+                    const newResources = resources.map((r) => (r.id === currentResource.id ? {...r, ...packUpdate} : r))
                     setResources(newResources)
                     setCurrentResource(newResources.find((r) => r.id === currentResource.id))
                 }
@@ -328,11 +329,11 @@ function ResourceSettingsModal() {
     }
 
     return (
-        <div className="flex h-[50vh] max-h-full w-[50vw] gap-4">
+        <div className="flex h-[50vh] max-w-6xl max-h-full gap-4">
             <div className="flex w-80 flex-col p-0!">
-                <div className="h-fit w-full rounded-br bg-white/50 ring-2 ring-shadow dark:bg-n-6/50">
+                <div className="h-fit w-full rounded-br rounded-tl bg-white/50 ring-2 ring-shadow dark:bg-n-6/50">
                     <div className="flex items-center rounded px-6 py-6">
-                        <UserAvatar user={currentResource} size="lg" />
+                        <Avatar square className="w-12 h-12" initials={currentResource.display_name?.charAt(0)} alt={currentResource.display_name}/>
                         <div className="ml-3 grow">
                             <Heading>{currentResource.display_name || currentResource.slug}</Heading>
                             <Text alt>{currentResource.slug}</Text>
@@ -349,7 +350,7 @@ function ResourceSettingsModal() {
                                     'ring-default/25 ring-default group inline-flex w-full items-center justify-start gap-4 rounded px-4 py-3 transition-all hover:ring-2',
                                 )}
                             >
-                                <page.icon className="fill-alt h-4 w-4" />
+                                <page.icon className="fill-alt h-4 w-4"/>
                                 <Text alt>{page.title}</Text>
                             </div>
                         </div>
@@ -389,9 +390,9 @@ function ResourceSettingsModal() {
                             />
                             <div className="mt-2 flex items-center gap-x-3">
                                 {!profilePicPreview ? (
-                                    <UserCircleIcon className="text-alt h-12 w-12" aria-hidden="true" />
+                                    <UserCircleIcon className="text-alt h-12 w-12" aria-hidden="true"/>
                                 ) : (
-                                    <UserAvatar icon={profilePicPreview} size="lg" />
+                                    <UserAvatar icon={profilePicPreview} size="lg"/>
                                 )}
                                 <Button asChild variant="outline" onClick={() => document.getElementById('avatar')?.click()}>
                                     <div>Upload</div>
@@ -422,7 +423,7 @@ function ResourceSettingsModal() {
 
                             <div className="aspect-3/1 rounded-lg bg-n-2/25">
                                 {headerPicPreview ? (
-                                    <img src={headerPicPreview} alt="Header preview" className="rounded-lg object-cover" />
+                                    <img src={headerPicPreview} alt="Header preview" className="rounded-lg object-cover"/>
                                 ) : (
                                     <div className="text-default flex h-full items-center justify-center">
                                         <Text alt>Upload a header image</Text>
@@ -433,7 +434,7 @@ function ResourceSettingsModal() {
 
                         {Object.keys(fields).map((key, i) => (
                             <div key={i}>
-                                <Input ref={fields[key].ref} name={snakeToTitle(key)} label={snakeToTitle(key)} type={fields[key].type || 'text'} rows={4} />
+                                <Input ref={fields[key].ref} name={snakeToTitle(key)} label={snakeToTitle(key)} type={fields[key].type || 'text'} rows={4}/>
                             </div>
                         ))}
                     </div>

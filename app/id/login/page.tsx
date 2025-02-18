@@ -3,16 +3,16 @@ import {FormEvent, useState} from 'react'
 import {Logo} from '@/components/shared/logo'
 import {Heading} from '@/components/shared/text'
 import {Input} from '@/components/shared/input/text'
-import {Button} from '@/components/shared/ui/button'
-import {LoadingCircle} from '@/components/shared/icons'
+import {Button} from '@/components/shared/experimental-button-rework'
+import {LoadingCircle} from 'components/icons'
 import {useUserAccountStore} from '@/lib/states'
-import {Alert, AlertDescription, AlertTitle} from '@/components/shared/ui/alert'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import {supabase} from '@/lib/api'
 import Link from '@/components/shared/link'
 import {useSearchParams} from 'next/navigation'
 
 export default function IDLogin() {
-    const { user } = useUserAccountStore()
+    const {user} = useUserAccountStore()
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
@@ -49,7 +49,7 @@ export default function IDLogin() {
     return (
         <>
             <div>
-                <Logo className="h-12! w-12!" />
+                <Logo className="h-12! w-12!"/>
                 <Heading className="mt-6" size="2xl" as="h2">
                     Sign in
                 </Heading>
@@ -70,11 +70,11 @@ export default function IDLogin() {
                 )}
                 <form method="POST" className="space-y-6" onSubmit={loginUser}>
                     <div>
-                        <Input id="email" type="email" label="Email Address" required />
+                        <Input id="email" type="email" label="Email Address" required/>
                     </div>
 
                     <div className="space-y-1">
-                        <Input id="password" label="Password" type="password" autoComplete="current-password" required />
+                        <Input id="password" label="Password" type="password" autoComplete="current-password" required/>
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -96,12 +96,12 @@ export default function IDLogin() {
 
                     <div>
                         <Button
-                            variant="default"
+                            color="violet"
                             type="submit"
                             disabled={submitting}
                             className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
-                            {!submitting ? 'Sign in' : <LoadingCircle />}
+                            {!submitting ? 'Sign in' : <LoadingCircle/>}
                         </Button>
                     </div>
                 </form>

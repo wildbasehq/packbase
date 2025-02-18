@@ -10,7 +10,7 @@ import {toast} from 'sonner'
 import va from '@vercel/analytics'
 import {getPrevText} from '@/components/novel/lib/editor'
 import {NovelContext} from '../provider'
-import {LoadingCircle} from '@/components/shared/icons'
+import {LoadingCircle} from 'components/icons'
 
 interface CommandItemProps {
     title: string

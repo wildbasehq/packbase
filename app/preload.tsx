@@ -1,7 +1,7 @@
 'use client'
 
 import Body from '@/components/layout/body'
-import {LoadingDots} from '@/components/shared/icons'
+import {LoadingDots} from 'components/icons'
 import {Heading} from '@/components/shared/text'
 import {API_URL, setToken, vg} from '@/lib/api'
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'

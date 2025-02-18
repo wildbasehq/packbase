@@ -5,7 +5,7 @@ import UserAvatar from '@/components/shared/user/avatar'
 import Image from 'next/image'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
-import {Button} from '@/components/shared/ui/button'
+import {Button} from '@/components/shared/button'
 import {useUserAccountStore} from '@/lib/states'
 import {useState} from 'react'
 

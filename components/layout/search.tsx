@@ -1,7 +1,7 @@
 'use client'
 
-import { useId } from 'react'
-import KoratIcon from '@/components/shared/icons/korat'
+import {useId} from 'react'
+import KoratIcon from '@/components/icons/korat'
 
 function SearchIcon(props: any) {
     return (

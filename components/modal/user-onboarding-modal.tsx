@@ -14,12 +14,12 @@ import Image from 'next/image'
 import {Dispatch, FormEvent, SetStateAction, useEffect, useState} from 'react'
 import Modal from '.'
 import GodRays from '../charm/god-rays'
-import {LoadingCircle} from '../shared/icons'
-import XMarkIcon from '../shared/icons/dazzle/xmark'
+import {LoadingCircle} from '../icons'
+import XMarkIcon from '@/components/icons/dazzle/xmark'
 import SelectPills from '../shared/input/select-pills'
 import Link from '../shared/link'
 import {Heading, Text} from '../shared/text'
-import {Button} from '../shared/ui/button'
+import {Button} from '../shared/button'
 
 type StepFuncType = {
     setSubmitting: Dispatch<SetStateAction<boolean>>
