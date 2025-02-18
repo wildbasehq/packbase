@@ -1,5 +1,5 @@
 'use client'
-import {useResourceStore, useUIStore} from '@/lib/states'
+import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
 import {ArrowUpRightIcon, LucideIcon} from 'lucide-react'
 import React from 'react'
 import {Sidebar, SidebarBody, SidebarFooter, SidebarHeader, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection, SidebarSpacer} from '@/components/shared/sidebar'
@@ -33,6 +33,7 @@ export declare interface SideNavType {
 export function PackChannels({...props}: SideNavType) {
     const {hidden, navigation, loading} = useUIStore()
     const {currentResource} = useResourceStore()
+    const {user} = useUserAccountStore()
 
     if (hidden) return <></>
     return (
@@ -50,7 +51,7 @@ export function PackChannels({...props}: SideNavType) {
             <Sidebar className="bg-sidebar w-full max-w-[320px]">
                 <SidebarHeader>
                     <SidebarSection>
-                        <HowlCreator/>
+                        {user && <HowlCreator/>}
                         <SidebarItem href="/search">
                             <MagnifyingGlassIcon/>
                             <SidebarLabel>Search</SidebarLabel>
