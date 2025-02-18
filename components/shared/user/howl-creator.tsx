@@ -210,7 +210,7 @@ export default function HowlCreator() {
                                     />
                                 </div>
                                 <div className="flex-1"/>
-                                <Button color="indigo" disabled={submitting}>{!submitting ? 'Post' : <LoadingCircle/>}</Button>
+                                <Button type="submit" color="indigo" disabled={submitting}>{!submitting ? 'Post' : <LoadingCircle/>}</Button>
                             </div>
 
                             {attachments.length > 0 && (
