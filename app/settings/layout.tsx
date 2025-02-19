@@ -84,7 +84,7 @@ export default function Settings({children}: { children: React.ReactNode }) {
                         <form onSubmit={submitInviteCode} className="flex gap-2">
                             <Input name="username" placeholder="Desired username" className="w-full" required/>
                             <Input name="invite_code" placeholder="Invite Code" className="w-full" required/>
-                            <Button color="indigo">Submit</Button>
+                            <Button color="indigo" type="submit">Submit</Button>
                         </form>
                         <Text alt size="sm">
                             Enter the invite code you received.
