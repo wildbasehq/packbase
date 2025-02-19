@@ -45,14 +45,15 @@ function PackSelectForSetting() {
         <>
             {!packs ? (
                 <div className="flex gap-1">
-                    <LoadingCircle />{' '}
-                    <span className="animate-gradient-move-x bg-linear-to-r from-neutral-100 via-neutral-500 to-neutral-100 bg-clip-text text-transparent [background-size:300%]">
+                    <LoadingCircle/>{' '}
+                    <span
+                        className="animate-gradient-move-x bg-linear-to-r from-neutral-100 via-neutral-500 to-neutral-100 bg-clip-text text-transparent [background-size:300%]">
                         Loading packs...
                     </span>
                 </div>
             ) : !packs.length ? (
                 <p className="flex">
-                    <XMarkIcon className="text-alt mr-1 h-5 w-6 text-tertiary" />
+                    <XMarkIcon className="text-alt mr-1 h-5 w-6 text-tertiary"/>
                     <Text alt size="sm" className="text-tertiary!">
                         You don't have any packs yet, you can join one and set it as default later. Your default pack for now will be the Universe.
                     </Text>
@@ -90,7 +91,7 @@ const steps: {
         id: '01',
         name: 'Welcome!',
         description: 'Well... Who are you?',
-        component: ({ user }: { user: UserProfileBasic }) => (
+        component: ({user}: { user: UserProfileBasic }) => (
             <>
                 <div className="flex flex-col">
                     <Heading>✨ Welcome to Packbase ✨</Heading>
@@ -113,7 +114,8 @@ const steps: {
                                 </Text>
                             </label>
                             <div className="mt-2">
-                                <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800">
+                                <div
+                                    className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800">
                                     <input
                                         type="text"
                                         name="slug"
@@ -128,7 +130,7 @@ const steps: {
                                 </div>
                                 <Text size="xs" className="text-alt mt-1">
                                     This is for your personal space. You can set this to a custom domain later,
-                                    <br />
+                                    <br/>
                                     <b>
                                         <u>but changing the base URL is impossible!</u>
                                     </b>
@@ -136,7 +138,8 @@ const steps: {
                             </div>
 
                             <div className="mt-2">
-                                <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800">
+                                <div
+                                    className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800">
                                     <span className="flex select-none items-center pl-3 text-neutral-500 sm:text-sm">@</span>
                                     <input
                                         type="text"
@@ -157,29 +160,29 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden aspect-square items-center lg:flex">
-                    <Image src={WolfoxDrawing} alt="LITTLE BABY BOY" className="w-auto" height={3000} width={3000} />
+                    <Image src={WolfoxDrawing} alt="LITTLE BABY BOY" className="w-auto" height={3000} width={3000}/>
                 </div>
             </>
         ),
-        func: async ({ setSubmitting, user, setUser, callback, username, slug }) => {
+        func: async ({setSubmitting, user, setUser, callback, username, slug}) => {
             vg.user.me
                 .post({
                     username,
                     slug,
                 })
-                .then(({ data, error }) => {
+                .then(({data, error}) => {
                     if (data && !error) {
                         toast.success('Profile updated')
-                        setUser({ ...user, username, slug })
+                        setUser({...user, username, slug})
                         callback()
                     } else {
                         setSubmitting(false)
-                        toast.error("Couldn't save: " + (error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'))
+                        toast.error('Couldn\'t save: ' + (error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'))
                     }
                 })
                 .catch((err) => {
                     setSubmitting(false)
-                    toast.error("Couldn't save: " + (err.message ? `${err.cause}: ${err.message}` : 'Something went wrong'))
+                    toast.error('Couldn\'t save: ' + (err.message ? `${err.cause}: ${err.message}` : 'Something went wrong'))
                 })
         },
     },
@@ -187,7 +190,7 @@ const steps: {
         id: '02',
         name: 'Profile Type',
         description: 'Use our template, or your own HTML/CSS.',
-        component: ({ user }: { user: UserProfileBasic }) => (
+        component: ({user}: { user: UserProfileBasic }) => (
             <>
                 <div className="flex flex-col">
                     <Heading>Hey {user.username}! How do you want us to show you?</Heading>
@@ -220,29 +223,29 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden items-center lg:flex">
-                    <Image src={PuzzleCharacters} alt="3 Puzzle Characters" className="w-auto" />
+                    <Image src={PuzzleCharacters} alt="3 Puzzle Characters" className="w-auto"/>
                 </div>
             </>
         ),
-        func: async ({ setSubmitting, user, setUser, callback, ...args }) => {
+        func: async ({setSubmitting, user, setUser, callback, ...args}) => {
             const space_type = args['RadioGroup[id]'] // ??? IDK
             vg.user.me
                 .post({
                     space_type,
                 })
-                .then(({ data, error }) => {
+                .then(({data, error}) => {
                     if (data && !error) {
                         toast.success('Profile updated')
-                        setUser({ ...user, space_type })
+                        setUser({...user, space_type})
                         callback()
                     } else {
                         setSubmitting(false)
-                        toast.error("Couldn't save: " + (error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'))
+                        toast.error('Couldn\'t save: ' + (error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'))
                     }
                 })
                 .catch((err) => {
                     setSubmitting(false)
-                    toast.error("Couldn't save: " + (err.message ? `${err.cause}: ${err.message}` : 'Something went wrong'))
+                    toast.error('Couldn\'t save: ' + (err.message ? `${err.cause}: ${err.message}` : 'Something went wrong'))
                 })
         },
     },
@@ -269,7 +272,7 @@ const steps: {
                             </Text>
                         </div>
                         <div className="mt-8 space-y-8">
-                            <PackSelectForSetting />
+                            <PackSelectForSetting/>
 
                             <SelectPills
                                 label="Who Sees Your Howls"
@@ -296,30 +299,30 @@ const steps: {
                         </div>
                     </div>
                     <div className="hidden items-center lg:flex">
-                        <Image src={MusicMutedCharacters} alt="3 Puzzle Characters" className="w-auto" />
+                        <Image src={MusicMutedCharacters} alt="3 Puzzle Characters" className="w-auto"/>
                     </div>
                 </>
             )
         },
-        func: async ({ setSubmitting, user, setUser, callback, ...args }) => {
+        func: async ({setSubmitting, user, setUser, callback, ...args}) => {
             const post_privacy = args['post_privacy[id]'] // ??? IDK
             vg.user.me
                 .post({
                     post_privacy,
                 })
-                .then(({ data, error }) => {
+                .then(({data, error}) => {
                     if (data && !error) {
                         toast.success('Profile updated')
-                        setUser({ ...user, post_privacy })
+                        setUser({...user, post_privacy})
                         callback()
                     } else {
                         setSubmitting(false)
-                        toast.error("Couldn't save: " + (error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'))
+                        toast.error('Couldn\'t save: ' + (error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'))
                     }
                 })
                 .catch((err) => {
                     setSubmitting(false)
-                    toast.error("Couldn't save: " + (err.message ? `${err.cause}: ${err.message}` : 'Something went wrong'))
+                    toast.error('Couldn\'t save: ' + (err.message ? `${err.cause}: ${err.message}` : 'Something went wrong'))
                 })
         },
     },
@@ -379,11 +382,11 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden items-center lg:flex">
-                    <Image src={CursorCharacterSorting} alt="3 Puzzle Characters" className="w-auto" />
+                    <Image src={CursorCharacterSorting} alt="3 Puzzle Characters" className="w-auto"/>
                 </div>
             </>
         ),
-        func: async ({ callback }) => callback(),
+        func: async ({callback}) => callback(),
     },
     {
         id: '05',
@@ -404,15 +407,15 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden items-center lg:flex">
-                    <Image src={CharacterHoldingPencil} alt="3 Puzzle Characters" className="w-auto" />
+                    <Image src={CharacterHoldingPencil} alt="3 Puzzle Characters" className="w-auto"/>
                 </div>
             </>
         ),
     },
 ]
 
-export default function UserOnboardingModal({ state }: { state: [boolean, Dispatch<SetStateAction<boolean>>] }) {
-    const { user, setUser } = useUserAccountStore()
+export default function UserOnboardingModal({state}: { state: [boolean, Dispatch<SetStateAction<boolean>>] }) {
+    const {user, setUser} = useUserAccountStore()
     const [showOnboardingModal, setShowOnboardingModal] = state
     const [submitting, setSubmitting] = useState<boolean>(false)
     const [currentStep, setCurrentStep] = useState<number>(0)
@@ -424,7 +427,7 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
         const newStep = currentStep + 1
 
         if (currentStep === steps.length - 1) {
-            vg.dipswitch.post({ dpk: 'uod', dpv: '' })
+            vg.dipswitch.post({dpk: 'uod', dpv: ''})
             return setShowOnboardingModal(false)
         }
 
@@ -450,7 +453,7 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
 
     return (
         <>
-            {showOnboardingModal && <GodRays className="-top-12 z-40 opacity-20" />}
+            {showOnboardingModal && <GodRays className="-top-12 z-40 opacity-20"/>}
             <Modal
                 showModal={showOnboardingModal}
                 setShowModal={setShowOnboardingModal}
@@ -462,7 +465,7 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
                     {submitting && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/25 backdrop-blur-lg dark:bg-black">
                             <div className="flex items-center justify-center">
-                                <LoadingCircle />
+                                <LoadingCircle/>
                                 <span className="text-default ml-2">Please wait...</span>
                             </div>
                         </div>
@@ -496,7 +499,7 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
                                                             {stepIdx == currentStep ? (
                                                                 <span className="text-primary">{step.id}</span>
                                                             ) : stepIdx < currentStep ? (
-                                                                <CheckIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                                                                <CheckIcon className="h-6 w-6 text-white" aria-hidden="true"/>
                                                             ) : (
                                                                 <span className="text-alt">{step.id}</span>
                                                             )}
@@ -519,7 +522,7 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
                                                             fill="none"
                                                             preserveAspectRatio="none"
                                                         >
-                                                            <path d="M0.5 0V31L10.5 41L0.5 51V82" stroke="currentcolor" vectorEffect="non-scaling-stroke" />
+                                                            <path d="M0.5 0V31L10.5 41L0.5 51V82" stroke="currentcolor" vectorEffect="non-scaling-stroke"/>
                                                         </svg>
                                                     </div>
                                                 </>
@@ -535,7 +538,7 @@ export default function UserOnboardingModal({ state }: { state: [boolean, Dispat
                     <div className="mx-auto h-1/2 max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
                         <form onSubmit={nextStep} className="grid grid-cols-1 items-center justify-center gap-8 lg:grid-cols-2">
                             {/* Render JSX component from step */}
-                            {steps[currentStep].component({ user })}
+                            {steps[currentStep].component({user})}
 
                             {/* Buttons */}
                             <div className="flex justify-end gap-2">

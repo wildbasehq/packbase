@@ -10,7 +10,7 @@ import {UserProfileBasic} from '@/lib/defs/user'
 import Card from '@/components/shared/card'
 import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
-import {Dispatch, useEffect, useRef, useState} from 'react'
+import {Dispatch, useRef, useState} from 'react'
 import {LoadingCircle} from 'components/icons'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
@@ -23,7 +23,6 @@ import {Dropdown, DropdownItem, DropdownLabel, DropdownMenu} from '@/components/
 import clsx from 'clsx'
 import {Text} from '@/components/shared/text'
 import {Button} from '@/components/shared/button'
-import {Slideover} from '@/components/modal/slideover'
 import PostModal from '@/components/shared/feed/post-full-slideover'
 import {useModal} from '@/components/modal/provider'
 
@@ -54,46 +53,35 @@ export declare interface FeedPostType {
     onDelete?: () => void
 }
 
-export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
+export default function FeedPost({post, onDelete, postState}: FeedPostType) {
     const [postContent, setPostContent] = useState<FeedPostDataType>(post)
-    const [slideoverMediaOpen, setSlideoverMediaOpen] = useState(false)
-    const [selectedMedia, setSelectedMedia] = useState<any>()
 
-    const { show } = useModal()
+    const {show} = useModal()
 
-    const { user: signedInUser } = useUserAccountStore()
-    const bucketRoot = useUIStore((state) => state.bucketRoot)
+    const {user: signedInUser} = useUserAccountStore()
 
     const deletePost = () => {
-        vg.howl({ id: postContent.id })
+        vg.howl({id: postContent.id})
             .delete()
-            .then(({ data, error }) => {
+            .then(({data, error}) => {
                 if (error) {
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 } else {
                     onDelete && onDelete()
                     return toast.success('Howl deleted.', {
-                        icon: <TrashIcon />,
+                        icon: <TrashIcon/>,
                     })
                 }
             })
     }
 
     const onComment = (comment: any) => {
-        const newPostContent = { ...postContent }
+        const newPostContent = {...postContent}
         if (!newPostContent.comments) newPostContent.comments = []
         newPostContent.comments.push(comment)
         setPostContent(newPostContent)
         postState && postState[1](postState[0].map((p: any) => (p.id === postContent.id ? newPostContent : p)))
     }
-
-    useEffect(() => {
-        setSlideoverMediaOpen(!!selectedMedia)
-    }, [selectedMedia])
-
-    useEffect(() => {
-        if (!slideoverMediaOpen) setTimeout(() => setSelectedMedia(null), 100)
-    }, [slideoverMediaOpen])
 
     const openPost = () => {
         show(
@@ -101,8 +89,6 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                 postContent={postContent}
                 setPostContent={setPostContent}
                 signedInUser={signedInUser}
-                selectedMedia={selectedMedia}
-                setSelectedMedia={setSelectedMedia}
                 onComment={onComment}
                 postState={postState}
             />,
@@ -112,57 +98,15 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
 
     return (
         <>
-            {selectedMedia && (
-                <Slideover expandNatural={true} open={[slideoverMediaOpen, setSlideoverMediaOpen]}>
-                    <div className="px-4 py-4 sm:px-6">
-                        <div className="flex h-auto max-h-full flex-col">
-                            <div>
-                                <div className="aspect-w-10 aspect-h-7 rounded-default block w-full overflow-hidden">
-                                    <img src={`${bucketRoot}/profiles/${selectedMedia?.data.url}`} alt="" className="object-cover" />
-                                </div>
-                                <div className="mt-4 flex items-start justify-between">
-                                    <div>
-                                        <h2 className="text-default text-lg font-medium">@{postContent.user.username}'s Image Details</h2>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="text-default font-medium">Information</h3>
-                                <dl className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
-                                    <div className="flex justify-between py-3 text-sm font-medium">
-                                        <dt className="text-default-alt">Key</dt>
-                                        <dd className="text-default">E2User:{selectedMedia?.id}</dd>
-                                    </div>
-
-                                    {postContent?.created_at && (
-                                        <div className="flex justify-between py-3 text-sm font-medium">
-                                            <dt className="text-default-alt">Post Upload Date</dt>
-                                            <dd className="text-default">{new Date(postContent.created_at).toLocaleDateString()}</dd>
-                                        </div>
-                                    )}
-
-                                    <div className="flex justify-between py-3 text-sm font-medium">
-                                        <dt className="text-default-alt">Lives On</dt>
-                                        <dd className="text-default">
-                                            {selectedMedia?.data.url.indexOf('supabase') > -1 ? 'Fenra (High Availability)' : 'Dyre (Long-term)'}
-                                        </dd>
-                                    </div>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </Slideover>
-            )}
-
             <Card className="px-0! py-0!">
                 <div className="relative">
                     <div className="px-4 pt-5 sm:px-6">
                         {/* "___ Rehowled" */}
                         {postContent.howling && (
                             <div className="mb-6 flex items-center text-sm">
-                                <ArrowUpOnSquareIcon className="mr-2 h-4 w-4" />
+                                <ArrowUpOnSquareIcon className="mr-2 h-4 w-4"/>
                                 <Link href={`/@${postContent.actor?.username}/`} className="text-alt flex items-center">
-                                    <UserAvatar size="xs" icon={postContent.actor?.images?.avatar || ''} className="mr-2" />
+                                    <UserAvatar size="xs" icon={postContent.actor?.images?.avatar || ''} className="mr-2"/>
                                     {postContent.actor?.username} rehowled
                                 </Link>
                             </div>
@@ -171,7 +115,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                             <div className="mb-6 flex items-center text-sm">
                                 {/* <UserGroupIcon className="mr-2 h-4 w-4" /> */}
                                 <Link href={`/p/${postContent.pack?.slug}/`} className="text-alt flex items-center justify-center no-underline! hover:text-inherit">
-                                    <UserAvatar size="xs" icon={postContent.pack?.images?.avatar || ''} className="mr-2 rounded-xs" />
+                                    <UserAvatar size="xs" icon={postContent.pack?.images?.avatar || ''} className="mr-2 rounded-xs"/>
                                     <span>{postContent.pack?.display_name}</span>
                                 </Link>
                             </div>
@@ -187,13 +131,13 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                                 {postContent.user && postContent.user.id === signedInUser?.id && (
                                     <Dropdown>
                                         <MenuButton>
-                                            <EllipsisHorizontalIcon className="w-5" />
+                                            <EllipsisHorizontalIcon className="w-5"/>
                                         </MenuButton>
                                         <DropdownMenu className="mt-4 w-36! p-0!">
                                             <DropdownItem onClick={deletePost}>
                                                 <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1">
                                                     <div className="h-6 w-6 items-center justify-center p-0.5">
-                                                        <TrashIcon className="h-full w-full fill-tertiary transition-colors" />
+                                                        <TrashIcon className="h-full w-full fill-tertiary transition-colors"/>
                                                     </div>
                                                     <span className="text-sm">Delete</span>
                                                 </DropdownLabel>
@@ -211,7 +155,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
 
                         {/* Post Objects (Images) */}
                         {postContent.assets && postContent.assets.length > 0 && (
-                            <MediaGrid assets={postContent.assets} post={post} selectState={[selectedMedia, setSelectedMedia]} truncate />
+                            <MediaGrid assets={postContent.assets} post={post} truncate/>
                         )}
                     </div>
                     {/* <div className="bg-box-alt absolute bottom-0 left-0 ml-4 rounded-tl-xl rounded-tr-xl border-x border-b-0 border-t border-solid border-neutral-300 dark:border-neutral-700 sm:ml-6">
@@ -236,9 +180,9 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
                 {signedInUser && !signedInUser.anonUser && (
                     <div className="flex justify-between space-x-8 border-t px-4 py-4 sm:px-6">
                         <div className="flex">
-                            <React post={post} />
+                            <React post={post}/>
                         </div>
-                        <CommentBox className="flex-1" truncate originalPost={postContent} onComment={onComment} />
+                        <CommentBox className="flex-1" truncate originalPost={postContent} onComment={onComment}/>
                     </div>
                 )}
 
@@ -309,13 +253,12 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostType) {
     )
 }
 
-export function FeedListItem({ ...props }: any) {
-    const { comment, showLine, originalPost } = props
-    const [likes, setLikes] = useState(comment.likes || 0)
+export function FeedListItem({...props}: any) {
+    const {comment, showLine, originalPost} = props
     const [showReplyBox, setShowReplyBox] = useState(false)
     const [postContent, setPostContent] = originalPost
     const [postList, setPostList] = props.postState
-    const { user } = useUserAccountStore()
+    const {user} = useUserAccountStore()
 
     const handleReplySubmit = (commentBody: any, newPostContent: any, commentID: string) => {
         setShowReplyBox(false)
@@ -344,13 +287,13 @@ export function FeedListItem({ ...props }: any) {
     }
 
     const deleteComment = () => {
-        vg.howl({ id: comment.id })
+        vg.howl({id: comment.id})
             .delete()
-            .then(({ data, error }) => {
+            .then(({data, error}) => {
                 if (error) {
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 } else {
-                    const newPostContent = { ...postContent }
+                    const newPostContent = {...postContent}
                     newPostContent.comments = newPostContent.comments.filter((c: any) => c.id !== comment.id)
                     let newPostList = postList.map((post: any) => {
                         if (post.id === postContent.id) {
@@ -361,7 +304,7 @@ export function FeedListItem({ ...props }: any) {
                     setPostList(newPostList)
                     setPostContent(newPostContent)
                     return toast.success('Comment deleted.', {
-                        icon: <TrashIcon />,
+                        icon: <TrashIcon/>,
                     })
                 }
             })
@@ -370,15 +313,15 @@ export function FeedListItem({ ...props }: any) {
     return (
         <li>
             <div className="relative pb-8">
-                {showLine ? <span className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-neutral-300 dark:bg-neutral-700" aria-hidden="true" /> : null}
+                {showLine ? <span className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-neutral-300 dark:bg-neutral-700" aria-hidden="true"/> : null}
                 <div className="rounded-default hover:bg-box group relative flex cursor-pointer flex-col items-start space-x-3">
                     <div className="relative flex flex-row items-start space-x-3">
                         <div className="relative">
-                            <Avatar user={comment.user} className="bg-box-alt flex items-center justify-center rounded-full ring-8 ring-white dark:ring-n-7" />
+                            <Avatar user={comment.user} className="bg-box-alt flex items-center justify-center rounded-full ring-8 ring-white dark:ring-n-7"/>
 
                             {comment.likedParent && (
                                 <span className="bg-box-alt rounded-default absolute -bottom-0.5 -right-1 px-0.5 py-px">
-                                    <HandThumbUpIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    <HandThumbUpIcon className="h-5 w-5 text-gray-400" aria-hidden="true"/>
                                 </span>
                             )}
                         </div>
@@ -400,7 +343,7 @@ export function FeedListItem({ ...props }: any) {
 
                             <div
                                 className="text-default mt-2 break-words text-sm"
-                                style={{ wordBreak: 'break-word' }} // fix for long links
+                                style={{wordBreak: 'break-word'}} // fix for long links
                                 onClick={props.onClick}
                             >
                                 {comment.body}
@@ -433,7 +376,7 @@ export function FeedListItem({ ...props }: any) {
                                     onClick={() => deleteComment()}
                                 >
                                     <span className="sr-only">Open options</span>
-                                    <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                                    <TrashIcon className="h-5 w-5" aria-hidden="true"/>
                                 </button>
                             )}
                         </div>
@@ -442,7 +385,7 @@ export function FeedListItem({ ...props }: any) {
                     {/* Comment box to reply */}
                     {showReplyBox && (
                         <div className="mt-2 flex flex-row items-center">
-                            <CommentBox originalPost={postContent} onSubmit={handleReplySubmit} />
+                            <CommentBox originalPost={postContent} onSubmit={handleReplySubmit}/>
                         </div>
                     )}
                 </div>
@@ -452,12 +395,12 @@ export function FeedListItem({ ...props }: any) {
 }
 
 // Goes through replies, and calls itself again with padding if there are replies within replies.
-export function RecursiveCommentThread({ ...props }: any) {
-    const { comment, showLine, originalPost, postState } = props
+export function RecursiveCommentThread({...props}: any) {
+    const {comment, showLine, originalPost, postState} = props
 
     return (
         <>
-            <FeedListItem comment={comment} showLine={showLine || false} originalPost={originalPost} postState={postState} />
+            <FeedListItem comment={comment} showLine={showLine || false} originalPost={originalPost} postState={postState}/>
             {comment.comments &&
                 comment.comments.length > 0 &&
                 comment.comments.map((commentInside: any, commentInsideIdx: any) => (
@@ -476,8 +419,8 @@ export function RecursiveCommentThread({ ...props }: any) {
     )
 }
 
-export function React({ post }: FeedPostType) {
-    const { user } = useUserAccountStore()
+export function React({post}: FeedPostType) {
+    const {user} = useUserAccountStore()
     const [submitting, setSubmitting] = useState(false)
 
     const hasCurrentUser = post.reactions?.['0']?.includes(user?.id)
@@ -486,8 +429,8 @@ export function React({ post }: FeedPostType) {
         if (submitting) return
         setSubmitting(true)
 
-        const howlReact = vg.howl({ id: post.id }).react
-        ;(hasCurrentUser ? howlReact.delete({ slot: 0 }) : howlReact.post({ slot: 0 })).then(({ data, error }) => {
+        const howlReact = vg.howl({id: post.id}).react
+        ;(hasCurrentUser ? howlReact.delete({slot: 0}) : howlReact.post({slot: 0})).then(({data, error}) => {
             setSubmitting(false)
             if (error) {
                 return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
@@ -500,13 +443,13 @@ export function React({ post }: FeedPostType) {
                 if (hasCurrentUser) {
                     post.reactions['0'] = post.reactions['0'].filter((id) => id !== user?.id)
                     return toast.success('Removed reaction.', {
-                        icon: <TrashIcon />,
+                        icon: <TrashIcon/>,
                     })
                 }
 
                 post.reactions['0'].push(user.id)
                 return toast.success('Liked!', {
-                    icon: <HandThumbUpIcon />,
+                    icon: <HandThumbUpIcon/>,
                 })
             }
         })
@@ -518,12 +461,12 @@ export function React({ post }: FeedPostType) {
         <Button variant="ghost" className="inline-flex h-fit! cursor-pointer items-center px-2 text-sm" onClick={react}>
             {!submitting ? (
                 hasCurrentUser ? (
-                    <XMarkIcon className="text-alt h-4 w-4 hover:text-accent-1" />
+                    <XMarkIcon className="text-alt h-4 w-4 hover:text-accent-1"/>
                 ) : (
-                    <HandThumbUpIcon className="text-alt h-4 w-4 hover:text-inherit" />
+                    <HandThumbUpIcon className="text-alt h-4 w-4 hover:text-inherit"/>
                 )
             ) : (
-                <LoadingCircle className="h-4 w-4" />
+                <LoadingCircle className="h-4 w-4"/>
             )}
             {post.reactions?.['0']?.length > 0 && <Text className="text-alt ml-2 text-sm">{post.reactions['0'].length}</Text>}
         </Button>
@@ -544,9 +487,8 @@ export function React({ post }: FeedPostType) {
     )
 }
 
-export function MediaGrid({ ...props }: any) {
-    const { assets, truncate } = props
-    const [, setSelectedMedia] = props.selectState
+export function MediaGrid({...props}: any) {
+    const {assets, truncate} = props
 
     const bucketRoot = useUIStore((state) => state.bucketRoot)
     // IMPORTANT!
@@ -578,12 +520,11 @@ export function MediaGrid({ ...props }: any) {
                             src={`${bucketRoot}/profiles/${assets[0].data.url}`}
                             alt=""
                             className="aspect-w-10 aspect-h-7 w-full rounded object-cover"
-                            onClick={() => setSelectedMedia(assets[0])}
                         />
                     )}
 
                     {assets[0].type === 'video' && (
-                        <video src={`${bucketRoot}/profiles/${assets[0].data.url}`} className="aspect-w-10 aspect-h-7 rounded object-cover" controls />
+                        <video src={`${bucketRoot}/profiles/${assets[0].data.url}`} className="aspect-w-10 aspect-h-7 rounded object-cover" controls/>
                     )}
                 </div>
 
@@ -608,7 +549,6 @@ export function MediaGrid({ ...props }: any) {
                                                     src={`${bucketRoot}/profiles/${object.data.url}`}
                                                     alt=""
                                                     className="aspect-square h-full w-full object-cover"
-                                                    onClick={() => setSelectedMedia(object)}
                                                 />
 
                                                 {assets.length > 4 && (
@@ -628,8 +568,8 @@ export function MediaGrid({ ...props }: any) {
                                 switch (object.type) {
                                     case 'image':
                                         return (
-                                            <div key={objectIndex} className={`aspect-square w-full overflow-hidden rounded`} onClick={() => setSelectedMedia(object)}>
-                                                <img src={`${bucketRoot}/profiles/${object.data.url}`} alt="" className="aspect-square h-full w-full object-cover" />
+                                            <div key={objectIndex} className={`aspect-square w-full overflow-hidden rounded`}>
+                                                <img src={`${bucketRoot}/profiles/${object.data.url}`} alt="" className="aspect-square h-full w-full object-cover"/>
                                             </div>
                                         )
                                 }
@@ -642,11 +582,11 @@ export function MediaGrid({ ...props }: any) {
     )
 }
 
-export function CommentBox({ ...props }: any) {
-    const { originalPost, onComment } = props
+export function CommentBox({...props}: any) {
+    const {originalPost, onComment} = props
     const [commentSubmitting, setCommentSubmitting] = useState(false)
     const commentRef = useRef<HTMLInputElement>(null)
-    const { user } = useUserAccountStore()
+    const {user} = useUserAccountStore()
 
     const createComment = (e?: { preventDefault: () => void }) => {
         if (e) e.preventDefault()
@@ -656,9 +596,9 @@ export function CommentBox({ ...props }: any) {
             body: commentRef.current?.value,
         }
 
-        vg.howl({ id: originalPost.id })
+        vg.howl({id: originalPost.id})
             .comment.post(commentBody)
-            .then(({ data, error }) => {
+            .then(({data, error}) => {
                 console.log(data, error)
                 setCommentSubmitting(false)
                 if (error) {
@@ -681,7 +621,7 @@ export function CommentBox({ ...props }: any) {
             {!props.truncate && (
                 <div className="mb-4 flex items-center space-x-2">
                     <div className="shrink-0">
-                        <img className="h-8 w-8 rounded-full" src={user.images?.avatar || `/img/default-avatar.png`} alt="" />
+                        <img className="h-8 w-8 rounded-full" src={user.images?.avatar || `/img/default-avatar.png`} alt=""/>
                     </div>
                     <div className="min-w-0 flex-1">
                         <p className="text-default cursor-pointer text-sm font-medium hover:underline">
@@ -708,13 +648,13 @@ export function CommentBox({ ...props }: any) {
                     ref={commentRef}
                 />
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <img className="h-5 w-5 rounded-full" src={user.images?.avatar || `/img/default-avatar.png`} alt="" />
+                    <img className="h-5 w-5 rounded-full" src={user.images?.avatar || `/img/default-avatar.png`} alt=""/>
                 </div>
                 <div className="absolute inset-y-0 right-0 flex cursor-pointer items-center py-2 pr-2">
                     {commentSubmitting ? (
-                        <img className="h-5 w-5 animate-spin dark:invert" src={`/img/symbolic/process-working.symbolic.png`} alt="Process working spinner" />
+                        <img className="h-5 w-5 animate-spin dark:invert" src={`/img/symbolic/process-working.symbolic.png`} alt="Process working spinner"/>
                     ) : (
-                        <PaperAirplaneIcon className="text-default h-5 w-5" onClick={createComment} />
+                        <PaperAirplaneIcon className="text-default h-5 w-5" onClick={createComment}/>
                     )}
                 </div>
             </div>

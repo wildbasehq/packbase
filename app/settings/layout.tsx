@@ -9,15 +9,15 @@ import Link from '@/components/shared/link'
 import Image from 'next/image'
 import WolfoxDrawing from '@/public/img/illustrations/wolfox-drawing.png'
 import {Input} from '@/components/shared/input/text'
-import {Button} from '@/components/shared/button'
+import {Button} from '@/components/shared/experimental-button-rework'
 import {vg} from '@/lib/api'
 import GridBody from '@/components/layout/grid-body'
 
-export default function Settings({ children }: { children: React.ReactNode }) {
-    const { user } = useUserAccountStore()
+export default function Settings({children}: { children: React.ReactNode }) {
+    const {user} = useUserAccountStore()
     const router = useRouter()
-    const { setNavigation } = useUIStore()
-    const { setCurrentResource } = useResourceStore()
+    const {setNavigation} = useUIStore()
+    const {setCurrentResource} = useResourceStore()
 
     useEffect(() => {
         setNavigation([
@@ -45,7 +45,7 @@ export default function Settings({ children }: { children: React.ReactNode }) {
                 invite_code: formData.get('invite_code')?.toString() || '',
                 username: formData.get('username')?.toString() || '',
             })
-            .then(({ status, data, error }) => {
+            .then(({status, data, error}) => {
                 if (status === 200) window.location.reload()
                 else {
                     if (status === 422) {
@@ -82,9 +82,9 @@ export default function Settings({ children }: { children: React.ReactNode }) {
                     </div>
                     <div className="mt-12 flex flex-col">
                         <form onSubmit={submitInviteCode} className="flex gap-2">
-                            <Input name="username" placeholder="Desired username" className="w-full" required />
-                            <Input name="invite_code" placeholder="Invite Code" className="w-full" required />
-                            <Button>Submit</Button>
+                            <Input name="username" placeholder="Desired username" className="w-full" required/>
+                            <Input name="invite_code" placeholder="Invite Code" className="w-full" required/>
+                            <Button color="indigo">Submit</Button>
                         </form>
                         <Text alt size="sm">
                             Enter the invite code you received.
@@ -92,7 +92,7 @@ export default function Settings({ children }: { children: React.ReactNode }) {
                     </div>
                 </div>
                 <div className="hidden aspect-square items-center lg:flex">
-                    <Image src={WolfoxDrawing} alt="LITTLE BABY BOY" className="w-auto" height={3000} width={3000} />
+                    <Image src={WolfoxDrawing} alt="LITTLE BABY BOY" className="w-auto" height={3000} width={3000}/>
                 </div>
             </GridBody>
         )

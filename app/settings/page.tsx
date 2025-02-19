@@ -1,5 +1,5 @@
 'use client'
-import {Button} from '@/components/shared/button'
+import {Button} from '@/components/shared/experimental-button-rework'
 import Avatar from '@/components/shared/user/avatar'
 import {ArrowUpRightIcon, PhotoIcon, UserCircleIcon} from '@heroicons/react/24/solid'
 import {useEffect, useState} from 'react'
@@ -12,7 +12,7 @@ import {toast} from 'sonner'
 import {LoadingCircle} from 'components/icons'
 
 export default function SettingsGeneral() {
-    const { user } = useUserAccountStore()
+    const {user} = useUserAccountStore()
     const [submitting, setSubmitting] = useState<boolean>(false)
     const [handleInput, setHandleInput] = useState<string | undefined>(user?.username.indexOf('@') > -1 ? undefined : user?.username)
     const [slugInput, setSlugInput] = useState<string | undefined>(user?.slug)
@@ -69,18 +69,18 @@ export default function SettingsGeneral() {
                     header: coverPicPreview,
                 },
             })
-            .then(({ data, error }) => {
+            .then(({data, error}) => {
                 if (data && !error) {
                     toast.success('Profile updated')
                     window.location.reload()
                 } else {
                     setSubmitting(false)
-                    toast.error("Couldn't save: " + (error.value ? `${error.status}: ${error.value.message}` : 'Something went wrong'))
+                    toast.error('Couldn\'t save: ' + (error.value ? `${error.status}: ${error.value.message}` : 'Something went wrong'))
                 }
             })
             .catch((err) => {
                 setSubmitting(false)
-                toast.error("Couldn't save: " + (err.message ? `${err.cause}: ${err.message}` : 'Something went wrong'))
+                toast.error('Couldn\'t save: ' + (err.message ? `${err.cause}: ${err.message}` : 'Something went wrong'))
             })
     }
 
@@ -121,7 +121,8 @@ export default function SettingsGeneral() {
                                     </Text>
                                 </label>
                                 <div className="mt-2">
-                                    <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
+                                    <div
+                                        className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
                                         <input
                                             type="text"
                                             name="slug"
@@ -140,7 +141,8 @@ export default function SettingsGeneral() {
                                 </div>
 
                                 <div className="mt-2">
-                                    <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
+                                    <div
+                                        className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
                                         <span className="flex select-none items-center pl-3 text-neutral-500 sm:text-sm">@</span>
                                         <input
                                             type="text"
@@ -164,7 +166,8 @@ export default function SettingsGeneral() {
                                     Display Name
                                 </label>
                                 <div className="mt-2">
-                                    <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
+                                    <div
+                                        className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
                                         <input
                                             type="text"
                                             name="display_name"
@@ -191,7 +194,7 @@ export default function SettingsGeneral() {
                                         id="about"
                                         name="about"
                                         rows={3}
-                                        className="no-legacy text-default bg-default block w-full rounded-md border-0 py-1.5 shadow-xs ring-1 ring-inset ring-neutral-300 placeholder:text-neutral-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:ring-neutral-800 sm:text-sm sm:leading-6"
+                                        className="no-legacy text-default bg-default block w-full rounded-md border-0 px-3 py-1.5 shadow-xs ring-1 ring-inset ring-neutral-300 placeholder:text-neutral-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:ring-neutral-800 sm:text-sm sm:leading-6"
                                         defaultValue={user?.about?.bio || ''}
                                         onChange={(e) => setAboutInput(e.target.value)}
                                     />
@@ -199,7 +202,7 @@ export default function SettingsGeneral() {
                                 <p className="text-alt mt-3 select-none text-sm leading-6">
                                     Write a few sentences about yourself.{' '}
                                     <a href="https://commonmark.org/help/" target="_blank" rel="noopener noreferrer" className="text-primary">
-                                        Markdown <ArrowUpRightIcon className="inline h-4 w-4" />
+                                        Markdown <ArrowUpRightIcon className="inline h-4 w-4"/>
                                     </a>{' '}
                                     is supported.
                                 </p>
@@ -219,11 +222,11 @@ export default function SettingsGeneral() {
                                 />
                                 <div className="mt-2 flex items-center gap-x-3">
                                     {!profilePicPreview ? (
-                                        <UserCircleIcon className="text-alt h-12 w-12" aria-hidden="true" />
+                                        <UserCircleIcon className="text-alt h-12 w-12" aria-hidden="true"/>
                                     ) : (
-                                        <Avatar icon={profilePicPreview} size="lg" />
+                                        <Avatar icon={profilePicPreview} size="lg"/>
                                     )}
-                                    <Button asChild variant="outline" onClick={() => document.getElementById('avatar')?.click()}>
+                                    <Button outline onClick={() => document.getElementById('avatar')?.click()}>
                                         <div>Upload</div>
                                     </Button>
                                 </div>
@@ -241,10 +244,10 @@ export default function SettingsGeneral() {
                                     onClick={() => document.getElementById('cover-photo')?.click()}
                                 >
                                     {coverPicPreview && (
-                                        <img src={coverPicPreview} alt="" className="absolute inset-0 h-full w-full rounded-lg object-cover opacity-50 blur-lg" />
+                                        <img src={coverPicPreview} alt="" className="absolute inset-0 h-full w-full rounded-lg object-cover opacity-50 blur-lg"/>
                                     )}
                                     <div className="items-center justify-center text-center">
-                                        <PhotoIcon className="text-alt mx-auto h-12 w-12" aria-hidden="true" />
+                                        <PhotoIcon className="text-alt mx-auto h-12 w-12" aria-hidden="true"/>
                                         <div className="text-alt mt-4 flex select-none text-sm leading-6">
                                             <label
                                                 htmlFor="cover-photo"
@@ -274,10 +277,11 @@ export default function SettingsGeneral() {
                 <div className="mt-6 flex items-center justify-end gap-x-6">
                     <Button
                         type="submit"
+                        color="indigo"
                         disabled={submitting}
                         className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
-                        {!submitting ? 'Save' : <LoadingCircle />}
+                        {!submitting ? 'Save' : <LoadingCircle/>}
                     </Button>
                 </div>
             </form>

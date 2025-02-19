@@ -40,7 +40,7 @@ export default function PackSwitcher() {
     }
 
     return (
-        <div className="min-w-18 relative z-50 flex h-full flex-col items-center gap-4 border-r bg-n-8 p-4">
+        <div className="min-w-18 relative flex h-full flex-col items-center border-r gap-4 p-4">
             <Tooltip content="Home" side="right">
                 <div
                     className={cn(
@@ -95,7 +95,7 @@ export default function PackSwitcher() {
             {user && !user.anonUser && (
                 <Tooltip content="Create/Join Pack" side="right" delayDuration={0}>
                     <Link href="/p/new" className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === 'new' && 'force-pill')}>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 p-1 text-white">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 p-1">
                             <PlusIcon/>
                         </Button>
                     </Link>
@@ -106,7 +106,7 @@ export default function PackSwitcher() {
 
             <Tooltip content="Settings" side="right" delayDuration={0}>
                 <Link href="/settings" className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === 'settings' && 'force-pill')}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white">
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
                         <SettingsIcon/>
                     </Button>
                 </Link>

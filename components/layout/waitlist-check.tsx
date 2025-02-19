@@ -33,7 +33,7 @@ const ServiceStates: {
         icon: MailQuestionIcon,
         color: 'text-orange-500',
         status: 'Waiting',
-        text: "You're on the waitlist. You'll need an invite code from someone, or wait for us to open.",
+        text: 'You\'re on the waitlist. You\'ll need an invite code from someone, or wait for us to open.',
     },
     dummy: {
         icon: LoadingCircle,
@@ -44,7 +44,7 @@ const ServiceStates: {
 
 export default function WaitlistCheck() {
     const location = usePathname()
-    const { user } = useUserAccountStore()
+    const {user} = useUserAccountStore()
     const [serviceStatus, setServiceStatus] = useState<'dummy' | 'free' | 'ban' | 'wait'>('dummy')
 
     useEffect(() => {
@@ -55,13 +55,13 @@ export default function WaitlistCheck() {
     if (!user || !user.anonUser) return <></>
     return (
         <div
-            className={`bg-sidebar relative flex select-none items-start justify-between gap-x-8 gap-y-4 overflow-hidden border-b px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:px-6 lg:px-8 ${
+            className={`bg-sidebar relative flex select-none items-start justify-between gap-x-8 gap-y-4 overflow-hidden border-b px-4 py-5 shadow-sm sm:flex-row sm:items-center sm:px-6 lg:px-8 ${
                 serviceStatus === 'dummy' && 'shimmer-template before:animate-[shimmer_1s_linear_infinite]'
             }`}
         >
             <div>
                 <div className="flex items-center gap-x-3">
-                    <CurrentServiceIcon className={cn('h-7 w-7 flex-none rounded-md p-1', ServiceStates[serviceStatus].color || '')} />
+                    <CurrentServiceIcon className={cn('h-7 w-7 flex-none rounded-md p-1', ServiceStates[serviceStatus].color || '')}/>
                     <h1 className="flex gap-x-3 text-base leading-7">
                         <span className="text-default font-semibold">Status</span>
                         <span className="text-alt">:</span>
@@ -73,7 +73,7 @@ export default function WaitlistCheck() {
 
             {(location !== '/' && location !== '/p/universe') && (
                 <div className="elastic-bounce pointer-events-none h-12 w-24 flex-none sm:w-32">
-                    <Image src={Dog} alt="Dog" layout="responsive" />
+                    <Image src={Dog} alt="Dog" layout="responsive"/>
                 </div>
             )}
         </div>

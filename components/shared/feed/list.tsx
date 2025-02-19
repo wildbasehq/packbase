@@ -7,7 +7,7 @@ import WireframeGrid from '@/components/icons/wireframe-grid'
 import WireframeList from '@/components/icons/wireframe-list'
 import SelectMenu from '@/components/shared/input/select-dropdown'
 import {Heading, Text} from '@/components/shared/text'
-import {Button} from '@/components/shared/button'
+import {Button} from '@/components/shared/experimental-button-rework'
 import {vg} from '@/lib/api'
 import {useUISettingsStore, useUIStore} from '@/lib/states'
 import {HelpCircleIcon} from 'lucide-react'
@@ -21,41 +21,38 @@ import {ProjectSafeName} from '@/lib/utils'
 import UserAvatar from '@/components/shared/user/avatar'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import WrenchCharacter from '@/public/svg/wrench-character.svg'
-import Link from '@/components/shared/link'
 
 export default function FeedList({
-    packID = '00000000-0000-0000-0000-000000000000',
-    changingView,
-    setChangingView,
-}: {
+                                     packID = '00000000-0000-0000-0000-000000000000',
+                                     changingView,
+                                     setChangingView,
+                                 }: {
     packID?: string
     changingView?: boolean
     setChangingView?: any
 }) {
-    const { maintenance } = useUIStore()
+    const {maintenance} = useUIStore()
 
     if (maintenance) {
         return (
             <div className="flex flex-col items-center justify-center">
                 <Alert className="max-w-4xl">
                     <AlertTitle>
-                        <WrenchScrewdriverIcon className="text-default -mt-1 mr-1 inline-block h-4 w-4" />
+                        <WrenchScrewdriverIcon className="text-default -mt-1 mr-1 inline-block h-4 w-4"/>
                         Feed Maintenance
                     </AlertTitle>
                     <AlertDescription className="grid grid-cols-2">
                         <span>
                             The feed is currently under maintenance and can't be used. Please check again later!
-                            <br />
-                            <br />
+                            <br/>
+                            <br/>
                             {maintenance}
-                            <br />
-                            <br />
-                            <Link href="https://discord.gg/StuuK55gYA" target="_blank" className="underline">
-                                <Button variant="primary">Discord</Button>
-                            </Link>{' '}
+                            <br/>
+                            <br/>
+                            <Button color="indigo" href="https://discord.gg/StuuK55gYA" target="_blank">Discord</Button>{' '}
                         </span>
                         <div className="flex items-center justify-end">
-                            <Image src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto" />
+                            <Image src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto"/>
                         </div>
                     </AlertDescription>
                 </Alert>
@@ -71,7 +68,7 @@ export default function FeedList({
     const [posts, setPosts] = useState<any>([])
     const [masonryColumns, setMasonryColumns] = useState<{
         [key: number]: number
-    }>({ 350: 1 })
+    }>({350: 1})
 
     const FeedViewConfig = useUISettingsStore((state) => state.feedView)
 
@@ -95,19 +92,19 @@ export default function FeedList({
         switch (FeedViewConfig) {
             default:
             case 1:
-                setMasonryColumns({ 750: 1, 1080: 2, 1360: 3, 1640: 4 })
+                setMasonryColumns({750: 1, 1080: 2, 1360: 3, 1640: 4})
                 break
             case 2:
-                setMasonryColumns({ 350: 1 })
+                setMasonryColumns({350: 1})
                 break
         }
     }, [FeedViewConfig])
 
     const fetchPosts = (source?: string, clearPosts = false) => {
         if (source) console.log(`Fetching howls for ${packID} from ${source}...`)
-        vg.feed({ id: packID })
-            .get({ query: { page: postsCurrentPage } })
-            .then(({ data, error }) => {
+        vg.feed({id: packID})
+            .get({query: {page: postsCurrentPage}})
+            .then(({data, error}) => {
                 if (error) {
                     console.error(data) // @TODO: This returns [object Object] no matter what? Why?
                     setPosts([])
@@ -158,7 +155,7 @@ export default function FeedList({
         return (
             <>
                 <Heading className="items-center">
-                    <HandRaisedIcon className="text-default mr-1 inline-block h-6 w-6" />
+                    <HandRaisedIcon className="text-default mr-1 inline-block h-6 w-6"/>
                     {ProjectSafeName} can't continue
                 </Heading>
                 <p className="text-alt mt-1 text-sm leading-6">
@@ -193,7 +190,7 @@ export default function FeedList({
                     {changingView && (
                         <Card className="absolute right-0 top-0 z-50 mr-10 mt-40 gap-2 shadow-2xl">
                             <Heading size="lg" className="flex w-full! items-center">
-                                <HelpCircleIcon className="mr-2 inline-block h-5 w-5" />
+                                <HelpCircleIcon className="mr-2 inline-block h-5 w-5"/>
                                 Feed View
                                 {/*<span className="flex-1" />*/}
                                 {/*<MagicElement numSparkles={2}>*/}
@@ -211,7 +208,7 @@ export default function FeedList({
                             {/*    * Wolfbite Labs aren&apos;t responsible for any damages caused by third-party scripts.*/}
                             {/*    Always check the source code before installing.*/}
                             {/*</Text>*/}
-                            <FeedListViewControls callback={() => setChangingView(false)} />
+                            <FeedListViewControls callback={() => setChangingView(false)}/>
                         </Card>
                     )}
 
@@ -226,7 +223,7 @@ export default function FeedList({
                                 dataLength={posts.length}
                                 next={() => fetchPosts('infinite_scroll')}
                                 hasMore={postsHasMore}
-                                loader={<LoadingCardSmall />}
+                                loader={<LoadingCardSmall/>}
                                 endMessage={
                                     <Text alt className="pt-8 text-center">
                                         And just like that, you've reached the end of it all.
@@ -240,7 +237,7 @@ export default function FeedList({
                                         {/*{(packID === '00000000-0000-0000-0000-000000000000' || packID === 'universe') ? (*/}
                                         <Card>
                                             <Heading size="xs" className="mb-1 flex items-center">
-                                                <MegaphoneIcon className="mr-2 inline-block h-5 w-5" />
+                                                <MegaphoneIcon className="mr-2 inline-block h-5 w-5"/>
                                                 <span>PACK ANNOUNCEMENT</span>
                                             </Heading>
                                             <Text size="sm">
@@ -264,7 +261,7 @@ export default function FeedList({
                                         {/*)}*/}
 
                                         {posts.map((post: any, i: number) => (
-                                            <FeedListItem key={post.id} post={post} gridTutorialID={changingView ? i : undefined} postState={[posts, setPosts]} />
+                                            <FeedListItem key={post.id} post={post} gridTutorialID={changingView ? i : undefined} postState={[posts, setPosts]}/>
                                         ))}
                                     </Masonry>
                                 </ResponsiveMasonry>
@@ -284,11 +281,11 @@ export default function FeedList({
 }
 
 const views = [
-    { id: 1, name: 'Grid', icon: WireframeGrid, unavailable: false },
-    { id: 2, name: 'List', icon: WireframeList, unavailable: false },
+    {id: 1, name: 'Grid', icon: WireframeGrid, unavailable: false},
+    {id: 2, name: 'List', icon: WireframeList, unavailable: false},
 ]
 
-function FeedListViewControls({ callback }: { callback?: () => void }) {
+function FeedListViewControls({callback}: { callback?: () => void }) {
     const uiOptions = useUISettingsStore((state) => state)
 
     return (
@@ -297,12 +294,12 @@ function FeedListViewControls({ callback }: { callback?: () => void }) {
                 title="View Style"
                 selected={views[uiOptions.feedView - 1]}
                 onChange={(i) => {
-                    uiOptions.setOptions({ feedView: views.indexOf(i) + 1 })
+                    uiOptions.setOptions({feedView: views.indexOf(i) + 1})
                 }}
                 options={views}
             />
 
-            <Button className="mt-4" onClick={() => callback?.()}>
+            <Button color="indigo" className="mt-4" onClick={() => callback?.()}>
                 Done
             </Button>
         </Card>
@@ -310,9 +307,9 @@ function FeedListViewControls({ callback }: { callback?: () => void }) {
 }
 
 export function LoadingCard({
-    title,
-    masonryColumns,
-}: {
+                                title,
+                                masonryColumns,
+                            }: {
     title: string | JSX.Element
     masonryColumns?: {
         [key: number]: number
@@ -356,7 +353,7 @@ export function LoadingCard({
     )
 }
 
-function FeedListItem({ post, gridTutorialID, postState }: { post: any; gridTutorialID?: number; postState: [any, any] }) {
+function FeedListItem({post, gridTutorialID, postState}: { post: any; gridTutorialID?: number; postState: [any, any] }) {
     if (gridTutorialID !== undefined) {
         return (
             <Card
@@ -366,10 +363,10 @@ function FeedListItem({ post, gridTutorialID, postState }: { post: any; gridTuto
                 }}
             >
                 <div className="flex items-center gap-2">
-                    <div className="h-10 w-10 rounded-full bg-surface-variant" />
+                    <div className="h-10 w-10 rounded-full bg-surface-variant"/>
                     <div className="flex flex-col gap-1">
-                        <div className="h-4 w-20 rounded bg-surface-variant" />
-                        <div className="h-4 w-10 rounded bg-surface-variant" />
+                        <div className="h-4 w-20 rounded bg-surface-variant"/>
+                        <div className="h-4 w-10 rounded bg-surface-variant"/>
                     </div>
                 </div>
 

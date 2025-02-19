@@ -1,6 +1,4 @@
 import {Providers} from '@/app/provider'
-import NavBar from '@/components/layout/navbar'
-import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
 import {ProjectSafeName} from '@/lib/utils'
 import {Analytics} from '@vercel/analytics/react'
 import cx from 'classnames'
@@ -15,7 +13,9 @@ import Link from 'next/link'
 import {PackChannels} from '@/components/layout/pack-channels'
 import WaitlistCheck from '@/components/layout/waitlist-check'
 import Preload from '@/app/preload'
-import {Suspense} from 'react'
+import React, {Suspense} from 'react'
+import {SidebarLayout} from '@/components/shared/sidebar-layout'
+import NavBar from '@/components/layout/navbar'
 
 const wildbaseRemix = localFont({
     src: [
@@ -78,22 +78,23 @@ export default async function RootLayout({children}: { children: React.ReactNode
                     </Alert>
                 </div>
             </div>
-            <div id="NGContentArea" className="hidden h-full overflow-hidden sm:flex">
-                <PackSwitcher/>
-                <PackChannels slim={typeof window !== 'undefined' && window.innerWidth < 640}/>
-                <div className="grow">
-                    <NavBar/>
+            <SidebarLayout navbar={<NavBar/>} sidebar={<PackChannels slim={typeof window !== 'undefined' && window.innerWidth < 640}/>}>
+                <div id="NGContentArea" className="hidden h-full overflow-hidden sm:flex">
+                    <div className="grow">
+                        {/*<NavBar/>*/}
 
-                    <main className="flex h-[calc(100%-4rem)] flex-1 overflow-hidden">
-                        <div className="h-full w-full">
-                            <div id="NGRoot" className="h-full overflow-y-auto">
-                                <WaitlistCheck/>
-                                <Preload>{children}</Preload>
+                        {/* h-[calc(100%-4rem)] */}
+                        <main className="flex h-full flex-1">
+                            <div className="h-full w-full">
+                                <div id="NGRoot" className="h-full overflow-y-auto">
+                                    <WaitlistCheck/>
+                                    <Preload>{children}</Preload>
+                                </div>
                             </div>
-                        </div>
-                    </main>
+                        </main>
+                    </div>
                 </div>
-            </div>
+            </SidebarLayout>
 
             {/*<div*/}
             {/*    id="snap-UniverseEntryTest"*/}

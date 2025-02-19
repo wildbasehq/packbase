@@ -10,7 +10,7 @@ import {usePathname} from 'next/navigation'
 import {ArrowUpRightIcon} from 'lucide-react'
 
 export function Sidebar({className, ...props}: React.ComponentPropsWithoutRef<'nav'>) {
-    return <nav {...props} className={clsx(className, 'flex h-full min-h-0 flex-col border-r')}/>
+    return <nav {...props} className={clsx(className, 'flex h-full min-h-0 flex-col')}/>
 }
 
 export function SidebarHeader({className, ...props}: React.ComponentPropsWithoutRef<'div'>) {

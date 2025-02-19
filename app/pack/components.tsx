@@ -5,21 +5,21 @@ import dynamic from 'next/dynamic'
 import Body from '@/components/layout/body'
 import {Heading, Text} from '@/components/shared/text'
 import Link from '@/components/shared/link'
-import {Button} from '@/components/shared/button'
+import {Button} from '@/components/shared/experimental-button-rework'
 import girlDogBusStop from '@/datasets/lottie/girl-dog-bus-stop.json'
 import {LayoutDashboard} from 'lucide-react'
 import FeedList from '@/components/shared/feed/list'
 
 const PackHeader = dynamic(() => import('@/components/shared/pack/header'))
 
-export default function PackFeedController({ overrideFeedID }: { overrideFeedID?: string }) {
-    const { user } = useUserAccountStore()
-    const { currentResource } = useResourceStore()
+export default function PackFeedController({overrideFeedID}: { overrideFeedID?: string }) {
+    const {user} = useUserAccountStore()
+    const {currentResource} = useResourceStore()
 
     const [showFeed, setShowFeed] = useState(false)
     const [shadowSize, setShadowSize] = useState(0)
     const [changingView, setChangingView] = useState(false)
-    const Lottie = memo(dynamic(() => import('lottie-react'), { ssr: false }))
+    const Lottie = memo(dynamic(() => import('lottie-react'), {ssr: false}))
 
     useEffect(() => {
         if (user && !user.anonUser) setShowFeed(true)
@@ -39,7 +39,7 @@ export default function PackFeedController({ overrideFeedID }: { overrideFeedID?
 
     return (
         <>
-            {currentResource && currentResource?.slug !== 'universe' && <PackHeader pack={currentResource} />}
+            {currentResource && currentResource?.slug !== 'universe' && <PackHeader pack={currentResource}/>}
 
             {user?.anonUser && (
                 <Body className="max-w-6xl">
@@ -49,20 +49,21 @@ export default function PackFeedController({ overrideFeedID }: { overrideFeedID?
                             <div className="space-y-2">
                                 <Text size="sm">
                                     If you'd like to participate with the community, you'll need an invite from someone, wait for a completely random invite drop into
-                                    your inbox, or wait for us to open up. <b>You can view packs and profiles, but howls and other data will be completely inaccessible!</b>
-                                    <br />
-                                    <br />
+                                    your inbox, or wait for us to open up. <b>You can view packs and profiles, but howls and other data will be completely
+                                    inaccessible!</b>
+                                    <br/>
+                                    <br/>
                                     If you don't know anyone already in, your best bet is to wait.{' '}
                                     <span className="text-tertiary">If you've traded anything for an invite, you've been scammed.</span>
                                 </Text>
 
                                 <Link href="/settings">
-                                    <Button>I got a code!! yay!</Button>
+                                    <Button color="indigo">I got a code!! yay!</Button>
                                 </Link>
                             </div>
                         </div>
                         <div className="flex items-end justify-end">
-                            <Lottie className="right-0 h-80 w-auto" animationData={girlDogBusStop} />
+                            <Lottie className="right-0 h-80 w-auto" animationData={girlDogBusStop}/>
                         </div>
                     </div>
                 </Body>
@@ -73,20 +74,21 @@ export default function PackFeedController({ overrideFeedID }: { overrideFeedID?
                     {/* Header */}
                     {currentResource && currentResource?.slug === 'universe' && (
                         <div
-                            className="bg-sidebar sticky top-0 z-10 flex items-center justify-between border-b px-8 py-3 backdrop-blur-sm"
+                            className="sticky top-0 z-10 flex items-center justify-between border-b px-8 py-2 backdrop-blur-sm bg-white/95 dark:bg-zinc-900/95"
                             // shadow based on shadowSize value
-                            style={{ boxShadow: `0 0 ${shadowSize}px 0 rgba(0, 0, 0, 0.1)` }}
+                            style={{boxShadow: `0 0 ${shadowSize}px 0 rgba(0, 0, 0, 0.1)`}}
                         >
                             <Heading>Your Galaxy</Heading>
-                            <Button className="items-center" onClick={() => setChangingView(true)}>
-                                <LayoutDashboard className="mr-1 h-6 w-6" />
+                            <Button plain className="items-center" onClick={() => setChangingView(true)}>
+                                <LayoutDashboard className="mr-1 h-6 w-6"/>
                                 Change view
                             </Button>
                         </div>
                     )}
 
                     <div className="p-8">
-                        <FeedList packID={overrideFeedID || (currentResource?.slug === 'universe' ? 'universe:home' : currentResource?.id)} changingView={changingView} setChangingView={setChangingView} />
+                        <FeedList packID={overrideFeedID || (currentResource?.slug === 'universe' ? 'universe:home' : currentResource?.id)} changingView={changingView}
+                                  setChangingView={setChangingView}/>
                     </div>
                 </div>
             )}

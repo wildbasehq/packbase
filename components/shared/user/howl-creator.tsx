@@ -11,15 +11,33 @@ import {toast} from 'sonner'
 import {useResourceStore, useUserAccountStore} from '@/lib/states'
 import {Editor} from '@/components/novel'
 import {LinkIcon} from '@heroicons/react/24/solid'
-import Modal from '@/components/modal'
 import {Alert, AlertTitle} from '@/components/shared/alert'
 import {QuestionMarkCircleIcon, XCircleIcon} from '@heroicons/react/20/solid'
 import clsx from 'clsx'
 import Tooltip from '@/components/shared/tooltip'
+import {useModal} from '@/components/modal/provider'
 
 export default function HowlCreator() {
     const {user} = useUserAccountStore()
     const {currentResource} = useResourceStore()
+
+    const {show} = useModal()
+
+    return (
+        <>
+            {!user.reqOnboard && !currentResource.temporary && (
+                <Button outline className="w-full mb-2" onClick={() => show(<HowlCard/>)}>
+                    + Howl {!currentResource.standalone && `in ${currentResource.display_name}`}
+                </Button>
+            )}
+        </>
+    )
+}
+
+function HowlCard() {
+    const {user} = useUserAccountStore()
+    const {currentResource} = useResourceStore()
+
     const [submitting, setSubmitting] = useState<boolean>(false)
     const [showModal, setShowModal] = useState<boolean>(false)
     const [attachments, setAttachments] = useState<{ bright: boolean; data: string }[]>([])
@@ -135,106 +153,96 @@ export default function HowlCreator() {
     }
 
     return (
-        <>
-            {!user.reqOnboard && !currentResource.temporary && (
-                <Button outline className="w-full" onClick={() => setShowModal(true)}>
-                    + Howl {!currentResource.standalone && `in ${currentResource.display_name}`}
-                </Button>
+        <Card className="px-0! py-0! min-w-[32rem]">
+            {!currentResource.standalone && (
+                <Alert className="rounded-none! border-0!">
+                    <AlertTitle className="flex items-center">
+                        <UserAvatar name={currentResource.display_name} size={24} user={currentResource} className="mr-2 inline-flex"/>
+                        {currentResource.display_name}
+                        <Tooltip
+                            content={`Howling into ${currentResource.display_name}. This howl will be visible to all members of this pack regardless of your settings.`}
+                            side="right"
+                        >
+                            <QuestionMarkCircleIcon className="text-alt ml-1 h-4 w-4"/>
+                        </Tooltip>
+                    </AlertTitle>
+                </Alert>
             )}
+            <form onSubmit={submitPost}>
+                <div className="relative border-t">
+                    <div className="px-4 pt-5 sm:px-6">
+                        <div className="flex space-x-3">
+                            <div className="shrink-0">
+                                <UserAvatar user={user}/>
+                            </div>
+                            <div className="flex min-w-0 flex-1 flex-col justify-center">
+                                <Link href={`/@${user?.username}/`} className="text-default font-medium">
+                                    {user.display_name || user.username}
+                                </Link>
+                                <Text>New Howl</Text>
+                            </div>
+                            <div className="flex shrink-0 space-x-2 self-center">
+                                <DotIcon/>
+                            </div>
+                        </div>
+                    </div>
 
-            <Modal showModal={showModal} setShowModal={setShowModal}>
-                <Card className="px-0! py-0!">
-                    {!currentResource.standalone && (
-                        <Alert className="rounded-none! border-0!">
-                            <AlertTitle className="flex items-center">
-                                <UserAvatar name={currentResource.display_name} size={24} user={currentResource} className="mr-2 inline-flex"/>
-                                {currentResource.display_name}
-                                <Tooltip
-                                    content={`Howling into ${currentResource.display_name}. This howl will be visible to all members of this pack regardless of your settings.`}
-                                    side="right"
+                    <div className="min-h-fit w-full px-4 py-4 sm:px-6">
+                        <Editor
+                            onUpdate={(e) => {
+                                setBody(e?.storage.markdown.getMarkdown())
+                            }}
+                        />
+                    </div>
+                </div>
+
+                <div className="justify-between space-y-4 border-t px-4 py-4 sm:px-6">
+                    <div className="flex w-full items-center space-x-6">
+                        <div className="ml-auto flex items-center space-x-5">
+                            <div className="flex items-center">
+                                <button
+                                    type="button"
+                                    className="-m-2.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
+                                    onClick={() => fileInputRef.current?.click()}
                                 >
-                                    <QuestionMarkCircleIcon className="text-alt ml-1 h-4 w-4"/>
-                                </Tooltip>
-                            </AlertTitle>
-                        </Alert>
+                                    <span className="sr-only">Insert link</span>
+                                    <LinkIcon className="h-5 w-5" aria-hidden="true"/>
+                                </button>
+                            </div>
+                            <input
+                                type="file"
+                                name="assets"
+                                id="assets"
+                                className="hidden"
+                                accept="image/*"
+                                ref={fileInputRef}
+                                onChange={(e) => addAttachment(e.target.files?.[0] || null)}
+                            />
+                        </div>
+                        <div className="flex-1"/>
+                        <Button type="submit" color="indigo" disabled={submitting}>{!submitting ? 'Post' : <LoadingCircle/>}</Button>
+                    </div>
+
+                    {attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-7">
+                            {attachments.map((attachment: any, idx: number) => (
+                                <div key={idx} className="relative">
+                                    <img src={attachment.data} alt="" className="h-20 w-20 rounded object-cover"/>
+                                    <Button
+                                        type="button"
+                                        outline
+                                        className={clsx('absolute right-0 top-0 h-5 w-5', attachment.bright ? 'text-alt' : 'text-white')}
+                                        onClick={() => removeAttachment(idx)}
+                                    >
+                                        <span className="sr-only">Remove</span>
+                                        <XCircleIcon className="h-5 w-5" aria-hidden="true"/>
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
                     )}
-                    <form onSubmit={submitPost}>
-                        <div className="relative border-t">
-                            <div className="px-4 pt-5 sm:px-6">
-                                <div className="flex space-x-3">
-                                    <div className="shrink-0">
-                                        <UserAvatar user={user}/>
-                                    </div>
-                                    <div className="flex min-w-0 flex-1 flex-col justify-center">
-                                        <Link href={`/@${user?.username}/`} className="text-default font-medium">
-                                            {user.display_name || user.username}
-                                        </Link>
-                                        <Text>New Howl</Text>
-                                    </div>
-                                    <div className="flex shrink-0 space-x-2 self-center">
-                                        <DotIcon/>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="min-h-fit w-full px-4 py-4 sm:px-6">
-                                <Editor
-                                    onUpdate={(e) => {
-                                        setBody(e?.storage.markdown.getMarkdown())
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="justify-between space-y-4 border-t px-4 py-4 sm:px-6">
-                            <div className="flex w-full items-center space-x-6">
-                                <div className="ml-auto flex items-center space-x-5">
-                                    <div className="flex items-center">
-                                        <button
-                                            type="button"
-                                            className="-m-2.5 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:text-gray-500"
-                                            onClick={() => fileInputRef.current?.click()}
-                                        >
-                                            <span className="sr-only">Insert link</span>
-                                            <LinkIcon className="h-5 w-5" aria-hidden="true"/>
-                                        </button>
-                                    </div>
-                                    <input
-                                        type="file"
-                                        name="assets"
-                                        id="assets"
-                                        className="hidden"
-                                        accept="image/*"
-                                        ref={fileInputRef}
-                                        onChange={(e) => addAttachment(e.target.files?.[0] || null)}
-                                    />
-                                </div>
-                                <div className="flex-1"/>
-                                <Button type="submit" color="indigo" disabled={submitting}>{!submitting ? 'Post' : <LoadingCircle/>}</Button>
-                            </div>
-
-                            {attachments.length > 0 && (
-                                <div className="flex flex-wrap gap-7">
-                                    {attachments.map((attachment: any, idx: number) => (
-                                        <div key={idx} className="relative">
-                                            <img src={attachment.data} alt="" className="h-20 w-20 rounded object-cover"/>
-                                            <Button
-                                                type="button"
-                                                outline
-                                                className={clsx('absolute right-0 top-0 h-5 w-5', attachment.bright ? 'text-alt' : 'text-white')}
-                                                onClick={() => removeAttachment(idx)}
-                                            >
-                                                <span className="sr-only">Remove</span>
-                                                <XCircleIcon className="h-5 w-5" aria-hidden="true"/>
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </form>
-                </Card>
-            </Modal>
-        </>
+                </div>
+            </form>
+        </Card>
     )
 }

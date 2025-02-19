@@ -4,7 +4,7 @@ import {Input} from '@/components/shared/input/text'
 import {Logo} from '@/components/shared/logo'
 import {Heading, Text} from '@/components/shared/text'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
-import {Button} from '@/components/shared/button'
+import {Button} from '@/components/shared/experimental-button-rework'
 import {ProjectSafeName} from '@/lib/utils'
 import {MailQuestion} from 'lucide-react'
 import {FormEvent, useRef, useState} from 'react'
@@ -50,7 +50,7 @@ export default function IDCreate() {
     return (
         <>
             <div>
-                <Logo className="h-12! w-12!" />
+                <Logo className="h-12! w-12!"/>
                 <Heading className="mt-6" size="2xl" as="h2">
                     Create a new account
                 </Heading>
@@ -81,14 +81,14 @@ export default function IDCreate() {
 
                 <Alert>
                     <AlertTitle>
-                        <MailQuestion className="inline-flex h-5 w-5" /> You'll need an invite code
+                        <MailQuestion className="inline-flex h-5 w-5"/> You'll need an invite code
                     </AlertTitle>
                     <AlertDescription>
                         <p>
                             It's required in the next step. Don't have one? If a friend of yours does, they can generate one for you!
                         </p>
                         <p className="text-tertiary">
-                            <br />
+                            <br/>
                             If you've traded anything for an invite, whether it be an art trade, or even money, you've been scammed.
                         </p>
                     </AlertDescription>
@@ -96,7 +96,7 @@ export default function IDCreate() {
 
                 <form method="POST" className="space-y-6" onSubmit={createUser}>
                     <div>
-                        <Input id="email" type="email" label="Email Address" required />
+                        <Input id="email" type="email" label="Email Address" required/>
                     </div>
 
                     <div>
@@ -136,12 +136,12 @@ export default function IDCreate() {
 
                     <div>
                         <Button
-                            variant="default"
+                            color="indigo"
                             type="submit"
                             disabled={submitting}
                             className="flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
-                            {!submitting ? 'Register' : <LoadingCircle />}
+                            {!submitting ? 'Register' : <LoadingCircle/>}
                         </Button>
                     </div>
                 </form>
