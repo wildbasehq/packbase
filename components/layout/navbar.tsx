@@ -31,7 +31,7 @@ export default function NavBar() {
             <div className={`${hidden ? '' : '!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}>
                 {hidden ? (
                     <Link className="flex-1" href="/">
-                        <Logo className="h-8 w-fit"/>
+                        <Logo className="h-8"/>
                     </Link>
                 ) : (
                     <div className="flex-1"/>
