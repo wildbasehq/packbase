@@ -12,6 +12,7 @@ import {Input} from '@/components/shared/input/text'
 import {Button} from '@/components/shared/experimental-button-rework'
 import {vg} from '@/lib/api'
 import GridBody from '@/components/layout/grid-body'
+import {EnvelopeIcon, EnvelopeOpenIcon} from '@heroicons/react/16/solid'
 
 export default function Settings({children}: { children: React.ReactNode }) {
     const {user} = useUserAccountStore()
@@ -20,14 +21,32 @@ export default function Settings({children}: { children: React.ReactNode }) {
     const {setCurrentResource} = useResourceStore()
 
     useEffect(() => {
-        setNavigation([
-            {
-                name: 'General',
-                description: '',
-                href: '/settings',
-                icon: Cog6ToothIcon,
-            },
-        ])
+        if (!user || user?.anonUser) {
+            setNavigation([
+                {
+                    name: 'Enter Invite',
+                    description: '',
+                    href: '/settings',
+                    icon: EnvelopeIcon,
+                }
+            ])
+        } else {
+            setNavigation([
+                {
+                    name: 'General',
+                    description: '',
+                    href: '/settings',
+                    icon: Cog6ToothIcon,
+                },
+                {
+                    name: 'Invite',
+                    href: '/settings/invite',
+                    description: 'Invite a friend to join the community',
+                    icon: EnvelopeOpenIcon,
+                }
+            ])
+        }
+
         setCurrentResource(settingsResource)
     }, [])
 
