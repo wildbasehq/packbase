@@ -1,5 +1,4 @@
 const utwm = require('unplugin-tailwindcss-mangle/webpack')
-const nextBuildId = require('next-build-id')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -29,14 +28,9 @@ const nextConfig = {
     env: {
         NEXT_PUBLIC_SUPABASE_URL: process.env.SUPABASE_URL,
         NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
-        
+
         NEXT_PUBLIC_POSTHOG_KEY: process.env.POSTHOG_KEY,
         NEXT_PUBLIC_POSTHOG_HOST: process.env.POSTHOG_HOST,
-
-        NEXT_PUBLIC_BUILD_ID: nextBuildId.sync({
-            dir: __dirname,
-            describe: true,
-        }),
     },
     webpack: (config) => {
         if (process.env.NODE_ENV === 'production') {
