@@ -4,7 +4,6 @@ import {Button} from '@/components/shared/button'
 import Tooltip from '@/components/shared/tooltip'
 import {HelpCircleIcon} from 'lucide-react'
 import Link from '@/components/shared/link'
-import Countdown from '@/components/home/countdown'
 import {Gradient} from '@/components/shared/gradient'
 import {Container} from '@/components/layout/container'
 import Image from 'next/image'
@@ -100,7 +99,7 @@ export default function GuestLanding() {
         <div className="overflow-hidden space-y-8">
             <Hero/>
             <div className="mx-auto flex w-full max-w-7xl flex-col px-8">
-                <Countdown/>
+                {/*<Countdown/>*/}
 
                 {/* Groups */}
                 <div className="overflow-hidden lg:py-24">
