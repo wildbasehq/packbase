@@ -75,12 +75,12 @@ export default function SettingsGeneral() {
                     window.location.reload()
                 } else {
                     setSubmitting(false)
-                    toast.error('Couldn\'t save: ' + (error.value ? `${error.status}: ${error.value.message}` : 'Something went wrong'))
+                    toast.error('Couldn\'t save: ' + (error.value ? `${error.status}: ${error.value.summary || error.value.error}` : 'Something went wrong'))
                 }
             })
             .catch((err) => {
                 setSubmitting(false)
-                toast.error('Couldn\'t save: ' + (err.message ? `${err.cause}: ${err.message}` : 'Something went wrong'))
+                toast.error('Couldn\'t save: ' + (err.message ? `${err.cause}: ${err}` : 'Something went wrong'))
             })
     }
 

@@ -4,7 +4,7 @@ import {Button} from '@/components/shared/button'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
 
-export default function PackHeader({ ...props }: any) {
+export default function PackHeader({...props}: any) {
     const pack = props.pack
 
     return (
@@ -35,7 +35,7 @@ export default function PackHeader({ ...props }: any) {
                         </div>
                     </div>
                     <div>
-                        <PackMembershipButton pack={pack} />
+                        <PackMembershipButton pack={pack}/>
                     </div>
                 </div>
                 <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
@@ -51,12 +51,12 @@ export default function PackHeader({ ...props }: any) {
     )
 }
 
-function PackMembershipButton({ pack }: { pack: any }) {
+function PackMembershipButton({pack}: { pack: any }) {
     const packJoin = () => {
-        vg.pack({ id: pack.id })
+        vg.pack({id: pack.id})
             .join.post()
-            .then(({ error }) => {
-                if (error) return toast.error(error.value ? `${error.status}: ${error.value.message}` : 'Something went wrong')
+            .then(({error}) => {
+                if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 window.location.reload()
             })
             .catch((e) => {
@@ -66,7 +66,7 @@ function PackMembershipButton({ pack }: { pack: any }) {
     }
 
     const packLeave = () => {
-        vg.pack({ id: pack.id })
+        vg.pack({id: pack.id})
             .join.delete()
             .then(() => {
                 window.location.reload()
