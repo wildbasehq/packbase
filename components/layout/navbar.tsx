@@ -8,12 +8,11 @@ import UserAvatar from '@/components/shared/user/avatar'
 import {useUIStore, useUserAccountStore} from '@/lib/states'
 import {MenuButton} from '@headlessui/react'
 import {ScanFaceIcon} from 'lucide-react'
-import Link from 'next/link'
 import React, {useEffect, useState} from 'react'
 import UserOnboardingModal from '../modal/user-onboarding-modal'
 import {FaDiscord} from 'react-icons/fa6'
-import LionLogo from '@/public/img/logo.png'
-import Image from 'next/image'
+import {Logo} from '@/components/shared/logo'
+import Link from '@/components/shared/link'
 
 export default function NavBar() {
     const {user} = useUserAccountStore()
@@ -31,9 +30,9 @@ export default function NavBar() {
 
             <div className={`${hidden ? '' : '!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}>
                 {hidden ? (
-                    <div className="flex-1">
-                        <Image src={LionLogo} alt="Lion logo" className="h-8 w-fit dark:invert"/>
-                    </div>
+                    <Link className="flex-1" href="/">
+                        <Logo className="h-8 w-fit"/>
+                    </Link>
                 ) : (
                     <div className="flex-1"/>
                 )}

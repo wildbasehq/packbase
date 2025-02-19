@@ -5,7 +5,7 @@ export const Logo = ({...props}) => {
     props.className = !props.noStyle
         ? cn(
             props.className,
-            !props.noColorTheme && 'bg-[#F5F6FC] dark:bg-primary',
+            !props.noColorTheme && 'bg-[#F5F6FC] dark:bg-primary dark:fill-white',
             'ring-1 ring-inset ring-n-7/25 rounded-md w-8 h-8 flex justify-center items-center p-1.5',
         )
         : props.className
