@@ -32,7 +32,7 @@ function MobileSidebar({open, close, children}: React.PropsWithChildren<{ open: 
             />
             <Headless.DialogPanel
                 transition
-                className="fixed inset-y-0 w-full max-w-80 p-2 transition duration-300 ease-in-out data-closed:-translate-x-full"
+                className="fixed inset-y-0 w-full max-w-[25.5rem] p-2 transition duration-300 ease-in-out data-closed:-translate-x-full"
             >
                 <div className="flex h-full flex-col rounded-lg bg-white ring-1 shadow-xs ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10">
                     <div className="-mb-3 px-4 pt-3">
@@ -78,7 +78,9 @@ export function SidebarLayout({
 
             {/* Content */}
             <div className="flex flex-col flex-1">
-                {navbar}
+                <div className="hidden lg:flex">
+                    {navbar}
+                </div>
                 <main className={`pb-2 lg:min-w-0 lg:pt-2 lg:pr-2 ${!hidden ? 'lg:pl-98' : 'lg:pl-2'}`}>
                     <div
                         className="grow lg:rounded-lg lg:bg-white h-screen lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10 overflow-hidden">

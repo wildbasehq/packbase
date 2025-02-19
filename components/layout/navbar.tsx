@@ -1,6 +1,5 @@
 'use client'
 
-import {Search} from '@/components/layout/search'
 import UserDropdown from '@/components/layout/user-dropdown'
 import {Dropdown, DropdownMenu} from '@/components/shared/dropdown'
 import {ThemeToggle} from '@/components/shared/theme-toggle'
@@ -30,7 +29,7 @@ export default function NavBar() {
         <>
             {user && !user.anonUser && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]}/>}
 
-            <div className="flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4">
+            <div className={`${hidden ? '' : '!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}>
                 {hidden ? (
                     <div className="flex-1">
                         <Image src={LionLogo} alt="Lion logo" className="h-8 w-fit dark:invert"/>
@@ -40,8 +39,8 @@ export default function NavBar() {
                 )}
 
                 <div className="justify-self-end h-16 w-full max-w-7xl">
-                    <div className="relative flex h-full lg:items-center lg:justify-between">
-                        {user && !user.anonUser && <Search/>}
+                    <div className="relative flex h-full justify-end lg:items-center xl:justify-between">
+                        {/*{user && !user.anonUser && <Search/>}*/}
                         <div className="relative"></div>
 
                         <div className="flex items-center gap-5">
