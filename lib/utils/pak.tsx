@@ -11,7 +11,7 @@ export function BentoStaffBadge({type, ...props}: {
 }) {
     return (
         <Tooltip content={badgeConfig.config.staff.tooltip[type] || 'Staff Badge'}>
-            <Image src={`${rootDir}${badgeConfig._rootDir}staff/${type}.png`} alt="Staff badge" {...props} />
+            <Image unoptimized src={`${rootDir}${badgeConfig._rootDir}staff/${type}.png`} alt="Staff badge" {...props} />
         </Tooltip>
     )
 }

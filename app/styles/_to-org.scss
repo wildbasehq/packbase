@@ -1,6 +1,7 @@
+@use 'unicorn/texture';
+@use 'nextgen2/snapper-engine/main';
+
 @reference './globals.css';
-@import 'unicorn/texture';
-@import 'nextgen2/snapper-engine/main';
 
 @mixin background-opacity($color, $opacity: 0.3) {
   background: $color; /* The Fallback */

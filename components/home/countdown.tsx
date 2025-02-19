@@ -60,15 +60,15 @@ export default function Countdown() {
                             <u>Packbase will start in an invite-only alpha</u>
                         </b>
                         , however people can invite as many people as they'd like.
-                        <br />
-                        <br />
+                        <br/>
+                        <br/>
                         If you're coming from Yipnyap, you'll need to start fresh on Packbase. At a later date, you can migrate your FurAffinity data onto Packbase either
                         to your profile or to a separate pack profile (alt).
                     </Text>
                 </div>
             </div>
             <div className="flex items-end justify-end">
-                <Image src={IkikaiServing} alt="shiba serving noodles to stray cats drawing" className="right-0 w-auto" />
+                <Image unoptimized src={IkikaiServing} alt="shiba serving noodles to stray cats drawing" className="right-0 w-auto"/>
             </div>
         </div>
     )

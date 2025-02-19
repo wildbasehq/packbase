@@ -98,7 +98,7 @@ export default function FeedPost({post, onDelete, postState}: FeedPostType) {
 
     return (
         <>
-            <Card className="px-0! py-0!">
+            <Card className="w-full px-0! py-0!">
                 <div className="relative">
                     <div className="px-4 pt-5 sm:px-6">
                         {/* "___ Rehowled" */}

@@ -111,7 +111,7 @@ export default function Settings({children}: { children: React.ReactNode }) {
                     </div>
                 </div>
                 <div className="hidden aspect-square items-center lg:flex">
-                    <Image src={WolfoxDrawing} alt="LITTLE BABY BOY" className="w-auto" height={3000} width={3000}/>
+                    <Image unoptimized src={WolfoxDrawing} alt="LITTLE BABY BOY" className="w-auto" height={3000} width={3000}/>
                 </div>
             </GridBody>
         )

@@ -6,7 +6,7 @@ export default function NotFound() {
     return (
         <Body className="justify-center items-center h-full">
             <div className="flex flex-col max-w-md">
-                <Image src="/img/cat-chasing-laser-nl.gif"
+                <Image unoptimized src="/img/cat-chasing-laser-nl.gif"
                        alt="Animated pixel cat chasing a laser, before being beamed up disappearing."
                        className="mx-auto justify-center items-center w-80 h-auto mb-8"
                        height={1024}

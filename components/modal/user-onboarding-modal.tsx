@@ -160,7 +160,7 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden aspect-square items-center lg:flex">
-                    <Image src={WolfoxDrawing} alt="LITTLE BABY BOY" className="w-auto" height={3000} width={3000}/>
+                    <Image unoptimized src={WolfoxDrawing} alt="LITTLE BABY BOY" className="w-auto" height={3000} width={3000}/>
                 </div>
             </>
         ),
@@ -223,7 +223,7 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden items-center lg:flex">
-                    <Image src={PuzzleCharacters} alt="3 Puzzle Characters" className="w-auto"/>
+                    <Image unoptimized src={PuzzleCharacters} alt="3 Puzzle Characters" className="w-auto"/>
                 </div>
             </>
         ),
@@ -299,7 +299,7 @@ const steps: {
                         </div>
                     </div>
                     <div className="hidden items-center lg:flex">
-                        <Image src={MusicMutedCharacters} alt="3 Puzzle Characters" className="w-auto"/>
+                        <Image unoptimized src={MusicMutedCharacters} alt="3 Puzzle Characters" className="w-auto"/>
                     </div>
                 </>
             )
@@ -382,7 +382,7 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden items-center lg:flex">
-                    <Image src={CursorCharacterSorting} alt="3 Puzzle Characters" className="w-auto"/>
+                    <Image unoptimized src={CursorCharacterSorting} alt="3 Puzzle Characters" className="w-auto"/>
                 </div>
             </>
         ),
@@ -407,7 +407,7 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden items-center lg:flex">
-                    <Image src={CharacterHoldingPencil} alt="3 Puzzle Characters" className="w-auto"/>
+                    <Image unoptimized src={CharacterHoldingPencil} alt="3 Puzzle Characters" className="w-auto"/>
                 </div>
             </>
         ),

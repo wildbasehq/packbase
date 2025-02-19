@@ -52,7 +52,7 @@ export default function FeedList({
                             <Button color="indigo" href="https://discord.gg/StuuK55gYA" target="_blank">Discord</Button>{' '}
                         </span>
                         <div className="flex items-center justify-end">
-                            <Image src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto"/>
+                            <Image unoptimized src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto"/>
                         </div>
                     </AlertDescription>
                 </Alert>

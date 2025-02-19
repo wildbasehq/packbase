@@ -62,7 +62,7 @@ function Hero() {
                     </Heading>
                     {typeof tagline !== 'string' && (
                         <div className="flex items-center mt-4">
-                            <Image src={tagline.pack.image}
+                            <Image unoptimized src={tagline.pack.image}
                                    alt=""
                                    className="h-7 w-7 rounded-md"
                                    width={28}
