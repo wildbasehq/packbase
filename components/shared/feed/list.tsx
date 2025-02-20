@@ -211,7 +211,7 @@ export default function FeedList({
                         {posts.length !== 0 && (
                             <InfiniteScroll
                                 scrollableTarget="NGRoot"
-                                key={feedID}
+                                key={changingView ? 'changing' : 'unchanged'}
                                 scrollThreshold={0.5}
                                 className={FeedViewConfig !== 1 ? 'sm:w-screen sm:max-w-md' : ''}
                                 dataLength={posts.length}
@@ -300,17 +300,41 @@ function FeedListViewControls({callback}: { callback?: () => void }) {
     )
 }
 
-export function LoadingCard({title}: {
+export function LoadingCard({
+                                title,
+                                masonryColumns,
+                            }: {
     title: string | JSX.Element
+    masonryColumns?: {
+        [key: number]: number
+    }
 }) {
     return (
-        <div className="flex items-center justify-center w-full h-[calc(100vh-14rem)]">
-            <div className="relative">
-                <Card>
+        // @ts-ignore
+        <ResponsiveMasonry columnsCountBreakPoints={masonryColumns}>
+            {/* @ts-ignore */}
+            <Card className="dont-animate w-full absolute z-10">
+                <img
+                    src="/img/dog-on-ship.gif"
+                    alt="Animated pixel dog in box panting before falling over, then looping."
+                    className="h-42 w-fit"
+                    style={{
+                        imageRendering: 'pixelated',
+                        display: 'inline-block',
+                        marginTop: '-1px',
+                        marginRight: '4px',
+                    }}
+                />
+                <Text size="sm">{title}</Text>
+            </Card>
+
+            <Masonry className="list-stagger animate-pulse-stagger" gutter="24px">
+                {/* EXTREMELY DIRTY TRICKKKKK */}
+                <Card className="w-full">
                     <img
                         src="/img/dog-on-ship.gif"
                         alt="Animated pixel dog in box panting before falling over, then looping."
-                        className="h-24 w-fit self-center mb-2 z-[1]"
+                        className="h-42 w-fit"
                         style={{
                             imageRendering: 'pixelated',
                             display: 'inline-block',
@@ -318,18 +342,23 @@ export function LoadingCard({title}: {
                             marginRight: '4px',
                         }}
                     />
-                    <Text size="sm" className="z-[1]">{title}</Text>
+                    <Text size="sm">{title}</Text>
                 </Card>
 
-                {/* Background cards skewed */}
-                <div className="absolute inset-0">
-                    {/* @ts-ignore */}
-                    <Card className="absolute inset-0 !h-42 transform -rotate-5 bg-surface-variant animate-pulse"/>
-                    {/* @ts-ignore */}
-                    <Card className="absolute inset-0 !h-42 transform rotate-6 bg-surface-variant animate-pulse"/>
-                </div>
-            </div>
-        </div>
+                {/* Bunch of empty cards of different random heights */}
+                {Array.from(Array(50).keys()).map((i) => (
+                    <Card
+                        key={i}
+                        style={{
+                            height: `${Math.floor(Math.random() * 100) + 120}px`,
+                            width: '100%',
+                        }}
+                    >
+                        <></>
+                    </Card>
+                ))}
+            </Masonry>
+        </ResponsiveMasonry>
     )
 }
 
