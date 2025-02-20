@@ -1,4 +1,5 @@
 import {ReactElement} from 'react'
+// @ts-ignore
 import {usePathname} from 'wouter/types/use-browser-location'
 import Link from './link'
 
