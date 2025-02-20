@@ -27,20 +27,6 @@
   }
 }
 
-.list-stagger > * {
-  & > * {
-    $n: 10;
-    opacity: 0;
-    @apply animate-slide-up-fade;
-
-    @for $x from 0 through $n {
-      &:nth-child(#{$x}) {
-        animation-delay: 100ms * ($x - 1) !important;
-      }
-    }
-  }
-}
-
 .switcher-list-stagger > * {
   & > * {
     $n: 50;
@@ -56,14 +42,12 @@
 }
 
 .animate-pulse-stagger > * {
-  & > *:not(.dont-animate) {
-    $n: 50;
-    animation: slide-up-fade-out 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  $n: 50;
 
-    @for $x from 1 through $n {
-      &:nth-child(#{$x}) {
-        animation-delay: 150ms * ($x) !important;
-      }
+  @for $x from 1 through $n {
+    & > * > *:not(.dont-animate) {
+      animation: slide-up-fade-out 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      animation-delay: 50ms * ($x - 1) !important;
     }
   }
 }

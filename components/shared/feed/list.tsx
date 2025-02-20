@@ -125,8 +125,8 @@ export default function FeedList({
 
     const LoadingCardSmall = () => {
         return (
-            <GridBody>
-                <Card className="dont-animate">
+            <GridBody className="dont-animate">
+                <Card>
                     <img
                         src="/img/dog-on-ship.gif"
                         alt="Animated pixel dog in box panting before falling over, then looping."
@@ -300,24 +300,17 @@ function FeedListViewControls({callback}: { callback?: () => void }) {
     )
 }
 
-export function LoadingCard({
-                                title,
-                                masonryColumns,
-                            }: {
+export function LoadingCard({title}: {
     title: string | JSX.Element
-    masonryColumns?: {
-        [key: number]: number
-    }
 }) {
     return (
-        // @ts-ignore
-        <ResponsiveMasonry columnsCountBreakPoints={masonryColumns}>
-            {/* @ts-ignore */}
-            <Masonry className="list-stagger animate-pulse-stagger" gutter="24px">
-                <Card className="dont-animate">
+        <div className="flex items-center justify-center w-full h-[calc(100vh-14rem)]">
+            <div className="relative">
+                <Card>
                     <img
                         src="/img/dog-on-ship.gif"
                         alt="Animated pixel dog in box panting before falling over, then looping."
+                        className="h-24 w-fit self-center mb-2 z-[1]"
                         style={{
                             imageRendering: 'pixelated',
                             display: 'inline-block',
@@ -325,22 +318,18 @@ export function LoadingCard({
                             marginRight: '4px',
                         }}
                     />
-                    <Text size="sm">{title}</Text>
+                    <Text size="sm" className="z-[1]">{title}</Text>
                 </Card>
 
-                {/* Bunch of empty cards of different random heights */}
-                {Array.from(Array(50).keys()).map((i) => (
-                    <Card
-                        key={i}
-                        style={{
-                            height: `${Math.floor(Math.random() * 100) + 120}px`,
-                        }}
-                    >
-                        <></>
-                    </Card>
-                ))}
-            </Masonry>
-        </ResponsiveMasonry>
+                {/* Background cards skewed */}
+                <div className="absolute inset-0">
+                    {/* @ts-ignore */}
+                    <Card className="absolute inset-0 !h-42 transform -rotate-5 bg-surface-variant animate-pulse"/>
+                    {/* @ts-ignore */}
+                    <Card className="absolute inset-0 !h-42 transform rotate-6 bg-surface-variant animate-pulse"/>
+                </div>
+            </div>
+        </div>
     )
 }
 
@@ -351,6 +340,7 @@ function FeedListItem({post, gridTutorialID, postState}: { post: any; gridTutori
                 style={{
                     height: `${Math.floor(Math.random() * 75) + 150}px`,
                     backgroundColor: `hsl(${gridTutorialID * 15} 50% 50% / 0.05)`,
+                    width: '100%',
                 }}
             >
                 <div className="flex items-center gap-2">
