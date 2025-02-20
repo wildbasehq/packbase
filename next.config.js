@@ -26,11 +26,11 @@ const nextConfig = {
         domains: ['127.0.0.1', 'udxdytccktvaedirxooa.supabase.co', 'ecwxmakixjrsklydfmtl.supabase.co', 'cdn.discordapp.com', 'unavatar.io', 'localhost'],
     },
     env: {
-        VITE_PUBLIC_SUPABASE_URL: import.meta.env.SUPABASE_URL,
-        VITE_PUBLIC_SUPABASE_ANON_KEY: import.meta.env.SUPABASE_ANON_KEY,
+        VITE_SUPABASE_URL: import.meta.env.SUPABASE_URL,
+        VITE_SUPABASE_ANON_KEY: import.meta.env.SUPABASE_ANON_KEY,
 
-        VITE_PUBLIC_POSTHOG_KEY: import.meta.env.POSTHOG_KEY,
-        VITE_PUBLIC_POSTHOG_HOST: import.meta.env.POSTHOG_HOST,
+        VITE_POSTHOG_KEY: import.meta.env.POSTHOG_KEY,
+        VITE_POSTHOG_HOST: import.meta.env.POSTHOG_HOST,
     },
     webpack: (config) => {
         if (import.meta.env.NODE_ENV === 'production') {

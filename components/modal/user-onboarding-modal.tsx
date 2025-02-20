@@ -10,7 +10,7 @@ import CursorCharacterSorting from '@/src/images/svg/cursor-character-sorting.sv
 import MusicMutedCharacters from '@/src/images/svg/music-muted-characters.svg'
 import clsx from 'clsx'
 import {CheckIcon} from 'lucide-react'
-import {Dispatch, FormEvent, SetStateAction, useEffect, useState} from 'react'
+import {Dispatch, FormEvent, JSX, SetStateAction, useEffect, useState} from 'react'
 import Modal from '.'
 import GodRays from '../charm/god-rays'
 import {LoadingCircle} from '../icons'

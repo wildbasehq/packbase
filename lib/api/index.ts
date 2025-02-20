@@ -5,7 +5,7 @@
 import {createClient} from '@/lib/supabase/client'
 import VoyageSDK from 'voyagesdk-ts'
 
-export const API_URL = import.meta.env.VITE_PUBLIC_YAPOCK_URL
+export const API_URL = import.meta.env.VITE_YAPOCK_URL
 let TOKEN: string | undefined
 
 export const supabase = createClient()

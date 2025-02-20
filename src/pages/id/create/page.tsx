@@ -62,7 +62,7 @@ export default function IDCreate() {
             </div>
 
             <div className="mt-8 space-y-8">
-                {import.meta.env.VITE_PUBLIC_REGISTRATION_CLOSE && (
+                {import.meta.env.VITE_REGISTRATION_CLOSE && (
                     <div className="flex flex-col space-y-2 text-center">
                         <Heading size="2xl" className="text-2xl">
                             Registration is closed.

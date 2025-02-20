@@ -3,9 +3,9 @@ import {ModalProvider} from '@/components/modal/provider'
 import posthog from 'posthog-js'
 import {PostHogProvider} from 'posthog-js/react'
 
-if (typeof window !== 'undefined' && import.meta.env.VITE_PUBLIC_POSTHOG_KEY) {
-    posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY || '', {
-        api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+if (typeof window !== 'undefined' && import.meta.env.VITE_POSTHOG_KEY) {
+    posthog.init(import.meta.env.VITE_POSTHOG_KEY || '', {
+        api_host: import.meta.env.VITE_POSTHOG_HOST,
         capture_pageview: false // Disable automatic pageview capture, as we capture manually
     })
 }

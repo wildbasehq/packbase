@@ -169,7 +169,7 @@ export default function UserDropdown({showOnboardingModal}: { showOnboardingModa
             <div className="flex w-full flex-col items-center justify-center border-t px-7 py-5">
                 <Text size="xs" alt>
                     {ProjectSafeName} (Name isn't final. {ProjectName}) &copy; ✱base. &mdash;{' '}
-                    {import.meta.env.VITE_PUBLIC_VERCEL_GIT_COMMIT_REF || import.meta.env.VITE_PUBLIC_VERCEL_ENV || 'local'} - {import.meta.env.VITE_PUBLIC_BUILD_ID || '0000000'}
+                    {import.meta.env.VITE_VERCEL_GIT_COMMIT_REF || import.meta.env.VITE_VERCEL_ENV || 'local'} - {import.meta.env.VITE_BUILD_ID || '0000000'}
                 </Text>
             </div>
         </DropdownHeader>

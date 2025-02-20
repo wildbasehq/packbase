@@ -1,4 +1,5 @@
 import {cn} from '@/lib/utils'
+import {JSX} from 'react'
 
 const textSize = {
     xs: 'text-xs',
@@ -12,7 +13,7 @@ const textSize = {
 
 export function Heading({as, children, size = 'base', ...props}: {
     as?: React.ElementType;
-    children: React.ReactNode;
+    children?: React.ReactNode;
     size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl';
     [key: string]: any;
 }): JSX.Element {
@@ -26,7 +27,7 @@ export function Heading({as, children, size = 'base', ...props}: {
 }
 
 export function Text({children, size = 'sm', alt, ...props}: {
-    children: React.ReactNode;
+    children?: React.ReactNode;
     size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl';
     alt?: boolean;
     [key: string]: any;
