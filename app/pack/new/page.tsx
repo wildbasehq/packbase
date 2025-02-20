@@ -16,13 +16,13 @@ import {FormEvent, Fragment, useEffect, useState} from 'react'
 import PackCard from '@/components/shared/pack/card'
 
 export default function PackAdd() {
-    const { setCurrentResource } = useResourceStore()
-    const { setHidden } = useUIStore()
+    const {setCurrentResource} = useResourceStore()
+    const {setHidden} = useUIStore()
     const user = useUserAccountStore((state) => state.user)
 
     useEffect(() => {
         setHidden(true)
-        setCurrentResource({ id: 'new', slug: 'new', display_name: 'Create a Pack', standalone: true })
+        setCurrentResource({id: 'new', slug: 'new', display_name: 'Create a Pack', standalone: true})
     }, [])
 
     return (
@@ -37,17 +37,17 @@ export default function PackAdd() {
                                 feed, so go wild!
                             </p>
                             <div className="flex flex-col space-y-4">
-                                <CreateGroupSidebar />
+                                <CreateGroupSidebar/>
                             </div>
                         </CTABody>
 
-                        <CTASideImage src="/img/illustrations/settings/friends.svg" alt="" />
+                        <CTASideImage src="/img/illustrations/settings/friends.svg" alt=""/>
                     </CTA>
                 </Body>
             )}
 
             <div className="flex flex-col space-y-12 px-4 pt-12 sm:px-6 lg:px-12">
-                <SearchablePackList />
+                <SearchablePackList/>
             </div>
         </div>
     )
@@ -59,22 +59,22 @@ const postPrivacy = [
         name: 'Public',
         desc: 'Everyone in the world can see this',
     },
-    {
-        id: 'followers',
-        name: 'Followers Only',
-        desc: 'Only your followers can see this',
-        warn: 'Your friends are counted as followers',
-    },
-    {
-        id: 'friends',
-        name: 'Friends Only',
-        desc: 'Only your friends can see this',
-    },
-    {
-        id: 'private',
-        name: 'Private',
-        desc: 'Just for you and people you invite',
-    },
+    // {
+    //     id: 'followers',
+    //     name: 'Followers Only',
+    //     desc: 'Only your followers can see this',
+    //     warn: 'Your friends are counted as followers',
+    // },
+    // {
+    //     id: 'friends',
+    //     name: 'Friends Only',
+    //     desc: 'Only your friends can see this',
+    // },
+    // {
+    //     id: 'private',
+    //     name: 'Private',
+    //     desc: 'Just for you and people you invite',
+    // },
 ]
 
 function CreateGroupSidebar() {
@@ -94,7 +94,7 @@ function CreateGroupSidebar() {
                 description: event.currentTarget.description.value,
                 // privacy: selected.id,
             })
-            .then(({ data, error }) => {
+            .then(({data, error}) => {
                 if (error) {
                     setSubmitting(false)
                     toast.error(
@@ -157,7 +157,7 @@ function CreateGroupSidebar() {
                                                     <div className="ml-3 flex h-7 items-center">
                                                         <Button disabled={submitting} type="reset" variant="ghost" size="self" onClick={() => setOnboardOpen(false)}>
                                                             <span className="sr-only">Close panel</span>
-                                                            <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                                                            <XMarkIcon className="h-6 w-6" aria-hidden="true"/>
                                                         </Button>
                                                     </div>
                                                 </div>
@@ -178,7 +178,7 @@ function CreateGroupSidebar() {
                                                 <div className="divide-y divide-neutral-200 px-4 dark:divide-neutral-700 sm:px-6">
                                                     <div className="space-y-6 pb-5 pt-6">
                                                         <div>
-                                                            <Input label="Pack Name" name="display_name" description="Minor edits (up to 5T/month) can be done later." />
+                                                            <Input label="Pack Name" name="display_name" description="Minor edits (up to 5T/month) can be done later."/>
                                                         </div>
                                                         <div>
                                                             <Input
@@ -211,7 +211,7 @@ function CreateGroupSidebar() {
                                                                             <Radio
                                                                                 key={privacyOption.name}
                                                                                 value={privacyOption}
-                                                                                className={({ focus, checked }) =>
+                                                                                className={({focus, checked}) =>
                                                                                     `${
                                                                                         focus
                                                                                             ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-neutral-300'
@@ -225,7 +225,7 @@ function CreateGroupSidebar() {
                                                                                     ring-default flex select-none flex-col justify-center rounded border px-4 py-4 !no-underline transition-all`
                                                                                 }
                                                                             >
-                                                                                {({ checked }) => (
+                                                                                {({checked}) => (
                                                                                     <>
                                                                                         <div className="flex w-full items-center justify-between">
                                                                                             <div className="flex items-center">
@@ -242,7 +242,7 @@ function CreateGroupSidebar() {
                                                                                                         <span>{privacyOption.desc}</span>{' '}
                                                                                                         {privacyOption.warn && (
                                                                                                             <p className="inline-flex items-center">
-                                                                                                                <QuestionMarkCircleIcon className="text-alt h-4 w-4" />
+                                                                                                                <QuestionMarkCircleIcon className="text-alt h-4 w-4"/>
                                                                                                                 <span className="ml-1">{privacyOption.warn}</span>
                                                                                                             </p>
                                                                                                         )}
@@ -251,7 +251,7 @@ function CreateGroupSidebar() {
                                                                                             </div>
                                                                                             {checked && (
                                                                                                 <div className="text-default shrink-0">
-                                                                                                    <CheckIcon className="h-6 w-6" />
+                                                                                                    <CheckIcon className="h-6 w-6"/>
                                                                                                 </div>
                                                                                             )}
                                                                                         </div>
@@ -272,7 +272,7 @@ function CreateGroupSidebar() {
                                             <Button disabled={submitting} type="reset" variant="grey" onClick={() => setOnboardOpen(false)}>
                                                 Cancel
                                             </Button>
-                                            <Button disabled={submitting}>{!submitting ? 'Create' : <LoadingCircle className="invert" />}</Button>
+                                            <Button disabled={submitting}>{!submitting ? 'Create' : <LoadingCircle className="invert"/>}</Button>
                                         </div>
                                     </form>
                                 </div>
@@ -291,7 +291,7 @@ function SearchablePackList() {
     const [packsHidden, setPacksHidden] = useState<number>(0)
 
     useEffect(() => {
-        vg.packs.get().then(({ data }) => {
+        vg.packs.get().then(({data}) => {
             // Set packs except for 'universe' slug
             setPacks(data?.packs.filter((pack) => pack.slug !== 'universe') || [])
             setPacksHidden(data?.hidden)
@@ -316,9 +316,10 @@ function SearchablePackList() {
                     <div className="flex rounded-md shadow-xs">
                         <div className="relative grow focus-within:z-10">
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <MagnifyingGlassIcon className="text-default-alt h-5 w-5" aria-hidden="true" />
+                                <MagnifyingGlassIcon className="text-default-alt h-5 w-5" aria-hidden="true"/>
                             </div>
-                            <div className="flex rounded-md rounded-br-none rounded-tr-none bg-white shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600! dark:bg-white/5 dark:ring-white/10 sm:max-w-md">
+                            <div
+                                className="flex rounded-md rounded-br-none rounded-tr-none bg-white shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600! dark:bg-white/5 dark:ring-white/10 sm:max-w-md">
                                 <input
                                     type="text"
                                     name="desktop-search-pack"
@@ -333,9 +334,9 @@ function SearchablePackList() {
                             type="button"
                             className="bg-default text-default hover:bg-default-alt relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-neutral-300 dark:ring-white/10"
                         >
-                            <BarsArrowUpIcon className="text-default-alt -ml-0.5 h-5 w-5" aria-hidden="true" />
+                            <BarsArrowUpIcon className="text-default-alt -ml-0.5 h-5 w-5" aria-hidden="true"/>
                             Sort
-                            <ChevronDownIcon className="text-default-alt -mr-1 h-5 w-5" aria-hidden="true" />
+                            <ChevronDownIcon className="text-default-alt -mr-1 h-5 w-5" aria-hidden="true"/>
                         </button>
                     </div>
                 </div>
@@ -343,7 +344,7 @@ function SearchablePackList() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {packs.map((pack) => (
-                    <PackCard key={pack.id} pack={pack} />
+                    <PackCard key={pack.id} pack={pack}/>
                 ))}
             </div>
         </>
