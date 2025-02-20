@@ -71,7 +71,7 @@ export default function SettingsInvite() {
                     {generating ? 'Generating...' : 'Generate Invite'}
                 </Button>
             ) : (
-                <Text className="mt-8 text-destructive">
+                <Text className="mt-8 !text-destructive">
                     You have too many unused invites. Let people use some first, then you can generate more!
                 </Text>
             )}
