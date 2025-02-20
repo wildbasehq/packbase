@@ -241,8 +241,8 @@ export default function FeedList({
                                                 <span>PACK ANNOUNCEMENT</span>
                                             </Heading>
                                             <Text size="sm">
-                                                🎉 You're testing SUPER early, so much that the waitlist hasn't even begun yet. Things will break, please report them in
-                                                the Discord instead of posting them publicly. Thank you!
+                                                The invite code generation requirement is temporarily disabled! You can generate and invite as many people as you'd like
+                                                :3
                                             </Text>
                                             <Text className="mt-2 flex items-center justify-end">
                                                 <UserAvatar
