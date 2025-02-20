@@ -1,5 +1,3 @@
-'use client'
-
 import {Dropdown, DropdownDescription, DropdownHeader, DropdownItem, DropdownLabel, DropdownMenu} from '@/components/shared/dropdown'
 import LogoutIcon from '@/components/icons/logout'
 import {Heading, Text} from '@/components/shared/text'

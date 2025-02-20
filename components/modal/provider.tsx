@@ -1,5 +1,3 @@
-'use client'
-
 import {createContext, ReactNode, useContext, useState} from 'react'
 import {Dialog} from '@/components/shared/dialog'
 
@@ -10,7 +8,7 @@ interface ModalContextProps {
 
 const ModalContext = createContext<ModalContextProps | undefined>(undefined)
 
-export function ModalProvider({ children }: { children: ReactNode }) {
+export function ModalProvider({children}: { children: ReactNode }) {
     const [modalContent, setModalContent] = useState<ReactNode | null>(null)
     const [showModal, setShowModal] = useState(false)
 
@@ -27,7 +25,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <ModalContext.Provider value={{ show, hide }}>
+        <ModalContext.Provider value={{show, hide}}>
             {children}
             {modalContent && (
                 <Dialog open={showModal} onClose={setShowModal} className="z-[100]">

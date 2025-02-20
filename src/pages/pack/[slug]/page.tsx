@@ -1,4 +1,3 @@
-'use client'
 import PackFeedController from '../../pack/components'
 import {useUIStore, useUserAccountStore} from '@/lib/states'
 import {useEffect} from 'react'

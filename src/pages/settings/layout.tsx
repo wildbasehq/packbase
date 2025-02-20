@@ -1,4 +1,3 @@
-'use client'
 import {useEffect} from 'react'
 import Body from '@/components/layout/body'
 import {settingsResource, useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'

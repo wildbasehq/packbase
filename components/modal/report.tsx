@@ -1,5 +1,3 @@
-'use client'
-
 import {AlertTriangle, XCircleIcon} from 'lucide-react'
 import {FormEvent, useState} from 'react'
 import {toast} from 'sonner'

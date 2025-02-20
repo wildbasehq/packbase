@@ -1,5 +1,3 @@
-'use client'
-
 import UserAvatar from '@/components/shared/user/avatar'
 // @ts-ignore
 import Link from '@/components/shared/link'

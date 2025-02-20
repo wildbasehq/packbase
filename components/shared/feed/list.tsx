@@ -1,5 +1,3 @@
-'use client'
-
 import GridBody from '@/components/layout/grid-body'
 import Card from '@/components/shared/card'
 import FeedPost from '@/components/shared/feed/post'

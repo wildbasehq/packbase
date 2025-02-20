@@ -1,4 +1,3 @@
-'use client'
 import {FormEvent, useState} from 'react'
 import {Logo} from '@/components/shared/logo'
 import {Heading} from '@/components/shared/text'

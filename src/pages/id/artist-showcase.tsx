@@ -1,5 +1,3 @@
-'use client'
-
 import {createClient} from '@/lib/supabase/client'
 import {useEffect, useState} from 'react'
 import UserInfoCol from '@/components/shared/user/info-col'
@@ -40,7 +38,7 @@ export default function IDArtistShowcase() {
                 </Text>
                 <UserInfoCol user={notice.user}/>
             </div>
-            <img className="inset-0 h-full w-full object-cover" src={notice.image} alt="" width={3840} height={2160} quality={100}/>
+            <img className="inset-0 h-full w-full object-cover" src={notice.image} alt=""/>
         </div>
     )
 }

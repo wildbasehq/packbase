@@ -1,4 +1,3 @@
-'use client'
 import {Button} from '@/components/shared/experimental-button-rework'
 import Avatar from '@/components/shared/user/avatar'
 import {ArrowUpRightIcon, PhotoIcon, UserCircleIcon} from '@heroicons/react/24/solid'

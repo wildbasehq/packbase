@@ -1,5 +1,3 @@
-'use client'
-
 import {Toaster} from 'sonner'
 import {ModalProvider} from '@/components/modal/provider'
 import posthog from 'posthog-js'

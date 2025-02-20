@@ -1,4 +1,3 @@
-'use client'
 import {ReactElement} from 'react'
 import {usePathname} from 'wouter/types/use-browser-location'
 import Link from './link'

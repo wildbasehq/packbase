@@ -1,5 +1,4 @@
 // app/PostHogPageView.tsx
-'use client'
 
 import {useEffect} from 'react'
 import {usePostHog} from 'posthog-js/react'

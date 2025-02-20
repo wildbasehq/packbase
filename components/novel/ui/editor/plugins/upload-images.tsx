@@ -110,9 +110,9 @@ export function startImageUpload(file: File, view: EditorView, pos: number) {
     })
 }
 
-export const handleImageUpload = (file: File) => {
+export const handleImageUpload = (_file: File) => {
     // upload to Vercel Blob
-    return new Promise((resolve) => {
+    return new Promise((_resolve) => {
         toast.error('Please upload using the button below! This feature has been disabled.')
         throw new Error('Please upload using the button below! This feature has been disabled.')
     })

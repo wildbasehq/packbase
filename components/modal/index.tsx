@@ -1,5 +1,3 @@
-'use client'
-
 import useWindowSize from '@/lib/hooks/use-window-size'
 import clsx from 'clsx'
 import {AnimatePresence, motion} from 'framer-motion'
@@ -10,7 +8,6 @@ export default function Modal({
                                   children,
                                   showModal,
                                   setShowModal,
-                                  maxWidth,
                                   className,
                               }: {
     children: React.ReactNode

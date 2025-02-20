@@ -1,5 +1,3 @@
-'use client'
-
 import {ExpandingArrow, LoadingCircle} from '@/components/icons'
 import {Logo} from '@/components/shared/logo'
 import {Heading, Text} from '@/components/shared/text'

@@ -1,5 +1,3 @@
-'use client'
-
 import {ReactNode} from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-dropdown-menu'
 import {Drawer} from 'vaul'

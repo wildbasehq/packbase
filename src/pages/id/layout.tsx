@@ -1,11 +1,9 @@
-'use client'
-
 import IDArtistShowcase from './artist-showcase'
 import {useUIStore} from '@/lib/states'
 import {ReactNode, useEffect} from 'react'
 
-export default function IDLayout({ children }: { children: ReactNode }) {
-    const { setHidden } = useUIStore()
+export default function IDLayout({children}: { children: ReactNode }) {
+    const {setHidden} = useUIStore()
 
     useEffect(() => {
         setHidden(true)
@@ -23,7 +21,7 @@ export default function IDLayout({ children }: { children: ReactNode }) {
                     <div className="mx-auto w-full max-w-sm lg:w-96">{children}</div>
                 </div>
                 <div className="relative col-span-1 hidden overflow-hidden rounded-bl-3xl rounded-tl-3xl 2xl:block">
-                    <IDArtistShowcase />
+                    <IDArtistShowcase/>
                 </div>
             </div>
         </>

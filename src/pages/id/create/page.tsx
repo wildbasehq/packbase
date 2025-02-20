@@ -1,4 +1,3 @@
-'use client'
 import {LoadingCircle} from '@/components/icons'
 import {Input} from '@/components/shared/input/text'
 import {Logo} from '@/components/shared/logo'
@@ -14,8 +13,8 @@ import Link from '@/components/shared/link'
 export default function IDCreate() {
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const password = useRef<HTMLInputElement>()
-    const passwordRepeat = useRef<HTMLInputElement>()
+    const password = useRef<HTMLInputElement>(null)
+    const passwordRepeat = useRef<HTMLInputElement>(null)
 
     const createUser = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()

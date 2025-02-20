@@ -78,7 +78,7 @@ function HowlCard() {
         post.tenant_id = currentResource.id
         vg.howl.create
             .post(post)
-            .then(({data, error}) => {
+            .then(({error}) => {
                 if (error) {
                     setSubmitting(false)
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')

@@ -1,5 +1,3 @@
-'use client'
-
 import {Container} from '@/components/layout/container'
 import {Heading, Text} from '@/components/shared/text'
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/shared/table'

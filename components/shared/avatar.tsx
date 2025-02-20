@@ -85,6 +85,7 @@ export const AvatarButton = forwardRef(function AvatarButton(
             </TouchTarget>
         </Link>
     ) : (
+        // @ts-ignore - bruh
         <Headless.Button {...props} className={classes} ref={ref}>
             <TouchTarget>
                 <Avatar src={src} square={square} initials={initials} alt={alt}/>

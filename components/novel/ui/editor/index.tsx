@@ -1,5 +1,3 @@
-'use client'
-
 import {useEffect, useState} from 'react'
 import {EditorContent, JSONContent, useEditor} from '@tiptap/react'
 import {defaultEditorProps} from './props'
@@ -134,7 +132,7 @@ export default function Editor({
                 className={className}
             >
                 {editor && <EditorBubbleMenu editor={editor}/>}
-                {editor?.isActive('image') && <imgResizer editor={editor}/>}
+                {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
                 <EditorContent editor={editor}/>
             </div>
         </NovelContext.Provider>

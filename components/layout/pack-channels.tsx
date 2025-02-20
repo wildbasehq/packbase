@@ -1,4 +1,3 @@
-'use client'
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
 import {ArrowUpRightIcon} from 'lucide-react'
 import {Sidebar, SidebarBody, SidebarFooter, SidebarHeader, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection, SidebarSpacer} from '@/components/shared/sidebar'

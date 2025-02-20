@@ -1,5 +1,3 @@
-'use client'
-
 import Body from '@/components/layout/body'
 import {CTA, CTABody, CTASideImage} from '@/components/shared/cta'
 import {LoadingCircle} from '@/components/icons'
@@ -53,7 +51,12 @@ export default function PackAdd() {
     )
 }
 
-const postPrivacy = [
+const postPrivacy: {
+    id: string
+    name: string
+    desc: string
+    warn?: string
+}[] = [
     {
         id: 'everyone',
         name: 'Public',

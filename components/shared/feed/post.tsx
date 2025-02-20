@@ -63,7 +63,7 @@ export default function FeedPost({post, onDelete, postState}: FeedPostType) {
     const deletePost = () => {
         vg.howl({id: postContent.id})
             .delete()
-            .then(({data, error}) => {
+            .then(({error}) => {
                 if (error) {
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 } else {
@@ -289,7 +289,7 @@ export function FeedListItem({...props}: any) {
     const deleteComment = () => {
         vg.howl({id: comment.id})
             .delete()
-            .then(({data, error}) => {
+            .then(({error}) => {
                 if (error) {
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 } else {
@@ -430,7 +430,7 @@ export function React({post}: FeedPostType) {
         setSubmitting(true)
 
         const howlReact = vg.howl({id: post.id}).react
-        ;(hasCurrentUser ? howlReact.delete({slot: 0}) : howlReact.post({slot: 0})).then(({data, error}) => {
+        ;(hasCurrentUser ? howlReact.delete({slot: 0}) : howlReact.post({slot: 0})).then(({error}) => {
             setSubmitting(false)
             if (error) {
                 return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')

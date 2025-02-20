@@ -1,5 +1,3 @@
-'use client'
-
 import ECGIcon from '@/components/icons/dazzle/ecg'
 import {Logo} from '@/components/shared/logo'
 import {Text} from '@/components/shared/text'

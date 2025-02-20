@@ -1,4 +1,3 @@
-'use client'
 import './waitlist-check.component.scss'
 import {useUserAccountStore} from '@/lib/states'
 import {useEffect, useState} from 'react'

@@ -1,21 +1,18 @@
-import StarterKit from "@tiptap/starter-kit";
-import HorizontalRule from "@tiptap/extension-horizontal-rule";
-import TiptapLink from "@tiptap/extension-link";
-import TiptapImage from "@tiptap/extension-image";
-import Placeholder from "@tiptap/extension-placeholder";
-import TiptapUnderline from "@tiptap/extension-underline";
-import TextStyle from "@tiptap/extension-text-style";
-import { Color } from "@tiptap/extension-color";
-import TaskItem from "@tiptap/extension-task-item";
-import TaskList from "@tiptap/extension-task-list";
-import { Markdown } from "tiptap-markdown";
-import Highlight from "@tiptap/extension-highlight";
-import SlashCommand from "./slash-command";
-import { InputRule } from "@tiptap/core";
-import UploadImagesPlugin from "@/components/novel/ui/editor/plugins/upload-images";
-import UpdatedImage from "./updated-image";
-import CustomKeymap from "./custom-keymap";
-import DragAndDrop from "./drag-and-drop";
+import StarterKit from '@tiptap/starter-kit'
+import HorizontalRule from '@tiptap/extension-horizontal-rule'
+import TiptapLink from '@tiptap/extension-link'
+import TiptapImage from '@tiptap/extension-image'
+import Placeholder from '@tiptap/extension-placeholder'
+import TiptapUnderline from '@tiptap/extension-underline'
+import TextStyle from '@tiptap/extension-text-style'
+import {Color} from '@tiptap/extension-color'
+import {Markdown} from 'tiptap-markdown'
+import Highlight from '@tiptap/extension-highlight'
+import SlashCommand from './slash-command'
+import {InputRule} from '@tiptap/core'
+import UploadImagesPlugin from '@/components/novel/ui/editor/plugins/upload-images'
+import UpdatedImage from './updated-image'
+import CustomKeymap from './custom-keymap'
 
 export const defaultExtensions = [
     StarterKit.configure({
@@ -37,7 +34,7 @@ export const defaultExtensions = [
         // },
         blockquote: {
             HTMLAttributes: {
-                class: "border-l-4 border-stone-700",
+                class: 'border-l-4 border-stone-700',
             },
         },
         // codeBlock: {
@@ -48,13 +45,13 @@ export const defaultExtensions = [
         // },
         code: {
             HTMLAttributes: {
-                class: "rounded-md bg-stone-200 px-1.5 py-1 font-mono font-medium text-stone-900",
-                spellcheck: "false",
+                class: 'rounded-md bg-stone-200 px-1.5 py-1 font-mono font-medium text-stone-900',
+                spellcheck: 'false',
             },
         },
         horizontalRule: false,
         dropcursor: {
-            color: "#DBEAFE",
+            color: '#DBEAFE',
             width: 4,
         },
         gapcursor: false,
@@ -65,52 +62,52 @@ export const defaultExtensions = [
             return [
                 new InputRule({
                     find: /^(?:---|—-|___\s|\*\*\*\s)$/,
-                    handler: ({ state, range }) => {
-                        const attributes = {};
+                    handler: ({state, range}) => {
+                        const attributes = {}
 
-                        const { tr } = state;
-                        const start = range.from;
-                        let end = range.to;
+                        const {tr} = state
+                        const start = range.from
+                        let end = range.to
 
                         tr.insert(start - 1, this.type.create(attributes)).delete(
                             tr.mapping.map(start),
                             tr.mapping.map(end),
-                        );
+                        )
                     },
                 }),
-            ];
+            ]
         },
     }).configure({
         HTMLAttributes: {
-            class: "mt-4 mb-6 border-t border-stone-300",
+            class: 'mt-4 mb-6 border-t border-stone-300',
         },
     }),
     TiptapLink.configure({
         HTMLAttributes: {
-            class: "text-stone-400 underline underline-offset-[3px] hover:text-stone-600 transition-colors cursor-pointer",
+            class: 'text-stone-400 underline underline-offset-[3px] hover:text-stone-600 transition-colors cursor-pointer',
         },
     }),
     TiptapImage.extend({
         addProseMirrorPlugins() {
-            return [UploadImagesPlugin()];
+            return [UploadImagesPlugin()]
         },
     }).configure({
         allowBase64: true,
         HTMLAttributes: {
-            class: "rounded-lg border border-stone-200",
+            class: 'rounded-lg border border-stone-200',
         },
     }),
     UpdatedImage.configure({
         HTMLAttributes: {
-            class: "rounded-lg border border-stone-200",
+            class: 'rounded-lg border border-stone-200',
         },
     }),
     Placeholder.configure({
-        placeholder: ({ node }) => {
-            if (node.type.name === "heading") {
-                return `Heading ${node.attrs.level}`;
+        placeholder: ({node}) => {
+            if (node.type.name === 'heading') {
+                return `Heading ${node.attrs.level}`
             }
-            return "'/' to add stuff, or just start writing...";
+            return '\'/\' to add stuff, or just start writing...'
         },
         includeChildren: true,
     }),
@@ -139,4 +136,4 @@ export const defaultExtensions = [
     }),
     CustomKeymap,
     // DragAndDrop,
-];
+]

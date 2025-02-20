@@ -1,4 +1,3 @@
-'use client'
 import {Heading} from '@/components/shared/text'
 import Markdown from '@/components/shared/markdown'
 import UserAvatar from '@/components/shared/user/avatar'
