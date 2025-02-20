@@ -1,7 +1,6 @@
 'use client'
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
-import {ArrowUpRightIcon, LucideIcon} from 'lucide-react'
-import React from 'react'
+import {ArrowUpRightIcon} from 'lucide-react'
 import {Sidebar, SidebarBody, SidebarFooter, SidebarHeader, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection, SidebarSpacer} from '@/components/shared/sidebar'
 import {FireIcon, HomeIcon, InboxIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
 import ResourceSwitcher from '@/components/layout/resource-switcher'
@@ -12,26 +11,7 @@ const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon, Sparkles: SparklesIcon, Fire: FireIcon,
 }
 
-export declare interface SideNavItemType {
-    name: string | JSX.Element
-    description?: string
-    href: string
-    target?: string
-    current?: boolean
-    new?: boolean
-    icon: ((props: React.SVGProps<SVGSVGElement>) => JSX.Element) | LucideIcon | string
-}
-
-export declare interface SideNavType {
-    slim?: boolean
-    items?: SideNavItemType[]
-    footer?: React.ReactNode
-    heading?: string | null
-    theme?: any
-    children?: React.ReactNode
-}
-
-export function PackChannels({...props}: SideNavType) {
+export function PackChannels() {
     const {hidden, navigation, loading} = useUIStore()
     const {currentResource} = useResourceStore()
     const {user} = useUserAccountStore()
@@ -67,7 +47,7 @@ export function PackChannels({...props}: SideNavType) {
                     </SidebarHeader>
                     <SidebarBody>
                         <SidebarSection>
-                            <SidebarItem href={(!currentResource.slug || currentResource.slug === 'universe') ? '/' : `/p/${currentResource.slug}`}>
+                            <SidebarItem href={(!currentResource.slug) ? '/p/universe' : `/p/${currentResource.slug}`}>
                                 <HomeIcon/>
                                 <SidebarLabel>Home</SidebarLabel>
                             </SidebarItem>
@@ -101,8 +81,9 @@ export function PackChannels({...props}: SideNavType) {
     )
 }
 
-function DynamicIcon({name, ...props}) {
+function DynamicIcon({name, ...props}: any) {
     // icon://IconName
+    // @ts-ignore
     const Icon = availableIcons[name.replace('icon://', '')]
     if (!Icon) return <QuestionMarkCircleIcon {...props}/>
     return <Icon {...props} />

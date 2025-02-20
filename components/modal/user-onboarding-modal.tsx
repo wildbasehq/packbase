@@ -3,14 +3,13 @@ import {UserProfileBasic} from '@/lib/defs/user'
 import {useUserAccountStore} from '@/lib/states'
 import {toast} from 'sonner'
 import {ProjectSafeName} from '@/lib/utils'
-import WolfoxDrawing from '@/public/img/illustrations/wolfox-drawing.png'
-import PuzzleCharacters from '@/public/svg/3-puzzle-characters.svg'
-import CharacterHoldingPencil from '@/public/svg/character-holding-pencil.svg'
-import CursorCharacterSorting from '@/public/svg/cursor-character-sorting.svg'
-import MusicMutedCharacters from '@/public/svg/music-muted-characters.svg'
+import WolfoxDrawing from '@/src/images/png/wolfox-drawing.png'
+import PuzzleCharacters from '@/src/images/svg/3-puzzle-characters.svg'
+import CharacterHoldingPencil from '@/src/images/svg/character-holding-pencil.svg'
+import CursorCharacterSorting from '@/src/images/svg/cursor-character-sorting.svg'
+import MusicMutedCharacters from '@/src/images/svg/music-muted-characters.svg'
 import clsx from 'clsx'
 import {CheckIcon} from 'lucide-react'
-import Image from 'next/image'
 import {Dispatch, FormEvent, SetStateAction, useEffect, useState} from 'react'
 import Modal from '.'
 import GodRays from '../charm/god-rays'
@@ -160,7 +159,7 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden aspect-square items-center lg:flex">
-                    <Image unoptimized src={WolfoxDrawing} alt="LITTLE BABY BOY" className="w-auto" height={3000} width={3000}/>
+                    <img src={WolfoxDrawing} alt="LITTLE BABY BOY" className="w-auto" height={3000} width={3000}/>
                 </div>
             </>
         ),
@@ -223,7 +222,7 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden items-center lg:flex">
-                    <Image unoptimized src={PuzzleCharacters} alt="3 Puzzle Characters" className="w-auto"/>
+                    <img src={PuzzleCharacters} alt="3 Puzzle Characters" className="w-auto"/>
                 </div>
             </>
         ),
@@ -299,7 +298,7 @@ const steps: {
                         </div>
                     </div>
                     <div className="hidden items-center lg:flex">
-                        <Image unoptimized src={MusicMutedCharacters} alt="3 Puzzle Characters" className="w-auto"/>
+                        <img src={MusicMutedCharacters} alt="3 Puzzle Characters" className="w-auto"/>
                     </div>
                 </>
             )
@@ -382,7 +381,7 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden items-center lg:flex">
-                    <Image unoptimized src={CursorCharacterSorting} alt="3 Puzzle Characters" className="w-auto"/>
+                    <img src={CursorCharacterSorting} alt="3 Puzzle Characters" className="w-auto"/>
                 </div>
             </>
         ),
@@ -407,7 +406,7 @@ const steps: {
                     </div>
                 </div>
                 <div className="hidden items-center lg:flex">
-                    <Image unoptimized src={CharacterHoldingPencil} alt="3 Puzzle Characters" className="w-auto"/>
+                    <img src={CharacterHoldingPencil} alt="3 Puzzle Characters" className="w-auto"/>
                 </div>
             </>
         ),

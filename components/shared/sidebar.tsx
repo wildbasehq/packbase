@@ -6,8 +6,8 @@ import {LayoutGroup, motion} from 'framer-motion'
 import React, {forwardRef, useId} from 'react'
 import {TouchTarget} from './button'
 import Link from './link'
-import {usePathname} from 'next/navigation'
 import {ArrowUpRightIcon} from 'lucide-react'
+import {useLocation} from 'wouter'
 
 export function Sidebar({className, ...props}: React.ComponentPropsWithoutRef<'nav'>) {
     return <nav {...props} className={clsx(className, 'flex h-full min-h-0 flex-col')}/>
@@ -85,7 +85,7 @@ export const SidebarItem = forwardRef(function SidebarItem(
         ),
     ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>
 ) {
-    const pathname = usePathname()
+    const [pathname] = useLocation()
     if (typeof current === 'undefined') {
         current = 'href' in props ? pathname === props.href : false
     }
@@ -130,6 +130,7 @@ export const SidebarItem = forwardRef(function SidebarItem(
                     <TouchTarget>{children}</TouchTarget>
                 </Headless.CloseButton>
             ) : (
+                // @ts-ignore
                 <Headless.Button
                     {...props}
                     className={clsx('cursor-default', classes)}

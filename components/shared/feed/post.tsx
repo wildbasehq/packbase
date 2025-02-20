@@ -3,7 +3,6 @@
  */
 
 import {ArrowUpOnSquareIcon, TrashIcon} from '@heroicons/react/24/solid'
-import Link from 'next/link'
 import UserAvatar from '@/components/shared/user/avatar'
 import Avatar from '@/components/shared/user/avatar'
 import {UserProfileBasic} from '@/lib/defs/user'
@@ -11,7 +10,7 @@ import Card from '@/components/shared/card'
 import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
 import {Dispatch, useRef, useState} from 'react'
-import {LoadingCircle} from 'components/icons'
+import {LoadingCircle} from '@/components/icons'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
 import {useUIStore, useUserAccountStore} from '@/lib/states'
@@ -25,6 +24,7 @@ import {Text} from '@/components/shared/text'
 import {Button} from '@/components/shared/button'
 import PostModal from '@/components/shared/feed/post-full-slideover'
 import {useModal} from '@/components/modal/provider'
+import Link from '@/components/shared/link.tsx'
 
 export declare interface FeedPostDataType {
     id: string

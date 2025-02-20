@@ -11,7 +11,6 @@ import {Button} from '@/components/shared/experimental-button-rework'
 import {vg} from '@/lib/api'
 import {useUISettingsStore, useUIStore} from '@/lib/states'
 import {HelpCircleIcon} from 'lucide-react'
-import Image from 'next/image'
 import {useEffect, useState} from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Masonry, {ResponsiveMasonry} from 'react-responsive-masonry'
@@ -20,7 +19,7 @@ import {HandRaisedIcon, MegaphoneIcon, WrenchScrewdriverIcon} from '@heroicons/r
 import {ProjectSafeName} from '@/lib/utils'
 import UserAvatar from '@/components/shared/user/avatar'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
-import WrenchCharacter from '@/public/svg/wrench-character.svg'
+import WrenchCharacter from '@/src/images/svg/wrench-character.svg'
 
 export default function FeedList({
                                      packID = '00000000-0000-0000-0000-000000000000',
@@ -52,7 +51,7 @@ export default function FeedList({
                             <Button color="indigo" href="https://discord.gg/StuuK55gYA" target="_blank">Discord</Button>{' '}
                         </span>
                         <div className="flex items-center justify-end">
-                            <Image unoptimized src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto"/>
+                            <img src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto"/>
                         </div>
                     </AlertDescription>
                 </Alert>
@@ -130,12 +129,9 @@ export default function FeedList({
         return (
             <GridBody>
                 <Card className="dont-animate">
-                    <Image
+                    <img
                         src="/img/dog-on-ship.gif"
                         alt="Animated pixel dog in box panting before falling over, then looping."
-                        height={128}
-                        width={168}
-                        unoptimized
                         style={{
                             imageRendering: 'pixelated',
                             display: 'inline-block',
@@ -321,12 +317,9 @@ export function LoadingCard({
             {/* @ts-ignore */}
             <Masonry className="list-stagger animate-pulse-stagger" gutter="24px">
                 <Card className="dont-animate">
-                    <Image
+                    <img
                         src="/img/dog-on-ship.gif"
                         alt="Animated pixel dog in box panting before falling over, then looping."
-                        height={128}
-                        width={168}
-                        unoptimized
                         style={{
                             imageRendering: 'pixelated',
                             display: 'inline-block',

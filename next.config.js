@@ -26,14 +26,14 @@ const nextConfig = {
         domains: ['127.0.0.1', 'udxdytccktvaedirxooa.supabase.co', 'ecwxmakixjrsklydfmtl.supabase.co', 'cdn.discordapp.com', 'unavatar.io', 'localhost'],
     },
     env: {
-        NEXT_PUBLIC_SUPABASE_URL: process.env.SUPABASE_URL,
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+        VITE_PUBLIC_SUPABASE_URL: import.meta.env.SUPABASE_URL,
+        VITE_PUBLIC_SUPABASE_ANON_KEY: import.meta.env.SUPABASE_ANON_KEY,
 
-        NEXT_PUBLIC_POSTHOG_KEY: process.env.POSTHOG_KEY,
-        NEXT_PUBLIC_POSTHOG_HOST: process.env.POSTHOG_HOST,
+        VITE_PUBLIC_POSTHOG_KEY: import.meta.env.POSTHOG_KEY,
+        VITE_PUBLIC_POSTHOG_HOST: import.meta.env.POSTHOG_HOST,
     },
     webpack: (config) => {
-        if (process.env.NODE_ENV === 'production') {
+        if (import.meta.env.NODE_ENV === 'production') {
             config.plugins.push(utwm())
         }
 
