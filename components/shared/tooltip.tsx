@@ -22,7 +22,7 @@ export default function Tooltip({
     return (
         <TooltipPrimitive.Provider delayDuration={typeof delayDuration !== undefined ? delayDuration : 100}>
             <TooltipPrimitive.Root>
-                <TooltipPrimitive.Trigger className="hidden sm:inline-flex" asChild>
+                <TooltipPrimitive.Trigger className="inline-flex" asChild>
                     {children}
                 </TooltipPrimitive.Trigger>
                 <TooltipPrimitive.Content

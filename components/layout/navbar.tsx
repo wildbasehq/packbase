@@ -28,7 +28,7 @@ export default function NavBar() {
         <>
             {user && !user.anonUser && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]}/>}
 
-            <div className={`${hidden ? '' : '!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}>
+            <div className={`${hidden ? '' : 'sm:!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}>
                 {hidden ? (
                     <Link className="flex-1" href="/">
                         <Logo className="h-8"/>

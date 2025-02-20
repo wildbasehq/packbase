@@ -74,7 +74,7 @@ export default function PackFeedController({overrideFeedID}: { overrideFeedID?: 
                     {/* Header */}
                     {currentResource && currentResource?.slug === 'universe' && (
                         <div
-                            className="sticky top-0 z-10 flex items-center justify-between border-b px-8 py-2 backdrop-blur-sm bg-white/95 dark:bg-zinc-900/95"
+                            className="sticky hidden sm:flex top-0 z-10 items-center justify-between border-b px-8 py-2 backdrop-blur-sm bg-white/95 dark:bg-zinc-900/95"
                             // shadow based on shadowSize value
                             style={{boxShadow: `0 0 ${shadowSize}px 0 rgba(0, 0, 0, 0.1)`}}
                         >

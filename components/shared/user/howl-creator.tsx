@@ -153,7 +153,7 @@ function HowlCard() {
     }
 
     return (
-        <Card className="px-0! py-0! min-w-[32rem]">
+        <Card className="px-0! py-0! min-w-full sm:min-w-[32rem]">
             {!currentResource.standalone && (
                 <Alert className="rounded-none! border-0!">
                     <AlertTitle className="flex items-center">

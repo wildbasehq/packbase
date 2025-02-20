@@ -7,15 +7,13 @@ import localFont from 'next/font/local'
 import {inter, lexend} from './fonts'
 import './styles/globals.css'
 import './styles/_to-org.scss'
-import {FaceFrownIcon} from '@heroicons/react/20/solid'
-import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
-import Link from 'next/link'
 import {PackChannels} from '@/components/layout/pack-channels'
 import WaitlistCheck from '@/components/layout/waitlist-check'
 import Preload from '@/app/preload'
 import React, {Suspense} from 'react'
 import {SidebarLayout} from '@/components/shared/sidebar-layout'
 import NavBar from '@/components/layout/navbar'
+import {Text} from '@/components/shared/text'
 
 const wildbaseRemix = localFont({
     src: [
@@ -59,27 +57,17 @@ export default async function RootLayout({children}: { children: React.ReactNode
             <Suspense>
                 <PostHogPageView/>
             </Suspense>
-            {/* "Mobile is unsupported" notice */}
-            <div className="flex h-full items-center justify-center px-8 sm:hidden">
-                <div className="flex flex-col gap-4">
-                    <Alert>
-                        <AlertTitle>
-                            <FaceFrownIcon className="inline-flex h-5 w-5"/> Mobile is unsupported
-                        </AlertTitle>
-                        <AlertDescription>
-                            During the early stages of private alpha, Packbase is only available on desktop. Please use a desktop browser to access Packbase.
-                            <br/>
-                            <br/>
-                            <Link href="https://discord.gg/StuuK55gYA" target="_blank" className="underline">
-                                Join our Discord
-                            </Link>{' '}
-                            to be notified when mobile support is available.
-                        </AlertDescription>
-                    </Alert>
+            {/* "Mobile is unsupported" notice on bottom of page at all times*/}
+            <div className="absolute bottom-0 left-0 w-full h-12 z-40 bg-sidebar sm:hidden">
+                <div className="flex justify-center items-center h-full">
+                    <Text size="xs" className="text-center">
+                        Mobile is unsupported! We won't take bug reports for mobile during the alpha. A mobile app is being worked on and coming soon.
+                    </Text>
                 </div>
             </div>
+
             <SidebarLayout navbar={<NavBar/>} sidebar={<PackChannels slim={typeof window !== 'undefined' && window.innerWidth < 640}/>}>
-                <div id="NGContentArea" className="hidden h-full overflow-hidden sm:flex">
+                <div id="NGContentArea" className="h-full overflow-hidden flex">
                     <div className="grow">
                         {/*<NavBar/>*/}
 
