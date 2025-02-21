@@ -22,7 +22,11 @@ function MoonIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
 }
 
 export function ThemeToggle() {
-    const [theme, setTheme] = useLocalStorage('theme', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    const [themeObj, setTheme] = useLocalStorage('theme', {
+        theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+    })
+
+    const {theme} = themeObj
 
     useEffect(() => {
         document.documentElement.classList.remove('light', 'dark')
@@ -34,7 +38,9 @@ export function ThemeToggle() {
             type="button"
             className="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            onClick={() => setTheme({
+                theme: theme === 'light' ? 'dark' : 'light',
+            })}
         >
             <SunIcon className="h-5 w-5 stroke-zinc-900 dark:hidden"/>
             <MoonIcon className="hidden h-5 w-5 stroke-white dark:block"/>
