@@ -313,24 +313,24 @@ export function LoadingCard({
         // @ts-ignore
         <ResponsiveMasonry columnsCountBreakPoints={masonryColumns}>
             {/* @ts-ignore */}
-            <Card className="dont-animate w-full absolute z-10">
-                <img
-                    src="/img/dog-on-ship.gif"
-                    alt="Animated pixel dog in box panting before falling over, then looping."
-                    className="h-42 w-fit"
-                    style={{
-                        imageRendering: 'pixelated',
-                        display: 'inline-block',
-                        marginTop: '-1px',
-                        marginRight: '4px',
-                    }}
-                />
-                <Text size="sm">{title}</Text>
-            </Card>
+            {/*<Card className="dont-animate w-full absolute z-10">*/}
+            {/*    <img*/}
+            {/*        src="/img/dog-on-ship.gif"*/}
+            {/*        alt="Animated pixel dog in box panting before falling over, then looping."*/}
+            {/*        className="h-42 w-fit"*/}
+            {/*        style={{*/}
+            {/*            imageRendering: 'pixelated',*/}
+            {/*            display: 'inline-block',*/}
+            {/*            marginTop: '-1px',*/}
+            {/*            marginRight: '4px',*/}
+            {/*        }}*/}
+            {/*    />*/}
+            {/*    <Text size="sm">{title}</Text>*/}
+            {/*</Card>*/}
 
             <Masonry className="list-stagger animate-pulse-stagger" gutter="24px">
                 {/* EXTREMELY DIRTY TRICKKKKK */}
-                <Card className="w-full">
+                <Card className="w-full dont-animate">
                     <img
                         src="/img/dog-on-ship.gif"
                         alt="Animated pixel dog in box panting before falling over, then looping."

@@ -56,6 +56,11 @@
 }
 
 .animate-pulse-stagger > * {
+  &:first-child > *:first-child {
+    animation: none;
+    opacity: 1;
+  }
+
   & > * {
     $n: 50;
     animation: slide-up-fade-out 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
