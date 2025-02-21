@@ -21,43 +21,62 @@ export default function Preload({children}: { children: React.ReactNode }) {
             .then((server) => {
                 setBucketRoot(server.data.bucketRoot)
                 setMaintenance(server.data.maintenance)
-                setServiceLoading('auth')
+                setStatus('auth')
                 // @ts-ignore
                 supabase.auth.getSession().then(async ({data: {session}}) => {
                     const {user, access_token, expires_in} = session || {}
                     if (user) {
                         setToken(access_token, expires_in)
-                        setServiceLoading('auth:@me')
-                        vg.user.me
-                            .get()
-                            .then(async ({data}) => {
-                                setServiceLoading('auth:@me:metadata')
-                                const dipswitch = (await vg.dipswitch.get({
-                                    query: {}
-                                })).data || []
-                                let userBuild = {
-                                    id: user.id,
-                                    username: data?.username || 'new_here_' + new Date().getTime(),
-                                    display_name: data?.display_name || 'new_here_' + new Date().getTime(),
-                                    reqOnboard: !data || !data?.username,
-                                    dp: dipswitch,
-                                    anonUser: !data,
-                                    ...data,
-                                }
+                        setStatus('auth:@me')
+                        const localUser = localStorage.getItem('user')
+                        if (localUser) {
+                            const packs = localStorage.getItem('packs')
+                            if (packs) setResources(JSON.parse(packs))
+                            setUser(JSON.parse(localUser))
+                            proceed()
+                        }
+                        setTimeout(() => {
+                            vg.user.me
+                                .get()
+                                .then(async ({data}) => {
+                                    setStatus('auth:@me:metadata')
+                                    const dipswitch = (await vg.dipswitch.get({
+                                        query: {}
+                                    })).data || []
+                                    let userBuild = {
+                                        id: user.id,
+                                        username: data?.username || 'new_here_' + new Date().getTime(),
+                                        display_name: data?.display_name || 'new_here_' + new Date().getTime(),
+                                        reqOnboard: !data || !data?.username,
+                                        dp: dipswitch,
+                                        anonUser: !data,
+                                        ...data,
+                                    }
 
-                                if (!userBuild.anonUser) {
-                                    const packs = (await vg.user.me.packs.get()).data || []
-                                    setResources(packs)
-                                } else {
-                                    setResources([])
-                                }
+                                    if (JSON.stringify(userBuild) !== localUser) {
+                                        console.log('↻ User data changed, updating...')
+                                        localStorage.setItem('user', JSON.stringify(userBuild))
+                                        setUser(userBuild)
+                                    }
 
-                                setUser(userBuild)
-                                proceed()
-                            })
-                            .catch(_ => {
-                                supabase.auth.signOut()
-                            })
+                                    if (!userBuild.anonUser) {
+                                        const packs = (await vg.user.me.packs.get()).data || []
+                                        if (JSON.stringify(packs) !== localStorage.getItem('packs')) {
+                                            console.log('↻ Packs data changed, updating...')
+                                            localStorage.setItem('packs', JSON.stringify(packs))
+                                            setResources(packs)
+                                        }
+                                    } else {
+                                        localStorage.removeItem('packs')
+                                        setResources([])
+                                    }
+
+                                    proceed()
+                                })
+                                .catch(_ => {
+                                    supabase.auth.signOut()
+                                })
+                        }, 5000)
                     } else {
                         setUser(null)
                         proceed()
@@ -75,9 +94,19 @@ export default function Preload({children}: { children: React.ReactNode }) {
             })
     }, [])
 
+    const setStatus = (status: string) => {
+        setServiceLoading((prev) => {
+            console.log('🚦', status, prev)
+            if (prev === status) return prev
+            if (prev === 'proceeding') return prev
+            return status
+        })
+    }
+
     const proceed = () => {
         if (error) return
-        setServiceLoading('proceeding')
+        if (serviceLoading === 'proceeding') return
+        setStatus('proceeding')
         setLoading(false)
         setConnecting(false)
     }
