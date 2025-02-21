@@ -38,7 +38,6 @@ export default function IDCreate() {
 
     // Validates password repeat
     const validatePassword = () => {
-        console.log(password.current.value, passwordRepeat.current.value)
         if (password.current.value !== passwordRepeat.current.value) {
             passwordRepeat.current.setCustomValidity('Passwords must match')
         } else {

@@ -8,7 +8,6 @@ export default function IDArtistShowcase() {
 
     useEffect(() => {
         if (!window) return
-        console.log('fetching notice')
 
         supabase
             .from('notice')

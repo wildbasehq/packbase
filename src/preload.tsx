@@ -6,6 +6,7 @@ import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
 import {ProjectSafeName} from '@/lib/utils'
 import {HandRaisedIcon} from '@heroicons/react/20/solid'
 import {useEffect, useState} from 'react'
+import {getSelfProfile} from '@/lib/api/cron/profile-update.ts'
 
 export default function Preload({children}: { children: React.ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`polling ${API_URL}`)
@@ -32,54 +33,16 @@ export default function Preload({children}: { children: React.ReactNode }) {
                         if (localUser) {
                             const json = JSON.parse(localUser)
                             if (json.state.user) {
-                                queueWorker('account-sync')
                                 const packs = localStorage.getItem('packs')
                                 if (packs) setResources(JSON.parse(packs))
                                 setUser(json.state.user)
                                 proceed()
                             }
                         }
-                        vg.user.me
-                            .get()
-                            .then(async ({data}) => {
-                                setStatus('auth:@me:metadata')
-                                const dipswitch = (await vg.dipswitch.get({
-                                    query: {}
-                                })).data || []
-                                let userBuild = {
-                                    id: user.id,
-                                    username: data?.username || 'new_here_' + new Date().getTime(),
-                                    display_name: data?.display_name || 'new_here_' + new Date().getTime(),
-                                    reqOnboard: !data || !data?.username,
-                                    dp: dipswitch,
-                                    anonUser: !data,
-                                    ...data,
-                                }
 
-                                if (JSON.stringify(userBuild) !== JSON.stringify(JSON.parse(localUser).state.user)) {
-                                    console.log('↻ User data changed, updating...')
-                                    setUser(userBuild)
-                                }
-
-                                if (!userBuild.anonUser) {
-                                    const packs = (await vg.user.me.packs.get()).data || []
-                                    if (JSON.stringify(packs) !== localStorage.getItem('packs')) {
-                                        console.log('↻ Packs data changed, updating...')
-                                        localStorage.setItem('packs', JSON.stringify(packs))
-                                        setResources(packs)
-                                    }
-                                } else {
-                                    localStorage.removeItem('packs')
-                                    setResources([])
-                                }
-
-                                completeWorker('account-sync')
-
-                                proceed()
-                            })
-                            .catch(_ => {
-                                supabase.auth.signOut()
-                            })
+                        getSelfProfile(() => {
+                            proceed()
+                        })
                     } else {
                         setUser(null)
                         proceed()
@@ -87,7 +50,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
                 })
             })
             .catch((e) => {
-                console.log(e)
+                log.error('Core', e)
                 if (e?.message.indexOf('Failed') > -1)
                     return setError({
                         cause: 'UI & Server could not talk together',
@@ -99,7 +62,6 @@ export default function Preload({children}: { children: React.ReactNode }) {
 
     const setStatus = (status: string) => {
         setServiceLoading((prev) => {
-            console.log('🚦', status, prev)
             if (prev === status) return prev
             if (prev === 'proceeding') return prev
             return status

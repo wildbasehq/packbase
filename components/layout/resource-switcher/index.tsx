@@ -298,7 +298,7 @@ function ResourceSettingsModal() {
                 delete packUpdate[key]
             }
         }
-        console.log(packUpdate)
+
         vg.pack({id: currentResource.id})
             .post(packUpdate)
             .then(({error}) => {

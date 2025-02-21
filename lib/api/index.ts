@@ -4,6 +4,8 @@
 //         : `${window.location.protocol}//api.${window.location.hostname.replace('www.', '')}/api/`) : '/api/') + 'v2/';
 import VoyageSDK from 'voyagesdk-ts'
 import {useUIStore} from '@/lib/states.ts'
+import './cron/profile-update.ts'
+import {getSelfProfile} from '@/lib/api/cron/profile-update.ts'
 
 export const API_URL = import.meta.env.VITE_YAPOCK_URL
 let TOKEN: string | undefined
@@ -35,7 +37,7 @@ export const setToken = (token?: string, expires_in?: number) => {
     if (expires_in) {
         clearTimeout(refreshTimer)
         refreshTimer = setTimeout(refreshSession, expires_in * 1000)
-        console.log('Token set, will refresh in', expires_in)
+        log.info('Wild ID', 'Token set, will refresh in', expires_in)
     } else {
         clearTimeout(refreshTimer)
     }
@@ -55,4 +57,9 @@ const refreshSession = async () => {
 
     completeWorker('refresh-session')
     setToken(session?.access_token)
+
+    getSelfProfile()
+
+    setTimeout(refreshSession, session.expires_in * 1000)
+    log.info('Wild ID', 'Token refreshed, will refresh in', session.expires_in)
 }

@@ -114,7 +114,6 @@ export default function FeedList({
     const fetchPosts = (source?: string, clearOnNew = false, postsToUse?: any) => {
         const postsArray = postsToUse || posts
         queueWorker(`howl-dl${source ? `-${source}` : ''}`)
-        if (source) console.log(`Fetching howls for ${packID} from ${source}...`)
 
         vg.feed({id: packID})
             .get({query: {page: clearOnNew ? 1 : postsCurrentPage}})
@@ -140,7 +139,6 @@ export default function FeedList({
                     const newPosts = data.data.map((post: any) => post.id)
                     const oldPosts = postsArray.map((post: any) => post.id)
                     if (newPosts.filter((id: string) => !oldPosts.includes(id)).length !== 0) {
-                        console.log('New posts found, clearing feed...')
                         setPosts(data.data)
                         setPostsCurrentPage(2)
                         setPostsHasMore(data.has_more)
