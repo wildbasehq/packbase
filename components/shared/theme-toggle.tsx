@@ -1,5 +1,7 @@
-import {JSX, SVGProps, useEffect} from 'react'
+import {JSX, SVGProps, useEffect, useState} from 'react'
 import useLocalStorage from '@/lib/hooks/use-local-storage.ts'
+import {supabase} from '@/lib/api'
+import {useUserAccountStore} from '@/lib/states.ts'
 
 function SunIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
@@ -23,11 +25,36 @@ function MoonIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
 
 export function ThemeToggle() {
     const [theme, setTheme] = useLocalStorage('theme', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    const [loaded, setLoaded] = useState(false)
+    const {user} = useUserAccountStore()
 
     useEffect(() => {
+        if (!user) return setLoaded(true)
+        if (loaded) return
+        supabase.auth.getUser().then(({data, error}) => {
+            if (error) return
+            const doTheme = data?.user?.user_metadata?.theme
+            log.info('Theme', 'Got user theme:', doTheme)
+            setLoaded(true)
+            if (doTheme) setTheme(doTheme)
+        })
+    }, [])
+
+    useEffect(() => {
+        if (user && !loaded && theme === 'light') return
+        log.info('Theme', 'Setting theme:', theme)
         document.documentElement.classList.remove('light', 'dark')
         document.documentElement.classList.add(theme)
-    }, [theme])
+
+        if (user && loaded) {
+            log.info('Theme', 'Updating user theme:', theme)
+            supabase.auth.updateUser({
+                data: {theme}
+            }).catch(e => {
+                log.error('Theme', 'Failed to update user theme:', e)
+            })
+        }
+    }, [theme, loaded])
 
     return (
         <button
