@@ -3,7 +3,6 @@
  */
 
 import {ArrowUpOnSquareIcon, TrashIcon} from '@heroicons/react/24/solid'
-import Link from 'next/link'
 import UserAvatar from '@/components/shared/user/avatar'
 import Avatar from '@/components/shared/user/avatar'
 import {UserProfileBasic} from '@/lib/defs/user'
@@ -11,7 +10,7 @@ import Card from '@/components/shared/card'
 import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
 import {Dispatch, useRef, useState} from 'react'
-import {LoadingCircle} from 'components/icons'
+import {LoadingCircle} from '@/components/icons'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
 import {useUIStore, useUserAccountStore} from '@/lib/states'
@@ -25,6 +24,7 @@ import {Text} from '@/components/shared/text'
 import {Button} from '@/components/shared/button'
 import PostModal from '@/components/shared/feed/post-full-slideover'
 import {useModal} from '@/components/modal/provider'
+import Link from '@/components/shared/link.tsx'
 
 export declare interface FeedPostDataType {
     id: string
@@ -63,7 +63,7 @@ export default function FeedPost({post, onDelete, postState}: FeedPostType) {
     const deletePost = () => {
         vg.howl({id: postContent.id})
             .delete()
-            .then(({data, error}) => {
+            .then(({error}) => {
                 if (error) {
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 } else {
@@ -190,7 +190,7 @@ export default function FeedPost({post, onDelete, postState}: FeedPostType) {
                     <div className="px-4 py-4 sm:px-6">
                         <div className="flow-root">
                             <ul role="list" className="-mb-8">
-                                {post.comments.map((comment) => (
+                                {post.comments.slice(0, 6).map((comment) => (
                                     <div key={comment.id}>
                                         <FeedListItem
                                             comment={comment}
@@ -289,7 +289,7 @@ export function FeedListItem({...props}: any) {
     const deleteComment = () => {
         vg.howl({id: comment.id})
             .delete()
-            .then(({data, error}) => {
+            .then(({error}) => {
                 if (error) {
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                 } else {
@@ -430,7 +430,7 @@ export function React({post}: FeedPostType) {
         setSubmitting(true)
 
         const howlReact = vg.howl({id: post.id}).react
-        ;(hasCurrentUser ? howlReact.delete({slot: 0}) : howlReact.post({slot: 0})).then(({data, error}) => {
+        ;(hasCurrentUser ? howlReact.delete({slot: 0}) : howlReact.post({slot: 0})).then(({error}) => {
             setSubmitting(false)
             if (error) {
                 return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
@@ -590,6 +590,7 @@ export function CommentBox({...props}: any) {
 
     const createComment = (e?: { preventDefault: () => void }) => {
         if (e) e.preventDefault()
+        if (commentSubmitting) return
         setCommentSubmitting(true)
 
         const commentBody = {
@@ -631,13 +632,14 @@ export function CommentBox({...props}: any) {
                 </div>
             )}
 
-            <div
+            <form
                 className={clsx(
                     commentSubmitting
                         ? 'relative isolate overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:border before:border-x-0 before:border-b-0 before:border-t before:border-solid before:border-neutral-100/10 before:bg-linear-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent'
                         : '',
                     'relative flex items-center rounded',
                 )}
+                onSubmit={createComment}
             >
                 <input
                     type="text"
@@ -650,14 +652,14 @@ export function CommentBox({...props}: any) {
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <img className="h-5 w-5 rounded-full" src={user.images?.avatar || `/img/default-avatar.png`} alt=""/>
                 </div>
-                <div className="absolute inset-y-0 right-0 flex cursor-pointer items-center py-2 pr-2">
+                <button type="submit" className="absolute inset-y-0 right-0 flex cursor-pointer items-center py-2 pr-2">
                     {commentSubmitting ? (
                         <img className="h-5 w-5 animate-spin dark:invert" src={`/img/symbolic/process-working.symbolic.png`} alt="Process working spinner"/>
                     ) : (
-                        <PaperAirplaneIcon className="text-default h-5 w-5" onClick={createComment}/>
+                        <PaperAirplaneIcon className="text-default h-5 w-5"/>
                     )}
-                </div>
-            </div>
+                </button>
+            </form>
         </div>
     )
 }

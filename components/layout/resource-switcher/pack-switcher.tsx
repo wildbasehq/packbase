@@ -1,5 +1,3 @@
-'use client'
-
 import ECGIcon from '@/components/icons/dazzle/ecg'
 import {Logo} from '@/components/shared/logo'
 import {Text} from '@/components/shared/text'
@@ -11,10 +9,10 @@ import {cn} from '@/lib/utils'
 import {UsersIcon} from '@heroicons/react/20/solid'
 import {PlusIcon} from '@heroicons/react/24/solid'
 import {SettingsIcon, TentTreeIcon} from 'lucide-react'
-import Link from 'next/link'
-import {useRouter} from 'next/navigation'
 import useSound from 'use-sound'
-import './pack-switcher.component.scss'
+import './pack-switcher.component.css'
+import Link from '@/components/shared/link.tsx'
+import {useLocation} from 'wouter'
 
 export default function PackSwitcher() {
     const [initialSound] = useSound('/sounds/switcher.ogg')
@@ -26,17 +24,17 @@ export default function PackSwitcher() {
     const {currentResource, setCurrentResource, resources} = useResourceStore()
     const {user} = useUserAccountStore()
     const {resourceDefault, loading, setLoading} = useUIStore()
-    const router = useRouter()
+    const [, navigate] = useLocation()
 
     const switchResource = (resource: any) => {
         if (loading || currentResource.id === resource.id) {
-            if (resource.slug === 'universe') router.push('/p/universe')
+            if (resource.slug === 'universe') navigate('/p/universe')
             return heavyHoverSound()
         }
         resource.id === resourceDefault.id ? initialSound() : switchedSound()
         setCurrentResource(resource)
         setLoading(true)
-        router.push(`/p/${resource.slug}`)
+        navigate(`/p/${resource.slug}`)
     }
 
     return (

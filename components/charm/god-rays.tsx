@@ -7,7 +7,7 @@ const classNames = (...classes) => classes.filter(Boolean).join(' ')
  * @param {number} [props.durationSeconds] Animation duration in seconds
  * @param {string} [props.className]
  */
-export default function GodRays({ durationSeconds = 60, className }) {
+export default function GodRays({durationSeconds = 60, className}) {
     return (
         <div className="absolute inset-0 overflow-hidden">
             <div
@@ -17,6 +17,7 @@ export default function GodRays({ durationSeconds = 60, className }) {
                 )}
                 style={{
                     transform: 'translate3d(0, 0, 0)', // Fixes blurred edges in Safari
+                    // @ts-ignore
                     '--bg': 'currentcolor',
                     '--duration': `${durationSeconds}s`,
                     '--stripes': `repeating-linear-gradient(

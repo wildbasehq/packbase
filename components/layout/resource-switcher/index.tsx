@@ -1,6 +1,4 @@
-'use client'
-
-import {ExpandingArrow, LoadingCircle} from 'components/icons'
+import {ExpandingArrow, LoadingCircle} from '@/components/icons'
 import {Logo} from '@/components/shared/logo'
 import {Heading, Text} from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
@@ -8,8 +6,7 @@ import useComponentVisible from '@/lib/hooks/use-component-visible'
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
 import {createRef, useEffect, useState} from 'react'
 import useSound from 'use-sound'
-import {PlayFunction} from 'use-sound/dist/types'
-import './resource-switcher.component.scss'
+import './resource-switcher.component.css'
 import {Dropdown, DropdownHeader, DropdownMenu} from '@/components/shared/dropdown'
 import {MenuButton, MenuItem} from '@headlessui/react'
 import LogoutIcon from '@/components/icons/logout'
@@ -50,7 +47,7 @@ export default function ResourceSwitcher() {
     // fuck you nextjs
     const [domReady, setDomReady] = useState(false)
 
-    const playSound = (sound: PlayFunction) => {
+    const playSound = (sound: any) => {
         sound()
     }
 
@@ -112,7 +109,7 @@ export default function ResourceSwitcher() {
                     </Dropdown>
                 </div>
             ) : (
-                <div className="shimmer-template flex cursor-pointer select-none flex-row items-center justify-between">
+                <div className="flex cursor-pointer select-none flex-row items-center justify-between">
                     <span className="z-10 flex w-full items-center justify-between">
                         <div className="flex h-10 items-center space-x-2">
                             <LoadingCircle/>
@@ -128,7 +125,7 @@ export default function ResourceSwitcher() {
 function ResourceSwitcherMenu({close}: { close: () => void }) {
     const {currentResource: pack} = useResourceStore()
     const {user} = useUserAccountStore()
-    const {show, hide} = useModal()
+    const {show} = useModal()
 
     return (
         <DropdownHeader className="flex w-96 flex-col p-0!">
@@ -304,7 +301,7 @@ function ResourceSettingsModal() {
         console.log(packUpdate)
         vg.pack({id: currentResource.id})
             .post(packUpdate)
-            .then(({data, error}) => {
+            .then(({error}) => {
                 if (error) {
                     toast.error(
                         `Whoops! ${error.status}: ${

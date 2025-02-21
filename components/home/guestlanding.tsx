@@ -6,7 +6,6 @@ import {HelpCircleIcon} from 'lucide-react'
 import Link from '@/components/shared/link'
 import {Gradient} from '@/components/shared/gradient'
 import {Container} from '@/components/layout/container'
-import Image from 'next/image'
 
 const links = [
     {name: 'Join Packbase', href: '/id/create/'},
@@ -62,11 +61,9 @@ function Hero() {
                     </Heading>
                     {typeof tagline !== 'string' && (
                         <div className="flex items-center mt-4">
-                            <Image unoptimized src={tagline.pack.image}
-                                   alt=""
-                                   className="h-7 w-7 rounded-md"
-                                   width={28}
-                                   height={28}
+                            <img src={tagline.pack.image}
+                                 alt=""
+                                 className="h-7 w-7 rounded-md"
                             />
                             <Link href={`/p/${tagline.pack.slug}`}>
                                 <Text size="lg" className="ml-2">

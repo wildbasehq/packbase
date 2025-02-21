@@ -1,5 +1,3 @@
-'use client'
-
 import GridBody from '@/components/layout/grid-body'
 import Card from '@/components/shared/card'
 import FeedPost from '@/components/shared/feed/post'
@@ -11,8 +9,7 @@ import {Button} from '@/components/shared/experimental-button-rework'
 import {vg} from '@/lib/api'
 import {useUISettingsStore, useUIStore} from '@/lib/states'
 import {HelpCircleIcon} from 'lucide-react'
-import Image from 'next/image'
-import {useEffect, useState} from 'react'
+import {JSX, useEffect, useState} from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Masonry, {ResponsiveMasonry} from 'react-responsive-masonry'
 import {toast} from 'sonner'
@@ -20,7 +17,7 @@ import {HandRaisedIcon, MegaphoneIcon, WrenchScrewdriverIcon} from '@heroicons/r
 import {ProjectSafeName} from '@/lib/utils'
 import UserAvatar from '@/components/shared/user/avatar'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
-import WrenchCharacter from '@/public/svg/wrench-character.svg'
+import WrenchCharacter from '@/src/images/svg/wrench-character.svg'
 
 export default function FeedList({
                                      packID = '00000000-0000-0000-0000-000000000000',
@@ -52,7 +49,7 @@ export default function FeedList({
                             <Button color="indigo" href="https://discord.gg/StuuK55gYA" target="_blank">Discord</Button>{' '}
                         </span>
                         <div className="flex items-center justify-end">
-                            <Image unoptimized src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto"/>
+                            <img src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto"/>
                         </div>
                     </AlertDescription>
                 </Alert>
@@ -128,14 +125,11 @@ export default function FeedList({
 
     const LoadingCardSmall = () => {
         return (
-            <GridBody>
-                <Card className="dont-animate">
-                    <Image
+            <GridBody className="dont-animate">
+                <Card>
+                    <img
                         src="/img/dog-on-ship.gif"
                         alt="Animated pixel dog in box panting before falling over, then looping."
-                        height={128}
-                        width={168}
-                        unoptimized
                         style={{
                             imageRendering: 'pixelated',
                             display: 'inline-block',
@@ -217,7 +211,7 @@ export default function FeedList({
                         {posts.length !== 0 && (
                             <InfiniteScroll
                                 scrollableTarget="NGRoot"
-                                key={feedID}
+                                key={changingView ? 'changing' : 'unchanged'}
                                 scrollThreshold={0.5}
                                 className={FeedViewConfig !== 1 ? 'sm:w-screen sm:max-w-md' : ''}
                                 dataLength={posts.length}
@@ -319,14 +313,28 @@ export function LoadingCard({
         // @ts-ignore
         <ResponsiveMasonry columnsCountBreakPoints={masonryColumns}>
             {/* @ts-ignore */}
+            {/*<Card className="dont-animate w-full absolute z-10">*/}
+            {/*    <img*/}
+            {/*        src="/img/dog-on-ship.gif"*/}
+            {/*        alt="Animated pixel dog in box panting before falling over, then looping."*/}
+            {/*        className="h-42 w-fit"*/}
+            {/*        style={{*/}
+            {/*            imageRendering: 'pixelated',*/}
+            {/*            display: 'inline-block',*/}
+            {/*            marginTop: '-1px',*/}
+            {/*            marginRight: '4px',*/}
+            {/*        }}*/}
+            {/*    />*/}
+            {/*    <Text size="sm">{title}</Text>*/}
+            {/*</Card>*/}
+
             <Masonry className="list-stagger animate-pulse-stagger" gutter="24px">
-                <Card className="dont-animate">
-                    <Image
+                {/* EXTREMELY DIRTY TRICKKKKK */}
+                <Card className="w-full dont-animate">
+                    <img
                         src="/img/dog-on-ship.gif"
                         alt="Animated pixel dog in box panting before falling over, then looping."
-                        height={128}
-                        width={168}
-                        unoptimized
+                        className="h-42 w-fit"
                         style={{
                             imageRendering: 'pixelated',
                             display: 'inline-block',
@@ -343,6 +351,7 @@ export function LoadingCard({
                         key={i}
                         style={{
                             height: `${Math.floor(Math.random() * 100) + 120}px`,
+                            width: '100%',
                         }}
                     >
                         <></>
@@ -360,6 +369,7 @@ function FeedListItem({post, gridTutorialID, postState}: { post: any; gridTutori
                 style={{
                     height: `${Math.floor(Math.random() * 75) + 150}px`,
                     backgroundColor: `hsl(${gridTutorialID * 15} 50% 50% / 0.05)`,
+                    width: '100%',
                 }}
             >
                 <div className="flex items-center gap-2">

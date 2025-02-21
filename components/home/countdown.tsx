@@ -1,8 +1,6 @@
-'use client'
 import {useEffect, useState} from 'react'
 import {Heading, Text} from '@/components/shared/text'
-import IkikaiServing from '@/public/img/ikigai-serving.png'
-import Image from 'next/image'
+import IkikaiServing from '@/src/images/png/ikigai-serving.png'
 
 export default function Countdown() {
     // For countdown to 00:00 8th of April 2024 (AEDT)
@@ -68,7 +66,7 @@ export default function Countdown() {
                 </div>
             </div>
             <div className="flex items-end justify-end">
-                <Image unoptimized src={IkikaiServing} alt="shiba serving noodles to stray cats drawing" className="right-0 w-auto"/>
+                <img src={IkikaiServing} alt="shiba serving noodles to stray cats drawing" className="right-0 w-auto"/>
             </div>
         </div>
     )

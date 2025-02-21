@@ -1,3 +1,5 @@
+import {JSX} from 'react'
+
 export default function WireframeList({...props}: {
     [key: string]: any;
 }): JSX.Element {
@@ -31,7 +33,8 @@ export default function WireframeList({...props}: {
                                     <path fill="url(#b)" d="M0 0h34v24H0z"/>
                                 </pattern>
                             </defs>
-                            <path fill="url(#c)" d="m40 174-5 1h-1l-4 4 6 1h1l3-6Zm9 11v1l-1 2-2 1-1 1H35l-1 1-5 5h-1l-2-5-9 1v-1l2-5v-1l-4-1 5-3 1-1 3-5h1l5-3s1 0 0 0l-1 8 9 1 1 1 2 2v1h8Z"/>
+                            <path fill="url(#c)"
+                                  d="m40 174-5 1h-1l-4 4 6 1h1l3-6Zm9 11v1l-1 2-2 1-1 1H35l-1 1-5 5h-1l-2-5-9 1v-1l2-5v-1l-4-1 5-3 1-1 3-5h1l5-3s1 0 0 0l-1 8 9 1 1 1 2 2v1h8Z"/>
                             <g>
                                 <path fill="#fff" d="M33 183h5v1l-1 1h-2l-2-2Z" className="fill-white"/>
                             </g>

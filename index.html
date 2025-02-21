@@ -1,0 +1,28 @@
+<!doctype html>
+<html class="overflow-hidden" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <link href="/src/favicon.ico" rel="icon" type="image/svg+xml"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <style>
+        @font-face {
+            font-family: "Lexend";
+            src: url('@/src/fonts/lexend-variable.ttf') format('truetype');
+        }
+
+        :root {
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+
+    <!-- scss -->
+    <link href="/src/styles/globals.css" rel="stylesheet">
+    <link href="/src/styles/_to-org.scss" rel="stylesheet">
+
+    <title>Packbase</title>
+</head>
+<body class="h-full overflow-hidden bg-n-1 dark:bg-n-9">
+<div class="text-n-8 dark:text-white" id="root"></div>
+<script src="/src/main.tsx" type="module"></script>
+</body>
+</html>

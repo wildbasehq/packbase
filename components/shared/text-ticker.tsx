@@ -1,5 +1,3 @@
-'use client'
-
 import {useEffect, useState} from 'react'
 import ReactTextTransition, {presets} from 'react-text-transition'
 import {SpringConfig} from '@react-spring/web'

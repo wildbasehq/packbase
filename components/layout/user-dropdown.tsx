@@ -1,5 +1,3 @@
-'use client'
-
 import {Dropdown, DropdownDescription, DropdownHeader, DropdownItem, DropdownLabel, DropdownMenu} from '@/components/shared/dropdown'
 import LogoutIcon from '@/components/icons/logout'
 import {Heading, Text} from '@/components/shared/text'
@@ -12,9 +10,9 @@ import {MenuButton} from '@headlessui/react'
 import {ChevronDownIcon} from '@heroicons/react/20/solid'
 import {MinusCircleIcon, MoonIcon} from '@heroicons/react/24/solid'
 import {SettingsIcon} from 'lucide-react'
-import Link from 'next/link'
 import {Dispatch, SetStateAction} from 'react'
 import {supabase} from '@/lib/api'
+import Link from '@/components/shared/link.tsx'
 
 export default function UserDropdown({showOnboardingModal}: { showOnboardingModal: Dispatch<SetStateAction<boolean>> | (() => void) }) {
     const {user, setUser} = useUserAccountStore()
@@ -171,7 +169,7 @@ export default function UserDropdown({showOnboardingModal}: { showOnboardingModa
             <div className="flex w-full flex-col items-center justify-center border-t px-7 py-5">
                 <Text size="xs" alt>
                     {ProjectSafeName} (Name isn't final. {ProjectName}) &copy; ✱base. &mdash;{' '}
-                    {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF || process.env.NEXT_PUBLIC_VERCEL_ENV || 'local'} - {process.env.NEXT_PUBLIC_BUILD_ID || '0000000'}
+                    {import.meta.env.VITE_VERCEL_GIT_COMMIT_REF || import.meta.env.VITE_VERCEL_ENV || 'local'} - {import.meta.env.VITE_BUILD_ID || '0000000'}
                 </Text>
             </div>
         </DropdownHeader>

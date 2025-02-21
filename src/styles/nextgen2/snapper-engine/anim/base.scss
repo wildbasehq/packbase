@@ -1,0 +1,65 @@
+$anim-cubic-bezier: 0.25s cubic-bezier(0, 1.25, 0, 1);
+
+@use "crawl-text";
+@use "groupcreationanimation";
+
+.snapanim-hue-blur {
+  filter: blur(64px) hue-rotate(0);
+  animation: logoHueBlur 1s ease-out, logoHueBlur 120s linear 1s infinite;
+}
+
+.snapanim-hue-blur-reverse {
+  filter: blur(64px) hue-rotate(0);
+  animation: logoHueBlur 1s ease-out reverse, logoHueBlur 120s linear 1s infinite reverse;
+}
+
+.snapanim-elastic {
+  // Transform to zoom in
+  &.snapanim-in {
+    transform: scale(0); // Should start at 0
+    transition: transform $anim-cubic-bezier;
+    animation: zoomIn $anim-cubic-bezier forwards;
+  }
+}
+
+.snapanim-shake {
+  animation: snapShake infinite 100ms;
+}
+
+@keyframes snapShake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(4px);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes logoHueBlur {
+  0% {
+    filter: blur(64px) hue-rotate(0);
+  }
+
+  100% {
+    filter: blur(64px) hue-rotate(360deg);
+  }
+}
+

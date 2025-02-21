@@ -1,9 +1,8 @@
 import UserAvatar from '@/components/shared/user/avatar'
-import Link from 'next/link'
 import {Text} from '@/components/shared/text'
 import {DotIcon} from 'lucide-react'
 import {Button} from '@/components/shared/experimental-button-rework'
-import {LoadingCircle} from 'components/icons'
+import {LoadingCircle} from '@/components/icons'
 import Card from '@/components/shared/card'
 import React, {FormEvent, useRef, useState} from 'react'
 import {vg} from '@/lib/api'
@@ -16,6 +15,7 @@ import {QuestionMarkCircleIcon, XCircleIcon} from '@heroicons/react/20/solid'
 import clsx from 'clsx'
 import Tooltip from '@/components/shared/tooltip'
 import {useModal} from '@/components/modal/provider'
+import Link from '@/components/shared/link.tsx'
 
 export default function HowlCreator() {
     const {user} = useUserAccountStore()
@@ -78,7 +78,7 @@ function HowlCard() {
         post.tenant_id = currentResource.id
         vg.howl.create
             .post(post)
-            .then(({data, error}) => {
+            .then(({error}) => {
                 if (error) {
                     setSubmitting(false)
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')

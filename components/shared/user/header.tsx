@@ -1,8 +1,6 @@
-'use client'
 import {Heading} from '@/components/shared/text'
 import Markdown from '@/components/shared/markdown'
 import UserAvatar from '@/components/shared/user/avatar'
-import Image from 'next/image'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
 import {Button} from '@/components/shared/button'
@@ -10,7 +8,7 @@ import {useUserAccountStore} from '@/lib/states'
 import {useState} from 'react'
 
 // @TODO: Unify user and pack headers.
-export default function ProfileHeader({ ...props }: any) {
+export default function ProfileHeader({...props}: any) {
     const profile = props.user
 
     const {user} = useUserAccountStore()
@@ -18,7 +16,7 @@ export default function ProfileHeader({ ...props }: any) {
     return (
         <div className="relative">
             <div>
-                <Image
+                <img
                     height={1080}
                     width={1920}
                     className="pointer-events-none aspect-banner w-full rounded-bl rounded-br object-cover"
@@ -29,7 +27,7 @@ export default function ProfileHeader({ ...props }: any) {
             <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
                 <div className="-mt-12 sm:flex sm:items-end sm:space-x-5">
                     <div className="flex">
-                        <UserAvatar size={96} user={profile} className="bg-default ring-default pointer-events-none h-24 w-24 rounded-lg ring-1 sm:h-32 sm:w-32" />
+                        <UserAvatar size={96} user={profile} className="bg-default ring-default pointer-events-none h-24 w-24 rounded-lg ring-1 sm:h-32 sm:w-32"/>
                     </div>
                     <div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                         <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
@@ -57,7 +55,7 @@ export default function ProfileHeader({ ...props }: any) {
     )
 }
 
-function UserFollowButton({ user }: { user: any }) {
+function UserFollowButton({user}: { user: any }) {
     const [following, setFollowing] = useState(user.following)
     const [submitting, setSubmitting] = useState(false)
     const follow = () => {

@@ -1,6 +1,6 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { ProjectSafeName } from '@/lib/utils'
+import {create} from 'zustand'
+import {persist} from 'zustand/middleware'
+import {ProjectSafeName} from '@/lib/utils'
 
 interface UIStore {
     feedView: number
@@ -96,7 +96,6 @@ export const useResourceStore = create<ResourceStore>((set) => ({
 export const settingsResource = {
     id: 'settings',
     display_name: 'Configure',
-    icon: '/svg/settings.svg',
     standalone: true,
 }
 

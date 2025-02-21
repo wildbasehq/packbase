@@ -1,13 +1,11 @@
-'use client'
-
 import {AlertTriangle, XCircleIcon} from 'lucide-react'
-import {useParams} from 'next/navigation'
 import {FormEvent, useState} from 'react'
 import {toast} from 'sonner'
-import {LoadingDots} from 'components/icons'
+import {LoadingDots} from '@/components/icons'
 import {Input} from '@/components/shared/input/text'
 import {Button} from '@/components/shared/button'
 import {ProjectSafeName} from '@/lib/utils'
+import {useParams} from 'wouter'
 
 export default function ReportAbuse() {
     const [open, setOpen] = useState(false)

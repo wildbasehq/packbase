@@ -1,5 +1,3 @@
-'use client'
-
 import {useEffect, useState} from 'react'
 import {EditorContent, JSONContent, useEditor} from '@tiptap/react'
 import {defaultEditorProps} from './props'
@@ -7,7 +5,6 @@ import {defaultExtensions} from './extensions'
 import useLocalStorage from '@/components/novel/lib/hooks/use-local-storage'
 import {useDebouncedCallback} from 'use-debounce'
 import {EditorBubbleMenu} from './bubble-menu'
-import {ImageResizer} from './extensions/image-resizer'
 import {EditorProps} from '@tiptap/pm/view'
 import {Editor as EditorClass, Extensions} from '@tiptap/core'
 import {NovelContext} from './provider'
@@ -135,7 +132,7 @@ export default function Editor({
                 className={className}
             >
                 {editor && <EditorBubbleMenu editor={editor}/>}
-                {editor?.isActive('image') && <ImageResizer editor={editor}/>}
+                {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
                 <EditorContent editor={editor}/>
             </div>
         </NovelContext.Provider>

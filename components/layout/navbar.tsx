@@ -1,5 +1,3 @@
-'use client'
-
 import UserDropdown from '@/components/layout/user-dropdown'
 import {Dropdown, DropdownMenu} from '@/components/shared/dropdown'
 import {ThemeToggle} from '@/components/shared/theme-toggle'

@@ -1,5 +1,5 @@
-import { JSX, SVGProps, useEffect, useState} from 'react'
-import {useTheme} from 'next-themes'
+import {JSX, SVGProps, useEffect} from 'react'
+import useLocalStorage from '@/lib/hooks/use-local-storage.ts'
 
 function SunIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
@@ -16,29 +16,28 @@ function SunIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
 function MoonIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" {...props}>
-            <path d="M15.224 11.724a5.5 5.5 0 0 1-6.949-6.949 5.5 5.5 0 1 0 6.949 6.949Z" />
+            <path d="M15.224 11.724a5.5 5.5 0 0 1-6.949-6.949 5.5 5.5 0 1 0 6.949 6.949Z"/>
         </svg>
     )
 }
 
 export function ThemeToggle() {
-    let { resolvedTheme, setTheme } = useTheme()
-    let otherTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
-    let [mounted, setMounted] = useState(false)
+    const [theme, setTheme] = useLocalStorage('theme', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
 
     useEffect(() => {
-        setMounted(true)
-    }, [])
+        document.documentElement.classList.remove('light', 'dark')
+        document.documentElement.classList.add(theme)
+    }, [theme])
 
     return (
         <button
             type="button"
             className="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5"
-            aria-label={mounted ? `Switch to ${otherTheme} theme` : 'Toggle theme'}
-            onClick={() => setTheme(otherTheme)}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
         >
-            <SunIcon className="h-5 w-5 stroke-zinc-900 dark:hidden" />
-            <MoonIcon className="hidden h-5 w-5 stroke-white dark:block" />
+            <SunIcon className="h-5 w-5 stroke-zinc-900 dark:hidden"/>
+            <MoonIcon className="hidden h-5 w-5 stroke-white dark:block"/>
         </button>
     )
 }

@@ -1,18 +1,15 @@
-'use client'
-
 import UserAvatar from '@/components/shared/user/avatar'
 // @ts-ignore
 import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
 import {BentoStaffBadge} from '@/lib/utils/pak'
 import * as HoverCard from '@radix-ui/react-hover-card'
-import Image from 'next/image'
 
 export default function UserInfoCol({
-    user,
-    size,
-    tag,
-}: {
+                                        user,
+                                        size,
+                                        tag,
+                                    }: {
     user: any // object
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
     tag?: React.ReactNode
@@ -24,18 +21,18 @@ export default function UserInfoCol({
     return (
         <HoverCard.Root>
             <HoverCard.Trigger className="select-none no-underline!" asChild>
-                <UserInfo user={user} size={size} tag={tag} />
+                <UserInfo user={user} size={size} tag={tag}/>
             </HoverCard.Trigger>
             <HoverCard.Portal>
                 <HoverCard.Content
                     className="data-[side=right]:animate-slideLeftAndFade data-[side=left]:animate-slideRightAndFade relative w-96 overflow-hidden rounded border bg-card p-5 shadow-sm data-[side=bottom]:animate-slide-up-fade-snapper data-[side=top]:animate-slide-down-fade data-[state=open]:transition-all"
                     sideOffset={5}
-                    collisionPadding={{ left: 32 }}
+                    collisionPadding={{left: 32}}
                 >
                     {user.images?.header && (
                         <div className="pointer-events-none absolute right-0 top-0 h-full w-full">
                             {/*<div className="absolute w-full h-full bg-card/90 rounded"/>*/}
-                            <Image
+                            <img
                                 src={user.images?.header}
                                 width={1080}
                                 height={1080}
@@ -46,12 +43,12 @@ export default function UserInfoCol({
                     )}
 
                     <div className="z-50 flex flex-col gap-[7px]">
-                        <UserAvatar size="3xl" user={user} />
+                        <UserAvatar size="3xl" user={user}/>
                         <div className="flex flex-col gap-4">
                             <div>
                                 <div className="text-md">
                                     {user.display_name || user.username}
-                                    {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />}
+                                    {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20}/>}
                                 </div>
                                 <div className="text-alt text-sm">@{user.username}</div>
                             </div>
@@ -67,7 +64,7 @@ export default function UserInfoCol({
                         </div>
                     </div>
 
-                    <HoverCard.Arrow className="fill-white" />
+                    <HoverCard.Arrow className="fill-white"/>
                 </HoverCard.Content>
             </HoverCard.Portal>
         </HoverCard.Root>
@@ -75,21 +72,21 @@ export default function UserInfoCol({
 }
 
 export function UserInfo({
-    user,
-    size,
-    tag,
-}: {
+                             user,
+                             size,
+                             tag,
+                         }: {
     user: any // object
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
     tag?: React.ReactNode
 }) {
     return (
         <div className="flex flex-row items-center gap-2">
-            <UserAvatar user={user} size={size} />
+            <UserAvatar user={user} size={size}/>
             <div className="flex flex-col">
                 <Link href={`/@${user.username}`} className="text-default text-sm font-semibold">
                     {user.display_name || user.username}
-                    {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />}
+                    {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20}/>}
                 </Link>
                 <span className="text-alt w-32 self-baseline overflow-hidden text-ellipsis whitespace-nowrap text-xs unicorn:text-on-surface-variant/50">
                     {tag || user.tag || user.about?.bio || 'piss'}
