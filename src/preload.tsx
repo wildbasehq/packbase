@@ -26,7 +26,6 @@ export default function Preload({children}: { children: React.ReactNode }) {
                 supabase.auth.getSession().then(async ({data: {session}}) => {
                     const {user, access_token, expires_in} = session || {}
                     if (user) {
-                        const {data} = await supabase.auth.getSession()
                         setToken(access_token, expires_in)
                         setServiceLoading('auth:@me')
                         vg.user.me
