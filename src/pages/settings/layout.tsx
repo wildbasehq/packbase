@@ -1,7 +1,6 @@
 import {useEffect} from 'react'
 import Body from '@/components/layout/body'
 import {settingsResource, useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
-import {Cog6ToothIcon} from '@heroicons/react/24/solid'
 import {Heading, Text} from '@/components/shared/text'
 import Link from '@/components/shared/link'
 import WolfoxDrawing from '@/src/images/png/wolfox-drawing.png'
@@ -9,10 +8,10 @@ import {Input} from '@/components/shared/input/text'
 import {Button} from '@/components/shared/experimental-button-rework'
 import {vg} from '@/lib/api'
 import GridBody from '@/components/layout/grid-body'
-import {EnvelopeIcon, EnvelopeOpenIcon} from '@heroicons/react/16/solid'
-import {useLocation} from 'wouter'
+import {EnvelopeIcon, EnvelopeOpenIcon, IdentificationIcon, SwatchIcon} from '@heroicons/react/16/solid'
+import {Redirect, useLocation} from 'wouter'
 
-export default function Settings({children}: { children: React.ReactNode }) {
+export default function SettingsLayout({children}: { children: React.ReactNode }) {
     const {user} = useUserAccountStore()
     const [, navigate] = useLocation()
     const {setNavigation} = useUIStore()
@@ -31,10 +30,15 @@ export default function Settings({children}: { children: React.ReactNode }) {
         } else {
             setNavigation([
                 {
-                    name: 'General',
+                    name: 'Public Information',
                     description: '',
                     href: '/settings',
-                    icon: Cog6ToothIcon,
+                    icon: IdentificationIcon,
+                },
+                {
+                    name: 'Template',
+                    href: '/settings/template',
+                    icon: SwatchIcon,
                 },
                 {
                     name: 'Invite',
@@ -78,7 +82,9 @@ export default function Settings({children}: { children: React.ReactNode }) {
             })
     }
 
-    if (!user) return navigate('/id/login')
+    if (!user) return <>
+        <Redirect to="/id/login"/>
+    </>
 
     if (user.anonUser)
         return (

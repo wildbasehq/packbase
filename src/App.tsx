@@ -16,6 +16,9 @@ import PackHome from '@/src/pages/pack/[slug]/page.tsx'
 import PackCosmos from '@/src/pages/pack/[slug]/cosmos/page.tsx'
 import NotFound from '@/src/not-found.tsx'
 import PackAdd from '@/src/pages/pack/new/page.tsx'
+import SettingsLayout from '@/src/pages/settings/layout.tsx'
+import SettingsGeneral from '@/src/pages/settings/page.tsx'
+import SettingsInvite from '@/src/pages/settings/invite/page.tsx'
 
 function App() {
     return (
@@ -56,16 +59,35 @@ function App() {
                                                     </IDLayout>
                                                 </Route>
 
-                                                <Route path="/p/new">
-                                                    <PackAdd/>
-                                                </Route>
                                                 <Route path="/p" nest>
-                                                    <Route path="/:slug" nest>
-                                                        <PackLayout>
-                                                            <Route path="/"><PackHome/></Route>
-                                                            <Route path="/cosmos"><PackCosmos/></Route>
-                                                        </PackLayout>
-                                                    </Route>
+                                                    <Switch>
+                                                        <Route path="/new">
+                                                            <PackAdd/>
+                                                        </Route>
+
+                                                        <Route path="/:slug" nest>
+                                                            <PackLayout>
+                                                                <Route path="/"><PackHome/></Route>
+                                                                <Route path="/cosmos"><PackCosmos/></Route>
+                                                            </PackLayout>
+                                                        </Route>
+                                                    </Switch>
+                                                </Route>
+
+                                                <Route path="/settings" nest>
+                                                    <SettingsLayout>
+                                                        <Switch>
+                                                            <Route path="/invite">
+                                                                <SettingsInvite/>
+                                                            </Route>
+
+                                                            <Route path="/">
+                                                                <SettingsGeneral/>
+                                                            </Route>
+
+                                                            <Route component={NotFound}/>
+                                                        </Switch>
+                                                    </SettingsLayout>
                                                 </Route>
 
                                                 <Route>
