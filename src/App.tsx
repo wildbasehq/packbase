@@ -22,6 +22,7 @@ import SettingsInvite from '@/src/pages/settings/invite/page.tsx'
 import TermsPage from '@/src/pages/terms/page.tsx'
 import ThankYouFriends from '@/src/pages/thanks/page.tsx'
 import UserProfile from '@/src/pages/user/[...slug]/page.tsx'
+import SettingsTemplate from '@/src/pages/settings/template/page.tsx'
 
 function App() {
     return (
@@ -85,13 +86,11 @@ function App() {
                                                 <Route path="/settings" nest>
                                                     <SettingsLayout>
                                                         <Switch>
-                                                            <Route path="/invite">
-                                                                <SettingsInvite/>
-                                                            </Route>
+                                                            <Route path="/template" component={SettingsTemplate}/>
 
-                                                            <Route path="/">
-                                                                <SettingsGeneral/>
-                                                            </Route>
+                                                            <Route path="/invite" component={SettingsInvite}/>
+
+                                                            <Route path="/" component={SettingsGeneral}/>
 
                                                             <Route component={NotFound}/>
                                                         </Switch>
