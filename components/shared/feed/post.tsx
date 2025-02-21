@@ -11,6 +11,7 @@ import UserInfoCol from '@/components/shared/user/info-col'
 import moment from 'moment'
 import {Dispatch, useRef, useState} from 'react'
 import {LoadingCircle} from '@/components/icons'
+import ProcessWorkingSymbol from '@/src/images/symbolic/process-working.symbolic.png'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
 import {useUIStore, useUserAccountStore} from '@/lib/states'
@@ -654,7 +655,7 @@ export function CommentBox({...props}: any) {
                 </div>
                 <button type="submit" className="absolute inset-y-0 right-0 flex cursor-pointer items-center py-2 pr-2">
                     {commentSubmitting ? (
-                        <img className="h-5 w-5 animate-spin dark:invert" src={`/img/symbolic/process-working.symbolic.png`} alt="Process working spinner"/>
+                        <img className="h-5 w-5 animate-spin dark:invert" src={ProcessWorkingSymbol} alt="Process working spinner"/>
                     ) : (
                         <PaperAirplaneIcon className="text-default h-5 w-5"/>
                     )}

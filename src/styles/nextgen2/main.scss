@@ -15,7 +15,7 @@
 // TODO: Bloody move these into their own stuff
 // Devel uses different header backgrounds
 .devel {
-  background-image: cross-fade(5% url("/img/symbolic/devel.symbolic.svg"),
+  background-image: cross-fade(5% url("@/src/images/symbolic/devel.symbolic.svg"),
           image(transparent));
   background-repeat: repeat-x;
 }
