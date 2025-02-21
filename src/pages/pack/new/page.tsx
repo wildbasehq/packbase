@@ -5,7 +5,7 @@ import {Input} from '@/components/shared/input/text'
 import {Heading, Text} from '@/components/shared/text'
 import {Button} from '@/components/shared/button'
 import {vg} from '@/lib/api'
-import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
+import {useResourceStore, useUserAccountStore} from '@/lib/states'
 import {toast} from 'sonner'
 import {Description, Dialog, DialogTitle, Label, Radio, RadioGroup, Transition, TransitionChild} from '@headlessui/react'
 import {BarsArrowUpIcon, ChevronDownIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon} from '@heroicons/react/20/solid'
@@ -15,11 +15,9 @@ import PackCard from '@/components/shared/pack/card'
 
 export default function PackAdd() {
     const {setCurrentResource} = useResourceStore()
-    const {setHidden} = useUIStore()
     const user = useUserAccountStore((state) => state.user)
 
     useEffect(() => {
-        setHidden(true)
         setCurrentResource({id: 'new', slug: 'new', display_name: 'Create a Pack', standalone: true})
     }, [])
 

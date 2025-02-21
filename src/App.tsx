@@ -15,6 +15,7 @@ import PackLayout from '@/src/pages/pack/[slug]/layout.tsx'
 import PackHome from '@/src/pages/pack/[slug]/page.tsx'
 import PackCosmos from '@/src/pages/pack/[slug]/cosmos/page.tsx'
 import NotFound from '@/src/not-found.tsx'
+import PackAdd from '@/src/pages/pack/new/page.tsx'
 
 function App() {
     return (
@@ -55,6 +56,9 @@ function App() {
                                                     </IDLayout>
                                                 </Route>
 
+                                                <Route path="/p/new">
+                                                    <PackAdd/>
+                                                </Route>
                                                 <Route path="/p" nest>
                                                     <Route path="/:slug" nest>
                                                         <PackLayout>
