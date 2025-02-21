@@ -35,48 +35,46 @@ export default function Preload({children}: { children: React.ReactNode }) {
                             setUser(JSON.parse(localUser))
                             proceed()
                         }
-                        setTimeout(() => {
-                            vg.user.me
-                                .get()
-                                .then(async ({data}) => {
-                                    setStatus('auth:@me:metadata')
-                                    const dipswitch = (await vg.dipswitch.get({
-                                        query: {}
-                                    })).data || []
-                                    let userBuild = {
-                                        id: user.id,
-                                        username: data?.username || 'new_here_' + new Date().getTime(),
-                                        display_name: data?.display_name || 'new_here_' + new Date().getTime(),
-                                        reqOnboard: !data || !data?.username,
-                                        dp: dipswitch,
-                                        anonUser: !data,
-                                        ...data,
-                                    }
+                        vg.user.me
+                            .get()
+                            .then(async ({data}) => {
+                                setStatus('auth:@me:metadata')
+                                const dipswitch = (await vg.dipswitch.get({
+                                    query: {}
+                                })).data || []
+                                let userBuild = {
+                                    id: user.id,
+                                    username: data?.username || 'new_here_' + new Date().getTime(),
+                                    display_name: data?.display_name || 'new_here_' + new Date().getTime(),
+                                    reqOnboard: !data || !data?.username,
+                                    dp: dipswitch,
+                                    anonUser: !data,
+                                    ...data,
+                                }
 
-                                    if (JSON.stringify(userBuild) !== localUser) {
-                                        console.log('↻ User data changed, updating...')
-                                        localStorage.setItem('user', JSON.stringify(userBuild))
-                                        setUser(userBuild)
-                                    }
+                                if (JSON.stringify(userBuild) !== localUser) {
+                                    console.log('↻ User data changed, updating...')
+                                    localStorage.setItem('user', JSON.stringify(userBuild))
+                                    setUser(userBuild)
+                                }
 
-                                    if (!userBuild.anonUser) {
-                                        const packs = (await vg.user.me.packs.get()).data || []
-                                        if (JSON.stringify(packs) !== localStorage.getItem('packs')) {
-                                            console.log('↻ Packs data changed, updating...')
-                                            localStorage.setItem('packs', JSON.stringify(packs))
-                                            setResources(packs)
-                                        }
-                                    } else {
-                                        localStorage.removeItem('packs')
-                                        setResources([])
+                                if (!userBuild.anonUser) {
+                                    const packs = (await vg.user.me.packs.get()).data || []
+                                    if (JSON.stringify(packs) !== localStorage.getItem('packs')) {
+                                        console.log('↻ Packs data changed, updating...')
+                                        localStorage.setItem('packs', JSON.stringify(packs))
+                                        setResources(packs)
                                     }
+                                } else {
+                                    localStorage.removeItem('packs')
+                                    setResources([])
+                                }
 
-                                    proceed()
-                                })
-                                .catch(_ => {
-                                    supabase.auth.signOut()
-                                })
-                        }, 5000)
+                                proceed()
+                            })
+                            .catch(_ => {
+                                supabase.auth.signOut()
+                            })
                     } else {
                         setUser(null)
                         proceed()
