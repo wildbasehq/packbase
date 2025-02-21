@@ -115,12 +115,17 @@ interface ResourceUIStore {
     navigation: any[]
     bucketRoot: string
     maintenance: string | null
+
     setHidden: (hidden: boolean) => void
     setLoading: (loading: boolean) => void
     setConnecting: (connecting: boolean) => void
     setNavigation: (navigation: any) => void
     setBucketRoot: (bucketRoot: string) => void
     setMaintenance: (maintenance: string | null) => void
+
+    workerQueue: any[]
+    queueWorker: (worker: any) => void
+    completeWorker: (worker: any) => void
 }
 
 export const useUIStore = create<ResourceUIStore>((set) => ({
@@ -131,6 +136,7 @@ export const useUIStore = create<ResourceUIStore>((set) => ({
     navigation: [],
     bucketRoot: '',
     maintenance: null,
+    workerQueue: [],
     setHidden: (hidden) =>
         set((state) => ({
             ...state,
@@ -162,4 +168,25 @@ export const useUIStore = create<ResourceUIStore>((set) => ({
             ...state,
             maintenance,
         })),
+
+    queueWorker: (worker) =>
+        set((state) => {
+            const queue = state.workerQueue
+            queue.push(worker)
+            return {
+                ...state,
+                workerQueue: queue,
+            }
+        }),
+
+    completeWorker: (worker) =>
+        set((state) => {
+            const queue = state.workerQueue
+            // Remove the worker from the queue
+            queue.splice(queue.indexOf(worker), 1)
+            return {
+                ...state,
+                workerQueue: queue,
+            }
+        })
 }))

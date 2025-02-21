@@ -11,7 +11,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`polling ${API_URL}`)
     const [error, setError] = useState<any | null>(null)
     const {setUser} = useUserAccountStore()
-    const {setLoading, setConnecting, setBucketRoot, setMaintenance} = useUIStore()
+    const {setLoading, setConnecting, setBucketRoot, setMaintenance, queueWorker, completeWorker} = useUIStore()
     const {setResources} = useResourceStore()
 
     useEffect(() => {
@@ -32,6 +32,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
                         if (localUser) {
                             const json = JSON.parse(localUser)
                             if (json.state.user) {
+                                queueWorker('account-sync')
                                 const packs = localStorage.getItem('packs')
                                 if (packs) setResources(JSON.parse(packs))
                                 setUser(json.state.user)
@@ -71,6 +72,8 @@ export default function Preload({children}: { children: React.ReactNode }) {
                                     localStorage.removeItem('packs')
                                     setResources([])
                                 }
+
+                                completeWorker('account-sync')
 
                                 proceed()
                             })

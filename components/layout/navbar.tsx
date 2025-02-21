@@ -11,10 +11,12 @@ import UserOnboardingModal from '../modal/user-onboarding-modal'
 import {FaDiscord} from 'react-icons/fa6'
 import {Logo} from '@/components/shared/logo'
 import Link from '@/components/shared/link'
+import {LoadingSpinner} from '@/components/icons'
+import Tooltip from '@/components/shared/tooltip.tsx'
 
 export default function NavBar() {
     const {user} = useUserAccountStore()
-    const {hidden} = useUIStore()
+    const {hidden, workerQueue} = useUIStore()
 
     const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false)
 
@@ -41,6 +43,23 @@ export default function NavBar() {
                         <div className="relative"></div>
 
                         <div className="flex items-center gap-5">
+                            {workerQueue.length > 0 && <>
+                                <Tooltip content={
+                                    <div className="flex flex-col gap-2 p-4">
+                                        <div className="text-xs">Tasks in progress:</div>
+                                        {workerQueue.map((task, i) => (
+                                            <div key={i} className="text-xs truncate">{task}</div>
+                                        ))}
+                                    </div>
+                                }>
+                                    <div className="flex scale-80 ">
+                                        <LoadingSpinner className="!transform-[scale(0.3)]"/> <span
+                                        className="text-xs inline-flex items-center -ml-4">{workerQueue.length} working</span>
+                                    </div>
+                                </Tooltip>
+
+                                <div className="md:dark:bg-white/15 hidden md:block md:h-5 md:w-px md:bg-n-8/10"/>
+                            </>}
                             <div className="flex gap-4">
                                 <ThemeToggle/>
                             </div>
