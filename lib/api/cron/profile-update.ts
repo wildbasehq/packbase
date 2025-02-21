@@ -13,9 +13,11 @@ export const getSelfProfile = (cb?: () => void) => {
         .get()
         .then(async ({data}) => {
             log.info('User Data', 'Got:', data)
+            queueWorker('dipswitch')
             const dipswitch = (await vg.dipswitch.get({
                 query: {}
             })).data || []
+            completeWorker('dipswitch')
 
             log.info('User Data', 'Got dipswitch:', dipswitch)
             let userBuild = {
@@ -34,7 +36,9 @@ export const getSelfProfile = (cb?: () => void) => {
             }
 
             if (!userBuild.anonUser) {
+                queueWorker('pack-sync')
                 const packs = (await vg.user.me.packs.get()).data || []
+                completeWorker('pack-sync')
                 if (JSON.stringify(packs) !== localStorage.getItem('packs')) {
                     log.info('User Data', '↻ Packs data changed, updating...')
                     localStorage.setItem('packs', JSON.stringify(packs))
