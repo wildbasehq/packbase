@@ -1,6 +1,8 @@
 @use 'unicorn/texture';
 @use 'nextgen2/snapper-engine/main';
 
+@reference './globals.css';
+
 @mixin background-opacity($color, $opacity: 0.3) {
   background: $color; /* The Fallback */
   background: rgba($color, $opacity);
@@ -109,10 +111,6 @@
 
 .AccordionContent[data-state='closed'] {
   animation: slideUp 300ms cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.shimmer-template {
-  @apply before:absolute before:border-n-5 before:inset-0 before:border-t before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent;
 }
 
 @keyframes sidenav-pole-entry {

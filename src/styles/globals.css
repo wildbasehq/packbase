@@ -440,3 +440,7 @@
 .bg-card-solid {
   @apply bg-white dark:bg-n-7;
 }
+
+.shimmer-template {
+  @apply before:absolute before:border-n-5 before:inset-0 before:border-t before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent;
+}

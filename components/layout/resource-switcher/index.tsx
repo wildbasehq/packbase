@@ -109,7 +109,7 @@ export default function ResourceSwitcher() {
                     </Dropdown>
                 </div>
             ) : (
-                <div className="shimmer-template flex cursor-pointer select-none flex-row items-center justify-between">
+                <div className="flex cursor-pointer select-none flex-row items-center justify-between">
                     <span className="z-10 flex w-full items-center justify-between">
                         <div className="flex h-10 items-center space-x-2">
                             <LoadingCircle/>
