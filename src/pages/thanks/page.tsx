@@ -5,7 +5,7 @@ export default function ThankYouFriends() {
     return (
         <Body className="max-w-2xl">
             <Heading size="2xl">
-                From the bottom of my <s>failing</s> heart, thank you for sticking by me.
+                Thank you, to everyone ever apart of this journey
             </Heading>
             <Text className="mt-4">
                 Even when I went AWOL, even when I was a piece of shit, you stood by me with patience and kindness that pulled me back to reality - thanks for believing

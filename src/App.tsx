@@ -19,6 +19,9 @@ import PackAdd from '@/src/pages/pack/new/page.tsx'
 import SettingsLayout from '@/src/pages/settings/layout.tsx'
 import SettingsGeneral from '@/src/pages/settings/page.tsx'
 import SettingsInvite from '@/src/pages/settings/invite/page.tsx'
+import TermsPage from '@/src/pages/terms/page.tsx'
+import ThankYouFriends from '@/src/pages/thanks/page.tsx'
+import UserProfile from '@/src/pages/user/[...slug]/page.tsx'
 
 function App() {
     return (
@@ -52,6 +55,9 @@ function App() {
                                                     <Redirect to="/p/universe"/>
                                                 </Route>
 
+                                                <Route path="/terms" component={TermsPage}/>
+                                                <Route path="/thanks" component={ThankYouFriends}/>
+
                                                 <Route path="/id" nest>
                                                     <IDLayout>
                                                         <Route path="/login"><IDLogin/></Route>
@@ -73,6 +79,8 @@ function App() {
                                                         </Route>
                                                     </Switch>
                                                 </Route>
+
+                                                <Route path={/^\/@(?<slug>[^\/]+)$/} component={UserProfile}/>
 
                                                 <Route path="/settings" nest>
                                                     <SettingsLayout>

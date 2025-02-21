@@ -5,14 +5,16 @@ import {LoadingCircle} from '@/components/icons'
 import NotFound from '@/src/not-found'
 import Body from '@/components/layout/body'
 import FeedList from '@/components/shared/feed/list'
+import {useParams} from 'wouter'
 
-export default function UserProfile({params}: { params: { slug: string } }) {
+export default function UserProfile() {
     const [user, setUser] = useState<any>(null)
     const [error, setError] = useState<any>(null)
     const [loading, setLoading] = useState<boolean>(true)
+    const {slug} = useParams<{ slug: string }>()
 
     useEffect(() => {
-        vg.user({username: params.slug})
+        vg.user({username: slug})
             .get()
             .then(({data}) => {
                 if (!data || data.message) return setError('failed')
