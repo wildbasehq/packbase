@@ -28,7 +28,7 @@ export default function FeedList({
     changingView?: boolean
     setChangingView?: any
 }) {
-    const {maintenance} = useUIStore()
+    const {maintenance, queueWorker, completeWorker} = useUIStore()
 
     if (maintenance) {
         return (
@@ -98,6 +98,7 @@ export default function FeedList({
     }, [FeedViewConfig])
 
     const fetchPosts = (source?: string, clearPosts = false) => {
+        queueWorker('howl-dl')
         if (source) console.log(`Fetching howls for ${packID} from ${source}...`)
         vg.feed({id: packID})
             .get({query: {page: postsCurrentPage}})
@@ -120,6 +121,7 @@ export default function FeedList({
 
                 setPostsReady(true)
                 setPostsHasMore(data.has_more)
+                completeWorker('howl-dl')
             })
     }
 
