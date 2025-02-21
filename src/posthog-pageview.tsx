@@ -4,7 +4,7 @@ import {useEffect} from 'react'
 import {usePostHog} from 'posthog-js/react'
 import {useLocation, useSearchParams} from 'wouter'
 
-export default function PostHogPageView(): null {
+export default function PosthogPageview(): null {
     const [pathname] = useLocation()
     const searchParams = useSearchParams()
     const posthog = usePostHog()

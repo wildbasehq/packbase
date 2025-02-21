@@ -1,37 +1,48 @@
-import {Suspense} from 'react'
-import PostHogPageView from './PostHogPageView.tsx'
+import {lazy, Suspense} from 'react'
 import {Text} from '@/components/shared/text.tsx'
 import {SidebarLayout} from '@/components/shared/sidebar-layout.tsx'
 import NavBar from '@/components/layout/navbar.tsx'
 import {PackChannels} from '@/components/layout/pack-channels.tsx'
-import WaitlistCheck from '@/components/layout/waitlist-check.tsx'
 import Preload from './preload.tsx'
 import {Providers} from './provider.tsx'
 import {Redirect, Route, Switch} from 'wouter'
-import IDLayout from '@/src/pages/id/layout.tsx'
-import IDLogin from '@/src/pages/id/login/page.tsx'
-import IDCreate from '@/src/pages/id/create/page.tsx'
-import PackLayout from '@/src/pages/pack/[slug]/layout.tsx'
-import PackHome from '@/src/pages/pack/[slug]/page.tsx'
-import PackCosmos from '@/src/pages/pack/[slug]/cosmos/page.tsx'
-import NotFound from '@/src/not-found.tsx'
-import PackAdd from '@/src/pages/pack/new/page.tsx'
-import SettingsLayout from '@/src/pages/settings/layout.tsx'
-import SettingsGeneral from '@/src/pages/settings/page.tsx'
-import SettingsInvite from '@/src/pages/settings/invite/page.tsx'
-import TermsPage from '@/src/pages/terms/page.tsx'
-import ThankYouFriends from '@/src/pages/thanks/page.tsx'
-import UserProfile from '@/src/pages/user/[...slug]/page.tsx'
-import SettingsTemplate from '@/src/pages/settings/template/page.tsx'
+
+// Lazy load all pages
+const IDLayout = lazy(() => import('@/src/pages/id/layout.tsx'))
+const IDLogin = lazy(() => import('@/src/pages/id/login/page.tsx'))
+const IDCreate = lazy(() => import('@/src/pages/id/create/page.tsx'))
+const PackLayout = lazy(() => import('@/src/pages/pack/[slug]/layout.tsx'))
+const PackHome = lazy(() => import('@/src/pages/pack/[slug]/page.tsx'))
+const PackCosmos = lazy(() => import('@/src/pages/pack/[slug]/cosmos/page.tsx'))
+const NotFound = lazy(() => import('@/src/not-found.tsx'))
+const PackAdd = lazy(() => import('@/src/pages/pack/new/page.tsx'))
+const SettingsLayout = lazy(() => import('@/src/pages/settings/layout.tsx'))
+const SettingsGeneral = lazy(() => import('@/src/pages/settings/page.tsx'))
+const SettingsInvite = lazy(() => import('@/src/pages/settings/invite/page.tsx'))
+const TermsPage = lazy(() => import('@/src/pages/terms/page.tsx'))
+const ThankYouFriends = lazy(() => import('@/src/pages/thanks/page.tsx'))
+const UserProfile = lazy(() => import('@/src/pages/user/[...slug]/page.tsx'))
+const SettingsTemplate = lazy(() => import('@/src/pages/settings/template/page.tsx'))
+
+// Lazy load components
+const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
+const PostHogPageview = lazy(() => import('@/src/posthog-pageview.tsx'))
+
+// Loading fallback component
+const LoadingFallback = () => (
+    <div className="flex items-center justify-center h-full">
+        <Text>Loading...</Text>
+    </div>
+)
 
 function App() {
     return (
         <>
             <Providers>
                 <Suspense>
-                    <PostHogPageView/>
+                    <PostHogPageview/>
                 </Suspense>
-                {/* "Mobile is unsupported" notice on bottom of page at all times*/}
+
                 <div className="absolute bottom-0 left-0 w-full h-12 z-40 bg-sidebar sm:hidden">
                     <div className="flex justify-center items-center h-full">
                         <Text size="xs" className="text-center">
@@ -43,9 +54,6 @@ function App() {
                 <SidebarLayout navbar={<NavBar/>} sidebar={<PackChannels/>}>
                     <div id="NGContentArea" className="h-full overflow-hidden flex">
                         <div className="grow">
-                            {/*<NavBar/>*/}
-
-                            {/* h-[calc(100%-4rem)] */}
                             <main className="flex h-full flex-1">
                                 <div className="h-full w-full">
                                     <div id="NGRoot" className="h-full overflow-y-auto">
@@ -56,49 +64,104 @@ function App() {
                                                     <Redirect to="/p/universe"/>
                                                 </Route>
 
-                                                <Route path="/terms" component={TermsPage}/>
-                                                <Route path="/thanks" component={ThankYouFriends}/>
+                                                <Route path="/terms">
+                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                        <TermsPage/>
+                                                    </Suspense>
+                                                </Route>
+
+                                                <Route path="/thanks">
+                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                        <ThankYouFriends/>
+                                                    </Suspense>
+                                                </Route>
 
                                                 <Route path="/id" nest>
-                                                    <IDLayout>
-                                                        <Route path="/login"><IDLogin/></Route>
-                                                        <Route path="/create"><IDCreate/></Route>
-                                                    </IDLayout>
+                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                        <IDLayout>
+                                                            <Route path="/login">
+                                                                <Suspense fallback={<LoadingFallback/>}>
+                                                                    <IDLogin/>
+                                                                </Suspense>
+                                                            </Route>
+                                                            <Route path="/create">
+                                                                <Suspense fallback={<LoadingFallback/>}>
+                                                                    <IDCreate/>
+                                                                </Suspense>
+                                                            </Route>
+                                                        </IDLayout>
+                                                    </Suspense>
                                                 </Route>
 
                                                 <Route path="/p" nest>
                                                     <Switch>
                                                         <Route path="/new">
-                                                            <PackAdd/>
+                                                            <Suspense fallback={<LoadingFallback/>}>
+                                                                <PackAdd/>
+                                                            </Suspense>
                                                         </Route>
 
                                                         <Route path="/:slug" nest>
-                                                            <PackLayout>
-                                                                <Route path="/"><PackHome/></Route>
-                                                                <Route path="/cosmos"><PackCosmos/></Route>
-                                                            </PackLayout>
+                                                            <Suspense fallback={<LoadingFallback/>}>
+                                                                <PackLayout>
+                                                                    <Route path="/">
+                                                                        <Suspense fallback={<LoadingFallback/>}>
+                                                                            <PackHome/>
+                                                                        </Suspense>
+                                                                    </Route>
+                                                                    <Route path="/cosmos">
+                                                                        <Suspense fallback={<LoadingFallback/>}>
+                                                                            <PackCosmos/>
+                                                                        </Suspense>
+                                                                    </Route>
+                                                                </PackLayout>
+                                                            </Suspense>
                                                         </Route>
                                                     </Switch>
                                                 </Route>
 
-                                                <Route path={/^\/@(?<slug>[^\/]+)$/} component={UserProfile}/>
+                                                <Route path={/^\/@(?<slug>[^\/]+)$/}>
+                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                        <UserProfile/>
+                                                    </Suspense>
+                                                </Route>
 
                                                 <Route path="/settings" nest>
-                                                    <SettingsLayout>
-                                                        <Switch>
-                                                            <Route path="/template" component={SettingsTemplate}/>
+                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                        <SettingsLayout>
+                                                            <Switch>
+                                                                <Route path="/template">
+                                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                                        <SettingsTemplate/>
+                                                                    </Suspense>
+                                                                </Route>
 
-                                                            <Route path="/invite" component={SettingsInvite}/>
+                                                                <Route path="/invite">
+                                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                                        <SettingsInvite/>
+                                                                    </Suspense>
+                                                                </Route>
 
-                                                            <Route path="/" component={SettingsGeneral}/>
+                                                                <Route path="/">
+                                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                                        <SettingsGeneral/>
+                                                                    </Suspense>
+                                                                </Route>
 
-                                                            <Route component={NotFound}/>
-                                                        </Switch>
-                                                    </SettingsLayout>
+                                                                <Route>
+                                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                                        <NotFound/>
+                                                                    </Suspense>
+                                                                </Route>
+                                                            </Switch>
+                                                        </SettingsLayout>
+                                                    </Suspense>
                                                 </Route>
 
                                                 <Route>
-                                                    <NotFound/>
+                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                        <NotFound/>
+                                                    </Suspense>
                                                 </Route>
                                             </Switch>
                                         </Preload>
@@ -108,19 +171,6 @@ function App() {
                         </div>
                     </div>
                 </SidebarLayout>
-
-                {/*<div*/}
-                {/*    id="snap-UniverseEntryTest"*/}
-                {/*    className="absolute flex justify-center items-center bottom-0 left-0 w-full h-1/2 z-40 bg-card shadow-inner shadow-n-4">*/}
-                {/*    <Alert className="w-fit">*/}
-                {/*        <AlertTitle>*/}
-                {/*            <LoadingCircle className="inline-flex w-5 h-5"/> Universe Entry Test*/}
-                {/*        </AlertTitle>*/}
-                {/*        <AlertDescription>*/}
-                {/*            entrypoint "@rek"*/}
-                {/*        </AlertDescription>*/}
-                {/*    </Alert>*/}
-                {/*</div>*/}
             </Providers>
         </>
     )

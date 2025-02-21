@@ -1,10 +1,13 @@
-import HTMLProfileEditor from '@/src/pages/settings/template/html-editor.tsx'
+import {lazy, Suspense} from 'react'
 
+const HTMLProfileEditor = lazy(() => import('@/src/pages/settings/template/html-editor.tsx'))
 export default function SettingsTemplate() {
     return (
         <div>
             <h1>Template</h1>
-            <HTMLProfileEditor/>
+            <Suspense fallback={<div>Loading...</div>}>
+                <HTMLProfileEditor/>
+            </Suspense>
         </div>
     )
 }
