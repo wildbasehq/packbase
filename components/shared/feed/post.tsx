@@ -190,7 +190,7 @@ export default function FeedPost({post, onDelete, postState}: FeedPostType) {
                     <div className="px-4 py-4 sm:px-6">
                         <div className="flow-root">
                             <ul role="list" className="-mb-8">
-                                {post.comments.map((comment) => (
+                                {post.comments.slice(0, 6).map((comment) => (
                                     <div key={comment.id}>
                                         <FeedListItem
                                             comment={comment}
@@ -590,6 +590,7 @@ export function CommentBox({...props}: any) {
 
     const createComment = (e?: { preventDefault: () => void }) => {
         if (e) e.preventDefault()
+        if (commentSubmitting) return
         setCommentSubmitting(true)
 
         const commentBody = {
@@ -631,13 +632,14 @@ export function CommentBox({...props}: any) {
                 </div>
             )}
 
-            <div
+            <form
                 className={clsx(
                     commentSubmitting
                         ? 'relative isolate overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:border before:border-x-0 before:border-b-0 before:border-t before:border-solid before:border-neutral-100/10 before:bg-linear-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent'
                         : '',
                     'relative flex items-center rounded',
                 )}
+                onSubmit={createComment}
             >
                 <input
                     type="text"
@@ -650,14 +652,14 @@ export function CommentBox({...props}: any) {
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <img className="h-5 w-5 rounded-full" src={user.images?.avatar || `/img/default-avatar.png`} alt=""/>
                 </div>
-                <div className="absolute inset-y-0 right-0 flex cursor-pointer items-center py-2 pr-2">
+                <button type="submit" className="absolute inset-y-0 right-0 flex cursor-pointer items-center py-2 pr-2">
                     {commentSubmitting ? (
                         <img className="h-5 w-5 animate-spin dark:invert" src={`/img/symbolic/process-working.symbolic.png`} alt="Process working spinner"/>
                     ) : (
-                        <PaperAirplaneIcon className="text-default h-5 w-5" onClick={createComment}/>
+                        <PaperAirplaneIcon className="text-default h-5 w-5"/>
                     )}
-                </div>
-            </div>
+                </button>
+            </form>
         </div>
     )
 }
