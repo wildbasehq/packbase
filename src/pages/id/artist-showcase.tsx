@@ -1,7 +1,7 @@
-import {createClient} from '@/lib/supabase/client'
 import {useEffect, useState} from 'react'
 import UserInfoCol from '@/components/shared/user/info-col'
 import {Text} from '@/components/shared/text'
+import {supabase} from '@/lib/api'
 
 export default function IDArtistShowcase() {
     const [notice, setNotice] = useState<any>(null)
@@ -9,7 +9,6 @@ export default function IDArtistShowcase() {
     useEffect(() => {
         if (!window) return
         console.log('fetching notice')
-        const supabase = createClient()
 
         supabase
             .from('notice')

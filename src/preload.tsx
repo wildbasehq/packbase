@@ -1,14 +1,12 @@
 import Body from '@/components/layout/body'
 import {LoadingDots} from '@/components/icons'
 import {Heading} from '@/components/shared/text'
-import {API_URL, setToken, vg} from '@/lib/api'
+import {API_URL, setToken, supabase, vg} from '@/lib/api'
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
-import {createClient} from '@/lib/supabase/client'
 import {ProjectSafeName} from '@/lib/utils'
 import {HandRaisedIcon} from '@heroicons/react/20/solid'
 import {useEffect, useState} from 'react'
 
-const supabase = createClient()
 export default function Preload({children}: { children: React.ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`polling ${API_URL}`)
     const [error, setError] = useState<any | null>(null)
@@ -25,9 +23,11 @@ export default function Preload({children}: { children: React.ReactNode }) {
                 setMaintenance(server.data.maintenance)
                 setServiceLoading('auth')
                 // @ts-ignore
-                supabase.auth.getUser().then(async ({data: {user}}) => {
+                supabase.auth.getSession().then(async ({data: {session}}) => {
+                    const {user, access_token, expires_in} = session || {}
                     if (user) {
-                        setToken(await supabase.auth.getSession().then(({data}) => data?.session?.access_token))
+                        const {data} = await supabase.auth.getSession()
+                        setToken(access_token, expires_in)
                         setServiceLoading('auth:@me')
                         vg.user.me
                             .get()
