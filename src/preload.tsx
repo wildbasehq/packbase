@@ -28,12 +28,15 @@ export default function Preload({children}: { children: React.ReactNode }) {
                     if (user) {
                         setToken(access_token, expires_in)
                         setStatus('auth:@me')
-                        const localUser = localStorage.getItem('user')
+                        const localUser = localStorage.getItem('user-account')
                         if (localUser) {
-                            const packs = localStorage.getItem('packs')
-                            if (packs) setResources(JSON.parse(packs))
-                            setUser(JSON.parse(localUser))
-                            proceed()
+                            const json = JSON.parse(localUser)
+                            if (json.state.user) {
+                                const packs = localStorage.getItem('packs')
+                                if (packs) setResources(JSON.parse(packs))
+                                setUser(json.state.user)
+                                proceed()
+                            }
                         }
                         vg.user.me
                             .get()
@@ -52,9 +55,8 @@ export default function Preload({children}: { children: React.ReactNode }) {
                                     ...data,
                                 }
 
-                                if (JSON.stringify(userBuild) !== localUser) {
+                                if (JSON.stringify(userBuild) !== JSON.stringify(JSON.parse(localUser).state.user)) {
                                     console.log('↻ User data changed, updating...')
-                                    localStorage.setItem('user', JSON.stringify(userBuild))
                                     setUser(userBuild)
                                 }
 
