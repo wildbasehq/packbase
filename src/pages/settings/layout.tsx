@@ -10,12 +10,14 @@ import {vg} from '@/lib/api'
 import GridBody from '@/components/layout/grid-body'
 import {EnvelopeIcon, EnvelopeOpenIcon, IdentificationIcon, SwatchIcon} from '@heroicons/react/16/solid'
 import {Redirect, useLocation} from 'wouter'
+import {usePostHog} from 'posthog-js/react'
 
 export default function SettingsLayout({children}: { children: React.ReactNode }) {
     const {user} = useUserAccountStore()
     const [, navigate] = useLocation()
     const {setNavigation} = useUIStore()
     const {setCurrentResource} = useResourceStore()
+    const posthog = usePostHog()
 
     useEffect(() => {
         if (!user || user?.anonUser) {
@@ -35,11 +37,11 @@ export default function SettingsLayout({children}: { children: React.ReactNode }
                     href: '/settings',
                     icon: IdentificationIcon,
                 },
-                {
+                ...posthog?.isFeatureEnabled('settings-html-editor') ? [{
                     name: 'Template',
                     href: '/settings/template',
                     icon: SwatchIcon,
-                },
+                },] : [],
                 {
                     name: 'Invite',
                     href: '/settings/invite',
