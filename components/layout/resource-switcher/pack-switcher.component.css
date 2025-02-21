@@ -4,7 +4,8 @@
 }
 
 .hover\:show-pill:before {
-    @apply absolute rounded bg-n-7 transition-all duration-200 ease-in-out dark:bg-white;
+    @apply absolute rounded transition-all duration-200 ease-in-out;
+    background-color: var(--color-n-7);
     --content-height: 0rem;
     --content-width: 0rem;
     --offset: -0.4rem;
@@ -13,6 +14,10 @@
     height: var(--content-height);
     width: var(--content-width);
     left: var(--offset);
+}
+
+html.dark .hover\:show-pill:before {
+    background-color: white;
 }
 
 .hover\:show-pill:hover:before, .force-pill:before {
