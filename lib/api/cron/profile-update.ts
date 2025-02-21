@@ -24,7 +24,7 @@ export const getSelfProfile = (cb?: () => void) => {
                 display_name: data?.display_name || 'new_here_' + new Date().getTime(),
                 reqOnboard: !data || !data?.username,
                 dp: dipswitch,
-                anonUser: !data,
+                anonUser: !data?.username,
                 ...data,
             }
 
