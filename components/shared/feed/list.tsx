@@ -69,6 +69,20 @@ export default function FeedList({
 
     const FeedViewConfig = useUISettingsStore((state) => state.feedView)
 
+    // Auto refresh feed
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // We're not setting the state here, just ensuring the most up-to-date state
+            setPosts((posts) => {
+                if (posts.length === 0) return posts
+                fetchPosts('auto-refresh', true, posts)
+                return posts
+            })
+        }, 60000)
+
+        return () => clearInterval(interval)
+    }, [])
+
     useEffect(() => {
         let timeout: NodeJS.Timeout
         if (feedID) {
@@ -77,7 +91,7 @@ export default function FeedList({
             setPostsReady(false)
             setPostsHasMore(false)
             setPostsCurrentPage(1)
-            fetchPosts('pack_update')
+            fetchPosts('pack-update')
         }
 
         return () => {
@@ -97,11 +111,13 @@ export default function FeedList({
         }
     }, [FeedViewConfig])
 
-    const fetchPosts = (source?: string, clearPosts = false) => {
-        queueWorker('howl-dl')
+    const fetchPosts = (source?: string, clearOnNew = false, postsToUse?: any) => {
+        const postsArray = postsToUse || posts
+        queueWorker(`howl-dl${source ? `-${source}` : ''}`)
         if (source) console.log(`Fetching howls for ${packID} from ${source}...`)
+
         vg.feed({id: packID})
-            .get({query: {page: postsCurrentPage}})
+            .get({query: {page: clearOnNew ? 1 : postsCurrentPage}})
             .then(({data, error}) => {
                 if (error) {
                     console.error(data) // @TODO: This returns [object Object] no matter what? Why?
@@ -111,11 +127,26 @@ export default function FeedList({
                     return
                 }
 
-                if (clearPosts) {
-                    setPosts(data.data)
-                    setPostsCurrentPage(1)
+                // if clearOnNew, check if there's any new post IDs in the new data
+                if (clearOnNew) {
+                    if (data.data.length === 0) {
+                        setPosts([])
+                        setPostsReady(true)
+                        setPostsHasMore(false)
+                        completeWorker('howl-dl')
+                        return
+                    }
+
+                    const newPosts = data.data.map((post: any) => post.id)
+                    const oldPosts = postsArray.map((post: any) => post.id)
+                    if (newPosts.filter((id: string) => !oldPosts.includes(id)).length !== 0) {
+                        console.log('New posts found, clearing feed...')
+                        setPosts(data.data)
+                        setPostsCurrentPage(2)
+                        setPostsHasMore(data.has_more)
+                    }
                 } else {
-                    setPosts([...posts, ...data.data])
+                    setPosts([...postsArray, ...data.data])
                     setPostsCurrentPage(postsCurrentPage + 1)
                 }
 
@@ -217,7 +248,7 @@ export default function FeedList({
                                 scrollThreshold={0.5}
                                 className={FeedViewConfig !== 1 ? 'sm:w-screen sm:max-w-md' : ''}
                                 dataLength={posts.length}
-                                next={() => fetchPosts('infinite_scroll')}
+                                next={() => fetchPosts('infinite-scroll')}
                                 hasMore={postsHasMore}
                                 loader={<LoadingCardSmall/>}
                                 endMessage={
