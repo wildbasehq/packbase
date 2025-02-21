@@ -3,6 +3,7 @@
 //         ? 'http://localhost/api/'
 //         : `${window.location.protocol}//api.${window.location.hostname.replace('www.', '')}/api/`) : '/api/') + 'v2/';
 import VoyageSDK from 'voyagesdk-ts'
+import {useUIStore} from '@/lib/states.ts'
 
 export const API_URL = import.meta.env.VITE_YAPOCK_URL
 let TOKEN: string | undefined
@@ -14,9 +15,12 @@ export let {supabase, vg} = new VoyageSDK(API_URL, {
     },
 })
 
+const {queueWorker, completeWorker} = useUIStore.getState()
+
 let refreshTimer
 
 export const setToken = (token?: string, expires_in?: number) => {
+    queueWorker('voyage-initiate')
     TOKEN = token
     let newClient = new VoyageSDK(API_URL, {
         token,
@@ -35,15 +39,20 @@ export const setToken = (token?: string, expires_in?: number) => {
     } else {
         clearTimeout(refreshTimer)
     }
+
+    completeWorker('voyage-initiate')
 }
 
 const refreshSession = async () => {
     if (!TOKEN) return
+    queueWorker('refresh-session')
     const {data, error} = await supabase.auth.refreshSession()
     const {session, user} = data || {}
     if (error || !session) {
         alert('Oops! Voyage lost this session, your page will refresh')
         window.location.reload()
     }
+
+    completeWorker('refresh-session')
     setToken(session?.access_token)
 }
