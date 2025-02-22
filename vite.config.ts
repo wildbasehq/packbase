@@ -15,6 +15,9 @@ export default defineConfig({
             '@/datasets': path.resolve(__dirname, './datasets'),
         },
     },
+    define: {
+        'import.meta.env.CF_PAGES_COMMIT_SHA': process.env.CF_PAGES_COMMIT_SHA || '"synced"',
+    },
     plugins: [
         react(),
         tailwindcss()

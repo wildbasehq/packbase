@@ -126,6 +126,9 @@ interface ResourceUIStore {
     workerQueue: any[]
     queueWorker: (worker: any) => void
     completeWorker: (worker: any) => void
+
+    updateAvailable: boolean
+    setUpdateAvailable: (update: boolean) => void
 }
 
 export const useUIStore = create<ResourceUIStore>((set) => ({
@@ -137,6 +140,7 @@ export const useUIStore = create<ResourceUIStore>((set) => ({
     bucketRoot: '',
     maintenance: null,
     workerQueue: [],
+    updateAvailable: false,
     setHidden: (hidden) =>
         set((state) => ({
             ...state,
@@ -190,5 +194,11 @@ export const useUIStore = create<ResourceUIStore>((set) => ({
                 ...state,
                 workerQueue: queue,
             }
-        })
+        }),
+
+    setUpdateAvailable: (update) =>
+        set((state) => ({
+            ...state,
+            updateAvailable: update,
+        })),
 }))

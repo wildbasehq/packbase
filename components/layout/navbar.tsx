@@ -13,10 +13,11 @@ import {Logo} from '@/components/shared/logo'
 import Link from '@/components/shared/link'
 import {LoadingSpinner} from '@/components/icons'
 import Tooltip from '@/components/shared/tooltip.tsx'
+import {Badge} from '@/components/shared/badge.tsx'
 
 export default function NavBar() {
     const {user} = useUserAccountStore()
-    const {hidden, workerQueue} = useUIStore()
+    const {hidden, workerQueue, updateAvailable} = useUIStore()
 
     const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false)
 
@@ -60,6 +61,19 @@ export default function NavBar() {
 
                                 <div className="md:dark:bg-white/15 hidden md:block md:h-5 md:w-px md:bg-n-8/10"/>
                             </>}
+                            {updateAvailable && (
+                                <>
+                                    <Tooltip content="Click to update Packbase">
+                                        <div className="flex scale-80 cursor-pointer" onClick={() => window.location.reload()}>
+                                            <Badge color="amber" className="flex items-center justify-center">
+                                                <span className="text-xs">Update available</span>
+                                            </Badge>
+                                        </div>
+                                    </Tooltip>
+
+                                    <div className="md:dark:bg-white/15 hidden md:block md:h-5 md:w-px md:bg-n-8/10"/>
+                                </>
+                            )}
                             <div className="flex gap-4">
                                 <ThemeToggle/>
                             </div>

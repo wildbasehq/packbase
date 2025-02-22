@@ -4,8 +4,9 @@
 //         : `${window.location.protocol}//api.${window.location.hostname.replace('www.', '')}/api/`) : '/api/') + 'v2/';
 import VoyageSDK from 'voyagesdk-ts'
 import {useUIStore} from '@/lib/states.ts'
-import './cron/profile-update.ts'
 import {getSelfProfile} from '@/lib/api/cron/profile-update.ts'
+
+import './cron/check-update.ts'
 
 export const API_URL = import.meta.env.VITE_YAPOCK_URL
 let TOKEN: string | undefined
