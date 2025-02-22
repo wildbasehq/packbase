@@ -43,6 +43,8 @@ export const getSelfProfile = (cb?: () => void) => {
                     log.info('User Data', '↻ Packs data changed, updating...')
                     localStorage.setItem('packs', JSON.stringify(packs))
                     setResources(packs)
+                } else {
+                    setResources(JSON.parse(localStorage.getItem('packs') || '[]'))
                 }
             } else {
                 localStorage.removeItem('packs')
