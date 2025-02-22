@@ -14,4 +14,4 @@ globalThis.check_update_cron = setInterval(async () => {
     if (currentVersion !== pulledVersion) {
         setUpdateAvailable(true)
     }
-}, 4000)
+}, 30000)
