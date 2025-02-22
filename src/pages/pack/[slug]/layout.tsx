@@ -3,7 +3,6 @@ import {LoadingDots} from '@/components/icons'
 import {Heading} from '@/components/shared/text'
 import {vg} from '@/lib/api'
 import {useResourceStore, useUIStore} from '@/lib/states'
-import {ProjectName, ProjectSafeName} from '@/lib/utils'
 import {FaceFrownIcon} from '@heroicons/react/24/solid'
 import {OrbitIcon} from 'lucide-react'
 import {useEffect, useState} from 'react'
@@ -118,8 +117,8 @@ export default function PackLayout({children}: {
                         <>
                             <Heading className="items-center">
                                 <FaceFrownIcon className="text-default mr-1 inline-block h-6 w-6"/>
-                                {error.cause === 404 ? `The Cosmos can't find ${slug}` : `${ProjectSafeName} can\'t continue`}
-                                {error.cause === 404 && slug === 'universe' && `. Someone setup ${ProjectSafeName} wrong :/`}
+                                {error.cause === 404 ? `The Cosmos can't find ${slug}` : `Packbase can\'t continue`}
+                                {error.cause === 404 && slug === 'universe' && `. Someone setup Packbase wrong :/`}
                             </Heading>
                             <p className="text-alt mt-1 text-sm leading-6">
                                 {error.cause === 404 ? (
@@ -134,7 +133,7 @@ export default function PackLayout({children}: {
                                                 Sorry!
                                                 <br/>
                                                 <br/>
-                                                If you're a developer and this is your first time running {ProjectName}, you'll need to create a new pack with the{' '}
+                                                If you're a developer and this is your first time running Packbase, you'll need to create a new pack with the{' '}
                                                 <code>universe</code> slug. You can do this with the site public, as the user needs the <code>GLOBAL_ADMIN</code>{' '}
                                                 permission to create a pack with that slug, but users will see this screen...
                                             </>

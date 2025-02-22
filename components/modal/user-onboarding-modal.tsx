@@ -2,7 +2,6 @@ import {vg} from '@/lib/api'
 import {UserProfileBasic} from '@/lib/defs/user'
 import {useUserAccountStore} from '@/lib/states'
 import {toast} from 'sonner'
-import {ProjectSafeName} from '@/lib/utils'
 import WolfoxDrawing from '@/src/images/png/wolfox-drawing.png'
 import PuzzleCharacters from '@/src/images/svg/3-puzzle-characters.svg'
 import CharacterHoldingPencil from '@/src/images/svg/character-holding-pencil.svg'
@@ -109,7 +108,7 @@ const steps: {
                             <label htmlFor="slug" className="block">
                                 <Heading>First, your Space URL & Username</Heading>
                                 <Text alt size="xs">
-                                    Your username is used to find and reference you across {ProjectSafeName}. Your Space URL holds your personal customised site.
+                                    Your username is used to find and reference you across Packbase. Your Space URL holds your personal customised site.
                                 </Text>
                             </label>
                             <div className="mt-2">

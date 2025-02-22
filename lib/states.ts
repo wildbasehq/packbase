@@ -1,6 +1,5 @@
 import {create} from 'zustand'
 import {persist} from 'zustand/middleware'
-import {ProjectSafeName} from '@/lib/utils'
 
 interface UIStore {
     feedView: number
@@ -74,7 +73,7 @@ interface ResourceStore {
 const resourceDefault = {
     id: '00000000-0000-0000-0000-000000000000',
     slug: 'universe',
-    display_name: ProjectSafeName,
+    display_name: 'Packbase',
     standalone: true,
 }
 

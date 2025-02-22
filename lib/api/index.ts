@@ -8,6 +8,20 @@ import {getSelfProfile} from '@/lib/api/cron/profile-update.ts'
 
 import './cron/check-update.ts'
 
+/**
+ * The name of the project. All Wildbase projects should have a name
+ * outside the final product name. Should be sent with telemetry and
+ * all requests to the server.
+ *
+ * @projectName Korat
+ * @since 24-05-2024
+ * @specific Yipnyap (AKA Korat) v4 (Honeybear)
+ * @authors @rek
+ */
+export const ProjectName = `Project Korat`
+export const ProjectSafeName = 'Packbase'
+export const ProjectDeps = ['scalebite', 'ypnyp', 'feral']
+
 export const API_URL = import.meta.env.VITE_YAPOCK_URL
 let TOKEN: string | undefined
 
@@ -51,7 +65,7 @@ export const setToken = (token?: string, expires_at?: number) => {
     completeWorker('voyage-initiate')
 }
 
-const refreshSession = async () => {
+export const refreshSession = async () => {
     if (!TOKEN) return
     queueWorker('refresh-session')
     const {data, error} = await supabase.auth.refreshSession()

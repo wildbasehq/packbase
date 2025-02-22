@@ -1,19 +1,6 @@
 import {type ClassValue, clsx} from 'clsx'
 import {twMerge} from 'tailwind-merge'
-
-/**
- * The name of the project. All Wildbase projects should have a name
- * outside the final product name. Should be sent with telemetry and
- * all requests to the server.
- *
- * @projectName Korat
- * @since 24-05-2024
- * @specific Yipnyap (AKA Korat) v4 (Honeybear)
- * @authors @rek
- */
-export const ProjectName = `Project Korat`
-export const ProjectSafeName = 'Packbase'
-export const ProjectDeps = ['scalebite', 'ypnyp', 'feral']
+import {refreshSession} from '@/lib/api'
 
 export async function fetcher<JSON = any>(input: RequestInfo, init?: RequestInit): Promise<JSON> {
     const res = await fetch(input, init)
@@ -94,6 +81,10 @@ globalThis.log = {
             'color: #DC2626; font-weight: bold;',
             ...content
         )
+
+        if (content && content[0] === 401) {
+            refreshSession()
+        }
     },
 
     warn: (prefix, ...content) => {

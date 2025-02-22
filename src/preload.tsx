@@ -3,7 +3,6 @@ import {LoadingDots} from '@/components/icons'
 import {Heading} from '@/components/shared/text'
 import {API_URL, setToken, supabase, vg} from '@/lib/api'
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
-import {ProjectSafeName} from '@/lib/utils'
 import {HandRaisedIcon} from '@heroicons/react/20/solid'
 import {useEffect, useState} from 'react'
 import {getSelfProfile} from '@/lib/api/cron/profile-update.ts'
@@ -54,7 +53,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
                 if (e?.message.indexOf('Failed') > -1)
                     return setError({
                         cause: 'UI & Server could not talk together',
-                        message: `${ProjectSafeName} is offline, or your network is extremely unstable.`,
+                        message: `Packbase is offline, or your network is extremely unstable.`,
                     })
                 return setError(e)
             })
@@ -100,7 +99,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
                                     Preparing...
                                 </Heading>
                                 <p className="text-alt mt-1 text-sm leading-6">
-                                    {ProjectSafeName} is asking the server for information about you &amp; the service. This will get saved in your browser{'\''}s{' '}
+                                    Packbase is asking the server for information about you &amp; the service. This will get saved in your browser{'\''}s{' '}
                                     <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage" target="_blank" rel="noopener noreferrer">
                                         session storage
                                     </a>
@@ -117,7 +116,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
                             <>
                                 <Heading className="items-center">
                                     <HandRaisedIcon className="text-default mr-1 inline-block h-6 w-6"/>
-                                    {ProjectSafeName} can't continue
+                                    Packbase can't continue
                                 </Heading>
                                 <p className="text-alt mt-1 text-sm leading-6">
                                     {error.cause || 'Something went wrong'}: {error.message || error.stack}

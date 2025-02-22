@@ -4,7 +4,6 @@ import {toast} from 'sonner'
 import {LoadingDots} from '@/components/icons'
 import {Input} from '@/components/shared/input/text'
 import {Button} from '@/components/shared/button'
-import {ProjectSafeName} from '@/lib/utils'
 import {useParams} from 'wouter'
 
 export default function ReportAbuse() {
@@ -26,7 +25,7 @@ export default function ReportAbuse() {
         setSubmitting(false)
         setOpen(false)
         toast.success(
-            `We got it! Thanks for making ${ProjectSafeName} even better. Click here to see your report.`,
+            `We got it! Thanks for making Packbase even better. Click here to see your report.`,
         )
     }
 

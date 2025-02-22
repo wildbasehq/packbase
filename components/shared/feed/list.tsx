@@ -14,7 +14,6 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import Masonry, {ResponsiveMasonry} from 'react-responsive-masonry'
 import {toast} from 'sonner'
 import {HandRaisedIcon, MegaphoneIcon, WrenchScrewdriverIcon} from '@heroicons/react/20/solid'
-import {ProjectSafeName} from '@/lib/utils'
 import UserAvatar from '@/components/shared/user/avatar'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import WrenchCharacter from '@/src/images/svg/wrench-character.svg'
@@ -119,7 +118,7 @@ export default function FeedList({
             .get({query: {page: clearOnNew ? 1 : postsCurrentPage}})
             .then(({data, error}) => {
                 if (error) {
-                    console.error(data) // @TODO: This returns [object Object] no matter what? Why?
+                    log.error('Feed Error', error.status) // @TODO: This returns [object Object] no matter what? Why?
                     setPosts([])
                     toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
                     setError(new Error(error.status))
@@ -181,7 +180,7 @@ export default function FeedList({
             <>
                 <Heading className="items-center">
                     <HandRaisedIcon className="text-default mr-1 inline-block h-6 w-6"/>
-                    {ProjectSafeName} can't continue
+                    Packbase can't continue
                 </Heading>
                 <p className="text-alt mt-1 text-sm leading-6">
                     {(error.cause as string) || 'Something went wrong'}: {error.message || error.stack}

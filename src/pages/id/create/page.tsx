@@ -4,10 +4,9 @@ import {Logo} from '@/components/shared/logo'
 import {Heading, Text} from '@/components/shared/text'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import {Button} from '@/components/shared/experimental-button-rework'
-import {ProjectSafeName} from '@/lib/utils'
+import {supabase} from '@/lib/api'
 import {MailQuestion} from 'lucide-react'
 import {FormEvent, useRef, useState} from 'react'
-import {supabase} from '@/lib/api'
 import Link from '@/components/shared/link'
 
 export default function IDCreate() {
@@ -66,7 +65,7 @@ export default function IDCreate() {
                         <Heading size="2xl" className="text-2xl">
                             Registration is closed.
                         </Heading>
-                        <Text>{ProjectSafeName} is not open for public registration.</Text>
+                        <Text>Packbase is not open for public registration.</Text>
                     </div>
                 )}
 

@@ -5,13 +5,12 @@ import Tooltip from '@/components/shared/tooltip'
 import {Button} from '@/components/shared/button'
 import UserAvatar from '@/components/shared/user/avatar'
 import {useUserAccountStore} from '@/lib/states'
-import {ProjectName, ProjectSafeName} from '@/lib/utils'
+import {ProjectName, supabase} from '@/lib/api'
 import {MenuButton} from '@headlessui/react'
 import {ChevronDownIcon} from '@heroicons/react/20/solid'
 import {MinusCircleIcon, MoonIcon} from '@heroicons/react/24/solid'
 import {SettingsIcon} from 'lucide-react'
 import {Dispatch, SetStateAction} from 'react'
-import {supabase} from '@/lib/api'
 import Link from '@/components/shared/link.tsx'
 
 export default function UserDropdown({showOnboardingModal}: { showOnboardingModal: Dispatch<SetStateAction<boolean>> | (() => void) }) {
@@ -168,7 +167,7 @@ export default function UserDropdown({showOnboardingModal}: { showOnboardingModa
             </div>
             <div className="flex w-full flex-col items-center justify-center border-t px-7 py-5">
                 <Text size="xs" alt>
-                    {ProjectSafeName} (Name isn't final. {ProjectName}) &copy; ✱base. &mdash;{' '}
+                    Packbase (Name isn't final. {ProjectName}) &copy; ✱base. &mdash;{' '}
                     {import.meta.env.CF_PAGES_COMMIT_SHA || '0000000'}
                 </Text>
             </div>
