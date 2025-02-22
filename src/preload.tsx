@@ -25,9 +25,9 @@ export default function Preload({children}: { children: React.ReactNode }) {
                 setStatus('auth')
                 // @ts-ignore
                 supabase.auth.getSession().then(async ({data: {session}}) => {
-                    const {user, access_token, expires_in} = session || {}
+                    const {user, access_token, expires_at} = session || {}
                     if (user) {
-                        setToken(access_token, expires_in)
+                        setToken(access_token, expires_at)
                         setStatus('auth:@me')
                         const localUser = localStorage.getItem('user-account')
                         if (localUser) {

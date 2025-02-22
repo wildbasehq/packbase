@@ -22,7 +22,7 @@ const {queueWorker, completeWorker} = useUIStore.getState()
 
 let refreshTimer
 
-export const setToken = (token?: string, expires_in?: number) => {
+export const setToken = (token?: string, expires_at?: number) => {
     queueWorker('voyage-initiate')
     TOKEN = token
     let newClient = new VoyageSDK(API_URL, {
@@ -35,12 +35,17 @@ export const setToken = (token?: string, expires_in?: number) => {
     vg = newClient.vg
     supabase = newClient.supabase
 
-    if (expires_in) {
-        clearTimeout(refreshTimer)
-        refreshTimer = setTimeout(refreshSession, expires_in * 1000)
-        log.info('Wild ID', 'Token set, will refresh in', expires_in)
+    if (expires_at) {
+        log.info('Wild ID', 'Token set, will refresh at', expires_at)
+        if (refreshTimer) clearInterval(refreshTimer)
+        refreshTimer = setInterval(() => {
+            // Check if date passed
+            if (new Date().getTime() >= expires_at) {
+                refreshSession()
+            }
+        }, 60000)
     } else {
-        clearTimeout(refreshTimer)
+        clearInterval(refreshTimer)
     }
 
     completeWorker('voyage-initiate')
@@ -61,6 +66,5 @@ const refreshSession = async () => {
 
     getSelfProfile()
 
-    setTimeout(refreshSession, session.expires_in * 1000)
     log.info('Wild ID', 'Token refreshed, will refresh in', session.expires_in)
 }
