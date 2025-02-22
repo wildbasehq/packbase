@@ -120,7 +120,7 @@ function App() {
                                                     </Switch>
                                                 </Route>
 
-                                                <Route path={/^\/@(?<slug>[^\/]+)$/}>
+                                                <Route path={/^\/@(?<slug>[^\/]+)\/?$/}>
                                                     <Suspense fallback={<LoadingFallback/>}>
                                                         <UserProfile/>
                                                     </Suspense>
