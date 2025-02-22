@@ -14,6 +14,8 @@ export default function UserProfile() {
     const {slug} = useParams<{ slug: string }>()
 
     useEffect(() => {
+        setLoading(true)
+        setError(null)
         vg.user({username: slug.split('/')[0]})
             .get()
             .then(({data}) => {
