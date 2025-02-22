@@ -16,7 +16,7 @@ export default defineConfig({
         },
     },
     define: {
-        'import.meta.env.CF_PAGES_COMMIT_SHA': process.env.CF_PAGES_COMMIT_SHA || '"synced"',
+        'import.meta.env.CF_PAGES_COMMIT_SHA': `${process.env.CF_PAGES_COMMIT_SHA}` || '"synced"',
     },
     plugins: [
         react(),
