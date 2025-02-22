@@ -24,7 +24,7 @@ export default function UserProfile() {
             .catch((e) => {
                 setError(e)
             })
-    }, [])
+    }, [slug])
 
     if (error) return <NotFound/>
 
