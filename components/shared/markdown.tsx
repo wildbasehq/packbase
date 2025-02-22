@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 
 export default function Markdown({children, ...props}: { children: string; [x: string]: any }) {
     // Check for numbers followed by a period, and if so, replace with \.
-    children = children.replace(/(\d+)\./g, '$1\\.')
+    children = children?.replace(/(\d+)\./g, '$1\\.')
 
     return (
         <ReactMarkdown
