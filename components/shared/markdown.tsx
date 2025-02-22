@@ -2,6 +2,9 @@ import {Heading, Text} from '@/components/shared/text'
 import ReactMarkdown from 'react-markdown'
 
 export default function Markdown({children, ...props}: { children: string; [x: string]: any }) {
+    // Check for numbers followed by a period, and if so, replace with \.
+    children = children.replace(/(\d+)\./g, '$1\\.')
+
     return (
         <ReactMarkdown
             components={{
@@ -17,6 +20,9 @@ export default function Markdown({children, ...props}: { children: string; [x: s
                 p(props) {
                     return <Text {...props} />
                 },
+                ul(props) {
+                    return <ul className="list-disc pl-4" {...props} />
+                }
             }}
             {...props}
         >
