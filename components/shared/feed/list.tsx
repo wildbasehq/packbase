@@ -17,6 +17,7 @@ import {HandRaisedIcon, MegaphoneIcon, WrenchScrewdriverIcon} from '@heroicons/r
 import UserAvatar from '@/components/shared/user/avatar'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import WrenchCharacter from '@/src/images/svg/wrench-character.svg'
+import {WorkerStore} from '@/lib/workers.ts'
 
 export default function FeedList({
                                      packID = '00000000-0000-0000-0000-000000000000',
@@ -27,7 +28,8 @@ export default function FeedList({
     changingView?: boolean
     setChangingView?: any
 }) {
-    const {maintenance, queueWorker, completeWorker} = useUIStore()
+    const {maintenance} = useUIStore()
+    const {enqueue} = WorkerStore()
 
     if (maintenance) {
         return (
@@ -112,45 +114,43 @@ export default function FeedList({
 
     const fetchPosts = (source?: string, clearOnNew = false, postsToUse?: any) => {
         const postsArray = postsToUse || posts
-        queueWorker(`howl-dl${source ? `-${source}` : ''}`)
-
-        vg.feed({id: packID})
-            .get({query: {page: clearOnNew ? 1 : postsCurrentPage}})
-            .then(({data, error}) => {
-                if (error) {
-                    log.error('Feed Error', error.status) // @TODO: This returns [object Object] no matter what? Why?
-                    setPosts([])
-                    toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
-                    setError(new Error(error.status))
-                    return
-                }
-
-                // if clearOnNew, check if there's any new post IDs in the new data
-                if (clearOnNew) {
-                    if (data.data.length === 0) {
+        enqueue(`howl-dl${source ? `-${source}` : ''}`, async () => {
+            vg.feed({id: packID})
+                .get({query: {page: clearOnNew ? 1 : postsCurrentPage}})
+                .then(({data, error}) => {
+                    if (error) {
+                        log.error('Feed Error', error.status) // @TODO: This returns [object Object] no matter what? Why?
                         setPosts([])
-                        setPostsReady(true)
-                        setPostsHasMore(false)
-                        completeWorker('howl-dl')
+                        toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+                        setError(new Error(error.status))
                         return
                     }
 
-                    const newPosts = data.data.map((post: any) => post.id)
-                    const oldPosts = postsArray.map((post: any) => post.id)
-                    if (newPosts.filter((id: string) => !oldPosts.includes(id)).length !== 0) {
-                        setPosts(data.data)
-                        setPostsCurrentPage(2)
-                        setPostsHasMore(data.has_more)
-                    }
-                } else {
-                    setPosts([...postsArray, ...data.data])
-                    setPostsCurrentPage(postsCurrentPage + 1)
-                }
+                    // if clearOnNew, check if there's any new post IDs in the new data
+                    if (clearOnNew) {
+                        if (data.data.length === 0) {
+                            setPosts([])
+                            setPostsReady(true)
+                            setPostsHasMore(false)
+                            return
+                        }
 
-                setPostsReady(true)
-                setPostsHasMore(data.has_more)
-                completeWorker('howl-dl')
-            })
+                        const newPosts = data.data.map((post: any) => post.id)
+                        const oldPosts = postsArray.map((post: any) => post.id)
+                        if (newPosts.filter((id: string) => !oldPosts.includes(id)).length !== 0) {
+                            setPosts(data.data)
+                            setPostsCurrentPage(2)
+                            setPostsHasMore(data.has_more)
+                        }
+                    } else {
+                        setPosts([...postsArray, ...data.data])
+                        setPostsCurrentPage(postsCurrentPage + 1)
+                    }
+
+                    setPostsReady(true)
+                    setPostsHasMore(data.has_more)
+                })
+        })
     }
 
     const LoadingCardSmall = () => {

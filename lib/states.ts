@@ -122,10 +122,6 @@ interface ResourceUIStore {
     setBucketRoot: (bucketRoot: string) => void
     setMaintenance: (maintenance: string | null) => void
 
-    workerQueue: any[]
-    queueWorker: (worker: any) => void
-    completeWorker: (worker: any) => void
-
     updateAvailable: boolean
     setUpdateAvailable: (update: boolean) => void
 }
@@ -138,7 +134,6 @@ export const useUIStore = create<ResourceUIStore>((set) => ({
     navigation: [],
     bucketRoot: '',
     maintenance: null,
-    workerQueue: [],
     updateAvailable: false,
     setHidden: (hidden) =>
         set((state) => ({
@@ -171,29 +166,6 @@ export const useUIStore = create<ResourceUIStore>((set) => ({
             ...state,
             maintenance,
         })),
-
-    queueWorker: (worker) =>
-        set((state) => {
-            const queue = state.workerQueue
-            queue.push(worker)
-            log.info('Worker', 'Added:', worker)
-            return {
-                ...state,
-                workerQueue: queue,
-            }
-        }),
-
-    completeWorker: (worker) =>
-        set((state) => {
-            const queue = state.workerQueue
-            // Remove the worker from the queue
-            queue.splice(queue.indexOf(worker), 1)
-            log.info('Worker', 'Completed:', worker)
-            return {
-                ...state,
-                workerQueue: queue,
-            }
-        }),
 
     setUpdateAvailable: (update) =>
         set((state) => ({
