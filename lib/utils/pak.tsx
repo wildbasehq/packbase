@@ -14,3 +14,14 @@ export function BentoStaffBadge({type, ...props}: {
         </Tooltip>
     )
 }
+
+export function BentoGenericUnlockableBadge({type, ...props}: {
+    type: string
+    [x: string]: any
+}) {
+    return (
+        <Tooltip content={badgeConfig.config.unlockables.tooltip[type] || 'Unlockable Badge'} side="bottom">
+            <img src={`${rootDir}${badgeConfig._rootDir}unlockables/${type}.png`} alt="Unlockable badge" {...props} />
+        </Tooltip>
+    )
+}

@@ -8,7 +8,7 @@ import {Input} from '@/components/shared/input/text'
 import {Button} from '@/components/shared/experimental-button-rework'
 import {vg} from '@/lib/api'
 import GridBody from '@/components/layout/grid-body'
-import {EnvelopeIcon, EnvelopeOpenIcon, IdentificationIcon, SwatchIcon} from '@heroicons/react/16/solid'
+import {EnvelopeIcon, EnvelopeOpenIcon, IdentificationIcon, SwatchIcon, TrophyIcon} from '@heroicons/react/16/solid'
 import {Redirect, useLocation} from 'wouter'
 import {usePostHog} from 'posthog-js/react'
 
@@ -47,6 +47,12 @@ export default function SettingsLayout({children}: { children: React.ReactNode }
                     href: '/settings/invite',
                     description: 'Invite a friend to join the community',
                     icon: EnvelopeOpenIcon,
+                },
+                {
+                    name: 'Unlockables',
+                    href: '/settings/unlockables',
+                    description: 'Unlockable content',
+                    icon: TrophyIcon,
                 }
             ])
         }

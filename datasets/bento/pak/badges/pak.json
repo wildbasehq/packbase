@@ -12,18 +12,25 @@
       "default": "1.png",
       "kingless": "1_1.png"
     },
-    "bestow_award": {
-      "_rootDir": "bestow_award/",
-      "1": "1.png",
-      "3": "2.png",
-      "5": "3.png",
-      "10": "4.png",
-      "15": "5.png",
-      "20": "6.png",
-      "30": "7.png",
-      "35": "8.png",
-      "40": "9.png",
-      "50": "10.png"
+    "unlockables": {
+      "_rootDir": "unlockables/",
+      "tooltip": {
+        "cat_invite_1": "Invited someone!",
+        "cat_invite_2": "Invited 2 people",
+        "cat_invite_3": "Invited 3 people",
+        "cat_invite_4": "Invited 4 people",
+        "cat_invite_5": "Invited 5 people",
+        "cat_invite_6": "Invited 6 people",
+        "cat_invite_7": "Invited 7 people",
+        "cat_invite_8": "Invited 8 people",
+        "cat_invite_9": "Invited 9 people",
+        "cat_invite_10": "Invited 10 people",
+        "cat_invite_11": "Invited 11 people",
+        "cat_invite_12": "Invited 12 people",
+        "cat_invite_13": "A baker's dozen of invites",
+        "cat_invite_14": "Backbone of the community",
+        "cat_invite_15": "The life of the party. We are eternally grateful and at forever your service."
+      }
     }
   }
 }

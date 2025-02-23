@@ -6,6 +6,7 @@ import {PackChannels} from '@/components/layout/pack-channels.tsx'
 import Preload from './preload.tsx'
 import {Providers} from './provider.tsx'
 import {Redirect, Route, Switch} from 'wouter'
+import SettingsUnlockablesPage from '@/src/pages/settings/unlockables/page.tsx'
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/src/pages/id/layout.tsx'))
@@ -130,6 +131,11 @@ function App() {
                                                     <Suspense fallback={<LoadingFallback/>}>
                                                         <SettingsLayout>
                                                             <Switch>
+                                                                <Route path="/unlockables">
+                                                                    <Suspense fallback={<LoadingFallback/>}>
+                                                                        <SettingsUnlockablesPage/>
+                                                                    </Suspense>
+                                                                </Route>
                                                                 <Route path="/template">
                                                                     <Suspense fallback={<LoadingFallback/>}>
                                                                         <SettingsTemplate/>

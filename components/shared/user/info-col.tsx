@@ -2,7 +2,7 @@ import UserAvatar from '@/components/shared/user/avatar'
 // @ts-ignore
 import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
-import {BentoStaffBadge} from '@/lib/utils/pak'
+import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak'
 import * as HoverCard from '@radix-ui/react-hover-card'
 
 export default function UserInfoCol({
@@ -49,6 +49,7 @@ export default function UserInfoCol({
                                 <div className="text-md">
                                     {user.display_name || user.username}
                                     {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20}/>}
+                                    {user.badge && <BentoGenericUnlockableBadge type={user.badge} className="-mt-2 ml-1 inline-flex h-5 w-5" width={20} height={20}/>}
                                 </div>
                                 <div className="text-alt text-sm">@{user.username}</div>
                             </div>
@@ -87,6 +88,7 @@ export function UserInfo({
                 <Link href={`/@${user.username}`} className="text-default text-sm font-semibold">
                     {user.display_name || user.username}
                     {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20}/>}
+                    {user.badge && <BentoGenericUnlockableBadge type={user.badge} className="-mt-2 ml-1 inline-flex h-5 w-5" width={20} height={20}/>}
                 </Link>
                 <span className="text-alt w-32 self-baseline overflow-hidden text-ellipsis whitespace-nowrap text-xs unicorn:text-on-surface-variant/50">
                     {tag || user.tag || user.username || 'piss'}
