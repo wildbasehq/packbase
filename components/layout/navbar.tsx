@@ -17,7 +17,7 @@ import {Badge} from '@/components/shared/badge.tsx'
 
 export default function NavBar() {
     const {user} = useUserAccountStore()
-    const {hidden, workerQueue, updateAvailable} = useUIStore()
+    const {hidden, workerQueue, updateAvailable, maintenance} = useUIStore()
 
     const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false)
 
@@ -27,7 +27,7 @@ export default function NavBar() {
 
     return (
         <>
-            {user && !user.anonUser && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]}/>}
+            {user && !user.anonUser && !maintenance && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]}/>}
 
             <div className={`${hidden ? '' : 'sm:!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}>
                 {hidden ? (

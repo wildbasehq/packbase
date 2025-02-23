@@ -19,6 +19,9 @@ export default function Preload({children}: { children: React.ReactNode }) {
         vg.server.describeServer
             .get()
             .then((server) => {
+                setBucketRoot(server.data.bucketRoot)
+                setMaintenance(server.data.maintenance)
+
                 if (server.data.maintenance) {
                     return setError({
                         cause: 'Server is under maintenance',
@@ -26,8 +29,6 @@ export default function Preload({children}: { children: React.ReactNode }) {
                     })
                 }
 
-                setBucketRoot(server.data.bucketRoot)
-                // setMaintenance(server.data.maintenance)
                 setStatus('auth')
                 // @ts-ignore
                 supabase.auth.getSession().then(async ({data: {session}}) => {
