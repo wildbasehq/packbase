@@ -114,7 +114,15 @@ export default function FeedList({
 
     const fetchPosts = (source?: string, clearOnNew = false, postsToUse?: any) => {
         const postsArray = postsToUse || posts
-        enqueue(`howl-dl${source ? `-${source}` : ''}`, async () => {
+        log.info('Feed', `Fetching posts from ${source}...`)
+        enqueue(`howl-dl-${packID}`, async (cache) => {
+            const cached = cache.get()
+            if (cached) {
+                log.info('Feed', `Using cache for ${packID}`)
+                setPosts(cached)
+                setPostsReady(true)
+            }
+
             vg.feed({id: packID})
                 .get({query: {page: clearOnNew ? 1 : postsCurrentPage}})
                 .then(({data, error}) => {
@@ -149,6 +157,7 @@ export default function FeedList({
 
                     setPostsReady(true)
                     setPostsHasMore(data.has_more)
+                    cache.replace([...postsArray, ...data.data])
                 })
         })
     }
