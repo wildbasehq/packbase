@@ -22,7 +22,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
                 if (server.data.maintenance) {
                     return setError({
                         cause: 'Server is under maintenance',
-                        message: `Packbase is currently under maintenance. Please check back later.`,
+                        message: server.data.maintenance || `Packbase is currently under maintenance. Please check back later.`,
                     })
                 }
 
