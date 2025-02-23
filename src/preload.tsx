@@ -11,7 +11,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`polling ${API_URL}`)
     const [error, setError] = useState<any | null>(null)
     const {setUser} = useUserAccountStore()
-    const {setLoading, setConnecting, setBucketRoot, setMaintenance, queueWorker, completeWorker} = useUIStore()
+    const {setLoading, setConnecting, setBucketRoot, setMaintenance} = useUIStore()
     const {setResources} = useResourceStore()
 
     useEffect(() => {
