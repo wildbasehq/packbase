@@ -16,6 +16,8 @@ export default function UserProfile() {
     useEffect(() => {
         setLoading(true)
         setError(null)
+        setUser(null)
+
         vg.user({username: slug.split('/')[0]})
             .get()
             .then(({data}) => {
@@ -42,10 +44,10 @@ export default function UserProfile() {
 
             {user && (
                 <>
-                    {user && <ProfileHeader user={user}/>}
+                    <ProfileHeader user={user}/>
 
                     <div className="p-8">
-                        <FeedList packID={user.id}/>
+                        <FeedList key={user} packID={user.id}/>
                     </div>
                 </>
             )}
