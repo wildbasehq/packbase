@@ -41,7 +41,7 @@ const ProgressBar = ({value}) => {
     return (
         <div className="w-full space-y-2">
             <div className="flex justify-between text-sm">
-                <Text>Progress: {value} invite</Text>
+                <Text>Progress: {value} invited</Text>
                 <div className="space-x-4">
                     <Text alt className="inline-flex">Special badges at</Text>
                     <span className="text-blue-500">15</span>
@@ -107,7 +107,7 @@ export default function SettingsUnlockablesPage() {
                     </Text>
                 </div>
 
-                <ProgressBar value={user.metadata.invites_total}/>
+                <ProgressBar value={user.metadata.invited}/>
 
                 <div className="space-y-6">
                     <div>

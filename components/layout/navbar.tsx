@@ -25,7 +25,7 @@ export default function NavBar() {
 
     return (
         <>
-            {user && !user?.metadata?.dp_uod && !maintenance && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]}/>}
+            {user && !user?.metadata?.dp_uod && !user.anonUser && !maintenance && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]}/>}
 
             <div className={`${hidden ? '' : 'sm:!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}>
                 {hidden ? (
