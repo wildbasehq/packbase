@@ -1,4 +1,4 @@
-import {vg} from '@/lib/api'
+import {supabase, vg} from '@/lib/api'
 import {UserProfileBasic} from '@/lib/defs/user'
 import {useUserAccountStore} from '@/lib/states'
 import {toast} from 'sonner'
@@ -425,7 +425,13 @@ export default function UserOnboardingModal({state}: { state: [boolean, Dispatch
         const newStep = currentStep + 1
 
         if (currentStep === steps.length - 1) {
-            vg.dipswitch.post({dpk: 'uod', dpv: ''})
+            supabase.auth.updateUser({
+                data: {
+                    dp_uod: true,
+                }
+            }).catch(e => {
+                log.error('User Onboarding', 'Failed to update user:', e)
+            })
             return setShowOnboardingModal(false)
         }
 

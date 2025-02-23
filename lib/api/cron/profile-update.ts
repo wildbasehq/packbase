@@ -13,19 +13,13 @@ export const getSelfProfile = (cb?: () => void) => {
         .get()
         .then(async ({data}) => {
             log.info('User Data', 'Got:', data)
-            queueWorker('dipswitch')
-            const dipswitch = (await vg.dipswitch.get({
-                query: {}
-            })).data || []
-            completeWorker('dipswitch')
 
-            log.info('User Data', 'Got dipswitch:', dipswitch)
             let userBuild = {
                 id: data.id,
                 username: data?.username || 'new_here_' + new Date().getTime(),
                 display_name: data?.display_name || 'new_here_' + new Date().getTime(),
                 reqOnboard: !data || !data?.username,
-                dp: dipswitch,
+                dp: data?.dp || {},
                 anonUser: !data?.username,
                 ...data,
             }

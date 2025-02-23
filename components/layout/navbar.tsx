@@ -6,7 +6,7 @@ import UserAvatar from '@/components/shared/user/avatar'
 import {useUIStore, useUserAccountStore} from '@/lib/states'
 import {MenuButton} from '@headlessui/react'
 import {ScanFaceIcon} from 'lucide-react'
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import UserOnboardingModal from '../modal/user-onboarding-modal'
 import {FaDiscord} from 'react-icons/fa6'
 import {Logo} from '@/components/shared/logo'
@@ -19,15 +19,11 @@ export default function NavBar() {
     const {user} = useUserAccountStore()
     const {hidden, workerQueue, updateAvailable, maintenance} = useUIStore()
 
-    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false)
-
-    useEffect(() => {
-        setShowOnboardingModal(!user?.dp.uod)
-    }, [user])
+    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(true)
 
     return (
         <>
-            {user && !user.anonUser && !maintenance && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]}/>}
+            {user && !user?.metadata?.dp_uod && !maintenance && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]}/>}
 
             <div className={`${hidden ? '' : 'sm:!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}>
                 {hidden ? (
