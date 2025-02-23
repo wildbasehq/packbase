@@ -89,7 +89,7 @@ export function UserInfo({
                     {user.type && <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20}/>}
                 </Link>
                 <span className="text-alt w-32 self-baseline overflow-hidden text-ellipsis whitespace-nowrap text-xs unicorn:text-on-surface-variant/50">
-                    {tag || user.tag || user.about?.bio || 'piss'}
+                    {tag || user.tag || user.username || 'piss'}
                 </span>
             </div>
         </div>
