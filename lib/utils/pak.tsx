@@ -9,7 +9,7 @@ export function BentoStaffBadge({type, ...props}: {
     [x: string]: any
 }) {
     return (
-        <Tooltip content={badgeConfig.config.staff.tooltip[type] || 'Staff Badge'}>
+        <Tooltip content={badgeConfig.config.staff.tooltip[type] || 'Staff Badge'} side="bottom">
             <img src={`${rootDir}${badgeConfig._rootDir}staff/${type}.png`} alt="Staff badge" {...props} />
         </Tooltip>
     )
