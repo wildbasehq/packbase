@@ -1,6 +1,48 @@
 import {create} from 'zustand'
 
 /**
+ * Cache manager for storing and retrieving job results
+ */
+class CacheManager {
+    private jobId: string
+    private store: WorkerState
+
+    constructor(jobId: string, store: WorkerState) {
+        this.jobId = jobId
+        this.store = store
+    }
+
+    /**
+     * Get the current cached value
+     */
+    get<T>(): T | undefined {
+        return this.store.cache.get(this.jobId) as T | undefined
+    }
+
+    /**
+     * Replace the current cached value
+     */
+    replace<T>(value: T): void {
+        this.store.cache.set(this.jobId, value)
+    }
+
+    /**
+     * Update the cached value using a transform function
+     */
+    update<T>(transformer: (currentValue: T | undefined) => T): void {
+        const currentValue = this.store.cache.get(this.jobId) as T | undefined
+        this.store.cache.set(this.jobId, transformer(currentValue))
+    }
+
+    /**
+     * Clear the cached value
+     */
+    clear(): void {
+        this.store.cache.delete(this.jobId)
+    }
+}
+
+/**
  * Represents the possible states of a job in the queue
  */
 type JobStatus = 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'
@@ -18,7 +60,7 @@ interface Job {
     /** Unique identifier for the job */
     id: string
     /** The async function to be executed */
-    fn: () => Promise<void>
+    fn: (cache: CacheManager) => Promise<void>
     /** Current status of the job */
     status: JobStatus
     /** Priority level of the job */
@@ -71,6 +113,8 @@ interface WorkerState {
     jobs: Map<string, Job>
     /** Separate queues for each priority level */
     queues: Record<JobPriority, string[]>
+    /** Cache manager for storing job results */
+    cache: Map<string, any>
 
     /**
      * Adds a new job to the queue
@@ -79,7 +123,7 @@ interface WorkerState {
      * @param options - Optional configuration for the job
      * @returns boolean indicating if the job was successfully queued
      */
-    enqueue: (id: string, fn: () => Promise<void>, options?: JobOptions) => boolean
+    enqueue: (id: string, fn: (cache: CacheManager) => Promise<void>, options?: JobOptions) => boolean
 
     /**
      * Processes the next job in the queue according to priority
@@ -121,62 +165,19 @@ interface WorkerState {
      * @returns Current status of the job or undefined if not found
      */
     getJobStatus: (id: string) => JobStatus | undefined
-}
 
-/**
- * Zustand store for managing the worker state
- */
-interface Job {
-    id: string
-    fn: () => Promise<void>
-    status: JobStatus
-    priority: JobPriority
-    attempts: number
-    maxAttempts: number
-    timeoutMs: number
-    queuedAt: Date
-    startedAt?: Date
-    completedAt?: Date
-    error?: Error
-    timeoutId?: NodeJS.Timeout
-}
+    /**
+     * Clears the cache for a specific job
+     * @param id - ID of the job to clear cache for
+     */
+    clearCache: (id: string) => void
 
-/**
- * Zustand store for state definition and management
- */
-interface WorkerState {
-    // Maximum number of jobs that can be in the queue
-    readonly MAX_QUEUE_SIZE: number
-    // Maximum number of concurrent jobs
-    readonly MAX_CONCURRENT_JOBS: number
-    // Default timeout for jobs in milliseconds
-    readonly DEFAULT_TIMEOUT_MS: number
-    // Default maximum retry attempts
-    readonly DEFAULT_MAX_ATTEMPTS: number
-
-    jobs: Map<string, Job>
-    // Separate queue for each priority level
-    queues: Record<JobPriority, string[]>
-
-    // Core operations
-    enqueue: (
-        id: string,
-        fn: () => Promise<void>,
-        options?: {
-            priority?: JobPriority
-            timeoutMs?: number
-            maxAttempts?: number
-        }
-    ) => boolean
-    process: () => void
-    cancel: (id: string) => void
-    retry: (id: string) => void
-    cleanup: () => void
-
-    // Getters for different job states
-    getRunningJobs: () => Job[]
-    getQueuedJobs: () => Job[]
-    getJobStatus: (id: string) => JobStatus | undefined
+    /**
+     * Gets the cached value for a specific job
+     * @param id - ID of the job to get cached value for
+     * @returns Cached value or undefined if not found
+     */
+    getCachedValue: <T>(id: string) => T | undefined
 }
 
 export const WorkerStore = create<WorkerState>((set, get) => ({
@@ -192,26 +193,24 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
         medium: [],
         low: []
     },
+    cache: new Map(),
 
     enqueue: (id, fn, options = {}) => {
         const state = get()
         const totalQueuedJobs = Object.values(state.queues)
             .reduce((sum, queue) => sum + queue.length, 0)
 
-        // Check if queue is at capacity
         if (totalQueuedJobs >= state.MAX_QUEUE_SIZE) {
             log.error('Worker', `Queue is full. Rejected job ${id}`)
             return false
         }
 
-        // Check if job exists and its status
         const existingJob = state.jobs.get(id)
         if (existingJob) {
             if (!['completed', 'failed', 'cancelled'].includes(existingJob.status)) {
                 log.error('Worker', `Job ${id} already exists and is ${existingJob.status}`)
                 return false
             }
-            // Remove the old completed/failed/cancelled job
             state.jobs.delete(id)
         }
 
@@ -219,7 +218,6 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
         const timeoutMs = options.timeoutMs || state.DEFAULT_TIMEOUT_MS
         const maxAttempts = options.maxAttempts || state.DEFAULT_MAX_ATTEMPTS
 
-        // Create new job
         const job: Job = {
             id,
             fn,
@@ -251,7 +249,6 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
             return
         }
 
-        // Process jobs in priority order
         const priorities: JobPriority[] = ['critical', 'high', 'medium', 'low']
 
         for (const priority of priorities) {
@@ -262,12 +259,10 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
             const job = state.jobs.get(jobId)
             if (!job) continue
 
-            // Execute job
             job.status = 'running'
             job.startedAt = new Date()
             job.attempts++
 
-            // Set timeout
             job.timeoutId = setTimeout(() => {
                 const currentJob = get().jobs.get(jobId)
                 if (currentJob?.status === 'running') {
@@ -276,12 +271,13 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
                 }
             }, job.timeoutMs)
 
-            // Execute the job
-            job.fn()
+            // Create cache manager instance for this job
+            const cacheManager = new CacheManager(jobId, get())
+
+            job.fn(cacheManager)
                 .then(() => handleJobSuccess(jobId))
                 .catch(error => handleJobFailure(jobId, error))
 
-            // Update state
             set(state => ({
                 jobs: new Map(state.jobs).set(jobId, job),
                 queues: {
@@ -292,6 +288,18 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
 
             break
         }
+    },
+
+    clearCache: (id) => {
+        set(state => {
+            const newCache = new Map(state.cache)
+            newCache.delete(id)
+            return {cache: newCache}
+        })
+    },
+
+    getCachedValue: (id) => {
+        return get().cache.get(id)
     },
 
     cancel: (id) => {

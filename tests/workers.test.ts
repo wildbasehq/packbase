@@ -13,13 +13,121 @@ describe('WorkerStore', () => {
                 high: [],
                 medium: [],
                 low: []
-            }
+            },
+            cache: new Map() // Add cache reset
         })
     })
 
     afterEach(() => {
         // Cleanup after each test
         shutdownWorker()
+    })
+
+    describe('cache functionality', () => {
+        test('should allow jobs to store and retrieve cached data', async () => {
+            const jobId = 'cache-test-job'
+            const testData = {key: 'value'}
+            let retrievedData = null
+
+            // First job stores data
+            await new Promise<void>(resolve => {
+                WorkerStore.getState().enqueue(jobId, async (cache) => {
+                    cache.replace(testData)
+                    resolve()
+                })
+                WorkerStore.getState().process()
+            })
+
+            // Second job retrieves data
+            await new Promise<void>(resolve => {
+                WorkerStore.getState().enqueue(jobId, async (cache) => {
+                    retrievedData = cache.get()
+                    resolve()
+                })
+                WorkerStore.getState().process()
+            })
+
+            expect(retrievedData).toEqual(testData)
+        })
+
+        test('should allow clearing cache for specific jobs', async () => {
+            const jobId = 'cache-clear-test'
+            const testData = {key: 'value'}
+
+            // Store data
+            await new Promise<void>(resolve => {
+                WorkerStore.getState().enqueue(jobId, async (cache) => {
+                    cache.replace(testData)
+                    resolve()
+                })
+                WorkerStore.getState().process()
+            })
+
+            // Clear cache
+            WorkerStore.getState().clearCache(jobId)
+
+            // Verify cache is cleared
+            const cachedValue = WorkerStore.getState().getCachedValue(jobId)
+            expect(cachedValue).toBeUndefined()
+        })
+
+        test('should allow updating cached data with transform function', async () => {
+            const jobId = 'cache-update-test'
+            const initialData = [1, 2, 3]
+            let finalData = null
+
+            // Store initial data
+            await new Promise<void>(resolve => {
+                WorkerStore.getState().enqueue(jobId, async (cache) => {
+                    cache.replace(initialData)
+                    resolve()
+                })
+                WorkerStore.getState().process()
+            })
+
+            // Update data using transform
+            await new Promise<void>(resolve => {
+                WorkerStore.getState().enqueue(jobId, async (cache) => {
+                    cache.update<number[]>(currentData => currentData ? [...currentData, 4] : [4])
+                    finalData = cache.get()
+                    resolve()
+                })
+                WorkerStore.getState().process()
+            })
+
+            expect(finalData).toEqual([1, 2, 3, 4])
+        })
+
+        test('should maintain separate caches for different jobs', async () => {
+            const job1Id = 'cache-job-1'
+            const job2Id = 'cache-job-2'
+            const data1 = {job: 1}
+            const data2 = {job: 2}
+
+            // Store data for both jobs
+            await Promise.all([
+                new Promise<void>(resolve => {
+                    WorkerStore.getState().enqueue(job1Id, async (cache) => {
+                        cache.replace(data1)
+                        resolve()
+                    })
+                    WorkerStore.getState().process()
+                }),
+                new Promise<void>(resolve => {
+                    WorkerStore.getState().enqueue(job2Id, async (cache) => {
+                        cache.replace(data2)
+                        resolve()
+                    })
+                    WorkerStore.getState().process()
+                })
+            ])
+
+            const cache1 = WorkerStore.getState().getCachedValue(job1Id)
+            const cache2 = WorkerStore.getState().getCachedValue(job2Id)
+
+            expect(cache1).toEqual(data1)
+            expect(cache2).toEqual(data2)
+        })
     })
 
     describe('enqueue', () => {
