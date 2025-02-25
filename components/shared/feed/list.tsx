@@ -117,7 +117,7 @@ export default function FeedList({
         log.info('Feed', `Fetching posts from ${source}...`)
         enqueue(`howl-dl-${packID}`, async (cache) => {
             const cached = cache.get()
-            if (cached && source !== 'auto-refresh') {
+            if (cached && source !== 'auto-refresh' && postsCurrentPage === 1) {
                 log.info('Feed', `Using cache for ${packID}`)
                 setPosts(cached)
                 setPostsReady(true)
