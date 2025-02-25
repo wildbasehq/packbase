@@ -368,7 +368,7 @@ export function FeedListItem({...props}: any) {
                             {/*    </div>*/}
                             {/*</div>*/}
 
-                            {comment.user.id === user.id && (
+                            {comment.user.id === user?.id && (
                                 <button
                                     type="button"
                                     className="bg-box-alt text-default hover:bg-box flex h-8 w-8 items-center justify-center rounded-full"
