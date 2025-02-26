@@ -28,7 +28,7 @@ export function Slideover({
                             className="pointer-events-auto relative w-screen sm:max-w-md transform transition duration-200 ease-snapper data-closed:translate-x-full sm:duration-350"
                         >
                             <div className="flex h-full flex-col overflow-y-auto bg-neutral-100 dark:bg-n-7 shadow-xl">
-                                <div className="px-4 sm:px-6 bg-white dark:bg-n-8 h-16 border-b flex items-center justify-between">
+                                <div className="px-4 sm:px-6 bg-white dark:bg-n-8 h-18 border-b flex items-center justify-between">
                                     {props.navbar}
                                     <button
                                         type="button"
