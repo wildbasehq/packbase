@@ -7,6 +7,8 @@ import HowlCreator from '@/components/shared/user/howl-creator'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
 import {useState} from 'react'
 import InboxPage from '@/src/pages/inbox/page.tsx'
+import {Badge} from '@/components/shared/badge.tsx'
+import Tooltip from '@/components/shared/tooltip.tsx'
 
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon, Sparkles: SparklesIcon, Fire: FireIcon,
@@ -50,10 +52,13 @@ export function PackChannels() {
                                 <SidebarLabel>Home</SidebarLabel>
                             </SidebarItem>
                             {navigation?.map((item, index) => (
-                                <SidebarItem key={index} href={item.href} current={item.current}>
-                                    {typeof item.icon === 'string' ? <DynamicIcon name={item.icon}/> : <item.icon/>}
-                                    <SidebarLabel>{item.name}</SidebarLabel>
-                                </SidebarItem>
+                                <Tooltip key={index} content={item.description || item.name} delayDuration={0}>
+                                    <SidebarItem key={index} href={item.href} current={item.current}>
+                                        {typeof item.icon === 'string' ? <DynamicIcon name={item.icon}/> : <item.icon/>}
+                                        <SidebarLabel>{item.name}</SidebarLabel>
+                                        {item.badge && <Badge color="indigo" className="ml-auto">{item.badge}</Badge>}
+                                    </SidebarItem>
+                                </Tooltip>
                             ))}
                         </SidebarSection>
                         <SidebarSpacer/>
