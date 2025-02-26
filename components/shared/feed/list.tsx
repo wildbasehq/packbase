@@ -23,40 +23,13 @@ export default function FeedList({
                                      packID = '00000000-0000-0000-0000-000000000000',
                                      changingView,
                                      setChangingView,
-                                 }: {
+                                 }: Readonly<{
     packID?: string
     changingView?: boolean
     setChangingView?: any
-}) {
+}>) {
     const {maintenance} = useUIStore()
     const {enqueue} = WorkerStore()
-
-    if (maintenance) {
-        return (
-            <div className="flex flex-col items-center justify-center">
-                <Alert className="max-w-4xl">
-                    <AlertTitle>
-                        <WrenchScrewdriverIcon className="text-default -mt-1 mr-1 inline-block h-4 w-4"/>
-                        Feed Maintenance
-                    </AlertTitle>
-                    <AlertDescription className="grid grid-cols-2">
-                        <span>
-                            The feed is currently under maintenance and can't be used. Please check again later!
-                            <br/>
-                            <br/>
-                            {maintenance}
-                            <br/>
-                            <br/>
-                            <Button color="indigo" href="https://discord.gg/StuuK55gYA" target="_blank">Discord</Button>{' '}
-                        </span>
-                        <div className="flex items-center justify-end">
-                            <img src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto"/>
-                        </div>
-                    </AlertDescription>
-                </Alert>
-            </div>
-        )
-    }
 
     const feedID = 'EVERYTHING0'
     const [error, setError] = useState<Error | null>(null)
@@ -102,12 +75,13 @@ export default function FeedList({
 
     useEffect(() => {
         switch (FeedViewConfig) {
-            default:
-            case 1:
-                setMasonryColumns({750: 1, 1080: 2, 1360: 3, 1640: 4})
-                break
             case 2:
                 setMasonryColumns({350: 1})
+                break
+            
+            case 1:
+            default:
+                setMasonryColumns({750: 1, 1080: 2, 1360: 3, 1640: 4})
                 break
         }
     }, [FeedViewConfig])
@@ -195,6 +169,33 @@ export default function FeedList({
                     {(error.cause as string) || 'Something went wrong'}: {error.message || error.stack}
                 </p>
             </>
+        )
+    }
+
+    if (maintenance) {
+        return (
+            <div className="flex flex-col items-center justify-center">
+                <Alert className="max-w-4xl">
+                    <AlertTitle>
+                        <WrenchScrewdriverIcon className="text-default -mt-1 mr-1 inline-block h-4 w-4"/>
+                        Feed Maintenance
+                    </AlertTitle>
+                    <AlertDescription className="grid grid-cols-2">
+                        <span>
+                            The feed is currently under maintenance and can't be used. Please check again later!
+                            <br/>
+                            <br/>
+                            {maintenance}
+                            <br/>
+                            <br/>
+                            <Button color="indigo" href="https://discord.gg/StuuK55gYA" target="_blank">Discord</Button>{' '}
+                        </span>
+                        <div className="flex items-center justify-end">
+                            <img src={WrenchCharacter} alt="Wrench head character waving" className="aspect-square h-48 w-auto"/>
+                        </div>
+                    </AlertDescription>
+                </Alert>
+            </div>
         )
     }
 
@@ -318,7 +319,7 @@ const views = [
     {id: 2, name: 'List', icon: WireframeList, unavailable: false},
 ]
 
-function FeedListViewControls({callback}: { callback?: () => void }) {
+function FeedListViewControls({callback}: Readonly<{ callback?: () => void }>) {
     const uiOptions = useUISettingsStore((state) => state)
 
     return (
@@ -342,31 +343,15 @@ function FeedListViewControls({callback}: { callback?: () => void }) {
 export function LoadingCard({
                                 title,
                                 masonryColumns,
-                            }: {
+                            }: Readonly<{
     title: string | JSX.Element
     masonryColumns?: {
         [key: number]: number
     }
-}) {
+}>) {
     return (
         // @ts-ignore
         <ResponsiveMasonry columnsCountBreakPoints={masonryColumns}>
-            {/* @ts-ignore */}
-            {/*<Card className="dont-animate w-full absolute z-10">*/}
-            {/*    <img*/}
-            {/*        src="/img/dog-on-ship.gif"*/}
-            {/*        alt="Animated pixel dog in box panting before falling over, then looping."*/}
-            {/*        className="h-42 w-fit"*/}
-            {/*        style={{*/}
-            {/*            imageRendering: 'pixelated',*/}
-            {/*            display: 'inline-block',*/}
-            {/*            marginTop: '-1px',*/}
-            {/*            marginRight: '4px',*/}
-            {/*        }}*/}
-            {/*    />*/}
-            {/*    <Text size="sm">{title}</Text>*/}
-            {/*</Card>*/}
-
             <Masonry className="list-stagger animate-pulse-stagger" gutter="24px">
                 {/* EXTREMELY DIRTY TRICKKKKK */}
                 <Card className="w-full dont-animate">
@@ -401,7 +386,7 @@ export function LoadingCard({
     )
 }
 
-function FeedListItem({post, gridTutorialID, postState}: { post: any; gridTutorialID?: number; postState: [any, any] }) {
+function FeedListItem({post, gridTutorialID, postState}: Readonly<{ post: any; gridTutorialID?: number; postState: [any, any] }>) {
     if (gridTutorialID !== undefined) {
         return (
             <Card

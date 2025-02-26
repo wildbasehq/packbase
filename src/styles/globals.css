@@ -40,8 +40,8 @@
   --color-n-4: rgb(164 169 187);
   --color-n-5: rgb(110 113 128);
   --color-n-6: rgb(64 66 77);
-  --color-n-7: rgb(30 30 36);
-  --color-n-8: var(--color-primary-midnight);
+  --color-n-7: rgb(38,38,40);
+  --color-n-8: rgb(30,30,32);
   --color-n-9: var(--color-primary-midnight);
 
   --color-primary: var(--color-primary-cosmos);

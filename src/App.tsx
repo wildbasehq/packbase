@@ -38,147 +38,145 @@ const LoadingFallback = () => (
 
 function App() {
     return (
-        <>
-            <Providers>
-                <Suspense>
-                    <PostHogPageview/>
-                </Suspense>
+        <Providers>
+            <Suspense>
+                <PostHogPageview/>
+            </Suspense>
 
-                <div className="absolute bottom-0 left-0 w-full h-12 z-40 bg-sidebar sm:hidden">
-                    <div className="flex justify-center items-center h-full">
-                        <Text size="xs" className="text-center">
-                            Mobile is unsupported! We won't take bug reports for mobile during the alpha. A mobile app is being worked on and coming soon.
-                        </Text>
-                    </div>
+            <div className="absolute bottom-0 left-0 w-full h-12 z-40 bg-sidebar sm:hidden">
+                <div className="flex justify-center items-center h-full">
+                    <Text size="xs" className="text-center">
+                        Mobile is unsupported! We won't take bug reports for mobile during the alpha. A mobile app is being worked on and coming soon.
+                    </Text>
                 </div>
+            </div>
 
-                <SidebarLayout navbar={<NavBar/>} sidebar={<PackChannels/>}>
-                    <div id="NGContentArea" className="h-full overflow-hidden flex">
-                        <div className="grow">
-                            <main className="flex h-full flex-1">
-                                <div className="h-full w-full">
-                                    <div id="NGRoot" className="h-full overflow-y-auto">
-                                        <WaitlistCheck/>
-                                        <Preload>
-                                            <Switch>
-                                                <Route path="/">
-                                                    <Redirect to="/p/universe"/>
-                                                </Route>
+            <SidebarLayout navbar={<NavBar/>} sidebar={<PackChannels/>}>
+                <div id="NGContentArea" className="h-full overflow-hidden flex">
+                    <div className="grow">
+                        <main className="flex h-full flex-1">
+                            <div className="h-full w-full">
+                                <div id="NGRoot" className="h-full overflow-y-auto">
+                                    <WaitlistCheck/>
+                                    <Preload>
+                                        <Switch>
+                                            <Route path="/">
+                                                <Redirect to="/p/universe"/>
+                                            </Route>
 
-                                                <Route path="/terms">
-                                                    <Suspense fallback={<LoadingFallback/>}>
-                                                        <TermsPage/>
-                                                    </Suspense>
-                                                </Route>
+                                            <Route path="/terms">
+                                                <Suspense fallback={<LoadingFallback/>}>
+                                                    <TermsPage/>
+                                                </Suspense>
+                                            </Route>
 
-                                                <Route path="/thanks">
-                                                    <Suspense fallback={<LoadingFallback/>}>
-                                                        <ThankYouFriends/>
-                                                    </Suspense>
-                                                </Route>
+                                            <Route path="/thanks">
+                                                <Suspense fallback={<LoadingFallback/>}>
+                                                    <ThankYouFriends/>
+                                                </Suspense>
+                                            </Route>
 
-                                                <Route path="/id" nest>
-                                                    <Suspense fallback={<LoadingFallback/>}>
-                                                        <IDLayout>
-                                                            <Route path="/login">
-                                                                <Suspense fallback={<LoadingFallback/>}>
-                                                                    <IDLogin/>
-                                                                </Suspense>
-                                                            </Route>
-                                                            <Route path="/create">
-                                                                <Suspense fallback={<LoadingFallback/>}>
-                                                                    <IDCreate/>
-                                                                </Suspense>
-                                                            </Route>
-                                                        </IDLayout>
-                                                    </Suspense>
-                                                </Route>
-
-                                                <Route path="/p" nest>
-                                                    <Switch>
-                                                        <Route path="/new">
+                                            <Route path="/id" nest>
+                                                <Suspense fallback={<LoadingFallback/>}>
+                                                    <IDLayout>
+                                                        <Route path="/login">
                                                             <Suspense fallback={<LoadingFallback/>}>
-                                                                <PackAdd/>
+                                                                <IDLogin/>
                                                             </Suspense>
                                                         </Route>
-
-                                                        <Route path="/:slug" nest>
+                                                        <Route path="/create">
                                                             <Suspense fallback={<LoadingFallback/>}>
-                                                                <PackLayout>
-                                                                    <Route path="/">
-                                                                        <Suspense fallback={<LoadingFallback/>}>
-                                                                            <PackHome/>
-                                                                        </Suspense>
-                                                                    </Route>
-                                                                    <Route path="/cosmos">
-                                                                        <Suspense fallback={<LoadingFallback/>}>
-                                                                            <PackCosmos/>
-                                                                        </Suspense>
-                                                                    </Route>
-                                                                </PackLayout>
+                                                                <IDCreate/>
                                                             </Suspense>
                                                         </Route>
-                                                    </Switch>
-                                                </Route>
+                                                    </IDLayout>
+                                                </Suspense>
+                                            </Route>
 
-                                                <Route path={/^\/@(?<slug>[^\/]+)\/?$/}>
-                                                    <Suspense fallback={<LoadingFallback/>}>
-                                                        <UserProfile/>
-                                                    </Suspense>
-                                                </Route>
+                                            <Route path="/p" nest>
+                                                <Switch>
+                                                    <Route path="/new">
+                                                        <Suspense fallback={<LoadingFallback/>}>
+                                                            <PackAdd/>
+                                                        </Suspense>
+                                                    </Route>
 
-                                                <Route path="/settings" nest>
-                                                    <Suspense fallback={<LoadingFallback/>}>
-                                                        <SettingsLayout>
-                                                            <Switch>
-                                                                <Route path="/unlockables">
-                                                                    <Suspense fallback={<LoadingFallback/>}>
-                                                                        <SettingsUnlockablesPage/>
-                                                                    </Suspense>
-                                                                </Route>
-                                                                <Route path="/template">
-                                                                    <Suspense fallback={<LoadingFallback/>}>
-                                                                        <SettingsTemplate/>
-                                                                    </Suspense>
-                                                                </Route>
-
-                                                                <Route path="/invite">
-                                                                    <Suspense fallback={<LoadingFallback/>}>
-                                                                        <SettingsInvite/>
-                                                                    </Suspense>
-                                                                </Route>
-
+                                                    <Route path="/:slug" nest>
+                                                        <Suspense fallback={<LoadingFallback/>}>
+                                                            <PackLayout>
                                                                 <Route path="/">
                                                                     <Suspense fallback={<LoadingFallback/>}>
-                                                                        <SettingsGeneral/>
+                                                                        <PackHome/>
                                                                     </Suspense>
                                                                 </Route>
-
-                                                                <Route>
+                                                                <Route path="/cosmos">
                                                                     <Suspense fallback={<LoadingFallback/>}>
-                                                                        <NotFound/>
+                                                                        <PackCosmos/>
                                                                     </Suspense>
                                                                 </Route>
-                                                            </Switch>
-                                                        </SettingsLayout>
-                                                    </Suspense>
-                                                </Route>
+                                                            </PackLayout>
+                                                        </Suspense>
+                                                    </Route>
+                                                </Switch>
+                                            </Route>
 
-                                                <Route>
-                                                    <Suspense fallback={<LoadingFallback/>}>
-                                                        <NotFound/>
-                                                    </Suspense>
-                                                </Route>
-                                            </Switch>
-                                        </Preload>
-                                    </div>
+                                            <Route path={/^\/@(?<slug>[^\/]+)\/?$/}>
+                                                <Suspense fallback={<LoadingFallback/>}>
+                                                    <UserProfile/>
+                                                </Suspense>
+                                            </Route>
+
+                                            <Route path="/settings" nest>
+                                                <Suspense fallback={<LoadingFallback/>}>
+                                                    <SettingsLayout>
+                                                        <Switch>
+                                                            <Route path="/unlockables">
+                                                                <Suspense fallback={<LoadingFallback/>}>
+                                                                    <SettingsUnlockablesPage/>
+                                                                </Suspense>
+                                                            </Route>
+                                                            <Route path="/template">
+                                                                <Suspense fallback={<LoadingFallback/>}>
+                                                                    <SettingsTemplate/>
+                                                                </Suspense>
+                                                            </Route>
+
+                                                            <Route path="/invite">
+                                                                <Suspense fallback={<LoadingFallback/>}>
+                                                                    <SettingsInvite/>
+                                                                </Suspense>
+                                                            </Route>
+
+                                                            <Route path="/">
+                                                                <Suspense fallback={<LoadingFallback/>}>
+                                                                    <SettingsGeneral/>
+                                                                </Suspense>
+                                                            </Route>
+
+                                                            <Route>
+                                                                <Suspense fallback={<LoadingFallback/>}>
+                                                                    <NotFound/>
+                                                                </Suspense>
+                                                            </Route>
+                                                        </Switch>
+                                                    </SettingsLayout>
+                                                </Suspense>
+                                            </Route>
+
+                                            <Route>
+                                                <Suspense fallback={<LoadingFallback/>}>
+                                                    <NotFound/>
+                                                </Suspense>
+                                            </Route>
+                                        </Switch>
+                                    </Preload>
                                 </div>
-                            </main>
-                        </div>
+                            </div>
+                        </main>
                     </div>
-                </SidebarLayout>
-            </Providers>
-        </>
+                </div>
+            </SidebarLayout>
+        </Providers>
     )
 }
 

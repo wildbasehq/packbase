@@ -5,6 +5,8 @@ import {FireIcon, HomeIcon, InboxIcon, MagnifyingGlassIcon, QuestionMarkCircleIc
 import ResourceSwitcher from '@/components/layout/resource-switcher'
 import HowlCreator from '@/components/shared/user/howl-creator'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
+import {useState} from 'react'
+import InboxPage from '@/src/pages/inbox/page.tsx'
 
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon, Sparkles: SparklesIcon, Fire: FireIcon,
@@ -38,10 +40,7 @@ export function PackChannels() {
                                 <MagnifyingGlassIcon/>
                                 <SidebarLabel>Search</SidebarLabel>
                             </SidebarItem>
-                            <SidebarItem href="/inbox">
-                                <InboxIcon/>
-                                <SidebarLabel>Inbox</SidebarLabel>
-                            </SidebarItem>
+                            <InboxButton/>
                         </SidebarSection>
                     </SidebarHeader>
                     <SidebarBody>
@@ -86,4 +85,17 @@ function DynamicIcon({name, ...props}: any) {
     const Icon = availableIcons[name.replace('icon://', '')]
     if (!Icon) return <QuestionMarkCircleIcon {...props}/>
     return <Icon {...props} />
+}
+
+function InboxButton() {
+    const [open, setOpen] = useState(false)
+    return (
+        <>
+            {open && <InboxPage onClose={() => setOpen(false)}/>}
+            <SidebarItem onClick={() => setOpen(true)}>
+                <InboxIcon/>
+                <SidebarLabel>Inbox</SidebarLabel>
+            </SidebarItem>
+        </>
+    )
 }
