@@ -1,4 +1,4 @@
-import {useEffect} from 'react'
+import React, {useEffect} from 'react'
 import Body from '@/components/layout/body'
 import {settingsResource, useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
 import {Heading, Text} from '@/components/shared/text'
@@ -9,12 +9,12 @@ import {Button} from '@/components/shared/experimental-button-rework'
 import {vg} from '@/lib/api'
 import GridBody from '@/components/layout/grid-body'
 import {EnvelopeIcon, EnvelopeOpenIcon, IdentificationIcon, SwatchIcon, TrophyIcon} from '@heroicons/react/16/solid'
-import {Redirect, useLocation} from 'wouter'
+import {Redirect} from 'wouter'
 import {usePostHog} from 'posthog-js/react'
+import {InviteFestivalIcon} from '@/src/pages/settings/unlockables/page.tsx'
 
 export default function SettingsLayout({children}: { children: React.ReactNode }) {
     const {user} = useUserAccountStore()
-    const [, navigate] = useLocation()
     const {setNavigation} = useUIStore()
     const {setCurrentResource} = useResourceStore()
     const posthog = usePostHog()
@@ -49,9 +49,25 @@ export default function SettingsLayout({children}: { children: React.ReactNode }
                     icon: EnvelopeOpenIcon,
                 },
                 {
-                    name: 'Unlockables',
+                    name: 'Events',
                     href: '/settings/unlockables',
-                    description: 'Unlockable content',
+                    description: <div className="space-y-2 p-2">
+                        <div
+                            className="flex items-center"
+                        >
+                            <InviteFestivalIcon/>
+                            <Heading
+                                size="2xl"
+                                className="bg-gradient-to-r animate-logo-hue from-amber-600 to-orange-600 bg-clip-text text-transparent dark:from-amber-400 dark:to-orange-400"
+                            >
+                                Invite Festival
+                            </Heading>
+                        </div>
+                        <Text size="sm">
+                            Invite your friends to join the community and unlock special rewards!
+                        </Text>
+                    </div>,
+                    badge: 'Limited Event',
                     icon: TrophyIcon,
                 }
             ])

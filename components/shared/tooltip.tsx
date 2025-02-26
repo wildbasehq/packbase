@@ -26,7 +26,7 @@ export default function Tooltip({
                 <TooltipPrimitive.Content
                     sideOffset={4}
                     side={side || 'top'}
-                    className="z-30 hidden max-w-[20rem] items-center rounded-md border bg-card drop-shadow-lg sm:block"
+                    className="!z-[999] hidden max-w-[20rem] items-center rounded-md border bg-card drop-shadow-lg sm:block"
                 >
                     {typeof content === 'string' ? (
                         <Text size="xs" className="px-2 py-1.5 text-center">
