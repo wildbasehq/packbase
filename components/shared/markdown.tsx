@@ -1,5 +1,6 @@
 import {Heading, Text} from '@/components/shared/text'
 import ReactMarkdown from 'react-markdown'
+import {Pre} from '@/components/shared/code.tsx'
 
 export default function Markdown({children, ...props}: { children: string; [x: string]: any }) {
     // Check for numbers followed by a period, and if so, replace with \.
@@ -22,7 +23,15 @@ export default function Markdown({children, ...props}: { children: string; [x: s
                 },
                 ul(props) {
                     return <ul className="list-disc pl-4" {...props} />
-                }
+                },
+                pre: (props) => {
+                    return <Pre code={props.children?.toString()} title={''}>
+                        {props.children}
+                    </Pre>
+                },
+                // code: (props) => {
+                //     return <Code {...props} />
+                // }
             }}
             {...props}
         >
