@@ -137,9 +137,10 @@ function CodePanel({
     let child = Children.only(children)
 
     if (isValidElement(child)) {
-        tag = child.props.tag ?? tag
-        label = child.props.label ?? label
-        code = child.props.code ?? code
+        const props: any = child.props
+        tag = props.tag ?? tag
+        label = props.label ?? label
+        code = props.code ?? code
     }
 
     if (!code) {
@@ -225,7 +226,7 @@ function CodeGroupPanels({
 
 function usePreventLayoutShift() {
     let positionRef = useRef<HTMLElement>(null)
-    let rafRef = useRef<number | undefined>()
+    let rafRef = useRef<number | undefined>(undefined)
 
     useEffect(() => {
         return () => {
