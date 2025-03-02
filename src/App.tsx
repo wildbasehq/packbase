@@ -7,6 +7,7 @@ import Preload from './preload.tsx'
 import {Providers} from './provider.tsx'
 import {Redirect, Route, Switch} from 'wouter'
 import SettingsUnlockablesPage from '@/src/pages/settings/unlockables/page.tsx'
+import Console from '@/components/shared/console.tsx'
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/src/pages/id/layout.tsx'))
@@ -42,6 +43,8 @@ function App() {
             <Suspense>
                 <PostHogPageview/>
             </Suspense>
+
+            <Console/>
 
             <div className="absolute bottom-0 left-0 w-full h-12 z-40 bg-sidebar sm:hidden">
                 <div className="flex justify-center items-center h-full">
