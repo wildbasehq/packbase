@@ -4,8 +4,8 @@ import ProfileHeader from '@/components/shared/user/header'
 import {LoadingCircle} from '@/components/icons'
 import NotFound from '@/src/not-found'
 import Body from '@/components/layout/body'
-import FeedList from '@/components/shared/feed/list'
 import {useParams} from 'wouter'
+import {Feed} from '@/components/feed'
 
 export default function UserProfile() {
     const [user, setUser] = useState<any>(null)
@@ -47,7 +47,7 @@ export default function UserProfile() {
                     <ProfileHeader user={user}/>
 
                     <div className="p-8">
-                        <FeedList key={user} packID={user.id}/>
+                        <Feed packID={user.id}/>
                     </div>
                 </>
             )}
