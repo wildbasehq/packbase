@@ -210,7 +210,11 @@ export default function Feed({packID = '00000000-0000-0000-0000-000000000000'}: 
 
             {/* Main content area */}
             {state.isLoading && state.posts.length === 0 ? (
-                <FeedLoading isMasonry message="Speeding through the howls..."/>
+                <FeedLoading isMasonry message={<>
+                    Speeding through the howls...
+                    <br/><br/>
+                    We're experiencing much higher traffic than usual, so please bear with us. If the feed takes too long, try navigating to another page and coming back.
+                </>}/>
             ) : state.posts.length === 0 ? (
                 <FeedEmpty message="Oddly enough, there's nothing to show you here."/>
             ) : (
