@@ -5,14 +5,41 @@ import {Heading, Text} from '@/components/shared/text'
 import {useUserAccountStore} from '@/lib/states'
 import {BentoGenericUnlockableBadge} from '@/lib/utils/pak'
 import badgeConfig from '@/datasets/bento/pak/badges/pak.json'
-import {Gradient} from '@/components/shared/gradient'
 import {LockClosedIcon, TrophyIcon, UserCircleIcon} from '@heroicons/react/24/solid'
 import {QuestionMarkCircleIcon} from '@heroicons/react/20/solid'
 import {toast} from 'sonner'
 import {CrawlText} from '@/components/shared/crawl-text'
 import {vg} from '@/lib/api'
 
-export const InviteFestivalIcon = () => (
+// We'll import the existing component since it's already well-designed for this purpose
+// This is essentially a wrapper to make it fit nicely in our settings dialog
+const UnlockableSettings: React.FC = () => {
+    return (
+        <div className="h-full overflow-y-auto">
+            <div className="flex items-center justify-center p-6">
+                <InviteFestivalIcon/>
+                <Heading
+                    size="2xl"
+                    className="bg-gradient-to-r animate-logo-hue from-amber-600 to-orange-600 bg-clip-text text-transparent dark:from-amber-400 dark:to-orange-400"
+                >
+                    Invite Festival
+                </Heading>
+            </div>
+
+            <React.Suspense fallback={
+                <div className="flex h-96 items-center justify-center">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-amber-600"></div>
+                </div>
+            }>
+                <TrophyCaseUnlockables/>
+            </React.Suspense>
+        </div>
+    )
+}
+
+export default UnlockableSettings
+
+const InviteFestivalIcon = () => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 240 240"
@@ -84,40 +111,6 @@ export const InviteFestivalIcon = () => (
         </defs>
     </svg>
 )
-
-const InviteFestivalHeader = () => {
-    return (
-        <div
-            className="relative mb-12 overflow-hidden rounded-xl ring-default ring-2 bg-gradient-to-r from-amber-50 to-orange-50 p-8 dark:bg-zinc-800 dark:from-amber-900/20 dark:to-orange-900/20">
-            <div className="absolute inset-0">
-                <Gradient className="h-full w-full opacity-30"/>
-            </div>
-
-            <div className="relative z-10">
-                <motion.div
-                    initial={{opacity: 0, y: -20}}
-                    animate={{opacity: 1, y: 0}}
-                    className="mb-4 flex items-center"
-                >
-                    <InviteFestivalIcon/>
-                    <Heading
-                        size="2xl"
-                        className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent dark:from-amber-400 dark:to-orange-400"
-                    >
-                        Invite Festival
-                    </Heading>
-                </motion.div>
-
-                <div className="text-zinc-700 dark:text-zinc-300 whitespace-break-spaces">
-                    <CrawlText delay={300} fast>
-                        ::c:white Display your achievements and build your collection by inviting friends to Packbase. These are permanent unlockables that you can
-                        show off on your profile with pride~
-                    </CrawlText>
-                </div>
-            </div>
-        </div>
-    )
-}
 
 // Trophy Case Display component with shelves and glass effect
 const TrophyCase = ({children, title}) => {
@@ -425,7 +418,7 @@ const ProgressDisplay = ({value}) => {
 }
 
 // Main Unlockables Trophy Case component
-export default function TrophyCaseUnlockables() {
+function TrophyCaseUnlockables() {
     const {user} = useUserAccountStore()
     const [selectedBadge, setSelectedBadge] = useState(null)
     const [isUpdatingBadge, setIsUpdatingBadge] = useState(false)
@@ -491,9 +484,6 @@ export default function TrophyCaseUnlockables() {
 
     return (
         <Container>
-            {/* Hero section with animated background */}
-            <InviteFestivalHeader/>
-
             {/* Progress display */}
             <ProgressDisplay value={invitedCount}/>
 

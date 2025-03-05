@@ -12,9 +12,12 @@ import {MinusCircleIcon, MoonIcon} from '@heroicons/react/24/solid'
 import {SettingsIcon} from 'lucide-react'
 import {Dispatch, SetStateAction} from 'react'
 import Link from '@/components/shared/link.tsx'
+import {useModal} from '@/components/modal/provider.tsx'
+import SettingsDialog from '@/src/pages/settings/layout.tsx'
 
 export default function UserDropdown({showOnboardingModal}: { showOnboardingModal: Dispatch<SetStateAction<boolean>> | (() => void) }) {
     const {user, setUser} = useUserAccountStore()
+    const {show} = useModal()
 
     const StatusOptions = [
         {
@@ -84,12 +87,9 @@ export default function UserDropdown({showOnboardingModal}: { showOnboardingModa
                                     <Heading>{user.display_name || user.username}</Heading>
                                     <Text alt>{user.username}</Text>
                                 </div>
-                                <Link href="/settings">
-                                    {/* mt-1 to offset button */}
-                                    <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer">
-                                        <SettingsIcon className="h-5 w-5"/>
-                                    </Button>
-                                </Link>
+                                <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer" onClick={(() => show(<SettingsDialog/>))}>
+                                    <SettingsIcon className="h-5 w-5"/>
+                                </Button>
                             </div>
                         </Link>
                     )}

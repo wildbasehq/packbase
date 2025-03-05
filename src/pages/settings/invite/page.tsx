@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from 'react'
-import {Container} from '@/components/layout/container'
-import {Heading, Text} from '@/components/shared/text'
 import {Button} from '@/components/shared/experimental-button-rework'
+import {Heading, Text} from '@/components/shared/text'
 import {AnimatePresence, motion} from 'framer-motion'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
-import {Gradient} from '@/components/shared/gradient'
 import {CrawlText} from '@/components/shared/crawl-text'
 import {CheckCircleIcon, EnvelopeIcon} from '@heroicons/react/24/solid'
 import {ClipboardIcon, ShareIcon} from '@heroicons/react/20/solid'
@@ -33,16 +31,7 @@ const InviteCard = ({invite, index}) => {
     }
 
     return (
-        <motion.div
-            initial={{opacity: 0, y: 20}}
-            animate={{opacity: 1, y: 0}}
-            transition={{delay: index * 0.1, duration: 0.3}}
-            className="relative overflow-hidden rounded-xl bg-white p-6 shadow-lg dark:bg-zinc-800/80"
-        >
-            {/* Decorative elements */}
-            <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-indigo-400/10"/>
-            <div className="absolute -left-4 -bottom-8 h-16 w-16 rounded-full bg-blue-400/10"/>
-
+        <div className="relative overflow-hidden rounded-xl bg-white p-6 shadow-lg dark:bg-zinc-800/80">
             <div className="relative">
                 {/* Code display */}
                 <div
@@ -110,7 +99,7 @@ const InviteCard = ({invite, index}) => {
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
     )
 }
 
@@ -140,7 +129,7 @@ const EmptyState = () => (
     </motion.div>
 )
 
-const SettingsInvite = () => {
+const InviteSettings: React.FC = () => {
     const [generating, setGenerating] = useState(false)
     const [error, setError] = useState(null)
     const [invites, setInvites] = useState([])
@@ -178,76 +167,56 @@ const SettingsInvite = () => {
     }
 
     return (
-        <Container>
+        <div className="h-full overflow-y-auto p-6">
             {/* Hero section with gradient background */}
-            <div className="relative mb-12 overflow-hidden rounded-2xl ring-default ring-2 p-8 dark:bg-zinc-800">
-                <div className="absolute inset-0">
-                    <Gradient className="h-full w-full opacity-30"/>
-                </div>
-
+            <div className="relative mb-6 overflow-hidden rounded-xl bg-white dark:bg-zinc-800 ring-default ring-2 p-6">
                 <div className="relative z-10">
                     <div className="flex flex-col space-y-2">
                         {/* Animated title */}
-                        <motion.div
-                            initial={{opacity: 0, y: -20}}
-                            animate={{opacity: 1, y: 0}}
-                        >
-                            <Heading size="2xl" className="mb-2">
-                                <EnvelopeIcon className="mr-2 inline-block h-8 w-8"/>
-                                Share the Experience
-                            </Heading>
-                        </motion.div>
+                        <Heading size="2xl" className="mb-2">
+                            <EnvelopeIcon className="mr-2 inline-block h-8 w-8"/>
+                            Share the Experience
+                        </Heading>
 
                         {/* Animated text */}
                         <div className="mb-6 text-zinc-700 dark:text-zinc-300 whitespace-break-spaces">
-                            <CrawlText delay={300} fast>
-                                ::c:white Invite friends to join the Packbase community. Each invite is ::bold unique and valid for 30 days.
-                            </CrawlText>
+                            <Text>
+                                Invite friends to join the Packbase community. Each invite is <b>unique and valid for 30 days</b>.
+                            </Text>
                         </div>
 
                         {/* Generate button */}
-                        <motion.div
-                            initial={{opacity: 0, y: 20}}
-                            animate={{opacity: 1, y: 0}}
-                            transition={{delay: 0.3}}
-                        >
-                            {invites.length < 10 ? (
-                                <Button
-                                    color="indigo"
-                                    className="mt-2"
-                                    disabled={generating}
-                                    onClick={generateInvite}
-                                >
-                                    {generating ? (
-                                        <motion.div
-                                            className="flex items-center"
-                                            animate={{opacity: [0.5, 1, 0.5]}}
-                                            transition={{duration: 1.5, repeat: Infinity}}
-                                        >
-                                            <EnvelopeIcon className="mr-2 h-5 w-5"/>
-                                            Creating your invite...
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div className="flex items-center">
-                                            <EnvelopeIcon className="mr-2 h-5 w-5"/>
-                                            Generate New Invite
-                                        </motion.div>
-                                    )}
-                                </Button>
-                            ) : (
-                                <motion.div
-                                    initial={{opacity: 0, y: 10}}
-                                    animate={{opacity: 1, y: 0}}
-                                >
-                                    <Alert variant="destructive" className="border-none bg-red-900/70">
-                                        <AlertTitle>Invite Limit Reached</AlertTitle>
-                                        <AlertDescription>
-                                            You have 10 unused invites. Wait for some to be used before generating more.
-                                        </AlertDescription>
-                                    </Alert>
-                                </motion.div>
-                            )}
-                        </motion.div>
+                        {invites.length < 10 ? (
+                            <Button
+                                color="indigo"
+                                className="mt-2"
+                                disabled={generating}
+                                onClick={generateInvite}
+                            >
+                                {generating ? (
+                                    <motion.div
+                                        className="flex items-center"
+                                        animate={{opacity: [0.5, 1, 0.5]}}
+                                        transition={{duration: 1.5, repeat: Infinity}}
+                                    >
+                                        <EnvelopeIcon className="mr-2 h-5 w-5"/>
+                                        Creating your invite...
+                                    </motion.div>
+                                ) : (
+                                    <motion.div className="flex items-center">
+                                        <EnvelopeIcon className="mr-2 h-5 w-5"/>
+                                        Generate New Invite
+                                    </motion.div>
+                                )}
+                            </Button>
+                        ) : (
+                            <Alert variant="destructive" className="border-none bg-red-900/70">
+                                <AlertTitle>Invite Limit Reached</AlertTitle>
+                                <AlertDescription>
+                                    You have 10 unused invites. Wait for some to be used before generating more.
+                                </AlertDescription>
+                            </Alert>
+                        )}
                     </div>
                 </div>
             </div>
@@ -296,7 +265,7 @@ const SettingsInvite = () => {
                         animate={{opacity: 1, height: 'auto'}}
                         exit={{opacity: 0, height: 0}}
                     >
-                        <Alert variant="destructive" className="mb-8">
+                        <Alert variant="destructive" className="mb-6">
                             <AlertTitle>
                                 {error}!
                             </AlertTitle>
@@ -310,8 +279,8 @@ const SettingsInvite = () => {
             </AnimatePresence>
 
             {/* Invite codes section */}
-            <div className="mt-12">
-                <div className="mb-6 flex items-center justify-between">
+            <div className="mt-6">
+                <div className="mb-4 flex items-center justify-between">
                     <Heading size="xl">
                         Your Invites
                     </Heading>
@@ -342,7 +311,7 @@ const SettingsInvite = () => {
                 initial={{opacity: 0, y: 20}}
                 animate={{opacity: 1, y: 0}}
                 transition={{delay: 0.5}}
-                className="mt-12"
+                className="mt-8"
             >
                 <Card className="!bg-primary/10 !max-w-full">
                     <Heading size="lg" className="mb-4">
@@ -352,14 +321,13 @@ const SettingsInvite = () => {
                         <li><Text>Each invite code can only be used once</Text></li>
                         <li><Text>Invites automatically expire 30 days after generation</Text></li>
                         <li><Text>You can have up to 10 active invites at once</Text></li>
-                        <li><Text>Make sure to give your invites to people who will contribute positively to the community, as their behaviour reflects on you as
-                            well!</Text>
+                        <li><Text>Make sure to give your invites to people who will contribute positively to the community</Text>
                         </li>
                     </ul>
                 </Card>
             </motion.div>
-        </Container>
+        </div>
     )
 }
 
-export default SettingsInvite
+export default InviteSettings
