@@ -1,33 +1,44 @@
-import {useResourceStore, useUserAccountStore} from '@/lib/states'
+// src/components/pages/pack-feed-controller.tsx
 import {useEffect, useState} from 'react'
+import {useResourceStore, useUserAccountStore} from '@/lib/states'
+import Lottie from 'lottie-react'
+
 import Body from '@/components/layout/body'
 import {Heading, Text} from '@/components/shared/text'
 import Link from '@/components/shared/link'
-import {Button} from '@/components/shared/experimental-button-rework'
-import girlDogBusStop from '@/datasets/lottie/girl-dog-bus-stop.json'
-import {LayoutDashboard} from 'lucide-react'
-import FeedList from '@/components/shared/feed/list'
-import PackHeader from '@/components/shared/pack/header.tsx'
-import Lottie from 'lottie-react'
+import {Button} from '@/components/shared/button'
+import PackHeader from '@/components/shared/pack/header'
+import {Feed} from '@/components/feed'
 
-export default function PackFeedController({overrideFeedID}: { overrideFeedID?: string }) {
+// Animation asset
+import girlDogBusStop from '@/datasets/lottie/girl-dog-bus-stop.json'
+
+interface PackFeedControllerProps {
+    overrideFeedID?: string;
+}
+
+export default function PackFeedController({overrideFeedID}: PackFeedControllerProps) {
     const {user} = useUserAccountStore()
     const {currentResource} = useResourceStore()
 
-    const [showFeed, setShowFeed] = useState(false)
     const [shadowSize, setShadowSize] = useState(0)
-    const [changingView, setChangingView] = useState(false)
+    const [viewSettingsOpen, setViewSettingsOpen] = useState(false)
 
-    useEffect(() => {
-        if (user && !user.anonUser) setShowFeed(true)
-    }, [user])
+    // Determine feed ID based on context
+    const feedID = overrideFeedID ||
+        (currentResource?.slug === 'universe' ? 'universe:home' : currentResource?.id)
 
-    // Scroll detection
+    // Only show feed to authenticated users
+    const isAuthenticated = user && !user?.anonUser
+
+    // Handle scroll detection for header shadow
     useEffect(() => {
-        const root = document.getElementById('NGRoot') as HTMLElement
+        const root = document.getElementById('NGRoot')
+        if (!root) return
+
         const handleScroll = () => {
-            // Max size of shadow is 20px, spread over 100px of scroll  (0.2px per scroll)
-            setShadowSize(Math.min(20, root.scrollTop * 0.1))
+            // Max size of shadow is 16px, spread over 160px of scroll (0.1px per scroll)
+            setShadowSize(Math.min(16, root.scrollTop * 0.1))
         }
 
         root.addEventListener('scroll', handleScroll)
@@ -35,60 +46,63 @@ export default function PackFeedController({overrideFeedID}: { overrideFeedID?: 
     }, [])
 
     return (
-        <>
-            {currentResource && currentResource?.slug !== 'universe' && <PackHeader pack={currentResource}/>}
+        <div className="relative min-h-screen">
+            {/* Pack header (if in a specific pack) */}
+            {currentResource && currentResource?.slug !== 'universe' && (
+                <PackHeader pack={currentResource}/>
+            )}
 
-            {user?.anonUser && (
-                <Body className="max-w-6xl">
-                    <div className="mb-12 grid max-w-6xl grid-cols-1 items-center justify-center gap-8 lg:grid-cols-2">
-                        <div className="flex flex-col space-y-4">
-                            <Heading size="xl">All there's left is to wait.</Heading>
-                            <div className="space-y-2">
-                                <Text size="sm">
-                                    If you'd like to participate with the community, you'll need an invite from someone, wait for a completely random invite drop into
-                                    your inbox, or wait for us to open up. <b>You can view packs and profiles, but howls and other data will be completely
-                                    inaccessible!</b>
-                                    <br/>
-                                    <br/>
-                                    If you don't know anyone already in, your best bet is to wait.{' '}
-                                    <span className="text-tertiary">If you've traded anything for an invite, you've been scammed.</span>
+            {/* Guest view - login prompt */}
+            {!isAuthenticated && (
+                <Body className="max-w-6xl py-12">
+                    <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
+                        <div className="flex flex-col space-y-6">
+                            <Heading size="xl" className="text-neutral-900 dark:text-neutral-100">
+                                All there's left is to wait.
+                            </Heading>
+
+                            <div className="space-y-4">
+                                <Text className="text-neutral-700 dark:text-neutral-300">
+                                    If you'd like to participate with the community, you'll need an invite from someone,
+                                    wait for a completely random invite drop into your inbox, or wait for us to open up.{' '}
+                                    <span className="font-medium">
+                    You can view packs and profiles, but howls and other data will be completely inaccessible!
+                  </span>
                                 </Text>
 
-                                <Link href="/settings">
-                                    <Button color="indigo">I got a code!! yay!</Button>
-                                </Link>
+                                <Text className="text-neutral-600 dark:text-neutral-400">
+                                    If you don't know anyone already in, your best bet is to wait.{' '}
+                                    <span className="text-amber-600 dark:text-amber-400">
+                    If you've traded anything for an invite, you've been scammed.
+                  </span>
+                                </Text>
+
+                                <div className="pt-2">
+                                    <Link href="/settings">
+                                        <Button>
+                                            I have an invite code!
+                                        </Button>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex items-end justify-end">
-                            <Lottie className="right-0 h-80 w-auto" animationData={girlDogBusStop}/>
+
+                        <div className="flex items-end justify-center lg:justify-end">
+                            <Lottie className="h-80 w-auto" animationData={girlDogBusStop}/>
                         </div>
                     </div>
                 </Body>
             )}
 
-            {showFeed && (
+            {/* Authenticated view - feed display */}
+            {isAuthenticated && (
                 <div className="flex flex-col">
-                    {/* Header */}
-                    {currentResource && currentResource?.slug === 'universe' && (
-                        <div
-                            className="sticky hidden sm:flex top-0 z-10 items-center justify-between border-b px-8 py-2 backdrop-blur-sm bg-white/95 dark:bg-zinc-900/95"
-                            // shadow based on shadowSize value
-                            style={{boxShadow: `0 0 ${shadowSize}px 0 rgba(0, 0, 0, 0.1)`}}
-                        >
-                            <Heading>Your Galaxy</Heading>
-                            <Button plain className="items-center" onClick={() => setChangingView(true)}>
-                                <LayoutDashboard className="mr-1 h-6 w-6"/>
-                                Change view
-                            </Button>
-                        </div>
-                    )}
-
-                    <div className="p-8">
-                        <FeedList packID={overrideFeedID || (currentResource?.slug === 'universe' ? 'universe:home' : currentResource?.id)} changingView={changingView}
-                                  setChangingView={setChangingView}/>
+                    {/* Feed container */}
+                    <div className="p-4 sm:p-8">
+                        <Feed packID={feedID}/>
                     </div>
                 </div>
             )}
-        </>
+        </div>
     )
 }

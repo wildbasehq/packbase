@@ -98,70 +98,69 @@ export default function FeedPost({post, onDelete, postState}: FeedPostType) {
     let alreadyAnnouncedMore = false
 
     return (
-        <>
-            <Card className="w-full px-0! py-0!">
-                <div className="relative">
-                    <div className="px-4 pt-5 sm:px-6">
-                        {/* "___ Rehowled" */}
-                        {postContent.howling && (
-                            <div className="mb-6 flex items-center text-sm">
-                                <ArrowUpOnSquareIcon className="mr-2 h-4 w-4"/>
-                                <Link href={`/@${postContent.actor?.username}/`} className="text-alt flex items-center">
-                                    <UserAvatar size="xs" icon={postContent.actor?.images?.avatar || ''} className="mr-2"/>
-                                    {postContent.actor?.username} rehowled
-                                </Link>
-                            </div>
-                        )}
-                        {postContent.pack && postContent.pack.slug !== 'universe' && (
-                            <div className="mb-6 flex items-center text-sm">
-                                {/* <UserGroupIcon className="mr-2 h-4 w-4" /> */}
-                                <Link href={`/p/${postContent.pack?.slug}/`} className="text-alt flex items-center justify-center no-underline! hover:text-inherit">
-                                    <UserAvatar size="xs" icon={postContent.pack?.images?.avatar || ''} className="mr-2 rounded-xs"/>
-                                    <span>{postContent.pack?.display_name}</span>
-                                </Link>
-                            </div>
-                        )}
-                        <div className="flex space-x-3">
-                            <div className="flex-1">
-                                <UserInfoCol
-                                    user={postContent.user}
-                                    tag={<time dateTime={postContent.created_at}>about {moment(postContent.created_at).fromNow()}</time>}
-                                />
-                            </div>
-                            <div className="flex shrink-0 space-x-2 self-center">
-                                {postContent.user && postContent.user.id === signedInUser?.id && (
-                                    <Dropdown>
-                                        <MenuButton>
-                                            <EllipsisHorizontalIcon className="w-5"/>
-                                        </MenuButton>
-                                        <DropdownMenu className="mt-4 w-36! p-0!">
-                                            <DropdownItem onClick={deletePost}>
-                                                <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1">
-                                                    <div className="h-6 w-6 items-center justify-center p-0.5">
-                                                        <TrashIcon className="h-full w-full fill-tertiary transition-colors"/>
-                                                    </div>
-                                                    <span className="text-sm">Delete</span>
-                                                </DropdownLabel>
-                                            </DropdownItem>
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                )}
-                            </div>
+        <Card className="w-full px-0! py-0!">
+            <div className="relative">
+                <div className="px-4 pt-5 sm:px-6">
+                    {/* "___ Rehowled" */}
+                    {postContent.howling && (
+                        <div className="mb-6 flex items-center text-sm">
+                            <ArrowUpOnSquareIcon className="mr-2 h-4 w-4"/>
+                            <Link href={`/@${postContent.actor?.username}/`} className="text-alt flex items-center">
+                                <UserAvatar size="xs" icon={postContent.actor?.images?.avatar || ''} className="mr-2"/>
+                                {postContent.actor?.username} rehowled
+                            </Link>
+                        </div>
+                    )}
+                    {postContent.pack && postContent.pack.slug !== 'universe' && (
+                        <div className="mb-6 flex items-center text-sm">
+                            {/* <UserGroupIcon className="mr-2 h-4 w-4" /> */}
+                            <Link href={`/p/${postContent.pack?.slug}/`} className="text-alt flex items-center justify-center no-underline! hover:text-inherit">
+                                <UserAvatar size="xs" icon={postContent.pack?.images?.avatar || ''} className="mr-2 rounded-xs"/>
+                                <span>{postContent.pack?.display_name}</span>
+                            </Link>
+                        </div>
+                    )}
+                    <div className="flex space-x-3">
+                        <div className="flex-1">
+                            <UserInfoCol
+                                user={postContent.user}
+                                tag={<time dateTime={postContent.created_at}>about {moment(postContent.created_at).fromNow()}</time>}
+                            />
+                        </div>
+                        <div className="flex shrink-0 space-x-2 self-center">
+                            {postContent.user && postContent.user.id === signedInUser?.id && (
+                                <Dropdown>
+                                    <MenuButton>
+                                        <EllipsisHorizontalIcon className="w-5"/>
+                                    </MenuButton>
+                                    <DropdownMenu className="mt-4 w-36! p-0!">
+                                        <DropdownItem onClick={deletePost}>
+                                            <DropdownLabel className="group inline-flex items-center justify-start gap-3 py-1">
+                                                <div className="h-6 w-6 items-center justify-center p-0.5">
+                                                    <TrashIcon className="h-full w-full fill-tertiary transition-colors"/>
+                                                </div>
+                                                <span className="text-sm">Delete</span>
+                                            </DropdownLabel>
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>
+                            )}
                         </div>
                     </div>
-                    <div className="min-h-fit w-full cursor-pointer px-4 py-4 sm:px-6">
-                        <div className="text-default space-y-4 break-words text-sm" onClick={() => openPost()}>
-                            <Markdown>{postContent.body}</Markdown>
-                        </div>
+                </div>
+                <div className="min-h-fit w-full cursor-pointer px-4 py-4 sm:px-6">
+                    <div className="text-default space-y-4 break-words text-sm" onClick={() => openPost()}>
+                        <Markdown>{postContent.body}</Markdown>
+                    </div>
 
-                        {/* Post Objects (Images) */}
-                        {postContent.assets && postContent.assets.length > 0 && (
-                            <MediaGrid assets={postContent.assets} post={post} truncate/>
-                        )}
-                    </div>
-                    {/* <div className="bg-box-alt absolute bottom-0 left-0 ml-4 rounded-tl-xl rounded-tr-xl border-x border-b-0 border-t border-solid border-neutral-300 dark:border-neutral-700 sm:ml-6">
+                    {/* Post Objects (Images) */}
+                    {postContent.assets && postContent.assets.length > 0 && (
+                        <MediaGrid assets={postContent.assets} post={post} truncate/>
+                    )}
+                </div>
+                {/* <div className="bg-box-alt absolute bottom-0 left-0 ml-4 rounded-tl-xl rounded-tr-xl border-x border-b-0 border-t border-solid border-neutral-300 dark:border-neutral-700 sm:ml-6">
                         <div className="flex items-center space-x-2 px-4 py-2">
-                            <div className="shrink-0"> 
+                            <div className="shrink-0">
                                 <img
                                     className="h-4 w-4 rounded-full"
                                     src={user.images?.avatar || `/img/avatar/default-avatar.png`}
@@ -175,82 +174,81 @@ export default function FeedPost({post, onDelete, postState}: FeedPostType) {
                             </div>
                         </div>
                     </div> */}
+            </div>
+
+            {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
+            {signedInUser && !signedInUser.anonUser && (
+                <div className="flex justify-between space-x-8 border-t px-4 py-4 sm:px-6">
+                    <div className="flex">
+                        <React post={post}/>
+                    </div>
+                    <CommentBox className="flex-1" truncate originalPost={postContent} onComment={onComment}/>
                 </div>
+            )}
 
-                {/* Footer - Like & Share on left, rest of space taken up by a reply textbox with send icon on right */}
-                {signedInUser && !signedInUser.anonUser && (
-                    <div className="flex justify-between space-x-8 border-t px-4 py-4 sm:px-6">
-                        <div className="flex">
-                            <React post={post}/>
-                        </div>
-                        <CommentBox className="flex-1" truncate originalPost={postContent} onComment={onComment}/>
+            {post?.comments && post.comments.length > 0 && (
+                <div className="px-4 py-4 sm:px-6">
+                    <div className="flow-root">
+                        <ul role="list" className="-mb-8">
+                            {post.comments.slice(0, 6).map((comment) => (
+                                <div key={comment.id}>
+                                    <FeedListItem
+                                        comment={comment}
+                                        showLine={comment.comments && comment.comments.length > 0}
+                                        originalPost={[postContent, setPostContent]}
+                                        postState={postState}
+                                        onClick={() => openPost()}
+                                    />
+                                    {comment.comments && comment.comments.length > 0 && (
+                                        <>
+                                            {/* @ts-ignore - fuck sake. */}
+                                            <FeedListItem
+                                                key={comment.comments[comment.comments.length - 1].id}
+                                                comment={comment.comments[comment.comments.length - 1]}
+                                                showLine={comment.comments[comment.comments.length - 1].forceRender}
+                                                originalPost={[postContent, setPostContent]}
+                                                postState={postState}
+                                                onClick={() => openPost()}
+                                            />
+
+                                            {/* almost there: check if any replies from here have 'forceRender', then, well, force render it */}
+                                            {comment.comments[comment.comments.length - 1].comments?.map((replyInsideAgain) => {
+                                                /* @ts-ignore - hey, its right this time! but it's a one-off thing. */
+                                                if (replyInsideAgain.forceRender) {
+                                                    return (
+                                                        <FeedListItem
+                                                            key={replyInsideAgain.id}
+                                                            comment={replyInsideAgain}
+                                                            showLineReverse
+                                                            originalPost={[postContent, setPostContent]}
+                                                            postState={postState}
+                                                            onClick={() => openPost()}
+                                                        />
+                                                    )
+                                                } else if (!alreadyAnnouncedMore) {
+                                                    alreadyAnnouncedMore = true
+                                                    // Return a "+ more" text
+                                                    return (
+                                                        <li className="relative -mt-8 px-12 pb-8">
+                                                            <div
+                                                                className="text-alt cursor-pointer pl-1 text-sm font-medium hover:underline"
+                                                                // onClick={() => setSlideoverOpen(true)}
+                                                            >
+                                                                + {comment.comments[comment.comments.length - 1].comments.length} more
+                                                            </div>
+                                                        </li>
+                                                    )
+                                                }
+                                            })}
+                                        </>
+                                    )}
+                                </div>
+                            ))}
+                        </ul>
                     </div>
-                )}
-
-                {post?.comments && post.comments.length > 0 && (
-                    <div className="px-4 py-4 sm:px-6">
-                        <div className="flow-root">
-                            <ul role="list" className="-mb-8">
-                                {post.comments.slice(0, 6).map((comment) => (
-                                    <div key={comment.id}>
-                                        <FeedListItem
-                                            comment={comment}
-                                            showLine={comment.comments && comment.comments.length > 0}
-                                            originalPost={[postContent, setPostContent]}
-                                            postState={postState}
-                                            onClick={() => openPost()}
-                                        />
-                                        {comment.comments && comment.comments.length > 0 && (
-                                            <>
-                                                {/* @ts-ignore - fuck sake. */}
-                                                <FeedListItem
-                                                    key={comment.comments[comment.comments.length - 1].id}
-                                                    comment={comment.comments[comment.comments.length - 1]}
-                                                    showLine={comment.comments[comment.comments.length - 1].forceRender}
-                                                    originalPost={[postContent, setPostContent]}
-                                                    postState={postState}
-                                                    onClick={() => openPost()}
-                                                />
-
-                                                {/* almost there: check if any replies from here have 'forceRender', then, well, force render it */}
-                                                {comment.comments[comment.comments.length - 1].comments?.map((replyInsideAgain) => {
-                                                    /* @ts-ignore - hey, its right this time! but it's a one-off thing. */
-                                                    if (replyInsideAgain.forceRender) {
-                                                        return (
-                                                            <FeedListItem
-                                                                key={replyInsideAgain.id}
-                                                                comment={replyInsideAgain}
-                                                                showLineReverse
-                                                                originalPost={[postContent, setPostContent]}
-                                                                postState={postState}
-                                                                onClick={() => openPost()}
-                                                            />
-                                                        )
-                                                    } else if (!alreadyAnnouncedMore) {
-                                                        alreadyAnnouncedMore = true
-                                                        // Return a "+ more" text
-                                                        return (
-                                                            <li className="relative -mt-8 px-12 pb-8">
-                                                                <div
-                                                                    className="text-alt cursor-pointer pl-1 text-sm font-medium hover:underline"
-                                                                    // onClick={() => setSlideoverOpen(true)}
-                                                                >
-                                                                    + {comment.comments[comment.comments.length - 1].comments.length} more
-                                                                </div>
-                                                            </li>
-                                                        )
-                                                    }
-                                                })}
-                                            </>
-                                        )}
-                                    </div>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                )}
-            </Card>
-        </>
+                </div>
+            )}
+        </Card>
     )
 }
 
