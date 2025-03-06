@@ -11,7 +11,7 @@ import {ClipboardIcon, ShareIcon} from '@heroicons/react/20/solid'
 import Card from '@/components/shared/card.tsx'
 
 // Invite Card Component with animations
-const InviteCard = ({invite, index}) => {
+const InviteCard = ({ invite, index }) => {
     const [copied, setCopied] = useState(false)
 
     // Calculate expiry date (30 days from creation)
@@ -31,7 +31,10 @@ const InviteCard = ({invite, index}) => {
     }
 
     return (
-        <div className="relative p-6 overflow-hidden border-transparent rounded-xl bg-sidebar highlight-zinc-950/10 dark:highlight-white/10">
+        <div
+            key={index}
+            className="relative p-6 overflow-hidden border-transparent rounded-xl bg-sidebar highlight-zinc-950/10 dark:highlight-white/10"
+        >
             <div className="relative">
                 {/* Code display */}
                 <div

@@ -76,10 +76,10 @@ export function DropdownItem({
         '*:data-[slot=avatar]:-ml-1 *:data-[slot=avatar]:mr-2.5 *:data-[slot=avatar]:size-6 sm:*:data-[slot=avatar]:mr-2 sm:*:data-[slot=avatar]:size-5'
     )
 
-    // @ts-ignore - bruh
     return (
         <Headless.MenuItem>
-            {'href' in props ? <Link {...props} className={classes} /> : <button type="button" {...props} className={classes} />}
+            {/* @ts-ignore - bruh */}
+            {'href' in props ? <Link {...props} className={classes} /> : <button {...props} className={classes} />}
         </Headless.MenuItem>
     )
 }
