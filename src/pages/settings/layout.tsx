@@ -9,17 +9,20 @@ import TemplateSettings from './template/page'
 import InviteSettings from './invite/page'
 import UnlockableSettings from './unlockables/page'
 import AnonUserSettings from './anon-user/page'
+import { Heading } from '@/components/shared/heading'
+import { Text } from '@/components/shared/text'
+import UserAvatar from '@/components/shared/user/avatar'
 
 export type SettingsTab = {
-    id: string;
-    name: string;
-    description?: string | React.ReactNode;
-    icon: React.ElementType;
-    badge?: string;
-};
+    id: string
+    name: string
+    description?: string | React.ReactNode
+    icon: React.ElementType
+    badge?: string
+}
 
 const SettingsDialog: React.FC = () => {
-    const {user} = useUserAccountStore()
+    const { user } = useUserAccountStore()
     const [activeTab, setActiveTab] = useState<string>('profile')
     const posthog = usePostHog()
 
@@ -32,7 +35,7 @@ const SettingsDialog: React.FC = () => {
                     name: 'Enter Invite',
                     description: '',
                     icon: EnvelopeIcon,
-                }
+                },
             ]
         }
 
@@ -54,7 +57,7 @@ const SettingsDialog: React.FC = () => {
                 description: 'Invite your friends to join the community and unlock special rewards!',
                 badge: 'Limited Event',
                 icon: TrophyIcon,
-            }
+            },
         ]
 
         // Conditionally add template tab based on feature flag
@@ -83,82 +86,83 @@ const SettingsDialog: React.FC = () => {
         if (!user) return null
 
         if (user.anonUser) {
-            return <AnonUserSettings/>
+            return <AnonUserSettings />
         }
 
         switch (activeTab) {
             case 'profile':
-                return <ProfileSettings/>
+                return <ProfileSettings />
             case 'template':
-                return <TemplateSettings/>
+                return <TemplateSettings />
             case 'invite':
-                return <InviteSettings/>
+                return <InviteSettings />
             case 'unlockables':
-                return <UnlockableSettings/>
+                return <UnlockableSettings />
             default:
-                return <ProfileSettings/>
+                return <ProfileSettings />
         }
     }
 
     return (
-        <div className="flex h-[750px] max-h-[85vh] w-[1100px] max-w-[95vw] overflow-hidden rounded-xl bg-white dark:bg-zinc-900 shadow-2xl">
+        <div className="flex flex-col sm:flex-row h-[750px] max-h-[85vh] w-[1100px] max-w-[95vw] overflow-hidden rounded-xl bg-white dark:bg-zinc-900 shadow-2xl">
             {/* Sidebar */}
-            <div className="w-64 flex-shrink-0 border-r border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950">
-                <div className="flex h-full flex-col">
+            <div className="hidden sm:block flex-shrink-0 border-r w-[25%] bg-sidebar">
+                <div className="flex flex-col h-full">
                     <div className="p-4 border-b border-gray-200 dark:border-zinc-800">
-                        <h2 className="text-lg font-medium text-gray-900 dark:text-white">Settings</h2>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Manage your account preferences</p>
+                        <Heading className="text-lg font-medium">Settings</Heading>
+                        <Text className="text-sm text-gray-500 dark:text-gray-400">Manage your account preferences</Text>
                     </div>
 
-                    <nav className="flex-1 overflow-y-auto p-4">
+                    <nav className="flex-1 p-4 overflow-y-auto">
                         <ul className="space-y-1">
-                            {tabs.map((tab) => (
-                                <li key={tab.id}>
-                                    <button
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`w-full flex items-center rounded-md px-3 py-2 text-left text-sm font-medium ${
-                                            activeTab === tab.id
-                                                ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
-                                                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800'
-                                        }`}
-                                    >
-                                        <tab.icon className={`h-5 w-5 mr-3 ${
-                                            activeTab === tab.id ? 'text-blue-500' : 'text-gray-400 dark:text-gray-500'
-                                        }`}/>
-                                        <span>{tab.name}</span>
+                            {tabs.map(tab => (
+                                <li
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`w-full flex flex-col rounded-md px-3 py-2 text-left text-sm font-medium ${
+                                        activeTab === tab.id
+                                            ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300'
+                                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800'
+                                    }`}
+                                >
+                                    <div onClick={() => setActiveTab(tab.id)} className="flex flex-row items-center">
+                                        <tab.icon
+                                            className={`h-5 w-5 mr-3 ${
+                                                activeTab === tab.id ? 'text-indigo-500' : 'text-gray-400 dark:text-gray-500'
+                                            }`}
+                                        />
+                                        <Text>{tab.name}</Text>
 
                                         {tab.badge && (
-                                            <span
-                                                className="ml-auto rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-                        {tab.badge}
-                      </span>
+                                            <Text
+                                                size="xs"
+                                                className="ml-auto rounded-full bg-amber-100 px-2.5 py-0.5 font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+                                            >
+                                                {tab.badge}
+                                            </Text>
                                         )}
-                                    </button>
+                                    </div>
 
                                     {tab.description && typeof tab.description !== 'string' && (
-                                        <div className="ml-8 mt-1 mb-3">{tab.description}</div>
+                                        <div className="mt-1 mb-3 ml-8">{tab.description}</div>
                                     )}
 
                                     {tab.description && typeof tab.description === 'string' && tab.description.length > 0 && (
-                                        <p className="ml-8 mt-1 text-xs text-gray-500 dark:text-gray-400">{tab.description}</p>
+                                        <Text size="xs" className="mt-1 ml-8 text-alt">
+                                            {tab.description}
+                                        </Text>
                                     )}
                                 </li>
                             ))}
                         </ul>
                     </nav>
 
-                    <div className="border-t border-gray-200 dark:border-zinc-800 p-4">
+                    <div className="p-4 border-t border-gray-200 dark:border-zinc-800">
                         <div className="flex items-center">
-                            <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                                {user?.display_name?.[0] || user?.username?.[0] || '?'}
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                    {user?.display_name || user?.username || 'Anonymous User'}
-                                </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {user?.anonUser ? 'Not registered yet' : `@${user?.username}`}
-                                </p>
+                            <UserAvatar user={user} size="lg" />
+                            <div className="ml-2">
+                                <Text className="text-sm font-medium">{user?.display_name || user?.username || 'Anonymous User'}</Text>
+                                <Text className="text-xs text-alt">{user?.anonUser ? 'Not registered yet' : `@${user?.username}`}</Text>
                             </div>
                         </div>
                     </div>
@@ -167,9 +171,7 @@ const SettingsDialog: React.FC = () => {
 
             {/* Content area */}
             <div className="flex-1 overflow-y-auto">
-                <div className="h-full">
-                    {renderContent()}
-                </div>
+                <div className="h-full">{renderContent()}</div>
             </div>
         </div>
     )

@@ -31,7 +31,7 @@ const InviteCard = ({invite, index}) => {
     }
 
     return (
-        <div className="relative p-6 overflow-hidden bg-white shadow-lg rounded-xl dark:bg-zinc-800/80">
+        <div className="relative p-6 overflow-hidden border-transparent rounded-xl bg-sidebar highlight-zinc-950/10 dark:highlight-white/10">
             <div className="relative">
                 {/* Code display */}
                 <div
@@ -40,12 +40,8 @@ const InviteCard = ({invite, index}) => {
                 >
                     {invite.invite_code}
                     {copied ? (
-                        <motion.span
-                            initial={{scale: 0}}
-                            animate={{scale: 1}}
-                            className="inline-flex ml-2 text-green-500"
-                        >
-                            <CheckCircleIcon className="w-5 h-5"/>
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="inline-flex ml-2 text-green-500">
+                            <CheckCircleIcon className="w-5 h-5" />
                         </motion.span>
                     ) : null}
                 </div>
@@ -56,45 +52,44 @@ const InviteCard = ({invite, index}) => {
                         <Text size="xs" alt>
                             Created {new Date(invite.created_at).toLocaleDateString()}
                         </Text>
-                        <Text
-                            size="xs"
-                            className={daysRemaining < 7 ? 'text-amber-500' : 'text-zinc-500'}
-                        >
+                        <Text size="xs" className={daysRemaining < 7 ? 'text-amber-500' : 'text-zinc-500'}>
                             Expires in {daysRemaining} days
                         </Text>
                     </div>
 
                     <div className="flex gap-2">
                         <motion.button
-                            whileHover={{scale: 1.05}}
-                            whileTap={{scale: 0.95}}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             className="flex items-center justify-center p-2 rounded-full bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
                             onClick={handleCopy}
                         >
-                            <ClipboardIcon className="w-4 h-4"/>
+                            <ClipboardIcon className="w-4 h-4" />
                         </motion.button>
 
                         <motion.button
-                            whileHover={{scale: 1.05}}
-                            whileTap={{scale: 0.95}}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             className="flex items-center justify-center p-2 rounded-full bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
                             onClick={() => {
                                 const text = `Hey! Join me on Packbase with this invite code: ${invite.invite_code}!\n\nhttps://packbase.app/`
                                 if (navigator.share) {
-                                    navigator.share({
-                                        title: 'Packbase Invite',
-                                        text: text
-                                    }).catch(_ => {
-                                        navigator.clipboard.writeText(text)
-                                        toast.success('Invite message copied to clipboard!')
-                                    })
+                                    navigator
+                                        .share({
+                                            title: 'Packbase Invite',
+                                            text: text,
+                                        })
+                                        .catch(_ => {
+                                            navigator.clipboard.writeText(text)
+                                            toast.success('Invite message copied to clipboard!')
+                                        })
                                 } else {
                                     navigator.clipboard.writeText(text)
                                     toast.success('Invite message copied to clipboard!')
                                 }
                             }}
                         >
-                            <ShareIcon className="w-4 h-4"/>
+                            <ShareIcon className="w-4 h-4" />
                         </motion.button>
                     </div>
                 </div>

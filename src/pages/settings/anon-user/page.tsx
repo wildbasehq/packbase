@@ -42,42 +42,39 @@ const AnonUserSettings: React.FC = () => {
     }
 
     return (
-        <div className="h-full overflow-y-auto p-6">
+        <div className="h-full p-6 overflow-y-auto">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <motion.div
-                    initial={{opacity: 0, y: 20}}
-                    animate={{opacity: 1, y: 0}}
-                    transition={{duration: 0.5}}
-                    className="flex flex-col"
-                >
-                    <Heading size="2xl" className="mb-4">Got a code?!?</Heading>
+                <div className="flex flex-col">
+                    <Heading size="2xl" className="mb-4">
+                        Got a code?!?
+                    </Heading>
                     <div className="space-y-4">
                         <Text alt size="sm">
                             If yes, yippee! We're glad you're here. Please enter a valid invite code to get started.{' '}
                             <span className="text-tertiary">
-                If you've traded anything for an invite, whether it be an art trade, or even money, you've been scammed. Report that code instead and work on getting whatever you gave back.
-              </span>
+                                If you've traded anything for an invite, whether it be an art trade, or even money, you've been scammed.
+                                Report that code instead and work on getting whatever you gave back.
+                            </span>
                         </Text>
                         <Text alt size="sm">
-                            If you haven't already, please familiarise yourself with our <Link href="/terms">Community & Data Security Guidelines</Link>.
+                            If you haven't already, please familiarise yourself with our{' '}
+                            <Link href="/terms">Community & Data Security Guidelines</Link>.
                         </Text>
                     </div>
 
-                    <div className="mt-8 flex flex-col">
+                    <div className="flex flex-col mt-8">
                         <form onSubmit={submitInviteCode} className="space-y-4">
                             <div>
-                                <label htmlFor="username" className="block text-sm font-medium mb-1">Username</label>
-                                <Input
-                                    name="username"
-                                    id="username"
-                                    placeholder="Desired username"
-                                    className="w-full"
-                                    required
-                                />
+                                <label htmlFor="username" className="block mb-1 text-sm font-medium">
+                                    Username
+                                </label>
+                                <Input name="username" id="username" placeholder="Desired username" className="w-full" required />
                             </div>
 
                             <div>
-                                <label htmlFor="invite_code" className="block text-sm font-medium mb-1">Invite Code</label>
+                                <label htmlFor="invite_code" className="block mb-1 text-sm font-medium">
+                                    Invite Code
+                                </label>
                                 <Input
                                     name="invite_code"
                                     id="invite_code"
@@ -87,8 +84,8 @@ const AnonUserSettings: React.FC = () => {
                                 />
                             </div>
 
-                            <div className="flex items-center space-x-2 pt-4">
-                                <EnvelopeIcon className="h-5 w-5 text-indigo-500"/>
+                            <div className="flex items-center space-x-2">
+                                <EnvelopeIcon className="w-5 h-5 text-indigo-500" />
                                 <Text alt size="sm">
                                     Enter the invite code you received
                                 </Text>
@@ -99,30 +96,11 @@ const AnonUserSettings: React.FC = () => {
                             </Button>
                         </form>
                     </div>
-                </motion.div>
+                </div>
 
-                <motion.div
-                    initial={{opacity: 0}}
-                    animate={{opacity: 1}}
-                    transition={{duration: 0.5, delay: 0.3}}
-                    className="hidden lg:flex items-center justify-center"
-                >
-                    <motion.img
-                        src={WolfoxDrawing}
-                        alt="Packbase Mascot"
-                        className="w-4/5 max-w-xs"
-                        initial={{scale: 0.9}}
-                        animate={{
-                            scale: [0.9, 1.02, 0.9],
-                            rotate: [0, 1, 0, -1, 0]
-                        }}
-                        transition={{
-                            duration: 10,
-                            repeat: Infinity,
-                            repeatType: 'reverse'
-                        }}
-                    />
-                </motion.div>
+                <div className="items-center justify-center hidden lg:flex">
+                    <img src={WolfoxDrawing} alt="Packbase Mascot" className="w-4/5 max-w-xs" />
+                </div>
             </div>
         </div>
     )
