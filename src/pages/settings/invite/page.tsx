@@ -31,11 +31,11 @@ const InviteCard = ({invite, index}) => {
     }
 
     return (
-        <div className="relative overflow-hidden rounded-xl bg-white p-6 shadow-lg dark:bg-zinc-800/80">
+        <div className="relative p-6 overflow-hidden bg-white shadow-lg rounded-xl dark:bg-zinc-800/80">
             <div className="relative">
                 {/* Code display */}
                 <div
-                    className="mb-3 cursor-pointer overflow-hidden rounded bg-zinc-50 px-4 py-3 font-mono text-lg tracking-wide dark:bg-zinc-900/50"
+                    className="px-4 py-3 mb-3 overflow-hidden font-mono text-lg tracking-wide rounded cursor-pointer bg-zinc-50 dark:bg-zinc-900/50"
                     onClick={handleCopy}
                 >
                     {invite.invite_code}
@@ -43,9 +43,9 @@ const InviteCard = ({invite, index}) => {
                         <motion.span
                             initial={{scale: 0}}
                             animate={{scale: 1}}
-                            className="ml-2 inline-flex text-green-500"
+                            className="inline-flex ml-2 text-green-500"
                         >
-                            <CheckCircleIcon className="h-5 w-5"/>
+                            <CheckCircleIcon className="w-5 h-5"/>
                         </motion.span>
                     ) : null}
                 </div>
@@ -68,18 +68,18 @@ const InviteCard = ({invite, index}) => {
                         <motion.button
                             whileHover={{scale: 1.05}}
                             whileTap={{scale: 0.95}}
-                            className="flex items-center justify-center rounded-full bg-zinc-100 p-2 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
+                            className="flex items-center justify-center p-2 rounded-full bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
                             onClick={handleCopy}
                         >
-                            <ClipboardIcon className="h-4 w-4"/>
+                            <ClipboardIcon className="w-4 h-4"/>
                         </motion.button>
 
                         <motion.button
                             whileHover={{scale: 1.05}}
                             whileTap={{scale: 0.95}}
-                            className="flex items-center justify-center rounded-full bg-zinc-100 p-2 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
+                            className="flex items-center justify-center p-2 rounded-full bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
                             onClick={() => {
-                                const text = `Hey! Join me on Packbase with this invite code: ${invite.invite_code}`
+                                const text = `Hey! Join me on Packbase with this invite code: ${invite.invite_code}!\n\nhttps://packbase.app/`
                                 if (navigator.share) {
                                     navigator.share({
                                         title: 'Packbase Invite',
@@ -94,7 +94,7 @@ const InviteCard = ({invite, index}) => {
                                 }
                             }}
                         >
-                            <ShareIcon className="h-4 w-4"/>
+                            <ShareIcon className="w-4 h-4"/>
                         </motion.button>
                     </div>
                 </div>
@@ -107,7 +107,7 @@ const EmptyState = () => (
     <motion.div
         initial={{opacity: 0}}
         animate={{opacity: 1}}
-        className="flex flex-col items-center justify-center space-y-6 rounded-xl border-2 border-dashed border-zinc-200 py-16 dark:border-zinc-700"
+        className="flex flex-col items-center justify-center py-16 space-y-6 border-2 border-dashed rounded-xl border-zinc-200 dark:border-zinc-700"
     >
         <motion.div
             animate={{
@@ -119,9 +119,9 @@ const EmptyState = () => (
                 repeat: Infinity,
                 repeatType: 'loop'
             }}
-            className="rounded-full bg-indigo-100 p-5 dark:bg-indigo-900/30"
+            className="p-5 bg-indigo-100 rounded-full dark:bg-indigo-900/30"
         >
-            <EnvelopeIcon className="h-10 w-10 text-indigo-600 dark:text-indigo-400"/>
+            <EnvelopeIcon className="w-10 h-10 text-indigo-600 dark:text-indigo-400"/>
         </motion.div>
         <Text className="text-center text-zinc-500">
             No invite codes yet! Generate one to share with friends.
@@ -167,14 +167,14 @@ const InviteSettings: React.FC = () => {
     }
 
     return (
-        <div className="h-full overflow-y-auto p-6">
+        <div className="h-full p-6 overflow-y-auto">
             {/* Hero section with gradient background */}
-            <div className="relative mb-6 overflow-hidden rounded-xl bg-white dark:bg-zinc-800 ring-default ring-2 p-6">
+            <div className="relative p-6 mb-6 overflow-hidden bg-white rounded-xl dark:bg-zinc-800 ring-default ring-2">
                 <div className="relative z-10">
                     <div className="flex flex-col space-y-2">
                         {/* Animated title */}
                         <Heading size="2xl" className="mb-2">
-                            <EnvelopeIcon className="mr-2 inline-block h-8 w-8"/>
+                            <EnvelopeIcon className="inline-block w-8 h-8 mr-2"/>
                             Share the Experience
                         </Heading>
 
@@ -199,12 +199,12 @@ const InviteSettings: React.FC = () => {
                                         animate={{opacity: [0.5, 1, 0.5]}}
                                         transition={{duration: 1.5, repeat: Infinity}}
                                     >
-                                        <EnvelopeIcon className="mr-2 h-5 w-5"/>
+                                        <EnvelopeIcon className="w-5 h-5 mr-2"/>
                                         Creating your invite...
                                     </motion.div>
                                 ) : (
                                     <motion.div className="flex items-center">
-                                        <EnvelopeIcon className="mr-2 h-5 w-5"/>
+                                        <EnvelopeIcon className="w-5 h-5 mr-2"/>
                                         Generate New Invite
                                     </motion.div>
                                 )}
@@ -235,7 +235,7 @@ const InviteSettings: React.FC = () => {
                             initial={{scale: 0.8, opacity: 0}}
                             animate={{scale: 1, opacity: 1}}
                             exit={{scale: 0.8, opacity: 0}}
-                            className="relative z-10 rounded-2xl bg-white p-8 text-center shadow-xl dark:bg-zinc-800"
+                            className="relative z-10 p-8 text-center bg-white shadow-xl rounded-2xl dark:bg-zinc-800"
                         >
                             <motion.div
                                 animate={{
@@ -244,7 +244,7 @@ const InviteSettings: React.FC = () => {
                                 }}
                                 transition={{duration: 0.7}}
                             >
-                                <EnvelopeIcon className="mx-auto h-16 w-16 text-indigo-500"/>
+                                <EnvelopeIcon className="w-16 h-16 mx-auto text-indigo-500"/>
                             </motion.div>
                             <Heading size="xl" className="mt-4">
                                 Invite Created!
@@ -280,11 +280,11 @@ const InviteSettings: React.FC = () => {
 
             {/* Invite codes section */}
             <div className="mt-6">
-                <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center justify-between mb-4">
                     <Heading size="xl">
                         Your Invites
                     </Heading>
-                    <div className="rounded-full bg-zinc-100 px-3 py-1 dark:bg-zinc-800">
+                    <div className="px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800">
                         <Text alt className="font-medium">
                             {invites.length}/10 <span className="text-xs">available</span>
                         </Text>
@@ -317,7 +317,7 @@ const InviteSettings: React.FC = () => {
                     <Heading size="lg" className="mb-4">
                         Invite Tips
                     </Heading>
-                    <ul className="ml-5 space-y-3 text-zinc-700 dark:text-zinc-300 list-disc">
+                    <ul className="ml-5 space-y-3 list-disc text-zinc-700 dark:text-zinc-300">
                         <li><Text>Each invite code can only be used once</Text></li>
                         <li><Text>Invites automatically expire 30 days after generation</Text></li>
                         <li><Text>You can have up to 10 active invites at once</Text></li>
