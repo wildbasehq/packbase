@@ -309,7 +309,7 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000' }
 
                 // Update cache
                 try {
-                    enqueue(`howl-dl-${packID}`, async cache => {
+                    enqueue(`howl-dl-${packID}-${source}`, async cache => {
                         if (page === 1) {
                             cache.replace(data.data)
                         } else {
