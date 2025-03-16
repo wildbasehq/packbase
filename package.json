@@ -59,7 +59,7 @@
     "framer-motion": "^11.2.6",
     "install": "^0.13.0",
     "lottie-react": "^2.4.0",
-    "lucide-react": "^0.379.0",
+    "lucide-react": "^0.475.0",
     "moment": "^2.29.4",
     "monaco-editor": "^0.52.2",
     "monaco-html-linter": "^1.0.4",
