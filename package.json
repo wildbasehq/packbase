@@ -75,7 +75,7 @@
     "react-moveable": "^0.56.0",
     "react-responsive-masonry": "^2.2.0",
     "react-text-transition": "^3.1.0",
-    "react-wrap-balancer": "^0.3.0",
+    "react-wrap-balancer": "^0.5.0",
     "sass": "^1.66.1",
     "sonner": "^0.6.2",
     "tailwind-merge": "^2.3.0",
