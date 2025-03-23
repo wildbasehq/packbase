@@ -25,58 +25,69 @@ export default function NavBar() {
 
     return (
         <>
-            {user && !user?.metadata?.dp_uod && !user.anonUser && !maintenance && <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]}/>}
+            {user && !user?.metadata?.dp_uod && !user.anonUser && !maintenance && (
+                <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]} />
+            )}
 
-            <div className={`${hidden ? '' : 'sm:!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}>
-                {hidden ? (
+            <div
+                className={`${hidden || !user ? '' : 'sm:!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}
+            >
+                {hidden || !user ? (
                     <Link className="flex-1" href="/">
-                        <Logo className="h-8"/>
+                        <Logo className="h-8" />
                     </Link>
                 ) : (
-                    <div className="flex-1"/>
+                    <div className="flex-1" />
                 )}
 
-                <div className="justify-self-end h-16 w-full max-w-7xl">
-                    <div className="relative flex h-full justify-end lg:items-center xl:justify-between">
+                <div className="w-full h-16 justify-self-end max-w-7xl">
+                    <div className="relative flex justify-end h-full lg:items-center xl:justify-between">
                         {/*{user && !user.anonUser && <Search/>}*/}
                         <div className="relative"></div>
 
                         <div className="flex items-center gap-5">
-                            {jobs.size > 0 && <>
-                                <WorkerSpinner/>
-                            </>}
+                            {jobs.size > 0 && (
+                                <>
+                                    <WorkerSpinner />
+                                </>
+                            )}
                             {updateAvailable && (
                                 <>
                                     <Tooltip content="Click to update Packbase">
-                                        <div className="flex scale-80 cursor-pointer" onClick={() => window.location.reload()}>
+                                        <div className="flex cursor-pointer scale-80" onClick={() => window.location.reload()}>
                                             <Badge color="amber" className="flex items-center justify-center">
                                                 <span className="text-xs">Update available</span>
                                             </Badge>
                                         </div>
                                     </Tooltip>
 
-                                    <div className="md:dark:bg-white/15 hidden md:block md:h-5 md:w-px md:bg-n-8/10"/>
+                                    <div className="hidden md:dark:bg-white/15 md:block md:h-5 md:w-px md:bg-n-8/10" />
                                 </>
                             )}
                             <div className="flex gap-4">
-                                <ThemeToggle/>
+                                <ThemeToggle />
                             </div>
                             <div className="flex gap-4">
-                                <Button href="https://discord.gg/StuuK55gYA" target="_blank" plain className="flex items-center justify-center">
-                                    <FaDiscord className="mr-1 h-4 w-4"/> Discord
+                                <Button
+                                    href="https://discord.gg/StuuK55gYA"
+                                    target="_blank"
+                                    plain
+                                    className="flex items-center justify-center"
+                                >
+                                    <FaDiscord className="w-4 h-4 mr-1" /> Discord
                                 </Button>
                             </div>
 
-                            <div className="md:dark:bg-white/15 hidden md:block md:h-5 md:w-px md:bg-n-8/10"/>
+                            <div className="hidden md:dark:bg-white/15 md:block md:h-5 md:w-px md:bg-n-8/10" />
 
                             <div className="hidden min-[416px]:contents">
                                 {user && (
                                     <Dropdown>
                                         <MenuButton>
-                                            <UserAvatar user={user} size="md" className={`${user.reqOnboard && 'animate-pulse'}`}/>
+                                            <UserAvatar user={user} size="md" className={`${user.reqOnboard && 'animate-pulse'}`} />
                                         </MenuButton>
                                         <DropdownMenu className="z-20 mt-4 p-0!">
-                                            <UserDropdown showOnboardingModal={setShowOnboardingModal}/>
+                                            <UserDropdown showOnboardingModal={setShowOnboardingModal} />
                                         </DropdownMenu>
                                     </Dropdown>
                                 )}
@@ -85,7 +96,7 @@ export default function NavBar() {
                                     <>
                                         <Link href="/id/login" className="no-underline!">
                                             <Button color="indigo" className="flex items-center justify-center">
-                                                <ScanFaceIcon className="mr-1 h-4 w-4"/> Sign In
+                                                <ScanFaceIcon className="w-4 h-4 mr-1" /> Sign In
                                             </Button>
                                         </Link>
                                     </>

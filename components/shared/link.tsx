@@ -7,18 +7,29 @@ const Link = forwardRef(function Link(props: Omit<ComponentPropsWithoutRef<'a'>,
     to?: string
     href?: string
 }, ref: ForwardedRef<HTMLAnchorElement>) {
-    const shallowProps = {...props}
+    const shallowProps = { ...props }
     const href = shallowProps.href || shallowProps.to
     delete shallowProps.href
     delete shallowProps.to
 
+    // Check if the link is external (starts with http)
+    const isExternal = href?.startsWith('http')
+
     return (
         <Headless.DataInteractive>
-            {/* @ts-ignore */}
-            <RouterLink {...shallowProps}
-                        to={`~${href}`}
-                        className={clsx('text-primary', props.className)}
-                        ref={ref}/>
+            {isExternal ? (
+                <a
+                    {...shallowProps}
+                    href={href}
+                    className={clsx('text-primary', props.className)}
+                    ref={ref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                />
+            ) : (
+                // @ts-ignore
+                <RouterLink {...shallowProps} to={`~${href}`} className={clsx('text-primary', props.className)} ref={ref} />
+            )}
         </Headless.DataInteractive>
     )
 })

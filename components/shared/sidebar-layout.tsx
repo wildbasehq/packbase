@@ -21,21 +21,21 @@ function CloseMenuIcon() {
     )
 }
 
-function MobileSidebar({open, close, children}: React.PropsWithChildren<{ open: boolean; close: () => void }>) {
+function MobileSidebar({ open, close, children }: React.PropsWithChildren<{ open: boolean; close: () => void }>) {
     return (
         <Headless.Dialog open={open} onClose={close} className="lg:hidden">
             <Headless.DialogBackdrop
                 transition
-                className="fixed inset-0 bg-black/30 transition data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+                className="fixed inset-0 transition bg-black/30 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
             />
             <Headless.DialogPanel
                 transition
                 className="fixed inset-y-0 w-full max-w-[25.5rem] p-2 transition duration-300 ease-in-out data-closed:-translate-x-full"
             >
-                <div className="flex h-full flex-col rounded-lg bg-white ring-1 shadow-xs ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10">
-                    <div className="-mb-3 px-4 pt-3">
+                <div className="flex flex-col h-full bg-white rounded-lg shadow-xs ring-1 ring-zinc-950/5 dark:bg-zinc-900 dark:ring-white/10">
+                    <div className="px-4 pt-3 -mb-3">
                         <Headless.CloseButton as={NavbarItem} aria-label="Close navigation">
-                            <CloseMenuIcon/>
+                            <CloseMenuIcon />
                         </Headless.CloseButton>
                     </div>
                     {children}
@@ -46,16 +46,16 @@ function MobileSidebar({open, close, children}: React.PropsWithChildren<{ open: 
 }
 
 export function SidebarLayout({
-                                  navbar,
-                                  sidebar,
-                                  children,
-                              }: React.PropsWithChildren<{ navbar: React.ReactNode; sidebar: React.ReactNode }>) {
+    navbar,
+    sidebar,
+    children,
+}: React.PropsWithChildren<{ navbar: React.ReactNode; sidebar: React.ReactNode }>) {
     let [showSidebar, setShowSidebar] = useState(false)
-    const {user} = useUserAccountStore()
-    const {hidden} = useUIStore()
+    const { user } = useUserAccountStore()
+    const { hidden } = useUIStore()
 
     return (
-        <div className="relative isolate flex min-h-svh w-full bg-white max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
+        <div className="relative flex w-full bg-white isolate min-h-svh max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
             {/* Sidebar on desktop */}
             {!hidden && <div className="fixed inset-y-0 left-0 w-98 max-lg:hidden">{sidebar}</div>}
 
@@ -68,20 +68,17 @@ export function SidebarLayout({
             <header className="flex items-center px-4 lg:hidden">
                 <div className="py-2.5">
                     <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
-                        <OpenMenuIcon/>
+                        <OpenMenuIcon />
                     </NavbarItem>
                 </div>
-                <div className="min-w-0 flex-1">{navbar}</div>
+                <div className="flex-1 min-w-0">{navbar}</div>
             </header>
 
             {/* Content */}
             <div className="flex flex-col flex-1">
-                <div className="hidden lg:flex">
-                    {navbar}
-                </div>
-                <main className={`pb-2 lg:min-w-0 lg:pt-2 lg:pr-2 ${!hidden ? 'lg:pl-98' : 'lg:pl-2'}`}>
-                    <div
-                        className="grow lg:rounded-lg lg:bg-white h-screen lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10 overflow-hidden">
+                <div className="hidden lg:flex">{navbar}</div>
+                <main className={`pb-2 lg:min-w-0 lg:pt-2 lg:pr-2 ${!hidden && user ? 'lg:pl-98' : 'lg:pl-2'}`}>
+                    <div className="h-screen overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
                         <div className="mx-auto overflow-hidden h-[calc(100%-4.5rem)]">{children}</div>
                     </div>
                 </main>

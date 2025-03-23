@@ -19,12 +19,12 @@ export function PackChannels() {
     const {currentResource} = useResourceStore()
     const {user} = useUserAccountStore()
 
-    if (hidden) return <></>
+    if (hidden || !user) return <></>
     return (
         <div className="flex h-full">
             <PackSwitcher/>
             <div className="flex flex-col">
-                <nav aria-label="Sections" className="min-h-16 flex flex-col w-80">
+                <nav aria-label="Sections" className="flex flex-col min-h-16 w-80">
                     <div
                         className={`shimmer-template relative flex h-full items-center px-5 py-2 overflow-hidden ${loading ? 'before:animate-shimmer-fast' : ''}`}
                     >
