@@ -57,7 +57,7 @@ export function SidebarLayout({
     return (
         <div className="relative flex w-full bg-white isolate min-h-svh max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
             {/* Sidebar on desktop */}
-            {!hidden && <div className="fixed inset-y-0 left-0 w-98 max-lg:hidden">{sidebar}</div>}
+            {!hidden && user && <div className="fixed inset-y-0 left-0 w-98 max-lg:hidden">{sidebar}</div>}
 
             {/* Sidebar on mobile */}
             <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
