@@ -209,6 +209,7 @@ function Hero() {
             <Container className="relative z-10 text-center pt-96 pb-82">
                 <Heading className="!text-5xl tracking-tight md:!text-7xl font-new-spirit-bold">
                     <VerticalCutReveal
+                        reverse
                         splitBy="characters"
                         staggerDuration={0.025}
                         staggerFrom="first"
