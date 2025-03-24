@@ -21,7 +21,9 @@ export default function NavBar() {
     const {hidden, updateAvailable, maintenance} = useUIStore()
     const {jobs, getRunningJobs} = WorkerStore()
 
-    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(true)
+    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(
+        user && !user?.metadata?.dp_uod && !user.anonUser && !maintenance
+    )
 
     return (
         <>
