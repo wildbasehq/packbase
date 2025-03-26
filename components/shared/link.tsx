@@ -21,7 +21,7 @@ const Link = forwardRef(function Link(props: Omit<ComponentPropsWithoutRef<'a'>,
                 <a
                     {...shallowProps}
                     href={href}
-                    className={clsx('text-primary', props.className)}
+                    className={clsx(props.className, 'text-primary')}
                     ref={ref}
                     target="_blank"
                     rel="noopener noreferrer"
