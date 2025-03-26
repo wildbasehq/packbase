@@ -5,6 +5,9 @@ import VerticalCutReveal from '../shared/text/vertical-cut-text'
 import { motion } from 'framer-motion'
 import Tooltip from '../shared/tooltip'
 import { ArrowUpRightIcon } from '@heroicons/react/20/solid'
+import { ClockIcon, EyeIcon, UserIcon } from '@heroicons/react/24/solid'
+import { ReactNode, useMemo } from 'react'
+import { QuestionMarkCircleIcon } from '@heroicons/react/16/solid'
 
 // Animation configuration
 const animConfig = {
@@ -325,20 +328,147 @@ function LandingContent() {
     )
 }
 
+// Reusable highlighted text component with randomized clip path
+function HighlightedText({ children, width = '110%' }: { children: ReactNode; width?: string }) {
+    // Generate random wavy SVG path for highlight
+    const svgPath = useMemo(() => {
+        const segments = 10
+        let path = ''
+
+        // Starting point
+        path += `M 0,${Math.floor(Math.random() * 16) + 2} `
+
+        // Top edge - random wavy line
+        for (let i = 1; i <= segments; i++) {
+            const x = (i * 100) / segments
+            const y = Math.floor(Math.random() * 16) + 2
+            path += `L ${x},${y} `
+        }
+
+        // Right edge
+        path += `L 100,${Math.floor(Math.random() * 15) + 80} `
+
+        // Bottom edge - random wavy line
+        for (let i = segments - 1; i >= 0; i--) {
+            const x = (i * 100) / segments
+            const y = Math.floor(Math.random() * 15) + 80
+            path += `L ${x},${y} `
+        }
+
+        // Close the path
+        path += 'Z'
+
+        return path
+    }, [])
+
+    return (
+        <span className="relative z-10 font-instrument-serif-italic text-default">
+            {' '}
+            <span
+                className="absolute inset-0 -z-[1]"
+                style={{
+                    width,
+                }}
+            >
+                <svg
+                    width="100%"
+                    height="100%"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        transform: 'rotate(1deg) skewX(1deg)',
+                        marginTop: '0.25rem',
+                    }}
+                >
+                    <path
+                        d={svgPath}
+                        fill="var(--highlight-color, oklch(0.901 0.076 70.697))"
+                        fillOpacity="0.5"
+                        className="dark:fill-orange-900 dark:fill-opacity-30"
+                    />
+                </svg>
+            </span>
+            {children}
+        </span>
+    )
+}
+
+function StopBeingPrey() {
+    return (
+        <Container className="[&>*]:space-y-3 py-42">
+            <Heading className="!text-5xl tracking-tight font-instrument-serif-regular">
+                Social media preys on your{' '}
+                <span className="space-x-4">
+                    <HighlightedText width="105%">
+                        <EyeIcon className="inline-flex w-8 h-8 text-lime-500/80 dark:text-primary-lime" /> attention,
+                    </HighlightedText>{' '}
+                    <HighlightedText>
+                        <UserIcon className="inline-flex w-8 h-8 text-lime-500/80 dark:text-primary-lime" /> data,
+                    </HighlightedText>{' '}
+                    <HighlightedText>
+                        <ClockIcon className="inline-flex w-8 h-8 text-lime-500/80 dark:text-primary-lime" /> time
+                    </HighlightedText>
+                </span>
+                .
+                <br />— it doesn't have to be this way.
+            </Heading>
+            <Text>
+                Twitter (X), Instagram, TikTok, etc. all do this &mdash; Meta alone makes ~$50 per user per year¹. While furry-centric
+                platforms don't do any of this (
+                <Tooltip
+                    delayDuration={0}
+                    content="Some furry sites force you pay a subscription - well, 'donate' - to use basic features."
+                >
+                    <span>
+                        <sub>... to an extent</sub> <sup>?</sup>
+                    </span>
+                </Tooltip>
+                ) and work for creators, there's a better way &mdash; a way that benefits everyone, even if they're not creators.
+                Dating-esque apps like Barq <b>don't work</b> for community communication.
+            </Text>
+            <Text>Packbase puts communities first. Completely free, full HTML/CSS customisation, and no ads.</Text>
+            <ul className="space-y-1 list-none">
+                <li>
+                    <Text alt size="xs" className="text-neutral-500">
+                        <a
+                            href="https://www.statista.com/statistics/234056/facebook-average-revenue-per-user/"
+                            className="hover:underline"
+                            target="_blank"
+                        >
+                            ¹Statista Data Value Per User Report (2023)
+                        </a>
+                    </Text>
+                </li>
+            </ul>
+        </Container>
+    )
+}
 export default function GuestLanding() {
     return (
-        <div className="space-y-8 overflow-hidden">
-            <Hero />
-            <LandingContent />
-
+        <div className="h-full pb-6 space-y-8 overflow-x-hidden overflow-y-auto bg-zinc-100 dark:bg-zinc-950">
+            <div className="relative z-30 bg-white rounded-md ring-2 ring-default dark:bg-zinc-900">
+                <Hero />
+                <LandingContent />
+                <StopBeingPrey />
+            </div>
             {/* Minimal footer */}
-            <Container>
-                <div className="pt-8 my-12 border-t">
-                    <Text alt className="text-sm">
-                        &copy; 2025 ✱base. All rights reserved.
-                    </Text>
+            <div className="sticky bottom-0 left-0 z-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80 h-80">
+                <div className="w-full px-8 h-80 border-x border-n-2/80 dark:border-n-6/80">
+                    <h1 className="fixed flex flex-col opacity-50 select-none bottom-8 left-8 font-wildbase-bold">
+                        <span className="text-8xl">
+                            <span className="text-primary-cosmos">✱</span>base
+                        </span>
+                        <span className="mt-1 text-xs ml-22 text-default-alt font-wildbase-medium">
+                            &copy; 2025 ✱base. All rights reserved.
+                        </span>
+                    </h1>
                 </div>
-            </Container>
+            </div>
         </div>
     )
 }
