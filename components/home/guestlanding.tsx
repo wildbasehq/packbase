@@ -2,11 +2,19 @@ import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { Container } from '@/components/layout/container'
 import VerticalCutReveal from '../shared/text/vertical-cut-text'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Tooltip from '../shared/tooltip'
-import { ArrowUpRightIcon } from '@heroicons/react/20/solid'
+import {
+    ArrowUpRightIcon,
+    HeartIcon,
+    GlobeAltIcon,
+    BoltIcon,
+    CubeTransparentIcon,
+    ShieldCheckIcon,
+    SparklesIcon,
+} from '@heroicons/react/20/solid'
 import { ClockIcon, EyeIcon, UserIcon } from '@heroicons/react/24/solid'
-import { ReactNode, useMemo } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/16/solid'
 import Link from '../shared/link'
 
@@ -431,7 +439,7 @@ function StopBeingPrey() {
                     </span>
                 </Tooltip>
                 ) and work for creators, there's a better way &mdash; a way that benefits everyone, even if they're not creators.
-                Dating-esque apps like Barq <b>don't work</b> for community communication.
+                Dating-esque apps like Barq <b>don't work</b> for community communication, and puts members actively at risk.
             </Text>
             <Text>Packbase puts communities first. Completely free, full HTML/CSS customisation, and no ads.</Text>
             <ul className="space-y-1 list-none">
@@ -450,6 +458,161 @@ function StopBeingPrey() {
         </Container>
     )
 }
+
+// Replace the existing BlurFadeIn component with this new version
+function BlurFadeIn({ children, isVisible, staggerDelay = 0.05 }: { children: ReactNode; isVisible: boolean; staggerDelay?: number }) {
+    // Extract text content from React elements
+    const extractText = (node: ReactNode): string => {
+        if (typeof node === 'string') return node
+        if (typeof node === 'number') return node.toString()
+        if (Array.isArray(node)) return node.map(extractText).join(' ')
+        return ''
+    }
+
+    const text = extractText(children)
+    const words = text.split(' ').filter(word => word.length > 0)
+
+    return (
+        <AnimatePresence>
+            {isVisible && (
+                <div className="flex flex-wrap gap-1">
+                    {words.map((word, index) => (
+                        <motion.span
+                            key={index}
+                            initial={{ filter: 'blur(2px)', opacity: 0 }}
+                            animate={{ filter: 'blur(0px)', opacity: 1 }}
+                            exit={{ filter: 'blur(2px)', opacity: 0 }}
+                            transition={{
+                                duration: 0.4,
+                                ease: 'easeOut',
+                                delay: index * staggerDelay,
+                            }}
+                        >
+                            {word}{' '}
+                        </motion.span>
+                    ))}
+                </div>
+            )}
+        </AnimatePresence>
+    )
+}
+
+function FeaturePromiseGrid() {
+    const features = [
+        {
+            icon: 'SparklesIcon',
+            title: 'Community First',
+            description: 'Built for communities, not advertisers. Your data stays private and your experience stays clean.',
+        },
+        {
+            icon: 'ShieldCheckIcon',
+            title: 'Privacy Focused',
+            description:
+                "No tracking, no ads, no selling your data. We promise to keep your information secure - we're using it too, y'know!",
+        },
+        {
+            icon: 'CubeTransparentIcon',
+            title: 'Full Customization',
+            description: 'Complete HTML/CSS customization for your community space and profile, making it truly yours.',
+        },
+        {
+            icon: 'BoltIcon',
+            title: 'Lightning Fast',
+            description: "We're partnered with multiple storage and caching providers which helps with loading and upload times.",
+        },
+        {
+            icon: 'GlobeAltIcon',
+            title: 'Open Platform',
+            description: 'An inclusive space that works for everyone, not just content creators.',
+        },
+        {
+            icon: 'HeartIcon',
+            title: 'Forever Free',
+            description: "No hidden fees, no premium tiers, no forced paywalls. Any fees, we waive if you can't pay for any reason.",
+            accordion:
+                "While Packbase is completely free to use with all core features, we do offer optional one-time payments for expanded storage capabilities. The free tier includes unlimited storage with a 10MB per file limit, which is sufficient for most users. For those needing to upload larger files, we offer a simple $1 per 10MB increase, as a one-time permanent upgrade to your account. This helps us cover our server costs while keeping the platform accessible. If you're unable to pay for any reason, please reach out - we'll provide these upgrades at no cost to you.",
+        },
+    ]
+
+    // Import icons dynamically based on the icon name in the features array
+    const getIcon = iconName => {
+        const icons = {
+            SparklesIcon: props => <SparklesIcon {...props} />,
+            ShieldCheckIcon: props => <ShieldCheckIcon {...props} />,
+            CubeTransparentIcon: props => <CubeTransparentIcon {...props} />,
+            BoltIcon: props => <BoltIcon {...props} />,
+            GlobeAltIcon: props => <GlobeAltIcon {...props} />,
+            HeartIcon: props => <HeartIcon {...props} />,
+        }
+        return icons[iconName] || null
+    }
+
+    return (
+        <Container className="py-16">
+            <Heading className="mb-12 !text-5xl text-center font-instrument-serif-regular">Our Promises to You</Heading>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                {features.map((feature, index) => {
+                    const IconComponent = getIcon(feature.icon)
+                    const hasAccordion = !!feature.accordion
+                    const [isAccordionOpen, setIsAccordionOpen] = useState(false)
+
+                    return (
+                        <div
+                            key={index}
+                            className="flex flex-col items-start gap-4 p-6 transition-all bg-white rounded-lg shadow-sm cursor-pointer ring-1 ring-default dark:bg-zinc-900 hover:shadow-md"
+                            onClick={() => hasAccordion && setIsAccordionOpen(!isAccordionOpen)}
+                        >
+                            <div className="flex items-start w-full gap-4">
+                                <div className="flex-shrink-0">
+                                    <div className="p-2 bg-indigo-100 rounded-lg dark:bg-indigo-900/30">
+                                        {IconComponent && <IconComponent className="w-6 h-6 text-indigo-500/80 dark:text-indigo-400" />}
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                        <Heading size="lg" className="mb-1 font-bold text-default">
+                                            {feature.title}
+                                        </Heading>
+                                        {hasAccordion && (
+                                            <button
+                                                onClick={e => {
+                                                    e.stopPropagation()
+                                                    setIsAccordionOpen(!isAccordionOpen)
+                                                }}
+                                                className="flex items-center text-sm text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300"
+                                            >
+                                                <span>{isAccordionOpen ? 'Show less' : 'Learn more'}</span>
+                                                <QuestionMarkCircleIcon className="w-4 h-4 ml-1" />
+                                            </button>
+                                        )}
+                                    </div>
+                                    <Text alt>{feature.description}</Text>
+                                </div>
+                            </div>
+
+                            {hasAccordion && isAccordionOpen && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="w-full pt-3 pl-12 mt-2 border-t border-n-2/80 dark:border-n-6/80"
+                                >
+                                    <Text alt size="sm">
+                                        <BlurFadeIn isVisible={isAccordionOpen} staggerDelay={0.002}>
+                                            {feature.accordion}
+                                        </BlurFadeIn>
+                                    </Text>
+                                </motion.div>
+                            )}
+                        </div>
+                    )
+                })}
+            </div>
+        </Container>
+    )
+}
+
 export default function GuestLanding() {
     const links = {
         Packbase: [
@@ -479,19 +642,17 @@ export default function GuestLanding() {
                 <Hero />
                 <LandingContent />
                 <StopBeingPrey />
+                <FeaturePromiseGrid />
             </div>
             {/* Minimal footer */}
-            <div className="sticky bottom-0 left-0 z-0 w-full px-8 border-dotted border-y border-n-2/80 dark:border-n-6/80 h-80">
-                <div className="flex items-end justify-end w-full border-dotted h-80 border-x border-n-2/80 dark:border-n-6/80">
+            <div className="sticky bottom-0 left-0 z-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80 h-80">
+                <div className="flex items-end justify-end w-full h-80 border-x border-n-2/80 dark:border-n-6/80">
                     {/* Horizontal dotted border at the top of items */}
-                    <div
-                        className="absolute left-0 right-0 border-t border-dotted border-n-2/80 dark:border-n-6/80"
-                        style={{ top: '2rem' }}
-                    ></div>
+                    <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80" style={{ top: '2rem' }}></div>
 
                     {/* Items with grid border style */}
-                    <div className="flex justify-end w-full border-t border-dotted border-n-2/80 dark:border-n-6/80">
-                        <div className="relative grid grid-cols-2 gap-12 px-4 py-2 mb-8 mr-8 border-x">
+                    <div className="flex justify-end w-full border-t border-n-2/80 dark:border-n-6/80">
+                        <div className="relative grid grid-cols-2 gap-12 px-4 py-2 mb-8 mr-8 ring-1 ring-default">
                             {Object.entries(links).map(([category, items]) => (
                                 <div key={category}>
                                     <Heading className="mb-3 !font-bold !uppercase">{category}</Heading>
@@ -513,10 +674,7 @@ export default function GuestLanding() {
                     </div>
 
                     {/* Horizontal dotted border at the bottom of items */}
-                    <div
-                        className="absolute left-0 right-0 border-t border-dotted border-n-2/80 dark:border-n-6/80"
-                        style={{ bottom: '1.85rem' }}
-                    ></div>
+                    <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80" style={{ bottom: '1.85rem' }}></div>
 
                     {/* Floating brand text on bottom-left - should not interact with other elements! */}
                     <h1 className="fixed flex flex-col opacity-50 select-none bottom-6.5 left-8 font-bold">
