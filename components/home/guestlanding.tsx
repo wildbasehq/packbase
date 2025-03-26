@@ -8,6 +8,7 @@ import { ArrowUpRightIcon } from '@heroicons/react/20/solid'
 import { ClockIcon, EyeIcon, UserIcon } from '@heroicons/react/24/solid'
 import { ReactNode, useMemo } from 'react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/16/solid'
+import Link from '../shared/link'
 
 // Animation configuration
 const animConfig = {
@@ -383,6 +384,7 @@ function HighlightedText({ children, width = '110%' }: { children: ReactNode; wi
                         height: '100%',
                         transform: 'rotate(1deg) skewX(1deg)',
                         marginTop: '0.25rem',
+                        borderRadius: '1.25rem',
                     }}
                 >
                     <path
@@ -418,7 +420,7 @@ function StopBeingPrey() {
                 <br />— it doesn't have to be this way.
             </Heading>
             <Text>
-                Twitter (X), Instagram, TikTok, etc. all do this &mdash; Meta alone makes ~$50 per user per year¹. While furry-centric
+                Twitter (X), Instagram, TikTok, etc. all do this &mdash; Facebook alone makes ~$50 per user per year¹. While furry-centric
                 platforms don't do any of this (
                 <Tooltip
                     delayDuration={0}
@@ -449,6 +451,28 @@ function StopBeingPrey() {
     )
 }
 export default function GuestLanding() {
+    const links = {
+        Packbase: [
+            {
+                name: 'Terms & Privacy',
+                href: '/terms',
+            },
+        ],
+        Wildbase: [
+            {
+                name: 'Labratory',
+                href: 'https://labs.packbase.app/',
+            },
+            {
+                name: 'Discord',
+                href: 'https://discord.gg/StuuK55gYA',
+            },
+            {
+                name: 'Changelog',
+                href: 'https://changelog.packbase.app/',
+            },
+        ],
+    }
     return (
         <div className="h-full pb-6 space-y-8 overflow-x-hidden overflow-y-auto bg-zinc-100 dark:bg-zinc-950">
             <div className="relative z-30 bg-white rounded-md ring-2 ring-default dark:bg-zinc-900">
@@ -457,14 +481,50 @@ export default function GuestLanding() {
                 <StopBeingPrey />
             </div>
             {/* Minimal footer */}
-            <div className="sticky bottom-0 left-0 z-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80 h-80">
-                <div className="w-full px-8 h-80 border-x border-n-2/80 dark:border-n-6/80">
+            <div className="sticky bottom-0 left-0 z-0 w-full px-8 border-dotted border-y border-n-2/80 dark:border-n-6/80 h-80">
+                <div className="flex items-end justify-end w-full border-dotted h-80 border-x border-n-2/80 dark:border-n-6/80">
+                    {/* Horizontal dotted border at the top of items */}
+                    <div
+                        className="absolute left-0 right-0 border-t border-dotted border-n-2/80 dark:border-n-6/80"
+                        style={{ top: '2rem' }}
+                    ></div>
+
+                    {/* Items with grid border style */}
+                    <div className="flex justify-end w-full border-t border-dotted border-n-2/80 dark:border-n-6/80">
+                        <div className="relative grid grid-cols-2 gap-12 px-4 py-2 mb-8 mr-8 border-x">
+                            {Object.entries(links).map(([category, items]) => (
+                                <div key={category}>
+                                    <Heading className="mb-3 !font-bold !uppercase">{category}</Heading>
+                                    <ul className="space-y-2">
+                                        {items.map(item => (
+                                            <li key={item.name}>
+                                                <Link
+                                                    href={item.href}
+                                                    className="text-sm transition-colors text-alt hover:!text-primary-cosmos hover:underline"
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Horizontal dotted border at the bottom of items */}
+                    <div
+                        className="absolute left-0 right-0 border-t border-dotted border-n-2/80 dark:border-n-6/80"
+                        style={{ bottom: '1.85rem' }}
+                    ></div>
+
                     {/* Floating brand text on bottom-left - should not interact with other elements! */}
-                    <h1 className="fixed flex flex-col opacity-50 select-none bottom-8 left-8 font-wildbase-bold">
-                        <span className="text-8xl">
-                            <span className="text-primary-cosmos">✱</span>base
+                    <h1 className="fixed flex flex-col opacity-50 select-none bottom-6.5 left-8 font-bold">
+                        <span className="tracking-tighter text-8xl">
+                            <span className="font-extrabold text-primary-lime">✱</span>
+                            <span className="font-wildbase-bold">base</span>
                         </span>
-                        <span className="mt-1 text-xs ml-22 text-default-alt font-wildbase-medium">
+                        <span className="mt-0.5 text-xs tracking-tight ml-22 text-default-alt font-wildbase-medium">
                             &copy; 2025 ✱base. All rights reserved.
                         </span>
                     </h1>
