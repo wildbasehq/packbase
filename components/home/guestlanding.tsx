@@ -459,6 +459,7 @@ export default function GuestLanding() {
             {/* Minimal footer */}
             <div className="sticky bottom-0 left-0 z-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80 h-80">
                 <div className="w-full px-8 h-80 border-x border-n-2/80 dark:border-n-6/80">
+                    {/* Floating brand text on bottom-left - should not interact with other elements! */}
                     <h1 className="fixed flex flex-col opacity-50 select-none bottom-8 left-8 font-wildbase-bold">
                         <span className="text-8xl">
                             <span className="text-primary-cosmos">✱</span>base
