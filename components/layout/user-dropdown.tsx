@@ -63,7 +63,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
 
     return (
         <DropdownHeader className="flex w-96 flex-col p-0!">
-            <div className="w-full rounded-bl rounded-br shadow-sm h-fit bg-white/50 dark:bg-n-6/50">
+            <div className="w-full rounded-bl rounded-br h-fit bg-white/50 dark:bg-n-6/50">
                 <div className="p-2 border-b">
                     {user?.anonUser && (
                         <Link
@@ -192,7 +192,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
             </div>
             <div className="flex flex-col items-center justify-center w-full py-5 border-t px-7">
                 <Text size="xs" alt>
-                    Packbase (Name isn't final. {ProjectName}) &copy; ✱base. &mdash; {import.meta.env.CF_PAGES_COMMIT_SHA || '0000000'}
+                    Packbase (Early {ProjectName}) &copy; ✱base. &mdash; {import.meta.env.CF_PAGES_COMMIT_SHA || '0000000'}
                 </Text>
             </div>
         </DropdownHeader>

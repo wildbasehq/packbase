@@ -80,20 +80,7 @@ export default function NavBar() {
                                 </Button>
                             </div>
 
-                            <div className="hidden md:dark:bg-white/15 md:block md:h-5 md:w-px md:bg-n-8/10" />
-
                             <div className="hidden min-[416px]:contents">
-                                {user && (
-                                    <Dropdown>
-                                        <MenuButton>
-                                            <UserAvatar user={user} size="md" className={`${user.reqOnboard && 'animate-pulse'}`} />
-                                        </MenuButton>
-                                        <DropdownMenu className="z-20 mt-4 p-0!">
-                                            <UserDropdown showOnboardingModal={setShowOnboardingModal} />
-                                        </DropdownMenu>
-                                    </Dropdown>
-                                )}
-
                                 {!user && (
                                     <>
                                         <Link href="/id/login" className="no-underline!">
