@@ -26,17 +26,17 @@ export default function FeedAnnouncement({variant = 'default'}: FeedAnnouncement
 
     return (
         <Card className={`border ${getBgClass()}`}>
-            <Heading size="xs" className="mb-2 flex items-center text-neutral-800 dark:text-neutral-200">
-                <MegaphoneIcon className="mr-2 h-4 w-4 text-neutral-600 dark:text-neutral-400"/>
+            <Heading size="xs" className="flex items-center mb-2 text-neutral-800 dark:text-neutral-200">
+                <MegaphoneIcon className="w-4 h-4 mr-2 text-neutral-600 dark:text-neutral-400" />
                 <span>ANNOUNCEMENT</span>
             </Heading>
 
             <Text size="sm" className="text-neutral-700 dark:text-neutral-300">
-                The invite code generation requirement is temporarily disabled! You can generate and invite
-                as many people as you'd like.
+                The invite code generation requirement will be turned back on soon! Make sure to generate as many codes as you can before
+                then (if you want).
             </Text>
 
-            <div className="mt-3 flex items-center justify-end">
+            <div className="flex items-center justify-end mt-3">
                 <UserAvatar
                     user={{
                         username: 'rek',
