@@ -63,7 +63,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
 
     return (
         <DropdownHeader className="flex w-96 flex-col p-0!">
-            <div className="w-full rounded-bl rounded-br h-fit bg-white/50 dark:bg-n-6/50">
+            <div className="w-full rounded-bl rounded-br bg-white/50 h-fit ring-1 ring-default dark:bg-n-6/50">
                 <div className="p-2 border-b">
                     {user?.anonUser && (
                         <Link
