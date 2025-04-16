@@ -16,10 +16,11 @@ import {useModal} from '@/components/modal/provider'
 import {SettingsIcon} from 'lucide-react'
 import {Button} from '@/components/shared/button'
 import clsx from 'clsx'
-import {ClipboardIcon, UserGroupIcon} from '@heroicons/react/20/solid'
+import {ClipboardIcon, TrashIcon, UserGroupIcon} from '@heroicons/react/20/solid'
 import {Avatar} from '@/components/shared/avatar'
 import ResourceSettingsGeneral from './pages/general'
 import ResourceSettingsMembers from '@/components/layout/resource-switcher/pages/members.tsx'
+import ResourceDeletePage from './pages/delete'
 
 export default function ResourceSwitcher() {
     const hoverCancelSFX = '/sounds/switch-hover-s.ogg'
@@ -197,13 +198,13 @@ function ResourceSettingsModal() {
             description: 'Manage pack members',
             icon: UserGroupIcon,
             element: <ResourceSettingsMembers/>,
+        },
+        {
+            title: 'Delete This Pack',
+            description: 'Delete the pack and all data',
+            icon: TrashIcon,
+            element: <ResourceDeletePage/>,
         }
-        // {
-        //     title: 'Delete pack',
-        //     description: 'Delete this pack',
-        //     href: `/p/${pack.slug}/delete`,
-        //     icon: TrashIcon,
-        // },
     ]
 
     return (
