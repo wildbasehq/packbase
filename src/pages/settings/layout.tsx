@@ -12,6 +12,9 @@ import AnonUserSettings from './anon-user/page'
 import { Heading } from '@/components/shared/heading'
 import { Text } from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
+import clsx from 'clsx'
+import { TrashIcon } from '@heroicons/react/20/solid'
+import SettingsDeleteAccount from './delete/page'
 
 export type SettingsTab = {
     id: string
@@ -58,10 +61,16 @@ const SettingsDialog: React.FC = () => {
                 badge: 'Limited Event',
                 icon: TrophyIcon,
             },
+            {
+                id: 'delete',
+                name: 'Delete Account',
+                description: 'Delete your account and all associated data',
+                icon: TrashIcon,
+            },
         ]
 
         // Conditionally add template tab based on feature flag
-        if (posthog?.isFeatureEnabled('settings-html-editor')) {
+        if (posthog?.isFeatureEnabled('settings-html-editor') || window.location.hostname === '127.0.0.1') {
             tabs.splice(1, 0, {
                 id: 'template',
                 name: 'Template',
@@ -98,6 +107,8 @@ const SettingsDialog: React.FC = () => {
                 return <InviteSettings />
             case 'unlockables':
                 return <UnlockableSettings />
+            case 'delete':
+                return <SettingsDeleteAccount />
             default:
                 return <ProfileSettings />
         }
@@ -114,16 +125,15 @@ const SettingsDialog: React.FC = () => {
                     </div>
 
                     <nav className="flex-1 p-4 overflow-y-auto">
-                        <ul className="space-y-1">
+                        <ul className="space-y-2">
                             {tabs.map(tab => (
                                 <li
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`w-full flex flex-col rounded-md px-3 py-2 text-left text-sm font-medium ${
-                                        activeTab === tab.id
-                                            ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300'
-                                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-zinc-800'
-                                    }`}
+                                    className={clsx(
+                                        activeTab === tab.id ? 'bg-n-2/25 dark:bg-n-6/50' : 'hover:bg-n-2/25 dark:hover:bg-n-6/50',
+                                        'ring-default/25 ring-default group w-full items-center justify-start gap-4 rounded px-4 py-3 transition-all hover:ring-2'
+                                    )}
                                 >
                                     <div onClick={() => setActiveTab(tab.id)} className="flex flex-row items-center">
                                         <tab.icon
