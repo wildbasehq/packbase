@@ -32,8 +32,8 @@ export default function FeedAnnouncement({variant = 'default'}: FeedAnnouncement
             </Heading>
 
             <Text size="sm" className="text-neutral-700 dark:text-neutral-300">
-                The invite code generation requirement will be turned back on soon! Make sure to generate as many codes as you can before
-                then (if you want).
+                The invite code generation requirement is live. Additionally, you may now suggest and vote on features via{' '}
+                <a href="https://packbase.wildbase.xyz/" className="text-blue-500">our new feedback inlet!</a> More info in our Discord Server.
             </Text>
 
             <div className="flex items-center justify-end mt-3">
