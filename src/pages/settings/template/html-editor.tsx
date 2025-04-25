@@ -37,7 +37,7 @@ const linterConfig = {
     'tag-pair': true,                   // Tag must be paired
     'tag-self-close': true,             // Empty tags must be self closed
     'tagname-lowercase': true,          // All html element names must be in lowercase
-    'empty-tag-not-self-closed': true,  // Empty tags must not use self-closing syntax
+    'empty-tag-not-self-closed': false,  // Empty tags must not use self-closing syntax
     'src-not-empty': true,              // The src attribute of an img(script,link) must have a value
     'href-abs-or-rel': false,           // An href attribute must be either absolute or relative
 
@@ -203,7 +203,40 @@ const MonacoEditorWrapper = ({defaultValue, onChange}) => {
 const HTMLProfileEditor = () => {
     const [showPreview, setShowPreview] = useState(false)
     const [error, setError] = useState('')
-    const [code, setCode] = useState(`<div class="p-2 ring-1 ring-default rounded-lg">
+    const [code, setCode] = useState(`<!--
+  * These show between your header and posts on your profile.
+  * More customisation will be added in the near future!
+  * Your profile will soon be able to be fully replaced
+  * with your own HTML and CSS.
+  * 
+  * Hit the "Show Preview" button to see your changes.
+  * Hit the "Save Changes" button to save your changes.
+  * 
+  * !! NOTE !! This is a work in progress and will be improved
+  * in the future.
+  * 
+  * You may lose access to using this feature if you add
+  * code in a way we don't anticipate. AI or "vibe coding"
+  * is not endorsed, and you will lose access.
+  * Trust us, **we'll know**.
+  * 
+  * BY USING AND INTERACTING WITH THE "TEMPLATE" FEATURE, YOU AGREE
+  * THAT WILDBASE ("WE") CAN TERMINATE YOUR ACCESS TO THIS FEATURE
+  * AT ANY TIME FOR ANY REASON, AND ARE SOLELY LIABLE FOR ANY DAMAGE
+  * CAUSED TO YOUR ACCOUNT AS A RESULT FROM THE USE OF THIS FEATURE.
+  * 
+  * THIS FEATURE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+  * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  * 
+  * This comment can be safely removed. Have fun!
+-->
+
+<div class="p-2 ring-1 ring-default rounded-lg">
   <h1>My Profile</h1>
   <p>Welcome to my page!</p>
 </div>`)
@@ -233,7 +266,7 @@ const HTMLProfileEditor = () => {
         for (const element of BLOCKED_ELEMENTS) {
             const found = doc.getElementsByTagName(element)
             if (found.length > 0) {
-                return `The use of <${element}> tags is not allowed for security reasons.`
+                return `The use of <${element}> tags is reserved for verified developers with high trust.`
             }
         }
 
@@ -243,7 +276,7 @@ const HTMLProfileEditor = () => {
             const attributes = el.attributes
             for (const attr of attributes) {
                 if (attr.name.toLowerCase().startsWith('on')) {
-                    return `Event handlers (like ${attr.name}) are not allowed for security reasons.`
+                    return `Event handlers (like ${attr.name}) are reserved for verified developers with high trust.`
                 }
             }
         }

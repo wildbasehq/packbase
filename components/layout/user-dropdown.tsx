@@ -192,7 +192,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
             </div>
             <div className="flex flex-col items-center justify-center w-full py-5 border-t px-7">
                 <Text size="xs" alt>
-                    Packbase (Early {ProjectName}) &copy; ✱base. &mdash; {import.meta.env.CF_PAGES_COMMIT_SHA || '0000000'}
+                    Packbase ({ProjectName}) &copy; ✱base. &mdash; {import.meta.env.CF_PAGES_COMMIT_SHA || '0000000'}
                 </Text>
             </div>
         </DropdownHeader>

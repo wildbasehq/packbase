@@ -70,7 +70,7 @@ const SettingsDialog: React.FC = () => {
         ]
 
         // Conditionally add template tab based on feature flag
-        if (posthog?.isFeatureEnabled('settings-html-editor') || window.location.hostname === '127.0.0.1') {
+        if (posthog?.isFeatureEnabled('settings-html-editor') || window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
             tabs.splice(1, 0, {
                 id: 'template',
                 name: 'Template',

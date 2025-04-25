@@ -14,13 +14,12 @@ import {WorkerStore} from '@/lib/workers.ts'
  * all requests to the server.
  *
  * @projectName Korat
+ * @subcode Honeybear
  * @since 24-05-2024
- * @specific Yipnyap (AKA Korat) v4 (Honeybear)
  * @authors @rek
  */
-export const ProjectName = `Project Korat`
+export const ProjectName = `Project Korat Honeybear`
 export const ProjectSafeName = 'Packbase'
-export const ProjectDeps = ['scalebite', 'ypnyp', 'feral']
 
 export const API_URL = import.meta.env.VITE_YAPOCK_URL
 let TOKEN: string | undefined
