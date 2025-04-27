@@ -2,14 +2,14 @@ import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { Container } from '@/components/layout/container'
 import VerticalCutReveal from '../shared/text/vertical-cut-text'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import Tooltip from '../shared/tooltip'
 import {
     ArrowUpRightIcon,
-    HeartIcon,
-    GlobeAltIcon,
     BoltIcon,
     CubeTransparentIcon,
+    GlobeAltIcon,
+    HeartIcon,
     ShieldCheckIcon,
     SparklesIcon,
 } from '@heroicons/react/20/solid'
@@ -44,9 +44,9 @@ const animConfig = {
 const links = [
     { name: 'Join Packbase', href: '/id/create/', primary: true },
     {
-        name: 'Volunteer',
+        name: 'Discord Community',
         href: 'https://discord.gg/StuuK55gYA',
-        tooltip: 'Discord invite - Middle-click or right-click to open in new tab',
+        tooltip: 'Discord invite - will open in a new tab',
     },
 ]
 
