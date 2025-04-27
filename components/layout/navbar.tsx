@@ -1,25 +1,21 @@
-import UserDropdown from '@/components/layout/user-dropdown'
-import {Dropdown, DropdownMenu} from '@/components/shared/dropdown'
-import {ThemeToggle} from '@/components/shared/theme-toggle'
-import {Button} from '@/components/shared/experimental-button-rework'
-import UserAvatar from '@/components/shared/user/avatar'
-import {useUIStore, useUserAccountStore} from '@/lib/states'
-import {MenuButton} from '@headlessui/react'
-import {ScanFaceIcon} from 'lucide-react'
-import React, {useState} from 'react'
+import { ThemeToggle } from '@/components/shared/theme-toggle'
+import { Button } from '@/components/shared/experimental-button-rework'
+import { useUIStore, useUserAccountStore } from '@/lib/states'
+import { ScanFaceIcon } from 'lucide-react'
+import React, { useState } from 'react'
 import UserOnboardingModal from '../modal/user-onboarding-modal'
-import {FaDiscord} from 'react-icons/fa6'
-import {Logo} from '@/components/shared/logo'
+import { Logo } from '@/components/shared/logo'
 import Link from '@/components/shared/link'
 import Tooltip from '@/components/shared/tooltip.tsx'
-import {Badge} from '@/components/shared/badge.tsx'
-import {WorkerStore} from '@/lib/workers.ts'
-import {WorkerSpinner} from '@/lib/use-worker-status.tsx'
+import { Badge } from '@/components/shared/badge.tsx'
+import { WorkerStore } from '@/lib/workers.ts'
+import { WorkerSpinner } from '@/lib/use-worker-status.tsx'
+import { truncate } from '@/lib/utils'
 
 export default function NavBar() {
-    const {user} = useUserAccountStore()
-    const {hidden, updateAvailable, maintenance} = useUIStore()
-    const {jobs, getRunningJobs} = WorkerStore()
+    const { user } = useUserAccountStore()
+    const { hidden, updateAvailable, maintenance } = useUIStore()
+    const { jobs, getRunningJobs } = WorkerStore()
 
     const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(
         user && !user?.metadata?.dp_uod && !user.anonUser && !maintenance
@@ -48,14 +44,10 @@ export default function NavBar() {
                         <div className="relative"></div>
 
                         <div className="flex items-center gap-5">
-                            {jobs.size > 0 && (
-                                <>
-                                    <WorkerSpinner />
-                                </>
-                            )}
+                            {jobs.size > 0 && <WorkerSpinner />}
                             {updateAvailable && (
                                 <>
-                                    <Tooltip content="Click to update Packbase">
+                                    <Tooltip content={`Click to update: ${truncate(updateAvailable, 7)}`} delayDuration={0}>
                                         <div className="flex cursor-pointer scale-80" onClick={() => window.location.reload()}>
                                             <Badge color="amber" className="flex items-center justify-center">
                                                 <span className="text-xs">Update available</span>
@@ -69,26 +61,14 @@ export default function NavBar() {
                             <div className="flex gap-4">
                                 <ThemeToggle />
                             </div>
-                            <div className="flex gap-4">
-                                <Button
-                                    href="https://discord.gg/StuuK55gYA"
-                                    target="_blank"
-                                    plain
-                                    className="flex items-center justify-center"
-                                >
-                                    <FaDiscord className="w-4 h-4 mr-1" /> Discord
-                                </Button>
-                            </div>
 
                             <div className="hidden min-[416px]:contents">
                                 {!user && (
-                                    <>
-                                        <Link href="/id/login" className="no-underline!">
-                                            <Button color="indigo" className="flex items-center justify-center">
-                                                <ScanFaceIcon className="w-4 h-4 mr-1" /> Sign In
-                                            </Button>
-                                        </Link>
-                                    </>
+                                    <Link href="/id/login" className="no-underline!">
+                                        <Button color="indigo" className="flex items-center justify-center">
+                                            <ScanFaceIcon className="w-4 h-4 mr-1" /> Sign In
+                                        </Button>
+                                    </Link>
                                 )}
                             </div>
                         </div>
