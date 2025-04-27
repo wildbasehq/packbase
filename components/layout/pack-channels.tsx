@@ -1,6 +1,16 @@
-import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
-import {ArrowUpRightIcon} from 'lucide-react'
-import {Sidebar, SidebarBody, SidebarFooter, SidebarHeader, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection, SidebarSpacer} from '@/components/shared/sidebar'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
+import { ArrowUpRightIcon } from 'lucide-react'
+import {
+    Sidebar,
+    SidebarBody,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarHeading,
+    SidebarItem,
+    SidebarLabel,
+    SidebarSection,
+    SidebarSpacer,
+} from '@/components/shared/sidebar'
 import {
     ChevronUpIcon,
     FireIcon,
@@ -17,10 +27,12 @@ import { useState } from 'react'
 import InboxPage from '@/src/pages/inbox/page.tsx'
 import { Badge } from '@/components/shared/badge.tsx'
 import Tooltip from '@/components/shared/tooltip.tsx'
-import { DropdownButton, DropdownMenu } from '../shared/dropdown'
-import { Dropdown } from '../shared/dropdown'
+import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '../shared/dropdown'
 import { Avatar } from '../shared/avatar'
 import UserDropdown from './user-dropdown'
+import { SiDiscord } from 'react-icons/si'
+import { ChatBubbleBottomCenterIcon, FaceSmileIcon } from '@heroicons/react/16/solid'
+import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon,
@@ -81,10 +93,34 @@ export function PackChannels() {
                         </SidebarSection>
                         <SidebarSpacer />
                         <SidebarSection>
-                            <SidebarItem href="https://discord.gg/StuuK55gYA" target="_blank">
-                                <QuestionMarkCircleIcon />
-                                <SidebarLabel external>Support</SidebarLabel>
-                            </SidebarItem>
+                            <Dropdown>
+                                <DropdownButton as={SidebarItem}>
+                                    <QuestionMarkCircleIcon />
+                                    <SidebarLabel>Help</SidebarLabel>
+                                </DropdownButton>
+                                <DropdownMenu anchor="top">
+                                    <DropdownItem
+                                        onClick={() => {
+                                            window.Intercom?.('show')
+                                        }}
+                                    >
+                                        <ChatBubbleBottomCenterIcon className="w-4 h-4 inline-flex" />
+                                        <SidebarLabel>Docs & Chat</SidebarLabel>
+                                    </DropdownItem>
+                                    <DropdownItem href="https://packbase.wildbase.xyz" target="_blank">
+                                        <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon" />
+                                        <SidebarLabel>Feedback</SidebarLabel>
+                                    </DropdownItem>
+                                    <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
+                                        <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon" />
+                                        <SidebarLabel>Discord</SidebarLabel>
+                                    </DropdownItem>
+                                    <DropdownItem href="https://wildbase.xyz/" target="_blank">
+                                        <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon" />
+                                        <SidebarLabel>Wildbase</SidebarLabel>
+                                    </DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
                             <SidebarItem href="https://changelog.packbase.app" target="_blank">
                                 <SparklesIcon />
                                 <SidebarLabel external>Changelog</SidebarLabel>
@@ -124,11 +160,11 @@ export function PackChannels() {
     )
 }
 
-function DynamicIcon({name, ...props}: any) {
+function DynamicIcon({ name, ...props }: any) {
     // icon://IconName
     // @ts-ignore
     const Icon = availableIcons[name.replace('icon://', '')]
-    if (!Icon) return <QuestionMarkCircleIcon {...props}/>
+    if (!Icon) return <QuestionMarkCircleIcon {...props} />
     return <Icon {...props} />
 }
 
@@ -136,9 +172,9 @@ function InboxButton() {
     const [open, setOpen] = useState(false)
     return (
         <>
-            {open && <InboxPage onClose={() => setOpen(false)}/>}
+            {open && <InboxPage onClose={() => setOpen(false)} />}
             <SidebarItem onClick={() => setOpen(true)}>
-                <InboxIcon/>
+                <InboxIcon />
                 <SidebarLabel>Inbox</SidebarLabel>
             </SidebarItem>
         </>
