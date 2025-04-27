@@ -1,6 +1,6 @@
-import {useUIStore} from '@/lib/states.ts'
+import { useUIStore } from '@/lib/states.ts'
 
-const {setUpdateAvailable} = useUIStore.getState()
+const { setUpdateAvailable } = useUIStore.getState()
 
 if (globalThis.check_update_cron) clearInterval(globalThis.check_update_cron)
 globalThis.check_update_cron = setInterval(async () => {
@@ -12,6 +12,6 @@ globalThis.check_update_cron = setInterval(async () => {
     const pulledDOM = new DOMParser().parseFromString(text, 'text/html')
     const pulledVersion = pulledDOM.querySelector('meta[name="commit-sha"]')?.getAttribute('content')
     if (currentVersion !== pulledVersion) {
-        setUpdateAvailable(true)
+        setUpdateAvailable(pulledVersion)
     }
-}, 30000)
+}, 10000)

@@ -1,5 +1,5 @@
-import {create} from 'zustand'
-import {persist} from 'zustand/middleware'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 interface UIStore {
     feedView: number
@@ -10,20 +10,20 @@ interface UIStore {
 // UI Settings Store
 export const useUISettingsStore = create(
     persist<UIStore>(
-        (set) => ({
+        set => ({
             feedView: 1,
             analyticalAllowed: false,
 
-            setOptions: (options) =>
-                set((state) => ({
+            setOptions: options =>
+                set(state => ({
                     ...state,
                     ...options,
                 })),
         }),
         {
             name: 'ui-settings',
-        },
-    ),
+        }
+    )
 )
 
 /**
@@ -39,25 +39,25 @@ interface UserAccountStore {
 
 export const useUserAccountStore = create(
     persist<UserAccountStore>(
-        (set) => ({
+        set => ({
             accessToken: '',
             user: null,
 
-            setAccessToken: (accessToken) =>
-                set((state) => ({
+            setAccessToken: accessToken =>
+                set(state => ({
                     ...state,
                     accessToken,
                 })),
             setUser: (user: any) =>
-                set((state) => ({
+                set(state => ({
                     ...state,
                     user,
                 })),
         }),
         {
             name: 'user-account',
-        },
-    ),
+        }
+    )
 )
 
 /**
@@ -77,16 +77,16 @@ const resourceDefault = {
     standalone: true,
 }
 
-export const useResourceStore = create<ResourceStore>((set) => ({
+export const useResourceStore = create<ResourceStore>(set => ({
     currentResource: resourceDefault,
     resources: [],
-    setCurrentResource: (currentResource) =>
-        set((state) => ({
+    setCurrentResource: currentResource =>
+        set(state => ({
             ...state,
             currentResource,
         })),
-    setResources: (resources) =>
-        set((state) => ({
+    setResources: resources =>
+        set(state => ({
             ...state,
             resources,
         })),
@@ -122,11 +122,11 @@ interface ResourceUIStore {
     setBucketRoot: (bucketRoot: string) => void
     setMaintenance: (maintenance: string | null) => void
 
-    updateAvailable: boolean
-    setUpdateAvailable: (update: boolean) => void
+    updateAvailable: string | false
+    setUpdateAvailable: (update: string | false) => void
 }
 
-export const useUIStore = create<ResourceUIStore>((set) => ({
+export const useUIStore = create<ResourceUIStore>(set => ({
     resourceDefault,
     hidden: false,
     loading: true,
@@ -135,40 +135,40 @@ export const useUIStore = create<ResourceUIStore>((set) => ({
     bucketRoot: '',
     maintenance: null,
     updateAvailable: false,
-    setHidden: (hidden) =>
-        set((state) => ({
+    setHidden: hidden =>
+        set(state => ({
             ...state,
             hidden,
         })),
-    setLoading: (loading) =>
-        set((state) => ({
+    setLoading: loading =>
+        set(state => ({
             ...state,
             loading,
         })),
-    setConnecting: (connecting) =>
-        set((state) => ({
+    setConnecting: connecting =>
+        set(state => ({
             ...state,
             connecting,
         })),
     setNavigation: (navigation: any) =>
-        set((state) => ({
+        set(state => ({
             ...state,
             navigation,
             hidden: false,
         })),
     setBucketRoot: (bucketRoot: string) =>
-        set((state) => ({
+        set(state => ({
             ...state,
             bucketRoot,
         })),
     setMaintenance: (maintenance: string | null) =>
-        set((state) => ({
+        set(state => ({
             ...state,
             maintenance,
         })),
 
-    setUpdateAvailable: (update) =>
-        set((state) => ({
+    setUpdateAvailable: update =>
+        set(state => ({
             ...state,
             updateAvailable: update,
         })),
