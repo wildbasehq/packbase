@@ -114,6 +114,8 @@ interface ResourceUIStore {
     navigation: any[]
     bucketRoot: string
     maintenance: string | null
+    websocketStatus: string
+    serverCapabilities: string[]
 
     setHidden: (hidden: boolean) => void
     setLoading: (loading: boolean) => void
@@ -121,6 +123,8 @@ interface ResourceUIStore {
     setNavigation: (navigation: any) => void
     setBucketRoot: (bucketRoot: string) => void
     setMaintenance: (maintenance: string | null) => void
+    setWebsocketStatus: (status: string) => void
+    setServerCapabilities: (capabilities: string[]) => void
 
     updateAvailable: string | false
     setUpdateAvailable: (update: string | false) => void
@@ -135,6 +139,8 @@ export const useUIStore = create<ResourceUIStore>(set => ({
     bucketRoot: '',
     maintenance: null,
     updateAvailable: false,
+    websocketStatus: 'connecting',
+    serverCapabilities: [],
     setHidden: hidden =>
         set(state => ({
             ...state,
@@ -166,10 +172,20 @@ export const useUIStore = create<ResourceUIStore>(set => ({
             ...state,
             maintenance,
         })),
+    setWebsocketStatus: (status: string) =>
+        set(state => ({
+            ...state,
+            websocketStatus: status,
+        })),
 
     setUpdateAvailable: update =>
         set(state => ({
             ...state,
             updateAvailable: update,
+        })),
+    setServerCapabilities: capabilities =>
+        set(state => ({
+            ...state,
+            serverCapabilities: capabilities,
         })),
 }))

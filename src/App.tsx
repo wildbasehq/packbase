@@ -1,12 +1,11 @@
-import {lazy, Suspense} from 'react'
-import {Text} from '@/components/shared/text.tsx'
-import {SidebarLayout} from '@/components/shared/sidebar-layout.tsx'
+import { lazy, Suspense } from 'react'
+import { Text } from '@/components/shared/text.tsx'
+import { SidebarLayout } from '@/components/shared/sidebar-layout.tsx'
 import NavBar from '@/components/layout/navbar.tsx'
-import {PackChannels} from '@/components/layout/pack-channels.tsx'
+import { PackChannels } from '@/components/layout/pack-channels.tsx'
 import Preload from './preload.tsx'
-import {Providers} from './provider.tsx'
-import {Redirect, Route, Switch} from 'wouter'
-import SettingsUnlockablesPage from '@/src/pages/settings/unlockables/page.tsx'
+import { Providers } from './provider.tsx'
+import { Redirect, Route, Switch } from 'wouter'
 import Console from '@/components/shared/console.tsx'
 
 // Lazy load all pages
@@ -25,6 +24,9 @@ const TermsPage = lazy(() => import('@/src/pages/terms/page.tsx'))
 const ThankYouFriends = lazy(() => import('@/src/pages/thanks/page.tsx'))
 const UserProfile = lazy(() => import('@/src/pages/user/[...slug]/page.tsx'))
 const SettingsTemplate = lazy(() => import('@/src/pages/settings/template/page.tsx'))
+
+// Playground
+const Playground = lazy(() => import('@/src/pages/playground/page.tsx'))
 
 // Lazy load components
 const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
@@ -77,6 +79,12 @@ function App() {
                                             <Route path="/thanks">
                                                 <Suspense fallback={<LoadingFallback />}>
                                                     <ThankYouFriends />
+                                                </Suspense>
+                                            </Route>
+
+                                            <Route path="/playground">
+                                                <Suspense fallback={<LoadingFallback />}>
+                                                    <Playground />
                                                 </Suspense>
                                             </Route>
 

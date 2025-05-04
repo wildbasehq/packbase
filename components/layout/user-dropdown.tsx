@@ -23,20 +23,22 @@ import Link from '@/components/shared/link.tsx'
 import { useModal } from '@/components/modal/provider.tsx'
 import SettingsDialog from '@/src/pages/settings/layout.tsx'
 import { toast } from 'sonner'
+import { PresenceExtension, usePresence } from '@/lib/socket/useProvider.ts'
 
 export default function UserDropdown({ showOnboardingModal }: { showOnboardingModal: Dispatch<SetStateAction<boolean>> | (() => void) }) {
     const { user, setUser } = useUserAccountStore()
     const { show } = useModal()
+    const { updateStatus } = usePresence()
 
     const StatusOptions = [
         {
-            id: 1,
+            id: PresenceExtension.StatusType.ONLINE,
             name: 'Online',
             description: "Everyone will see that you're online.",
             className: 'bg-green-400',
         },
         {
-            id: 2,
+            id: PresenceExtension.StatusType.DND,
             name: 'Do not disturb',
             description:
                 'Notifications are silent, all users DMing you will see a notice that you\'ve made or a generic "currently busy" message.',
@@ -44,15 +46,15 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
             className: 'text-accent-1',
         },
         {
-            id: 3,
+            id: PresenceExtension.StatusType.AWAY,
             name: 'Idle',
             description: "Automatically switches to this when you're not focused in the tab or browser.",
             icon: MoonIcon,
             className: 'text-accent-5',
         },
         {
-            id: 0,
-            name: 'Invisible',
+            id: PresenceExtension.StatusType.OFFLINE,
+            name: 'Offline',
             description:
                 "Disconnects from Packbase DMs. Still able to access messages, but won't send or receive read receipts nor receive real-time notifications.",
             className: 'border-n-5 group-hover:border-white border-dashed border-2 w-4 h-4',
@@ -141,12 +143,16 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                             <DropdownItem
                                 key={i}
                                 onClick={() => {
-                                    if (option.id === 0) {
+                                    if (option.id === 3) {
                                         toast.message("You're no longer connected to Packbase DMs.")
                                     }
                                     setUser({
                                         ...user,
                                         status: option.id,
+                                    })
+
+                                    updateStatus({
+                                        statusType: option.id,
                                     })
                                 }}
                             >

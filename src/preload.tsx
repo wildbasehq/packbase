@@ -1,26 +1,27 @@
 import Body from '@/components/layout/body'
-import {LoadingDots} from '@/components/icons'
-import {Heading} from '@/components/shared/text'
-import {API_URL, setToken, supabase, vg} from '@/lib/api'
-import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/states'
-import {HandRaisedIcon} from '@heroicons/react/20/solid'
-import {useEffect, useState} from 'react'
-import {getSelfProfile} from '@/lib/api/cron/profile-update.ts'
+import { LoadingDots } from '@/components/icons'
+import { Heading } from '@/components/shared/text'
+import { API_URL, setToken, supabase, vg } from '@/lib/api'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
+import { HandRaisedIcon } from '@heroicons/react/20/solid'
+import { useEffect, useState } from 'react'
+import { getSelfProfile } from '@/lib/api/cron/profile-update.ts'
 
-export default function Preload({children}: { children: React.ReactNode }) {
+export default function Preload({ children }: { children: React.ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`polling ${API_URL}`)
     const [error, setError] = useState<any | null>(null)
-    const {setUser} = useUserAccountStore()
-    const {setLoading, setConnecting, setBucketRoot, setMaintenance} = useUIStore()
-    const {setResources} = useResourceStore()
+    const { setUser } = useUserAccountStore()
+    const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
+    const { setResources } = useResourceStore()
 
     useEffect(() => {
         if (!serviceLoading.startsWith('polling')) return
         vg.server.describeServer
             .get()
-            .then((server) => {
+            .then(server => {
                 setBucketRoot(server.data.bucketRoot)
                 setMaintenance(server.data.maintenance)
+                setServerCapabilities(server.data.capabilities || [])
 
                 if (server.data.maintenance) {
                     return setError({
@@ -31,8 +32,8 @@ export default function Preload({children}: { children: React.ReactNode }) {
 
                 setStatus('auth')
                 // @ts-ignore
-                supabase.auth.getSession().then(async ({data: {session}}) => {
-                    const {user, access_token, expires_at} = session || {}
+                supabase.auth.getSession().then(async ({ data: { session } }) => {
+                    const { user, access_token, expires_at } = session || {}
                     if (user) {
                         setToken(access_token, expires_at)
                         setStatus('auth:@me')
@@ -56,7 +57,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
                     }
                 })
             })
-            .catch((e) => {
+            .catch(e => {
                 log.error('Core', e)
                 if (e?.message.indexOf('Failed') > -1)
                     return setError({
@@ -68,7 +69,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
     }, [])
 
     const setStatus = (status: string) => {
-        setServiceLoading((prev) => {
+        setServiceLoading(prev => {
             if (prev === status) return prev
             if (prev === 'proceeding') return prev
             return status
@@ -107,14 +108,19 @@ export default function Preload({children}: { children: React.ReactNode }) {
                                     Preparing...
                                 </Heading>
                                 <p className="text-alt mt-1 text-sm leading-6">
-                                    Packbase is asking the server for information about you &amp; the service. This will get saved in your browser{'\''}s{' '}
-                                    <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage" target="_blank" rel="noopener noreferrer">
+                                    Packbase is asking the server for information about you &amp; the service. This will get saved in your
+                                    browser{"'"}s{' '}
+                                    <a
+                                        href="https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
                                         session storage
                                     </a>
                                     .
                                 </p>
                                 <div className="mt-4 flex space-x-1">
-                                    <LoadingDots className="mt-1"/>
+                                    <LoadingDots className="mt-1" />
                                     <span>{serviceLoading}</span>
                                 </div>
                             </>
@@ -123,7 +129,7 @@ export default function Preload({children}: { children: React.ReactNode }) {
                         {error && (
                             <>
                                 <Heading className="items-center">
-                                    <HandRaisedIcon className="text-default mr-1 inline-block h-6 w-6"/>
+                                    <HandRaisedIcon className="text-default mr-1 inline-block h-6 w-6" />
                                     Packbase can't continue
                                 </Heading>
                                 <p className="text-alt mt-1 text-sm leading-6">

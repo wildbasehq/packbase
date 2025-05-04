@@ -1,5 +1,6 @@
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
 import { ArrowUpRightIcon } from 'lucide-react'
+import { lazy, Suspense } from 'react'
 import {
     Sidebar,
     SidebarBody,
@@ -11,8 +12,15 @@ import {
     SidebarSection,
     SidebarSpacer,
 } from '@/components/shared/sidebar'
+
+// Lazy load ConnectionStatus component
+const ConnectionStatus = lazy(() => import('./ConnectionStatus').then(module => ({
+    default: module.ConnectionStatus
+})))
+
 import {
     ChevronUpIcon,
+    ExclamationTriangleIcon,
     FireIcon,
     HomeIcon,
     InboxIcon,
@@ -40,10 +48,14 @@ const availableIcons = {
     Fire: FireIcon,
 }
 
+
 export function PackChannels() {
-    const { hidden, navigation, loading } = useUIStore()
+    const { hidden, navigation, loading, serverCapabilities } = useUIStore()
     const { currentResource } = useResourceStore()
     const { user } = useUserAccountStore()
+
+    // Check if realtime capability is available
+    const hasRealtimeCapability = serverCapabilities.includes('realtime')
 
     if (hidden || !user) return <></>
     return (
@@ -131,7 +143,13 @@ export function PackChannels() {
                         <SidebarHeading>(c) ✱base - Packbase is early access!</SidebarHeading>
                     </SidebarFooter>
 
-                    <SidebarFooter className="max-lg:hidden">
+                    <SidebarFooter className="max-lg:hidden relative">
+                        {/* Conditionally render ConnectionStatus based on realtime capability */}
+                        {hasRealtimeCapability && (
+                            <Suspense fallback={null}>
+                                <ConnectionStatus />
+                            </Suspense>
+                        )}
                         <Dropdown>
                             <DropdownButton as={SidebarItem}>
                                 <span className="flex items-center min-w-0 gap-3">
