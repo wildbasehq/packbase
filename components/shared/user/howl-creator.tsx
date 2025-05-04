@@ -1,32 +1,31 @@
 import UserAvatar from '@/components/shared/user/avatar'
-import {Text} from '@/components/shared/text'
-import {DotIcon} from 'lucide-react'
-import {Button} from '@/components/shared/experimental-button-rework'
-import {LoadingCircle} from '@/components/icons'
+import { Text } from '@/components/shared/text'
+import { DotIcon } from 'lucide-react'
+import { Button } from '@/components/shared/experimental-button-rework'
+import { LoadingCircle } from '@/components/icons'
 import Card from '@/components/shared/card'
-import React, {FormEvent, useRef, useState} from 'react'
-import {vg} from '@/lib/api'
-import {toast} from 'sonner'
-import {useResourceStore, useUserAccountStore} from '@/lib/states'
-import {Editor} from '@/components/novel'
-import {LinkIcon} from '@heroicons/react/24/solid'
-import {Alert, AlertTitle} from '@/components/shared/alert'
-import {QuestionMarkCircleIcon, XCircleIcon} from '@heroicons/react/20/solid'
+import React, { FormEvent, useRef, useState } from 'react'
+import { vg } from '@/lib/api'
+import { toast } from 'sonner'
+import { useResourceStore, useUserAccountStore } from '@/lib/states'
+import { Editor } from '@/components/novel'
+import { LinkIcon } from '@heroicons/react/24/solid'
+import { Alert, AlertTitle } from '@/components/shared/alert'
+import { XCircleIcon } from '@heroicons/react/20/solid'
 import clsx from 'clsx'
-import Tooltip from '@/components/shared/tooltip'
-import {useModal} from '@/components/modal/provider'
+import { useModal } from '@/components/modal/provider'
 import Link from '@/components/shared/link.tsx'
 
 export default function HowlCreator() {
-    const {user} = useUserAccountStore()
-    const {currentResource} = useResourceStore()
+    const { user } = useUserAccountStore()
+    const { currentResource } = useResourceStore()
 
-    const {show} = useModal()
+    const { show } = useModal()
 
     return (
         <>
             {!user.reqOnboard && !currentResource.temporary && (
-                <Button outline className="w-full mb-2" onClick={() => show(<HowlCard/>)}>
+                <Button outline className="w-full mb-2" onClick={() => show(<HowlCard />)}>
                     + Howl {!currentResource.standalone && `in ${currentResource.display_name}`}
                 </Button>
             )}
@@ -35,8 +34,8 @@ export default function HowlCreator() {
 }
 
 function HowlCard() {
-    const {user} = useUserAccountStore()
-    const {currentResource} = useResourceStore()
+    const { user } = useUserAccountStore()
+    const { currentResource } = useResourceStore()
 
     const [submitting, setSubmitting] = useState<boolean>(false)
     const [showModal, setShowModal] = useState<boolean>(false)
@@ -60,7 +59,7 @@ function HowlCard() {
         }
 
         // @ts-ignore
-        const assets = attachments?.map((attachment) => {
+        const assets = attachments?.map(attachment => {
             return {
                 name: 'e',
                 data: attachment.data,
@@ -78,7 +77,7 @@ function HowlCard() {
         post.tenant_id = currentResource.id
         vg.howl.create
             .post(post)
-            .then(({error}) => {
+            .then(({ error }) => {
                 if (error) {
                     setSubmitting(false)
                     return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
@@ -89,7 +88,7 @@ function HowlCard() {
                     return window.location.reload()
                 }
             })
-            .catch((error) => {
+            .catch(error => {
                 console.log(error)
                 setSubmitting(false)
                 toast.error('Something went wrong')
@@ -156,15 +155,12 @@ function HowlCard() {
         <Card className="px-0! py-0! min-w-full sm:min-w-[32rem]">
             {!currentResource.standalone && (
                 <Alert className="rounded-none! border-0!">
-                    <AlertTitle className="flex items-center">
-                        <UserAvatar name={currentResource.display_name} size={24} user={currentResource} className="mr-2 inline-flex"/>
-                        {currentResource.display_name}
-                        <Tooltip
-                            content={`Howling into ${currentResource.display_name}. This howl will be visible to all members of this pack regardless of your settings.`}
-                            side="right"
-                        >
-                            <QuestionMarkCircleIcon className="text-alt ml-1 h-4 w-4"/>
-                        </Tooltip>
+                    <AlertTitle className="flex flex-col">
+                        <div className="flex gap-1 items-center mb-1">
+                            <UserAvatar name={currentResource.display_name} size={24} user={currentResource} className="inline-flex" />
+                            {currentResource.display_name}
+                        </div>
+                        <Text alt>This howl will be visible to all members of this pack regardless of your personal settings.</Text>
                     </AlertTitle>
                 </Alert>
             )}
@@ -173,7 +169,7 @@ function HowlCard() {
                     <div className="px-4 pt-5 sm:px-6">
                         <div className="flex space-x-3">
                             <div className="shrink-0">
-                                <UserAvatar user={user}/>
+                                <UserAvatar user={user} />
                             </div>
                             <div className="flex min-w-0 flex-1 flex-col justify-center">
                                 <Link href={`/@${user?.username}/`} className="text-default font-medium">
@@ -182,14 +178,14 @@ function HowlCard() {
                                 <Text>New Howl</Text>
                             </div>
                             <div className="flex shrink-0 space-x-2 self-center">
-                                <DotIcon/>
+                                <DotIcon />
                             </div>
                         </div>
                     </div>
 
                     <div className="min-h-fit w-full px-4 py-4 sm:px-6">
                         <Editor
-                            onUpdate={(e) => {
+                            onUpdate={e => {
                                 setBody(e?.storage.markdown.getMarkdown())
                             }}
                         />
@@ -206,7 +202,7 @@ function HowlCard() {
                                     onClick={() => fileInputRef.current?.click()}
                                 >
                                     <span className="sr-only">Insert link</span>
-                                    <LinkIcon className="h-5 w-5" aria-hidden="true"/>
+                                    <LinkIcon className="h-5 w-5" aria-hidden="true" />
                                 </button>
                             </div>
                             <input
@@ -216,18 +212,20 @@ function HowlCard() {
                                 className="hidden"
                                 accept="image/*"
                                 ref={fileInputRef}
-                                onChange={(e) => addAttachment(e.target.files?.[0] || null)}
+                                onChange={e => addAttachment(e.target.files?.[0] || null)}
                             />
                         </div>
-                        <div className="flex-1"/>
-                        <Button type="submit" color="indigo" disabled={submitting}>{!submitting ? 'Post' : <LoadingCircle/>}</Button>
+                        <div className="flex-1" />
+                        <Button type="submit" color="indigo" disabled={submitting}>
+                            {!submitting ? 'Post' : <LoadingCircle />}
+                        </Button>
                     </div>
 
                     {attachments.length > 0 && (
                         <div className="flex flex-wrap gap-7">
                             {attachments.map((attachment: any, idx: number) => (
                                 <div key={idx} className="relative">
-                                    <img src={attachment.data} alt="" className="h-20 w-20 rounded object-cover"/>
+                                    <img src={attachment.data} alt="" className="h-20 w-20 rounded object-cover" />
                                     <Button
                                         type="button"
                                         outline
@@ -235,7 +233,7 @@ function HowlCard() {
                                         onClick={() => removeAttachment(idx)}
                                     >
                                         <span className="sr-only">Remove</span>
-                                        <XCircleIcon className="h-5 w-5" aria-hidden="true"/>
+                                        <XCircleIcon className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                 </div>
                             ))}
