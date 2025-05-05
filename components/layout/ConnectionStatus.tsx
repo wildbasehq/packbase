@@ -28,16 +28,6 @@ export function ConnectionStatus() {
     useEffect(() => {
         // If the status hasn't changed, do nothing
         if (websocketStatus === lastStatusUpdateRef.current) {
-            if (websocketStatus === 'connected' && connectionMessage === 'connected') {
-                log.info('ConnectionWidget', 'Clearing connected message timer (already connected)')
-                if (connectedMessageTimerRef.current) {
-                    clearTimeout(connectedMessageTimerRef.current)
-                    connectedMessageTimerRef.current = null
-                }
-
-                setConnectionMessage(null)
-                return
-            }
             return
         }
 
@@ -124,15 +114,6 @@ export function ConnectionStatus() {
         )
 
         return () => {
-            // Clean up all timers and jobs on effect cleanup
-            log.info('ConnectionWidget', 'Cleaning up resources on effect cleanup')
-
-            if (connectedMessageTimerRef.current) {
-                log.info('ConnectionWidget', 'Clearing connected message timer during cleanup')
-                clearTimeout(connectedMessageTimerRef.current)
-                connectedMessageTimerRef.current = null
-            }
-
             if (statusUpdateJobIdRef.current) {
                 log.info('ConnectionWidget', `Cancelling job during cleanup: ${statusUpdateJobIdRef.current}`)
                 WorkerStore.getState().cancel(statusUpdateJobIdRef.current)
