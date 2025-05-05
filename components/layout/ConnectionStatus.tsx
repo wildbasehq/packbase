@@ -26,87 +26,89 @@ export function ConnectionStatus() {
     useEffect(() => {
         // If the status hasn't changed, do nothing
         if (websocketStatus === lastStatusUpdateRef.current) {
-            return;
+            return
         }
 
         // Update the last status
-        lastStatusUpdateRef.current = websocketStatus;
+        lastStatusUpdateRef.current = websocketStatus
 
         // Cancel any existing status update job
         if (statusUpdateJobIdRef.current) {
-            WorkerStore.getState().cancel(statusUpdateJobIdRef.current);
-            statusUpdateJobIdRef.current = null;
+            WorkerStore.getState().cancel(statusUpdateJobIdRef.current)
+            statusUpdateJobIdRef.current = null
         }
 
         // Clear any existing connected message timer
         if (connectedMessageTimerRef.current) {
-            clearTimeout(connectedMessageTimerRef.current);
-            connectedMessageTimerRef.current = null;
+            clearTimeout(connectedMessageTimerRef.current)
+            connectedMessageTimerRef.current = null
         }
 
         // Always show connecting message during the grace period
         if (websocketStatus === 'connecting' || connectionMessage === null) {
-            setConnectionMessage('connecting');
+            setConnectionMessage('connecting')
         }
 
         // Create a unique job ID for this status update
-        const jobId = `status-update-${Date.now()}`;
-        statusUpdateJobIdRef.current = jobId;
+        const jobId = `status-update-${Date.now()}`
+        statusUpdateJobIdRef.current = jobId
 
         // Enqueue a job to update the status after the grace period
         WorkerStore.getState().enqueue(
             jobId,
-            async (cache) => {
+            async cache => {
                 // Store the initial status when the job was created
                 if (!cache.get()) {
-                    cache.replace(websocketStatus);
+                    cache.replace(websocketStatus)
                 }
 
                 // Wait for the grace period
-                await new Promise(resolve => setTimeout(resolve, STATUS_UPDATE_GRACE_PERIOD));
+                await new Promise(resolve => setTimeout(resolve, STATUS_UPDATE_GRACE_PERIOD))
 
                 // Get the status that was stored when the job was created
-                const statusToShow = cache.get<string>();
+                const statusToShow = cache.get<string>()
 
                 // Update the connection message based on the status
                 switch (statusToShow) {
                     case 'connected':
-                        setConnectionMessage('connected');
+                        setConnectionMessage('connected')
 
                         // Auto-hide connected message after display time
                         connectedMessageTimerRef.current = setTimeout(() => {
-                            setConnectionMessage(null);
-                            connectedMessageTimerRef.current = null;
-                        }, CONNECTION_MESSAGE_DISPLAY_TIME);
-                        break;
+                            setConnectionMessage(null)
+                            connectedMessageTimerRef.current = null
+                        }, CONNECTION_MESSAGE_DISPLAY_TIME)
+                        break
 
                     case 'disconnected':
-                        setConnectionMessage('disconnected');
-                        break;
+                        setConnectionMessage('disconnected')
+                        break
 
                     case 'connecting':
-                        setConnectionMessage('connecting');
-                        break;
+                        setConnectionMessage('connecting')
+                        break
 
                     default:
-                        setConnectionMessage(null);
+                        setConnectionMessage(null)
                 }
             },
             { priority: 'high' }
-        );
+        )
 
         return () => {
             // Clean up all timers and jobs on effect cleanup
             if (connectedMessageTimerRef.current) {
-                clearTimeout(connectedMessageTimerRef.current);
-                connectedMessageTimerRef.current = null;
+                clearTimeout(connectedMessageTimerRef.current)
+                connectedMessageTimerRef.current = null
+
+                setConnectionMessage(null)
             }
 
             if (statusUpdateJobIdRef.current) {
-                WorkerStore.getState().cancel(statusUpdateJobIdRef.current);
-                statusUpdateJobIdRef.current = null;
+                WorkerStore.getState().cancel(statusUpdateJobIdRef.current)
+                statusUpdateJobIdRef.current = null
             }
-        };
+        }
     }, [websocketStatus, connectionMessage])
 
     return (
