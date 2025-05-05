@@ -384,12 +384,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         }
 
         return () => {
-            // Only clean up on component unmount, not on every user change
-            if (socketRef.current) {
-                socketRef.current.close()
-                socketRef.current = null
-            }
-
             if (reconnectTimerRef.current) {
                 clearTimeout(reconnectTimerRef.current)
                 reconnectTimerRef.current = null
