@@ -31,7 +31,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         if (user) {
             posthog.identify(user.id)
         }
-    }, [user])
+
+        if (serverCapabilities.includes('realtime')) {
+            hasRealtimeCapability.current = true
+        }
+    }, [user, serverCapabilities])
 
     // Render content with or without WebSocketProvider based on capabilities
     const renderContent = () => (
@@ -55,7 +59,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <PostHogProvider client={posthog}>
             <IntercomComponent user={user}>
-                {!!hasRealtimeCapability.current ? (
+                {hasRealtimeCapability.current ? (
                     <Suspense fallback={renderContent()}>
                         <WebSocketProvider>{renderContent()}</WebSocketProvider>
                     </Suspense>
