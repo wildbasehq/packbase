@@ -232,8 +232,10 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
             setConnectionState('disconnected')
             setSupportedExtensions(new Set())
 
-            toast.error('Disconnected from Packbase DMs: ' + event.reason)
-            setWebsocketStatus('disconnected')
+            if (![1005, 1008].includes(event.code)) {
+                toast.error('Disconnected from Packbase DMs: ' + event.reason)
+                setWebsocketStatus('disconnected')
+            }
 
             // Attempt reconnection if enabled
             if (autoReconnect && socketUrlRef.current && event.code !== 1005) {
