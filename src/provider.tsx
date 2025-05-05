@@ -3,13 +3,15 @@ import { ModalProvider } from '@/components/modal/provider'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import IntercomComponent from '@/components/shared/intercom'
 
 // Lazy load WebSocketProvider
-const WebSocketProvider = lazy(() => import('@/lib/socket/WebsocketContext.tsx').then(module => ({
-    default: module.WebSocketProvider
-})))
+const WebSocketProvider = lazy(() =>
+    import('@/lib/socket/WebsocketContext.tsx').then(module => ({
+        default: module.WebSocketProvider,
+    }))
+)
 
 if (typeof window !== 'undefined' && import.meta.env.VITE_POSTHOG_KEY) {
     posthog.init(import.meta.env.VITE_POSTHOG_KEY || '', {
@@ -23,7 +25,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     const { serverCapabilities } = useUIStore()
 
     // Check if realtime capability is available
-    const hasRealtimeCapability = serverCapabilities.includes('realtime')
+    const hasRealtimeCapability = useRef(serverCapabilities.includes('realtime'))
 
     useEffect(() => {
         if (user) {
@@ -55,9 +57,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <IntercomComponent user={user}>
                 {hasRealtimeCapability ? (
                     <Suspense fallback={renderContent()}>
-                        <WebSocketProvider>
-                            {renderContent()}
-                        </WebSocketProvider>
+                        <WebSocketProvider>{renderContent()}</WebSocketProvider>
                     </Suspense>
                 ) : (
                     renderContent()

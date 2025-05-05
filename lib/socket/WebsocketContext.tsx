@@ -79,10 +79,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     const tokenRef = useRef<string | null>(null)
     const reconnectAttemptsRef = useRef<number>(0)
     const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null)
-    const reconnectPromiseRef = useRef<Promise<void> | null>(null)
-    const reconnectResolveRef = useRef<(() => void) | null>(null)
-    const reconnectRejectRef = useRef<((reason?: any) => void) | null>(null)
-    const toastIdRef = useRef<string | number | null>(null)
+    const reconnectRef = useRef<((reason?: any) => void) | null>(null)
 
     // Map to store message handlers: extensionId_type -> handler[]
     const messageHandlersRef = useRef<Map<string, Array<(payload: Uint8Array) => void>>>(new Map())
@@ -163,14 +160,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         // Send handshake automatically
         sendHandshake()
 
-        // Resolve the reconnect promise if it exists
-        if (reconnectResolveRef.current) {
-            reconnectResolveRef.current()
-            reconnectResolveRef.current = null
-            reconnectRejectRef.current = null
-
-            setWebsocketStatus('connected')
-        }
+        setWebsocketStatus('connected')
     }, [])
 
     // Send initial handshake
@@ -275,14 +265,9 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         // Check if we've reached max reconnect attempts
         if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
             log.info('Realtime', 'Max reconnect attempts reached')
+            toast.error('Max reconnect attempts reached. Please check your connection.')
 
-            // Reject the reconnect promise if it exists
-            if (reconnectRejectRef.current) {
-                reconnectRejectRef.current('Maximum reconnect attempts reached')
-                reconnectResolveRef.current = null
-                reconnectRejectRef.current = null
-                setWebsocketStatus('disconnected')
-            }
+            setWebsocketStatus('disconnected')
 
             return
         }
@@ -290,22 +275,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         reconnectAttemptsRef.current++
         log.info('Realtime', `Scheduling reconnect attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts}`)
 
-        // Create a new reconnect promise if one doesn't exist
-        if (!reconnectPromiseRef.current) {
-            reconnectPromiseRef.current = new Promise((resolve, reject) => {
-                reconnectResolveRef.current = resolve
-                reconnectRejectRef.current = reject
-            })
-
-            // Show a toast with the promise
-            toastIdRef.current = toast.promise(reconnectPromiseRef.current, {
-                loading: 'Reconnecting to Packbase DMs...',
-                success: 'Reconnected to Packbase DMs',
-                error: error => `Connection failed: ${error}`,
-            })
-
-            setWebsocketStatus('connecting')
-        }
+        setWebsocketStatus('connecting')
 
         // Set timer for reconnect
         reconnectTimerRef.current = setTimeout(() => {
@@ -417,11 +387,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
                 clearTimeout(reconnectTimerRef.current)
                 reconnectTimerRef.current = null
             }
-
-            // Clean up any pending reconnect promises
-            reconnectPromiseRef.current = null
-            reconnectResolveRef.current = null
-            reconnectRejectRef.current = null
         }
     }, [user?.id, connect, disconnect]) // Only depend on user ID, not the entire user object
 
