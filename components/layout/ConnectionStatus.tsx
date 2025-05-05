@@ -5,6 +5,7 @@ import { LoadingCircle } from '@/components/icons'
 import { Text } from '@/components/shared/text.tsx'
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { WorkerStore } from '@/lib/workers'
+// Logging is globally available
 
 // Message display constants
 const CONNECTION_MESSAGE_DISPLAY_TIME = 1000 // 1 second to show connected message
@@ -15,7 +16,10 @@ const STATUS_UPDATE_GRACE_PERIOD = 3000 // 3 seconds grace period before showing
 type ConnectionMessageType = 'connecting' | 'connected' | 'disconnected' | null
 
 export function ConnectionStatus() {
+    log.info('ConnectionWidget', 'Rendering ConnectionStatus component')
+
     const { websocketStatus } = useUIStore()
+    log.info('ConnectionWidget', `Current websocket status: ${websocketStatus}`)
 
     const [connectionMessage, setConnectionMessage] = useState<ConnectionMessageType>('connecting')
     const connectedMessageTimerRef = useRef<NodeJS.Timeout | null>(null) // Timer for auto-hiding connected message
@@ -29,29 +33,36 @@ export function ConnectionStatus() {
             return
         }
 
+        // Log the websocket status change
+        log.info('ConnectionWidget', `Websocket status changed: ${lastStatusUpdateRef.current} -> ${websocketStatus}`)
+
         // Update the last status
         lastStatusUpdateRef.current = websocketStatus
 
         // Cancel any existing status update job
         if (statusUpdateJobIdRef.current) {
+            log.info('ConnectionWidget', `Cancelling existing job: ${statusUpdateJobIdRef.current}`)
             WorkerStore.getState().cancel(statusUpdateJobIdRef.current)
             statusUpdateJobIdRef.current = null
         }
 
         // Clear any existing connected message timer if the status is not 'connected'
         if (connectedMessageTimerRef.current && websocketStatus !== 'connected') {
+            log.info('ConnectionWidget', 'Clearing connected message timer due to status change')
             clearTimeout(connectedMessageTimerRef.current)
             connectedMessageTimerRef.current = null
         }
 
         // Always show connecting message during the grace period
         if (websocketStatus === 'connecting' || connectionMessage === null) {
+            log.info('ConnectionWidget', `Setting connection message to 'connecting'`)
             setConnectionMessage('connecting')
         }
 
         // Create a unique job ID for this status update
         const jobId = `status-update-${Date.now()}`
         statusUpdateJobIdRef.current = jobId
+        log.info('ConnectionWidget', `Created new status update job: ${jobId}`)
 
         // Enqueue a job to update the status after the grace period
         WorkerStore.getState().enqueue(
@@ -59,36 +70,45 @@ export function ConnectionStatus() {
             async cache => {
                 // Store the initial status when the job was created
                 if (!cache.get()) {
+                    log.info('ConnectionWidget', `Caching initial status: ${websocketStatus}`)
                     cache.replace(websocketStatus)
                 }
 
                 // Wait for the grace period
+                log.info('ConnectionWidget', `Waiting for grace period: ${STATUS_UPDATE_GRACE_PERIOD}ms`)
                 await new Promise(resolve => setTimeout(resolve, STATUS_UPDATE_GRACE_PERIOD))
 
                 // Get the status that was stored when the job was created
                 const statusToShow = cache.get<string>()
+                log.info('ConnectionWidget', `Retrieved cached status: ${statusToShow}`)
 
                 // Update the connection message based on the status
                 switch (statusToShow) {
                     case 'connected':
+                        log.info('ConnectionWidget', `Setting connection message to 'connected'`)
                         setConnectionMessage('connected')
 
                         // Auto-hide connected message after display time
+                        log.info('ConnectionWidget', `Setting timer to hide connected message after ${CONNECTION_MESSAGE_DISPLAY_TIME}ms`)
                         connectedMessageTimerRef.current = setTimeout(() => {
+                            log.info('ConnectionWidget', `Auto-hiding connected message`)
                             setConnectionMessage(null)
                             connectedMessageTimerRef.current = null
                         }, CONNECTION_MESSAGE_DISPLAY_TIME)
                         break
 
                     case 'disconnected':
+                        log.info('ConnectionWidget', `Setting connection message to 'disconnected'`)
                         setConnectionMessage('disconnected')
                         break
 
                     case 'connecting':
+                        log.info('ConnectionWidget', `Setting connection message to 'connecting'`)
                         setConnectionMessage('connecting')
                         break
 
                     default:
+                        log.info('ConnectionWidget', `Clearing connection message (was: ${connectionMessage})`)
                         setConnectionMessage(null)
                 }
             },
@@ -97,12 +117,16 @@ export function ConnectionStatus() {
 
         return () => {
             // Clean up all timers and jobs on effect cleanup
+            log.info('ConnectionWidget', 'Cleaning up resources on effect cleanup')
+
             if (connectedMessageTimerRef.current) {
+                log.info('ConnectionWidget', 'Clearing connected message timer during cleanup')
                 clearTimeout(connectedMessageTimerRef.current)
                 connectedMessageTimerRef.current = null
             }
 
             if (statusUpdateJobIdRef.current) {
+                log.info('ConnectionWidget', `Cancelling job during cleanup: ${statusUpdateJobIdRef.current}`)
                 WorkerStore.getState().cancel(statusUpdateJobIdRef.current)
                 statusUpdateJobIdRef.current = null
             }
