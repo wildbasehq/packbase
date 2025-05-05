@@ -38,8 +38,8 @@ export function ConnectionStatus() {
             statusUpdateJobIdRef.current = null
         }
 
-        // Clear any existing connected message timer
-        if (connectedMessageTimerRef.current) {
+        // Clear any existing connected message timer if the status is not 'connected'
+        if (connectedMessageTimerRef.current && websocketStatus !== 'connected') {
             clearTimeout(connectedMessageTimerRef.current)
             connectedMessageTimerRef.current = null
         }
@@ -100,8 +100,6 @@ export function ConnectionStatus() {
             if (connectedMessageTimerRef.current) {
                 clearTimeout(connectedMessageTimerRef.current)
                 connectedMessageTimerRef.current = null
-
-                setConnectionMessage(null)
             }
 
             if (statusUpdateJobIdRef.current) {
