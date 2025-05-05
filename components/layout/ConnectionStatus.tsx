@@ -16,8 +16,6 @@ const STATUS_UPDATE_GRACE_PERIOD = 3000 // 3 seconds grace period before showing
 type ConnectionMessageType = 'connecting' | 'connected' | 'disconnected' | null
 
 export function ConnectionStatus() {
-    log.info('ConnectionWidget', 'Rendering ConnectionStatus component')
-
     const { websocketStatus } = useUIStore()
     log.info('ConnectionWidget', `Current websocket status: ${websocketStatus}`)
 
@@ -30,6 +28,16 @@ export function ConnectionStatus() {
     useEffect(() => {
         // If the status hasn't changed, do nothing
         if (websocketStatus === lastStatusUpdateRef.current) {
+            if (websocketStatus === 'connected' && connectionMessage === 'connected') {
+                log.info('ConnectionWidget', 'Clearing connected message timer (already connected)')
+                if (connectedMessageTimerRef.current) {
+                    clearTimeout(connectedMessageTimerRef.current)
+                    connectedMessageTimerRef.current = null
+                }
+
+                setConnectionMessage(null)
+                return
+            }
             return
         }
 
