@@ -4,10 +4,12 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { LoadingCircle } from '@/components/icons'
 import { Text } from '@/components/shared/text.tsx'
 import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import { WorkerStore } from '@/lib/workers'
 
 // Message display constants
 const CONNECTION_MESSAGE_DISPLAY_TIME = 1000 // 1 second to show connected message
 const DISCONNECTION_GRACE_PERIOD = 5000 // 5 seconds before showing disconnected message
+const STATUS_UPDATE_GRACE_PERIOD = 3000 // 3 seconds grace period before showing status updates
 
 // Message types
 type ConnectionMessageType = 'connecting' | 'connected' | 'disconnected' | null
@@ -16,63 +18,96 @@ export function ConnectionStatus() {
     const { websocketStatus } = useUIStore()
 
     const [connectionMessage, setConnectionMessage] = useState<ConnectionMessageType>('connecting')
-    const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null)
-    const disconnectTimeRef = useRef<number | null>(null)
-    const connectedMessageTimerRef = useRef<NodeJS.Timeout | null>(null) // New ref for connected message timer
+    const connectedMessageTimerRef = useRef<NodeJS.Timeout | null>(null) // Timer for auto-hiding connected message
+    const lastStatusUpdateRef = useRef<string>(websocketStatus) // Track last status to avoid unnecessary updates
+    const statusUpdateJobIdRef = useRef<string | null>(null) // Track current status update job
 
     // Connection state handling
     useEffect(() => {
-        // Clear any existing disconnect timer
-        if (disconnectTimerRef.current) {
-            clearTimeout(disconnectTimerRef.current)
-            disconnectTimerRef.current = null
+        // If the status hasn't changed, do nothing
+        if (websocketStatus === lastStatusUpdateRef.current) {
+            return;
+        }
+
+        // Update the last status
+        lastStatusUpdateRef.current = websocketStatus;
+
+        // Cancel any existing status update job
+        if (statusUpdateJobIdRef.current) {
+            WorkerStore.getState().cancel(statusUpdateJobIdRef.current);
+            statusUpdateJobIdRef.current = null;
         }
 
         // Clear any existing connected message timer
         if (connectedMessageTimerRef.current) {
-            clearTimeout(connectedMessageTimerRef.current)
-            connectedMessageTimerRef.current = null
+            clearTimeout(connectedMessageTimerRef.current);
+            connectedMessageTimerRef.current = null;
         }
 
-        switch (websocketStatus) {
-            case 'connected':
-                // On connected: clear disconnect time and show connected message
-                disconnectTimeRef.current = null
-                setConnectionMessage('connected')
-
-                // Auto-hide connected message after display time - store timeout ID in ref
-                connectedMessageTimerRef.current = setTimeout(() => {
-                    setConnectionMessage(null)
-                    connectedMessageTimerRef.current = null // Clear ref after timeout completes
-                }, CONNECTION_MESSAGE_DISPLAY_TIME)
-                break
-
-            case 'connecting':
-                // On connecting: show connecting message
-                setConnectionMessage('connecting')
-                break
-
-            case 'disconnected':
-                setConnectionMessage('disconnected')
-                break
-
-            default:
-                setConnectionMessage(null)
+        // Always show connecting message during the grace period
+        if (websocketStatus === 'connecting' || connectionMessage === null) {
+            setConnectionMessage('connecting');
         }
+
+        // Create a unique job ID for this status update
+        const jobId = `status-update-${Date.now()}`;
+        statusUpdateJobIdRef.current = jobId;
+
+        // Enqueue a job to update the status after the grace period
+        WorkerStore.getState().enqueue(
+            jobId,
+            async (cache) => {
+                // Store the initial status when the job was created
+                if (!cache.get()) {
+                    cache.replace(websocketStatus);
+                }
+
+                // Wait for the grace period
+                await new Promise(resolve => setTimeout(resolve, STATUS_UPDATE_GRACE_PERIOD));
+
+                // Get the status that was stored when the job was created
+                const statusToShow = cache.get<string>();
+
+                // Update the connection message based on the status
+                switch (statusToShow) {
+                    case 'connected':
+                        setConnectionMessage('connected');
+
+                        // Auto-hide connected message after display time
+                        connectedMessageTimerRef.current = setTimeout(() => {
+                            setConnectionMessage(null);
+                            connectedMessageTimerRef.current = null;
+                        }, CONNECTION_MESSAGE_DISPLAY_TIME);
+                        break;
+
+                    case 'disconnected':
+                        setConnectionMessage('disconnected');
+                        break;
+
+                    case 'connecting':
+                        setConnectionMessage('connecting');
+                        break;
+
+                    default:
+                        setConnectionMessage(null);
+                }
+            },
+            { priority: 'high' }
+        );
 
         return () => {
-            // Clean up all timers on effect cleanup
-            if (disconnectTimerRef.current) {
-                clearTimeout(disconnectTimerRef.current)
-                disconnectTimerRef.current = null
+            // Clean up all timers and jobs on effect cleanup
+            if (connectedMessageTimerRef.current) {
+                clearTimeout(connectedMessageTimerRef.current);
+                connectedMessageTimerRef.current = null;
             }
 
-            if (connectedMessageTimerRef.current) {
-                clearTimeout(connectedMessageTimerRef.current)
-                connectedMessageTimerRef.current = null
+            if (statusUpdateJobIdRef.current) {
+                WorkerStore.getState().cancel(statusUpdateJobIdRef.current);
+                statusUpdateJobIdRef.current = null;
             }
-        }
-    }, [websocketStatus])
+        };
+    }, [websocketStatus, connectionMessage])
 
     return (
         <>

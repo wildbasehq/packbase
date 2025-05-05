@@ -232,17 +232,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
             setConnectionState('disconnected')
             setSupportedExtensions(new Set())
 
+            toast.error('Disconnected from Packbase DMs: ' + event.reason)
+            setWebsocketStatus('disconnected')
+
             // Attempt reconnection if enabled
             if (autoReconnect && socketUrlRef.current && event.code !== 1005) {
-                // Only show error toast if not auto-reconnecting
-                if (!autoReconnect) {
-                    toast.error('Disconnected from Packbase DMs: ' + event.reason)
-                    setWebsocketStatus('disconnected')
-                }
                 attemptReconnect()
-            } else {
-                toast.error('Disconnected from Packbase DMs: ' + event.reason)
-                setWebsocketStatus('disconnected')
             }
         },
         [autoReconnect]
@@ -274,8 +269,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
 
         reconnectAttemptsRef.current++
         log.info('Realtime', `Scheduling reconnect attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts}`)
-
-        setWebsocketStatus('connecting')
 
         // Set timer for reconnect
         reconnectTimerRef.current = setTimeout(() => {
