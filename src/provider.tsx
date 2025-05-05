@@ -25,7 +25,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     const { serverCapabilities } = useUIStore()
 
     // Check if realtime capability is available
-    const hasRealtimeCapability = useRef(serverCapabilities.includes('realtime'))
+    const hasRealtimeCapability = useRef<boolean>(serverCapabilities.includes('realtime'))
 
     useEffect(() => {
         if (user) {
@@ -55,7 +55,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <PostHogProvider client={posthog}>
             <IntercomComponent user={user}>
-                {hasRealtimeCapability ? (
+                {!!hasRealtimeCapability.current ? (
                     <Suspense fallback={renderContent()}>
                         <WebSocketProvider>{renderContent()}</WebSocketProvider>
                     </Suspense>

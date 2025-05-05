@@ -69,7 +69,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     reconnectInterval = 3000,
     maxReconnectAttempts = 5,
 }) => {
-    const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected')
+    const [connectionState, setConnectionState] = useState<ConnectionState>('connecting')
     const [supportedExtensions, setSupportedExtensions] = useState<Set<number>>(new Set())
     const { user } = useUserAccountStore()
     const { setWebsocketStatus } = useUIStore()
@@ -79,7 +79,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     const tokenRef = useRef<string | null>(null)
     const reconnectAttemptsRef = useRef<number>(0)
     const reconnectTimerRef = useRef<NodeJS.Timeout | null>(null)
-    const reconnectRef = useRef<((reason?: any) => void) | null>(null)
 
     // Map to store message handlers: extensionId_type -> handler[]
     const messageHandlersRef = useRef<Map<string, Array<(payload: Uint8Array) => void>>>(new Map())
