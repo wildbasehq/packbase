@@ -5,6 +5,7 @@ import { PostHogProvider } from 'posthog-js/react'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import IntercomComponent from '@/components/shared/intercom'
+import { Text } from '@/components/shared/text.tsx'
 
 // Lazy load WebSocketProvider
 const WebSocketProvider = lazy(() =>
@@ -60,7 +61,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <PostHogProvider client={posthog}>
             <IntercomComponent user={user}>
                 {hasRealtimeCapability.current ? (
-                    <Suspense fallback={renderContent()}>
+                    <Suspense
+                        fallback={
+                            <div className="flex items-center justify-center h-full">
+                                <Text>Loading...</Text>
+                            </div>
+                        }
+                    >
                         <WebSocketProvider>{renderContent()}</WebSocketProvider>
                     </Suspense>
                 ) : (

@@ -91,6 +91,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
             socketUrlRef.current = url
             tokenRef.current = token || globalThis.TOKEN || null
 
+            if (!tokenRef.current) {
+                log.error('Realtime', 'No token provided for WebSocket connection')
+                setConnectionState('disconnected')
+                return
+            }
+
             // Don't connect if user isn't signed in
             if (!user) {
                 log.info('Realtime', 'WebSocket connection not established: User not signed in')
