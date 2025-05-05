@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useUIStore, useUserAccountStore } from '@/lib/states'
+import { API_URL } from '@/lib/api'
 
 // Protocol constants
 const Protocol = {
@@ -367,7 +368,10 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
         // Connect only if we have a user and no active connection
         if (userId && !socketRef.current) {
             // Only attempt to connect if we have a URL (either stored or default)
-            const url = socketUrlRef.current || 'ws://localhost:8000/ws'
+            // If no URL is provided, use the default in API_URL by getting the domain only, stripping HTTP(S) and trailing slash
+            const apiUrl = API_URL?.replace(/https?:\/\//, '').replace(/\/$/, '') || ''
+            const wsType = apiUrl.startsWith('localhost') ? 'ws' : 'wss'
+            const url = socketUrlRef.current || `${wsType}://${apiUrl}/ws`
             const token = tokenRef.current || globalThis.TOKEN || undefined
             connect(url, token)
         } else if (!userId && socketRef.current) {
