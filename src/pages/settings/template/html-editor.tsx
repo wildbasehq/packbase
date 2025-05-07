@@ -3,7 +3,6 @@ import React, {useEffect, useRef, useState} from 'react'
 import * as monaco from 'monaco-editor'
 import {Button} from '@/components/shared/experimental-button-rework.tsx'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert.tsx'
-import Card from '@/components/shared/card.tsx'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import HTMLMonacoLinter, {HTMLMonacoMarks} from 'monaco-html-linter'
@@ -291,8 +290,6 @@ const HTMLProfileEditor = () => {
         try {
             const parser = new DOMParser()
             const doc = parser.parseFromString(htmlContent, 'text/html')
-            const errors = doc.getElementsByTagName('parsererror')
-            const warnings = doc.getElementsByTagName('warning')
 
             const report = new HTMLMonacoMarks(htmlContent, linterConfig).getLinterResponse()
 
@@ -394,15 +391,12 @@ const HTMLProfileEditor = () => {
             {/* Error Alert */}
             {error && (
                 <Alert variant="destructive">
-                    {error
-                        .split('\n')
-                        .map((line, index) =>
-                            index === 0 ? (
-                                <AlertTitle key={index}>{line}</AlertTitle>
-                            ) : (
-                                <AlertDescription key={index}>{line}</AlertDescription>
-                            )
-                        )}
+                    {error.split('\n').map((line, index) => {
+                        if (index === 0) {
+                            return <AlertTitle key={index}>{line}</AlertTitle>;
+                        }
+                        return <AlertDescription key={index}>{line}</AlertDescription>;
+                    })}
                 </Alert>
             )}
 

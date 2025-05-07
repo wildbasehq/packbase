@@ -68,7 +68,7 @@ export default function CharmingTabs({items, tabComponent: TabComponent = "a", s
                 <>
                     <div
                         ref={ref}
-                        className="group relative overflow-hidden rounded-full bg-[#60a5fa44] p-[2px] shadow-xs"
+                        className="group relative overflow-hidden rounded-full bg-[#60a5fa44] dark:bg-n-7/50 p-[2px] shadow-xs"
                         style={{
                             transform: "translateZ(0)",
                             backfaceVisibility: "hidden",
@@ -84,6 +84,7 @@ export default function CharmingTabs({items, tabComponent: TabComponent = "a", s
                                     backgroundImage: activeX
                                         ? " radial-gradient(#af91ff, transparent 80%) "
                                         : undefined,
+                                    opacity: "var(--tw-bg-opacity, 1)",
                                 }}
                             ></div>
 
@@ -99,7 +100,7 @@ export default function CharmingTabs({items, tabComponent: TabComponent = "a", s
                                         : undefined,
                                 }}
                             ></div>
-                            <div className="relative flex items-center rounded-full bg-white/90 px-2">
+                            <div className="relative flex items-center rounded-full bg-white/90 dark:bg-n-8/90 px-2">
                                 {items.map((item, idx) => (
                                     <DesktopTab
                                         key={idx}
@@ -122,6 +123,7 @@ export default function CharmingTabs({items, tabComponent: TabComponent = "a", s
                                     backgroundImage: activeX
                                         ? " radial-gradient(100% 75% at 50% 130%, #60a5faff, transparent 60%) "
                                         : undefined,
+                                    opacity: "var(--tw-bg-opacity, 1)",
                                 }}
                             ></div>
                         </div>
@@ -131,13 +133,13 @@ export default function CharmingTabs({items, tabComponent: TabComponent = "a", s
                             <>
                                 <Menu.Button
                                     ref={refs.setReference}
-                                    className="group peer relative flex rounded-full bg-white/90 p-2 outline-hidden transition-colors active:bg-white/80 md:hidden"
+                                    className="group peer relative flex rounded-full bg-white/90 dark:bg-n-8/90 p-2 outline-hidden transition-colors active:bg-white/80 dark:active:bg-n-7/80 md:hidden"
                                 >
                                     <MenuIcon isOpen={open} />
                                 </Menu.Button>
 
                                 {/* Focus/hover background */}
-                                <div className="absolute inset-0 -z-1 block bg-[#af91ff] opacity-20 transition-opacity duration-100 group-hover:opacity-70 peer-focus:opacity-100 md:hidden"></div>
+                                <div className="absolute inset-0 -z-1 block bg-[#af91ff] dark:bg-[#af91ff]/70 opacity-20 transition-opacity duration-100 group-hover:opacity-70 peer-focus:opacity-100 md:hidden"></div>
                             </>
                         </div>
                     </div>
@@ -160,8 +162,8 @@ export default function CharmingTabs({items, tabComponent: TabComponent = "a", s
                                     leaveFrom="transform scale-100 opacity-100"
                                     leaveTo="transform scale-95 opacity-0"
                                 >
-                                    <div className="mt-3 origin-top-right rounded-[0.75rem] bg-[#60a5fa88] p-[2px]">
-                                        <div className="rounded-[calc(0.75rem-2px)] bg-white/[0.95] py-1 pr-4 shadow-md">
+                                    <div className="mt-3 origin-top-right rounded-[0.75rem] bg-[#60a5fa88] dark:bg-n-7/70 p-[2px]">
+                                        <div className="rounded-[calc(0.75rem-2px)] bg-white/[0.95] dark:bg-n-8/[0.95] py-1 pr-4 shadow-md">
                                             {items.map((item, idx) => (
                                                 <MobileTab
                                                     key={idx}
@@ -207,8 +209,8 @@ function DesktopTab({as: Component, label, isActive, setActiveElement, ...rest}:
             className={classNames(
                 "group flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium outline-hidden transition-colors duration-200 lg:px-6",
                 isActive
-                    ? "text-indigo-900 focus:text-indigo-950"
-                    : "text-slate-500 hover:text-slate-700 focus:text-slate-700",
+                    ? "text-indigo-900 focus:text-indigo-950 dark:text-indigo-300 dark:focus:text-indigo-200"
+                    : "text-slate-500 hover:text-slate-700 focus:text-slate-700 dark:text-n-3 dark:hover:text-n-1 dark:focus:text-n-1",
             )}
             {...rest}
         >
@@ -216,8 +218,8 @@ function DesktopTab({as: Component, label, isActive, setActiveElement, ...rest}:
                 className={classNames(
                     "block h-1 w-1 rounded-full transition-transform duration-200",
                     isActive
-                        ? "scale-100 bg-indigo-600 group-focus:bg-indigo-800"
-                        : "scale-0 bg-gray-600 group-focus:scale-100",
+                        ? "scale-100 bg-indigo-600 group-focus:bg-indigo-800 dark:bg-indigo-400 dark:group-focus:bg-indigo-300"
+                        : "scale-0 bg-gray-600 group-focus:scale-100 dark:bg-gray-400 dark:group-focus:bg-gray-300",
                 )}
             ></div>
             {label}
@@ -237,8 +239,8 @@ function MobileTab({ as, label, isActive, ...rest }: {
             className={classNames(
                 "group/item flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium outline-hidden transition-colors duration-200 lg:px-6",
                 isActive
-                    ? "text-indigo-900 focus:text-indigo-950"
-                    : "text-slate-500 hover:text-slate-700 focus:text-slate-700",
+                    ? "text-indigo-900 focus:text-indigo-950 dark:text-indigo-300 dark:focus:text-indigo-200"
+                    : "text-slate-500 hover:text-slate-700 focus:text-slate-700 dark:text-n-3 dark:hover:text-n-1 dark:focus:text-n-1",
             )}
             {...rest}
         >
@@ -248,9 +250,9 @@ function MobileTab({ as, label, isActive, ...rest }: {
                         className={classNames(
                             "block h-1 w-1 rounded-full transition-transform duration-200",
                             isActive
-                                ? "group/item-focus:bg-indigo-800 scale-100 bg-indigo-600"
+                                ? "group/item-focus:bg-indigo-800 scale-100 bg-indigo-600 dark:bg-indigo-400 dark:group/item-focus:bg-indigo-300"
                                 : classNames(
-                                    "group/item-focus:scale-100 bg-gray-600",
+                                    "group/item-focus:scale-100 bg-gray-600 dark:bg-gray-400 dark:group/item-focus:bg-gray-300",
                                     active ? "scale-100" : "scale-0",
                                 ),
                         )}
@@ -272,7 +274,7 @@ function MenuIcon({ isOpen = false }) {
                         <div
                             key={innerIdx}
                             className={classNames(
-                                "h-0.5 w-full rounded-full bg-slate-500 transition-all duration-150 group-hover:bg-slate-600",
+                                "h-0.5 w-full rounded-full bg-slate-500 dark:bg-n-3 transition-all duration-150 group-hover:bg-slate-600 dark:group-hover:bg-n-1",
                                 innerIdx === 1 && "absolute top-0",
                                 isOpen &&
                                 classNames(

@@ -9,7 +9,6 @@ import { WorkerStore } from '@/lib/workers'
 
 // Message display constants
 const CONNECTION_MESSAGE_DISPLAY_TIME = 1000 // 1 second to show connected message
-const DISCONNECTION_GRACE_PERIOD = 5000 // 5 seconds before showing disconnected message
 const STATUS_UPDATE_GRACE_PERIOD = 3000 // 3 seconds grace period before showing status updates
 
 // Message types
@@ -17,7 +16,6 @@ type ConnectionMessageType = 'connecting' | 'connected' | 'disconnected' | null
 
 export function ConnectionStatus() {
     const { websocketStatus } = useUIStore()
-    log.info('ConnectionWidget', `Current websocket status: ${websocketStatus}`)
 
     const [connectionMessage, setConnectionMessage] = useState<ConnectionMessageType>('connecting')
     const connectedMessageTimerRef = useRef<NodeJS.Timeout | null>(null) // Timer for auto-hiding connected message
