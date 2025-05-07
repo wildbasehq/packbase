@@ -1,7 +1,7 @@
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
 import type React from 'react'
-import {Button} from './button'
+import { Button } from './button'
 import Link from './link'
 
 export function Dropdown(props: Headless.MenuProps) {
@@ -9,10 +9,10 @@ export function Dropdown(props: Headless.MenuProps) {
 }
 
 export function DropdownButton<T extends React.ElementType = typeof Button>({
-                                                                                // @ts-ignore
-                                                                                as = Button,
-                                                                                ...props
-                                                                            }: { className?: string } & Omit<Headless.MenuButtonProps<T>, 'className'>) {
+    // @ts-ignore
+    as = Button,
+    ...props
+}: { className?: string } & Omit<Headless.MenuButtonProps<T>, 'className'>) {
     // @ts-ignore
     return <Headless.MenuButton as={as} {...props} />
 }
@@ -34,7 +34,7 @@ export function DropdownMenu({
                     // Base styles
                     'isolate w-max rounded-xl p-1',
                     // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
-                    'outline outline-1 outline-transparent focus:outline-hidden',
+                    'outline-1 outline-transparent focus:outline-hidden',
                     // Handle scrolling when menu won't fit in viewport
                     'overflow-y-auto',
                     // Popover background
@@ -62,7 +62,7 @@ export function DropdownItem({
         // Text styles
         'text-left text-base/6 text-default sm:text-sm/6 forced-colors:text-[CanvasText]',
         // Focus
-        'data-focus:bg-blue-500 data-focus:text-white',
+        'data-focus:bg-blue-500 data-focus:!text-white',
         // Disabled state
         'data-disabled:opacity-50',
         // Forced colors mode
@@ -84,7 +84,7 @@ export function DropdownItem({
     )
 }
 
-export function DropdownHeader({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+export function DropdownHeader({ className, ...props }: Readonly<React.ComponentPropsWithoutRef<'div'>>) {
     return <div {...props} className={clsx(className, 'col-span-5 px-3.5 pb-1 pt-2.5 sm:px-3')} />
 }
 
@@ -142,12 +142,16 @@ export function DropdownDescription({ className, ...props }: { className?: strin
     )
 }
 
-export function DropdownShortcut({keys, className, ...props}: { keys: string | string[]; className?: string } & Omit<Headless.DescriptionProps<'kbd'>, 'className'>) {
+export function DropdownShortcut({
+    keys,
+    className,
+    ...props
+}: { keys: string | string[]; className?: string } & Omit<Headless.DescriptionProps<'kbd'>, 'className'>) {
     return (
         <Headless.Description as="kbd" {...props} className={clsx(className, 'col-start-5 row-start-1 flex justify-self-end')}>
             {(Array.isArray(keys) ? keys : keys.split('')).map((char, index) => (
                 <kbd
-                    key={index}
+                    key={char}
                     className={clsx([
                         'forced-colors:group-data-focus:text-[HighlightText] min-w-[2ch] text-center font-sans capitalize text-zinc-400 group-data-focus:text-white',
                         // Make sure key names that are longer than one character (like "Tab") have extra space
