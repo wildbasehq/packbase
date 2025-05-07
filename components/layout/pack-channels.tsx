@@ -1,6 +1,6 @@
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/states'
 import { ArrowUpRightIcon } from 'lucide-react'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import {
     Sidebar,
     SidebarBody,
@@ -12,15 +12,8 @@ import {
     SidebarSection,
     SidebarSpacer,
 } from '@/components/shared/sidebar'
-
-// Lazy load ConnectionStatus component
-const ConnectionStatus = lazy(() => import('./ConnectionStatus').then(module => ({
-    default: module.ConnectionStatus
-})))
-
 import {
     ChevronUpIcon,
-    ExclamationTriangleIcon,
     FireIcon,
     HomeIcon,
     InboxIcon,
@@ -31,7 +24,6 @@ import {
 import ResourceSwitcher from '@/components/layout/resource-switcher'
 import HowlCreator from '@/components/shared/user/howl-creator'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
-import { useState } from 'react'
 import InboxPage from '@/src/pages/inbox/page.tsx'
 import { Badge } from '@/components/shared/badge.tsx'
 import Tooltip from '@/components/shared/tooltip.tsx'
@@ -42,12 +34,18 @@ import { SiDiscord } from 'react-icons/si'
 import { ChatBubbleBottomCenterIcon, FaceSmileIcon } from '@heroicons/react/16/solid'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 
+// Lazy load ConnectionStatus component
+const ConnectionStatus = lazy(() =>
+    import('./ConnectionStatus').then(module => ({
+        default: module.ConnectionStatus,
+    }))
+)
+
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon,
     Sparkles: SparklesIcon,
     Fire: FireIcon,
 }
-
 
 export function PackChannels() {
     const { hidden, navigation, loading, serverCapabilities } = useUIStore()
@@ -89,9 +87,9 @@ export function PackChannels() {
                                 <HomeIcon />
                                 <SidebarLabel>Home</SidebarLabel>
                             </SidebarItem>
-                            {navigation?.map((item, index) => (
-                                <Tooltip key={index} content={item.description || item.name} delayDuration={0}>
-                                    <SidebarItem key={index} href={item.href} current={item.current}>
+                            {navigation?.map(item => (
+                                <Tooltip key={item.href} content={item.description ?? item.name} delayDuration={0}>
+                                    <SidebarItem key={item.href} href={item.href} current={item.current}>
                                         {typeof item.icon === 'string' ? <DynamicIcon name={item.icon} /> : <item.icon />}
                                         <SidebarLabel>{item.name}</SidebarLabel>
                                         {item.badge && (
@@ -154,7 +152,7 @@ export function PackChannels() {
                             <DropdownButton as={SidebarItem}>
                                 <span className="flex items-center min-w-0 gap-3">
                                     <Avatar
-                                        src={user.images?.avatar || false}
+                                        src={user.images?.avatar ?? false}
                                         className="size-10"
                                         square
                                         alt=""
