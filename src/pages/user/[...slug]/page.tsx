@@ -17,18 +17,6 @@ function CustomTheme({ userId }: CustomThemeProps) {
     const [theme, setTheme] = useState<Theme | null>(null)
 
     useEffect(() => {
-        // This is a placeholder for the API fetch logic
-        // The actual API fetch logic will be added later
-
-        // Example of how the API fetch might look:
-        // fetchUserTheme(userId)
-        //     .then(themeData => {
-        //         setTheme(themeData)
-        //     })
-        //     .catch(error => {
-        //         console.error('Error fetching theme:', error)
-        //     })
-
         vg.user({ username: userId })
             .theme.get()
             .then(({ data }) => {
@@ -98,7 +86,7 @@ export default function UserProfile() {
                     {/* Custom theme code here */}
                     <CustomTheme userId={user.id} />
 
-                    <div className="p-8">
+                    <div className="p-8" id="profile-feed">
                         <Feed packID={user.id} />
                     </div>
                 </>
