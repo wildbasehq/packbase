@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react'
-import {useUserAccountStore} from '@/lib/states'
-import {usePostHog} from 'posthog-js/react'
-import {EnvelopeIcon, EnvelopeOpenIcon, IdentificationIcon, SwatchIcon, TrophyIcon} from '@heroicons/react/16/solid'
+import React, { useEffect, useState } from 'react'
+import { useUserAccountStore } from '@/lib/states'
+import { usePostHog } from 'posthog-js/react'
+import { EnvelopeIcon, EnvelopeOpenIcon, IdentificationIcon, SwatchIcon, TrophyIcon } from '@heroicons/react/16/solid'
 
 // Import all settings pages
 import ProfileSettings from './general/page'
@@ -70,13 +70,13 @@ const SettingsDialog: React.FC = () => {
         ]
 
         // Conditionally add template tab based on feature flag
-        if (posthog?.isFeatureEnabled('settings-html-editor') || window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
-            tabs.splice(1, 0, {
-                id: 'template',
-                name: 'Template',
-                icon: SwatchIcon,
-            })
-        }
+        // if (posthog?.isFeatureEnabled('settings-html-editor') || window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+        tabs.splice(1, 0, {
+            id: 'template',
+            name: 'Template',
+            icon: SwatchIcon,
+        })
+        // }
 
         return tabs
     }
