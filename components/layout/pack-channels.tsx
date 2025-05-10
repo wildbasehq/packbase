@@ -121,7 +121,7 @@ export function PackChannels() {
                                         <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon" />
                                         <SidebarLabel>Feedback</SidebarLabel>
                                     </DropdownItem>
-                                    <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
+                                    <DropdownItem href="https://discord.gg/wildbase" target="_blank">
                                         <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon" />
                                         <SidebarLabel>Discord</SidebarLabel>
                                     </DropdownItem>

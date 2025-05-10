@@ -45,7 +45,7 @@ const links = [
     { name: 'Join Packbase', href: '/id/create/', primary: true },
     {
         name: 'Discord Community',
-        href: 'https://discord.gg/StuuK55gYA',
+        href: 'https://discord.gg/wildbase',
         tooltip: 'Discord invite - will open in a new tab',
     },
 ]
@@ -632,7 +632,7 @@ export default function GuestLanding() {
             },
             {
                 name: 'Discord',
-                href: 'https://discord.gg/StuuK55gYA',
+                href: 'https://discord.gg/wildbase',
             },
             {
                 name: 'Changelog',

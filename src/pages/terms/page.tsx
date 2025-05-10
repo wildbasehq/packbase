@@ -1,5 +1,5 @@
 import Body from '@/components/layout/body'
-import {Heading, Text} from '@/components/shared/text'
+import { Heading, Text } from '@/components/shared/text'
 import Link from '@/components/shared/link'
 
 const retentionOrder = [
@@ -67,7 +67,11 @@ const dataCollection = [
     { type: 'Support tickets', purpose: 'Customer support', retention: 'Until resolved or ✱ID deletion' },
     { type: 'Preferences', purpose: 'User experience customization', retention: 'Until profile deletion' },
     { type: 'Notification settings', purpose: 'User experience customization', retention: 'Until profile deletion' },
-    { type: 'Search history', purpose: 'User experience customization', retention: 'Never - Stored in browser, but sent to API & disposed of after processing' },
+    {
+        type: 'Search history',
+        purpose: 'User experience customization',
+        retention: 'Never - Stored in browser, but sent to API & disposed of after processing',
+    },
 ].sort((a, b) => {
     return retentionOrder.indexOf(a.retention) - retentionOrder.indexOf(b.retention)
 })
@@ -89,16 +93,16 @@ export default function TermsPage() {
                     <div>
                         <Heading className="mb-4 text-2xl font-semibold">1.1 Agreement to Terms</Heading>
                         <Text className="leading-relaxed">
-                            By accessing or using Packbase, you agree to be bound by these Usage Policy. If you disagree with any part of these terms, you may not access
-                            Packbase.
+                            By accessing or using Packbase, you agree to be bound by these Usage Policy. If you disagree with any part of
+                            these terms, you may not access Packbase.
                         </Text>
                     </div>
 
                     <div>
                         <Heading className="mb-4 text-2xl font-semibold">1.2 Changes to Terms</Heading>
                         <Text className="leading-relaxed">
-                            We reserve the right to modify these terms at any time. We will notify you of any changes by posting the new terms on Packbase. Your continued
-                            use of Packbase constitutes acceptance of the modified terms.
+                            We reserve the right to modify these terms at any time. We will notify you of any changes by posting the new
+                            terms on Packbase. Your continued use of Packbase constitutes acceptance of the modified terms.
                         </Text>
                     </div>
 
@@ -119,7 +123,9 @@ export default function TermsPage() {
 
                     <div>
                         <Heading className="mb-4 text-2xl font-semibold">1.4 Termination</Heading>
-                        <Text className="leading-relaxed">We may terminate or suspend your account at any time, without prior notice, for any reason.</Text>
+                        <Text className="leading-relaxed">
+                            We may terminate or suspend your account at any time, without prior notice, for any reason.
+                        </Text>
                     </div>
 
                     <div>
@@ -130,7 +136,9 @@ export default function TermsPage() {
                                 <Heading size="xl" className="mb-4 font-medium">
                                     Standard Account Guidelines
                                 </Heading>
-                                <Text className="mb-4">Standard accounts must maintain PG-13 appropriate content. The following are prohibited:</Text>
+                                <Text className="mb-4">
+                                    Standard accounts must maintain PG-13 appropriate content. The following are prohibited:
+                                </Text>
                                 <ul className="text-default list-disc space-y-2 pl-6">
                                     <li>
                                         <Text>Adult or sexually explicit content outside of an Afterdark Account</Text>
@@ -166,7 +174,9 @@ export default function TermsPage() {
                                         <Text>Real-life sexually explicit content</Text>
                                     </li>
                                     <li>
-                                        <Text>Any suggestive content depicting underage characters or people, whether fictional or not.</Text>
+                                        <Text>
+                                            Any suggestive content depicting underage characters or people, whether fictional or not.
+                                        </Text>
                                     </li>
                                     <li>
                                         <Text>Non-consensual content</Text>
@@ -190,7 +200,9 @@ export default function TermsPage() {
                                 <Heading size="xl" className="mb-4 font-medium text-white!">
                                     Afterdark Account Guidelines
                                 </Heading>
-                                <Text className="mb-2 text-white!">Afterdark accounts allow mature content with the following requirements:</Text>
+                                <Text className="mb-2 text-white!">
+                                    Afterdark accounts allow mature content with the following requirements:
+                                </Text>
 
                                 <div className="space-y-4">
                                     <div>
@@ -219,7 +231,10 @@ export default function TermsPage() {
                                                 <Text>Adult content must be properly tagged</Text>
                                             </li>
                                             <li>
-                                                <Text>Content must be only be illustrated works. Real-life sexually explicit content is not allowed.</Text>
+                                                <Text>
+                                                    Content must be only be illustrated works. Real-life sexually explicit content is not
+                                                    allowed.
+                                                </Text>
                                             </li>
                                             <li>
                                                 <Text>Clear content warnings required</Text>
@@ -316,8 +331,8 @@ export default function TermsPage() {
                                     </li>
                                 </ul>
                                 <Text className="mt-4">
-                                    Wildbase Security T2 an in-house security standard that ensures the confidentiality, integrity, and availability of our systems and
-                                    data from transit to rest.
+                                    Wildbase Security T2 an in-house security standard that ensures the confidentiality, integrity, and
+                                    availability of our systems and data from transit to rest.
                                 </Text>
                             </div>
 
@@ -344,9 +359,10 @@ export default function TermsPage() {
                     <div>
                         <Heading className="mb-4">2.2 Data Collection</Heading>
                         <Text className="mb-4">
-                            We collect the following data to provide and improve Packbase. By using Packbase, you agree to the collection and use of information in
-                            accordance with this policy. 2 types of data pools exist; A WildID ("✱ID") and a Packbase Account ("Account", "Profile"). When you create a
-                            Packbase Account, you are also creating a ✱ID. Sensitive data is only stored in ✱ID.
+                            We collect the following data to provide and improve Packbase. By using Packbase, you agree to the collection
+                            and use of information in accordance with this policy. 2 types of data pools exist; A WildID ("✱ID") and a
+                            Packbase Account ("Account", "Profile"). When you create a Packbase Account, you are also creating a ✱ID.
+                            Sensitive data is only stored in ✱ID.
                         </Text>
                         <div className="overflow-x-auto rounded border">
                             <table className="min-w-full">
@@ -364,8 +380,11 @@ export default function TermsPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {dataCollection.map((data) => (
-                                        <tr key={data.type} className="odd:bg-white/50 even:bg-white dark:odd:bg-transparent dark:even:bg-n-7">
+                                    {dataCollection.map(data => (
+                                        <tr
+                                            key={data.type}
+                                            className="odd:bg-white/50 even:bg-white dark:odd:bg-transparent dark:even:bg-n-7"
+                                        >
                                             <td className="p-4">
                                                 <Text>{data.type}</Text>
                                             </td>
@@ -405,7 +424,9 @@ export default function TermsPage() {
                                 <Text>Right to object to processing</Text>
                             </li>
                         </ul>
-                        <Text className="mt-4">To exercise these rights, go to your profile settings then "Data Access", or email support@packbase.app.</Text>
+                        <Text className="mt-4">
+                            To exercise these rights, go to your profile settings then "Data Access", or email support@packbase.app.
+                        </Text>
                     </div>
 
                     <div>
@@ -415,7 +436,10 @@ export default function TermsPage() {
                                 <Text>We do not knowingly collect personal information from children under 13</Text>
                             </li>
                             <li>
-                                <Text>If we learn we have collected personal information from a child under 13, we will delete that information</Text>
+                                <Text>
+                                    If we learn we have collected personal information from a child under 13, we will delete that
+                                    information
+                                </Text>
                             </li>
                             <li>
                                 <Text>Parents can review, delete, or refuse further collection of their child's information</Text>
@@ -425,7 +449,9 @@ export default function TermsPage() {
 
                     <div>
                         <Heading className="mb-4 text-2xl font-semibold">2.4 Data Security</Heading>
-                        <Text className="mb-4">We implement appropriate technical and organizational measures to protect your data, including:</Text>
+                        <Text className="mb-4">
+                            We implement appropriate technical and organizational measures to protect your data, including:
+                        </Text>
                         <ul className="text-default list-disc space-y-2 pl-6">
                             <li>
                                 <Text>Encryption of data in transit and at rest</Text>
@@ -483,7 +509,10 @@ export default function TermsPage() {
 
                     <div>
                         <Heading className="mb-4 text-2xl font-semibold">2.7 Contact Information</Heading>
-                        <Text className="mb-4">For any questions about these terms or our privacy practices, email support@packbase.app OR contact us on our official <Link href="https://discord.gg/StuuK55gYA">Discord support channel</Link>.</Text>
+                        <Text className="mb-4">
+                            For any questions about these terms or our privacy practices, email support@packbase.app OR contact us on our
+                            official <Link href="https://discord.gg/wildbase">Discord support channel</Link>.
+                        </Text>
                     </div>
                 </div>
             </section>
@@ -493,7 +522,8 @@ export default function TermsPage() {
                     3. Governing Law
                 </Heading>
                 <Text>
-                    These terms shall be governed by and construed in accordance with the laws of Victoria, Australia, without regard to its conflict of law provisions.
+                    These terms shall be governed by and construed in accordance with the laws of Victoria, Australia, without regard to its
+                    conflict of law provisions.
                 </Text>
             </section>
         </Body>
