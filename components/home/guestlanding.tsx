@@ -510,8 +510,7 @@ function FeaturePromiseGrid() {
         {
             icon: 'ShieldCheckIcon',
             title: 'Privacy Focused',
-            description:
-                "No tracking, no ads, no selling your data. We promise to keep your information secure - we're using it too, y'know!",
+            description: "No ads, no selling your data. We promise to keep your information secure - we're using it too, y'know!",
         },
         {
             icon: 'CubeTransparentIcon',
