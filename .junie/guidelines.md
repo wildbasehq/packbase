@@ -1,6 +1,7 @@
 # Packbase Development Guidelines
 
-This document provides essential information for developers working on the Packbase project. It includes build/configuration instructions, testing information, and additional development details specific to this project.
+This document provides essential information for developers working on the Packbase project. It includes
+build/configuration instructions, testing information, and additional development details specific to this project.
 
 ## Build/Configuration Instructions
 
@@ -119,23 +120,23 @@ Here's a simple example of a utility function test:
 
 ```typescript
 // tests/utils.test.ts
-import { describe, expect, test } from 'bun:test';
+import {describe, expect, test} from 'bun:test';
 
 // Function to test
 function capitalizeString(str: string): string {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
 describe('capitalizeString', () => {
-  test('capitalizes first letter and lowercases the rest', () => {
-    expect(capitalizeString('hello')).toBe('Hello');
-    expect(capitalizeString('WORLD')).toBe('World');
-  });
+    test('capitalizes first letter and lowercases the rest', () => {
+        expect(capitalizeString('hello')).toBe('Hello');
+        expect(capitalizeString('WORLD')).toBe('World');
+    });
 
-  test('handles empty strings', () => {
-    expect(capitalizeString('')).toBe('');
-  });
+    test('handles empty strings', () => {
+        expect(capitalizeString('')).toBe('');
+    });
 });
 ```
 
@@ -163,7 +164,7 @@ This project uses Zustand for state management. Store definitions can be found i
 ### Styling
 
 - Tailwind CSS is used for styling
-- Custom Tailwind configuration is in `tailwind.config.js`
+- Global styles including Tailwind theming are in `src/styles/global.css`
 - Additional Tailwind plugins are used for animations and typography
 
 ### Code Style and Formatting
@@ -183,7 +184,8 @@ This project uses Zustand for state management. Store definitions can be found i
 
 ### Worker System
 
-The project includes a worker system for background processing. See the `lib/workers` directory and the `tests/workers.test.ts` file for examples of how to use it.
+The project includes a worker system for background processing. See the `lib/workers` directory and the
+`tests/workers.test.ts` file for examples of how to use it.
 
 ### Debugging
 
