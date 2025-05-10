@@ -321,10 +321,10 @@ function LandingContent() {
 
             <div className="relative z-10 flex items-center justify-center bg-white rounded dark:bg-zinc-900 ring-2 ring-default h-96">
                 <Text size="3xl" className="max-w-2xl mx-auto tracking-tight text-center font-instrument-serif-regular">
-                    A new social platform for furries
+                    What if there was a place
                     <br />
                     built for <span className="text-indigo-400 font-instrument-serif-italic">creativity</span> and{' '}
-                    <span className="text-indigo-400 font-instrument-serif-italic">connection</span>.
+                    <span className="text-indigo-400 font-instrument-serif-italic">connection</span>?
                     <br />
                     The internet should be truly <span className="font-instrument-serif-italic">yours</span>,
                     <br />
@@ -432,7 +432,7 @@ function StopBeingPrey() {
                 platforms don't do any of this (
                 <Tooltip
                     delayDuration={0}
-                    content="Some furry sites force you pay a subscription - well, 'donate' - to use basic features."
+                    content="Some furry sites force you pay a subscription to use some basic features, like uploading basic 4K images, or even just using a banner."
                 >
                     <span>
                         <sub>... to an extent</sub> <sup>?</sup>
@@ -441,7 +441,10 @@ function StopBeingPrey() {
                 ) and work for creators, there's a better way &mdash; a way that benefits everyone, even if they're not creators.
                 Dating-esque apps like Barq <b>don't work</b> for community communication, and puts members actively at risk.
             </Text>
-            <Text>Packbase puts communities first. Completely free, full HTML/CSS customisation, and no ads.</Text>
+            <Text>
+                Packbase puts communities first. Completely free, full HTML/CSS customisation, and no ads. We'll hold this promise until the
+                Year 3,000.
+            </Text>
             <ul className="space-y-1 list-none">
                 <li>
                     <Text alt size="xs" className="text-neutral-500">
@@ -518,12 +521,15 @@ function FeaturePromiseGrid() {
         {
             icon: 'BoltIcon',
             title: 'Lightning Fast',
-            description: "We're partnered with multiple storage and caching providers which helps with loading and upload times.",
+            description: "We're partnered with multiple storage and caching providers which directly benefit you.",
+            accordion:
+                'Packbase is built using highly optimised and extremely f###ing fast tech, including some that are experimental not yet publicly available and have been given to us by partners under an agreement.',
         },
         {
             icon: 'GlobeAltIcon',
             title: 'Open Platform',
-            description: 'An inclusive space that works for everyone, not just content creators.',
+            description:
+                "By the end of the private alpha, we'll be making 100% of our spending and income public and chunks of our code open-source.",
         },
         {
             icon: 'HeartIcon',
@@ -549,7 +555,6 @@ function FeaturePromiseGrid() {
 
     return (
         <Container className="py-16">
-            <Heading className="mb-12 !text-5xl text-center font-instrument-serif-regular">Our Promises to You</Heading>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 {features.map((feature, index) => {
                     const IconComponent = getIcon(feature.icon)
