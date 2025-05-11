@@ -53,7 +53,7 @@ export default function PackSwitcher() {
     }
 
     return (
-        <div className="min-w-16 relative flex h-full flex-col items-center border-r gap-3 py-2">
+        <div className="min-w-16 relative flex h-full flex-col items-center border-r gap-2 py-2">
             <Tooltip content="Home" side="right">
                 <div
                     className={cn(
