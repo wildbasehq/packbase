@@ -18,7 +18,6 @@ import HowlCreator from '@/components/shared/user/howl-creator'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
 import InboxPage from '@/pages/inbox/page.tsx'
 import { Badge } from '@/components/shared/badge.tsx'
-import Tooltip from '@/components/shared/tooltip.tsx'
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '../shared/dropdown'
 import { Avatar } from '../shared/avatar'
 import UserDropdown from './user-dropdown'
@@ -77,20 +76,26 @@ export function PackChannels() {
                         <SidebarSection>
                             <SidebarItem href={!currentResource.slug ? '/p/universe' : `/p/${currentResource.slug}`}>
                                 <HomeIcon />
-                                <SidebarLabel>Home</SidebarLabel>
+                                <div className="flex flex-col min-w-0">
+                                    <SidebarLabel>Home</SidebarLabel>
+                                    {/*<span className="text-xs/5 text-alt truncate">Testing a ticker</span>*/}
+                                </div>
                             </SidebarItem>
                             {navigation?.map(item => (
-                                <Tooltip key={item.href} content={item.description ?? item.name} delayDuration={0}>
-                                    <SidebarItem key={item.href} href={item.href} current={item.current}>
-                                        {typeof item.icon === 'string' ? <DynamicIcon name={item.icon} /> : <item.icon />}
+                                <SidebarItem key={item.href} href={item.href} current={item.current}>
+                                    {typeof item.icon === 'string' ? <DynamicIcon name={item.icon} /> : <item.icon />}
+                                    <div className="flex flex-col min-w-0">
                                         <SidebarLabel>{item.name}</SidebarLabel>
-                                        {item.badge && (
-                                            <Badge color="indigo" className="ml-auto">
-                                                {item.badge}
-                                            </Badge>
-                                        )}
-                                    </SidebarItem>
-                                </Tooltip>
+                                        {/* Subtext if item has ticker. */}
+                                        {item.ticker && <span className="text-xs/5 text-alt truncate">{item.ticker}</span>}
+                                    </div>
+                                    {/* Badge if item has badge. */}
+                                    {item.badge && (
+                                        <Badge color="indigo" className="ml-auto">
+                                            {item.badge}
+                                        </Badge>
+                                    )}
+                                </SidebarItem>
                             ))}
                         </SidebarSection>
                         <SidebarSpacer />

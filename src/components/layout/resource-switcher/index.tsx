@@ -64,7 +64,7 @@ export default function ResourceSwitcher() {
                     ref={ref}
                     className={`group flex select-none flex-row items-center justify-between ${loading ? 'cursor-no-drop!' : ''}`}
                     aria-label="Switch resource"
-                    title={loading ? 'Resource is still switching...' : 'Switch resource'}
+                    title={loading ? 'Resource is still switching...' : 'Open pack options'}
                     onAnimationEnd={() => {
                         ref.current?.classList.remove('[&>*>*]:animate-shake')
                     }}
