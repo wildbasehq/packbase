@@ -83,15 +83,17 @@ export function PackChannels() {
                             </SidebarItem>
                             {navigation?.map(item => (
                                 <SidebarItem key={item.href} href={item.href} current={item.current}>
-                                    {typeof item.icon === 'string' ? <DynamicIcon name={item.icon} /> : <item.icon />}
-                                    <div className="flex flex-col min-w-0">
+                                    <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+                                        {typeof item.icon === 'string' ? <DynamicIcon name={item.icon} /> : <item.icon />}
+                                    </div>
+                                    <div className="flex flex-col min-w-0 flex-1">
                                         <SidebarLabel>{item.name}</SidebarLabel>
                                         {/* Subtext if item has ticker. */}
-                                        {item.ticker && <span className="text-xs/5 text-alt truncate">{item.ticker}</span>}
+                                        {item.ticker && <span className="text-xs/5 text-alt truncate max-w-[200px]">{item.ticker}</span>}
                                     </div>
                                     {/* Badge if item has badge. */}
                                     {item.badge && (
-                                        <Badge color="indigo" className="ml-auto">
+                                        <Badge color="indigo" className="ml-auto flex-shrink-0">
                                             {item.badge}
                                         </Badge>
                                     )}
