@@ -1,0 +1,85 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    /* Primary colors */
+    --color-primary-ice-white: rgb(245 246 252);
+    --color-primary-cosmos: oklch(40% 0.275 282);
+    --color-primary-midnight: rgb(20 20 26);
+    --color-primary-lime: rgb(206 255 28);
+
+    /* Accent colors */
+    --color-accent-1: rgb(216 76 16);
+    --color-accent-5: rgb(221 167 63);
+
+    /* Neutral colors */
+    --color-n-1: rgb(237 239 247);
+    --color-n-2: rgb(211 214 224);
+    --color-n-3: rgb(188 191 204);
+    --color-n-4: rgb(164 169 187);
+    --color-n-5: rgb(110 113 128);
+    --color-n-6: rgb(64 66 77);
+    --color-n-7: rgb(38 38 40);
+    --color-n-8: rgb(30 30 32);
+    --color-n-9: var(--color-primary-midnight);
+
+    /* Semantic colors */
+    --color-destructive: rgb(233 38 58);
+    --color-destructive-foreground: hsl(0 0% 98%);
+
+    /* Base colors */
+    --color-background: hsl(0 0% 100%);
+    --color-foreground: hsl(240 10% 3.9%);
+
+    /* Component colors */
+    --color-card: hsl(0 0% 100%);
+    --color-card-foreground: hsl(240 10% 3.9%);
+
+    --color-popover: hsl(0 0% 100%);
+    --color-popover-foreground: hsl(240 10% 3.9%);
+
+    --color-muted: hsl(240 4.8% 95.9%);
+    --color-muted-foreground: hsl(240 3.8% 46.1%);
+
+    --color-accent: hsl(240 4.8% 95.9%);
+    --color-accent-foreground: hsl(240 5.9% 10%);
+
+    /* UI colors */
+    --color-border: hsl(240 5.9% 90%);
+    --color-divider: hsl(240 5.9% 90%);
+    --color-border-dark: hsl(240 3.7% 15.9%);
+    --color-input: hsl(240 5.9% 90%);
+    --color-ring: hsl(240 10% 3.9%);
+
+    /* Derived colors */
+    --color-primary: var(--color-primary-cosmos);
+    --color-primary-foreground: hsl(0 0% 98%);
+    --color-primary-light: oklch(0.585 0.233 277.117);
+    --color-secondary: var(--color-primary-lime);
+    --color-secondary-foreground: hsl(240 5.9% 10%);
+    --color-tertiary: var(--color-destructive);
+}
+
+@layer theme {
+    .dark {
+        --color-primary-text-cosmos: rgb(190 155 255);
+
+        --color-background: hsl(240 10% 3.9%);
+        --color-foreground: hsl(0 0% 98%);
+
+        --color-card: hsl(240 10% 3.9%);
+        --color-card-foreground: hsl(0 0% 98%);
+
+        --color-popover: hsl(240 10% 3.9%);
+        --color-popover-foreground: hsl(0 0% 98%);
+
+        --color-muted: hsl(240 3.7% 15.9%);
+        --color-muted-foreground: hsl(240 5% 64.9%);
+
+        --color-accent: hsl(240 3.7% 15.9%);
+        --color-accent-foreground: hsl(0 0% 98%);
+
+        --color-border: hsl(240 3.7% 15.9%);
+        --color-input: hsl(240 3.7% 15.9%);
+        --color-ring: hsl(240 4.9% 83.9%);
+    }
+}

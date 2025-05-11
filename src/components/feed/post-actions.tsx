@@ -109,7 +109,7 @@ export default function PostActions({ post, onComment }: PostActionsProps) {
                 {isSubmittingReaction ? (
                     <LoadingSpinner size="small" />
                 ) : hasReacted ? (
-                    <HandThumbUpIcon className="h-4 w-4 text-primary" />
+                    <HandThumbUpIcon className="h-4 w-4 !text-primary-light" />
                 ) : (
                     <OutlineHandThumbUpIcon className="h-4 w-4" />
                 )}

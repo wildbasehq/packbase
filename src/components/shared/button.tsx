@@ -1,15 +1,16 @@
 import * as React from 'react'
-import {Slot} from '@radix-ui/react-slot'
-import {cva, type VariantProps} from 'class-variance-authority'
+import { Slot } from '@radix-ui/react-slot'
+import { cva, type VariantProps } from 'class-variance-authority'
 
-import {cn} from '@/lib/utils/cn'
+import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
     'inline-flex items-center justify-center whitespace-nowrap select-none rounded text-sm font-medium ring-offset-background transition-all focus-visible:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hover:ring-4 hover:ring-n-5/10 disabled:cursor-not-allowed disabled:opacity-50',
     {
         variants: {
             variant: {
-                default: 'bg-card text-default ring-default border no-underline! transition-all hover:bg-n-2/25 hover:ring-4 dark:hover:bg-n-6/50',
+                default:
+                    'bg-card text-default ring-default border no-underline! transition-all hover:bg-n-2/25 hover:ring-4 dark:hover:bg-n-6/50',
                 primary: 'bg-primary text-white hover:bg-primary/90',
                 destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/75 hover:ring-destructive/25',
                 outline: 'ring-default text-default border no-underline! transition-all hover:bg-n-2/25 hover:ring-4 dark:hover:bg-n-6/50',
@@ -30,7 +31,7 @@ const buttonVariants = cva(
             variant: 'default',
             size: 'default',
         },
-    },
+    }
 )
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
@@ -44,15 +45,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ className, va
 Button.displayName = 'Button'
 
 function TouchTarget({ children }: { children: React.ReactNode }) {
-     return (
-         <>
-      <span
-          className="absolute top-1/2 left-1/2 size-[max(100%,2.75rem)] -translate-x-1/2 -translate-y-1/2 [@media(pointer:fine)]:hidden"
-          aria-hidden="true"
-      />
-             {children}
-         </>
-     )
+    return (
+        <>
+            <span
+                className="absolute top-1/2 left-1/2 size-[max(100%,2.75rem)] -translate-x-1/2 -translate-y-1/2 [@media(pointer:fine)]:hidden"
+                aria-hidden="true"
+            />
+            {children}
+        </>
+    )
 }
 
 export { Button, buttonVariants, TouchTarget }

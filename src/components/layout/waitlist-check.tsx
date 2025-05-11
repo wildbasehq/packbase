@@ -1,11 +1,11 @@
 import './waitlist-check.component.scss'
-import {useUserAccountStore} from '@/lib/state'
-import {useEffect, useState} from 'react'
-import {HandHeartIcon, LucideIcon, MailQuestionIcon, MailWarningIcon} from 'lucide-react'
-import {LoadingCircle} from '@/components/icons'
-import {cn} from '@/lib/utils'
+import { useUserAccountStore } from '@/lib/state'
+import { useEffect, useState } from 'react'
+import { HandHeartIcon, LucideIcon, MailQuestionIcon, MailWarningIcon } from 'lucide-react'
+import { LoadingCircle } from '@/components/icons'
+import { cn } from '@/lib/utils'
 import Dog from '@/src/images/svg/illustrate/dog.svg'
-import {useLocation} from 'wouter'
+import { useLocation } from 'wouter'
 
 const ServiceStates: {
     [x: string]: {
@@ -31,7 +31,7 @@ const ServiceStates: {
         icon: MailQuestionIcon,
         color: 'text-orange-500',
         status: 'Waiting',
-        text: 'You\'re on the waitlist. You\'ll need an invite code from someone, or wait for us to open.',
+        text: "You're on the waitlist. You'll need an invite code from someone, or wait for us to open.",
     },
     dummy: {
         icon: LoadingCircle,
@@ -42,7 +42,7 @@ const ServiceStates: {
 
 export default function WaitlistCheck() {
     const [location] = useLocation()
-    const {user} = useUserAccountStore()
+    const { user } = useUserAccountStore()
     const [serviceStatus, setServiceStatus] = useState<'dummy' | 'free' | 'ban' | 'wait'>('dummy')
 
     useEffect(() => {
@@ -59,7 +59,7 @@ export default function WaitlistCheck() {
         >
             <div>
                 <div className="flex items-center gap-x-3">
-                    <CurrentServiceIcon className={cn('h-7 w-7 flex-none rounded-md p-1', ServiceStates[serviceStatus].color || '')}/>
+                    <CurrentServiceIcon className={cn('h-7 w-7 flex-none rounded-md p-1', ServiceStates[serviceStatus].color || '')} />
                     <h1 className="flex gap-x-3 text-base leading-7">
                         <span className="text-default font-semibold">Status</span>
                         <span className="text-alt">:</span>
@@ -69,9 +69,9 @@ export default function WaitlistCheck() {
                 <p className="text-alt mt-2 text-xs leading-6">{ServiceStates[serviceStatus].text}</p>
             </div>
 
-            {(location !== '/' && location !== '/p/universe') && (
+            {location !== '/' && location !== '/p/universe' && (
                 <div className="elastic-bounce pointer-events-none h-12 w-24 flex-none sm:w-32">
-                    <img src={Dog} alt="Dog"/>
+                    <img src={Dog} alt="Dog" />
                 </div>
             )}
         </div>

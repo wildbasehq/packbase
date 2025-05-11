@@ -3,6 +3,7 @@ export * from './active-link'
 export * from './alert'
 export * from './avatar'
 export * from './badge'
+export * from './responsive'
 // export * from './button';
 export * from './card'
 export * from './checkbox'
@@ -45,8 +46,8 @@ export * from './tooltip'
 
 // Re-export components from subdirectories
 // Feed
-export { default as PostFullSlideover } from './feed/post-full-slideover'
-export { default as Post } from './feed/post'
+export * from './feed/post-full-slideover'
+export * from './feed/post'
 
 // Input
 export * from './input/select-dropdown'
