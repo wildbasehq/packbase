@@ -106,12 +106,15 @@ export default function PackSwitcher() {
                     delayDuration={0}
                 >
                     <div
-                        className={cn('hover:show-pill flex h-10 w-10 items-center', currentResource.id === item.id && 'force-pill')}
+                        className={cn(
+                            'hover:show-pill flex h-12 w-12 justify-center items-center',
+                            currentResource.id === item.id && 'force-pill'
+                        )}
                         onClick={() => switchResource(item)}
                     >
                         <UserAvatar
                             name={item.display_name}
-                            size={32}
+                            size={40}
                             icon={item.images?.avatar}
                             className="inline-flex cursor-pointer overflow-hidden"
                         />
