@@ -116,7 +116,7 @@ export default function PackSwitcher() {
                             name={item.display_name}
                             size={40}
                             icon={item.images?.avatar}
-                            className="inline-flex cursor-pointer overflow-hidden"
+                            className="inline-flex cursor-pointer overflow-hidden !rounded-xl"
                         />
                     </div>
                 </Tooltip>
