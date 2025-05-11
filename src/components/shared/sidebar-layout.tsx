@@ -74,6 +74,7 @@ export function SidebarLayout({
 
             {/* Content */}
             <div className="flex flex-col flex-1">
+                {!user && <div className="hidden lg:block">{navbar}</div>}
                 <main className={`pb-2 lg:min-w-0 lg:pt-2 lg:pr-2 ${!hidden && user ? 'lg:pl-96' : 'lg:pl-2'}`}>
                     <div className="h-[calc(100vh-1rem)] overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
                         <div className="mx-auto overflow-hidden h-full">{children}</div>
