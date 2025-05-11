@@ -7,6 +7,14 @@
     <meta content="Packbase" name="description"/>
     <meta content="%CF_PAGES_COMMIT_SHA%" name="commit-sha"/>
 
+    <script>
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
     <style>
         @font-face {
             font-family: "Lexend";
