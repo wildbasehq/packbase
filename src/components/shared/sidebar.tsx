@@ -88,9 +88,9 @@ export const SidebarItem = forwardRef(function SidebarItem(
         // Active
         'data-active:bg-n-2/25 data-active:*:data-[slot=icon]:fill-n-9',
         // Current - added shadow-inner for subtle inner shadow when current
-        'data-current:shadow-inner data-current:*:data-[slot=icon]:fill-n-9',
+        'data-current:shadow-inner data-current:*:data-[slot=icon]:fill-n-9 dark:shadow-n-9 data-current:dark:bg-n-8',
         // Same with hover
-        'data-hover:shadow-inner',
+        'data-hover:shadow-inner dark:shadow-n-9',
         // Dark mode
         'dark:text-white dark:*:data-[slot=icon]:fill-n-4',
         'dark:data-hover:bg-n-6/50 dark:data-hover:*:data-[slot=icon]:fill-white',
