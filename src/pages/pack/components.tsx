@@ -1,6 +1,6 @@
 // src/components/pages/pack-feed-controller.tsx
 import {useEffect, useState} from 'react'
-import {useResourceStore, useUserAccountStore} from '@/lib/states'
+import {useResourceStore, useUserAccountStore} from '@/lib/state'
 import Lottie from 'lottie-react'
 
 import Body from '@/components/layout/body'

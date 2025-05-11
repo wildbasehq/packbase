@@ -6,11 +6,11 @@ import * as path from 'node:path'
 export default defineConfig({
     resolve: {
         alias: {
-            '@/components': path.resolve(__dirname, './components'),
-            '@/pages': path.resolve(__dirname, './pages'),
+            '@/components': path.resolve(__dirname, './src/components'),
+            '@/pages': path.resolve(__dirname, './src/pages'),
             '@/src': path.resolve(__dirname, './src'),
-            '@/lib': path.resolve(__dirname, './lib'),
-            '@/styles': path.resolve(__dirname, './styles'),
+            '@/lib': path.resolve(__dirname, './src/lib'),
+            '@/styles': path.resolve(__dirname, './src/styles'),
             '@/public': path.resolve(__dirname, './public'),
             '@/datasets': path.resolve(__dirname, './datasets'),
         },
@@ -35,8 +35,8 @@ export default defineConfig({
                     }
 
                     // Components
-                    if (id.includes('/components/')) {
-                        const componentPath = id.split('/components/')[1]
+                    if (id.includes('/src/components/')) {
+                        const componentPath = id.split('/src/components/')[1]
                         const mainDir = componentPath.split('/')[0]
                         return `component-${mainDir}`
                     }

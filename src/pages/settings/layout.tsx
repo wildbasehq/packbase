@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useUserAccountStore } from '@/lib/states'
+import { useUserAccountStore } from '@/lib/index'
 import { usePostHog } from 'posthog-js/react'
 import { EnvelopeIcon, EnvelopeOpenIcon, IdentificationIcon, SwatchIcon, TrophyIcon } from '@heroicons/react/16/solid'
 

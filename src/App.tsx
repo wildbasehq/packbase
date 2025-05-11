@@ -9,24 +9,24 @@ import { Redirect, Route, Switch } from 'wouter'
 import Console from '@/components/shared/console.tsx'
 
 // Lazy load all pages
-const IDLayout = lazy(() => import('@/src/pages/id/layout.tsx'))
-const IDLogin = lazy(() => import('@/src/pages/id/login/page.tsx'))
-const IDCreate = lazy(() => import('@/src/pages/id/create/page.tsx'))
-const PackLayout = lazy(() => import('@/src/pages/pack/[slug]/layout.tsx'))
-const PackHome = lazy(() => import('@/src/pages/pack/[slug]/page.tsx'))
-const PackCosmos = lazy(() => import('@/src/pages/pack/[slug]/cosmos/page.tsx'))
+const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
+const IDLogin = lazy(() => import('@/pages/id/login/page.tsx'))
+const IDCreate = lazy(() => import('@/pages/id/create/page.tsx'))
+const PackLayout = lazy(() => import('@/pages/pack/[slug]/layout.tsx'))
+const PackHome = lazy(() => import('@/pages/pack/[slug]/page.tsx'))
+const PackCosmos = lazy(() => import('@/pages/pack/[slug]/cosmos/page.tsx'))
 const NotFound = lazy(() => import('@/src/not-found.tsx'))
-const PackAdd = lazy(() => import('@/src/pages/pack/new/page.tsx'))
-const SettingsLayout = lazy(() => import('@/src/pages/settings/layout.tsx'))
-const SettingsGeneral = lazy(() => import('@/src/pages/settings/page.tsx'))
-const SettingsInvite = lazy(() => import('@/src/pages/settings/invite/page.tsx'))
-const TermsPage = lazy(() => import('@/src/pages/terms/page.tsx'))
-const ThankYouFriends = lazy(() => import('@/src/pages/thanks/page.tsx'))
-const UserProfile = lazy(() => import('@/src/pages/user/[...slug]/page.tsx'))
-const SettingsTemplate = lazy(() => import('@/src/pages/settings/template/page.tsx'))
+const PackAdd = lazy(() => import('@/pages/pack/new/page.tsx'))
+const SettingsLayout = lazy(() => import('@/pages/settings/layout.tsx'))
+const SettingsGeneral = lazy(() => import('@/pages/settings/page.tsx'))
+const SettingsInvite = lazy(() => import('@/pages/settings/invite/page.tsx'))
+const TermsPage = lazy(() => import('@/pages/terms/page.tsx'))
+const ThankYouFriends = lazy(() => import('@/pages/thanks/page.tsx'))
+const UserProfile = lazy(() => import('@/pages/user/[...slug]/page.tsx'))
+const SettingsTemplate = lazy(() => import('@/pages/settings/template/page.tsx'))
 
 // Playground
-const Playground = lazy(() => import('@/src/pages/playground/page.tsx'))
+const Playground = lazy(() => import('@/pages/playground/page.tsx'))
 
 // Lazy load components
 const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
