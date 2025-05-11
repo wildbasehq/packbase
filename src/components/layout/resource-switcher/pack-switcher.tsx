@@ -53,7 +53,7 @@ export default function PackSwitcher() {
     }
 
     return (
-        <div className="min-w-16 relative flex h-full flex-col items-center border-r gap-2 py-2">
+        <div className="min-w-16 relative flex h-full flex-col items-center border-r py-2">
             <Tooltip content="Home" side="right">
                 <div
                     className={cn(
@@ -68,7 +68,7 @@ export default function PackSwitcher() {
                 </div>
             </Tooltip>
 
-            <div className="h-[0.1rem] w-full bg-n-5/20"></div>
+            <div className="h-[0.1rem] w-full bg-n-5/20 my-2"></div>
 
             {resources.map(item => (
                 <Tooltip
