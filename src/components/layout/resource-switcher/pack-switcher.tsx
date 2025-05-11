@@ -64,7 +64,7 @@ export default function PackSwitcher() {
                     )}
                     onClick={() => switchResource(resourceDefault)}
                 >
-                    <Logo noColorTheme className="!w-10 !h-10" />
+                    <Logo noColorTheme className="!w-9.5 !h-9.5" />
                 </div>
             </Tooltip>
 
@@ -114,7 +114,7 @@ export default function PackSwitcher() {
                     >
                         <UserAvatar
                             name={item.display_name}
-                            size={40}
+                            size={38}
                             icon={item.images?.avatar}
                             className="inline-flex cursor-pointer overflow-hidden !rounded-xl"
                         />
