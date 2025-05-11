@@ -25,7 +25,7 @@ export const VerifiedBadge: React.FC<VerifiedBadgeProps> = ({
                 <Tooltip.Portal>
                     <Tooltip.Content asChild sideOffset={5}>
                         <motion.div
-                            className="ml-18 rounded-md bg-n-8 max-w-76 px-3 py-2 text-xs select-none text-white shadow-md dark:bg-n-6 relative"
+                            className="ml-18 rounded-md bg-n-8 max-w-76 px-3 py-2 text-xs select-none text-white shadow-md dark:bg-n-7 relative"
                             initial={{ opacity: 0, y: -5, rotateX: -20 }}
                             animate={{ opacity: 1, y: 0, rotateX: 0 }}
                             exit={{ opacity: 0, y: -5, rotateX: -20 }}
@@ -39,7 +39,7 @@ export const VerifiedBadge: React.FC<VerifiedBadgeProps> = ({
                             }}
                         >
                             {tooltipText}
-                            <Tooltip.Arrow className="ml-18 fill-n-8 dark:fill-n-6" />
+                            <Tooltip.Arrow className="ml-18 fill-n-8 dark:fill-n-7" />
                         </motion.div>
                     </Tooltip.Content>
                 </Tooltip.Portal>
