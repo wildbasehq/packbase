@@ -8,7 +8,7 @@ import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import { cn } from '@/lib/utils'
 import { UsersIcon } from '@heroicons/react/20/solid'
 import { PlusIcon } from '@heroicons/react/24/solid'
-import { SettingsIcon, TentTreeIcon } from 'lucide-react'
+import { TentTreeIcon } from 'lucide-react'
 import useSound from 'use-sound'
 import './pack-switcher.component.css'
 import Link from '@/components/shared/link.tsx'
@@ -53,22 +53,22 @@ export default function PackSwitcher() {
     }
 
     return (
-        <div className="min-w-18 relative flex h-full flex-col items-center border-r gap-4 p-4">
+        <div className="min-w-16 relative flex h-full flex-col items-center border-r gap-3 py-2">
             <Tooltip content="Home" side="right">
                 <div
                     className={cn(
-                        'hover:show-pill flex h-8 w-8 cursor-pointer items-center [&>div]:bg-n-1',
+                        'hover:show-pill flex h-12 w-12 justify-center cursor-pointer items-center [&>div]:bg-n-1',
                         currentResource.id === resourceDefault.id
                             ? 'force-pill [&>div>*]:invert [&>div]:bg-primary'
                             : 'dark:[&>div>*]:invert dark:[&>div]:bg-n-7'
                     )}
                     onClick={() => switchResource(resourceDefault)}
                 >
-                    <Logo noColorTheme />
+                    <Logo noColorTheme className="!w-10 !h-10" />
                 </div>
             </Tooltip>
 
-            <div className="h-0.5 w-full bg-n-5/20"></div>
+            <div className="h-[0.1rem] w-full bg-n-5/20"></div>
 
             {resources.map(item => (
                 <Tooltip
@@ -106,7 +106,7 @@ export default function PackSwitcher() {
                     delayDuration={0}
                 >
                     <div
-                        className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === item.id && 'force-pill')}
+                        className={cn('hover:show-pill flex h-10 w-10 items-center', currentResource.id === item.id && 'force-pill')}
                         onClick={() => switchResource(item)}
                     >
                         <UserAvatar
@@ -133,17 +133,6 @@ export default function PackSwitcher() {
             )}
 
             <div className="grow" />
-
-            <Tooltip content="Settings" side="right" delayDuration={0}>
-                <Link
-                    href="/settings"
-                    className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === 'settings' && 'force-pill')}
-                >
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <SettingsIcon />
-                    </Button>
-                </Link>
-            </Tooltip>
         </div>
     )
 }

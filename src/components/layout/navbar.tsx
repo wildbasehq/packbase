@@ -1,4 +1,3 @@
-import { ThemeToggle } from '@/components/shared/theme-toggle'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { useUIStore, useUserAccountStore } from '@/lib/state'
 import { ScanFaceIcon } from 'lucide-react'
@@ -6,33 +5,28 @@ import React, { forwardRef, useId, useState } from 'react'
 import UserOnboardingModal from '../modal/user-onboarding-modal'
 import { Logo } from '@/components/shared/logo'
 import Link from '@/components/shared/link'
-import Tooltip from '@/components/shared/tooltip.tsx'
-import { Badge } from '@/components/shared/badge.tsx'
-import { WorkerStore } from '@/lib/workers'
-import { WorkerSpinner } from '@/lib/hooks/use-worker-status'
-import { truncate } from '@/lib/utils'
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
 import { LayoutGroup, motion } from 'framer-motion'
 import { TouchTarget } from '@/components/shared/button'
 
 // Navbar subcomponents
-export function NavbarDivider({className, ...props}: React.ComponentPropsWithoutRef<'div'>) {
-    return <div aria-hidden="true" {...props} className={clsx(className, 'h-6 w-px bg-zinc-950/10 dark:bg-white/10')}/>
+export function NavbarDivider({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+    return <div aria-hidden="true" {...props} className={clsx(className, 'h-6 w-px bg-zinc-950/10 dark:bg-white/10')} />
 }
 
-export function NavbarSection({className, ...props}: React.ComponentPropsWithoutRef<'div'>) {
+export function NavbarSection({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
     let id = useId()
 
     return (
         <LayoutGroup id={id}>
-            <div {...props} className={clsx(className, 'flex items-center gap-3')}/>
+            <div {...props} className={clsx(className, 'flex items-center gap-3')} />
         </LayoutGroup>
     )
 }
 
-export function NavbarSpacer({className, ...props}: React.ComponentPropsWithoutRef<'div'>) {
-    return <div aria-hidden="true" {...props} className={clsx(className, '-ml-4 flex-1')}/>
+export function NavbarSpacer({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+    return <div aria-hidden="true" {...props} className={clsx(className, '-ml-4 flex-1')} />
 }
 
 export const NavbarItem = forwardRef(function NavbarItem(
@@ -44,7 +38,7 @@ export const NavbarItem = forwardRef(function NavbarItem(
     }: { current?: boolean; className?: string; children: React.ReactNode } & (
         | Omit<Headless.ButtonProps, 'as' | 'className'>
         | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'>
-        ),
+    ),
     ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>
 ) {
     let classes = clsx(
@@ -68,12 +62,12 @@ export const NavbarItem = forwardRef(function NavbarItem(
 
     return (
         <span className={clsx(className, 'relative')}>
-      {current && (
-          <motion.span
-              layoutId="current-indicator"
-              className="absolute inset-x-2 -bottom-2.5 h-0.5 rounded-full bg-zinc-950 dark:bg-white"
-          />
-      )}
+            {current && (
+                <motion.span
+                    layoutId="current-indicator"
+                    className="absolute inset-x-2 -bottom-2.5 h-0.5 rounded-full bg-zinc-950 dark:bg-white"
+                />
+            )}
             {'href' in props ? (
                 <Link
                     {...props}
@@ -94,23 +88,22 @@ export const NavbarItem = forwardRef(function NavbarItem(
                     <TouchTarget>{children}</TouchTarget>
                 </Headless.Button>
             )}
-    </span>
+        </span>
     )
 })
 
-export function NavbarLabel({className, ...props}: React.ComponentPropsWithoutRef<'span'>) {
-    return <span {...props} className={clsx(className, 'truncate')}/>
+export function NavbarLabel({ className, ...props }: React.ComponentPropsWithoutRef<'span'>) {
+    return <span {...props} className={clsx(className, 'truncate')} />
 }
 
-export function Navbar({className, ...props}: React.ComponentPropsWithoutRef<'nav'>) {
-    return <nav {...props} className={clsx(className, 'flex flex-1 items-center gap-4 py-2.5')}/>
+export function Navbar({ className, ...props }: React.ComponentPropsWithoutRef<'nav'>) {
+    return <nav {...props} className={clsx(className, 'flex flex-1 items-center gap-4 py-2.5')} />
 }
 
 // Main Navbar component
 export default function NavBar() {
     const { user } = useUserAccountStore()
-    const { hidden, updateAvailable, maintenance } = useUIStore()
-    const { jobs } = WorkerStore()
+    const { hidden, maintenance } = useUIStore()
 
     const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(
         user && !user?.metadata?.dp_uod && !user.anonUser && !maintenance
@@ -139,23 +132,23 @@ export default function NavBar() {
                         <div className="relative"></div>
 
                         <div className="flex items-center gap-5">
-                            {jobs.size > 0 && <WorkerSpinner />}
-                            {updateAvailable && (
-                                <>
-                                    <Tooltip content={`Click to update: ${truncate(updateAvailable, 7)}`} delayDuration={0}>
-                                        <div className="flex cursor-pointer scale-80" onClick={() => window.location.reload()}>
-                                            <Badge color="amber" className="flex items-center justify-center">
-                                                <span className="text-xs">Update available</span>
-                                            </Badge>
-                                        </div>
-                                    </Tooltip>
+                            {/*{jobs.size > 0 && <WorkerSpinner />}*/}
+                            {/*{updateAvailable && (*/}
+                            {/*    <>*/}
+                            {/*        <Tooltip content={`Click to update: ${truncate(updateAvailable, 7)}`} delayDuration={0}>*/}
+                            {/*            <div className="flex cursor-pointer scale-80" onClick={() => window.location.reload()}>*/}
+                            {/*                <Badge color="amber" className="flex items-center justify-center">*/}
+                            {/*                    <span className="text-xs">Update available</span>*/}
+                            {/*                </Badge>*/}
+                            {/*            </div>*/}
+                            {/*        </Tooltip>*/}
 
-                                    <div className="hidden md:dark:bg-white/15 md:block md:h-5 md:w-px md:bg-n-8/10" />
-                                </>
-                            )}
-                            <div className="flex gap-4">
-                                <ThemeToggle />
-                            </div>
+                            {/*        <div className="hidden md:dark:bg-white/15 md:block md:h-5 md:w-px md:bg-n-8/10" />*/}
+                            {/*    </>*/}
+                            {/*)}*/}
+                            {/*<div className="flex gap-4">*/}
+                            {/*    <ThemeToggle />*/}
+                            {/*</div>*/}
 
                             <div className="hidden min-[416px]:contents">
                                 {!user && (

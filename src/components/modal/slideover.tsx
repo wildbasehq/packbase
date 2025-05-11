@@ -1,10 +1,10 @@
 import React from 'react'
-import {Dialog, DialogBackdrop, DialogPanel} from '@headlessui/react'
-import {XMarkIcon} from '@heroicons/react/24/outline'
+import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 
 export function Slideover({
-                              ...props
-                          }: {
+    ...props
+}: {
     open: [boolean, React.Dispatch<React.SetStateAction<boolean>>]
     expandNatural?: boolean // default: false, expands to largest size possible, up to 1/4 of screen
     className?: string
@@ -28,21 +28,19 @@ export function Slideover({
                             className="pointer-events-auto relative w-screen sm:max-w-md transform transition duration-200 ease-snapper data-closed:translate-x-full sm:duration-350"
                         >
                             <div className="flex h-full flex-col overflow-y-auto bg-neutral-100 dark:bg-n-7 shadow-xl">
-                                <div className="px-4 sm:px-6 bg-white dark:bg-n-8 h-18 border-b flex items-center justify-between">
+                                <div className="px-4 sm:px-6 bg-white dark:bg-n-8 h-16 border-b flex items-center justify-between">
                                     {props.navbar}
                                     <button
                                         type="button"
                                         onClick={() => setOpen(false)}
                                         className="relative bg-n-1 dark:bg-n-9 p-1.5 rounded-md ring-default focus:ring-2 focus:outline-hidden"
                                     >
-                                        <span className="absolute -inset-2.5"/>
+                                        <span className="absolute -inset-2.5" />
                                         <span className="sr-only">Close panel</span>
-                                        <XMarkIcon aria-hidden="true" className="size-4"/>
+                                        <XMarkIcon aria-hidden="true" className="size-4" />
                                     </button>
                                 </div>
-                                <div className="relative mt-6 py-6 flex-1 px-4 sm:px-6">
-                                    {props.children}
-                                </div>
+                                <div className="relative mt-6 py-6 flex-1 px-4 sm:px-6">{props.children}</div>
                             </div>
                         </DialogPanel>
                     </div>

@@ -44,11 +44,6 @@ export * from './textarea'
 export * from './theme-toggle'
 export * from './tooltip'
 
-// Re-export components from subdirectories
-// Feed
-export * from './feed/post-full-slideover'
-export * from './feed/post'
-
 // Input
 export * from './input/select-dropdown'
 export * from './input/select-pills'

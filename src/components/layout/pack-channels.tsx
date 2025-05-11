@@ -12,15 +12,7 @@ import {
     SidebarSection,
     SidebarSpacer,
 } from '@/components/shared/sidebar'
-import {
-    ChevronUpIcon,
-    FireIcon,
-    HomeIcon,
-    InboxIcon,
-    MagnifyingGlassIcon,
-    QuestionMarkCircleIcon,
-    SparklesIcon,
-} from '@heroicons/react/20/solid'
+import { ChevronUpIcon, FireIcon, HomeIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
 import ResourceSwitcher from '@/components/layout/resource-switcher'
 import HowlCreator from '@/components/shared/user/howl-creator'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
@@ -74,10 +66,10 @@ export function PackChannels() {
                     <SidebarHeader>
                         <SidebarSection>
                             {user && <HowlCreator />}
-                            <SidebarItem href="/search">
-                                <MagnifyingGlassIcon />
-                                <SidebarLabel>Search</SidebarLabel>
-                            </SidebarItem>
+                            {/*<SidebarItem href="/search">*/}
+                            {/*    <MagnifyingGlassIcon />*/}
+                            {/*    <SidebarLabel>Search</SidebarLabel>*/}
+                            {/*</SidebarItem>*/}
                             <InboxButton />
                         </SidebarSection>
                     </SidebarHeader>

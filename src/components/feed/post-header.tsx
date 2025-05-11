@@ -20,11 +20,11 @@ export default function PostHeader({post, signedInUser, onDelete}: PostHeaderPro
     const isAuthor = post.user?.id === signedInUser?.id
 
     return (
-        <div className="px-5 pt-5">
+        <div className="px-3 pt-3 sm:px-5 sm:pt-5">
             {/* Share info (rehowl) */}
             {post.howling && (
-                <div className="mb-4 flex items-center text-xs text-neutral-500 dark:text-neutral-400">
-                    <ArrowUpOnSquareIcon className="mr-2 h-3 w-3"/>
+                <div className="mb-3 flex items-center text-xs text-neutral-500 dark:text-neutral-400">
+                    <ArrowUpOnSquareIcon className="mr-2 h-3.5 w-3.5 sm:h-3 sm:w-3"/>
                     <Link
                         href={`/@${post.actor?.username}/`}
                         className="flex items-center hover:text-neutral-700 dark:hover:text-neutral-300"
@@ -41,7 +41,7 @@ export default function PostHeader({post, signedInUser, onDelete}: PostHeaderPro
 
             {/* Community info */}
             {post.pack && post.pack.slug !== 'universe' && (
-                <div className="mb-4 flex items-center text-xs text-neutral-500 dark:text-neutral-400">
+                <div className="mb-3 flex items-center text-xs text-neutral-500 dark:text-neutral-400">
                     <Link
                         href={`/p/${post.pack?.slug}/`}
                         className="flex items-center hover:text-neutral-700 dark:hover:text-neutral-300 text-default"
@@ -76,12 +76,12 @@ export default function PostHeader({post, signedInUser, onDelete}: PostHeaderPro
                 {isAuthor && (
                     <div className="flex shrink-0 self-center">
                         <Dropdown>
-                            <MenuButton className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                                <EllipsisHorizontalIcon className="h-5 w-5 text-neutral-500"/>
+                            <MenuButton className="flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                                <EllipsisHorizontalIcon className="h-6 w-6 sm:h-5 sm:w-5 text-neutral-500"/>
                             </MenuButton>
                             <DropdownMenu className="w-36 p-1">
                                 <DropdownItem onClick={onDelete}>
-                                    <DropdownLabel className="group flex items-center gap-2 px-2 py-1.5">
+                                    <DropdownLabel className="group flex items-center gap-2 px-2 py-2 sm:py-1.5">
                                         <TrashIcon className="h-4 w-4 text-neutral-500 group-hover:text-red-500"/>
                                         <span className="text-sm font-medium">Delete</span>
                                     </DropdownLabel>

@@ -80,13 +80,15 @@ export default function CommentItem({
     }
 
     // Indentation based on comment nesting level
-    const indentClass = level === 0 ? 'ml-0' : 'ml-6 pl-2 border-l border-neutral-200 dark:border-neutral-800'
+    const indentClass = level === 0 
+        ? 'ml-0' 
+        : 'ml-3 pl-2 sm:ml-6 border-l border-neutral-200 dark:border-neutral-800'
 
     return (
-        <li className={`py-2 ${indentClass}`}>
+        <li className={`py-1.5 sm:py-2 ${indentClass}`}>
             <div className="group relative">
                 {/* Comment content */}
-                <div className="flex gap-2" onClick={onClick}>
+                <div className="flex gap-2 sm:gap-3" onClick={onClick}>
                     <div className="flex-shrink-0 pt-0.5">
                         <UserAvatar
                             user={comment.user}
@@ -96,7 +98,7 @@ export default function CommentItem({
                     </div>
 
                     <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1">
+                        <div className="flex flex-wrap items-center gap-1">
                             <Link
                                 href={`/@${comment.user.username}/`}
                                 className="text-sm font-medium text-neutral-800 hover:underline dark:text-neutral-300 text-default"
@@ -116,7 +118,7 @@ export default function CommentItem({
                             </time>
                         </div>
 
-                        <div className="mt-1 text-sm text-neutral-700 dark:text-neutral-300 break-words">
+                        <div className="mt-0.5 sm:mt-1 text-sm text-neutral-700 dark:text-neutral-300 break-words">
                             {comment.body}
                         </div>
 
@@ -135,17 +137,17 @@ export default function CommentItem({
                     </div>
                 </div>
 
-                {/* Delete button (visible on hover) */}
+                {/* Delete button (always visible on mobile, hover on desktop) */}
                 {isAuthor && (
-                    <div className="absolute right-0 top-0 hidden group-hover:block">
+                    <div className="absolute right-0 top-0 block sm:hidden sm:group-hover:block">
                         <button
                             onClick={(e) => {
                                 e.stopPropagation()
                                 handleDeleteComment()
                             }}
-                            className="p-1 text-neutral-500 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300"
+                            className="p-2 sm:p-1 text-neutral-500 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300"
                         >
-                            <TrashIcon className="h-4 w-4"/>
+                            <TrashIcon className="h-5 w-5 sm:h-4 sm:w-4"/>
                         </button>
                     </div>
                 )}

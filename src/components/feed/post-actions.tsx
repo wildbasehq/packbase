@@ -98,20 +98,20 @@ export default function PostActions({ post, onComment }: PostActionsProps) {
     }
 
     return (
-        <div className="flex items-center gap-2 border-t border-neutral-200 dark:border-neutral-800 px-5 py-3">
+        <div className="flex items-center gap-2 border-t border-neutral-200 dark:border-neutral-800 px-3 py-2 sm:px-5 sm:py-3">
             {/* Like button */}
             <Button
                 plain
                 onClick={handleReaction}
                 disabled={isSubmittingReaction}
-                className="flex items-center gap-1.5 rounded-full py-1.5 px-3 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
+                className="flex items-center gap-1.5 rounded-full py-2 px-3.5 sm:py-1.5 sm:px-3 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
             >
                 {isSubmittingReaction ? (
                     <LoadingSpinner size="small" />
                 ) : hasReacted ? (
-                    <HandThumbUpIcon className="h-4 w-4 !text-primary-light" />
+                    <HandThumbUpIcon className="h-5 w-5 sm:h-4 sm:w-4 !text-primary-light" />
                 ) : (
-                    <OutlineHandThumbUpIcon className="h-4 w-4" />
+                    <OutlineHandThumbUpIcon className="h-5 w-5 sm:h-4 sm:w-4" />
                 )}
                 {reactionCount > 0 && <span className="text-xs font-medium">{reactionCount}</span>}
             </Button>
@@ -123,14 +123,14 @@ export default function PostActions({ post, onComment }: PostActionsProps) {
                     placeholder="Add a comment..."
                     value={commentText}
                     onChange={e => setCommentText(e.target.value)}
-                    className="w-full rounded-full border border-neutral-200 bg-neutral-50 py-1.5 pl-3 pr-10 text-sm placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-0 dark:border-neutral-800 dark:bg-neutral-900 dark:placeholder:text-neutral-600 dark:focus:border-neutral-700"
+                    className="w-full rounded-full border border-neutral-200 bg-neutral-50 py-2 pl-3.5 pr-10 sm:py-1.5 sm:pl-3 text-sm placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-0 dark:border-neutral-800 dark:bg-neutral-900 dark:placeholder:text-neutral-600 dark:focus:border-neutral-700"
                 />
                 <button
                     type="submit"
                     disabled={!commentText.trim() || isSubmittingComment}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-400 hover:text-neutral-600 disabled:opacity-50 dark:hover:text-neutral-300"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 sm:pr-3 text-neutral-400 hover:text-neutral-600 disabled:opacity-50 dark:hover:text-neutral-300"
                 >
-                    {isSubmittingComment ? <LoadingSpinner size="small" /> : <PaperAirplaneIcon className="h-4 w-4" />}
+                    {isSubmittingComment ? <LoadingSpinner size="small" /> : <PaperAirplaneIcon className="h-5 w-5 sm:h-4 sm:w-4" />}
                 </button>
             </form>
         </div>
