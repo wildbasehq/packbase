@@ -1,26 +1,26 @@
-import {ExpandingArrow, LoadingCircle} from '@/components/icons'
-import {Logo} from '@/components/shared/logo'
-import {Heading, Text} from '@/components/shared/text'
+import { ExpandingArrow, LoadingCircle } from '@/components/icons'
+import { Heading, Text } from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 import useComponentVisible from '@/lib/hooks/use-component-visible'
-import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
-import {useEffect, useState} from 'react'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
+import { useEffect, useState } from 'react'
 import useSound from 'use-sound'
 import './resource-switcher.component.css'
-import {Dropdown, DropdownHeader, DropdownMenu} from '@/components/shared/dropdown'
-import {MenuButton, MenuItem} from '@headlessui/react'
+import { Dropdown, DropdownHeader, DropdownMenu } from '@/components/shared/dropdown'
+import { MenuButton, MenuItem } from '@headlessui/react'
 import LogoutIcon from '@/components/icons/logout'
-import {vg} from '@/lib/api'
-import {toast} from 'sonner'
-import {useModal} from '@/components/modal/provider'
-import {SettingsIcon} from 'lucide-react'
-import {Button} from '@/components/shared/button'
+import { vg } from '@/lib/api'
+import { toast } from 'sonner'
+import { useModal } from '@/components/modal/provider'
+import { SettingsIcon } from 'lucide-react'
+import { Button } from '@/components/shared/button'
 import clsx from 'clsx'
-import {ClipboardIcon, TrashIcon, UserGroupIcon} from '@heroicons/react/20/solid'
-import {Avatar} from '@/components/shared/avatar'
+import { ClipboardIcon, TrashIcon, UserGroupIcon } from '@heroicons/react/20/solid'
+import { Avatar } from '@/components/shared/avatar'
 import ResourceSettingsGeneral from './pages/general'
 import ResourceSettingsMembers from '@/components/layout/resource-switcher/pages/members.tsx'
 import ResourceDeletePage from './pages/delete'
+import { VerifiedBadge } from '@/components/layout/resource-switcher/pack-badge.tsx'
 
 export default function ResourceSwitcher() {
     const hoverCancelSFX = '/sounds/switch-hover-s.ogg'
@@ -38,10 +38,10 @@ export default function ResourceSwitcher() {
         playbackRate: 0.3,
     })
 
-    const {currentResource} = useResourceStore()
+    const { currentResource } = useResourceStore()
 
-    const {loading, connecting} = useUIStore()
-    const {ref} = useComponentVisible({
+    const { loading, connecting } = useUIStore()
+    const { ref } = useComponentVisible({
         soundOnClose: cancelSound,
     })
     // fuck you nextjs
@@ -78,7 +78,7 @@ export default function ResourceSwitcher() {
                     <Dropdown>
                         <MenuButton
                             className="w-full"
-                            onClick={(e) => {
+                            onClick={e => {
                                 if (loading || currentResource.standalone || currentResource.temporary) {
                                     e.preventDefault()
                                     ref.current?.classList.add('[&>*>*]:animate-shake')
@@ -88,23 +88,16 @@ export default function ResourceSwitcher() {
                         >
                             <span className="z-10 flex w-full items-center justify-between">
                                 <div className="flex h-10 items-center space-x-2">
-                                    {!currentResource || (currentResource.standalone && !currentResource.icon) ? (
-                                        <Logo className="w-8"/>
-                                    ) : (
-                                        <UserAvatar
-                                            name={currentResource.display_name}
-                                            size={32}
-                                            icon={currentResource.icon || currentResource.images?.avatar}
-                                            className="inline-flex h-8 w-8 overflow-hidden"
-                                        />
+                                    {(currentResource.verified || currentResource.standalone || currentResource.slug === 'support') && (
+                                        <VerifiedBadge tooltipText="This is an official pack which represents the creator or organisation behind it." />
                                     )}
                                     <Text className="font-bold">{currentResource.display_name}</Text>
                                 </div>
-                                <ExpandingArrow className="right-0 -mt-1 h-6 w-6 rotate-90 text-neutral-500 transition-all dark:text-white"/>
+                                <ExpandingArrow className="right-0 -mt-1 h-6 w-6 rotate-90 text-neutral-500 transition-all dark:text-white" />
                             </span>
                         </MenuButton>
                         <DropdownMenu className="z-50 -mt-16 rounded-tl-none rounded-tr-none p-0!">
-                            <MenuItem>{({close}) => <ResourceSwitcherMenu close={close}/>}</MenuItem>
+                            <MenuItem>{({ close }) => <ResourceSwitcherMenu close={close} />}</MenuItem>
                         </DropdownMenu>
                     </Dropdown>
                 </div>
@@ -112,7 +105,7 @@ export default function ResourceSwitcher() {
                 <div className="flex cursor-pointer select-none flex-row items-center justify-between">
                     <span className="z-10 flex w-full items-center justify-between">
                         <div className="flex h-10 items-center space-x-2">
-                            <LoadingCircle/>
+                            <LoadingCircle />
                             <Text className="font-bold">Connecting</Text>
                         </div>
                     </span>
@@ -122,10 +115,10 @@ export default function ResourceSwitcher() {
     )
 }
 
-function ResourceSwitcherMenu({close}: { close: () => void }) {
-    const {currentResource: pack} = useResourceStore()
-    const {user} = useUserAccountStore()
-    const {show} = useModal()
+function ResourceSwitcherMenu({ close }: { close: () => void }) {
+    const { currentResource: pack } = useResourceStore()
+    const { user } = useUserAccountStore()
+    const { show } = useModal()
 
     return (
         <DropdownHeader className="flex w-96 flex-col p-0!">
@@ -136,11 +129,11 @@ function ResourceSwitcherMenu({close}: { close: () => void }) {
                         onClick={() => {
                             if (user.id === pack.owner_id) {
                                 close()
-                                show(<ResourceSettingsModal/>)
+                                show(<ResourceSettingsModal />)
                             }
                         }}
                     >
-                        <UserAvatar user={pack} size="lg"/>
+                        <UserAvatar user={pack} size="lg" />
                         <div className="ml-3 grow">
                             <Heading>{pack.display_name || pack.slug}</Heading>
                             <Text alt>{pack.slug}</Text>
@@ -149,7 +142,7 @@ function ResourceSwitcherMenu({close}: { close: () => void }) {
                             <div>
                                 {/* mt-1 to offset button */}
                                 <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer">
-                                    <SettingsIcon className="h-5 w-5"/>
+                                    <SettingsIcon className="h-5 w-5" />
                                 </Button>
                             </div>
                         )}
@@ -161,17 +154,17 @@ function ResourceSwitcherMenu({close}: { close: () => void }) {
                 <div
                     className="group inline-flex w-full cursor-pointer items-center justify-start gap-4 rounded px-4 py-3 ring-destructive/25 transition-all hover:bg-destructive/75 hover:ring-2"
                     onClick={() => {
-                        vg.pack({id: pack.id})
+                        vg.pack({ id: pack.id })
                             .join.delete()
                             .then(() => {
                                 window.location.reload()
                             })
-                            .catch((e) => {
+                            .catch(e => {
                                 toast.error(e.message)
                             })
                     }}
                 >
-                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white!"/>{' '}
+                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white!" />{' '}
                     <Text alt className="group-hover:text-white!">
                         Leave pack
                     </Text>
@@ -184,27 +177,27 @@ function ResourceSwitcherMenu({close}: { close: () => void }) {
 function ResourceSettingsModal() {
     const [currentPage, setCurrentPage] = useState('General Information')
 
-    const {currentResource, resources, setResources, setCurrentResource} = useResourceStore()
+    const { currentResource, resources, setResources, setCurrentResource } = useResourceStore()
 
     const pages = [
         {
             title: 'General Information',
             description: 'Change pack information',
             icon: ClipboardIcon,
-            element: <ResourceSettingsGeneral/>,
+            element: <ResourceSettingsGeneral />,
         },
         {
             title: 'Members',
             description: 'Manage pack members',
             icon: UserGroupIcon,
-            element: <ResourceSettingsMembers/>,
+            element: <ResourceSettingsMembers />,
         },
         {
             title: 'Delete This Pack',
             description: 'Delete the pack and all data',
             icon: TrashIcon,
-            element: <ResourceDeletePage/>,
-        }
+            element: <ResourceDeletePage />,
+        },
     ]
 
     return (
@@ -212,8 +205,13 @@ function ResourceSettingsModal() {
             <div className="flex w-80 flex-col p-0!">
                 <div className="h-fit w-full rounded-br rounded-tl-lg bg-white/50 ring-2 ring-shadow dark:bg-n-6/50">
                     <div className="flex items-center rounded px-6 py-6">
-                        <Avatar square className="w-12 h-12" initials={currentResource.display_name?.charAt(0)} alt={currentResource.display_name}
-                                src={currentResource.images?.avatar}/>
+                        <Avatar
+                            square
+                            className="w-12 h-12"
+                            initials={currentResource.display_name?.charAt(0)}
+                            alt={currentResource.display_name}
+                            src={currentResource.images?.avatar}
+                        />
                         <div className="ml-3 grow">
                             <Heading>{currentResource.display_name || currentResource.slug}</Heading>
                             <Text alt>{currentResource.slug}</Text>
@@ -227,10 +225,10 @@ function ResourceSettingsModal() {
                             <div
                                 className={clsx(
                                     page.title === currentPage ? 'bg-n-2/25 dark:bg-n-6/50' : 'hover:bg-n-2/25 dark:hover:bg-n-6/50',
-                                    'ring-default/25 ring-default group inline-flex w-full items-center justify-start gap-4 rounded px-4 py-3 transition-all hover:ring-2',
+                                    'ring-default/25 ring-default group inline-flex w-full items-center justify-start gap-4 rounded px-4 py-3 transition-all hover:ring-2'
                                 )}
                             >
-                                <page.icon className="fill-alt h-4 w-4"/>
+                                <page.icon className="fill-alt h-4 w-4" />
                                 <Text alt>{page.title}</Text>
                             </div>
                         </div>
@@ -240,7 +238,7 @@ function ResourceSettingsModal() {
 
             {/* Main settings portion with buttons on bottom-right at all times*/}
             <div className="flex h-full flex-1 flex-col gap-4 overflow-auto p-6">
-                {pages.find((page) => page.title === currentPage)?.element}
+                {pages.find(page => page.title === currentPage)?.element}
             </div>
         </div>
     )
