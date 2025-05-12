@@ -288,7 +288,7 @@ function SearchablePackList() {
 export default function PackAdd() {
     const { setCurrentResource } = useResourceStore()
     const user = useUserAccountStore(state => state.user)
-    const { show } = useModal()
+    const { show, hide } = useModal()
 
     useEffect(() => {
         setCurrentResource({
@@ -300,7 +300,7 @@ export default function PackAdd() {
     }, [setCurrentResource])
 
     const handleCreatePack = () => {
-        show(<CreatePackModal close={close} />)
+        show(<CreatePackModal close={hide} />)
     }
 
     if (!user || user.anonUser) {
