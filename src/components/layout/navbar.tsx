@@ -132,7 +132,7 @@ export default function NavBar() {
                         {/*<div className="relative"></div>*/}
                         {user && <AppTabs />}
                         {/*{user && !user.anonUser && <Search/>}*/}
-                        {/*<div className="relative"></div>*/}
+                        {!user && <div className="relative"></div>}
                         <div className="flex items-center gap-5">
                             {/*<div className="flex gap-4">*/}
                             {/*    <ThemeToggle />*/}
