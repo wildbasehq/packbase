@@ -126,9 +126,9 @@ export default function Search() {
     }
 
     return (
-        <div className="flex flex-col h-full bg-background">
+        <div className="flex flex-col h-full">
             {/* Search header */}
-            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border pb-4">
+            <div className="sticky top-0 z-10 backdrop-blur-sm border-b pb-4">
                 <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
                     <h1 className="text-2xl font-medium mb-4">{greeting}</h1>
 
