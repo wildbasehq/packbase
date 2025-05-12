@@ -18,12 +18,10 @@ const PackCosmos = lazy(() => import('@/pages/pack/[slug]/cosmos/page.tsx'))
 const NotFound = lazy(() => import('@/src/not-found.tsx'))
 const PackAdd = lazy(() => import('@/pages/pack/new/page.tsx'))
 const SettingsLayout = lazy(() => import('@/pages/settings/layout.tsx'))
-const SettingsGeneral = lazy(() => import('@/pages/settings/page.tsx'))
-const SettingsInvite = lazy(() => import('@/pages/settings/invite/page.tsx'))
 const TermsPage = lazy(() => import('@/pages/terms/page.tsx'))
 const ThankYouFriends = lazy(() => import('@/pages/thanks/page.tsx'))
 const UserProfile = lazy(() => import('@/pages/user/[...slug]/page.tsx'))
-const SettingsTemplate = lazy(() => import('@/pages/settings/template/page.tsx'))
+const SearchPage = lazy(() => import('@/pages/search/page.tsx'))
 
 // Playground
 const Playground = lazy(() => import('@/pages/playground/page.tsx'))
@@ -68,6 +66,12 @@ function App() {
                                         <Switch>
                                             <Route path="/">
                                                 <Redirect to="/p/universe" />
+                                            </Route>
+
+                                            <Route path="/search">
+                                                <Suspense fallback={<LoadingFallback />}>
+                                                    <SearchPage />
+                                                </Suspense>
                                             </Route>
 
                                             <Route path="/terms">
@@ -138,10 +142,8 @@ function App() {
                                                 </Suspense>
                                             </Route>
 
-                                            <Route path="/settings" nest>
-                                                <Suspense fallback={<LoadingFallback />}>
-                                                    <SettingsLayout />
-                                                </Suspense>
+                                            <Route path="/stuff" nest>
+                                                <div></div>
                                             </Route>
 
                                             <Route>

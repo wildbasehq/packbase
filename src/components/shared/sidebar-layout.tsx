@@ -2,6 +2,9 @@ import * as Headless from '@headlessui/react'
 import React, { useState } from 'react'
 import { useUIStore, useUserAccountStore } from '@/lib/state'
 import { NavbarItem } from '@/components/layout'
+import { useLocation } from 'wouter'
+import { motion } from 'framer-motion'
+import { Heading, Text } from '@/components/shared/text.tsx'
 
 function OpenMenuIcon() {
     return (
@@ -51,11 +54,13 @@ export function SidebarLayout({
     let [showSidebar, setShowSidebar] = useState(false)
     const { user } = useUserAccountStore()
     const { hidden } = useUIStore()
+    const [location] = useLocation()
+    const isSettingsPage = location === '/stuff'
 
     return (
         <div className="relative flex w-full bg-white isolate min-h-svh max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
             {/* Sidebar on desktop */}
-            {!hidden && user && <div className="fixed inset-y-0 left-0 w-98 max-lg:hidden">{sidebar}</div>}
+            {!hidden && user && <div className="fixed inset-y-0 left-0 w-98 max-lg:hidden z-10">{sidebar}</div>}
 
             {/* Sidebar on mobile */}
             <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
@@ -73,13 +78,54 @@ export function SidebarLayout({
             </header>
 
             {/* Content */}
-            <div className="flex flex-col flex-1">
-                {!user && <div className="hidden lg:block">{navbar}</div>}
-                <main className={`pb-2 lg:min-w-0 lg:pt-2 lg:pr-2 ${!hidden && user ? 'lg:pl-96' : 'lg:pl-2'}`}>
+            <div className="flex flex-col flex-1 relative">
+                <div className="hidden lg:block">{navbar}</div>
+                {isSettingsPage && (
+                    <div className="absolute flex justify-center items-center h-[calc(100vh-14rem)] lg:w-[calc(100%-24rem)] top-14 lg:ml-96 overflow-hidden grow">
+                        {/* center x/y content */}
+                        <div className="h-full flex items-center justify-center">
+                            <div className="w-full max-w-2xl">
+                                <div className="flex flex-col items-center justify-center">
+                                    <div className="flex flex-col items-center justify-center max-w-md text-center mb-4">
+                                        <img className="h-24 mb-6" src="/img/illustrations/onboarding/gray-cat.png" />
+                                        <Heading>*om nom nom*</Heading>
+                                        <Text alt>This will be ready soon, we just need more time in the background. Hang tight!</Text>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                <motion.main
+                    // key={isSettingsPage ? 'settings' : 'default'}
+                    className={`pb-2 lg:min-w-0 lg:pr-2 ${!hidden && user ? 'lg:pl-96' : 'lg:pl-2'} ${isSettingsPage ? '!z-10' : 'z-0'}`}
+                    initial={false}
+                    animate="animate"
+                    transition={{
+                        type: 'spring',
+                        stiffness: 600,
+                        damping: 40,
+                        mass: 1,
+                        bounce: 0,
+                    }}
+                    custom={{ isSettingsPage }}
+                    variants={{
+                        initial: {
+                            y: 0,
+                            filter: 'blur(0px)',
+                            opacity: 1,
+                        },
+                        animate: ({ isSettingsPage }) => ({
+                            y: isSettingsPage ? '80%' : 0,
+                            filter: isSettingsPage ? 'blur(2px)' : 'blur(0px)',
+                            // opacity: isSettingsPage ? 0.5 : 1,
+                        }),
+                    }}
+                >
                     <div className="h-[calc(100vh-1rem)] overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
                         <div className="mx-auto overflow-hidden h-full">{children}</div>
                     </div>
-                </main>
+                </motion.main>
             </div>
         </div>
     )

@@ -9,6 +9,7 @@ import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
 import { LayoutGroup, motion } from 'framer-motion'
 import { TouchTarget } from '@/components/shared/button'
+import { AppTabs } from '@/src/components'
 
 // Navbar subcomponents
 export function NavbarDivider({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
@@ -103,7 +104,7 @@ export function Navbar({ className, ...props }: React.ComponentPropsWithoutRef<'
 // Main Navbar component
 export default function NavBar() {
     const { user } = useUserAccountStore()
-    const { hidden, maintenance } = useUIStore()
+    const { hidden, maintenance, loading } = useUIStore()
 
     const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(
         user && !user?.metadata?.dp_uod && !user.anonUser && !maintenance
@@ -116,7 +117,7 @@ export default function NavBar() {
             )}
 
             <div
-                className={`${hidden || !user ? '' : 'sm:!pl-[24.5rem]'} flex h-16 w-full items-center justify-items-stretch px-2 sm:px-4`}
+                className={`${hidden || !user ? '' : 'sm:!pl-[24.5rem]'} flex h-14 w-full items-center justify-items-stretch px-2 sm:px-4 relative shimmer-template ${loading ? 'before:animate-shimmer-fast' : ''}`}
             >
                 {hidden || !user ? (
                     <Link className="flex-1" href="/">
@@ -126,26 +127,13 @@ export default function NavBar() {
                     <div className="flex-1" />
                 )}
 
-                <div className="w-full h-16 justify-self-end max-w-7xl">
+                <div className="w-full justify-self-end max-w-7xl">
                     <div className="relative flex justify-end h-full lg:items-center xl:justify-between">
+                        {/*<div className="relative"></div>*/}
+                        <AppTabs />
                         {/*{user && !user.anonUser && <Search/>}*/}
-                        <div className="relative"></div>
-
+                        {/*<div className="relative"></div>*/}
                         <div className="flex items-center gap-5">
-                            {/*{jobs.size > 0 && <WorkerSpinner />}*/}
-                            {/*{updateAvailable && (*/}
-                            {/*    <>*/}
-                            {/*        <Tooltip content={`Click to update: ${truncate(updateAvailable, 7)}`} delayDuration={0}>*/}
-                            {/*            <div className="flex cursor-pointer scale-80" onClick={() => window.location.reload()}>*/}
-                            {/*                <Badge color="amber" className="flex items-center justify-center">*/}
-                            {/*                    <span className="text-xs">Update available</span>*/}
-                            {/*                </Badge>*/}
-                            {/*            </div>*/}
-                            {/*        </Tooltip>*/}
-
-                            {/*        <div className="hidden md:dark:bg-white/15 md:block md:h-5 md:w-px md:bg-n-8/10" />*/}
-                            {/*    </>*/}
-                            {/*)}*/}
                             {/*<div className="flex gap-4">*/}
                             {/*    <ThemeToggle />*/}
                             {/*</div>*/}

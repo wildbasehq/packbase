@@ -39,7 +39,7 @@ const availableIcons = {
 }
 
 export function PackChannels() {
-    const { hidden, navigation, loading, serverCapabilities } = useUIStore()
+    const { hidden, navigation, serverCapabilities } = useUIStore()
     const { currentResource } = useResourceStore()
     const { user } = useUserAccountStore()
 
@@ -51,10 +51,8 @@ export function PackChannels() {
         <div className="flex h-full">
             <PackSwitcher />
             <div className="flex flex-col">
-                <nav aria-label="Sections" className="flex flex-col min-h-16 w-80">
-                    <div
-                        className={`shimmer-template relative flex h-full items-center px-5 py-2 overflow-hidden ${loading ? 'before:animate-shimmer-fast' : ''}`}
-                    >
+                <nav aria-label="Sections" className="flex flex-col min-h-14 w-80">
+                    <div className="relative flex h-full items-center px-5 py-2 overflow-hidden">
                         <div className="w-full">
                             <ResourceSwitcher />
                         </div>

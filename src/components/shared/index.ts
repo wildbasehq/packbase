@@ -43,6 +43,7 @@ export * from './text-ticker'
 export * from './textarea'
 export * from './theme-toggle'
 export * from './tooltip'
+export * from './expandable-tabs'
 
 // Input
 export * from './input/select-dropdown'
