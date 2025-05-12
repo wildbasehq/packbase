@@ -130,7 +130,7 @@ export default function NavBar() {
                 <div className="w-full justify-self-end max-w-7xl">
                     <div className="relative flex justify-end h-full lg:items-center xl:justify-between">
                         {/*<div className="relative"></div>*/}
-                        <AppTabs />
+                        {user && <AppTabs />}
                         {/*{user && !user.anonUser && <Search/>}*/}
                         {/*<div className="relative"></div>*/}
                         <div className="flex items-center gap-5">
