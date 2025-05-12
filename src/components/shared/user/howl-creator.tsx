@@ -183,7 +183,7 @@ function HowlCard() {
                         </div>
                     </div>
 
-                    <div className="min-h-fit w-full px-4 py-4 sm:px-6">
+                    <div className="min-h-[8rem] w-full px-4 py-4 sm:px-6">
                         <Editor
                             onUpdate={e => {
                                 setBody(e?.storage.markdown.getMarkdown())

@@ -1,3 +1,5 @@
+@reference '../../../../src/styles/globals.css';
+
 :root {
   --novel-highlight-default: #ffffff;
   --novel-highlight-purple: #f6f3f8;
@@ -20,4 +22,16 @@
   --novel-highlight-orange: #5c3a1a;
   --novel-highlight-pink: #5c1a3a;
   --novel-highlight-gray: #3a3a3a;
+}
+
+h1.enforce-proper-heading-size {
+  @apply text-3xl font-medium leading-none tracking-tight
+}
+
+h2.enforce-proper-heading-size {
+  @apply text-2xl font-medium leading-none tracking-tight
+}
+
+h3.enforce-proper-heading-size {
+  @apply text-xl font-medium leading-none tracking-tight
 }

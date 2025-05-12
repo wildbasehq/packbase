@@ -133,7 +133,9 @@ export default function Editor({
             >
                 {editor && <EditorBubbleMenu editor={editor}/>}
                 {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
-                <EditorContent editor={editor}/>
+                <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full">
+                    <EditorContent editor={editor}/>
+                </div>
             </div>
         </NovelContext.Provider>
     )
