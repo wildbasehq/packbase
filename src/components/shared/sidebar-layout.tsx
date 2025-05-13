@@ -89,7 +89,7 @@ export function SidebarLayout({
                                     <div className="flex flex-col items-center justify-center max-w-md text-center mb-4">
                                         <img className="h-24 mb-6" src="/img/illustrations/onboarding/gray-cat.png" />
                                         <Heading>*om nom nom*</Heading>
-                                        <Text alt>This will be ready soon, we just need more time in the background. Hang tight!</Text>
+                                        <Text alt>There's nothing here for you yet~</Text>
                                     </div>
                                 </div>
                             </div>
