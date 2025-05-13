@@ -24,14 +24,14 @@ export function AppTabs() {
     const onChange = (tab: number) => {
         // Handle if its "New Howl", assume its just a click and not a navigation
         if (tab === 4) {
-            if (!user.reqOnboard && !currentResource.temporary) {
+            if (user.reqOnboard || currentResource.temporary) {
                 show(
                     <Card>
                         <Heading size="xl" className="mb-2 pb-3 border-b">
                             ⚠️ You can't howl right now
                         </Heading>
                         <Text>
-                            {!user.reqOnboard
+                            {user.reqOnboard
                                 ? 'You need to create a profile first! Complete the onboarding then try again.'
                                 : 'You have to join this pack first to howl into it.'}
                         </Text>
