@@ -1,7 +1,5 @@
 import { Toaster } from 'sonner'
 import { ModalProvider } from '@/components/modal/provider'
-import posthog from 'posthog-js'
-import { PostHogProvider } from 'posthog-js/react'
 import { useUIStore, useUserAccountStore } from '@/lib/index'
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import IntercomComponent from '@/components/shared/intercom'
@@ -14,13 +12,6 @@ const WebSocketProvider = lazy(() =>
     }))
 )
 
-if (typeof window !== 'undefined' && import.meta.env.VITE_POSTHOG_KEY) {
-    posthog.init(import.meta.env.VITE_POSTHOG_KEY || '', {
-        api_host: import.meta.env.VITE_POSTHOG_HOST,
-        capture_pageview: false, // Disable automatic pageview capture, as we capture manually
-    })
-}
-
 export function Providers({ children }: { children: React.ReactNode }) {
     const { user } = useUserAccountStore()
     const { serverCapabilities } = useUIStore()
@@ -29,10 +20,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
     const hasRealtimeCapability = useRef<boolean>(serverCapabilities.includes('realtime'))
 
     useEffect(() => {
-        if (user) {
-            posthog.identify(user.id)
-        }
-
         if (serverCapabilities.includes('realtime')) {
             hasRealtimeCapability.current = true
         }
@@ -58,22 +45,20 @@ export function Providers({ children }: { children: React.ReactNode }) {
     )
 
     return (
-        <PostHogProvider client={posthog}>
-            <IntercomComponent user={user}>
-                {hasRealtimeCapability.current ? (
-                    <Suspense
-                        fallback={
-                            <div className="flex items-center justify-center h-full">
-                                <Text>Loading...</Text>
-                            </div>
-                        }
-                    >
-                        <WebSocketProvider>{renderContent()}</WebSocketProvider>
-                    </Suspense>
-                ) : (
-                    renderContent()
-                )}
-            </IntercomComponent>
-        </PostHogProvider>
+        <IntercomComponent user={user}>
+            {hasRealtimeCapability.current ? (
+                <Suspense
+                    fallback={
+                        <div className="flex items-center justify-center h-full">
+                            <Text>Loading...</Text>
+                        </div>
+                    }
+                >
+                    <WebSocketProvider>{renderContent()}</WebSocketProvider>
+                </Suspense>
+            ) : (
+                renderContent()
+            )}
+        </IntercomComponent>
     )
 }

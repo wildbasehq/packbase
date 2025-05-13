@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useUserAccountStore } from '@/lib/index'
-import { usePostHog } from 'posthog-js/react'
 import { EnvelopeIcon, EnvelopeOpenIcon, IdentificationIcon, SwatchIcon, TrophyIcon } from '@heroicons/react/16/solid'
 
 // Import all settings pages
@@ -27,7 +26,6 @@ export type SettingsTab = {
 const SettingsDialog: React.FC = () => {
     const { user } = useUserAccountStore()
     const [activeTab, setActiveTab] = useState<string>('profile')
-    const posthog = usePostHog()
 
     // Define tabs based on user state
     const getTabs = (): SettingsTab[] => {

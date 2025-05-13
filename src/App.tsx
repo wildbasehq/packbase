@@ -28,7 +28,6 @@ const Playground = lazy(() => import('@/pages/playground/page.tsx'))
 
 // Lazy load components
 const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
-const PostHogPageview = lazy(() => import('@/src/posthog-pageview.tsx'))
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -40,10 +39,6 @@ const LoadingFallback = () => (
 function App() {
     return (
         <Providers>
-            <Suspense>
-                <PostHogPageview />
-            </Suspense>
-
             <Console />
 
             <div className="absolute bottom-0 left-0 z-40 w-full h-12 bg-sidebar sm:hidden">
