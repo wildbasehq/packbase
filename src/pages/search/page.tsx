@@ -1,20 +1,13 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { AlertCircle, Clock, Filter, Loader2, RefreshCw, Search as SearchIcon, X } from 'lucide-react'
-import clsx from 'clsx'
 import { useSearch, useUserAccountStore, vg } from '@/lib'
 import { useDebounce } from 'use-debounce'
-
-// Define the structure of search results
-// This should be updated to match your actual API response structure
-interface SearchResult {
-    id: string
-    title: string
-    description: string
-    url: string
-    category?: string
-    timestamp?: string
-}
+import { SearchApiResponse, SearchResult } from './types'
+import { PackCard, PostCard, ProfileCard } from '@/components/search'
+import { Heading, Text } from '@/components/shared/text.tsx'
+import { ExpandableTabs } from '@/src/components'
+import { MagnifyingGlassCircleIcon, RectangleStackIcon, UserGroupIcon, UsersIcon } from '@heroicons/react/20/solid'
 
 // Array of greeting messages to randomly display
 const greetings = [
@@ -50,16 +43,20 @@ export default function Search() {
     const { query, setQuery } = useSearch()
     const { user } = useUserAccountStore()
 
-    const [results, setResults] = useState<SearchResult[]>([])
+    const [results, setResults] = useState<SearchApiResponse>({
+        results: { profiles: [], packs: [], posts: [] },
+        count: 0,
+        query: '',
+    })
     const [filteredResults, setFilteredResults] = useState<SearchResult[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isTyping, setIsTyping] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [greeting, setGreeting] = useState<string>('')
-    const [activeCategory, setActiveCategory] = useState('All')
+    const [activeCategory, setActiveCategory] = useState('Everything')
 
     // Debounce the search query with 3 seconds delay
-    const [debouncedQuery] = useDebounce<string>(query, 3000)
+    const [debouncedQuery] = useDebounce<string>(query, 500)
 
     // Get a random greeting on component mount
     useEffect(() => {
@@ -80,7 +77,11 @@ export default function Search() {
             setIsTyping(false)
 
             if (!debouncedQuery || debouncedQuery.trim() === '') {
-                setResults([])
+                setResults({
+                    results: { profiles: [], packs: [], posts: [] },
+                    count: 0,
+                    query: '',
+                })
                 setFilteredResults([])
                 setIsLoading(false)
                 return
@@ -90,17 +91,23 @@ export default function Search() {
                 setIsLoading(true)
                 setError(null)
 
-                const searchResults = await vg.search.post({ query: debouncedQuery })
+                const searchResults = await vg.search.get({ query: { q: debouncedQuery } })
                 if (searchResults.error) {
                     throw new Error(searchResults.error)
                 }
-                setResults(searchResults?.data || [])
+                setResults(
+                    searchResults.data || {
+                        results: { profiles: [], packs: [], posts: [] },
+                        count: 0,
+                        query: debouncedQuery,
+                    }
+                )
             } catch (err) {
                 console.error('Error fetching search results:', err)
                 if (err.message?.includes('NOT_FOUND')) {
                     setError("VE28004:Korat: This instance of Voyage doesn't allow searching.")
                 } else {
-                    setError(err instanceof Error ? err.message : 'An error occurred while fetching search results.')
+                    setError("An error occurred while fetching search results. We can't tell you more at this time.")
                 }
             } finally {
                 setIsLoading(false)
@@ -112,11 +119,16 @@ export default function Search() {
 
     // Filter results based on active category
     useEffect(() => {
-        if (activeCategory === 'All') {
-            setFilteredResults(results)
-        } else {
-            const filtered = results.filter(result => result.category === activeCategory)
-            setFilteredResults(filtered)
+        if (activeCategory === 'Everything') {
+            // Combine all result types
+            const allResults = [...(results.results?.profiles || []), ...(results.results?.packs || []), ...(results.results?.posts || [])]
+            setFilteredResults(allResults)
+        } else if (activeCategory === 'Profiles') {
+            setFilteredResults(results.results?.profiles || [])
+        } else if (activeCategory === 'Packs') {
+            setFilteredResults(results.results?.packs || [])
+        } else if (activeCategory === 'Posts') {
+            setFilteredResults(results.results?.posts || [])
         }
     }, [results, activeCategory])
 
@@ -138,8 +150,9 @@ export default function Search() {
                             <div className="text-sm text-muted-foreground">
                                 {filteredResults.length > 0 ? (
                                     <span>
-                                        Found {filteredResults.length} {filteredResults.length === 1 ? 'result' : 'results'}
-                                        {activeCategory !== 'All' ? ` in ${activeCategory}` : ''}
+                                        Found {results.count || filteredResults.length}{' '}
+                                        {(results.count || filteredResults.length) === 1 ? 'result' : 'results'}
+                                        {activeCategory !== 'Everything' ? ` in ${activeCategory}` : ''}
                                     </span>
                                 ) : !isLoading ? (
                                     <span>No results found for "{query}"</span>
@@ -160,6 +173,48 @@ export default function Search() {
                     )}
                 </div>
             </div>
+
+            {/* Category tabs */}
+            {query && filteredResults.length > 0 && !isLoading && (
+                <div className="max-w-md w-fit mx-auto px-4 mt-2">
+                    <ExpandableTabs
+                        tabs={[
+                            {
+                                title: 'Everything',
+                                icon: MagnifyingGlassCircleIcon,
+                            },
+                            ...(results.results?.profiles.length > 0
+                                ? [
+                                      {
+                                          title: 'Profiles',
+                                          icon: UsersIcon,
+                                      },
+                                  ]
+                                : []),
+                            ...(results.results?.packs.length > 0
+                                ? [
+                                      {
+                                          title: 'Packs',
+                                          icon: UserGroupIcon,
+                                      },
+                                  ]
+                                : []),
+                            ...(results.results?.posts.length > 0
+                                ? [
+                                      {
+                                          title: 'Posts',
+                                          icon: RectangleStackIcon,
+                                      },
+                                  ]
+                                : []),
+                        ]}
+                        onChange={index => {
+                            setActiveCategory(['Everything', 'Profiles', 'Packs', 'Posts'][index])
+                        }}
+                        activeTab={['Everything', 'Profiles', 'Packs', 'Posts'].indexOf(activeCategory)}
+                    />
+                </div>
+            )}
 
             {/* Results area */}
             <div className="flex-grow p-4 overflow-auto">
@@ -198,16 +253,23 @@ export default function Search() {
                                 Get typin', we'll handle the rest. Packs, users, howls, whatever Packbase has info on, we got you~
                             </p>
                         </div>
-                    ) : filteredResults.length === 0 ? (
-                        <div className="bg-card border border-border rounded-lg p-8 text-center my-6">
-                            <SearchIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                            <h3 className="text-lg font-medium mb-2">No results found</h3>
-                            <p className="text-muted-foreground max-w-md mx-auto mb-6">
-                                We couldn't find any matches for "{query}". Try using different keywords or check your spelling.
-                            </p>
-                            {activeCategory !== 'All' && (
+                    ) : filteredResults.length === 0 &&
+                      (!results.results?.profiles || results.results?.profiles.length === 0) &&
+                      (!results.results?.packs || results.results?.packs.length === 0) &&
+                      (!results.results?.posts || results.results?.posts.length === 0) ? (
+                        <div className="py-16 flex flex-col items-center text-center">
+                            <div className="bg-accent/50 p-6 rounded-full mb-4">
+                                <SearchIcon className="h-8 w-8 text-muted-foreground" />
+                            </div>
+                            <Heading size="xl" className="mb-2">
+                                This ain't on Packbase
+                            </Heading>
+                            <Text alt className="max-w-md">
+                                Woah, we couldn't find anything for "{query}". Try searching for something else?
+                            </Text>
+                            {activeCategory !== 'Everything' && (
                                 <button
-                                    onClick={() => setActiveCategory('All')}
+                                    onClick={() => setActiveCategory('Everything')}
                                     className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
                                 >
                                     <Filter className="h-4 w-4" />
@@ -217,51 +279,74 @@ export default function Search() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {filteredResults.map((result, index) => (
-                                <motion.div
-                                    key={result.id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.2, delay: index * 0.03 }}
-                                    className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 hover:border-border/80 group"
-                                >
-                                    <a href={result.url} className="block h-full">
-                                        <div className="p-5">
-                                            <div className="flex items-start justify-between mb-3">
-                                                <h2 className="text-lg font-medium text-foreground group-hover:text-primary transition-colors">
-                                                    {result.title}
-                                                </h2>
-                                                {result.category && (
-                                                    <span
-                                                        className={clsx(
-                                                            'text-xs px-2.5 py-1 rounded-full tracking-wide font-medium ml-2 flex-shrink-0',
-                                                            result.category === 'Documentation' &&
-                                                                'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-                                                            result.category === 'Blog Post' &&
-                                                                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                                            result.category === 'API' &&
-                                                                'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-                                                            result.category === 'Community' &&
-                                                                'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-                                                            result.category === 'Tutorial' &&
-                                                                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                            {filteredResults?.map((result, index) => {
+                                // Determine the result type based on available properties or explicit type
+                                let resultType
+
+                                // First check if we're in a specific category tab
+                                if (activeCategory === 'Profiles') {
+                                    resultType = 'profile'
+                                } else if (activeCategory === 'Packs') {
+                                    resultType = 'pack'
+                                } else if (activeCategory === 'Posts') {
+                                    resultType = 'post'
+                                } else {
+                                    // For 'All' category, try to determine type from the result properties
+                                    if (result.content_type === 'markdown' && result.body) {
+                                        resultType = 'post'
+                                    } else if (result.username && !result.body) {
+                                        resultType = 'profile'
+                                    } else if (result.user && result.body) {
+                                        resultType = 'post'
+                                    } else {
+                                        // Default to pack if we can't determine the type
+                                        resultType = 'pack'
+                                    }
+                                }
+
+                                // Render the appropriate component based on result type
+                                switch (resultType) {
+                                    case 'profile':
+                                        return <ProfileCard key={result.id} profile={result} />
+                                    case 'pack':
+                                        return <PackCard key={result.id} pack={result} />
+                                    case 'post':
+                                        return <PostCard key={result.id} post={result} />
+                                    default:
+                                        // Fallback to generic card if type can't be determined
+                                        return (
+                                            <motion.div
+                                                key={result.id}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.2, delay: index * 0.03 }}
+                                                className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 hover:border-border/80 group"
+                                            >
+                                                <a href={result.url} className="block h-full">
+                                                    <div className="p-5">
+                                                        <div className="flex items-start justify-between mb-3">
+                                                            <h2 className="text-lg font-medium text-foreground group-hover:text-primary transition-colors">
+                                                                {result.title}
+                                                            </h2>
+                                                            {result.category && (
+                                                                <span className="text-xs px-2.5 py-1 rounded-full tracking-wide font-medium ml-2 flex-shrink-0 bg-accent text-accent-foreground">
+                                                                    {result.category}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-muted-foreground mb-3 line-clamp-2">{result.description}</p>
+                                                        {result.timestamp && (
+                                                            <div className="flex items-center text-xs text-muted-foreground">
+                                                                <Clock className="h-3 w-3 mr-1" />
+                                                                <span>{result.timestamp}</span>
+                                                            </div>
                                                         )}
-                                                    >
-                                                        {result.category}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p className="text-muted-foreground mb-3 line-clamp-2">{result.description}</p>
-                                            {result.timestamp && (
-                                                <div className="flex items-center text-xs text-muted-foreground">
-                                                    <Clock className="h-3 w-3 mr-1" />
-                                                    <span>{result.timestamp}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </a>
-                                </motion.div>
-                            ))}
+                                                    </div>
+                                                </a>
+                                            </motion.div>
+                                        )
+                                }
+                            })}
                         </div>
                     )}
                 </div>

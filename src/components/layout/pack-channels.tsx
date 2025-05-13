@@ -86,7 +86,9 @@ export function PackChannels() {
                                     <div className="flex flex-col min-w-0 flex-1">
                                         <SidebarLabel>{item.name}</SidebarLabel>
                                         {/* Subtext if item has ticker. */}
-                                        {item.ticker && <span className="text-xs/5 text-alt truncate max-w-[200px]">{item.ticker}</span>}
+                                        {item.ticker && (
+                                            <span className="text-xs/5 text-muted-foreground truncate max-w-[200px]">{item.ticker}</span>
+                                        )}
                                     </div>
                                     {/* Badge if item has badge. */}
                                     {item.badge && (

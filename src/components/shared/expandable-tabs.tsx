@@ -28,6 +28,7 @@ interface ExpandableTabsProps {
     className?: string
     activeColor?: string
     onChange?: (index: number | null) => void
+    activeTab?: number
 }
 
 const buttonVariants = {
@@ -59,7 +60,7 @@ const transition = {
     bounce: 0,
 }
 
-export function ExpandableTabs({ tabs, className, activeColor = 'text-default', onChange }: ExpandableTabsProps) {
+export function ExpandableTabs({ tabs, className, activeColor = 'text-default', onChange, activeTab }: ExpandableTabsProps) {
     const [selected, setSelected] = React.useState<number | null>(null)
     const [location, setLocation] = useLocation()
 
@@ -80,8 +81,9 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
     useEffect(() => {
         // Match page href to tab href
         const currentPath = window.location.pathname
-        const matchedTab = tabs.find(tab => {
+        const matchedTab = tabs.find((tab, index) => {
             if (tab.type === 'separator') return false
+            if (index === activeTab) return true
             if (tab.href) {
                 if (typeof tab.href === 'string') {
                     return currentPath === tab.href.replace(/\/$/, '')

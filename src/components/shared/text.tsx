@@ -40,7 +40,13 @@ export function Text({
     alt?: boolean
     [key: string]: any
 }): JSX.Element {
-    props.className = cn('text-default select-none', props.className, textSize[size], alt && 'text-alt', '[&_p]:leading-relaxed')
+    props.className = cn(
+        'text-default select-none',
+        props.className,
+        textSize[size],
+        alt && 'text-muted-foreground',
+        '[&_p]:leading-relaxed'
+    )
 
     return <p {...props}>{children}</p>
 }
