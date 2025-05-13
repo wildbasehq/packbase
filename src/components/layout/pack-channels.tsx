@@ -14,7 +14,6 @@ import {
 } from '@/components/shared/sidebar'
 import { ChevronUpIcon, FireIcon, HomeIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
 import ResourceSwitcher from '@/components/layout/resource-switcher'
-import HowlCreator from '@/components/shared/user/howl-creator'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
 import InboxPage from '@/pages/inbox/page.tsx'
 import { Badge } from '@/components/shared/badge.tsx'
@@ -62,7 +61,7 @@ export function PackChannels() {
                 <Sidebar className="w-full max-w-[320px]">
                     <SidebarHeader>
                         <SidebarSection>
-                            {user && <HowlCreator />}
+                            {/*{user && <HowlCreator />}*/}
                             {/*<SidebarItem href="/search">*/}
                             {/*    <MagnifyingGlassIcon />*/}
                             {/*    <SidebarLabel>Search</SidebarLabel>*/}
