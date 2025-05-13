@@ -5,6 +5,7 @@ import { NavbarItem } from '@/components/layout'
 import { useLocation } from 'wouter'
 import { motion } from 'framer-motion'
 import { Heading, Text } from '@/components/shared/text.tsx'
+import FolderCollectionIcon from '@/components/icons/folder-collection.tsx'
 
 function OpenMenuIcon() {
     return (
@@ -82,14 +83,16 @@ export function SidebarLayout({
                 <div className="hidden lg:block">{navbar}</div>
                 {isSettingsPage && (
                     <div className="absolute flex justify-center items-center h-[calc(100vh-14rem)] lg:w-[calc(100%-24rem)] top-14 lg:ml-96 overflow-hidden grow">
-                        {/* center x/y content */}
                         <div className="h-full flex items-center justify-center">
                             <div className="w-full max-w-2xl">
                                 <div className="flex flex-col items-center justify-center">
-                                    <div className="flex flex-col items-center justify-center max-w-md text-center mb-4">
-                                        <img className="h-24 mb-6" src="/img/illustrations/onboarding/gray-cat.png" />
-                                        <Heading>*om nom nom*</Heading>
-                                        <Text alt>There's nothing here for you yet~</Text>
+                                    <div className="flex flex-col items-center justify-center max-w-xs text-center mb-4">
+                                        <FolderCollectionIcon className="h-24 mb-6" />
+                                        <Heading className="mb-2">You have no stuff yet</Heading>
+                                        <Text alt>
+                                            Your "stuff" is collections of content you've saved across Packbase or copy-and-pasted into
+                                            here, and will always have quick access to.
+                                        </Text>
                                     </div>
                                 </div>
                             </div>
