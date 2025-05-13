@@ -33,7 +33,7 @@ export default function HowlCreator() {
     )
 }
 
-function HowlCard() {
+export function HowlCard() {
     const { user } = useUserAccountStore()
     const { currentResource } = useResourceStore()
 
