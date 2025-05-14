@@ -1,23 +1,22 @@
-import {supabase, vg} from '@/lib/api'
-import {UserProfileBasic} from '@/lib/defs/user'
-import {useUserAccountStore} from '@/lib/state'
-import {toast} from 'sonner'
+import { supabase, vg } from '@/lib/api'
+import { UserProfileBasic } from '@/lib/defs/user'
+import { useUserAccountStore } from '@/lib/state'
+import { toast } from 'sonner'
 import WolfoxDrawing from '@/src/images/png/wolfox-drawing.png'
 import PuzzleCharacters from '@/src/images/svg/3-puzzle-characters.svg'
 import CharacterHoldingPencil from '@/src/images/svg/character-holding-pencil.svg'
 import CursorCharacterSorting from '@/src/images/svg/cursor-character-sorting.svg'
 import MusicMutedCharacters from '@/src/images/svg/music-muted-characters.svg'
 import clsx from 'clsx'
-import {CheckIcon} from 'lucide-react'
-import {Dispatch, FormEvent, JSX, SetStateAction, useEffect, useState} from 'react'
+import { CheckIcon } from 'lucide-react'
+import { Dispatch, FormEvent, JSX, SetStateAction, useEffect, useState } from 'react'
 import Modal from '.'
-import GodRays from '../charm/god-rays'
-import {LoadingCircle} from '../icons'
+import { LoadingCircle } from '../icons'
 import XMarkIcon from '@/components/icons/dazzle/xmark'
 import SelectPills from '../shared/input/select-pills'
 import Link from '../shared/link'
-import {Heading, Text} from '../shared/text'
-import {Button} from '../shared/button'
+import { Heading, Text } from '../shared/text'
+import { Button } from '../shared/button'
 
 type StepFuncType = {
     setSubmitting: Dispatch<SetStateAction<boolean>>
@@ -30,7 +29,7 @@ function PackSelectForSetting() {
 
     useEffect(() => {
         let effectTimeout
-        vg.user.me.packs.get().then((data) => {
+        vg.user.me.packs.get().then(data => {
             effectTimeout = setTimeout(() => {
                 setPacks(data?.data || [])
             }, 2000)
@@ -414,8 +413,8 @@ const steps: {
     },
 ]
 
-export default function UserOnboardingModal({state}: { state: [boolean, Dispatch<SetStateAction<boolean>>] }) {
-    const {user, setUser} = useUserAccountStore()
+export default function UserOnboardingModal({ state }: { state: [boolean, Dispatch<SetStateAction<boolean>>] }) {
+    const { user, setUser } = useUserAccountStore()
     const [showOnboardingModal, setShowOnboardingModal] = state
     const [submitting, setSubmitting] = useState<boolean>(false)
     const [currentStep, setCurrentStep] = useState<number>(0)
@@ -427,13 +426,15 @@ export default function UserOnboardingModal({state}: { state: [boolean, Dispatch
         const newStep = currentStep + 1
 
         if (currentStep === steps.length - 1) {
-            supabase.auth.updateUser({
-                data: {
-                    dp_uod: true,
-                }
-            }).catch(e => {
-                log.error('User Onboarding', 'Failed to update user:', e)
-            })
+            supabase.auth
+                .updateUser({
+                    data: {
+                        dp_uod: true,
+                    },
+                })
+                .catch(e => {
+                    log.error('User Onboarding', 'Failed to update user:', e)
+                })
 
             setUser({ ...user, metadata: { ...user.metadata, dp_uod: true } })
             return setShowOnboardingModal(false)
@@ -461,7 +462,7 @@ export default function UserOnboardingModal({state}: { state: [boolean, Dispatch
 
     return (
         <>
-            {showOnboardingModal && <GodRays className="z-40 -top-12 opacity-20" />}
+            {/*{showOnboardingModal && <GodRays className="z-40 -top-12 opacity-20" />}*/}
             <Modal
                 showModal={showOnboardingModal}
                 setShowModal={setShowOnboardingModal}
