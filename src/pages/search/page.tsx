@@ -91,7 +91,14 @@ export default function Search() {
                 setIsLoading(true)
                 setError(null)
 
-                const searchResults = await vg.search.get({ query: { q: debouncedQuery } })
+                const searchResults = await vg.search.get({
+                    query: {
+                        q: debouncedQuery,
+                        ...(activeCategory !== 'Everything' && {
+                            allowedTables: [activeCategory.toLowerCase() as 'profiles' | 'packs' | 'posts'],
+                        }),
+                    },
+                })
                 if (searchResults.error) {
                     throw new Error(searchResults.error)
                 }
@@ -115,7 +122,7 @@ export default function Search() {
         }
 
         fetchResults()
-    }, [debouncedQuery])
+    }, [debouncedQuery, activeCategory])
 
     // Filter results based on active category
     useEffect(() => {
@@ -175,46 +182,34 @@ export default function Search() {
             </div>
 
             {/* Category tabs */}
-            {query && filteredResults.length > 0 && !isLoading && (
-                <div className="max-w-md w-fit mx-auto px-4 mt-2">
-                    <ExpandableTabs
-                        tabs={[
-                            {
-                                title: 'Everything',
-                                icon: MagnifyingGlassCircleIcon,
-                            },
-                            ...(results.results?.profiles.length > 0
-                                ? [
-                                      {
-                                          title: 'Profiles',
-                                          icon: UsersIcon,
-                                      },
-                                  ]
-                                : []),
-                            ...(results.results?.packs.length > 0
-                                ? [
-                                      {
-                                          title: 'Packs',
-                                          icon: UserGroupIcon,
-                                      },
-                                  ]
-                                : []),
-                            ...(results.results?.posts.length > 0
-                                ? [
-                                      {
-                                          title: 'Posts',
-                                          icon: RectangleStackIcon,
-                                      },
-                                  ]
-                                : []),
-                        ]}
-                        onChange={index => {
-                            setActiveCategory(['Everything', 'Profiles', 'Packs', 'Posts'][index])
-                        }}
-                        activeTab={['Everything', 'Profiles', 'Packs', 'Posts'].indexOf(activeCategory)}
-                    />
-                </div>
-            )}
+            <div className="max-w-md w-fit mx-auto px-4 mt-2">
+                <ExpandableTabs
+                    tabs={[
+                        {
+                            title: 'Everything',
+                            icon: MagnifyingGlassCircleIcon,
+                        },
+
+                        {
+                            title: 'Profiles',
+                            icon: UsersIcon,
+                        },
+
+                        {
+                            title: 'Packs',
+                            icon: UserGroupIcon,
+                        },
+                        {
+                            title: 'Posts',
+                            icon: RectangleStackIcon,
+                        },
+                    ]}
+                    onChange={index => {
+                        setActiveCategory(['Everything', 'Profiles', 'Packs', 'Posts'][index])
+                    }}
+                    activeTab={['Everything', 'Profiles', 'Packs', 'Posts'].indexOf(activeCategory)}
+                />
+            </div>
 
             {/* Results area */}
             <div className="flex-grow p-4 overflow-auto">
