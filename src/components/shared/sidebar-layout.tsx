@@ -125,7 +125,7 @@ export function SidebarLayout({
                         }),
                     }}
                 >
-                    <div className="h-[calc(100vh-1rem)] overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
+                    <div className="h-[calc(100vh-4rem)] overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
                         <div className="mx-auto overflow-hidden h-full">{children}</div>
                     </div>
                 </motion.main>
