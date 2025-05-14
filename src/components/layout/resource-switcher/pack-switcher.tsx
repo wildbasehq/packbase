@@ -68,7 +68,7 @@ export default function PackSwitcher() {
                 </div>
             </Tooltip>
 
-            <div className="h-[0.1rem] w-full bg-n-5/20 my-2"></div>
+            <div className="h-[1px] w-full bg-n-3 my-2"></div>
 
             {resources.map(item => (
                 <Tooltip

@@ -1,6 +1,6 @@
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import { ArrowUpRightIcon } from 'lucide-react'
-import { lazy, Suspense, useState } from 'react'
+import { lazy, useState } from 'react'
 import {
     Sidebar,
     SidebarBody,
@@ -49,14 +49,16 @@ export function PackChannels() {
     return (
         <div className="flex h-full">
             <PackSwitcher />
-            <div className="flex flex-col">
-                <nav aria-label="Sections" className="flex flex-col min-h-14 w-80">
-                    <div className="relative flex h-full items-center px-5 py-2 overflow-hidden">
-                        <div className="w-full">
-                            <ResourceSwitcher />
+            <div className="flex flex-col w-80">
+                {!currentResource.standalone && (
+                    <nav aria-label="Sections" className="flex flex-col min-h-14 w-80">
+                        <div className="relative flex h-full items-center px-5 py-2 overflow-hidden">
+                            <div className="w-full">
+                                <ResourceSwitcher />
+                            </div>
                         </div>
-                    </div>
-                </nav>
+                    </nav>
+                )}
 
                 <Sidebar className="w-full max-w-[320px]">
                     <SidebarHeader>
@@ -98,6 +100,15 @@ export function PackChannels() {
                                     )}
                                 </SidebarItem>
                             ))}
+                        </SidebarSection>
+                        <SidebarSection>
+                            <SidebarHeading>Things are changin'</SidebarHeading>
+                            <SidebarLabel className="flex items-center gap-2 px-2 text-wrap select-none">
+                                <span className="text-xs/5 text-muted-foreground">
+                                    <span className="font-bold">Hold tight</span> - we're preparing final design details for Packbase,
+                                    expect ultra levels of jank.
+                                </span>
+                            </SidebarLabel>
                         </SidebarSection>
                         <SidebarSpacer />
                         <SidebarSection>
@@ -141,11 +152,11 @@ export function PackChannels() {
 
                     <SidebarFooter className="max-lg:hidden relative">
                         {/* Conditionally render ConnectionStatus based on realtime capability */}
-                        {hasRealtimeCapability && (
-                            <Suspense fallback={null}>
-                                <ConnectionStatus />
-                            </Suspense>
-                        )}
+                        {/*{hasRealtimeCapability && (*/}
+                        {/*    <Suspense fallback={null}>*/}
+                        {/*        <ConnectionStatus />*/}
+                        {/*    </Suspense>*/}
+                        {/*)}*/}
                         <Dropdown>
                             <DropdownButton as={SidebarItem}>
                                 <span className="flex items-center min-w-0 gap-3">
