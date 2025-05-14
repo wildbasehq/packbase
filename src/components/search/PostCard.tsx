@@ -25,10 +25,10 @@ export const PostCard = ({ post }: PostCardProps) => {
 
     return (
         <Link
-            href={post.url || (post.user ? `/user/${post.user.slug || post.user.username}/post/${post.id}` : `/post/${post.id}`)}
+            href={post.user ? `/@${post.user.username}/post/${post.id}` : `/post/${post.id}`}
             className="block h-full ring-1 rounded ring-default hover:ring-2 transition-shadow"
         >
-            <div className="p-5">
+            <div className="p-4">
                 {/* Post author info if available */}
                 {post.user && (
                     <div className="flex items-center gap-2 mb-3 text-default">

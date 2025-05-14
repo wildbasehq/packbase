@@ -294,6 +294,7 @@ export default function Search() {
                                     // For 'All' category, try to determine type from the result properties
                                     if (result.content_type === 'markdown' && result.body) {
                                         resultType = 'post'
+                                        // @ts-ignore
                                     } else if (result.username && !result.body) {
                                         resultType = 'profile'
                                     } else if (result.user && result.body) {
@@ -307,6 +308,7 @@ export default function Search() {
                                 // Render the appropriate component based on result type
                                 switch (resultType) {
                                     case 'profile':
+                                        // @ts-ignore
                                         return <ProfileCard key={result.id} profile={result} />
                                     case 'pack':
                                         return <PackCard key={result.id} pack={result} />
@@ -322,12 +324,9 @@ export default function Search() {
                                                 transition={{ duration: 0.2, delay: index * 0.03 }}
                                                 className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 hover:border-border/80 group"
                                             >
-                                                <a href={result.url} className="block h-full">
+                                                <div className="block h-full">
                                                     <div className="p-5">
                                                         <div className="flex items-start justify-between mb-3">
-                                                            <h2 className="text-lg font-medium text-foreground group-hover:text-primary transition-colors">
-                                                                {result.title}
-                                                            </h2>
                                                             {result.category && (
                                                                 <span className="text-xs px-2.5 py-1 rounded-full tracking-wide font-medium ml-2 flex-shrink-0 bg-accent text-accent-foreground">
                                                                     {result.category}
@@ -342,7 +341,7 @@ export default function Search() {
                                                             </div>
                                                         )}
                                                     </div>
-                                                </a>
+                                                </div>
                                             </motion.div>
                                         )
                                 }
