@@ -19,6 +19,7 @@
   /* Animation presets */
   --animate-logo-hue: hue var(--duration-1000) ease-out, hue 30s ease-out 1s infinite;
   --animate-hue: hue var(--duration-1000) ease-out;
+  --animate-hue-linear: hue var(--duration-1000) linear infinite;
   --animate-shimmer: shimmer var(--duration-1000) ease-out infinite;
   --animate-shimmer-fast: shimmer var(--duration-500) ease-in-out infinite;
   --animate-pulse-inverse: pulse-inverse var(--duration-200) ease-out;

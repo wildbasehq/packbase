@@ -6,7 +6,7 @@ import { useDebounce } from 'use-debounce'
 import { SearchApiResponse, SearchResult } from './types'
 import { PackCard, PostCard, ProfileCard } from '@/components/search'
 import { Heading, Text } from '@/components/shared/text.tsx'
-import { ExpandableTabs } from '@/src/components'
+import { Alert, AlertDescription, AlertTitle, ExpandableTabs } from '@/src/components'
 import { MagnifyingGlassCircleIcon, RectangleStackIcon, UserGroupIcon, UsersIcon } from '@heroicons/react/20/solid'
 
 // Array of greeting messages to randomly display
@@ -153,28 +153,45 @@ export default function Search() {
 
                     {/* Active filters/info display */}
                     {query && (
-                        <div className="flex items-center justify-between mt-4">
-                            <div className="text-sm text-muted-foreground">
-                                {filteredResults.length > 0 ? (
-                                    <span>
-                                        Found {results.count || filteredResults.length}{' '}
-                                        {(results.count || filteredResults.length) === 1 ? 'result' : 'results'}
-                                        {activeCategory !== 'Everything' ? ` in ${activeCategory}` : ''}
-                                    </span>
-                                ) : !isLoading ? (
-                                    <span>No results found for "{query}"</span>
-                                ) : null}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between mt-4">
+                                <div className="text-sm text-muted-foreground">
+                                    {filteredResults.length > 0 ? (
+                                        <span>
+                                            Found {results.count || filteredResults.length}{' '}
+                                            {(results.count || filteredResults.length) === 1 ? 'result' : 'results'}
+                                            {activeCategory !== 'Everything' ? ` in ${activeCategory}` : ''}
+                                        </span>
+                                    ) : !isLoading ? (
+                                        <span>No results found for "{query}"</span>
+                                    ) : (
+                                        'Hold on...'
+                                    )}
+                                </div>
+
+                                {/* Clear search button */}
+                                {query && (
+                                    <button
+                                        onClick={handleClearSearch}
+                                        className="inline-flex items-center gap-1 px-2 py-1 text-xs text-foreground/70 hover:text-foreground rounded hover:bg-accent/50 transition-colors"
+                                    >
+                                        <X className="h-3 w-3" />
+                                        <span>Clear</span>
+                                    </button>
+                                )}
                             </div>
 
-                            {/* Clear search button */}
-                            {query && (
-                                <button
-                                    onClick={handleClearSearch}
-                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs text-foreground/70 hover:text-foreground rounded hover:bg-accent/50 transition-colors"
-                                >
-                                    <X className="h-3 w-3" />
-                                    <span>Clear</span>
-                                </button>
+                            {/* Using whskrd warning*/}
+                            {query.startsWith('[') && (
+                                <Alert variant="warning">
+                                    <AlertTitle>whskrd is experimental</AlertTitle>
+                                    <AlertDescription>
+                                        <Text>
+                                            whskrd is an in-house scripting language which enables powerful and flexible search queries,
+                                            soon to be powering feeds. It's currently in an experimental phase and may not work as expected.
+                                        </Text>
+                                    </AlertDescription>
+                                </Alert>
                             )}
                         </div>
                     )}

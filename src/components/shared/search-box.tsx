@@ -11,31 +11,6 @@ interface SearchBoxProps {
     autoFocus?: boolean
 }
 
-const searchBoxVariants = {
-    initial: {
-        width: '40px',
-        opacity: 0,
-    },
-    animate: {
-        width: '100%',
-        opacity: 1,
-        transition: {
-            type: 'spring',
-            bounce: 0,
-            duration: 0.6,
-        },
-    },
-    exit: {
-        width: '40px',
-        opacity: 0,
-        transition: {
-            type: 'spring',
-            bounce: 0,
-            duration: 0.3,
-        },
-    },
-}
-
 export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = true }: SearchBoxProps) {
     const { query, setQuery } = useSearch()
     const inputRef = React.useRef<HTMLInputElement>(null)

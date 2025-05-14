@@ -1,12 +1,13 @@
 'use client'
 
 import * as React from 'react'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { LucideIcon } from 'lucide-react'
 import { useLocation } from 'wouter'
 import { SearchBox } from '@/components/shared/search-box.tsx'
+import { useSearch } from '@/lib'
 
 interface Tab {
     title?: string
@@ -63,6 +64,38 @@ const transition = {
 export function ExpandableTabs({ tabs, className, activeColor = 'text-default', onChange, activeTab }: ExpandableTabsProps) {
     const [selected, setSelected] = React.useState<number | null>(null)
     const [location, setLocation] = useLocation()
+    const { query } = useSearch()
+
+    // Inside your component before the return statement, add:
+    const prevQueryStartsWithBracket = useRef(false)
+    const [gradientDirection, setGradientDirection] = useState('forward')
+
+    // Add this effect to track query changes
+    useEffect(() => {
+        const currentStartsWithBracket = query.startsWith('[')
+
+        if (currentStartsWithBracket !== prevQueryStartsWithBracket.current) {
+            setGradientDirection(currentStartsWithBracket ? 'forward' : 'reverse')
+        }
+
+        prevQueryStartsWithBracket.current = currentStartsWithBracket
+    }, [query])
+
+    const gradientBorderAnimationClass = `
+  relative
+  after:content-['']
+  after:absolute
+  after:pointer-events-none
+  after:inset-[-1px]
+  after:rounded-[calc(theme(borderRadius.xl)+1px)]
+  after:bg-[linear-gradient(-45deg,_#b25aff_0,#e62c6d_8%,#ff530f_17%,#ff9100_25%,#ffc400_33%,theme(colors.amber.500)_34%,theme(colors.amber.500)_40%,theme(colors.indigo.500)_45%,theme(colors.indigo.500)_100%)]
+  after:bg-[length:400%_200%]
+  after:transition-[background-position,opacity]
+  after:ease-out
+  after:duration-500
+  after:z-0
+  after:opacity-0
+`
 
     const handleSelect = (index: number) => {
         setSelected(index)
@@ -121,12 +154,32 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
                         onClick={() => handleSelect(index)}
                         transition={transition}
                         className={cn(
-                            'relative flex items-center rounded-xl px-4 py-2 text-sm transition-colors font-medium duration-300 !h-9',
-                            selected === index ? cn('bg-muted', activeColor) : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            'relative flex items-center rounded-xl px-4 py-2 text-sm transition-colors font-medium duration-300 !h-9 z-[1]',
+                            selected === index ? cn('bg-muted', activeColor) : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                            tab.type === 'search' && gradientBorderAnimationClass,
+                            selected === index && query.startsWith('[')
+                                ? `after:opacity-100
+                            ${gradientDirection === 'forward' ? 'after:bg-[position:100%_100%]' : 'after:bg-[position:0_0]'}
+                            `
+                                : ''
                         )}
                         layout
                     >
-                        <Icon className="w-5 h-5 flex-shrink-0" />
+                        {tab.type === 'search' && (
+                            <div
+                                className={`bg-muted absolute inset-0 z-[1] rounded transition-opacity opacity-0 duration-300 ${selected === index ? 'opacity-100' : ''}`}
+                            />
+                        )}
+                        {/* floating card if query starts with bracket with text */}
+                        {query.startsWith('[') && selected === index && tab.type === 'search' && (
+                            <div className="absolute z-[1] rounded-2xl right-0">
+                                <p className="text-sm text-muted-foreground px-4 py-2">whskrd</p>
+                            </div>
+                        )}
+                        {/* The content of your button with proper z-index */}
+                        <div className="relative z-[2]">
+                            <Icon className="w-5 h-5 flex-shrink-0" />
+                        </div>
                         <AnimatePresence initial={false}>
                             {selected === index && tab.type !== 'search' && (
                                 <motion.span
@@ -135,7 +188,7 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
                                     animate="animate"
                                     exit="exit"
                                     transition={transition}
-                                    className="overflow-hidden whitespace-nowrap"
+                                    className="overflow-hidden whitespace-nowrap relative z-[2]"
                                     layout
                                 >
                                     {tab.title}
@@ -153,7 +206,7 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
                                     animate="animate"
                                     exit="exit"
                                     transition={transition}
-                                    className="overflow-hidden whitespace-nowrap"
+                                    className="overflow-hidden whitespace-nowrap relative z-[2]"
                                     layout
                                 >
                                     <SearchBox />
