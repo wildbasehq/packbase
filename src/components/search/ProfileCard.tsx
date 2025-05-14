@@ -15,12 +15,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
             <div className="p-4">
                 <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12">
-                        <Avatar
-                            square
-                            // src={profile?.images?.avatar}
-                            className="w-full h-full"
-                            initials={profile?.username?.slice(0, 2)}
-                        />
+                        <Avatar square src={profile?.images?.avatar} className="w-full h-full" initials={profile?.username?.slice(0, 2)} />
                     </div>
                     <div>
                         <h2 className="text-lg font-medium text-foreground group-hover:text-primary transition-colors">
