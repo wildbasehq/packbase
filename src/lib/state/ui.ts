@@ -43,7 +43,7 @@ export const useUIStore = create<ResourceUIStore>(set => ({
     maintenance: null,
     updateAvailable: false,
     websocketStatus: 'connecting',
-    serverCapabilities: [],
+    serverCapabilities: ['realtime'],
     setHidden: hidden =>
         set(state => ({
             ...state,
