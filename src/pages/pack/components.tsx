@@ -1,17 +1,18 @@
 // src/components/pages/pack-feed-controller.tsx
-import {useEffect, useState} from 'react'
-import {useResourceStore, useUserAccountStore} from '@/lib/state'
+import { useEffect, useState } from 'react'
+import { useResourceStore, useUserAccountStore } from '@/lib/state'
 import Lottie from 'lottie-react'
 
 import Body from '@/components/layout/body'
-import {Heading, Text} from '@/components/shared/text'
-import Link from '@/components/shared/link'
+import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/experimental-button-rework'
 import PackHeader from '@/components/shared/pack/header'
 import { Feed } from '@/components/feed'
 
 // Animation asset
 import girlDogBusStop from '@/datasets/lottie/girl-dog-bus-stop.json'
+import SettingsDialog from '@/pages/settings/layout.tsx'
+import { useModal } from '@/components/modal/provider.tsx'
 
 interface PackFeedControllerProps {
     overrideFeedID?: string
@@ -20,6 +21,7 @@ interface PackFeedControllerProps {
 export default function PackFeedController({ overrideFeedID }: PackFeedControllerProps) {
     const { user } = useUserAccountStore()
     const { currentResource } = useResourceStore()
+    const { show } = useModal()
 
     const [shadowSize, setShadowSize] = useState(0)
     const [viewSettingsOpen, setViewSettingsOpen] = useState(false)
@@ -75,7 +77,13 @@ export default function PackFeedController({ overrideFeedID }: PackFeedControlle
                                 </Text>
 
                                 <div className="pt-2">
-                                    <Button color="indigo" href="/settings">
+                                    <Button
+                                        color="indigo"
+                                        onClick={e => {
+                                            e.preventDefault()
+                                            show(<SettingsDialog />)
+                                        }}
+                                    >
                                         I have an invite code!
                                     </Button>
                                 </div>

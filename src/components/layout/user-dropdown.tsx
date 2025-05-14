@@ -68,8 +68,11 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
             <div className="w-full rounded-bl rounded-br bg-white/50 h-fit ring-1 ring-default dark:bg-n-6/50">
                 <div className="p-2 border-b">
                     {user?.anonUser && (
-                        <Link
-                            href="/settings"
+                        <div
+                            onClick={e => {
+                                e.preventDefault()
+                                show(<SettingsDialog />)
+                            }}
                             className="ring-default flex flex-col justify-center rounded px-4 py-4 no-underline! transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50"
                         >
                             <Heading size="sm">You need an invite</Heading>
@@ -77,7 +80,7 @@ export default function UserDropdown({ showOnboardingModal }: { showOnboardingMo
                                 You'll need an invite code to join Packbase. If you have one, click here! Otherwise, ask a friend or wait
                                 and see if you get lucky on our weekly rounds.
                             </Text>
-                        </Link>
+                        </div>
                     )}
                     {user.reqOnboard && !user.anonUser && (
                         <div
