@@ -213,7 +213,7 @@ function BottomRowCards() {
 
 function Hero() {
     return (
-        <div className="relative">
+        <div className="relative overflow-hidden">
             {/* Top row of skewed cards */}
             <TopRowCards />
 

@@ -164,7 +164,7 @@ export default function Search() {
                                         </span>
                                     ) : !isLoading ? (
                                         <span>No results found for "{query}"</span>
-                                    ) : !query.startsWith('[') ? (
+                                    ) : !query?.startsWith('[') ? (
                                         'Hold on...'
                                     ) : (
                                         'Hold on while whskrd starts...'
@@ -184,7 +184,7 @@ export default function Search() {
                             </div>
 
                             {/* Using whskrd warning */}
-                            {query.startsWith('[') && (
+                            {query?.startsWith('[') && (
                                 <Alert variant="warning">
                                     <AlertTitle>whskrd is experimental</AlertTitle>
                                     <AlertDescription>

@@ -72,7 +72,7 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
 
     // Add this effect to track query changes
     useEffect(() => {
-        const currentStartsWithBracket = query.startsWith('[')
+        const currentStartsWithBracket = query?.startsWith('[')
 
         if (currentStartsWithBracket !== prevQueryStartsWithBracket.current) {
             setGradientDirection(currentStartsWithBracket ? 'forward' : 'reverse')
@@ -157,7 +157,7 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
                             'relative flex items-center rounded-xl px-4 py-2 text-sm transition-colors font-medium duration-300 !h-9 z-[1]',
                             selected === index ? cn('bg-muted', activeColor) : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                             tab.type === 'search' && gradientBorderAnimationClass,
-                            selected === index && query.startsWith('[')
+                            selected === index && query?.startsWith('[')
                                 ? `after:opacity-100
                             ${gradientDirection === 'forward' ? 'after:bg-[position:100%_100%]' : 'after:bg-[position:0_0]'}
                             `
@@ -171,7 +171,7 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
                             />
                         )}
                         {/* floating card if query starts with bracket with text */}
-                        {query.startsWith('[') && selected === index && tab.type === 'search' && (
+                        {query?.startsWith('[') && selected === index && tab.type === 'search' && (
                             <div className="absolute z-[1] rounded-2xl right-0">
                                 <p className="text-sm text-muted-foreground px-4 py-2">whskrd</p>
                             </div>
