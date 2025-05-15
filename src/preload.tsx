@@ -1,71 +1,46 @@
 import Body from '@/components/layout/body'
 import { LoadingDots } from '@/components/icons'
 import { Heading } from '@/components/shared/text'
-import { API_URL, setToken, supabase, vg } from '@/lib/api'
+import { setToken, supabase, vg } from '@/lib/api'
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/index'
 import { HandRaisedIcon } from '@heroicons/react/20/solid'
 import { useEffect, useState } from 'react'
 import { getSelfProfile } from '@/lib/api/cron/profile-update.ts'
 
 export default function Preload({ children }: { children: React.ReactNode }) {
-    const [serviceLoading, setServiceLoading] = useState<string>(`polling ${API_URL}`)
+    const [serviceLoading, setServiceLoading] = useState<string>(`auth`)
     const [error, setError] = useState<any | null>(null)
     const { setUser } = useUserAccountStore()
     const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
     const { setResources } = useResourceStore()
 
     useEffect(() => {
-        if (!serviceLoading.startsWith('polling')) return
-        vg.server.describeServer
-            .get()
-            .then(server => {
-                setBucketRoot(server.data.bucketRoot)
-                setMaintenance(server.data.maintenance)
-                setServerCapabilities(server.data.capabilities || [])
-
-                if (server.data.maintenance) {
-                    return setError({
-                        cause: 'Server is under maintenance',
-                        message: server.data.maintenance || `Packbase is currently under maintenance. Please check back later.`,
-                    })
-                }
-
-                setStatus('auth')
-                // @ts-ignore
-                supabase.auth.getSession().then(async ({ data: { session } }) => {
-                    const { user, access_token, expires_at } = session || {}
-                    if (user) {
-                        setToken(access_token, expires_at)
-                        setStatus('auth:@me')
-                        const localUser = localStorage.getItem('user-account')
-                        if (localUser) {
-                            const json = JSON.parse(localUser)
-                            if (json.state.user) {
-                                const packs = localStorage.getItem('packs')
-                                if (packs) setResources(JSON.parse(packs))
-                                setUser(json.state.user)
-                                proceed()
-                            }
-                        }
-
-                        getSelfProfile(() => {
-                            proceed()
-                        })
-                    } else {
-                        setUser(null)
+        if (!serviceLoading.startsWith('auth')) return
+        // @ts-ignore
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
+            const { user, access_token, expires_at } = session || {}
+            if (user) {
+                setToken(access_token, expires_at)
+                setStatus('auth:@me')
+                const localUser = localStorage.getItem('user-account')
+                if (localUser) {
+                    const json = JSON.parse(localUser)
+                    if (json.state.user) {
+                        const packs = localStorage.getItem('packs')
+                        if (packs) setResources(JSON.parse(packs))
+                        setUser(json.state.user)
                         proceed()
                     }
+                }
+
+                getSelfProfile(() => {
+                    proceed()
                 })
-            })
-            .catch(e => {
-                log.error('Core', e)
-                if (e?.message.indexOf('Failed') > -1)
-                    return setError({
-                        cause: 'UI & Server could not talk together',
-                        message: `Packbase is offline, or your network is extremely unstable.`,
-                    })
-                return setError(e)
-            })
+            } else {
+                setUser(null)
+                proceed()
+            }
+        })
     }, [])
 
     const setStatus = (status: string) => {
@@ -82,6 +57,30 @@ export default function Preload({ children }: { children: React.ReactNode }) {
         setStatus('proceeding')
         setLoading(false)
         setConnecting(false)
+
+        vg.server.describeServer
+            .get()
+            .then(server => {
+                setBucketRoot(server.data.bucketRoot)
+                setMaintenance(server.data.maintenance)
+                setServerCapabilities(server.data.capabilities || [])
+
+                if (server.data.maintenance) {
+                    return setError({
+                        cause: 'Server is under maintenance',
+                        message: server.data.maintenance || `Packbase is currently under maintenance. Please check back later.`,
+                    })
+                }
+            })
+            .catch(e => {
+                log.error('Core', e)
+                if (e?.message.indexOf('Failed') > -1)
+                    return setError({
+                        cause: 'UI & Server could not talk together',
+                        message: `Packbase is offline, or your network is extremely unstable.`,
+                    })
+                return setError(e)
+            })
     }
 
     return (
