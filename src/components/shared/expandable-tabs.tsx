@@ -88,7 +88,7 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
   after:pointer-events-none
   after:inset-[-1px]
   after:rounded-[calc(theme(borderRadius.xl)+1px)]
-  after:bg-[linear-gradient(-45deg,_#b25aff_0,#e62c6d_8%,#ff530f_17%,#ff9100_25%,#ffc400_33%,theme(colors.amber.500)_34%,theme(colors.amber.500)_40%,theme(colors.indigo.500)_45%,theme(colors.indigo.500)_100%)]
+  after:bg-[linear-gradient(-45deg,_#b25aff_0,#e62c6d_8%,#ff530f_17%,#ff9100_25%,#ffc400_33%,theme(colors.amber.500)_34%,theme(colors.amber.500)_40%,#ffffff_45%,transparent_100%)]
   after:bg-[length:400%_200%]
   after:transition-[background-position,opacity]
   after:ease-out
