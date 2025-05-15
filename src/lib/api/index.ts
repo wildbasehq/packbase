@@ -72,7 +72,7 @@ export const refreshSession = async () => {
             window.location.reload()
         }
 
-        setToken(session?.access_token)
+        setToken(session?.access_token, session?.expires_at)
 
         getSelfProfile()
 

@@ -16,6 +16,30 @@ export default function Preload({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (!serviceLoading.startsWith('auth')) return
+        vg.server.describeServer
+            .get()
+            .then(server => {
+                setBucketRoot(server.data.bucketRoot)
+                setMaintenance(server.data.maintenance)
+                setServerCapabilities(server.data.capabilities || [])
+
+                if (server.data.maintenance) {
+                    return setError({
+                        cause: 'Server is under maintenance',
+                        message: server.data.maintenance || `Packbase is currently under maintenance. Please check back later.`,
+                    })
+                }
+            })
+            .catch(e => {
+                log.error('Core', e)
+                if (e?.message.indexOf('Failed') > -1)
+                    return setError({
+                        cause: 'UI & Server could not talk together',
+                        message: `Packbase is offline, or your network is extremely unstable.`,
+                    })
+                return setError(e)
+            })
+
         // @ts-ignore
         supabase.auth.getSession().then(async ({ data: { session } }) => {
             const { user, access_token, expires_at } = session || {}
@@ -57,30 +81,6 @@ export default function Preload({ children }: { children: React.ReactNode }) {
         setStatus('proceeding')
         setLoading(false)
         setConnecting(false)
-
-        vg.server.describeServer
-            .get()
-            .then(server => {
-                setBucketRoot(server.data.bucketRoot)
-                setMaintenance(server.data.maintenance)
-                setServerCapabilities(server.data.capabilities || [])
-
-                if (server.data.maintenance) {
-                    return setError({
-                        cause: 'Server is under maintenance',
-                        message: server.data.maintenance || `Packbase is currently under maintenance. Please check back later.`,
-                    })
-                }
-            })
-            .catch(e => {
-                log.error('Core', e)
-                if (e?.message.indexOf('Failed') > -1)
-                    return setError({
-                        cause: 'UI & Server could not talk together',
-                        message: `Packbase is offline, or your network is extremely unstable.`,
-                    })
-                return setError(e)
-            })
     }
 
     return (
