@@ -17,10 +17,6 @@ import { useLocation } from 'wouter'
 export default function PackSwitcher() {
     // Going back home
     const [initialSound] = useSound('/sounds/switcher.ogg')
-    // Entering pack
-    // 1 in 1000 chance of using `/sounds/sfx.lobotomy.social.new.wav` instead of `/sounds/switched.ogg`
-    const [switchedSoundNormal] = useSound('/sounds/switched.ogg')
-    const [switchedSoundSpecial] = useSound('/sounds/sfx.lobotomy.social.new.wav')
     // Not allowed
     const [heavyHoverSound] = useSound('/sounds/switch-hover-s.ogg', {
         playbackRate: 0.3,
@@ -31,22 +27,12 @@ export default function PackSwitcher() {
     const { resourceDefault, loading, setLoading } = useUIStore()
     const [, navigate] = useLocation()
 
-    const switchedSound = () => {
-        const rand = Math.random()
-        if (rand < 0.002) {
-            console.log('random hit', rand)
-            switchedSoundSpecial()
-        } else {
-            switchedSoundNormal()
-        }
-    }
-
     const switchResource = (resource: any) => {
         if (loading || currentResource.id === resource.id) {
             if (resource.slug === 'universe') navigate('/p/universe')
             return heavyHoverSound()
         }
-        resource.id === resourceDefault.id ? initialSound() : switchedSound()
+        resource.id === resourceDefault.id && initialSound()
         setCurrentResource(resource)
         setLoading(true)
         navigate(`/p/${resource.slug}`)

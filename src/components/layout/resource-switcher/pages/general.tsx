@@ -7,7 +7,7 @@ import { Input } from '@/components/shared/input/text.tsx'
 import { vg } from '@/lib/api'
 import { toast } from 'sonner'
 import { createRef, useEffect, useState } from 'react'
-import { useResourceStore } from '@/lib/index'
+import { useResourceStore } from '@/lib'
 
 export default function ResourceSettingsGeneral() {
     const { currentResource, setCurrentResource, resources, setResources } = useResourceStore()

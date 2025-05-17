@@ -14,13 +14,13 @@ import { toast } from 'sonner'
 import { useModal } from '@/components/modal/provider'
 import { SettingsIcon } from 'lucide-react'
 import { Button } from '@/components/shared/button'
-import clsx from 'clsx'
 import { ClipboardIcon, TrashIcon, UserGroupIcon } from '@heroicons/react/20/solid'
 import { Avatar } from '@/components/shared/avatar'
 import ResourceSettingsGeneral from './pages/general'
 import ResourceSettingsMembers from '@/components/layout/resource-switcher/pages/members.tsx'
 import ResourceDeletePage from './pages/delete'
 import { VerifiedBadge } from '@/components/layout/resource-switcher/pack-badge.tsx'
+import PagedModal from '@/components/shared/paged-modal'
 
 export default function ResourceSwitcher() {
     const hoverCancelSFX = '/sounds/switch-hover-s.ogg'
@@ -175,71 +175,44 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
 }
 
 function ResourceSettingsModal() {
-    const [currentPage, setCurrentPage] = useState('General Information')
+    const { currentResource } = useResourceStore()
 
-    const { currentResource, resources, setResources, setCurrentResource } = useResourceStore()
-
-    const pages = [
-        {
-            title: 'General Information',
-            description: 'Change pack information',
-            icon: ClipboardIcon,
-            element: <ResourceSettingsGeneral />,
-        },
-        {
-            title: 'Members',
-            description: 'Manage pack members',
-            icon: UserGroupIcon,
-            element: <ResourceSettingsMembers />,
-        },
-        {
-            title: 'Delete This Pack',
-            description: 'Delete the pack and all data',
-            icon: TrashIcon,
-            element: <ResourceDeletePage />,
-        },
-    ]
-
-    return (
-        <div className="flex h-[50vh] min-w-(--container-6xl) max-w-6xl max-h-full gap-4">
-            <div className="flex w-80 flex-col p-0!">
-                <div className="h-fit w-full rounded-br rounded-tl-lg bg-white/50 ring-2 ring-shadow dark:bg-n-6/50">
-                    <div className="flex items-center rounded px-6 py-6">
-                        <Avatar
-                            square
-                            className="w-12 h-12"
-                            initials={currentResource.display_name?.charAt(0)}
-                            alt={currentResource.display_name}
-                            src={currentResource.images?.avatar}
-                        />
-                        <div className="ml-3 grow">
-                            <Heading>{currentResource.display_name || currentResource.slug}</Heading>
-                            <Text alt>{currentResource.slug}</Text>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="inline-flex h-full w-72 flex-col gap-2 border-r-2 border-n-2/50 px-3 py-2 dark:border-n-6/80">
-                    {pages.map((page, i) => (
-                        <div key={i} className="text-default no-underline!" onClick={() => setCurrentPage(page.title)}>
-                            <div
-                                className={clsx(
-                                    page.title === currentPage ? 'bg-n-2/25 dark:bg-n-6/50' : 'hover:bg-n-2/25 dark:hover:bg-n-6/50',
-                                    'ring-default/25 ring-default group inline-flex w-full items-center justify-start gap-4 rounded px-4 py-3 transition-all hover:ring-2'
-                                )}
-                            >
-                                <page.icon className="fill-alt h-4 w-4" />
-                                <Text alt>{page.title}</Text>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Main settings portion with buttons on bottom-right at all times*/}
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-auto p-6">
-                {pages.find(page => page.title === currentPage)?.element}
+    // Create the resource profile footer component
+    const ResourceProfileFooter = (
+        <div className="flex items-center">
+            <Avatar
+                square
+                className="w-12 h-12"
+                initials={currentResource.display_name?.charAt(0)}
+                alt={currentResource.display_name}
+                src={currentResource.images?.avatar}
+            />
+            <div className="ml-3 grow">
+                <Heading>{currentResource.display_name || currentResource.slug}</Heading>
+                <Text alt>{currentResource.slug}</Text>
             </div>
         </div>
+    )
+
+    return (
+        <PagedModal footer={ResourceProfileFooter} className="h-[50vh] min-w-(--container-6xl) max-w-6xl">
+            <PagedModal.Page id="general" title="General Information" description="Change pack information" icon={ClipboardIcon}>
+                <PagedModal.Body>
+                    <ResourceSettingsGeneral />
+                </PagedModal.Body>
+            </PagedModal.Page>
+
+            <PagedModal.Page id="members" title="Members" description="Manage pack members" icon={UserGroupIcon}>
+                <PagedModal.Body>
+                    <ResourceSettingsMembers />
+                </PagedModal.Body>
+            </PagedModal.Page>
+
+            <PagedModal.Page id="delete" title="Delete This Pack" description="Delete the pack and all data" icon={TrashIcon}>
+                <PagedModal.Body>
+                    <ResourceDeletePage />
+                </PagedModal.Body>
+            </PagedModal.Page>
+        </PagedModal>
     )
 }
