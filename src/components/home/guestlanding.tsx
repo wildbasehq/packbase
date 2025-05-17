@@ -16,7 +16,7 @@ import {
 import { ClockIcon, EyeIcon, UserIcon } from '@heroicons/react/24/solid'
 import { ReactNode, useMemo, useState } from 'react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/16/solid'
-import Link from '../shared/link'
+import Link from '../shared/link' // Animation configuration
 
 // Animation configuration
 const animConfig = {
@@ -178,7 +178,7 @@ function TopRowCards() {
 
 function BottomRowCards() {
     return (
-        <div className="lg:flex w-[97%] -top-42 hidden absolute">
+        <div className="absolute bottom-1/4 left-0 right-0 w-full">
             <AnimatedCard
                 className="absolute left-0 w-1/3 h-40 mt-12 ml-2 overflow-hidden transform rounded ring-default ring-2 md:h-56 lg:h-72 bg-card -rotate-3"
                 initialY={animConfig.offset.bottom}
@@ -213,7 +213,7 @@ function BottomRowCards() {
 
 function Hero() {
     return (
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden h-full">
             {/* Top row of skewed cards */}
             <TopRowCards />
 
@@ -268,6 +268,8 @@ function Hero() {
                     )}
                 </div>
             </Container>
+
+            <BottomRowCards />
         </div>
     )
 }
@@ -308,31 +310,6 @@ function FakePost({
                     <img src={image} alt={content || user.name} className="object-cover w-full rounded-lg max-h-36 ring-2 ring-default" />
                 </div>
             )}
-        </div>
-    )
-}
-
-function LandingContent() {
-    return (
-        <div className="relative mx-8">
-            <div className="w-full">
-                <BottomRowCards />
-            </div>
-
-            <div className="relative z-10 flex items-center justify-center bg-white rounded dark:bg-zinc-900 ring-2 ring-default h-96">
-                <Text size="3xl" className="max-w-2xl mx-auto tracking-tight text-center font-instrument-serif-regular">
-                    What if there was a place
-                    <br />
-                    built for <span className="text-indigo-400 font-instrument-serif-italic">creativity</span> and{' '}
-                    <span className="text-indigo-400 font-instrument-serif-italic">connection</span>?
-                    <br />
-                    The internet should be truly <span className="font-instrument-serif-italic">yours</span>,
-                    <br />
-                    to paint, to play, to <span className="font-instrument-serif-italic">connect</span> &mdash; without
-                    <br />
-                    any barriers, paywalls, or ads.
-                </Text>
-            </div>
         </div>
     )
 }
@@ -621,32 +598,31 @@ export default function GuestLanding() {
     const links = {
         Packbase: [
             {
-                name: 'Terms & Privacy',
+                name: 'Usage Policy',
+                href: '/terms',
+            },
+            {
+                name: 'Data Handling',
                 href: '/terms',
             },
         ],
         Wildbase: [
             {
-                name: 'Labratory',
-                href: 'https://labs.packbase.app/',
+                name: 'Site',
+                href: 'https://wildbase.xyz/',
             },
             {
                 name: 'Discord',
                 href: 'https://discord.gg/wildbase',
             },
-            {
-                name: 'Changelog',
-                href: 'https://changelog.packbase.app/',
-            },
         ],
     }
     return (
-        <div className="h-full pb-6 space-y-8 overflow-x-hidden overflow-y-auto bg-zinc-100 dark:bg-zinc-950">
-            <div className="relative z-30 bg-white rounded-md ring-2 ring-default dark:bg-zinc-900">
+        <div className="h-full overflow-x-hidden overflow-y-auto bg-zinc-100 dark:bg-zinc-950">
+            <div className="relative z-30 h-full bg-white rounded-md ring-2 ring-default dark:bg-zinc-900">
                 <Hero />
-                <LandingContent />
-                <StopBeingPrey />
-                <FeaturePromiseGrid />
+                {/*<StopBeingPrey />*/}
+                {/*<FeaturePromiseGrid />*/}
             </div>
             {/* Minimal footer */}
             <div className="sticky bottom-0 left-0 z-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80 h-80">
@@ -681,12 +657,12 @@ export default function GuestLanding() {
                     <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80" style={{ bottom: '1.85rem' }}></div>
 
                     {/* Floating brand text on bottom-left - should not interact with other elements! */}
-                    <h1 className="fixed flex flex-col opacity-50 select-none bottom-6.5 left-8 font-bold">
+                    <h1 className="fixed flex flex-col opacity-50 select-none bottom-4 left-8 font-bold">
                         <span className="tracking-tighter text-8xl">
                             <span className="font-extrabold text-primary-lime">✱</span>
                             <span className="font-wildbase-bold">base</span>
                         </span>
-                        <span className="mt-0.5 text-xs tracking-tight ml-22 text-default-alt font-wildbase-medium">
+                        <span className="text-xs tracking-tight ml-22 text-default-alt font-wildbase-medium">
                             &copy; 2025 ✱base. All rights reserved.
                         </span>
                     </h1>
