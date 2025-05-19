@@ -4,6 +4,7 @@ import { useUIStore, useUserAccountStore } from '@/lib/index'
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import IntercomComponent from '@/components/shared/intercom'
 import { Text } from '@/components/shared/text.tsx'
+import { NotificationsProvider } from '@/lib/providers/notifications-provider'
 
 // Lazy load WebSocketProvider
 const WebSocketProvider = lazy(() =>
@@ -40,7 +41,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     },
                 }}
             />
-            <ModalProvider>{children}</ModalProvider>
+            <NotificationsProvider>
+                <ModalProvider>{children}</ModalProvider>
+            </NotificationsProvider>
         </>
     )
 
