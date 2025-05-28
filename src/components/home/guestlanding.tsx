@@ -13,7 +13,6 @@ import {
     ShieldCheckIcon,
     SparklesIcon,
 } from '@heroicons/react/20/solid'
-import { ClockIcon, EyeIcon, UserIcon } from '@heroicons/react/24/solid'
 import { ReactNode, useMemo, useState } from 'react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/16/solid'
 import Link from '../shared/link' // Animation configuration
@@ -42,10 +41,10 @@ const animConfig = {
 }
 
 const links = [
-    { name: 'Join Packbase', href: '/id/create/', primary: true },
+    { name: 'Join Waitlist', href: '/id/create/', primary: true },
     {
         name: 'Discord Community',
-        href: 'https://discord.gg/wildbase',
+        href: 'https://discord.gg/StuuK55gYA',
         tooltip: 'Discord invite - will open in a new tab',
     },
 ]
@@ -88,10 +87,11 @@ const posts = [
     // bottom
     {
         user: {
-            name: 'Skele',
-            avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/3dd43a7e-578e-4bef-a307-7c83c4a6f64d/0/avatar.png?updated=1740970106908',
+            name: 'Rek',
+            avatar: '/img/illustrations/onboarding/pfp/rekkisomo.png',
         },
-        content: 'I may or may not enjoy werewolves playing the violin',
+        content:
+            '(c) ✱base - Rekkisomo Harley (@rek), Meowcino (@cat),\nMocha (@mocha), T.J. (@tjcapy), Fludd (@flooderinodraws).\n\nSee you on Packbase~',
     },
     {
         user: {
@@ -178,7 +178,7 @@ function TopRowCards() {
 
 function BottomRowCards() {
     return (
-        <div className="absolute bottom-1/4 left-0 right-0 w-full">
+        <div className="absolute bottom-1/6 left-0 right-0 w-full">
             <AnimatedCard
                 className="absolute left-0 w-1/3 h-40 mt-12 ml-2 overflow-hidden transform rounded ring-default ring-2 md:h-56 lg:h-72 bg-card -rotate-3"
                 initialY={animConfig.offset.bottom}
@@ -214,12 +214,19 @@ function BottomRowCards() {
 function Hero() {
     return (
         <div className="relative overflow-hidden h-full">
+            {/* Background image absolute covering the whole screen */}
+            {/*<img*/}
+            {/*    src="/img/n-bg.jpg"*/}
+            {/*    alt="N-BG"*/}
+            {/*    className="absolute top-0 -z-10 w-full h-full object-cover object-bottom"*/}
+            {/*    style={{ objectPosition: '0 50%' }}*/}
+            {/*/>*/}
             {/* Top row of skewed cards */}
             <TopRowCards />
 
             {/* Main hero content */}
             <Container className="relative z-10 text-center pt-96 pb-82">
-                <Heading className="!text-5xl tracking-tight md:!text-7xl font-new-spirit-bold">
+                <Heading className="!text-5xl tracking-tight font-new-spirit-bold">
                     <VerticalCutReveal
                         reverse
                         splitBy="characters"
@@ -232,24 +239,8 @@ function Hero() {
                             damping: 21,
                         }}
                     >
-                        {`Your community`}
+                        Where conversations thrive
                     </VerticalCutReveal>
-                    <span className="!text-primary-cosmos">
-                        <VerticalCutReveal
-                            splitBy="characters"
-                            staggerDuration={0.025}
-                            staggerFrom="first"
-                            containerClassName="justify-center"
-                            transition={{
-                                type: 'spring',
-                                stiffness: 200,
-                                damping: 21,
-                                delay: 1.1,
-                            }}
-                        >
-                            {`Your pack`}
-                        </VerticalCutReveal>
-                    </span>
                 </Heading>
 
                 <div className="mt-12 space-y-4 sm:space-y-0 sm:flex sm:justify-center sm:gap-4">
@@ -269,7 +260,19 @@ function Hero() {
                 </div>
             </Container>
 
-            <BottomRowCards />
+            {/* Image of website. Centered in the middle of the screen */}
+            <div className="mx-auto px-[5%] -mt-36 pointer-events-none relative">
+                {/* Small text above */}
+                <div className="absolute -mt-12 top-0 left-0 px-[5%] text-xs text-white font-lexend">
+                    <p>
+                        * old UI, aw man guess you gotta sign up and see the new stuff oh noooo.
+                        <br />
+                        Cut us a little slack, we're still working on it.
+                    </p>
+                </div>
+                <div className="absolute inset-0 -m-3 mx-[5%] rounded-lg animate-aurora bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-indigo-500/30 blur-md"></div>
+                <img src="/img/website.png" alt="Website" className="w-full h-full object-contain rounded ring-3 relative z-10" />
+            </div>
         </div>
     )
 }
@@ -301,7 +304,7 @@ function FakePost({
 
             {content && (
                 <div className="px-4 pb-3">
-                    <p className="text-sm line-clamp-2">{content}</p>
+                    <pre className="text-sm line-clamp-4 font-lexend break-al">{content}</pre>
                 </div>
             )}
 
@@ -382,60 +385,6 @@ function HighlightedText({ children, width = '110%' }: { children: ReactNode; wi
             </span>
             {children}
         </span>
-    )
-}
-
-function StopBeingPrey() {
-    return (
-        <Container className="[&>*]:space-y-3 py-42">
-            <Heading className="!text-5xl tracking-tight font-instrument-serif-regular">
-                Social media preys on your{' '}
-                <span className="space-x-4">
-                    <HighlightedText width="105%">
-                        <EyeIcon className="inline-flex w-8 h-8 text-lime-500/80 dark:text-primary-lime" /> attention,
-                    </HighlightedText>{' '}
-                    <HighlightedText>
-                        <UserIcon className="inline-flex w-8 h-8 text-lime-500/80 dark:text-primary-lime" /> data,
-                    </HighlightedText>{' '}
-                    <HighlightedText>
-                        <ClockIcon className="inline-flex w-8 h-8 text-lime-500/80 dark:text-primary-lime" /> time
-                    </HighlightedText>
-                </span>
-                .
-                <br />— it doesn't have to be this way.
-            </Heading>
-            <Text>
-                Twitter (X), Instagram, TikTok, etc. all do this &mdash; Facebook alone makes ~$50 per user per year¹. While furry-centric
-                platforms don't do any of this (
-                <Tooltip
-                    delayDuration={0}
-                    content="Some furry sites force you to pay a subscription to use some basic features, like uploading basic 4K images, or even just using a banner."
-                >
-                    <span>
-                        <sub>... to an extent</sub> <sup>?</sup>
-                    </span>
-                </Tooltip>
-                ) and work for creators, there's a better way &mdash; a way that benefits everyone, even if they're not creators.
-                Dating-esque apps like Barq <b>don't work</b> for community communication, and puts members actively at risk.
-            </Text>
-            <Text>
-                Packbase puts communities first. Completely free, full HTML/CSS customisation, and no ads. We'll hold this promise until the
-                Year 3,000.
-            </Text>
-            <ul className="space-y-1 list-none">
-                <li>
-                    <Text alt size="xs" className="text-neutral-500">
-                        <a
-                            href="https://www.statista.com/statistics/234056/facebook-average-revenue-per-user/"
-                            className="hover:underline"
-                            target="_blank"
-                        >
-                            ¹Statista Data Value Per User Report (2023)
-                        </a>
-                    </Text>
-                </li>
-            </ul>
-        </Container>
     )
 }
 
@@ -613,13 +562,13 @@ export default function GuestLanding() {
             },
             {
                 name: 'Discord',
-                href: 'https://discord.gg/wildbase',
+                href: 'https://discord.gg/StuuK55gYA',
             },
         ],
     }
     return (
         <div className="h-full overflow-x-hidden overflow-y-auto bg-zinc-100 dark:bg-zinc-950">
-            <div className="relative z-30 h-full bg-white rounded-md ring-2 ring-default dark:bg-zinc-900">
+            <div className="relative z-30 h-full bg-white rounded-md ring-2 ring-default dark:bg-zinc-900 shadow-xl overflow-hidden">
                 <Hero />
                 {/*<StopBeingPrey />*/}
                 {/*<FeaturePromiseGrid />*/}
