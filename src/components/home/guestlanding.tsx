@@ -263,7 +263,7 @@ function Hero() {
             {/* Image of website. Centered in the middle of the screen */}
             <div className="mx-auto px-[5%] -mt-36 pointer-events-none relative">
                 {/* Small text above */}
-                <div className="absolute -mt-12 top-0 left-0 px-[5%] text-xs text-white font-lexend">
+                <div className="absolute -mt-12 top-0 left-0 px-[5%] text-xs font-lexend">
                     <p>
                         * old UI, aw man guess you gotta sign up and see the new stuff oh noooo.
                         <br />
