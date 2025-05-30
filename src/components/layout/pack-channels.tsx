@@ -44,7 +44,7 @@ export function PackChannels() {
     // Check if realtime capability is available
     const hasRealtimeCapability = serverCapabilities.includes('realtime')
 
-    if (hidden || !user) return <></>
+    if (!user) return <></>
     return (
         <div className="flex h-full">
             <PackSwitcher />
