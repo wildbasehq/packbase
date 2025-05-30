@@ -82,7 +82,7 @@ export function SidebarLayout({
                 <div className="hidden lg:block">{navbar}</div>
                 {isStuffPage && <YourStuffPage />}
                 <motion.main
-                    // key={isSettingsPage ? 'settings' : 'default'}
+                    key={isStuffPage ? 'settings' : 'default'}
                     className={`pb-2 lg:min-w-0 lg:pr-2 ${!hidden && user ? 'lg:pl-96' : 'lg:pl-2'} ${isStuffPage ? '!z-10' : 'z-0'}`}
                     initial={false}
                     animate="animate"
@@ -100,9 +100,9 @@ export function SidebarLayout({
                             filter: 'blur(0px)',
                             opacity: 1,
                         },
-                        animate: ({ isSettingsPage }) => ({
-                            y: isSettingsPage ? '80%' : 0,
-                            filter: isSettingsPage ? 'blur(2px)' : 'blur(0px)',
+                        animate: ({ isStuffPage }) => ({
+                            y: isStuffPage ? '80%' : 0,
+                            filter: isStuffPage ? 'blur(2px)' : 'blur(0px)',
                             // opacity: isSettingsPage ? 0.5 : 1,
                         }),
                     }}
