@@ -82,7 +82,7 @@ export function SidebarLayout({
                 <div className="hidden lg:block">{navbar}</div>
                 {isStuffPage && <YourStuffPage />}
                 <motion.main
-                    key={isStuffPage ? 'settings' : 'default'}
+                    // key={isStuffPage ? 'settings' : 'default'}
                     className={`pb-2 lg:min-w-0 lg:pr-2 ${!hidden && user ? 'lg:pl-96' : 'lg:pl-2'} ${isStuffPage ? '!z-10' : 'z-0'}`}
                     initial={false}
                     animate="animate"
