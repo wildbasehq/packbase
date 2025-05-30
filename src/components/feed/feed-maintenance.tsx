@@ -3,6 +3,7 @@ import { WrenchScrewdriverIcon } from '@heroicons/react/20/solid'
 import { Alert, AlertDescription, AlertTitle } from '@/components/shared/alert'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { FeedMaintenanceProps } from './types/feed'
+import WrenchCharacter from '@/src/images/svg/wrench-character.svg'
 
 /**
  * Displays a maintenance notice when the feed is unavailable
@@ -26,14 +27,14 @@ export default function FeedMaintenance({ message }: FeedMaintenanceProps) {
                             {message && <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-400">{message}</p>}
 
                             <div className="mt-4">
-                                <Button color="indigo" href="https://discord.gg/wildbase" target="_blank">
+                                <Button color="indigo" href="https://discord.gg/StuuK55gYA" target="_blank">
                                     Join Discord
                                 </Button>
                             </div>
                         </div>
 
                         <div className="flex items-center justify-center md:col-span-2">
-                            <img src="/img/wrench-character.svg" alt="Maintenance character" className="h-32 w-auto" />
+                            <img src={WrenchCharacter} alt="Maintenance character" className="h-32 w-auto" />
                         </div>
                     </div>
                 </AlertDescription>
