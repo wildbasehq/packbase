@@ -1,9 +1,10 @@
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import { ArrowUpRightIcon } from 'lucide-react'
-import { lazy, useState } from 'react'
+import { lazy, memo, useState } from 'react'
 import {
     Sidebar,
     SidebarBody,
+    SidebarDivider,
     SidebarFooter,
     SidebarHeader,
     SidebarHeading,
@@ -12,17 +13,15 @@ import {
     SidebarSection,
     SidebarSpacer,
 } from '@/components/shared/sidebar'
-import { ChevronUpIcon, FireIcon, HomeIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
+import { ChevronUpIcon, FireIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
 import ResourceSwitcher from '@/components/layout/resource-switcher'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
 import InboxPage from '@/pages/inbox/page.tsx'
-import { Badge } from '@/components/shared/badge.tsx'
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '../shared/dropdown'
-import { Avatar } from '../shared/avatar'
-import UserDropdown from './user-dropdown'
 import { SiDiscord } from 'react-icons/si'
-import { ChatBubbleBottomCenterIcon, FaceSmileIcon } from '@heroicons/react/16/solid'
+import { ChatBubbleBottomCenterIcon, FaceSmileIcon, HashtagIcon, MicrophoneIcon, NewspaperIcon } from '@heroicons/react/16/solid'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
+import UserDropdown from '@/components/layout/user-dropdown.tsx' // Lazy load ConnectionStatus component
 
 // Lazy load ConnectionStatus component
 const ConnectionStatus = lazy(() =>
@@ -74,31 +73,24 @@ export function PackChannels() {
                     <SidebarBody>
                         <SidebarSection>
                             <SidebarItem href={!currentResource.slug ? '/p/universe' : `/p/${currentResource.slug}`}>
-                                <HomeIcon />
+                                <NewspaperIcon />
                                 <div className="flex flex-col min-w-0">
-                                    <SidebarLabel>Home</SidebarLabel>
-                                    {/*<span className="text-xs/5 text-alt truncate">Testing a ticker</span>*/}
+                                    <SidebarLabel>For You</SidebarLabel>
                                 </div>
                             </SidebarItem>
+                        </SidebarSection>
+                        <SidebarDivider />
+                        <SidebarSection>
+                            <SidebarHeading>CHANNELS</SidebarHeading>
                             {navigation?.map(item => (
-                                <SidebarItem key={item.href} href={item.href} current={item.current}>
-                                    <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
-                                        {typeof item.icon === 'string' ? <DynamicIcon name={item.icon} /> : <item.icon />}
-                                    </div>
-                                    <div className="flex flex-col min-w-0 flex-1">
-                                        <SidebarLabel>{item.name}</SidebarLabel>
-                                        {/* Subtext if item has ticker. */}
-                                        {item.ticker && (
-                                            <span className="text-xs/5 text-muted-foreground truncate max-w-[200px]">{item.ticker}</span>
-                                        )}
-                                    </div>
-                                    {/* Badge if item has badge. */}
-                                    {item.badge && (
-                                        <Badge color="indigo" className="ml-auto flex-shrink-0">
-                                            {item.badge}
-                                        </Badge>
-                                    )}
-                                </SidebarItem>
+                                <Channel
+                                    key={item.href}
+                                    href={item.href}
+                                    name={item.name}
+                                    ticker={item.ticker}
+                                    badge="NEW"
+                                    isVoice={item.name.toLowerCase().includes('voice') || item.name.toLowerCase().includes('call')}
+                                />
                             ))}
                         </SidebarSection>
                         <SidebarSection>
@@ -130,7 +122,7 @@ export function PackChannels() {
                                         <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon" />
                                         <SidebarLabel>Feedback</SidebarLabel>
                                     </DropdownItem>
-                                    <DropdownItem href="https://discord.gg/wildbase" target="_blank">
+                                    <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
                                         <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon" />
                                         <SidebarLabel>Discord</SidebarLabel>
                                     </DropdownItem>
@@ -157,27 +149,22 @@ export function PackChannels() {
                         {/*        <ConnectionStatus />*/}
                         {/*    </Suspense>*/}
                         {/*)}*/}
-                        <Dropdown>
-                            <DropdownButton as={SidebarItem}>
-                                <span className="flex items-center min-w-0 gap-3">
-                                    <Avatar
-                                        src={user.images?.avatar ?? false}
-                                        className="size-10"
-                                        square
-                                        alt=""
-                                        initials={user.display_name.slice(0, 2)}
-                                    />
-                                    <span className="min-w-0">
-                                        <span className="block font-medium truncate text-sm/5">{user.display_name}</span>
-                                        <span className="block font-normal truncate text-xs/5 text-alt">{user.username}</span>
-                                    </span>
+                        <SidebarItem
+                            onClick={() => {
+                                if (!document.getElementsByClassName('cl-modalBackdrop')?.[0])
+                                    // @ts-ignore
+                                    document.getElementsByClassName('cl-userButtonTrigger')?.[0]?.click()
+                            }}
+                        >
+                            <span className="flex items-center min-w-0 gap-3">
+                                <DropdownComponent />
+                                <span className="min-w-0">
+                                    <span className="block font-medium truncate text-sm/5">{user.display_name}</span>
+                                    <span className="block font-normal truncate text-xs/5 text-alt">{user.username}</span>
                                 </span>
-                                <ChevronUpIcon />
-                            </DropdownButton>
-                            <DropdownMenu className="z-20 p-0!">
-                                <UserDropdown showOnboardingModal={() => {}} />
-                            </DropdownMenu>
-                        </Dropdown>
+                            </span>
+                            <ChevronUpIcon />
+                        </SidebarItem>
                     </SidebarFooter>
                 </Sidebar>
             </div>
@@ -185,12 +172,45 @@ export function PackChannels() {
     )
 }
 
+const DropdownComponent = memo(UserDropdown, () => true)
+
 function DynamicIcon({ name, ...props }: any) {
     // icon://IconName
     // @ts-ignore
     const Icon = availableIcons[name.replace('icon://', '')]
     if (!Icon) return <QuestionMarkCircleIcon {...props} />
     return <Icon {...props} />
+}
+
+function Channel({
+    href,
+    name,
+    ticker,
+    badge,
+    isVoice = false,
+}: {
+    href: string
+    name: string
+    ticker?: string
+    badge?: string
+    isVoice?: boolean
+}) {
+    return (
+        <SidebarItem href={href}>
+            {isVoice ? <MicrophoneIcon /> : <HashtagIcon />}
+
+            <div className="flex flex-col min-w-0 flex-1">
+                <SidebarLabel>{name}</SidebarLabel>
+                {ticker && <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate max-w-[200px]">{ticker}</span>}
+            </div>
+
+            {badge && (
+                <span className="ml-auto flex-shrink-0 bg-indigo-500 text-white text-xxs font-medium rounded-full px-1.5 min-w-5 h-5 flex items-center justify-center">
+                    {badge}
+                </span>
+            )}
+        </SidebarItem>
+    )
 }
 
 function InboxButton() {

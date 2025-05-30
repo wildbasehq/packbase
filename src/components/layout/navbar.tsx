@@ -106,13 +106,11 @@ export default function NavBar() {
     const { user } = useUserAccountStore()
     const { hidden, maintenance, loading } = useUIStore()
 
-    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(
-        user && !user?.metadata?.dp_uod && !user.anonUser && !maintenance
-    )
+    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(user && !user?.slug && !user.anonUser && !maintenance)
 
     return (
         <>
-            {user && !user?.metadata?.dp_uod && !user.anonUser && !maintenance && (
+            {user && !user?.slug && !user.anonUser && !maintenance && (
                 <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]} />
             )}
 

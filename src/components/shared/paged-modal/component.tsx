@@ -26,7 +26,7 @@ const Page: React.FC<PageProps> = ({ id: providedId, title, description, icon: I
 
     useEffect(() => {
         registerPage(id, { title, description, icon: Icon, badge })
-    }, [id, title, description, Icon, badge, registerPage])
+    }, [id, title, description, Icon, badge])
 
     if (activePage !== id) return null
 

@@ -30,7 +30,7 @@ export default function FeedError({ error }: FeedErrorProps) {
                 <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-3 sm:space-y-0">
                     <Button onClick={handleRefresh}>Try Again</Button>
 
-                    <Button outline href="https://discord.gg/wildbase" target="_blank">
+                    <Button outline href="https://discord.gg/StuuK55gYA" target="_blank">
                         Get Help
                     </Button>
                 </div>

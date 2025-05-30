@@ -13,6 +13,7 @@ export default defineConfig({
             '@/styles': path.resolve(__dirname, './src/styles'),
             '@/public': path.resolve(__dirname, './public'),
             '@/datasets': path.resolve(__dirname, './datasets'),
+            '@/types': path.resolve(__dirname, './src/types'),
         },
     },
     define: {

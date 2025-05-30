@@ -1,10 +1,11 @@
 import Body from '@/components/layout/body'
 import { LoadingDots } from '@/components/icons'
 import { Heading } from '@/components/shared/text'
-import { setToken, supabase, vg } from '@/lib/api'
+import { setToken, vg } from '@/lib/api'
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/index'
 import { HandRaisedIcon } from '@heroicons/react/20/solid'
 import { useEffect, useState } from 'react'
+import { useSession } from '@clerk/clerk-react'
 import { getSelfProfile } from '@/lib/api/cron/profile-update.ts'
 
 export default function Preload({ children }: { children: React.ReactNode }) {
@@ -14,8 +15,10 @@ export default function Preload({ children }: { children: React.ReactNode }) {
     const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
     const { setResources } = useResourceStore()
 
+    const { session, isSignedIn } = useSession()
+
     useEffect(() => {
-        if (!serviceLoading.startsWith('auth')) return
+        // if (!serviceLoading.startsWith('auth')) return
         vg.server.describeServer
             .get()
             .then(server => {
@@ -40,11 +43,9 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                 return setError(e)
             })
 
-        // @ts-ignore
-        supabase.auth.getSession().then(async ({ data: { session } }) => {
-            const { user, access_token, expires_at } = session || {}
-            if (user) {
-                setToken(access_token, expires_at)
+        if (isSignedIn) {
+            session.getToken().then(token => {
+                setToken(token, session.expireAt.getTime())
                 setStatus('auth:@me')
                 const localUser = localStorage.getItem('user-account')
                 if (localUser) {
@@ -60,12 +61,12 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                 getSelfProfile(() => {
                     proceed()
                 })
-            } else {
-                setUser(null)
-                proceed()
-            }
-        })
-    }, [])
+            })
+        } else {
+            setUser(null)
+            proceed()
+        }
+    }, [session, isSignedIn])
 
     const setStatus = (status: string) => {
         setServiceLoading(prev => {

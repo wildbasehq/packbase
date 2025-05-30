@@ -55,7 +55,7 @@ export function SidebarLayout({
     const { user } = useUserAccountStore()
     const { hidden } = useUIStore()
     const [location] = useLocation()
-    const isSettingsPage = location === '/stuff'
+    const isStuffPage = location === '/stuff'
 
     return (
         <div className="relative flex w-full bg-white isolate min-h-svh max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
@@ -80,10 +80,10 @@ export function SidebarLayout({
             {/* Content */}
             <div className="flex flex-col flex-1 relative">
                 <div className="hidden lg:block">{navbar}</div>
-                {isSettingsPage && <YourStuffPage />}
+                {isStuffPage && <YourStuffPage />}
                 <motion.main
                     // key={isSettingsPage ? 'settings' : 'default'}
-                    className={`pb-2 lg:min-w-0 lg:pr-2 ${!hidden && user ? 'lg:pl-96' : 'lg:pl-2'} ${isSettingsPage ? '!z-10' : 'z-0'}`}
+                    className={`pb-2 lg:min-w-0 lg:pr-2 ${!hidden && user ? 'lg:pl-96' : 'lg:pl-2'} ${isStuffPage ? '!z-10' : 'z-0'}`}
                     initial={false}
                     animate="animate"
                     transition={{
@@ -93,7 +93,7 @@ export function SidebarLayout({
                         mass: 1,
                         bounce: 0,
                     }}
-                    custom={{ isSettingsPage }}
+                    custom={{ isStuffPage }}
                     variants={{
                         initial: {
                             y: 0,

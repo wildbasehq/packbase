@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import './_color.css';
-@config "../../tailwind.config.js";
+/*@config "../../tailwind.config.js";*/
 
 /* Import Tailwind configuration files */
 @import './tailwind/colors.css';

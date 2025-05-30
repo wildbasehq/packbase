@@ -16,8 +16,8 @@ export const getSelfProfile = (cb?: () => void) => {
 
                 let userBuild = {
                     id: data.id,
-                    username: data?.username || 'new_here_' + new Date().getTime(),
-                    display_name: data?.display_name || 'new_here_' + new Date().getTime(),
+                    username: data?.username || 'new_here',
+                    display_name: data?.display_name || 'new_here',
                     reqOnboard: !data || !data?.username,
                     dp: data?.dp || {},
                     anonUser: !data?.username,

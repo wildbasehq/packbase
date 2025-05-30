@@ -12,12 +12,12 @@ import Console from '@/components/shared/console.tsx'
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
 const IDLogin = lazy(() => import('@/pages/id/login/page.tsx'))
 const IDCreate = lazy(() => import('@/pages/id/create/page.tsx'))
+const IDWaitlist = lazy(() => import('@/pages/id/waitlist/page.tsx'))
 const PackLayout = lazy(() => import('@/pages/pack/[slug]/layout.tsx'))
 const PackHome = lazy(() => import('@/pages/pack/[slug]/page.tsx'))
 const PackCosmos = lazy(() => import('@/pages/pack/[slug]/cosmos/page.tsx'))
 const NotFound = lazy(() => import('@/src/not-found.tsx'))
 const PackAdd = lazy(() => import('@/pages/pack/new/page.tsx'))
-const SettingsLayout = lazy(() => import('@/pages/settings/layout.tsx'))
 const TermsPage = lazy(() => import('@/pages/terms/page.tsx'))
 const ThankYouFriends = lazy(() => import('@/pages/thanks/page.tsx'))
 const UserProfile = lazy(() => import('@/pages/user/[...slug]/page.tsx'))
@@ -97,7 +97,8 @@ function App() {
                                                         </Route>
                                                         <Route path="/create">
                                                             <Suspense fallback={<LoadingFallback />}>
-                                                                <IDCreate />
+                                                                {/*<IDCreate />*/}
+                                                                <IDWaitlist />
                                                             </Suspense>
                                                         </Route>
                                                     </IDLayout>
@@ -138,6 +139,10 @@ function App() {
                                             </Route>
 
                                             <Route path="/stuff" nest>
+                                                <div></div>
+                                            </Route>
+
+                                            <Route path="/settings" nest>
                                                 <div></div>
                                             </Route>
 

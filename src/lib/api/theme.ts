@@ -26,7 +26,7 @@ export const ThemeAPI = {
         try {
             const response = await fetch(`${API_URL}/themes`, {
                 headers: {
-                    Authentication: `Bearer ${globalThis.TOKEN || ''}`,
+                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
                 },
             })
             if (!response.ok) {
@@ -46,7 +46,7 @@ export const ThemeAPI = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authentication: `Bearer ${globalThis.TOKEN || ''}`,
+                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
                 },
                 body: JSON.stringify(theme),
             })
@@ -67,7 +67,7 @@ export const ThemeAPI = {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authentication: `Bearer ${globalThis.TOKEN || ''}`,
+                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
                 },
                 body: JSON.stringify(theme),
             })
@@ -87,7 +87,7 @@ export const ThemeAPI = {
             const response = await fetch(`${API_URL}/themes/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    Authentication: `Bearer ${globalThis.TOKEN || ''}`,
+                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
                 },
             })
             if (!response.ok) {
@@ -107,7 +107,7 @@ export const ThemeAPI = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authentication: `Bearer ${globalThis.TOKEN || ''}`,
+                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
                 },
                 body: JSON.stringify({ html, css }),
             })
