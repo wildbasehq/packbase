@@ -1,44 +1,11 @@
-import { FormEvent, useState } from 'react'
 import { useUserAccountStore } from '@/lib/state'
-import { supabase } from '@/lib/api'
-import { useSearchParams } from 'wouter'
 import { SignIn } from '@clerk/clerk-react'
 import { Alert, AlertDescription, AlertTitle } from '@/src/components'
 
 export default function IDLogin() {
     const { user } = useUserAccountStore()
-    const [submitting, setSubmitting] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-
-    const [searchParams] = useSearchParams()
 
     if (user) return (window.location.href = '/')
-
-    const loginUser = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault()
-        if (submitting) return
-        setSubmitting(true)
-
-        const formData = new FormData(event.currentTarget)
-        const user = {
-            email: formData.get('email')?.toString() || '',
-            password: formData.get('password')?.toString() || '',
-        }
-        supabase.auth
-            .signInWithPassword(user)
-            .then(r => {
-                if (r.error) {
-                    setSubmitting(false)
-                    setError(r.error.toString())
-                } else {
-                    window.location.href = searchParams.get('redirect') || '/'
-                }
-            })
-            .catch(e => {
-                setSubmitting(false)
-                setError(e.toString())
-            })
-    }
 
     return (
         <>
