@@ -1,62 +1,62 @@
-// src/components/feed/types/feed.ts
-import {FeedPostData} from './post'
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
 
-export type FeedViewType = 1 | 2; // 1 = Grid, 2 = List
+import { FeedPostData } from './post'
+
+export type FeedViewType = 1 | 2 // Legacy - may be removed
 
 export interface FeedViewOption {
-    id: FeedViewType;
-    name: string;
-    icon: React.FC<React.SVGProps<SVGSVGElement>>;
-    unavailable?: boolean;
+    id: FeedViewType
+    name: string
+    icon: React.FC<React.SVGProps<SVGSVGElement>>
+    unavailable?: boolean
 }
 
 export interface FeedProps {
-    packID?: string;
-    initialView?: FeedViewType;
+    packID?: string
 }
 
 export interface FeedState {
-    posts: FeedPostData[];
-    isLoading: boolean;
-    hasMore: boolean;
-    currentPage: number;
-    error: Error | null;
+    posts: FeedPostData[]
+    isLoading: boolean
+    hasMore: boolean
+    currentPage: number
+    error: Error | null
 }
 
 export interface FeedHeaderProps {
-    onViewChange: () => void;
-    postsCount: number;
-    hasMore: boolean;
+    onViewChange: () => void
+    postsCount: number
+    hasMore: boolean
 }
 
 export interface FeedViewControlsProps {
-    onClose: () => void;
-    currentView: FeedViewType;
-    onViewChange: (view: FeedViewType) => void;
+    onClose: () => void
+    currentView: FeedViewType
+    onViewChange: (view: FeedViewType) => void
 }
 
 export interface FeedListProps {
-    posts: FeedPostData[];
-    isLoading: boolean;
-    hasMore: boolean;
-    onLoadMore: () => void;
-    onPostDelete: (postId: string) => void;
-    viewType: FeedViewType;
+    posts: FeedPostData[]
+    hasMore: boolean
+    onLoadMore: () => void
+    onPostDelete: (postId: string) => void
 }
 
 export interface FeedLoadingProps {
-    message?: string | React.ReactNode;
-    isMasonry?: boolean;
+    message?: string | React.ReactNode
+    isMasonry?: boolean
 }
 
 export interface FeedEmptyProps {
-    message?: string;
+    message?: string
 }
 
 export interface FeedMaintenanceProps {
-    message?: string;
+    message?: string
 }
 
 export interface FeedErrorProps {
-    error: Error;
+    error: Error
 }

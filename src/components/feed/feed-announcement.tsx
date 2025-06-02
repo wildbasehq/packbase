@@ -1,17 +1,21 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 // src/components/feed/FeedAnnouncement.tsx
-import {MegaphoneIcon} from '@heroicons/react/20/solid'
+import { MegaphoneIcon } from '@heroicons/react/20/solid'
 import Card from '@/components/shared/card'
-import {Heading, Text} from '@/components/shared/text'
+import { Heading, Text } from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 
 interface FeedAnnouncementProps {
-    variant?: 'default' | 'important' | 'celebration';
+    variant?: 'default' | 'important' | 'celebration'
 }
 
 /**
  * Displays an announcement card at the top of the feed
  */
-export default function FeedAnnouncement({variant = 'default'}: FeedAnnouncementProps) {
+export default function FeedAnnouncement({ variant = 'default' }: FeedAnnouncementProps) {
     // You can customize the style based on the variant
     const getBgClass = () => {
         switch (variant) {
@@ -33,7 +37,10 @@ export default function FeedAnnouncement({variant = 'default'}: FeedAnnouncement
 
             <Text size="sm" className="text-neutral-700 dark:text-neutral-300">
                 The invite code generation requirement is live. Additionally, you may now suggest and vote on features via{' '}
-                <a href="https://packbase.wildbase.xyz/" className="text-blue-500">our new feedback inlet!</a> More info in our Discord Server.
+                <a href="https://packbase.wildbase.xyz/" className="text-indigo-500">
+                    our new feedback inlet!
+                </a>{' '}
+                More info in our Discord Server.
             </Text>
 
             <div className="flex items-center justify-end mt-3">

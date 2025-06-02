@@ -1,15 +1,15 @@
-// src/components/feed/FeedPost.tsx
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
+// src/components/feed/feed-post.tsx
 import { useState } from 'react'
 import { useModal } from '@/components/modal/provider'
 import { toast } from 'sonner'
 import { vg } from '@/lib/api'
 import { useUserAccountStore } from '@/lib/state'
-import Card from '@/components/shared/card'
 import { FeedPostData, FeedPostProps } from './types/post'
-import PostHeader from './post-header'
-import PostBody from './post-body'
-import PostActions from './post-actions'
-import CommentSection from './comment-section'
+import ThreadPost from './thread-post'
 
 export default function FeedPost({ post, onDelete, postState }: FeedPostProps) {
     const [postContent, setPostContent] = useState<FeedPostData>(post)
@@ -22,7 +22,6 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostProps) {
 
             if (error) {
                 const errorMessage = error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'
-
                 toast.error(errorMessage)
                 return
             }
@@ -48,26 +47,15 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostProps) {
     }
 
     return (
-        <Card className="w-full overflow-hidden">
-            <div className="flex flex-col">
-                <PostHeader post={postContent} signedInUser={signedInUser} onDelete={handleDelete} />
-
-                <PostBody
-                    post={postContent}
-                    // onClick={openPostDetail}
-                />
-
-                {signedInUser && !signedInUser.anonUser && <PostActions post={postContent} onComment={handleComment} />}
-
-                {postContent.comments && postContent.comments.length > 0 && (
-                    <CommentSection
-                        comments={postContent.comments}
-                        postContent={postContent}
-                        setPostContent={setPostContent}
-                        postState={postState}
-                    />
-                )}
-            </div>
-        </Card>
+        <div className="w-full">
+            <ThreadPost
+                post={postContent}
+                signedInUser={signedInUser}
+                onDelete={handleDelete}
+                onComment={handleComment}
+                isRoot={true}
+                depth={0}
+            />
+        </div>
     )
 }
