@@ -50,7 +50,7 @@ export default function FloatingComposeButton() {
             <div className="max-w-2xl mx-auto p-4">
                 <button
                     onClick={handleClick}
-                    className="pointer-events-auto w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] p-4 flex items-center gap-3 group"
+                    className="pointer-events-auto w-full bg-sidebar backdrop-blur-xl border rounded shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] p-4 flex items-center gap-3 group"
                 >
                     <div className="flex-shrink-0">
                         <UserAvatar user={user} size="sm" className="rounded-full" />
