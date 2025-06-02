@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 // src/components/feed/PostActions.tsx
 import { useState } from 'react'
 import { HandThumbUpIcon, PaperAirplaneIcon } from '@heroicons/react/20/solid'
@@ -7,7 +11,7 @@ import { vg } from '@/lib/api'
 import { useUserAccountStore } from '@/lib/state'
 import { FeedPostData } from './types/post'
 import { Button } from '@/components/shared/experimental-button-rework'
-import { LoadingSpinner } from './loading-spinner'
+import { LoadingCircle } from '@/components/novel/ui/icons'
 
 interface PostActionsProps {
     post: FeedPostData
@@ -107,7 +111,7 @@ export default function PostActions({ post, onComment }: PostActionsProps) {
                 className="flex items-center gap-1.5 rounded-full py-2 px-3.5 sm:py-1.5 sm:px-3 text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800"
             >
                 {isSubmittingReaction ? (
-                    <LoadingSpinner size="small" />
+                    <LoadingCircle />
                 ) : hasReacted ? (
                     <HandThumbUpIcon className="h-5 w-5 sm:h-4 sm:w-4 !text-primary-light" />
                 ) : (
@@ -130,7 +134,7 @@ export default function PostActions({ post, onComment }: PostActionsProps) {
                     disabled={!commentText.trim() || isSubmittingComment}
                     className="absolute inset-y-0 right-0 flex items-center pr-3.5 sm:pr-3 text-neutral-400 hover:text-neutral-600 disabled:opacity-50 dark:hover:text-neutral-300"
                 >
-                    {isSubmittingComment ? <LoadingSpinner size="small" /> : <PaperAirplaneIcon className="h-5 w-5 sm:h-4 sm:w-4" />}
+                    {isSubmittingComment ? <LoadingCircle /> : <PaperAirplaneIcon className="h-5 w-5 sm:h-4 sm:w-4" />}
                 </button>
             </form>
         </div>

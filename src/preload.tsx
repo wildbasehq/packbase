@@ -1,12 +1,14 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import Body from '@/components/layout/body'
-import { LoadingDots } from '@/components/icons'
-import { Heading } from '@/components/shared/text'
 import { setToken, vg } from '@/lib/api'
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/index'
-import { HandRaisedIcon } from '@heroicons/react/20/solid'
 import { useEffect, useState } from 'react'
 import { useSession } from '@clerk/clerk-react'
 import { getSelfProfile } from '@/lib/api/cron/profile-update.ts'
+import { LogoSpinner } from '@/src/components'
 
 export default function Preload({ children }: { children: React.ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`auth`)
@@ -15,9 +17,10 @@ export default function Preload({ children }: { children: React.ReactNode }) {
     const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
     const { setResources } = useResourceStore()
 
-    const { session, isSignedIn } = useSession()
+    const { session, isSignedIn, isLoaded } = useSession()
 
     useEffect(() => {
+        if (!isLoaded) return
         // if (!serviceLoading.startsWith('auth')) return
         vg.server.describeServer
             .get()
@@ -32,9 +35,35 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                         message: server.data.maintenance || `Packbase is currently under maintenance. Please check back later.`,
                     })
                 }
+
+                if (isSignedIn) {
+                    session.getToken().then(token => {
+                        setToken(token, session.expireAt.getTime())
+                        setStatus('auth:@me')
+                        const localUser = localStorage.getItem('user-account')
+                        if (localUser) {
+                            const json = JSON.parse(localUser)
+                            if (json.state.user) {
+                                console.log('Found local user', json.state.user)
+                                const packs = localStorage.getItem('packs')
+                                if (packs) setResources(JSON.parse(packs))
+                                setUser(json.state.user)
+                                proceed()
+                            }
+                        }
+
+                        getSelfProfile(() => {
+                            proceed()
+                        })
+                    })
+                } else {
+                    setUser(null)
+                    proceed()
+                }
             })
             .catch(e => {
                 log.error('Core', e)
+                setStatus('error')
                 if (e?.message.indexOf('Failed') > -1)
                     return setError({
                         cause: 'UI & Server could not talk together',
@@ -42,30 +71,6 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                     })
                 return setError(e)
             })
-
-        if (isSignedIn) {
-            session.getToken().then(token => {
-                setToken(token, session.expireAt.getTime())
-                setStatus('auth:@me')
-                const localUser = localStorage.getItem('user-account')
-                if (localUser) {
-                    const json = JSON.parse(localUser)
-                    if (json.state.user) {
-                        const packs = localStorage.getItem('packs')
-                        if (packs) setResources(JSON.parse(packs))
-                        setUser(json.state.user)
-                        proceed()
-                    }
-                }
-
-                getSelfProfile(() => {
-                    proceed()
-                })
-            })
-        } else {
-            setUser(null)
-            proceed()
-        }
     }, [session, isSignedIn])
 
     const setStatus = (status: string) => {
@@ -89,55 +94,17 @@ export default function Preload({ children }: { children: React.ReactNode }) {
             {serviceLoading === 'proceeding' ? (
                 children
             ) : (
-                <Body className="h-full items-center justify-center">
-                    <div className="flex max-w-md flex-col">
-                        {!error && (
-                            <>
-                                <Heading className="items-center">
-                                    <img
-                                        src="/img/ghost-dog-in-box.gif"
-                                        alt="Animated pixel dog in box panting before falling over, then looping."
-                                        className="h-6 inline-block"
-                                        style={{
-                                            imageRendering: 'pixelated',
-                                            display: 'inline-block',
-                                            marginTop: '-1px',
-                                            marginRight: '4px',
-                                        }}
-                                    />
-                                    Preparing...
-                                </Heading>
-                                <p className="text-alt mt-1 text-sm leading-6">
-                                    Packbase is asking the server for information about you &amp; the service. This will get saved in your
-                                    browser{"'"}s{' '}
-                                    <a
-                                        href="https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        session storage
-                                    </a>
-                                    .
-                                </p>
-                                <div className="mt-4 flex space-x-1">
-                                    <LoadingDots className="mt-1" />
-                                    <span>{serviceLoading}</span>
-                                </div>
-                            </>
-                        )}
-
-                        {error && (
-                            <>
-                                <Heading className="items-center">
-                                    <HandRaisedIcon className="text-default mr-1 inline-block h-6 w-6" />
-                                    Packbase can't continue
-                                </Heading>
-                                <p className="text-alt mt-1 text-sm leading-6">
-                                    {error.cause || 'Something went wrong'}: {error.message || error.stack}
-                                </p>
-                            </>
-                        )}
-                    </div>
+                <Body bodyClassName="h-full" className="!h-full items-center justify-center">
+                    <LogoSpinner />
+                    <span className="text-sm mt-1">
+                        {serviceLoading.startsWith('auth')
+                            ? `Checking data...`
+                            : serviceLoading.startsWith('auth:@me')
+                              ? `Getting profile...`
+                              : serviceLoading.startsWith('cron')
+                                ? 'Welcome!'
+                                : 'Get set...'}
+                    </span>
                 </Body>
             )}
         </>

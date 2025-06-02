@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { lazy, Suspense } from 'react'
 import { Text } from '@/components/shared/text.tsx'
 import { SidebarLayout } from '@/components/shared/sidebar-layout.tsx'
@@ -7,6 +11,8 @@ import Preload from './preload.tsx'
 import { Providers } from './provider.tsx'
 import { Redirect, Route, Switch } from 'wouter'
 import Console from '@/components/shared/console.tsx'
+import { LogoSpinner } from '@/src/components'
+import Body from '@/components/layout/body.tsx'
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
@@ -31,9 +37,10 @@ const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'
 
 // Loading fallback component
 const LoadingFallback = () => (
-    <div className="flex items-center justify-center h-full">
-        <Text>Loading...</Text>
-    </div>
+    <Body bodyClassName="h-full" className="!h-full items-center justify-center">
+        <LogoSpinner />
+        <span className="text-sm mt-1">Welcome!</span>
+    </Body>
 )
 
 function App() {
@@ -55,9 +62,9 @@ function App() {
                     <div className="grow">
                         <main className="flex flex-1 h-full">
                             <div className="w-full h-full">
-                                <div id="NGRoot" className="h-full overflow-y-auto">
-                                    <WaitlistCheck />
-                                    <Preload>
+                                <Preload>
+                                    <div id="NGRoot" className="h-full overflow-y-auto">
+                                        <WaitlistCheck />
                                         <Switch>
                                             <Route path="/">
                                                 <Redirect to="/p/universe" />
@@ -152,8 +159,8 @@ function App() {
                                                 </Suspense>
                                             </Route>
                                         </Switch>
-                                    </Preload>
-                                </div>
+                                    </div>
+                                </Preload>
                             </div>
                         </main>
                     </div>

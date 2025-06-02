@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import React from 'react'
 import { SignedIn, UserButton } from '@clerk/clerk-react'
 import { EnvelopeOpenIcon, UserIcon } from '@heroicons/react/24/solid'
