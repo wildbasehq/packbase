@@ -72,7 +72,7 @@ export const LogoSpinner = ({
                     isLoading ? 'opacity-0' : 'opacity-100'
                 )}
             >
-                <Logo noStyle fullSize className="w-full h-full flex justify-center items-center" />
+                <Logo noStyle fullSize className="w-full h-full flex justify-center items-center dark:fill-white" />
             </div>
 
             <LoadingSpinner className={cn('transition-opacity duration-300', !isLoading ? 'opacity-0' : 'opacity-100')} />
