@@ -12,12 +12,11 @@ import UserAvatar from '@/components/shared/user/avatar'
 import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
 import MediaGallery from './media-gallery'
-import { FeedPostData } from './types/post'
 import { UserProfileBasic } from '@/lib/defs/user'
 import { formatRelativeTime } from '@/lib/utils/date'
 import { LoadingCircle } from '@/components/novel/ui/icons'
 import { Text } from '@/components/shared/text.tsx'
-import { AvatarButton } from '@/src/components'
+import { AvatarButton, FeedPostData } from '@/src/components'
 import { Button } from '@/components/shared/experimental-button-rework'
 
 interface ThreadPostProps {
@@ -93,12 +92,15 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                 return
             }
 
-            onComment({
+            const newComment: FeedPostData = {
                 id: data.id,
                 body: replyText.trim(),
                 user: signedInUser,
                 created_at: new Date().toISOString(),
-            })
+                reactions: {},
+            }
+
+            onComment(newComment)
 
             setReplyText('')
             setShowReplyForm(false)
@@ -138,7 +140,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 <Text className="text-sm" alt>
                                     ·
                                 </Text>
-                                <Link nref={`/${post.id}`}>
+                                <Link href={`/p/universe/generic-thread-fallback/${post.id}`}>
                                     <time className="text-sm text-muted-foreground">{formatRelativeTime(post.created_at)}</time>
                                 </Link>
                             </div>

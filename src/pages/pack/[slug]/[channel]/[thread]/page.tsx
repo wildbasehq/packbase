@@ -3,7 +3,7 @@
  */
 
 import { useParams } from 'wouter'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Text } from '@/components/shared/text.tsx'
 import { Avatar } from '@/components/shared/avatar.tsx'
 import { Button } from '@/components/shared/button.tsx'
@@ -11,61 +11,51 @@ import { Divider } from '@/components/shared/divider.tsx'
 import { ChatBox } from '@/components/shared/chat-box.tsx'
 import { Hash, MessageSquare, MoreHorizontal, Reply } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils/date.ts'
+import { useUIStore, vg } from '@/lib'
+import { FeedPostData, LogoSpinner } from '@/src/components'
+import { toast } from 'sonner'
 
-// Mock data for the thread
-const mockThread = {
-    id: '1',
-    title: 'Discussion about the new project features',
-    channel: 'general',
-    originalPost: {
-        id: 'msg-1',
-        content:
-            "Hey everyone! I wanted to start a discussion about the new features we're planning to implement. What are your thoughts on the user interface redesign?",
-        author: {
-            name: 'Unknown Mock "display_name" Enum!!!',
-            avatar: 'https://i.pravatar.cc/150?img=1',
-            status: 'online',
-        },
-        timestamp: '2025-06-02T10:30:00Z',
-        reactions: [
-            { emoji: '👍', count: 5, userReacted: true },
-            { emoji: '❤️', count: 2, userReacted: false },
-            { emoji: '🔥', count: 1, userReacted: false },
-        ],
-    },
-    replies: [
-        {
-            id: 'msg-2',
-            content: 'I think the new UI looks great! The color scheme is much more modern and accessible.',
-            author: {
-                name: 'Unknown Mock "display_name" Enum!!!',
-                avatar: 'https://i.pravatar.cc/150?img=2',
-                status: 'online',
-            },
-            timestamp: '2025-06-02T10:35:00Z',
-            reactions: [{ emoji: '👍', count: 3, userReacted: false }],
-        },
-        {
-            id: 'msg-3',
-            content: 'Agreed! One suggestion though - could we make the sidebar navigation a bit wider? Sometimes the text gets truncated.',
-            author: {
-                name: 'Unknown Mock "display_name" Enum!!!',
-                avatar: 'https://i.pravatar.cc/150?img=3',
-                status: 'away',
-            },
-            timestamp: '2025-06-02T10:42:00Z',
-            reactions: [],
-        },
-    ],
-}
+function ThreadMessage({
+    message,
+    isOriginalPost = false,
+    currentUserId = 'user-1',
+}: {
+    message: FeedPostData
+    isOriginalPost?: boolean
+    currentUserId?: string
+}) {
+    const bucketRoot = useUIStore(state => state.bucketRoot)
+    // Map reaction slots to emoji representations
+    const reactionEmojis = {
+        '0': '👍',
+        '1': '❤️',
+        '2': '🔥',
+        '3': '😂',
+        '4': '😮',
+        '5': '😢',
+        '6': '🙏',
+        '7': '👎',
+        '8': '🚀',
+        '9': '🎉',
+    }
 
-function ThreadMessage({ message, isOriginalPost = false }: { message: any; isOriginalPost?: boolean }) {
+    // Transform reactions to UI format
+    const formattedReactions = message.reactions
+        ? Object.entries(message.reactions)
+              .filter(([_, users]) => users && users.length > 0)
+              .map(([slot, users]) => ({
+                  emoji: reactionEmojis[slot as keyof typeof reactionEmojis] || '👍',
+                  count: users?.length || 0,
+                  userReacted: users?.includes(currentUserId) || false,
+              }))
+        : []
+
     return (
         <div className={`group relative ${isOriginalPost ? 'pb-4' : 'py-2'}`}>
             <div className="flex space-x-3">
                 <Avatar
-                    src={message.author.avatar}
-                    initials={message.author.name
+                    src={message.user?.images?.avatar}
+                    initials={(message.user?.display_name || message.user?.username)
                         .split(' ')
                         .map((n: string) => n[0])
                         .join('')}
@@ -75,20 +65,20 @@ function ThreadMessage({ message, isOriginalPost = false }: { message: any; isOr
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center space-x-2">
                         <Text weight="semibold" className="text-sm">
-                            {message.author.name}
+                            {message.user?.display_name || message.user?.username || 'Anonymous'}
                         </Text>
                         <Text size="xs" className="text-muted-foreground">
-                            {formatRelativeTime(message.timestamp)}
+                            {formatRelativeTime(message.created_at)}
                         </Text>
                     </div>
                     <div className="mt-1">
-                        <Text className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</Text>
+                        <Text className="text-sm leading-relaxed whitespace-pre-wrap">{message.body}</Text>
                     </div>
 
                     {/* Reactions */}
-                    {message.reactions && message.reactions.length > 0 && (
+                    {formattedReactions.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
-                            {message.reactions.map((reaction: any, index: number) => (
+                            {formattedReactions.map((reaction, index) => (
                                 <button
                                     key={index}
                                     className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs border transition-colors ${
@@ -112,6 +102,23 @@ function ThreadMessage({ message, isOriginalPost = false }: { message: any; isOr
                     </Button>
                 </div>
             </div>
+
+            {/* Display assets if any */}
+            {message.assets && message.assets.length > 0 && (
+                <div className="mt-3 pl-12">
+                    <div className="grid grid-cols-2 gap-2">
+                        {message.assets.map((asset, index) => (
+                            <div key={index} className="overflow-hidden rounded-md">
+                                <img
+                                    src={`${bucketRoot}/profiles/${asset.data.url}`}
+                                    alt={asset.data.name || 'Attached image'}
+                                    className="object-cover"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
@@ -119,12 +126,64 @@ function ThreadMessage({ message, isOriginalPost = false }: { message: any; isOr
 export default function PackChannelThread() {
     const { id, channel, slug } = useParams<{ id: string; channel: string; slug: string }>()
     const [newMessage, setNewMessage] = useState('')
+    const [currentUserId] = useState('user-1') // In a real app, this would come from authentication
 
-    const handleSendMessage = (content: string) => {
+    const [threadContent, setThreadContent] = useState<FeedPostData | null>(null)
+
+    const handleSendMessage = async (content: string) => {
+        if (!content.trim()) return
+
         console.log('Sending message:', content)
-        // Here you would typically send the message to your backend
-        setNewMessage('')
+        const { data, error } = await vg.howl({ id }).comment.post({
+            body: content.trim(),
+        })
+
+        if (error) {
+            console.error(error)
+            toast.error('Failed to send message')
+            return
+        } else {
+            setNewMessage('')
+            await getHowl()
+        }
     }
+
+    const getHowl = async () => {
+        console.log('Fetching thread:', id)
+        const howl = await vg.howl({ id }).get()
+
+        console.log('Fetched thread:', howl)
+        if (howl.data) {
+            setThreadContent(howl.data)
+        } else {
+            setThreadContent(null)
+        }
+        return howl
+    }
+
+    useEffect(() => {
+        getHowl()
+    }, [id])
+
+    if (!threadContent)
+        return (
+            <div className="flex h-full flex-col">
+                <div className="border-b px-6 py-4">
+                    <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2">
+                            <Hash className="h-5 w-5 text-muted-foreground" />
+                            <Text weight="semibold" className="text-lg">
+                                {channel}
+                            </Text>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-1 h-full w-full justify-center items-center">
+                    <LogoSpinner delay={0} />
+                </div>
+            </div>
+        )
 
     return (
         <div className="flex h-full flex-col">
@@ -145,7 +204,7 @@ export default function PackChannelThread() {
                     </div>
                 </div>
                 <Text size="sm" className="text-muted-foreground mt-1">
-                    {mockThread.replies.length + 1} messages
+                    {threadContent.comments?.length + 1 || 1} messages
                 </Text>
             </div>
 
@@ -154,21 +213,21 @@ export default function PackChannelThread() {
                 <div className="px-6 py-4">
                     {/* Original Post */}
                     <div className="mb-4">
-                        <ThreadMessage message={mockThread.originalPost} isOriginalPost={true} />
+                        <ThreadMessage message={threadContent} isOriginalPost={true} currentUserId={currentUserId} />
                         <Divider className="my-4" />
 
                         <div className="flex items-center space-x-2 mb-4">
                             <Reply className="h-4 w-4 text-muted-foreground" />
                             <Text size="sm" weight="semibold" className="text-muted-foreground">
-                                {mockThread.replies.length} replies
+                                {threadContent.comments?.length} replies
                             </Text>
                         </div>
                     </div>
 
                     {/* Replies */}
                     <div className="space-y-4">
-                        {mockThread.replies.map(reply => (
-                            <ThreadMessage key={reply.id} message={reply} />
+                        {threadContent.comments?.map(reply => (
+                            <ThreadMessage key={reply.id} message={reply} currentUserId={currentUserId} />
                         ))}
                     </div>
                 </div>
