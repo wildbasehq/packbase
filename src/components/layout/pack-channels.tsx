@@ -1,6 +1,10 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import { ArrowUpRightIcon } from 'lucide-react'
-import { lazy, memo, useState } from 'react'
+import { memo, useState } from 'react'
 import {
     Sidebar,
     SidebarBody,
@@ -17,18 +21,11 @@ import { ChevronUpIcon, FireIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIco
 import ResourceSwitcher from '@/components/layout/resource-switcher'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
 import InboxPage from '@/pages/inbox/page.tsx'
-import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '../shared/dropdown'
+import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/src/components'
 import { SiDiscord } from 'react-icons/si'
 import { ChatBubbleBottomCenterIcon, FaceSmileIcon, HashtagIcon, MicrophoneIcon, NewspaperIcon } from '@heroicons/react/16/solid'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
-import UserDropdown from '@/components/layout/user-dropdown.tsx' // Lazy load ConnectionStatus component
-
-// Lazy load ConnectionStatus component
-const ConnectionStatus = lazy(() =>
-    import('./ConnectionStatus').then(module => ({
-        default: module.ConnectionStatus,
-    }))
-)
+import UserDropdown from '@/components/layout/user-dropdown.tsx'
 
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon,
@@ -37,12 +34,9 @@ const availableIcons = {
 }
 
 export function PackChannels() {
-    const { hidden, navigation, serverCapabilities } = useUIStore()
+    const { navigation } = useUIStore()
     const { currentResource } = useResourceStore()
     const { user } = useUserAccountStore()
-
-    // Check if realtime capability is available
-    const hasRealtimeCapability = serverCapabilities.includes('realtime')
 
     if (!user) return <></>
     return (
@@ -81,14 +75,23 @@ export function PackChannels() {
                         </SidebarSection>
                         <SidebarDivider />
                         <SidebarSection>
-                            <SidebarHeading>CHANNELS</SidebarHeading>
+                            <div className="flex justify-between items-center">
+                                <SidebarHeading>Channels</SidebarHeading>
+                                {/*<Button*/}
+                                {/*    plain*/}
+                                {/*    onClick={e => {*/}
+                                {/*        e.preventDefault()*/}
+                                {/*    }}*/}
+                                {/*>*/}
+                                {/*    +*/}
+                                {/*</Button>*/}
+                            </div>
                             {navigation?.map(item => (
                                 <Channel
                                     key={item.href}
                                     href={item.href}
                                     name={item.name}
                                     ticker={item.ticker}
-                                    badge="NEW"
                                     isVoice={item.name.toLowerCase().includes('voice') || item.name.toLowerCase().includes('call')}
                                 />
                             ))}

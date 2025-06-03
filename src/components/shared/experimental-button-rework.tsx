@@ -1,6 +1,10 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
-import React, {forwardRef} from 'react'
+import React, { forwardRef } from 'react'
 import Link from './link'
 
 const styles = {
@@ -42,7 +46,7 @@ const styles = {
     ],
     outline: [
         // Base
-        'border-zinc-950/10 text-zinc-950 data-active:bg-zinc-950/[2.5%] data-hover:bg-zinc-950/[2.5%]',
+        'border-zinc-950/10 text-default data-active:bg-zinc-950/[2.5%] data-hover:bg-zinc-950/[2.5%]',
         // Dark mode
         'dark:border-white/15 dark:text-white dark:[--btn-bg:transparent] dark:data-active:bg-white/5 dark:data-hover:bg-white/5',
         // Icon
@@ -50,9 +54,11 @@ const styles = {
     ],
     plain: [
         // Base
-        'border-transparent text-zinc-950 data-active:bg-zinc-950/5 data-hover:bg-zinc-950/5',
+        'border-transparent text-default data-active:bg-zinc-950/5 data-hover:bg-zinc-950/5',
         // Dark mode
         'dark:text-white dark:data-active:bg-white/10 dark:data-hover:bg-white/10',
+        // Shadow hover
+        'data-hover:shadow-inner dark:shadow-n-9 transition-all',
         // Icon
         '[--btn-icon:var(--color-zinc-500)] data-active:[--btn-icon:var(--color-zinc-700)] data-hover:[--btn-icon:var(--color-zinc-700)] dark:[--btn-icon:var(--color-zinc-500)] dark:data-active:[--btn-icon:var(--color-zinc-400)] dark:data-hover:[--btn-icon:var(--color-zinc-400)]',
     ],
@@ -162,13 +168,13 @@ type ButtonProps = (
     | { color?: keyof typeof styles.colors; outline?: never; plain?: never }
     | { color?: never; outline: true; plain?: never }
     | { color?: never; outline?: never; plain: true }
-    ) & { className?: string; children: React.ReactNode } & (
-    | Omit<Headless.ButtonProps, 'as' | 'className'>
-    | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'>
+) & { className?: string; children: React.ReactNode } & (
+        | Omit<Headless.ButtonProps, 'as' | 'className'>
+        | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'>
     )
 
 export const Button = forwardRef(function Button(
-    {color, outline, plain, className, children, ...props}: ButtonProps,
+    { color, outline, plain, className, children, ...props }: ButtonProps,
     ref: React.ForwardedRef<HTMLElement>
 ) {
     let classes = clsx(
@@ -192,13 +198,13 @@ export const Button = forwardRef(function Button(
 /**
  * Expand the hit area to at least 44×44px on touch devices
  */
-export function TouchTarget({children}: { children: React.ReactNode }) {
+export function TouchTarget({ children }: { children: React.ReactNode }) {
     return (
         <>
-      <span
-          className="absolute top-1/2 left-1/2 size-[max(100%,2.75rem)] -translate-x-1/2 -translate-y-1/2 [@media(pointer:fine)]:hidden"
-          aria-hidden="true"
-      />
+            <span
+                className="absolute top-1/2 left-1/2 size-[max(100%,2.75rem)] -translate-x-1/2 -translate-y-1/2 [@media(pointer:fine)]:hidden"
+                aria-hidden="true"
+            />
             {children}
         </>
     )

@@ -47,7 +47,7 @@ export const Logo = ({ ...props }) => {
  * Same logo, fades logo SVG to spinner after a customisable delay
  */
 export const LogoSpinner = ({
-    delay = 500,
+    delay = 200,
 }: {
     delay?: number
     spinnerClassName?: string
