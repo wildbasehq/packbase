@@ -1,12 +1,20 @@
-import * as Headless from '@headlessui/react'
-import {ComponentPropsWithoutRef, ForwardedRef, forwardRef} from 'react'
-import clsx from 'clsx'
-import {Link as RouterLink} from 'wouter'
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
 
-const Link = forwardRef(function Link(props: Omit<ComponentPropsWithoutRef<'a'>, 'href'> & {
-    to?: string
-    href?: string
-}, ref: ForwardedRef<HTMLAnchorElement>) {
+import * as Headless from '@headlessui/react'
+import { ComponentPropsWithoutRef, ForwardedRef, forwardRef } from 'react'
+import clsx from 'clsx'
+import { Link as RouterLink } from 'wouter'
+
+const Link = forwardRef(function Link(
+    props: Omit<ComponentPropsWithoutRef<'a'>, 'href'> & {
+        to?: string
+        href?: string
+        nref?: string
+    },
+    ref: ForwardedRef<HTMLAnchorElement>
+) {
     const shallowProps = { ...props }
     const href = shallowProps.href || shallowProps.to
     delete shallowProps.href
@@ -28,7 +36,12 @@ const Link = forwardRef(function Link(props: Omit<ComponentPropsWithoutRef<'a'>,
                 />
             ) : (
                 // @ts-ignore
-                <RouterLink {...shallowProps} to={`~${href}`} className={clsx('text-primary', props.className)} ref={ref} />
+                <RouterLink
+                    {...shallowProps}
+                    to={shallowProps.nref || `~${href}`}
+                    className={clsx('text-primary', props.className)}
+                    ref={ref}
+                />
             )}
         </Headless.DataInteractive>
     )

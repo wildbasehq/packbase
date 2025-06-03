@@ -4,7 +4,7 @@
 
 // src/components/feed/thread-post.tsx
 import { useState } from 'react'
-import { ChatBubbleLeftIcon, ChevronRightIcon, HeartIcon, ShareIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { ChatBubbleLeftIcon, ChevronRightIcon, HeartIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import { toast } from 'sonner'
 import { vg } from '@/lib/api'
@@ -138,7 +138,9 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 <Text className="text-sm" alt>
                                     ·
                                 </Text>
-                                <time className="text-sm text-muted-foreground">{formatRelativeTime(post.created_at)}</time>
+                                <Link nref={`/${post.id}`}>
+                                    <time className="text-sm text-muted-foreground">{formatRelativeTime(post.created_at)}</time>
+                                </Link>
                             </div>
 
                             {/* Delete button for author */}
@@ -177,7 +179,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                         )}
 
                         {/* Actions - Only show on root or leaf nodes */}
-                        {(isRoot) && signedInUser && (
+                        {isRoot && signedInUser && (
                             <div className="flex items-center gap-4 mt-3">
                                 <button
                                     onClick={handleReaction}
@@ -200,10 +202,6 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 >
                                     <ChatBubbleLeftIcon className="w-5 h-5" />
                                     <span className="text-sm">{post.comments?.length || 0}</span>
-                                </button>
-
-                                <button className="flex items-center gap-1 text-neutral-500 hover:text-green-500 transition-colors">
-                                    <ShareIcon className="w-5 h-5" />
                                 </button>
                             </div>
                         )}

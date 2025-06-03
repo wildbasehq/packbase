@@ -13,6 +13,7 @@ import { Redirect, Route, Switch } from 'wouter'
 import Console from '@/components/shared/console.tsx'
 import { LogoSpinner } from '@/src/components'
 import Body from '@/components/layout/body.tsx'
+import PackChannelThread from '@/pages/pack/[slug]/[channel]/[thread]/page.tsx'
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
@@ -128,10 +129,19 @@ function App() {
                                                                         <PackHome />
                                                                     </Suspense>
                                                                 </Route>
-                                                                <Route path="/cosmos">
-                                                                    <Suspense fallback={<LoadingFallback />}>
-                                                                        <PackCosmos />
-                                                                    </Suspense>
+
+                                                                <Route path="/:channel" nest>
+                                                                    <Route path="/">
+                                                                        <Suspense fallback={<LoadingFallback />}>
+                                                                            <PackCosmos />
+                                                                        </Suspense>
+                                                                    </Route>
+
+                                                                    <Route path="/:id">
+                                                                        <Suspense fallback={<LoadingFallback />}>
+                                                                            <PackChannelThread />
+                                                                        </Suspense>
+                                                                    </Route>
                                                                 </Route>
                                                             </PackLayout>
                                                         </Suspense>

@@ -4,7 +4,6 @@
 
 // src/components/feed/feed-post.tsx
 import { useState } from 'react'
-import { useModal } from '@/components/modal/provider'
 import { toast } from 'sonner'
 import { vg } from '@/lib/api'
 import { useUserAccountStore } from '@/lib/state'
@@ -13,7 +12,6 @@ import ThreadPost from './thread-post'
 
 export default function FeedPost({ post, onDelete, postState }: FeedPostProps) {
     const [postContent, setPostContent] = useState<FeedPostData>(post)
-    const { show } = useModal()
     const { user: signedInUser } = useUserAccountStore()
 
     const handleDelete = async () => {
