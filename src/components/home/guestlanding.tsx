@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { Container } from '@/components/layout/container'
@@ -553,6 +557,10 @@ export default function GuestLanding() {
             {
                 name: 'Data Handling',
                 href: '/terms',
+            },
+            {
+                name: 'Bluesky',
+                href: 'https://bsky.app/profile/packbase.app',
             },
         ],
         Wildbase: [
