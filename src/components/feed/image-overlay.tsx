@@ -250,7 +250,7 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
             {/* Image container */}
             <div
                 ref={containerRef}
-                className={`relative -z-[1] h-full w-full overflow-hidden ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                className={`relative h-full w-full overflow-hidden ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
