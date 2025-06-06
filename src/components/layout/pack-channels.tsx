@@ -162,7 +162,9 @@ export function PackChannels() {
                             <span className="flex items-center min-w-0 gap-3">
                                 <DropdownComponent />
                                 <span className="min-w-0">
-                                    <span className="block font-medium truncate text-sm/5">{user.display_name}</span>
+                                    <span className="block font-medium truncate text-sm/5">
+                                        {user.display_name !== 'new_here' ? user.display_name : user.username}
+                                    </span>
                                     <span className="block font-normal truncate text-xs/5 text-alt">{user.username}</span>
                                 </span>
                             </span>

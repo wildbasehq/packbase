@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 // export const API_URL = (typeof window !== 'undefined' ? (
 //     window.location.hostname === 'localhost'
 //         ? 'http://localhost/api/'
@@ -46,6 +50,9 @@ export const setToken = (token?: string, expires_at?: number) => {
         })
         vg = newClient.vg
         supabase = newClient.supabase
+
+        // @ts-ignore womp womp, we dont use this internally. for extension development.
+        window.voyageSDK = newClient
 
         if (expires_at) {
             log.info('Wild ID', 'Token set, will refresh at', expires_at)
