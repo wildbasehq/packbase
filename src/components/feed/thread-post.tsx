@@ -162,7 +162,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                     className="w-4 h-4"
                                     square
                                 />
-                                <Link href={`/pack/${post.pack.slug}/`} className="text-xs font-semibold hover:underline text-default">
+                                <Link href={`/p/${post.pack.slug}/`} className="text-xs font-semibold hover:underline text-default">
                                     {post.pack.display_name}
                                 </Link>
                             </div>
