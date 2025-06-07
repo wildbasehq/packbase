@@ -140,7 +140,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 <Text className="text-sm" alt>
                                     ·
                                 </Text>
-                                <Link href={`/p/universe/generic-thread-fallback/${post.id}`}>
+                                <Link href={`/p/universe/all/${post.id}`}>
                                     <time className="text-sm text-muted-foreground">{formatRelativeTime(post.created_at)}</time>
                                 </Link>
                             </div>
