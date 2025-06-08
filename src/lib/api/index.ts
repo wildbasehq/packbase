@@ -51,8 +51,14 @@ export const setToken = (token?: string, expires_at?: number) => {
         vg = newClient.vg
         supabase = newClient.supabase
 
+        // Expose SDK for plugin development
         // @ts-ignore womp womp, we dont use this internally. for extension development.
         window.voyageSDK = newClient
+
+        // Emit authentication event for plugins
+        if (window.packbase) {
+            window.packbase.emit('user:auth:changed', { authenticated: !!token })
+        }
 
         if (expires_at) {
             log.info('Wild ID', 'Token set, will refresh at', expires_at)

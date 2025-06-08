@@ -143,6 +143,17 @@ export default function PackChannelThread() {
             toast.error('Failed to send message')
             return
         } else {
+            // Emit message sent event for plugins
+            if (window.packbase && data) {
+                window.packbase.emit('message:sent', {
+                    messageId: data.id,
+                    threadId: id,
+                    channelId: channel,
+                    content: content.trim(),
+                    timestamp: new Date().toISOString(),
+                })
+            }
+
             setNewMessage('')
             await getHowl()
         }
@@ -155,6 +166,17 @@ export default function PackChannelThread() {
         console.log('Fetched thread:', howl)
         if (howl.data) {
             setThreadContent(howl.data)
+
+            // Emit thread opened event for plugins
+            if (window.packbase) {
+                window.packbase.emit('thread:opened', {
+                    threadId: id,
+                    channelId: channel,
+                    packSlug: slug,
+                    title: howl.data.title || 'Untitled Thread',
+                    postCount: (howl.data.comments?.length || 0) + 1,
+                })
+            }
         } else {
             setThreadContent(null)
         }
