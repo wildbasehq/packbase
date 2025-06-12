@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { useUserAccountStore } from '@/lib/state'
 import { SignIn } from '@clerk/clerk-react'
 import { Alert, AlertDescription, AlertTitle } from '@/src/components'
