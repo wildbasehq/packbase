@@ -8,11 +8,17 @@ import { EnvelopeOpenIcon, UserIcon } from '@heroicons/react/24/solid'
 import ProfileSettings from '@/pages/settings/general/page.tsx'
 import InviteSettings from '@/pages/settings/invite/page.tsx'
 import { useLocation } from 'wouter'
-import { useUserAccountStore } from '@/lib'
 
 export default function UserDropdown() {
-    const { user } = useUserAccountStore()
     const [location, setLocation] = useLocation()
+
+    // Dirty get username from localStorage
+    let user: {
+        [key: string]: any
+    } = JSON.parse(localStorage.getItem('user-account') || '{}')
+    if (!user) return null
+    user = user.state?.user || {}
+
     return (
         <SignedIn>
             <UserButton>

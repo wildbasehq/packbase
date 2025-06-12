@@ -9,14 +9,14 @@ import { toast } from 'sonner'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 
-const ProfileSettings: React.FC = () => {
+const ProfileSettingsComponent: React.FC = () => {
     const { user } = useUserAccountStore()
     const bioRef = React.useMemo(() => React.createRef<HTMLTextAreaElement>(), [])
     const displayNameRef = React.useMemo(() => React.createRef<HTMLInputElement>(), [])
     const coverPicRef = React.useMemo(() => React.createRef<HTMLInputElement>(), [])
-    const coverPicPreview = React.useMemo(() => React.createRef<string>(), [])
 
     const [submitting, setSubmitting] = React.useState<boolean>(false)
+    const [coverPicPreview, setCoverPicPreview] = React.useState<string | undefined>(undefined)
 
     // When coverPicRef gets a valid photo uploaded, set the preview to the base64
     useEffect(() => {
@@ -25,7 +25,7 @@ const ProfileSettings: React.FC = () => {
             if (file) {
                 const reader = new FileReader()
                 reader.onloadend = () => {
-                    coverPicPreview.current = reader.result as string
+                    setCoverPicPreview(reader.result as string)
                 }
                 reader.readAsDataURL(file)
             }
@@ -94,10 +94,11 @@ const ProfileSettings: React.FC = () => {
                 <div
                     className="relative mt-2 flex aspect-banner items-center justify-center overflow-hidden rounded border-2 border-dashed bg-card px-6 py-10"
                     onClick={() => document.getElementById('cover-photo')?.click()}
+                    key={coverPicPreview}
                 >
                     {coverPicPreview && (
                         <img
-                            src={coverPicPreview.current}
+                            src={coverPicPreview}
                             alt=""
                             className="absolute inset-0 h-full w-full rounded-lg object-cover opacity-50 blur-lg"
                         />
@@ -132,5 +133,7 @@ const ProfileSettings: React.FC = () => {
         </form>
     )
 }
+
+const ProfileSettings = React.memo(ProfileSettingsComponent)
 
 export default ProfileSettings
