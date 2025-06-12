@@ -7,13 +7,35 @@ import React, { useEffect } from 'react'
 import { useUserAccountStore, vg } from '@/lib'
 import { toast } from 'sonner'
 import { Button } from '@/components/shared/experimental-button-rework'
+import { PhotoIcon } from '@heroicons/react/24/solid'
 
 const ProfileSettings: React.FC = () => {
     const { user } = useUserAccountStore()
     const bioRef = React.useMemo(() => React.createRef<HTMLTextAreaElement>(), [])
     const displayNameRef = React.useMemo(() => React.createRef<HTMLInputElement>(), [])
+    const coverPicRef = React.useMemo(() => React.createRef<HTMLInputElement>(), [])
+    const [coverPicPreview, setCoverPicPreview] = React.useState<string | undefined>()
 
     const [submitting, setSubmitting] = React.useState<boolean>(false)
+
+    // When coverPicRef gets a valid photo uploaded, set the preview to the base64
+    useEffect(() => {
+        const handleFileChange = () => {
+            const file = coverPicRef.current?.files?.[0]
+            if (file) {
+                const reader = new FileReader()
+                reader.onloadend = () => {
+                    setCoverPicPreview(reader.result as string)
+                }
+                reader.readAsDataURL(file)
+            }
+        }
+
+        if (coverPicRef.current) {
+            coverPicRef.current.addEventListener('change', handleFileChange)
+            return () => coverPicRef.current?.removeEventListener('change', handleFileChange)
+        }
+    }, [coverPicRef])
 
     useEffect(() => {
         if (bioRef.current) bioRef.current.value = user?.about?.bio || ''
@@ -31,6 +53,11 @@ const ProfileSettings: React.FC = () => {
                 about: {
                     bio: bioRef.current?.value || undefined,
                 },
+                images: coverPicPreview
+                    ? {
+                          header: coverPicPreview,
+                      }
+                    : undefined,
             })
             .then(({ data, error }) => {
                 if (data && !error) {
@@ -59,6 +86,33 @@ const ProfileSettings: React.FC = () => {
             <div className="mb-4">
                 <p className="text-sm text-muted-foreground">Username can be changed in your "Account" tab.</p>
             </div>
+
+            <div className="col-span-full">
+                <label htmlFor="cover-photo" className="text-default block select-none text-sm font-medium leading-6">
+                    Cover photo
+                </label>
+                <div
+                    className="relative mt-2 flex aspect-banner items-center justify-center overflow-hidden rounded border-2 border-dashed bg-card px-6 py-10"
+                    onClick={() => document.getElementById('cover-photo')?.click()}
+                >
+                    {coverPicPreview && (
+                        <img
+                            src={coverPicPreview}
+                            alt=""
+                            className="absolute inset-0 h-full w-full rounded-lg object-cover opacity-50 blur-lg"
+                        />
+                    )}
+                    <div className="items-center justify-center text-center">
+                        <PhotoIcon className="text-alt mx-auto h-12 w-12" aria-hidden="true" />
+                        <div className="text-alt mt-4 flex select-none text-sm leading-6">
+                            <p className="pl-1">Upload a file (drag and drop not supported)</p>
+                        </div>
+                        <p className="text-alt select-none text-xs leading-5">PNG, JPG, GIF up to 10MB, Aspect Ratio 3 / 1</p>
+                    </div>
+                </div>
+            </div>
+
+            <input id="cover-photo" name="file-upload" type="file" className="sr-only" accept="image/*" ref={coverPicRef} />
 
             <Field>
                 <Label>Display Name</Label>
