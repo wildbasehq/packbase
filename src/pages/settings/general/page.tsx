@@ -14,7 +14,7 @@ const ProfileSettings: React.FC = () => {
     const bioRef = React.useMemo(() => React.createRef<HTMLTextAreaElement>(), [])
     const displayNameRef = React.useMemo(() => React.createRef<HTMLInputElement>(), [])
     const coverPicRef = React.useMemo(() => React.createRef<HTMLInputElement>(), [])
-    const [coverPicPreview, setCoverPicPreview] = React.useState<string | undefined>()
+    const coverPicPreview = React.useMemo(() => React.createRef<string>(), [])
 
     const [submitting, setSubmitting] = React.useState<boolean>(false)
 
@@ -25,7 +25,7 @@ const ProfileSettings: React.FC = () => {
             if (file) {
                 const reader = new FileReader()
                 reader.onloadend = () => {
-                    setCoverPicPreview(reader.result as string)
+                    coverPicPreview.current = reader.result as string
                 }
                 reader.readAsDataURL(file)
             }
@@ -97,7 +97,7 @@ const ProfileSettings: React.FC = () => {
                 >
                     {coverPicPreview && (
                         <img
-                            src={coverPicPreview}
+                            src={coverPicPreview.current}
                             alt=""
                             className="absolute inset-0 h-full w-full rounded-lg object-cover opacity-50 blur-lg"
                         />
