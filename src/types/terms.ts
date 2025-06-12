@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 // types/terms.ts
 export const BANNED_COUNTRIES = ['North Korea', 'Iran', 'Syria', 'Cuba', 'Belarus', 'Russia', 'Sudan', 'Venezuela', 'Zimbabwe', 'Myanmar']
 
@@ -242,7 +246,7 @@ export const termsConfig: TermsConfig = {
         },
         {
             type: 'Payment information',
-            purpose: 'Transaction processing',
+            purpose: 'Transaction processing (handled securely by Stripe; card details are not stored on our servers)',
             retention: RetentionOrders.UNTIL_PROFILE_DEL_OR_LAW,
         },
         { type: 'Subscription details', purpose: 'Service management', retention: RetentionOrders.UNTIL_PROFILE_DEL },
@@ -620,7 +624,7 @@ export const termsConfig: TermsConfig = {
                         'PostHog: Used for analytics to understand user behavior and improve our services. PostHog processes anonymized usage data.',
                         'Clerk: Used for authentication and user management. Clerk processes account credentials and authentication data.',
                         'Supabase: Used for database and storage services. Supabase stores user content and profile information.',
-                        'Payment processors: If you make purchases, payment information is processed by secure payment providers.',
+                        'Payment processors: If you make purchases, payment information is processed by secure payment providers (primarily Stripe). We do not store your credit card details on our servers; this information is securely managed by Stripe and accessed through Clerk. Payment information is only retained by Stripe to process your transactions and for legal compliance purposes. We do not have any access to your card details and related information.',
                     ],
                 },
                 {

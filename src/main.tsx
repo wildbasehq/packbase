@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 // import './styles/globals.css'
@@ -33,6 +37,9 @@ createRoot(document.getElementById('root')!).render(
                     },
                     profilePage: {
                         title: 'Update Avatar',
+                    },
+                    billingPage: {
+                        title: 'Billing (Managed by Stripe / Clerk)',
                     },
                 },
             }}
