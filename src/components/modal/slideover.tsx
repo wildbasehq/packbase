@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import React from 'react'
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
@@ -40,7 +44,7 @@ export function Slideover({
                                         <XMarkIcon aria-hidden="true" className="size-4" />
                                     </button>
                                 </div>
-                                <div className="relative mt-6 py-6 flex-1 px-4 sm:px-6">{props.children}</div>
+                                <div className="relative my-6 flex-1 px-4 sm:px-6">{props.children}</div>
                             </div>
                         </DialogPanel>
                     </div>

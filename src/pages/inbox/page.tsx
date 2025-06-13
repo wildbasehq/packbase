@@ -1,5 +1,8 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import PlaceholderNotification from '@/components/icons/placeholder-notification.tsx'
-import { Container } from '@/components/layout/container.tsx'
 import { Heading, Text } from '@/components/shared/text.tsx'
 import { Slideover } from '@/components/modal/slideover.tsx'
 import { useEffect, useState } from 'react'
@@ -72,7 +75,7 @@ export default function InboxPage({ onClose }) {
                         </div>
                         <Text className="text-xs text-neutral-500">{formatRelativeTime(notification.created_at)}</Text>
                     </div>
-                    <Text className="text-sm mb-2 line-clamp-2">{notification.content}</Text>
+                    <Text className="text-sm mb-2">{notification.content}</Text>
                     <div className="flex justify-between items-center">
                         {notification.type && (
                             <Badge color="indigo" className="text-xs">
@@ -105,14 +108,14 @@ export default function InboxPage({ onClose }) {
                         )}
                     </div>
                     {notifications.length > 0 && (
-                        <Button outline onClick={markAllAsRead} className="text-xs">
+                        <Button outline onClick={markAllAsRead} className="text-xs mr-2">
                             Mark all as read
                         </Button>
                     )}
                 </div>
             }
         >
-            <Container className="flex flex-col h-full">
+            <div className="flex flex-col h-full">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center h-full">
                         <LoadingCircle className="mb-4 h-8 w-8" />
@@ -170,7 +173,7 @@ export default function InboxPage({ onClose }) {
                         )}
                     </div>
                 )}
-            </Container>
+            </div>
         </Slideover>
     )
 }
