@@ -1,13 +1,18 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { lazy, Suspense, useState } from 'react'
 import { Theme, useThemes } from '@/lib/api/theme'
 import { Button } from '@/components/shared/experimental-button-rework.tsx'
-import { Dialog, DialogBody, DialogTitle } from '@/components/shared/dialog.tsx'
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
+import { Heading, Text } from '@/components/shared/text.tsx'
+import Body from '@/components/layout/body.tsx'
 
 const ThemeEditor = lazy(() => import('@/src/pages/settings/template/theme-editor.tsx'))
 
-export default function SettingsTemplate() {
+export default function TemplateSettings() {
     const { themes, loading, error, addTheme, updateTheme, deleteTheme } = useThemes()
     const [isEditorOpen, setIsEditorOpen] = useState(false)
     const [currentTheme, setCurrentTheme] = useState<Theme | null>(null)
@@ -54,8 +59,8 @@ export default function SettingsTemplate() {
     }
 
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
+        <div>
+            <div className="flex justify-between items-center mb-6 mr-6">
                 <h1 className="text-2xl font-bold">Themes</h1>
                 <Button onClick={handleCreateTheme}>
                     <PlusIcon className="h-5 w-5 mr-2" />
@@ -129,23 +134,19 @@ export default function SettingsTemplate() {
 
             {/* Fullscreen Theme Editor Dialog */}
             {isEditorOpen && currentTheme && (
-                <Dialog
-                    open={isEditorOpen}
-                    onClose={() => setIsEditorOpen(false)}
-                    size="5xl"
-                    className="max-h-[90vh] overflow-hidden flex flex-col"
-                >
+                <div className="overflow-hidden bg-card flex flex-col !z-[10001] fixed inset-0 z-10 overflow-y-auto">
                     <div className="p-6 flex-1 overflow-auto">
-                        <DialogTitle className="text-xl mb-4">
+                        <Heading className="text-xl mb-4">
                             {currentTheme.id ? `Edit Theme: ${currentTheme.name}` : 'Create New Theme'}
-                        </DialogTitle>
-                        <DialogBody className="h-[calc(100vh-12rem)]">
+                        </Heading>
+                        <Text alt>⚠️ We're currently in beta and the editor is still in development.</Text>
+                        <Body className="h-[calc(100vh-12rem)]">
                             <Suspense fallback={<div className="flex items-center justify-center h-full">Loading editor...</div>}>
                                 <ThemeEditor theme={currentTheme} onSave={handleSaveTheme} onCancel={() => setIsEditorOpen(false)} />
                             </Suspense>
-                        </DialogBody>
+                        </Body>
                     </div>
-                </Dialog>
+                </div>
             )}
         </div>
     )
