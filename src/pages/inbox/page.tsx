@@ -56,7 +56,7 @@ export default function InboxPage({ onClose }) {
         return (
             <Card
                 className={cn(
-                    'mb-2 cursor-pointer transition-all hover:bg-neutral-100 dark:hover:bg-neutral-800 overflow-hidden',
+                    'mb-2 cursor-pointer transition-all hover:bg-n-1 dark:hover:bg-n-7 overflow-hidden',
                     !notification.read ? 'border-l-4 border-l-primary' : 'pl-4'
                 )}
                 onClick={() => markAsRead(notification.id)}
@@ -73,7 +73,9 @@ export default function InboxPage({ onClose }) {
                                 </Badge>
                             )}
                         </div>
-                        <Text className="text-xs text-neutral-500">{formatRelativeTime(notification.created_at)}</Text>
+                        <Text alt className="text-xs">
+                            {formatRelativeTime(notification.created_at)}
+                        </Text>
                     </div>
                     <Text className="text-sm mb-2">{notification.content}</Text>
                     <div className="flex justify-between items-center">
@@ -83,7 +85,9 @@ export default function InboxPage({ onClose }) {
                             </Badge>
                         )}
                         {notification.related_id && (
-                            <Text className="text-xs text-neutral-500">ID: {notification.related_id.substring(0, 8)}...</Text>
+                            <Text alt className="text-xs">
+                                ID: {notification.related_id.substring(0, 8)}...
+                            </Text>
                         )}
                     </div>
                 </div>
@@ -135,18 +139,10 @@ export default function InboxPage({ onClose }) {
                 ) : (
                     <div className="flex flex-col">
                         <div className="flex justify-between mb-4">
-                            <Button
-                                outline
-                                onClick={() => fetchNotifications(null, false)}
-                                className={cn('text-xs', !notifications.some(n => !n.read) && 'bg-neutral-100 dark:bg-neutral-800')}
-                            >
+                            <Button outline onClick={() => fetchNotifications(null, false)}>
                                 All
                             </Button>
-                            <Button
-                                outline
-                                onClick={() => fetchNotifications(null, true)}
-                                className={cn('text-xs', notifications.some(n => !n.read) && 'bg-neutral-100 dark:bg-neutral-800')}
-                            >
+                            <Button outline onClick={() => fetchNotifications(null, true)}>
                                 Unread
                             </Button>
                         </div>
