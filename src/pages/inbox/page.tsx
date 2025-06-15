@@ -95,8 +95,6 @@ export default function InboxPage({ onClose }) {
         )
     }
 
-    console.log(notifications)
-
     return (
         <Slideover
             open={[open, setOpen]}
