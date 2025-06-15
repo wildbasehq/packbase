@@ -4,7 +4,7 @@
 
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import { ArrowUpRightIcon } from 'lucide-react'
-import { memo, useState } from 'react'
+import { useState } from 'react'
 import {
     Sidebar,
     SidebarBody,
@@ -17,15 +17,13 @@ import {
     SidebarSection,
     SidebarSpacer,
 } from '@/components/shared/sidebar'
-import { ChevronUpIcon, FireIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
+import { FireIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
 import ResourceSwitcher from '@/components/layout/resource-switcher'
-import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher'
 import InboxPage from '@/pages/inbox/page.tsx'
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/src/components'
 import { SiDiscord } from 'react-icons/si'
 import { ChatBubbleBottomCenterIcon, FaceSmileIcon, HashtagIcon, MicrophoneIcon, NewspaperIcon } from '@heroicons/react/16/solid'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
-import UserDropdown from '@/components/layout/user-dropdown.tsx'
 
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon,
@@ -40,8 +38,7 @@ export function PackChannels() {
 
     if (!user) return <></>
     return (
-        <div className="flex h-full">
-            <PackSwitcher />
+        <>
             <div className="flex flex-col w-80">
                 {!currentResource.standalone && (
                     <nav aria-label="Sections" className="flex flex-col min-h-14 w-80">
@@ -144,40 +141,11 @@ export function PackChannels() {
                     <SidebarFooter>
                         <SidebarHeading>(c) ✱base - Private alpha, things break!</SidebarHeading>
                     </SidebarFooter>
-
-                    <SidebarFooter className="max-lg:hidden relative">
-                        {/* Conditionally render ConnectionStatus based on realtime capability */}
-                        {/*{hasRealtimeCapability && (*/}
-                        {/*    <Suspense fallback={null}>*/}
-                        {/*        <ConnectionStatus />*/}
-                        {/*    </Suspense>*/}
-                        {/*)}*/}
-                        <SidebarItem
-                            onClick={() => {
-                                if (!document.getElementsByClassName('cl-modalBackdrop')?.[0])
-                                    // @ts-ignore
-                                    document.getElementsByClassName('cl-userButtonTrigger')?.[0]?.click()
-                            }}
-                        >
-                            <span className="flex items-center min-w-0 gap-3">
-                                <DropdownComponent />
-                                <span className="min-w-0">
-                                    <span className="block font-medium truncate text-sm/5">
-                                        {user.display_name !== 'new_here' ? user.display_name : user.username}
-                                    </span>
-                                    <span className="block font-normal truncate text-xs/5 text-alt">{user.username}</span>
-                                </span>
-                            </span>
-                            <ChevronUpIcon />
-                        </SidebarItem>
-                    </SidebarFooter>
                 </Sidebar>
             </div>
-        </div>
+        </>
     )
 }
-
-const DropdownComponent = memo(UserDropdown, () => true)
 
 function DynamicIcon({ name, ...props }: any) {
     // icon://IconName

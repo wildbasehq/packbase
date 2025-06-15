@@ -1,9 +1,12 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { ExpandingArrow, LoadingCircle } from '@/components/icons'
 import { Heading, Text } from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 import useComponentVisible from '@/lib/hooks/use-component-visible'
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
-import { useEffect, useState } from 'react'
 import useSound from 'use-sound'
 import './resource-switcher.component.css'
 import { Dropdown, DropdownHeader, DropdownMenu } from '@/components/shared/dropdown'
@@ -24,16 +27,7 @@ import PagedModal from '@/components/shared/paged-modal'
 
 export default function ResourceSwitcher() {
     const hoverCancelSFX = '/sounds/switch-hover-s.ogg'
-    // sound refs
-    const [cancelSound] = useSound(hoverCancelSFX, {
-        volume: 0.35,
-        playbackRate: 0.25,
-    })
-    const [hoverSound] = useSound(hoverCancelSFX, {
-        volume: 0.25,
-        playbackRate: 0.5,
-        interrupt: true,
-    })
+
     const [heavyHoverSound] = useSound('/sounds/switch-hover-s.ogg', {
         playbackRate: 0.3,
     })
@@ -41,25 +35,11 @@ export default function ResourceSwitcher() {
     const { currentResource } = useResourceStore()
 
     const { loading, connecting } = useUIStore()
-    const { ref } = useComponentVisible({
-        soundOnClose: cancelSound,
-    })
-    // fuck you nextjs
-    const [domReady, setDomReady] = useState(false)
-
-    const playSound = (sound: any) => {
-        sound()
-    }
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setDomReady(true)
-        }
-    }, [])
+    const { ref } = useComponentVisible()
 
     return (
         <>
-            {domReady && !connecting ? (
+            {!connecting ? (
                 <div
                     ref={ref}
                     className={`group flex select-none flex-row items-center justify-between ${loading ? 'cursor-no-drop!' : ''}`}
@@ -67,12 +47,6 @@ export default function ResourceSwitcher() {
                     title={loading ? 'Resource is still switching...' : 'Open pack options'}
                     onAnimationEnd={() => {
                         ref.current?.classList.remove('[&>*>*]:animate-shake')
-                    }}
-                    onMouseEnter={() => {
-                        playSound(hoverSound)
-                    }}
-                    onMouseLeave={() => {
-                        playSound(cancelSound)
                     }}
                 >
                     <Dropdown>
@@ -82,7 +56,6 @@ export default function ResourceSwitcher() {
                                 if (loading || currentResource.standalone || currentResource.temporary) {
                                     e.preventDefault()
                                     ref.current?.classList.add('[&>*>*]:animate-shake')
-                                    return playSound(heavyHoverSound)
                                 }
                             }}
                         >

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import ECGIcon from '@/components/icons/dazzle/ecg'
 import { Logo } from '@/components/shared/logo'
 import { Text } from '@/components/shared/text'
@@ -9,19 +13,11 @@ import { cn } from '@/lib/utils'
 import { UsersIcon } from '@heroicons/react/20/solid'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { TentTreeIcon } from 'lucide-react'
-import useSound from 'use-sound'
 import './pack-switcher.component.css'
 import Link from '@/components/shared/link.tsx'
 import { useLocation } from 'wouter'
 
 export default function PackSwitcher() {
-    // Going back home
-    const [initialSound] = useSound('/sounds/switcher.ogg')
-    // Not allowed
-    const [heavyHoverSound] = useSound('/sounds/switch-hover-s.ogg', {
-        playbackRate: 0.3,
-    })
-
     const { currentResource, setCurrentResource, resources } = useResourceStore()
     const { user } = useUserAccountStore()
     const { resourceDefault, loading, setLoading } = useUIStore()
@@ -30,16 +26,14 @@ export default function PackSwitcher() {
     const switchResource = (resource: any) => {
         if (loading || currentResource.id === resource.id) {
             if (resource.slug === 'universe') navigate('/p/universe')
-            return heavyHoverSound()
         }
-        resource.id === resourceDefault.id && initialSound()
         setCurrentResource(resource)
         setLoading(true)
         navigate(`/p/${resource.slug}`)
     }
 
     return (
-        <div className="min-w-16 relative flex h-full flex-col items-center border-r py-2">
+        <div className="min-w-16 relative flex h-full flex-col items-center py-2">
             <Tooltip content="Home" side="right">
                 <div
                     className={cn(
@@ -54,7 +48,7 @@ export default function PackSwitcher() {
                 </div>
             </Tooltip>
 
-            <div className="h-[1px] w-full bg-n-3 dark:bg-n-7 my-2"></div>
+            <div className="h-[1px] w-1/2 bg-n-3 dark:bg-n-7 my-2"></div>
 
             {resources.map(item => (
                 <Tooltip

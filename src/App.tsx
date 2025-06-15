@@ -18,7 +18,6 @@ import PackChannelThread from '@/pages/pack/[slug]/[channel]/[thread]/page.tsx'
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
 const IDLogin = lazy(() => import('@/pages/id/login/page.tsx'))
-const IDCreate = lazy(() => import('@/pages/id/create/page.tsx'))
 const IDWaitlist = lazy(() => import('@/pages/id/waitlist/page.tsx'))
 const PackLayout = lazy(() => import('@/pages/pack/[slug]/layout.tsx'))
 const PackHome = lazy(() => import('@/pages/pack/[slug]/page.tsx'))
@@ -105,7 +104,6 @@ function App() {
                                                         </Route>
                                                         <Route path="/create">
                                                             <Suspense fallback={<LoadingFallback />}>
-                                                                {/*<IDCreate />*/}
                                                                 <IDWaitlist />
                                                             </Suspense>
                                                         </Route>

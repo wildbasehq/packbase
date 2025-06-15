@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { AlertCircle, Clock, Filter, Loader2, RefreshCw, Search as SearchIcon, X } from 'lucide-react'
@@ -6,7 +10,7 @@ import { useDebounce } from 'use-debounce'
 import { SearchApiResponse, SearchResult } from './types'
 import { PackCard, PostCard, ProfileCard } from '@/components/search'
 import { Heading, Text } from '@/components/shared/text.tsx'
-import { Alert, AlertDescription, AlertTitle, ExpandableTabs } from '@/src/components'
+import { Alert, AlertDescription, AlertTitle, AppTabs, ExpandableTabs } from '@/src/components'
 import { MagnifyingGlassCircleIcon, RectangleStackIcon, UserGroupIcon, UsersIcon } from '@heroicons/react/20/solid'
 
 // Array of greeting messages to randomly display
@@ -146,6 +150,7 @@ export default function Search() {
 
     return (
         <div className="flex flex-col h-full">
+            <AppTabs />
             {/* Search header */}
             <div className="sticky top-0 z-10 backdrop-blur-sm border-b pb-4">
                 <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">

@@ -1,10 +1,13 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import * as Headless from '@headlessui/react'
 import React, { useState } from 'react'
-import { useUIStore, useUserAccountStore } from '@/lib/state'
+import { useUserAccountStore } from '@/lib/state'
 import { NavbarItem } from '@/components/layout'
-import { useLocation } from 'wouter'
-import { motion } from 'framer-motion'
-import YourStuffPage from '@/pages/stuff/page.tsx'
+import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher.tsx'
+import UserSidebar from '@/components/layout/user-sidebar.tsx'
 
 function OpenMenuIcon() {
     return (
@@ -53,14 +56,17 @@ export function SidebarLayout({
 }: React.PropsWithChildren<{ navbar: React.ReactNode; sidebar: React.ReactNode }>) {
     let [showSidebar, setShowSidebar] = useState(false)
     const { user } = useUserAccountStore()
-    const { hidden } = useUIStore()
-    const [location] = useLocation()
-    const isStuffPage = location === '/stuff'
+    // const [location] = useLocation()
+    // const isStuffPage = location === '/stuff'
 
     return (
         <div className="relative flex w-full bg-white isolate min-h-svh max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
             {/* Sidebar on desktop */}
-            {user && <div className="fixed inset-y-0 left-0 w-98 max-lg:hidden z-10">{sidebar}</div>}
+            {user && (
+                <div className="fixed inset-y-0 left-0 z-10 max-lg:hidden flex h-full">
+                    <PackSwitcher />
+                </div>
+            )}
 
             {/* Sidebar on mobile */}
             <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
@@ -68,7 +74,7 @@ export function SidebarLayout({
             </MobileSidebar>
 
             {/* Navbar on mobile */}
-            <header className="flex items-center px-4 lg:hidden">
+            <header className="flex items-center px-4 lg:hidden z-10">
                 <div className="py-2.5">
                     <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
                         <OpenMenuIcon />
@@ -79,38 +85,42 @@ export function SidebarLayout({
 
             {/* Content */}
             <div className="flex flex-col flex-1 relative">
-                <div className="hidden lg:block">{navbar}</div>
-                {isStuffPage && <YourStuffPage />}
-                <motion.main
-                    // key={isStuffPage ? 'settings' : 'default'}
-                    className={`pb-2 lg:min-w-0 lg:pr-2 ${user ? 'lg:pl-96' : 'lg:pl-2'} ${isStuffPage ? '!z-10' : 'z-0'}`}
-                    initial={false}
-                    animate="animate"
-                    transition={{
-                        type: 'spring',
-                        stiffness: 600,
-                        damping: 40,
-                        mass: 1,
-                        bounce: 0,
-                    }}
-                    custom={{ isStuffPage }}
-                    variants={{
-                        initial: {
-                            y: 0,
-                            filter: 'blur(0px)',
-                            opacity: 1,
-                        },
-                        animate: ({ isStuffPage }) => ({
-                            y: isStuffPage ? '80%' : 0,
-                            filter: isStuffPage ? 'blur(2px)' : 'blur(0px)',
-                            // opacity: isSettingsPage ? 0.5 : 1,
-                        }),
-                    }}
-                >
-                    <div className="h-[calc(100vh-4rem)] overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-                        <div className="mx-auto overflow-hidden h-full">{children}</div>
+                {/*<div className="hidden lg:block">{navbar}</div>*/}
+                {/*{isStuffPage && <YourStuffPage />}*/}
+                <main className={`py-2 lg:min-w-0 lg:pr-2 ${user ? 'lg:pl-18' : 'lg:pl-2'}`}>
+                    {/*<motion.main*/}
+                    {/*    // key={isStuffPage ? 'settings' : 'default'}*/}
+                    {/*    className={`pb-2 lg:min-w-0 lg:pr-2 ${user ? 'lg:pl-96' : 'lg:pl-2'} ${isStuffPage ? '!z-10' : 'z-0'}`}*/}
+                    {/*    initial={false}*/}
+                    {/*    animate="animate"*/}
+                    {/*    transition={{*/}
+                    {/*        type: 'spring',*/}
+                    {/*        stiffness: 600,*/}
+                    {/*        damping: 40,*/}
+                    {/*        mass: 1,*/}
+                    {/*        bounce: 0,*/}
+                    {/*    }}*/}
+                    {/*    custom={{ isStuffPage }}*/}
+                    {/*    variants={{*/}
+                    {/*        initial: {*/}
+                    {/*            y: 0,*/}
+                    {/*            filter: 'blur(0px)',*/}
+                    {/*            opacity: 1,*/}
+                    {/*        },*/}
+                    {/*        animate: ({ isStuffPage }) => ({*/}
+                    {/*            y: isStuffPage ? '80%' : 0,*/}
+                    {/*            filter: isStuffPage ? 'blur(2px)' : 'blur(0px)',*/}
+                    {/*            // opacity: isSettingsPage ? 0.5 : 1,*/}
+                    {/*        }),*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    <div className="relative h-[calc(100vh-1rem)] flex overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
+                        {user && <div className="top-0 backdrop-blur border-r h-full flex">{sidebar}</div>}
+                        <div className="mx-auto max-w-1/2 w-full overflow-hidden h-full">{children}</div>
+                        <UserSidebar />
                     </div>
-                </motion.main>
+                    {/*</motion.main>*/}
+                </main>
             </div>
         </div>
     )
