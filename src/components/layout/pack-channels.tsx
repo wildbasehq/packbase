@@ -142,7 +142,7 @@ export function PackChannels() {
                         </SidebarSection>
                     </SidebarBody>
                     <SidebarFooter>
-                        <SidebarHeading>(c) ✱base - Packbase is early access!</SidebarHeading>
+                        <SidebarHeading>(c) ✱base - Private alpha, things break!</SidebarHeading>
                     </SidebarFooter>
 
                     <SidebarFooter className="max-lg:hidden relative">
