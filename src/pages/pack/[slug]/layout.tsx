@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import Body from '@/components/layout/body'
 import { LoadingDots } from '@/components/icons'
 import { Heading } from '@/components/shared/text'
@@ -7,6 +11,8 @@ import { FaceFrownIcon } from '@heroicons/react/24/solid'
 import { OrbitIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useParams } from 'wouter'
+import { PackChannels } from '@/src/components'
+import { SidebarPortal } from '@/lib/context/sidebar-context.tsx'
 
 export default function PackLayout({ children }: { children: React.ReactNode }) {
     const { resourceDefault, loading, setLoading, setNavigation } = useUIStore()
@@ -154,5 +160,13 @@ export default function PackLayout({ children }: { children: React.ReactNode }) 
             </Body>
         )
 
-    return children
+    return (
+        <>
+            <SidebarPortal>
+                <PackChannels />
+            </SidebarPortal>
+
+            {children}
+        </>
+    )
 }

@@ -4,11 +4,31 @@
 
 import * as Headless from '@headlessui/react'
 import React, { useState } from 'react'
-import { useUserAccountStore } from '@/lib/state'
+import { useResourceStore, useUserAccountStore } from '@/lib/state'
 import { NavbarItem } from '@/components/layout'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher.tsx'
 import UserSidebar from '@/components/layout/user-sidebar.tsx'
 import cx from 'classnames'
+import { useSidebar } from '@/lib/context/sidebar-context'
+import ResourceSwitcher from '@/components/layout/resource-switcher'
+import {
+    Dropdown,
+    DropdownButton,
+    DropdownItem,
+    DropdownMenu,
+    Sidebar,
+    SidebarBody,
+    SidebarFooter,
+    SidebarHeading,
+    SidebarItem,
+    SidebarLabel,
+    SidebarSection,
+    SidebarSpacer,
+} from '@/src/components'
+import { QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
+import { ChatBubbleBottomCenterIcon, FaceSmileIcon } from '@heroicons/react/16/solid'
+import { SiDiscord } from 'react-icons/si'
+import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 
 function OpenMenuIcon() {
     return (
@@ -50,13 +70,10 @@ function MobileSidebar({ open, close, children }: React.PropsWithChildren<{ open
     )
 }
 
-export function SidebarLayout({
-    navbar,
-    sidebar,
-    children,
-}: React.PropsWithChildren<{ navbar: React.ReactNode; sidebar: React.ReactNode }>) {
+export function SidebarLayout({ navbar, children }: React.PropsWithChildren<{ navbar: React.ReactNode }>) {
     let [showSidebar, setShowSidebar] = useState(false)
     const { user } = useUserAccountStore()
+    const { sidebarContent } = useSidebar()
     // const [location] = useLocation()
     // const isStuffPage = location === '/stuff'
 
@@ -71,7 +88,7 @@ export function SidebarLayout({
 
             {/* Sidebar on mobile */}
             <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
-                {sidebar}
+                <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
             </MobileSidebar>
 
             {/* Navbar on mobile */}
@@ -116,13 +133,92 @@ export function SidebarLayout({
                     {/*    }}*/}
                     {/*>*/}
                     <div className="relative h-[calc(100vh-1rem)] flex overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-                        {user && <div className="top-0 backdrop-blur border-r h-full flex">{sidebar}</div>}
+                        {user && (
+                            <div className="top-0 backdrop-blur border-r h-full flex">
+                                <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
+                            </div>
+                        )}
                         <div className={cx('mx-auto w-full overflow-hidden h-full', user && 'max-w-1/2')}>{children}</div>
                         {user && <UserSidebar />}
                     </div>
                     {/*</motion.main>*/}
                 </main>
             </div>
+        </div>
+    )
+}
+
+function SidebarContentContainer({ children }: { children: React.ReactNode }) {
+    const { currentResource } = useResourceStore()
+    return (
+        <div className="flex flex-col w-80">
+            {!currentResource.standalone && (
+                <nav aria-label="Sections" className="flex flex-col min-h-14 w-80">
+                    <div className="relative flex h-full items-center px-5 py-2 overflow-hidden">
+                        <div className="w-full">
+                            <ResourceSwitcher />
+                        </div>
+                    </div>
+                </nav>
+            )}
+            <Sidebar className="w-full max-w-[320px]">
+                <SidebarBody>
+                    {!children &&
+                        // Skeleton
+                        Array(10)
+                            .fill(null)
+                            .map((_, i) => (
+                                <SidebarSection key={i}>
+                                    <SidebarItem>
+                                        <SidebarLabel className="flex items-center space-x-2">
+                                            <div className="w-8 h-8 rounded-full bg-white dark:bg-n-7" />
+                                            <div className="w-24 h-4 rounded-full bg-white dark:bg-n-7" />
+                                        </SidebarLabel>
+                                    </SidebarItem>
+                                </SidebarSection>
+                            ))}
+                    {children}
+                    <SidebarSpacer />
+                    <SidebarSection>
+                        <Dropdown>
+                            <DropdownButton as={SidebarItem}>
+                                <QuestionMarkCircleIcon />
+                                <SidebarLabel>Help</SidebarLabel>
+                            </DropdownButton>
+                            <DropdownMenu anchor="top">
+                                <DropdownItem
+                                    onClick={() => {
+                                        window.Intercom?.('show')
+                                    }}
+                                >
+                                    <ChatBubbleBottomCenterIcon className="w-4 h-4 inline-flex" />
+                                    <SidebarLabel>Docs & Chat</SidebarLabel>
+                                </DropdownItem>
+                                <DropdownItem href="https://packbase.wildbase.xyz" target="_blank">
+                                    <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon" />
+                                    <SidebarLabel>Feedback</SidebarLabel>
+                                </DropdownItem>
+                                <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
+                                    <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon" />
+                                    <SidebarLabel>Discord</SidebarLabel>
+                                </DropdownItem>
+                                <DropdownItem href="https://wildbase.xyz/" target="_blank">
+                                    <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon" />
+                                    <SidebarLabel>Wildbase</SidebarLabel>
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                        <SidebarItem href="https://changelog.packbase.app" target="_blank">
+                            <SparklesIcon />
+                            <SidebarLabel external>Changelog</SidebarLabel>
+                        </SidebarItem>
+                    </SidebarSection>
+                </SidebarBody>
+
+                <SidebarFooter>
+                    <SidebarHeading>(c) ✱base - Private alpha, things break!</SidebarHeading>
+                </SidebarFooter>
+            </Sidebar>
         </div>
     )
 }

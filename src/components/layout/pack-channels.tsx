@@ -5,25 +5,10 @@
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import { ArrowUpRightIcon } from 'lucide-react'
 import { useState } from 'react'
-import {
-    Sidebar,
-    SidebarBody,
-    SidebarDivider,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarHeading,
-    SidebarItem,
-    SidebarLabel,
-    SidebarSection,
-    SidebarSpacer,
-} from '@/components/shared/sidebar'
+import { SidebarDivider, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection } from '@/components/shared/sidebar'
 import { FireIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
-import ResourceSwitcher from '@/components/layout/resource-switcher'
 import InboxPage from '@/pages/inbox/page.tsx'
-import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/src/components'
-import { SiDiscord } from 'react-icons/si'
-import { ChatBubbleBottomCenterIcon, FaceSmileIcon, HashtagIcon, MicrophoneIcon, NewspaperIcon } from '@heroicons/react/16/solid'
-import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
+import { HashtagIcon, MicrophoneIcon, NewspaperIcon } from '@heroicons/react/16/solid'
 
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon,
@@ -39,110 +24,46 @@ export function PackChannels() {
     if (!user) return <></>
     return (
         <>
-            <div className="flex flex-col w-80">
-                {!currentResource.standalone && (
-                    <nav aria-label="Sections" className="flex flex-col min-h-14 w-80">
-                        <div className="relative flex h-full items-center px-5 py-2 overflow-hidden">
-                            <div className="w-full">
-                                <ResourceSwitcher />
-                            </div>
-                        </div>
-                    </nav>
-                )}
-
-                <Sidebar className="w-full max-w-[320px]">
-                    <SidebarHeader>
-                        <SidebarSection>
-                            {/*{user && <HowlCreator />}*/}
-                            {/*<SidebarItem href="/search">*/}
-                            {/*    <MagnifyingGlassIcon />*/}
-                            {/*    <SidebarLabel>Search</SidebarLabel>*/}
-                            {/*</SidebarItem>*/}
-                            <InboxButton />
-                        </SidebarSection>
-                    </SidebarHeader>
-                    <SidebarBody>
-                        <SidebarSection>
-                            <SidebarItem href={!currentResource.slug ? '/p/universe' : `/p/${currentResource.slug}`}>
-                                <NewspaperIcon />
-                                <div className="flex flex-col min-w-0">
-                                    <SidebarLabel>For You</SidebarLabel>
-                                </div>
-                            </SidebarItem>
-                        </SidebarSection>
-                        <SidebarDivider />
-                        <SidebarSection>
-                            <div className="flex justify-between items-center">
-                                <SidebarHeading>Channels</SidebarHeading>
-                                {/*<Button*/}
-                                {/*    plain*/}
-                                {/*    onClick={e => {*/}
-                                {/*        e.preventDefault()*/}
-                                {/*    }}*/}
-                                {/*>*/}
-                                {/*    +*/}
-                                {/*</Button>*/}
-                            </div>
-                            {navigation?.map(item => (
-                                <Channel
-                                    key={item.href}
-                                    href={item.href}
-                                    name={item.name}
-                                    ticker={item.ticker}
-                                    isVoice={item.name.toLowerCase().includes('voice') || item.name.toLowerCase().includes('call')}
-                                />
-                            ))}
-                        </SidebarSection>
-                        <SidebarSection>
-                            <SidebarHeading>Things are changin'</SidebarHeading>
-                            <SidebarLabel className="flex items-center gap-2 px-2 text-wrap select-none">
-                                <span className="text-xs/5 text-muted-foreground">
-                                    <span className="font-bold">Hold tight</span> - we're preparing final design details for Packbase,
-                                    expect ultra levels of jank.
-                                </span>
-                            </SidebarLabel>
-                        </SidebarSection>
-                        <SidebarSpacer />
-                        <SidebarSection>
-                            <Dropdown>
-                                <DropdownButton as={SidebarItem}>
-                                    <QuestionMarkCircleIcon />
-                                    <SidebarLabel>Help</SidebarLabel>
-                                </DropdownButton>
-                                <DropdownMenu anchor="top">
-                                    <DropdownItem
-                                        onClick={() => {
-                                            window.Intercom?.('show')
-                                        }}
-                                    >
-                                        <ChatBubbleBottomCenterIcon className="w-4 h-4 inline-flex" />
-                                        <SidebarLabel>Docs & Chat</SidebarLabel>
-                                    </DropdownItem>
-                                    <DropdownItem href="https://packbase.wildbase.xyz" target="_blank">
-                                        <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon" />
-                                        <SidebarLabel>Feedback</SidebarLabel>
-                                    </DropdownItem>
-                                    <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
-                                        <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon" />
-                                        <SidebarLabel>Discord</SidebarLabel>
-                                    </DropdownItem>
-                                    <DropdownItem href="https://wildbase.xyz/" target="_blank">
-                                        <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon" />
-                                        <SidebarLabel>Wildbase</SidebarLabel>
-                                    </DropdownItem>
-                                </DropdownMenu>
-                            </Dropdown>
-                            <SidebarItem href="https://changelog.packbase.app" target="_blank">
-                                <SparklesIcon />
-                                <SidebarLabel external>Changelog</SidebarLabel>
-                            </SidebarItem>
-                        </SidebarSection>
-                    </SidebarBody>
-                    <SidebarFooter>
-                        <SidebarHeading>(c) ✱base - Private alpha, things break!</SidebarHeading>
-                    </SidebarFooter>
-                </Sidebar>
-            </div>
+            <SidebarSection>
+                <SidebarItem href={!currentResource.slug ? '/p/universe' : `/p/${currentResource.slug}`}>
+                    <NewspaperIcon />
+                    <div className="flex flex-col min-w-0">
+                        <SidebarLabel>For You</SidebarLabel>
+                    </div>
+                </SidebarItem>
+            </SidebarSection>
+            <SidebarDivider />
+            <SidebarSection>
+                <div className="flex justify-between items-center">
+                    <SidebarHeading>Channels</SidebarHeading>
+                    {/*<Button*/}
+                    {/*    plain*/}
+                    {/*    onClick={e => {*/}
+                    {/*        e.preventDefault()*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    +*/}
+                    {/*</Button>*/}
+                </div>
+                {navigation?.map(item => (
+                    <Channel
+                        key={item.href}
+                        href={item.href}
+                        name={item.name}
+                        ticker={item.ticker}
+                        isVoice={item.name.toLowerCase().includes('voice') || item.name.toLowerCase().includes('call')}
+                    />
+                ))}
+            </SidebarSection>
+            <SidebarSection>
+                <SidebarHeading>Things are changin'</SidebarHeading>
+                <SidebarLabel className="flex items-center gap-2 px-2 text-wrap select-none">
+                    <span className="text-xs/5 text-muted-foreground">
+                        <span className="font-bold">Hold tight</span> - we're preparing final design details for Packbase, expect ultra
+                        levels of jank.
+                    </span>
+                </SidebarLabel>
+            </SidebarSection>
         </>
     )
 }
