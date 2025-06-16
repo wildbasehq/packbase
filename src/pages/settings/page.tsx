@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { Button } from '@/components/shared/experimental-button-rework'
 import Avatar from '@/components/shared/user/avatar'
 import { ArrowUpRightIcon, PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { useEffect, useState } from 'react'
-import { useUserAccountStore } from '@/lib/index'
+import { useUserAccountStore } from '@/lib'
 import { Heading, Text } from '@/components/shared/text'
 import { vg } from '@/lib/api'
 import ProfileHeader from '@/components/shared/user/header'

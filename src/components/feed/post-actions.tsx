@@ -11,7 +11,7 @@ import { vg } from '@/lib/api'
 import { useUserAccountStore } from '@/lib/state'
 import { FeedPostData } from './types/post'
 import { Button } from '@/components/shared/experimental-button-rework'
-import { LoadingCircle } from '@/components/novel/ui/icons'
+import { LoadingCircle } from '@/src/components'
 
 interface PostActionsProps {
     post: FeedPostData

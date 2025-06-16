@@ -1,9 +1,13 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import React, { FormEvent, useEffect, useState } from 'react'
 import { LoadingCircle } from '@/components/icons'
 import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { vg } from '@/lib/api'
-import { useResourceStore, useUserAccountStore } from '@/lib/index'
+import { useResourceStore, useUserAccountStore } from '@/lib'
 import { toast } from 'sonner'
 import { CheckIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'

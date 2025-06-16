@@ -14,9 +14,8 @@ import Markdown from '@/components/shared/markdown'
 import MediaGallery from './media-gallery'
 import { UserProfileBasic } from '@/lib/defs/user'
 import { formatRelativeTime } from '@/lib/utils/date'
-import { LoadingCircle } from '@/components/novel/ui/icons'
 import { Text } from '@/components/shared/text.tsx'
-import { AvatarButton, FeedPostData } from '@/src/components'
+import { AvatarButton, FeedPostData, LoadingCircle } from '@/src/components'
 import { Button } from '@/components/shared/experimental-button-rework'
 
 interface ThreadPostProps {
