@@ -4,7 +4,7 @@
 
 import * as Headless from '@headlessui/react'
 import React, { useState } from 'react'
-import { useResourceStore, useUserAccountStore } from '@/lib/state'
+import { useResourceStore } from '@/lib/state'
 import { NavbarItem } from '@/components/layout'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher.tsx'
 import UserSidebar from '@/components/layout/user-sidebar.tsx'
@@ -29,6 +29,7 @@ import { QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
 import { ChatBubbleBottomCenterIcon, FaceSmileIcon } from '@heroicons/react/16/solid'
 import { SiDiscord } from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
+import { useSession } from '@clerk/clerk-react'
 
 function OpenMenuIcon() {
     return (
@@ -70,9 +71,9 @@ function MobileSidebar({ open, close, children }: React.PropsWithChildren<{ open
     )
 }
 
-export function SidebarLayout({ navbar, children }: React.PropsWithChildren<{ navbar: React.ReactNode }>) {
+export function SidebarLayout({ children }: React.PropsWithChildren) {
     let [showSidebar, setShowSidebar] = useState(false)
-    const { user } = useUserAccountStore()
+    const { isSignedIn } = useSession()
     const { sidebarContent } = useSidebar()
     // const [location] = useLocation()
     // const isStuffPage = location === '/stuff'
@@ -80,7 +81,7 @@ export function SidebarLayout({ navbar, children }: React.PropsWithChildren<{ na
     return (
         <div className="relative flex w-full bg-white isolate min-h-svh max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
             {/* Sidebar on desktop */}
-            {user && (
+            {isSignedIn && (
                 <div className="fixed inset-y-0 left-0 z-10 max-lg:hidden flex h-full">
                     <PackSwitcher />
                 </div>
@@ -98,14 +99,13 @@ export function SidebarLayout({ navbar, children }: React.PropsWithChildren<{ na
                         <OpenMenuIcon />
                     </NavbarItem>
                 </div>
-                <div className="flex-1 min-w-0">{navbar}</div>
             </header>
 
             {/* Content */}
             <div className="flex flex-col flex-1 relative">
                 {/*<div className="hidden lg:block">{navbar}</div>*/}
                 {/*{isStuffPage && <YourStuffPage />}*/}
-                <main className={`py-2 lg:min-w-0 lg:pr-2 ${user ? 'lg:pl-18' : 'lg:pl-2'}`}>
+                <main className={`py-2 lg:min-w-0 lg:pr-2 ${isSignedIn ? 'lg:pl-18' : 'lg:pl-2'}`}>
                     {/*<motion.main*/}
                     {/*    // key={isStuffPage ? 'settings' : 'default'}*/}
                     {/*    className={`pb-2 lg:min-w-0 lg:pr-2 ${user ? 'lg:pl-96' : 'lg:pl-2'} ${isStuffPage ? '!z-10' : 'z-0'}`}*/}
@@ -133,13 +133,13 @@ export function SidebarLayout({ navbar, children }: React.PropsWithChildren<{ na
                     {/*    }}*/}
                     {/*>*/}
                     <div className="relative h-[calc(100vh-1rem)] flex overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-                        {user && (
+                        {isSignedIn && (
                             <div className="top-0 backdrop-blur border-r h-full flex">
                                 <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                             </div>
                         )}
-                        <div className={cx('mx-auto w-full overflow-hidden h-full', user && 'max-w-1/2')}>{children}</div>
-                        {user && <UserSidebar />}
+                        <div className={cx('mx-auto w-full overflow-hidden h-full', isSignedIn && 'max-w-1/2')}>{children}</div>
+                        {isSignedIn && <UserSidebar />}
                     </div>
                     {/*</motion.main>*/}
                 </main>

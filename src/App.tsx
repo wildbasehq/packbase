@@ -5,7 +5,6 @@
 import { lazy, Suspense } from 'react'
 import { Text } from '@/components/shared/text.tsx'
 import { SidebarLayout } from '@/components/shared/sidebar-layout.tsx'
-import NavBar from '@/components/layout/navbar.tsx'
 import Preload from './preload.tsx'
 import { Providers } from './provider.tsx'
 import { SidebarProvider } from '@/lib/context/sidebar-context'
@@ -14,14 +13,16 @@ import Console from '@/components/shared/console.tsx'
 import { LogoSpinner } from '@/src/components'
 import Body from '@/components/layout/body.tsx'
 import PackChannelThread from '@/pages/pack/[slug]/[channel]/[thread]/page.tsx'
+import UniversePackLayout from '@/pages/pack/universe/layout.tsx'
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
 const IDLogin = lazy(() => import('@/pages/id/login/page.tsx'))
 const IDWaitlist = lazy(() => import('@/pages/id/waitlist/page.tsx'))
+const UniversePack = lazy(() => import('@/pages/pack/universe/page.tsx'))
+const UniverseEverything = lazy(() => import('@/pages/pack/[slug]/[channel]/page.tsx'))
 const PackLayout = lazy(() => import('@/pages/pack/[slug]/layout.tsx'))
 const PackHome = lazy(() => import('@/pages/pack/[slug]/page.tsx'))
-const PackCosmos = lazy(() => import('@/pages/pack/[slug]/[channel]/page.tsx'))
 const NotFound = lazy(() => import('@/src/not-found.tsx'))
 const PackAdd = lazy(() => import('@/pages/pack/new/page.tsx'))
 const TermsPage = lazy(() => import('@/pages/terms/page.tsx'))
@@ -58,7 +59,7 @@ function App() {
                     </div>
                 </div>
 
-                <SidebarLayout navbar={<NavBar />}>
+                <SidebarLayout>
                     <div id="NGContentArea" className="flex h-full overflow-hidden">
                         <div className="grow">
                             <main className="flex flex-1 h-full">
@@ -120,6 +121,22 @@ function App() {
                                                             </Suspense>
                                                         </Route>
 
+                                                        <Route path="/universe" nest>
+                                                            <UniversePackLayout>
+                                                                <Route path="/">
+                                                                    <Suspense fallback={<LoadingFallback />}>
+                                                                        <UniversePack />
+                                                                    </Suspense>
+                                                                </Route>
+
+                                                                <Route path="/cosmos">
+                                                                    <Suspense fallback={<LoadingFallback />}>
+                                                                        <UniverseEverything />
+                                                                    </Suspense>
+                                                                </Route>
+                                                            </UniversePackLayout>
+                                                        </Route>
+
                                                         <Route path="/:slug" nest>
                                                             <Suspense fallback={<LoadingFallback />}>
                                                                 <PackLayout>
@@ -132,7 +149,7 @@ function App() {
                                                                     <Route path="/:channel" nest>
                                                                         <Route path="/">
                                                                             <Suspense fallback={<LoadingFallback />}>
-                                                                                <PackCosmos />
+                                                                                <UniverseEverything />
                                                                             </Suspense>
                                                                         </Route>
 

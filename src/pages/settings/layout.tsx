@@ -1,13 +1,16 @@
-import React, { useEffect } from 'react'
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
+import React from 'react'
 import { useUserAccountStore } from '@/lib/index'
-import { EnvelopeIcon, EnvelopeOpenIcon, IdentificationIcon, SwatchIcon, TrophyIcon } from '@heroicons/react/16/solid'
+import { EnvelopeOpenIcon, IdentificationIcon, SwatchIcon, TrophyIcon } from '@heroicons/react/16/solid'
 
 // Import all settings pages
 import ProfileSettings from './general/page'
 import TemplateSettings from './template/page'
 import InviteSettings from './invite/page'
 import UnlockableSettings from './unlockables/page'
-import AnonUserSettings from './anon-user/page'
 import { Text } from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 import { TrashIcon } from '@heroicons/react/20/solid'
@@ -31,52 +34,23 @@ const SettingsDialog: React.FC = () => {
     // Render content based on user state
     if (!user) return null
 
-    // For anonymous users, show only the invite page
-    if (user.anonUser) {
-        return (
-            <PagedModal footer={UserProfileFooter}>
-                <PagedModal.Page 
-                    id="invite"
-                    title="Enter Invite" 
-                    icon={EnvelopeIcon}
-                >
-                    <AnonUserSettings />
-                </PagedModal.Page>
-            </PagedModal>
-        )
-    }
-
-    // For registered users, show all pages
     return (
         <PagedModal footer={UserProfileFooter}>
-            <PagedModal.Page 
-                id="profile"
-                title="Public Information" 
-                icon={IdentificationIcon}
-            >
+            <PagedModal.Page id="profile" title="Public Information" icon={IdentificationIcon}>
                 <ProfileSettings />
             </PagedModal.Page>
 
-            <PagedModal.Page 
-                id="template"
-                title="Template" 
-                icon={SwatchIcon}
-            >
+            <PagedModal.Page id="template" title="Template" icon={SwatchIcon}>
                 <TemplateSettings />
             </PagedModal.Page>
 
-            <PagedModal.Page 
-                id="invite"
-                title="Invite" 
-                icon={EnvelopeOpenIcon}
-                description="Invite a friend to join the community"
-            >
+            <PagedModal.Page id="invite" title="Invite" icon={EnvelopeOpenIcon} description="Invite a friend to join the community">
                 <InviteSettings />
             </PagedModal.Page>
 
-            <PagedModal.Page 
+            <PagedModal.Page
                 id="unlockables"
-                title="Events" 
+                title="Events"
                 icon={TrophyIcon}
                 description="Invite your friends to join the community and unlock special rewards!"
                 badge="Limited Event"
@@ -84,12 +58,7 @@ const SettingsDialog: React.FC = () => {
                 <UnlockableSettings />
             </PagedModal.Page>
 
-            <PagedModal.Page 
-                id="delete"
-                title="Delete Account" 
-                icon={TrashIcon}
-                description="Delete your account and all associated data"
-            >
+            <PagedModal.Page id="delete" title="Delete Account" icon={TrashIcon} description="Delete your account and all associated data">
                 <SettingsDeleteAccount />
             </PagedModal.Page>
         </PagedModal>

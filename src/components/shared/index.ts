@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 // Re-export all shared components
 export * from './active-link'
 export * from './alert'
@@ -41,7 +45,6 @@ export * from './table'
 export * from './tag'
 export * from './text-ticker'
 export * from './textarea'
-export * from './theme-toggle'
 export * from './tooltip'
 export * from './expandable-tabs'
 

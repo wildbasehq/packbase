@@ -180,7 +180,6 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                             </div>
                         )}
 
-                        {/* Actions - Only show on root or leaf nodes */}
                         {isRoot && signedInUser && (
                             <div className="flex items-center gap-4 mt-3">
                                 <button

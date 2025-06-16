@@ -1,9 +1,12 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 // Re-export all layout components
 export * from './body'
 export * from './ConnectionStatus'
 export * from './container'
 export * from './grid-body'
-export * from './nav'
 export * from './navbar'
 export * from './pack-channels'
 export * from './search'

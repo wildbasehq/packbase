@@ -1,15 +1,13 @@
-import { Button } from '@/components/shared/experimental-button-rework'
-import { useUIStore, useUserAccountStore } from '@/lib/state'
-import { ScanFaceIcon } from 'lucide-react'
-import React, { forwardRef, useId, useState } from 'react'
-import UserOnboardingModal from '../modal/user-onboarding-modal'
-import { Logo } from '@/components/shared/logo'
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
+import React, { forwardRef, useId } from 'react'
 import Link from '@/components/shared/link'
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
 import { LayoutGroup, motion } from 'framer-motion'
 import { TouchTarget } from '@/components/shared/button'
-import { AppTabs } from '@/src/components'
 
 // Navbar subcomponents
 export function NavbarDivider({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
@@ -99,56 +97,4 @@ export function NavbarLabel({ className, ...props }: React.ComponentPropsWithout
 
 export function Navbar({ className, ...props }: React.ComponentPropsWithoutRef<'nav'>) {
     return <nav {...props} className={clsx(className, 'flex flex-1 items-center gap-4 py-2.5')} />
-}
-
-// Main Navbar component
-export default function NavBar() {
-    const { user } = useUserAccountStore()
-    const { hidden, maintenance, loading } = useUIStore()
-
-    const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(user && !user?.slug && !user.anonUser && !maintenance)
-
-    return (
-        <>
-            {user && !user?.slug && !user.anonUser && !maintenance && (
-                <UserOnboardingModal state={[showOnboardingModal, setShowOnboardingModal]} />
-            )}
-
-            <div
-                className={`${hidden || !user ? '' : 'sm:!pl-[24.5rem]'} flex h-14 w-full items-center justify-items-stretch px-2 sm:px-4 relative shimmer-template ${loading ? 'before:animate-shimmer-fast' : ''}`}
-            >
-                {hidden || !user ? (
-                    <Link className="flex-1" href="/">
-                        <Logo className="h-8" />
-                    </Link>
-                ) : (
-                    <div className="flex-1" />
-                )}
-
-                <div className="w-full justify-self-end">
-                    <div className="relative flex justify-end h-full lg:items-center xl:justify-between">
-                        {/*<div className="relative"></div>*/}
-                        {user && <AppTabs />}
-                        {/*{user && !user.anonUser && <Search/>}*/}
-                        {!user && <div className="relative"></div>}
-                        <div className="flex items-center gap-5">
-                            {/*<div className="flex gap-4">*/}
-                            {/*    <ThemeToggle />*/}
-                            {/*</div>*/}
-
-                            <div className="hidden min-[416px]:contents">
-                                {!user && (
-                                    <Link href="/id/login" className="no-underline!">
-                                        <Button color="indigo" className="flex items-center justify-center">
-                                            <ScanFaceIcon className="w-4 h-4 mr-1" /> Sign In
-                                        </Button>
-                                    </Link>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
-    )
 }

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { Heading } from '@/components/shared/text'
 import Markdown from '@/components/shared/markdown'
 import UserAvatar from '@/components/shared/user/avatar'
@@ -49,7 +53,7 @@ export default function ProfileHeader({ ...props }: any) {
                             </div>
                         </div>
                     </div>
-                    {user && !user.anonUser && user.id !== profile.id && (
+                    {user && user.id !== profile.id && (
                         <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0" id="profile-content-follow-button-container">
                             <UserFollowButton user={profile} />
                         </div>

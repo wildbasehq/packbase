@@ -8,7 +8,7 @@ import { Text } from '@/components/shared/text'
 import Tooltip, { TooltipContent } from '@/components/shared/tooltip'
 import { Button } from '@/components/shared/button'
 import UserAvatar from '@/components/shared/user/avatar'
-import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
+import { useResourceStore, useUIStore } from '@/lib/state'
 import { cn } from '@/lib/utils'
 import { UsersIcon } from '@heroicons/react/20/solid'
 import { PlusIcon } from '@heroicons/react/24/solid'
@@ -16,10 +16,10 @@ import { TentTreeIcon } from 'lucide-react'
 import './pack-switcher.component.css'
 import Link from '@/components/shared/link.tsx'
 import { useLocation } from 'wouter'
+import { Protect } from '@clerk/clerk-react'
 
 export default function PackSwitcher() {
     const { currentResource, setCurrentResource, resources } = useResourceStore()
-    const { user } = useUserAccountStore()
     const { resourceDefault, loading, setLoading } = useUIStore()
     const [, navigate] = useLocation()
 
@@ -102,7 +102,7 @@ export default function PackSwitcher() {
                 </Tooltip>
             ))}
 
-            {user && !user.anonUser && (
+            <Protect>
                 <Tooltip content="Create/Join Pack" side="right" delayDuration={0}>
                     <Link
                         href="/p/new"
@@ -113,7 +113,7 @@ export default function PackSwitcher() {
                         </Button>
                     </Link>
                 </Tooltip>
-            )}
+            </Protect>
 
             <div className="grow" />
         </div>

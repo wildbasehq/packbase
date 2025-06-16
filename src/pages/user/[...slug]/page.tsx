@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { useEffect, useState } from 'react'
 import { vg } from '@/lib/api'
 import ProfileHeader from '@/components/shared/user/header'
@@ -83,7 +87,6 @@ export default function UserProfile() {
                 <>
                     <ProfileHeader user={user} />
 
-                    {/* Custom theme code here */}
                     <CustomTheme userId={user.id} />
 
                     <div className="p-8" id="profile-feed">
