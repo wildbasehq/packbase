@@ -124,14 +124,14 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                 <div className="flex gap-3">
                     {/* Avatar */}
                     <div className="flex-shrink-0 flex flex-col">
-                        <UserAvatar user={post.user} size="md" className="rounded-full" />
+                        <UserAvatar user={post.user} size={depth > 0 ? 'md' : 'lg'} className="rounded-full" />
                         {post.pack && post.pack?.slug !== 'universe' && (
                             <div className="relative h-12 before:absolute before:left-4 before:top-0 before:bottom-0 before:w-px before:bg-border">
                                 <AvatarButton
                                     src={post.pack.images?.avatar}
                                     alt={post.pack.display_name}
                                     initials={post.pack.display_name[0]}
-                                    className="w-8 h-8 mt-4"
+                                    className="w-10 h-10 mt-4"
                                     square
                                 />
                             </div>
@@ -139,7 +139,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 -mt-1">
                         <div className="flex items-center justify-between mb-1">
                             <div className="flex items-baseline gap-2">
                                 <Link href={`/@${post.user?.username}/`} className="font-semibold hover:underline text-default">
