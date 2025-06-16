@@ -102,7 +102,7 @@ export default function PostActions({ post, onComment }: PostActionsProps) {
     }
 
     return (
-        <div className="flex items-center gap-2 border-t border-neutral-200 dark:border-neutral-800 px-3 py-2 sm:px-5 sm:py-3">
+        <div className="flex items-center gap-2 border-t border-neutral-200F dark:border-neutral-800 px-3 py-2 sm:px-5 sm:py-3">
             {/* Like button */}
             <Button
                 plain

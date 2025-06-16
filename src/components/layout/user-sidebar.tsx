@@ -51,7 +51,7 @@ export default function UserSidebar() {
                                 {/* Search button */}
                                 <Link
                                     href="/search"
-                                    className="flex text-default flex-grow items-center py-1.5 px-2 rounded-lg bg-n-3 dark:bg-n-7 cursor-pointer hover:bg-n-4/25 hover:dark:inner-border hover:dark:inner-border-[#2e2e2e] hover:dark:unicorn:inner-border-outline/25"
+                                    className="flex text-default flex-grow items-center py-1.5 px-2 rounded-lg bg-card cursor-pointer hover:!bg-n-4/25 hover:dark:inner-border hover:dark:inner-border-[#2e2e2e] hover:dark:unicorn:inner-border-outline/25"
                                 >
                                     <div className="mr-1.5">
                                         <MagnifyingGlassIcon className="w-3 h-3" />
