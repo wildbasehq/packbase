@@ -19,7 +19,8 @@ import {
 } from '@heroicons/react/20/solid'
 import { ReactNode, useMemo, useState } from 'react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/16/solid'
-import Link from '../shared/link' // Animation configuration
+import Link from '../shared/link'
+import { Logo } from '@/src/components' // Animation configuration
 
 // Animation configuration
 const animConfig = {
@@ -230,7 +231,10 @@ function Hero() {
 
             {/* Main hero content */}
             <Container className="relative z-10 text-center pt-96 pb-82">
-                <Heading className="!text-5xl tracking-tight font-new-spirit-bold">
+                <Heading className="!text-5xl flex justify-center items-center tracking-tight font-new-spirit-bold">
+                    <div>
+                        <Logo fullSize className="!h-10 !w-10 mr-4 -mt-1.5" />
+                    </div>
                     <VerticalCutReveal
                         reverse
                         splitBy="characters"

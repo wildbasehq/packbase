@@ -8,6 +8,7 @@ import { useUserAccountStore } from '@/lib/state'
 import { NavbarItem } from '@/components/layout'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher.tsx'
 import UserSidebar from '@/components/layout/user-sidebar.tsx'
+import cx from 'classnames'
 
 function OpenMenuIcon() {
     return (
@@ -116,8 +117,8 @@ export function SidebarLayout({
                     {/*>*/}
                     <div className="relative h-[calc(100vh-1rem)] flex overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
                         {user && <div className="top-0 backdrop-blur border-r h-full flex">{sidebar}</div>}
-                        <div className="mx-auto max-w-1/2 w-full overflow-hidden h-full">{children}</div>
-                        <UserSidebar />
+                        <div className={cx('mx-auto w-full overflow-hidden h-full', user && 'max-w-1/2')}>{children}</div>
+                        {user && <UserSidebar />}
                     </div>
                     {/*</motion.main>*/}
                 </main>
