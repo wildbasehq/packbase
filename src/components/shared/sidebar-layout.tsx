@@ -168,14 +168,12 @@ function SidebarContentContainer({ children }: { children: React.ReactNode }) {
                         Array(10)
                             .fill(null)
                             .map((_, i) => (
-                                <SidebarSection key={i}>
-                                    <SidebarItem>
-                                        <SidebarLabel className="flex items-center space-x-2">
-                                            <div className="w-8 h-8 rounded-full bg-white dark:bg-n-7" />
-                                            <div className="w-24 h-4 rounded-full bg-white dark:bg-n-7" />
-                                        </SidebarLabel>
-                                    </SidebarItem>
-                                </SidebarSection>
+                                <div key={i} className="flex items-center py-3 px-2">
+                                    <SidebarLabel className="flex items-center space-x-2">
+                                        <div className="w-8 h-8 rounded-full bg-white dark:bg-n-7" />
+                                        <div className="w-24 h-4 rounded-full bg-white dark:bg-n-7" />
+                                    </SidebarLabel>
+                                </div>
                             ))}
                     {children}
                     <SidebarSpacer />
