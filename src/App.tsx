@@ -134,6 +134,12 @@ function App() {
                                                                         <UniverseEverything />
                                                                     </Suspense>
                                                                 </Route>
+
+                                                                <Route path="/:channel/:id" nest>
+                                                                    <Suspense fallback={<LoadingFallback />}>
+                                                                        <PackChannelThread />
+                                                                    </Suspense>
+                                                                </Route>
                                                             </UniversePackLayout>
                                                         </Route>
 

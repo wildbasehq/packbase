@@ -6,10 +6,9 @@ import { useParams } from 'wouter'
 import { useEffect, useState } from 'react'
 import { Text } from '@/components/shared/text.tsx'
 import { Avatar } from '@/components/shared/avatar.tsx'
-import { Button } from '@/components/shared/button.tsx'
 import { Divider } from '@/components/shared/divider.tsx'
 import { ChatBox } from '@/components/shared/chat-box.tsx'
-import { Hash, MessageSquare, MoreHorizontal, Reply } from 'lucide-react'
+import { Hash, MessageSquare, Reply } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils/date.ts'
 import { useUIStore, vg } from '@/lib'
 import { FeedPostData, LogoSpinner } from '@/src/components'
@@ -64,7 +63,7 @@ function ThreadMessage({
                 />
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center space-x-2">
-                        <Text weight="semibold" className="text-sm">
+                        <Text weight="semibold" size="sm">
                             {message.user?.display_name || message.user?.username || 'Anonymous'}
                         </Text>
                         <Text size="xs" className="text-muted-foreground">
@@ -72,7 +71,9 @@ function ThreadMessage({
                         </Text>
                     </div>
                     <div className="mt-1">
-                        <Text className="text-sm leading-relaxed whitespace-pre-wrap">{message.body}</Text>
+                        <Text size="sm" className="leading-relaxed whitespace-pre-wrap">
+                            {message.body}
+                        </Text>
                     </div>
 
                     {/* Reactions */}
@@ -96,11 +97,11 @@ function ThreadMessage({
                 </div>
 
                 {/* Message actions */}
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                </div>
+                {/*<div className="opacity-0 group-hover:opacity-100 transition-opacity">*/}
+                {/*    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">*/}
+                {/*        <MoreHorizontal className="h-4 w-4" />*/}
+                {/*    </Button>*/}
+                {/*</div>*/}
             </div>
 
             {/* Display assets if any */}
@@ -191,13 +192,11 @@ export default function PackChannelThread() {
         return (
             <div className="flex h-full flex-col">
                 <div className="border-b px-6 py-4">
-                    <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-2">
-                            <Hash className="h-5 w-5 text-muted-foreground" />
-                            <Text weight="semibold" className="text-lg">
-                                {channel}
-                            </Text>
-                        </div>
+                    <div className="flex items-center space-x-2">
+                        <Hash className="h-5 w-5 text-muted-foreground" />
+                        <Text weight="semibold" className="text-lg">
+                            {channel}
+                        </Text>
                     </div>
                 </div>
 
@@ -256,8 +255,8 @@ export default function PackChannelThread() {
             </div>
 
             {/* Chat Input */}
-            <div className="border-t border-n-3 dark:border-n-6 p-4">
-                <ChatBox placeholder={`Reply to thread...`} onSend={handleSendMessage} value={newMessage} onChange={setNewMessage} />
+            <div className="border-t p-4">
+                <ChatBox placeholder={`Reply to howl...`} onSend={handleSendMessage} value={newMessage} onChange={setNewMessage} />
             </div>
         </div>
     )

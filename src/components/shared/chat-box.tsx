@@ -221,7 +221,7 @@ export function ChatBox({
             {/* Input Area */}
             <div
                 className={cn(
-                    'border bg-card',
+                    'border bg-card/75',
                     showMarkdownToolbar && showToolbar ? 'rounded-b-lg border-t-0' : 'rounded-lg',
                     'focus-within:ring-2 focus-within:ring-primary focus-within:border-primary'
                 )}
