@@ -17,6 +17,7 @@ import { formatRelativeTime } from '@/lib/utils/date'
 import { Text } from '@/components/shared/text.tsx'
 import { AvatarButton, FeedPostData, LoadingCircle } from '@/src/components'
 import { Button } from '@/components/shared/experimental-button-rework'
+import { UserGroupIcon } from '@heroicons/react/16/solid'
 
 interface ThreadPostProps {
     post: FeedPostData
@@ -122,8 +123,19 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
 
                 <div className="flex gap-3">
                     {/* Avatar */}
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 flex flex-col">
                         <UserAvatar user={post.user} size="md" className="rounded-full" />
+                        {post.pack && post.pack?.slug !== 'universe' && (
+                            <div className="relative h-12 before:absolute before:left-4 before:top-0 before:bottom-0 before:w-px before:bg-border">
+                                <AvatarButton
+                                    src={post.pack.images?.avatar}
+                                    alt={post.pack.display_name}
+                                    initials={post.pack.display_name[0]}
+                                    className="w-8 h-8 mt-4"
+                                    square
+                                />
+                            </div>
+                        )}
                     </div>
 
                     {/* Content */}
@@ -152,21 +164,11 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                             )}
                         </div>
 
-                        {post.pack && post.pack.slug !== 'universe' && (
-                            <div className="flex items-center gap-2 my-2">
-                                <AvatarButton
-                                    src={post.pack.images?.avatar}
-                                    alt={post.pack.display_name}
-                                    initials={post.pack.display_name[0]}
-                                    className="w-4 h-4"
-                                    square
-                                />
-                                <Link href={`/p/${post.pack.slug}/`} className="text-xs font-semibold hover:underline text-default">
-                                    {post.pack.display_name}
-                                </Link>
-                            </div>
+                        {post.pack && post.pack?.slug !== 'universe' && (
+                            <Text size="xs" alt className="mb-1 items-center flex">
+                                <UserGroupIcon className="h-3 w-3 mr-1 inline-flex" /> howl'd in {post.pack.display_name}
+                            </Text>
                         )}
-
                         {/* Post body */}
                         <div className="whitespace-pre-wrap break-words">
                             <Markdown>{post.body}</Markdown>
