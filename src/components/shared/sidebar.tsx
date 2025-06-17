@@ -29,15 +29,7 @@ export function SidebarBody({ className, ...props }: React.ComponentPropsWithout
 }
 
 export function SidebarFooter({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
-    return (
-        <div
-            {...props}
-            className={clsx(
-                className,
-                'flex flex-col border-t border-zinc-950/5 p-4 dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5'
-            )}
-        />
-    )
+    return <div {...props} className={clsx(className, 'flex flex-col border-t p-4 [&>[data-slot=section]+[data-slot=section]]:mt-2.5')} />
 }
 
 export function SidebarSection({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {

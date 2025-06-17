@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
-import React, {forwardRef} from 'react'
-import {TouchTarget} from './button'
+import React, { forwardRef } from 'react'
+import { TouchTarget } from './button'
 import Link from './link'
 
 type AvatarProps = {
@@ -13,20 +17,20 @@ type AvatarProps = {
 }
 
 export function Avatar({
-                           src = null,
-                           square = false,
-                           initials,
-                           alt = '',
-                           className,
-                           ...props
-                       }: AvatarProps & React.ComponentPropsWithoutRef<'span'>) {
+    src = null,
+    square = false,
+    initials,
+    alt = '',
+    className,
+    ...props
+}: AvatarProps & React.ComponentPropsWithoutRef<'span'>) {
     // Random gradient from initial
     if (!src && initials) {
         const charCode = initials.charCodeAt(0)
         const random = Math.floor((charCode / 26) * 360)
         props.style = {
             ...props.style,
-            background: `linear-gradient(${random}deg, hsl(${random}, 100%, 80%), hsl(${random + 180}, 100%, 80%))`
+            background: `linear-gradient(${random}deg, hsl(${random}, 100%, 80%), hsl(${random + 180}, 100%, 80%))`,
         }
     }
 
@@ -38,7 +42,7 @@ export function Avatar({
                 className,
                 // Basic layout
                 'inline-grid shrink-0 align-middle [--avatar-radius:20%] [--ring-opacity:20%] *:col-start-1 *:row-start-1',
-                'outline -outline-offset-1 outline-black/(--ring-opacity) dark:outline-white/(--ring-opacity)',
+                'outline outline-3 -outline-offset-2 outline-black/(--ring-opacity) dark:outline-white/(--ring-opacity)',
                 // Add the correct border radius
                 square ? 'rounded-(--avatar-radius) *:rounded-(--avatar-radius)' : 'rounded-full *:rounded-full'
             )}
@@ -68,27 +72,27 @@ export const AvatarButton = forwardRef(function AvatarButton(
         alt,
         className,
         ...props
-    }: AvatarProps &
-        (Omit<Headless.ButtonProps, 'as' | 'className'> | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'>),
+    }: AvatarProps & (Omit<Headless.ButtonProps, 'as' | 'className'> | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'>),
     ref: React.ForwardedRef<HTMLElement>
 ) {
     let classes = clsx(
         className,
         square ? 'rounded-[20%]' : 'rounded-full',
-        'relative inline-grid focus:outline-hidden data-focus:outline-2 data-focus:outline-offset-2 data-focus:outline-blue-500'
+        'relative inline-grid focus:outline-hidden data-focus:outline-2 data-focus:outline-offset-2 data-focus:outline-blue-500',
+        'rounded-lg isolated relative'
     )
 
     return 'href' in props ? (
         <Link {...props} className={classes} ref={ref as React.ForwardedRef<HTMLAnchorElement>}>
             <TouchTarget>
-                <Avatar src={src} square={square} initials={initials} alt={alt}/>
+                <Avatar src={src} square={square} initials={initials} alt={alt} />
             </TouchTarget>
         </Link>
     ) : (
         // @ts-ignore - bruh
         <Headless.Button {...props} className={classes} ref={ref}>
             <TouchTarget>
-                <Avatar src={src} square={square} initials={initials} alt={alt}/>
+                <Avatar src={src} square={square} initials={initials} alt={alt} />
             </TouchTarget>
         </Headless.Button>
     )

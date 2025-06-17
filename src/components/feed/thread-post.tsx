@@ -126,7 +126,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                     <div className="flex-shrink-0 flex flex-col">
                         <UserAvatar user={post.user} size={depth > 0 ? 'md' : 'lg'} className="rounded-full" />
                         {post.pack && post.pack?.slug !== 'universe' && (
-                            <div className="relative h-12 before:absolute before:left-4 before:top-0 before:bottom-0 before:w-px before:bg-border">
+                            <div className="relative h-12 before:absolute before:left-5 before:top-0 before:bottom-0 before:w-px before:bg-border">
                                 <AvatarButton
                                     src={post.pack.images?.avatar}
                                     alt={post.pack.display_name}
