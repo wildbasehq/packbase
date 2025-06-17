@@ -112,7 +112,9 @@ function CreatePackModal({ close }: { close: () => void }) {
     return (
         <div className="p-6 max-w-lg">
             <h2 className="text-xl font-semibold mb-2">Create a Pack</h2>
-            <p className="text-neutral-500 text-sm mb-6">Packs are communities of people with shared interests and customizable spaces.</p>
+            <p className="text-muted-foreground text-sm mb-6">
+                Packs are communities of people with shared interests and customizable spaces.
+            </p>
 
             <form onSubmit={createPack}>
                 <div className="mb-6">
@@ -120,7 +122,7 @@ function CreatePackModal({ close }: { close: () => void }) {
                         Pack Name
                         <span className="text-red-500 ml-[0.25rem]">*</span>
                     </label>
-                    <p className="text-xs text-neutral-500 mb-2">What should people call your community?</p>
+                    <p className="text-xs text-muted-foreground mb-2">What should people call your community?</p>
                     <Input name="display_name" value={formData.display_name} onChange={handleInputChange} />
                 </div>
 
@@ -129,9 +131,9 @@ function CreatePackModal({ close }: { close: () => void }) {
                         Pack Slug
                         <span className="text-red-500 ml-[0.25rem]">*</span>
                     </label>
-                    <p className="text-xs text-neutral-500 mb-2">Choose wisely - changing this later will reset the pack!</p>
+                    <p className="text-xs text-muted-foreground mb-2">Choose wisely - changing this later will reset the pack!</p>
                     <div className="flex items-center">
-                        <span className="text-neutral-500 text-sm mr-1">packbase.app/p/</span>
+                        <span className="text-muted-foreground text-sm mr-1">packbase.app/p/</span>
                         <Input name="slug" value={formData.slug} onChange={handleInputChange} />
                     </div>
                 </div>
@@ -245,7 +247,7 @@ function SearchablePackList() {
                 <div>
                     <Heading size="lg">Discover Packs</Heading>
                     {packsHidden > 0 && (
-                        <Text size="sm" className="text-neutral-500">
+                        <Text size="sm" alt>
                             {packsHidden} pack{packsHidden !== 1 ? 's' : ''} already joined
                         </Text>
                     )}
@@ -253,7 +255,7 @@ function SearchablePackList() {
 
                 <div className="relative w-full sm:w-64">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <MagnifyingGlassIcon className="h-4 w-4 text-neutral-500" aria-hidden="true" />
+                        <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                     </div>
                     <Input
                         type="text"
@@ -267,7 +269,7 @@ function SearchablePackList() {
 
             {isLoading ? (
                 <div className="flex justify-center py-12">
-                    <LoadingCircle className="h-5 w-5 text-neutral-500" />
+                    <LoadingCircle className="h-5 w-5" />
                 </div>
             ) : filteredPacks.length > 0 ? (
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -277,7 +279,7 @@ function SearchablePackList() {
                 </div>
             ) : (
                 <div className="text-center py-16">
-                    <Text className="text-neutral-500">
+                    <Text alt>
                         {searchQuery ? `No packs matching "${searchQuery}"` : 'No packs available. Be the first to create one!'}
                     </Text>
                 </div>
@@ -311,7 +313,9 @@ export default function PackAdd() {
         return (
             <div className="py-16 px-4 text-center">
                 <Heading size="xl">Join packs on the platform</Heading>
-                <Text className="mt-4 text-neutral-500 max-w-md mx-auto">You need to sign in to view and join packs.</Text>
+                <Text alt className="mt-4 max-w-md mx-auto">
+                    You need to sign in to view and join packs.
+                </Text>
                 <div className="mt-8">
                     <Button href="/auth/signin">Sign In</Button>
                 </div>
@@ -324,7 +328,7 @@ export default function PackAdd() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-8 p-6">
                 <div className="max-w-md">
                     <Heading>Find your community</Heading>
-                    <Text className="mt-2 text-neutral-500">
+                    <Text alt className="mt-2">
                         Join packs centered around your interests or create your own to connect with others.
                     </Text>
                     <div className="mt-6">

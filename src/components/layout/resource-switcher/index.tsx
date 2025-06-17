@@ -66,7 +66,7 @@ export default function ResourceSwitcher() {
                                     )}
                                     <Text className="font-bold">{currentResource.display_name}</Text>
                                 </div>
-                                <ExpandingArrow className="right-0 -mt-1 h-6 w-6 rotate-90 text-neutral-500 transition-all dark:text-white" />
+                                <ExpandingArrow className="right-0 -mt-1 h-6 w-6 rotate-90 text-muted-foreground transition-all dark:text-white" />
                             </span>
                         </MenuButton>
                         <DropdownMenu className="z-50 -mt-16 rounded-tl-none rounded-tr-none p-0!">

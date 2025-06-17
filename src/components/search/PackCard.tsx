@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { SearchResult } from '@/pages/search/types'
 import Link from '@/components/shared/link.tsx'
 import { Avatar } from '@/src/components'
@@ -26,7 +30,7 @@ export const PackCard = ({ pack }: PackCardProps) => {
     return (
         <Link href={`/p/${pack.slug}`} className="block h-full ring-1 rounded ring-default hover:ring-2 transition-shadow">
             <div className="p-4">
-                <div className="mb-3 flex items-center text-xs text-neutral-500 dark:text-neutral-400">
+                <div className="mb-3 flex items-center text-xs text-muted-foreground">
                     <UserGroupIcon className="mr-2 h-3.5 w-3.5 sm:h-3 sm:w-3" />
                     <span>Pack</span>
                 </div>

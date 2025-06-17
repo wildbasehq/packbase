@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
@@ -16,7 +20,7 @@ const buttonVariants = cva(
                 outline: 'ring-default text-default border no-underline! transition-all hover:bg-n-2/25 hover:ring-4 dark:hover:bg-n-6/50',
                 secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
                 grey: 'bg-card border text-default hover:bg-zinc-900/5 dark:hover:bg-white/5',
-                ghost: 'transition-all text-default hover:ring-4 hover:ring-neutral-500/10',
+                ghost: 'transition-all text-default hover:ring-4 hover:ring-n-5/10',
                 link: 'text-primary underline-offset-4 hover:underline',
             },
             size: {

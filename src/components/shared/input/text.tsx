@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import React, { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -35,7 +39,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             'bg-default flex w-full focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600! sm:max-w-md'
                         )}
                     >
-                        {suffix && <span className="-mr-2.5 flex select-none items-center pl-3 text-neutral-500 sm:text-sm">{suffix}</span>}
+                        {suffix && (
+                            <span className="-mr-2.5 flex select-none items-center pl-3 text-muted-foreground sm:text-sm">{suffix}</span>
+                        )}
                         <InputElement
                             // @ts-ignore
                             type={type || 'text'}

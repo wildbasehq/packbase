@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 @import 'tailwindcss';
 @import './_color.css';
 /*@config "../../tailwind.config.js";*/
@@ -17,6 +21,13 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+  /*
+ * Optical border reusable
+ */
+  .border-optical {
+    @apply border-transparent bg-(--btn-border) dark:bg-(--btn-bg) before:absolute before:inset-0 before:-z-10 before:rounded-[calc(var(--radius-lg)-1px)] before:bg-(--btn-bg) before:shadow-sm dark:before:hidden dark:border-white/5 after:absolute after:inset-0 after:-z-10 after:rounded-[calc(var(--radius-lg)-1px)] after:shadow-[shadow:inset_0_1px_--theme(--color-white/15%)] data-active:after:bg-(--btn-hover-overlay) data-hover:after:bg-(--btn-hover-overlay) dark:after:-inset-px dark:after:rounded-lg;
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
@@ -98,7 +109,7 @@
 }
 
 .bg-card\/75 {
-  @apply bg-n-1/75 dark:bg-n-7/75;
+  @apply bg-white/75 dark:bg-n-7/75;
 }
 
 .bg-card-solid {
@@ -106,7 +117,7 @@
 }
 
 .shimmer-template {
-  @apply before:absolute before:border-n-5 before:inset-0 before:border-t before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-neutral-500/5 before:to-transparent;
+  @apply before:absolute before:border-n-5 before:inset-0 before:border-t before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-n-5/5 before:to-transparent;
 }
 
 /* Tailwind classes are now used for grid layout styling */

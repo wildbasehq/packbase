@@ -10,6 +10,8 @@ import { Text } from '@/components/shared/text.tsx'
 import UserDropdown from '@/components/layout/user-dropdown.tsx'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import Link from '@/components/shared/link.tsx'
+import { cn } from '@/lib'
+import { ButtonStyles } from '@/src/components'
 
 const DropdownComponent = memo(UserDropdown, () => true)
 
@@ -51,7 +53,10 @@ export default function UserSidebar() {
                                 {/* Search button */}
                                 <Link
                                     href="/search"
-                                    className="flex text-default flex-grow items-center py-1.5 px-2 rounded-lg bg-card cursor-pointer hover:!bg-n-4/25 hover:dark:inner-border hover:dark:inner-border-[#2e2e2e] hover:dark:unicorn:inner-border-outline/25"
+                                    className={cn(
+                                        'relative flex text-default flex-grow items-center py-1.5 px-2 rounded-lg border before:shadow-none isolate border-optical',
+                                        ButtonStyles.colors.light
+                                    )}
                                 >
                                     <div className="mr-1.5">
                                         <MagnifyingGlassIcon className="w-3 h-3" />

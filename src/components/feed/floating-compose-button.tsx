@@ -54,7 +54,7 @@ export default function FloatingComposeButton() {
                     <div className="flex-shrink-0">
                         <UserAvatar user={user} size="sm" className="rounded-full" />
                     </div>
-                    <span className="text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors text-left">
+                    <span className="text-muted-foreground group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors text-left">
                         Start a howling{currentResource.standalone ? '' : ' in ' + currentResource.display_name}...
                     </span>
                 </button>

@@ -23,7 +23,9 @@ export default function FeedList({ posts, hasMore, onLoadMore, onPostDelete }: F
                 loader={<FeedLoading message="Loading more threads..." />}
                 scrollThreshold={0.8}
                 endMessage={
-                    <Text className="py-8 text-center text-neutral-500 dark:text-neutral-400">You've reached the end of the threads.</Text>
+                    <Text className="py-8 text-center text-muted-foreground dark:text-neutral-400">
+                        You've reached the end of the threads.
+                    </Text>
                 }
             >
                 <div className="divide-y divide-neutral-200 dark:divide-neutral-800">

@@ -158,7 +158,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
 
                             {/* Delete button for author */}
                             {isAuthor && (
-                                <button onClick={onDelete} className="p-1 text-neutral-400 hover:text-red-500 transition-colors">
+                                <button onClick={onDelete} className="p-1 text-muted-foreground hover:text-red-500 transition-colors">
                                     <TrashIcon className="w-4 h-4" />
                                 </button>
                             )}
@@ -186,7 +186,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 <button
                                     onClick={handleReaction}
                                     disabled={isSubmittingReaction}
-                                    className="flex items-center gap-1 text-neutral-500 hover:text-red-500 transition-colors disabled:opacity-50"
+                                    className="flex items-center gap-1 text-muted-foreground hover:text-red-500 transition-colors disabled:opacity-50"
                                 >
                                     {isSubmittingReaction ? (
                                         <LoadingCircle />
@@ -200,7 +200,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
 
                                 <button
                                     onClick={() => setShowReplyForm(!showReplyForm)}
-                                    className="flex items-center gap-1 text-neutral-500 hover:text-indigo-500 transition-colors"
+                                    className="flex items-center gap-1 text-muted-foreground hover:text-indigo-500 transition-colors"
                                 >
                                     <ChatBubbleLeftIcon className="w-5 h-5" />
                                     <span className="text-sm">{post.comments?.length || 0}</span>

@@ -138,7 +138,7 @@ export default function SettingsGeneral() {
                                             onChange={e => setSlugInput(e.target.value)}
                                             required
                                         />
-                                        <span className="flex select-none items-center pr-3 text-neutral-500 sm:text-sm">
+                                        <span className="flex select-none items-center pr-3 text-muted-foreground sm:text-sm">
                                             .packbase.app
                                         </span>
                                     </div>
@@ -149,7 +149,7 @@ export default function SettingsGeneral() {
 
                                 <div className="mt-2">
                                     <div className="bg-default flex rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 dark:ring-neutral-800 sm:max-w-md">
-                                        <span className="flex select-none items-center pl-3 text-neutral-500 sm:text-sm">@</span>
+                                        <span className="flex select-none items-center pl-3 text-muted-foreground sm:text-sm">@</span>
                                         <input
                                             type="text"
                                             name="username"
