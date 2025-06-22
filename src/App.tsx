@@ -10,10 +10,11 @@ import { Providers } from './provider.tsx'
 import { SidebarProvider } from '@/lib/context/sidebar-context'
 import { Redirect, Route, Switch } from 'wouter'
 import Console from '@/components/shared/console.tsx'
-import { LogoSpinner } from '@/src/components'
+import { GuestLanding, LogoSpinner } from '@/src/components'
 import Body from '@/components/layout/body.tsx'
 import PackChannelThread from '@/pages/pack/[slug]/[channel]/[thread]/page.tsx'
 import UniversePackLayout from '@/pages/pack/universe/layout.tsx'
+import { SignedIn, SignedOut } from '@clerk/clerk-react'
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
@@ -69,7 +70,12 @@ function App() {
                                             <WaitlistCheck />
                                             <Switch>
                                                 <Route path="/">
-                                                    <Redirect to="/p/universe" />
+                                                    <SignedIn>
+                                                        <Redirect to="/p/universe" />
+                                                    </SignedIn>
+                                                    <SignedOut>
+                                                        <GuestLanding />
+                                                    </SignedOut>
                                                 </Route>
 
                                                 <Route path="/search">
