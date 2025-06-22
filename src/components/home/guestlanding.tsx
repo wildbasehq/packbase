@@ -47,6 +47,7 @@ const animConfig = {
 
 const links = [
     { name: 'Join Waitlist', href: '/id/create/', primary: true },
+    { name: 'Login', href: '/id/login/' },
     {
         name: 'Discord Community',
         href: 'https://discord.gg/StuuK55gYA',
