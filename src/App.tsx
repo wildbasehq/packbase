@@ -128,6 +128,9 @@ function App() {
                                                         </Route>
 
                                                         <Route path="/universe" nest>
+                                                            <SignedOut>
+                                                                <Redirect to="/" />
+                                                            </SignedOut>
                                                             <UniversePackLayout>
                                                                 <Route path="/">
                                                                     <Suspense fallback={<LoadingFallback />}>

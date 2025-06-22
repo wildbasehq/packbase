@@ -63,7 +63,7 @@ export default function Preload({ children }: { children: React.ReactNode }) {
             })
             .catch(e => {
                 log.error('Core', e)
-                setStatus('error')
+                setStatus('proceeding')
                 if (e?.message.indexOf('Failed') > -1)
                     return setError({
                         cause: 'UI & Server could not talk together',
