@@ -17,6 +17,7 @@ import './pack-switcher.component.css'
 import Link from '@/components/shared/link.tsx'
 import { useLocation } from 'wouter'
 import { Protect } from '@clerk/clerk-react'
+import { AnimatePresence, motion } from 'framer-motion'
 
 export default function PackSwitcher() {
     const { currentResource, setCurrentResource, resources } = useResourceStore()
@@ -85,19 +86,35 @@ export default function PackSwitcher() {
                     side="right"
                     delayDuration={0}
                 >
-                    <div
-                        className={cn(
-                            'hover:show-pill flex h-12 w-12 justify-center items-center',
-                            currentResource.id === item.id && 'force-pill'
-                        )}
-                        onClick={() => switchResource(item)}
-                    >
-                        <UserAvatar
-                            name={item.display_name}
-                            size={38}
-                            icon={item.images?.avatar}
-                            className="inline-flex cursor-pointer overflow-hidden !rounded-xl"
-                        />
+                    <div className="relative">
+                        <div
+                            className={cn(
+                                'hover:show-pill flex h-12 w-12 justify-center items-center',
+                                currentResource.id === item.id && 'force-pill'
+                            )}
+                            onClick={() => switchResource(item)}
+                        >
+                            <UserAvatar
+                                name={item.display_name}
+                                size={38}
+                                icon={item.images?.avatar}
+                                className="inline-flex cursor-pointer overflow-hidden !rounded-xl"
+                            />
+                        </div>
+
+                        {/* Pack icon background */}
+                        <AnimatePresence>
+                            {currentResource.id === item.id && (
+                                <motion.div
+                                    key={`pack-bg-${item.id}`}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="absolute inset-0 ring-white/10 -z-1 bg-white dark:bg-zinc-900 h-12 ml-0.5 rounded-tl rounded-bl rounded-out-r w-[calc(3.8rem+1px)] pack-icon-bg"
+                                />
+                            )}
+                        </AnimatePresence>
                     </div>
                 </Tooltip>
             ))}

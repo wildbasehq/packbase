@@ -3,6 +3,7 @@
  */
 
 @import 'tailwindcss';
+@import "tailwind-rounded-out";
 @import './_color.css';
 /*@config "../../tailwind.config.js";*/
 
