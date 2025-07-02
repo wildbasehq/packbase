@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { Button } from '@/components/shared/experimental-button-rework'
 import { Heading } from '@/components/shared/heading'
 import { Text } from '@/components/shared/text'
@@ -26,15 +30,7 @@ export default function SettingsDeleteAccount() {
                         </AlertDescription>
                     </Alert>
                 </div>
-                <Button
-                    onClick={() => {
-                        if (window.Intercom) {
-                            window.Intercom('show')
-                        }
-                    }}
-                    color="red"
-                    className="mt-2"
-                >
+                <Button color="red" className="mt-2">
                     Start the process
                 </Button>
             </div>

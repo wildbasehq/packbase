@@ -26,7 +26,7 @@ import {
     SidebarSpacer,
 } from '@/src/components'
 import { QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
-import { ChatBubbleBottomCenterIcon, FaceSmileIcon } from '@heroicons/react/16/solid'
+import { FaceSmileIcon } from '@heroicons/react/16/solid'
 import { SiDiscord } from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 import { useSession } from '@clerk/clerk-react'
@@ -184,14 +184,6 @@ function SidebarContentContainer({ children }: { children: React.ReactNode }) {
                                 <SidebarLabel>Help</SidebarLabel>
                             </DropdownButton>
                             <DropdownMenu anchor="top">
-                                <DropdownItem
-                                    onClick={() => {
-                                        window.Intercom?.('show')
-                                    }}
-                                >
-                                    <ChatBubbleBottomCenterIcon className="w-4 h-4 inline-flex" />
-                                    <SidebarLabel>Docs & Chat</SidebarLabel>
-                                </DropdownItem>
                                 <DropdownItem href="https://packbase.wildbase.xyz" target="_blank">
                                     <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon" />
                                     <SidebarLabel>Feedback</SidebarLabel>

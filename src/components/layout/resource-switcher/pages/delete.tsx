@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { Button } from '@/components/shared/experimental-button-rework'
 import { Heading } from '@/components/shared/heading'
 import { Text } from '@/components/shared/text'
@@ -16,15 +20,7 @@ export default function ResourceDeletePage() {
                     Someone from Wildbase - or Rheo - will guide you through the process of deleting your pack. This is a manual process
                     that requires some time and effort from our team. Be sure to alert your community before doing this.
                 </Text>
-                <Button
-                    onClick={() => {
-                        if (window.Intercom) {
-                            window.Intercom('show')
-                        }
-                    }}
-                    color="red"
-                    className="mt-2"
-                >
+                <Button color="red" className="mt-2">
                     Start the process
                 </Button>
             </div>
