@@ -89,7 +89,7 @@ export default function PackSwitcher() {
                     <div className="relative">
                         <div
                             className={cn(
-                                'hover:show-pill flex h-12 w-12 justify-center items-center',
+                                'hover:show-pill off-by-six flex h-12 w-12 justify-center items-center before:!left-[-0.65rem]',
                                 currentResource.id === item.id && 'force-pill'
                             )}
                             onClick={() => switchResource(item)}
