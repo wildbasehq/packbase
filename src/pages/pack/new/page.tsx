@@ -9,13 +9,11 @@ import { Button } from '@/components/shared/experimental-button-rework'
 import { vg } from '@/lib/api'
 import { useResourceStore, useUserAccountStore } from '@/lib'
 import { toast } from 'sonner'
-import { CheckIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid'
-import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
+import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 import PackCard from '@/components/shared/pack/card'
 import { useModal } from '@/components/modal/provider.tsx'
 import { Input } from '@/components/shared/input.tsx'
 import { Description, Field, Label } from '@/components/shared/fieldset.tsx'
-import { Radio, RadioGroup } from '@headlessui/react'
 
 // Types
 type PrivacyOption = {
@@ -146,56 +144,56 @@ function CreatePackModal({ close }: { close: () => void }) {
                     </Field>
                 </div>
 
-                <div className="mb-8">
-                    <label className="block text-sm font-medium mb-2">Privacy</label>
+                {/*<div className="mb-8">*/}
+                {/*    <label className="block text-sm font-medium mb-2">Privacy</label>*/}
 
-                    <RadioGroup value={selected} onChange={setSelected}>
-                        <Label className="sr-only select-none">Privacy</Label>
-                        <div className="space-y-2">
-                            {PRIVACY_OPTIONS.map(privacyOption => (
-                                <Radio
-                                    key={privacyOption.name}
-                                    value={privacyOption}
-                                    className={({ focus, checked }) =>
-                                        `${focus ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-neutral-300' : ''}
-                                                                                    ${
-                                                                                        checked
-                                                                                            ? 'bg-n-1/70 dark:bg-n-6'
-                                                                                            : 'hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50'
-                                                                                    }
-                                                                                    ring-default flex select-none flex-col justify-center rounded border px-4 py-4 !no-underline transition-all`
-                                    }
-                                >
-                                    {({ checked }) => (
-                                        <div className="flex w-full items-center justify-between">
-                                            <div className="flex items-center">
-                                                <div className="text-sm">
-                                                    <Label className={`font-medium  ${checked ? 'text-default' : 'text-alt'}`}>
-                                                        {privacyOption.name}
-                                                    </Label>
-                                                    <Description className="text-alt inline">
-                                                        <span>{privacyOption.desc}</span>{' '}
-                                                        {privacyOption.warn && (
-                                                            <p className="inline-flex items-center">
-                                                                <QuestionMarkCircleIcon className="text-alt h-4 w-4" />
-                                                                <span className="ml-1">{privacyOption.warn}</span>
-                                                            </p>
-                                                        )}
-                                                    </Description>
-                                                </div>
-                                            </div>
-                                            {checked && (
-                                                <div className="text-default shrink-0">
-                                                    <CheckIcon className="h-6 w-6" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </Radio>
-                            ))}
-                        </div>
-                    </RadioGroup>
-                </div>
+                {/*    <RadioGroup value={selected} onChange={setSelected}>*/}
+                {/*        <Label className="sr-only select-none">Privacy</Label>*/}
+                {/*        <div className="space-y-2">*/}
+                {/*            {PRIVACY_OPTIONS.map(privacyOption => (*/}
+                {/*                <Radio*/}
+                {/*                    key={privacyOption.name}*/}
+                {/*                    value={privacyOption}*/}
+                {/*                    className={({ focus, checked }) =>*/}
+                {/*                        `${focus ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-neutral-300' : ''}*/}
+                {/*                                                                    ${*/}
+                {/*                                                                        checked*/}
+                {/*                                                                            ? 'bg-n-1/70 dark:bg-n-6'*/}
+                {/*                                                                            : 'hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50'*/}
+                {/*                                                                    }*/}
+                {/*                                                                    ring-default flex select-none flex-col justify-center rounded border px-4 py-4 !no-underline transition-all`*/}
+                {/*                    }*/}
+                {/*                >*/}
+                {/*                    {({ checked }) => (*/}
+                {/*                        <div className="flex w-full items-center justify-between">*/}
+                {/*                            <div className="flex items-center">*/}
+                {/*                                <div className="text-sm">*/}
+                {/*                                    <Label className={`font-medium  ${checked ? 'text-default' : 'text-alt'}`}>*/}
+                {/*                                        {privacyOption.name}*/}
+                {/*                                    </Label>*/}
+                {/*                                    <Description className="text-alt inline">*/}
+                {/*                                        <span>{privacyOption.desc}</span>{' '}*/}
+                {/*                                        {privacyOption.warn && (*/}
+                {/*                                            <p className="inline-flex items-center">*/}
+                {/*                                                <QuestionMarkCircleIcon className="text-alt h-4 w-4" />*/}
+                {/*                                                <span className="ml-1">{privacyOption.warn}</span>*/}
+                {/*                                            </p>*/}
+                {/*                                        )}*/}
+                {/*                                    </Description>*/}
+                {/*                                </div>*/}
+                {/*                            </div>*/}
+                {/*                            {checked && (*/}
+                {/*                                <div className="text-default shrink-0">*/}
+                {/*                                    <CheckIcon className="h-6 w-6" />*/}
+                {/*                                </div>*/}
+                {/*                            )}*/}
+                {/*                        </div>*/}
+                {/*                    )}*/}
+                {/*                </Radio>*/}
+                {/*            ))}*/}
+                {/*        </div>*/}
+                {/*    </RadioGroup>*/}
+                {/*</div>*/}
 
                 <div className="flex justify-end space-x-3">
                     <Button plain type="button" onClick={close}>
