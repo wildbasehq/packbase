@@ -1,14 +1,17 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { Toaster } from 'sonner'
 import { ModalProvider } from '@/components/modal/provider'
-import { useUserAccountStore } from '@/lib/index'
-import IntercomComponent from '@/components/shared/intercom'
+import { useUserAccountStore } from '@/lib'
 import { NotificationsProvider } from '@/lib/providers/notifications-provider'
 
 export function Providers({ children }: { children: React.ReactNode }) {
     const { user } = useUserAccountStore()
 
     return (
-        <IntercomComponent user={user}>
+        <>
             <Toaster className="dark:hidden" position="top-center" />
             <Toaster
                 className="hidden dark:block"
@@ -24,6 +27,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <NotificationsProvider>
                 <ModalProvider>{children}</ModalProvider>
             </NotificationsProvider>
-        </IntercomComponent>
+        </>
     )
 }
