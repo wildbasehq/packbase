@@ -131,7 +131,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                     src={post.pack.images?.avatar}
                                     alt={post.pack.display_name}
                                     initials={post.pack.display_name[0]}
-                                    className="w-10 h-10 mt-4"
+                                    className="w-10 h-10 mt-4 aspect-square"
                                     square
                                 />
                             </div>
