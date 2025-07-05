@@ -72,7 +72,7 @@ function feedReducer(state: FeedState, action: FeedAction): FeedState {
     }
 }
 
-export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', channelID }: FeedProps) {
+export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', channelID, feedQueryOverride }: FeedProps) {
     const { maintenance } = useUIStore()
     const { enqueue } = WorkerStore()
 
@@ -121,7 +121,7 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', 
                     if (channelID) {
                         response = await vg.search.get({
                             query: {
-                                q: '[Where posts:channel_id ("' + channelID + '")]',
+                                q: feedQueryOverride || '[Where posts:channel_id ("' + channelID + '")]',
                                 allowedTables: ['posts'],
                             },
                         })

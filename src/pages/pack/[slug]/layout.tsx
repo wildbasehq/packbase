@@ -58,11 +58,13 @@ export default function PackLayout({ children }: { children: React.ReactNode }) 
 
                         for (const page of res.data?.pages || []) {
                             naviBuild.push({
+                                id: page.id,
                                 name: page.title,
                                 description: page.description,
                                 href: `/p/${slug}/${page.id}`,
                                 icon: page.icon || OrbitIcon,
                                 ticker: page.ticker,
+                                query: page.query || null,
                             })
                         }
                         setNavigation(naviBuild)

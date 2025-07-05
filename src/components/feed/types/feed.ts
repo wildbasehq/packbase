@@ -16,6 +16,7 @@ export interface FeedViewOption {
 export interface FeedProps {
     packID?: string
     channelID?: string
+    feedQueryOverride?: string
 }
 
 export interface FeedState {
