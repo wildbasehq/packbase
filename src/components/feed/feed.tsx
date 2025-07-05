@@ -218,8 +218,10 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', 
             const { data, error } = channelID
                 ? await vg.search.get({
                       query: {
-                          q: '[Where Where posts:channel_id ("' + channelID + '")]',
+                          q: '[Where posts:channel_id ("' + channelID + '")]',
                           allowedTables: ['posts'],
+                          limit: 10,
+                          offset: (page - 1) * 10,
                       },
                   })
                 : await vg.feed({ id: packID }).get({ query: { page } })
