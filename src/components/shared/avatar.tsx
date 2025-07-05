@@ -59,7 +59,7 @@ export function Avatar({
                     </text>
                 </svg>
             )}
-            {src && <img className="size-full" src={src} alt={alt} />}
+            {src && <img className="size-full aspect-square" src={src} alt={alt} />}
         </span>
     )
 }
@@ -79,7 +79,7 @@ export const AvatarButton = forwardRef(function AvatarButton(
         className,
         square ? 'rounded-[20%]' : 'rounded-full',
         'relative inline-grid focus:outline-hidden data-focus:outline-2 data-focus:outline-offset-2 data-focus:outline-blue-500',
-        'rounded-lg isolated relative aspect-square'
+        'rounded-lg isolated relative'
     )
 
     return 'href' in props ? (
