@@ -4,11 +4,13 @@
 
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import { ArrowUpRightIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { SidebarDivider, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection } from '@/components/shared/sidebar'
 import { FireIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
 import InboxPage from '@/pages/inbox/page.tsx'
-import { HashtagIcon, MicrophoneIcon, NewspaperIcon } from '@heroicons/react/16/solid'
+import { HashtagIcon, MicrophoneIcon, NewspaperIcon, PaperAirplaneIcon, PlusIcon } from '@heroicons/react/16/solid'
+import Popover from '@/components/shared/popover.tsx'
+import { vg } from '@/lib'
 
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon,
@@ -35,7 +37,10 @@ export function PackChannels() {
             <SidebarDivider />
             <SidebarSection>
                 <div className="flex justify-between items-center">
-                    <SidebarHeading>Channels</SidebarHeading>
+                    <div className="flex items-center justify-between w-full">
+                        <SidebarHeading>Channels</SidebarHeading>
+                        {currentResource.owner_id === user.id && <AddChannelButton />}
+                    </div>
                     {/*<Button*/}
                     {/*    plain*/}
                     {/*    onClick={e => {*/}
@@ -117,5 +122,81 @@ function InboxButton() {
                 <SidebarLabel>Inbox</SidebarLabel>
             </SidebarItem>
         </>
+    )
+}
+
+function AddChannelButton() {
+    return (
+        <Popover content={<AddChannelPopover />}>
+            <PlusIcon className="h-4 w-4 -mt-0.5 text-muted-foreground" />
+        </Popover>
+    )
+}
+
+/**
+ * Add channel card popover with "Channel name" input
+ */
+function AddChannelPopover() {
+    const { currentResource } = useResourceStore()
+    const { navigation, setNavigation } = useUIStore()
+    const formRef = useRef<HTMLFormElement>(null)
+
+    const createNewChannel = async (channelID: string) => {
+        vg.pack({ id: currentResource.id })
+            .pages.post({ slug: channelID })
+            .then(data => {
+                alert(JSON.stringify(data, null, 2))
+
+                if (data.status !== 200) {
+                    alert(data.error)
+                    return
+                } else {
+                    setNavigation([
+                        ...navigation,
+                        {
+                            name: data.data.title,
+                            href: `/p/${currentResource.slug}/${data.data.id}`,
+                        },
+                    ])
+
+                    formRef.current?.reset()
+                }
+            })
+    }
+
+    return (
+        <div className="flex flex-col gap-2 p-2 bg-sidebar">
+            <div className="flex items-center gap-2">
+                <HashtagIcon className="h-4 w-4 text-alt" />
+
+                <form
+                    ref={formRef}
+                    onSubmit={e => {
+                        e.preventDefault()
+                        const formData = new FormData(e.target as HTMLFormElement)
+                        const channelName = (formData.get('channel-name') as string)?.toLowerCase()
+                        if (!channelName) return
+                        // a-z lowercase, and any dashes as long as a character is before and after
+                        if (/@/g.test(channelName) || /[^a-z-]/g.test(channelName) || /-+$/.test(channelName) || /-+$/.test(channelName))
+                            return alert('Channel names can only contain lowercase letters and dashes. No spaces or special characters.')
+                        createNewChannel(channelName)
+                    }}
+                    className="flex items-center gap-2"
+                >
+                    <input
+                        type="text"
+                        placeholder="New Channel Name"
+                        name="channel-name"
+                        required
+                        autoFocus
+                        autoComplete="off"
+                        className="w-full bg-transparent border-none outline-none text-sm text-muted-foreground"
+                    />
+                    <button type="submit">
+                        <PaperAirplaneIcon className="h-4 w-4" />
+                    </button>
+                </form>
+            </div>
+        </div>
     )
 }

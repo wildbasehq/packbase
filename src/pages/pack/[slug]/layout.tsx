@@ -60,7 +60,7 @@ export default function PackLayout({ children }: { children: React.ReactNode }) 
                             naviBuild.push({
                                 name: page.title,
                                 description: page.description,
-                                href: `/p/${slug}/${page.slug}`,
+                                href: `/p/${slug}/${page.id}`,
                                 icon: page.icon || OrbitIcon,
                                 ticker: page.ticker,
                             })

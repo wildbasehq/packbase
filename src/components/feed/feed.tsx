@@ -6,7 +6,7 @@
 import { useEffect, useReducer, useRef } from 'react'
 import { toast } from 'sonner'
 import { vg } from '@/lib/api'
-import { useUIStore, useUserAccountStore } from '@/lib/state'
+import { useUIStore } from '@/lib/state'
 import { WorkerStore } from '@/lib/workers'
 import { FeedProps, FeedState } from './types/feed'
 import FeedList from './feed-list'
@@ -72,10 +72,9 @@ function feedReducer(state: FeedState, action: FeedAction): FeedState {
     }
 }
 
-export default function Feed({ packID = '00000000-0000-0000-0000-000000000000' }: FeedProps) {
+export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', channelID }: FeedProps) {
     const { maintenance } = useUIStore()
     const { enqueue } = WorkerStore()
-    const user = useUserAccountStore(state => state.user)
 
     const isMountedRef = useRef(false)
     const fetchCompletedRef = useRef(false)
@@ -118,7 +117,18 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000' }
 
             while (retryCount <= maxRetries) {
                 try {
-                    const response = await vg.feed({ id: packID }).get({ query: { page: 1 } })
+                    let response
+                    if (channelID) {
+                        response = await vg.search.get({
+                            query: {
+                                q: '[Where posts:channel_id ("' + channelID + '")]',
+                                allowedTables: ['posts'],
+                            },
+                        })
+                    } else {
+                        response = await vg.feed({ id: packID }).get({ query: { page: 1 } })
+                    }
+
                     data = response.data
                     error = response.error
 
@@ -205,7 +215,14 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000' }
         const page = checkForNew ? 1 : state.currentPage
 
         try {
-            const { data, error } = await vg.feed({ id: packID }).get({ query: { page } })
+            const { data, error } = channelID
+                ? await vg.search.get({
+                      query: {
+                          q: '[Where Where posts:channel_id ("' + channelID + '")]',
+                          allowedTables: ['posts'],
+                      },
+                  })
+                : await vg.feed({ id: packID }).get({ query: { page } })
 
             if (error) {
                 toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong loading the feed')

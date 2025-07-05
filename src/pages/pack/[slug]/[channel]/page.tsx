@@ -3,7 +3,12 @@
  */
 
 import PackFeedController from '../../../pack/components'
+import { useParams } from 'wouter'
 
 export default function UniverseEverything() {
-    return <PackFeedController overrideFeedID="universe" />
+    let { channel } = useParams<{
+        channel: string
+    }>()
+
+    return <PackFeedController key={channel} channelID={channel} />
 }

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import UserAvatar from '@/components/shared/user/avatar'
 import { Text } from '@/components/shared/text'
 import { DotIcon } from 'lucide-react'
@@ -33,12 +37,11 @@ export default function HowlCreator() {
     )
 }
 
-export function HowlCard() {
+export function HowlCard({ channelID }: { channelID?: string } = {}) {
     const { user } = useUserAccountStore()
     const { currentResource } = useResourceStore()
 
     const [submitting, setSubmitting] = useState<boolean>(false)
-    const [showModal, setShowModal] = useState<boolean>(false)
     const [attachments, setAttachments] = useState<{ bright: boolean; data: string }[]>([])
     const [body, setBody] = useState<string>('')
 
@@ -75,6 +78,7 @@ export function HowlCard() {
 
     const uploadPost = (post: any) => {
         post.tenant_id = currentResource.id
+        post.channel_id = channelID
         vg.howl.create
             .post(post)
             .then(({ error }) => {
@@ -161,6 +165,11 @@ export function HowlCard() {
                             {currentResource.display_name}
                         </div>
                         <Text alt>This howl will be visible to all members of this pack regardless of your personal settings.</Text>
+                        {channelID && (
+                            <div className="flex gap-1 items-center mt-1">
+                                <Text alt>Howl will belong to the currently selected channel</Text>
+                            </div>
+                        )}
                     </AlertTitle>
                 </Alert>
             )}

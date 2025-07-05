@@ -9,9 +9,10 @@ import { Protect } from '@clerk/clerk-react'
 
 interface PackFeedControllerProps {
     overrideFeedID?: string
+    channelID?: string
 }
 
-export default function PackFeedController({ overrideFeedID }: PackFeedControllerProps) {
+export default function PackFeedController({ overrideFeedID, channelID }: PackFeedControllerProps) {
     const { currentResource } = useResourceStore()
 
     // Determine feed ID based on context
@@ -26,7 +27,7 @@ export default function PackFeedController({ overrideFeedID }: PackFeedControlle
                 <div className="flex flex-col">
                     {/* Feed container */}
                     <div className="p-4 sm:p-8">
-                        <Feed packID={feedID} />
+                        <Feed packID={feedID} channelID={channelID} />
                     </div>
                 </div>
             </Protect>

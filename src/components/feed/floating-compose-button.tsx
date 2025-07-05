@@ -3,17 +3,32 @@
  */
 
 // src/components/feed/floating-compose-button.tsx
-import { useResourceStore, useUserAccountStore } from '@/lib/state'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import UserAvatar from '@/components/shared/user/avatar'
 import { useModal } from '@/components/modal/provider.tsx'
 import Card from '@/components/shared/card.tsx'
 import { Heading, Text } from '@/components/shared/text.tsx'
 import { Button, HowlCard } from '@/src/components'
+import { useParams } from 'wouter'
+import { useEffect, useState } from 'react'
 
 export default function FloatingComposeButton() {
     const { user } = useUserAccountStore()
     const { show, hide } = useModal()
     const { currentResource } = useResourceStore()
+    let { channel } = useParams<{
+        channel: string
+    }>()
+
+    const [channelName, setChannelName] = useState<string | null>(null)
+
+    const { navigation } = useUIStore()
+
+    useEffect(() => {
+        if (channel) {
+            setChannelName(navigation.find(item => item.href.endsWith(channel))?.name)
+        }
+    }, [channel])
 
     const handleClick = () => {
         console.log('Opening creator dialog...')
@@ -35,7 +50,7 @@ export default function FloatingComposeButton() {
                 </Card>
             )
         } else {
-            show(<HowlCard />)
+            show(<HowlCard channelID={channel} />)
         }
     }
 
@@ -55,7 +70,8 @@ export default function FloatingComposeButton() {
                         <UserAvatar user={user} size="sm" className="rounded-full" />
                     </div>
                     <span className="text-muted-foreground group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors text-left">
-                        Start a howling{currentResource.standalone ? '' : ' in ' + currentResource.display_name}...
+                        Start a howling
+                        {currentResource.standalone ? '' : ' in ' + (channelName ? '#' + channelName : currentResource.display_name)}
                     </span>
                 </button>
             </div>
