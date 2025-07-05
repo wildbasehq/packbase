@@ -3,9 +3,9 @@
  */
 
 import PackFeedController from '../../../pack/components'
-import { useParams } from 'wouter'
+import {useParams} from 'wouter'
 
-export default function UniverseEverything() {
+export default function PackChannel() {
     let { channel } = useParams<{
         channel: string
     }>()

@@ -2,26 +2,26 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { lazy, Suspense } from 'react'
-import { Text } from '@/components/shared/text.tsx'
-import { SidebarLayout } from '@/components/shared/sidebar-layout.tsx'
+import {lazy, Suspense} from 'react'
+import {Text} from '@/components/shared/text.tsx'
+import {SidebarLayout} from '@/components/shared/sidebar-layout.tsx'
 import Preload from './preload.tsx'
-import { Providers } from './provider.tsx'
-import { SidebarProvider } from '@/lib/context/sidebar-context'
-import { Redirect, Route, Switch } from 'wouter'
+import {Providers} from './provider.tsx'
+import {SidebarProvider} from '@/lib/context/sidebar-context'
+import {Redirect, Route, Switch} from 'wouter'
 import Console from '@/components/shared/console.tsx'
-import { GuestLanding, LogoSpinner } from '@/src/components'
+import {GuestLanding, LogoSpinner} from '@/src/components'
 import Body from '@/components/layout/body.tsx'
 import PackChannelThread from '@/pages/pack/[slug]/[channel]/[thread]/page.tsx'
 import UniversePackLayout from '@/pages/pack/universe/layout.tsx'
-import { SignedIn, SignedOut } from '@clerk/clerk-react'
+import {SignedIn, SignedOut} from '@clerk/clerk-react'
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
 const IDLogin = lazy(() => import('@/pages/id/login/page.tsx'))
 const IDWaitlist = lazy(() => import('@/pages/id/waitlist/page.tsx'))
 const UniversePack = lazy(() => import('@/pages/pack/universe/page.tsx'))
-const UniverseEverything = lazy(() => import('@/pages/pack/[slug]/[channel]/page.tsx'))
+const PackChannel = lazy(() => import('@/pages/pack/[slug]/[channel]/page.tsx'))
 const PackLayout = lazy(() => import('@/pages/pack/[slug]/layout.tsx'))
 const PackHome = lazy(() => import('@/pages/pack/[slug]/page.tsx'))
 const NotFound = lazy(() => import('@/src/not-found.tsx'))
@@ -140,7 +140,7 @@ function App() {
 
                                                                 <Route path="/cosmos">
                                                                     <Suspense fallback={<LoadingFallback />}>
-                                                                        <UniverseEverything />
+                                                                        <NotFound />
                                                                     </Suspense>
                                                                 </Route>
 
@@ -164,7 +164,7 @@ function App() {
                                                                     <Route path="/:channel" nest>
                                                                         <Route path="/">
                                                                             <Suspense fallback={<LoadingFallback />}>
-                                                                                <UniverseEverything />
+                                                                                <PackChannel />
                                                                             </Suspense>
                                                                         </Route>
 
