@@ -7,7 +7,6 @@
 //         ? 'http://localhost/api/'
 //         : `${window.location.protocol}//api.${window.location.hostname.replace('www.', '')}/api/`) : '/api/') + 'v2/';
 import VoyageSDK from 'voyagesdk-ts'
-import { getSelfProfile } from '@/lib/api/cron/profile-update.ts'
 
 import './cron/check-update.ts'
 import { WorkerStore } from '@/lib/workers'
@@ -36,9 +35,7 @@ export let { supabase, vg } = new VoyageSDK(API_URL, {
 
 const { enqueue } = WorkerStore.getState()
 
-let refreshTimer
-
-export const setToken = (token?: string, expires_at?: number) => {
+export const setToken = (token?: string) => {
     enqueue('voyage-initiate', async () => {
         globalThis.TOKEN = token
         let newClient = new VoyageSDK(API_URL, {
@@ -59,36 +56,23 @@ export const setToken = (token?: string, expires_at?: number) => {
         if (window.packbase) {
             window.packbase.emit('user:auth:changed', { authenticated: !!token })
         }
-
-        if (expires_at) {
-            log.info('Wild ID', 'Token set, will refresh at', expires_at)
-            if (refreshTimer) clearInterval(refreshTimer)
-            refreshTimer = setInterval(() => {
-                // Check if date passed
-                if (new Date().getTime() >= expires_at) {
-                    refreshSession()
-                }
-            }, 60000)
-        } else {
-            clearInterval(refreshTimer)
-        }
     })
 }
 
-export const refreshSession = async () => {
-    if (!globalThis.TOKEN) return
-    enqueue('refresh-session', async () => {
-        const { data, error } = await supabase.auth.refreshSession()
-        const { session, user } = data || {}
-        if (error || !session) {
-            alert('Oops! Voyage lost this session, your page will refresh')
-            window.location.reload()
-        }
-
-        setToken(session?.access_token, session?.expires_at)
-
-        getSelfProfile()
-
-        log.info('Wild ID', 'Token refreshed, will refresh in', session.expires_in)
-    })
-}
+// export const refreshSession = async () => {
+//     if (!globalThis.TOKEN) return
+//     enqueue('refresh-session', async () => {
+//         const { data, error } = await supabase.auth.refreshSession()
+//         const { session, user } = data || {}
+//         if (error || !session) {
+//             alert('Oops! Voyage lost this session, your page will refresh')
+//             window.location.reload()
+//         }
+//
+//         setToken(session?.access_token, session?.expires_at)
+//
+//         getSelfProfile()
+//
+//         log.info('Wild ID', 'Token refreshed, will refresh in', session.expires_in)
+//     })
+// }

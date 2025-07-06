@@ -38,7 +38,7 @@ export default function Preload({ children }: { children: React.ReactNode }) {
 
                 if (isSignedIn) {
                     session.getToken().then(token => {
-                        setToken(token, session.expireAt.getTime())
+                        setToken(token)
                         setStatus('auth:@me')
                         const localUser = localStorage.getItem('user-account')
                         if (localUser) {
