@@ -2,15 +2,15 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
-import {ArrowUpRightIcon} from 'lucide-react'
-import {useRef, useState} from 'react'
-import {SidebarDivider, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection} from '@/components/shared/sidebar'
-import {FireIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
+import { ArrowUpRightIcon } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { SidebarDivider, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection } from '@/components/shared/sidebar'
+import { FireIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
 import InboxPage from '@/pages/inbox/page.tsx'
-import {HashtagIcon, MicrophoneIcon, NewspaperIcon, PaperAirplaneIcon, PlusIcon} from '@heroicons/react/16/solid'
+import { HashtagIcon, MicrophoneIcon, NewspaperIcon, PaperAirplaneIcon, PlusIcon, UserGroupIcon } from '@heroicons/react/16/solid'
 import Popover from '@/components/shared/popover.tsx'
-import {vg} from '@/lib'
+import { vg } from '@/lib'
 
 const availableIcons = {
     ArrowUpRight: ArrowUpRightIcon,
@@ -27,12 +27,15 @@ export function PackChannels() {
     return (
         <>
             <SidebarSection>
-                <SidebarItem href={!currentResource.slug ? '/p/universe' : `/p/${currentResource.slug}`}>
-                    <NewspaperIcon />
-                    <div className="flex flex-col min-w-0">
-                        <SidebarLabel>For You</SidebarLabel>
-                    </div>
-                </SidebarItem>
+                {!currentResource.slug && <UniverseTopChannels />}
+                {currentResource.slug && (
+                    <SidebarItem href={`/p/${currentResource.slug}`}>
+                        <NewspaperIcon />
+                        <div className="flex flex-col min-w-0">
+                            <SidebarLabel>For You</SidebarLabel>
+                        </div>
+                    </SidebarItem>
+                )}
             </SidebarSection>
             <SidebarDivider />
             <SidebarSection>
@@ -69,6 +72,19 @@ export function PackChannels() {
                     </span>
                 </SidebarLabel>
             </SidebarSection>
+        </>
+    )
+}
+
+function UniverseTopChannels() {
+    return (
+        <>
+            <SidebarItem href="/p/universe">
+                <UserGroupIcon />
+                <div className="flex flex-col min-w-0">
+                    <SidebarLabel>Following</SidebarLabel>
+                </div>
+            </SidebarItem>
         </>
     )
 }
