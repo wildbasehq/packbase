@@ -18,6 +18,11 @@ export const getSelfProfile = (cb?: () => void) => {
             .then(async ({ data }) => {
                 log.info('User Data', 'Got:', data)
 
+                if (!data) {
+                    // @ts-ignore
+                    window.Clerk.signOut()
+                    return
+                }
                 let userBuild = {
                     id: data.id,
                     username: data?.username || 'new_here',
@@ -55,8 +60,6 @@ export const getSelfProfile = (cb?: () => void) => {
             })
             .catch(e => {
                 log.error('User Data', 'Error:', e)
-                // @ts-ignore
-                window.Clerk.signOut()
             })
     })
 }
