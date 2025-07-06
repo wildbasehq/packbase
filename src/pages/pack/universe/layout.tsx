@@ -2,9 +2,9 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {SidebarDivider, SidebarItem, SidebarLabel, SidebarSection} from '@/src/components'
-import {NewspaperIcon} from '@heroicons/react/16/solid'
-import {SidebarPortal} from '@/lib/context/sidebar-context.tsx'
+import { SidebarDivider, SidebarItem, SidebarLabel, SidebarSection } from '@/src/components'
+import { SidebarPortal } from '@/lib/context/sidebar-context.tsx'
+import { UserGroupIcon } from '@heroicons/react/16/solid'
 
 export default function UniversePackLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -23,9 +23,9 @@ function UniverseSidebarContent() {
         <>
             <SidebarSection>
                 <SidebarItem href="/p/universe">
-                    <NewspaperIcon />
+                    <UserGroupIcon />
                     <div className="flex flex-col min-w-0">
-                        <SidebarLabel>For You</SidebarLabel>
+                        <SidebarLabel>Following</SidebarLabel>
                     </div>
                 </SidebarItem>
                 {/*<SidebarItem href="/p/universe/cosmos">*/}
