@@ -27,8 +27,8 @@ export function PackChannels() {
     return (
         <>
             <SidebarSection>
-                {!currentResource.slug && <UniverseTopChannels />}
-                {currentResource.slug && (
+                {(!currentResource.slug || currentResource.slug === 'universe') && <UniverseTopChannels />}
+                {currentResource.slug && currentResource.slug !== 'universe' && (
                     <SidebarItem href={`/p/${currentResource.slug}`}>
                         <NewspaperIcon />
                         <div className="flex flex-col min-w-0">
