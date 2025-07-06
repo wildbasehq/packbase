@@ -1,4 +1,8 @@
-import { supabase, vg } from '@/lib/api'
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
+import { vg } from '@/lib/api'
 import { useResourceStore, useUserAccountStore, WorkerStore } from '@/lib/index'
 
 export const getSelfProfile = (cb?: () => void) => {
@@ -51,7 +55,8 @@ export const getSelfProfile = (cb?: () => void) => {
             })
             .catch(e => {
                 log.error('User Data', 'Error:', e)
-                supabase.auth.signOut()
+                // @ts-ignore
+                window.Clerk.signOut()
             })
     })
 }
