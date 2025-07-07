@@ -86,7 +86,7 @@ function App() {
                                                                 { type: 'search', icon: MagnifyingGlassIcon, href: '/search' },
                                                                 { type: 'separator' },
                                                                 // @ts-ignore
-                                                                { title: 'Login', icon: TbFaceId, href: '/id/create' },
+                                                                { title: 'Login', icon: TbFaceId, href: '/id/login' },
                                                             ]}
                                                         />
                                                     </div>
