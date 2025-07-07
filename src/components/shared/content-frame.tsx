@@ -99,11 +99,13 @@ export const useContentFrames = () => {
         throw new Error('useContentFrames must be used within a ContentFrame')
     }
 
-    const frames: ContentFrameContextType[] = []
+    let frames: {
+        [key: string]: ContentFrameContextType
+    } = {}
     let currentContext: ContentFrameContextType | undefined = context
 
     while (currentContext) {
-        frames.push(currentContext)
+        frames[currentContext.signature] = currentContext
         currentContext = currentContext.parent
     }
 

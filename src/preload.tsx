@@ -7,22 +7,24 @@ import { setToken, vg } from '@/lib/api'
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib'
 import { useEffect, useState } from 'react'
 import { SignedIn, SignedOut, useSession } from '@clerk/clerk-react'
-import { LogoSpinner, useContentFrame } from '@/src/components'
+import { LogoSpinner, useContentFrames } from '@/src/components'
 import ContentFrame from '@/components/shared/content-frame.tsx'
 
 export default function Preload({ children }: { children: React.ReactNode }) {
     return (
         <>
-            <SignedIn>
-                <ContentFrame get="user.me" cache>
-                    <ContentFrame get="user.me.packs" cache>
-                        <PreloadChild>{children}</PreloadChild>
+            <ContentFrame silentFail get="server.describeServer" cache>
+                <SignedIn>
+                    <ContentFrame get="user.me" cache>
+                        <ContentFrame get="user.me.packs" cache>
+                            <PreloadChild>{children}</PreloadChild>
+                        </ContentFrame>
                     </ContentFrame>
-                </ContentFrame>
-            </SignedIn>
-            <SignedOut>
-                <PreloadChild>{children}</PreloadChild>
-            </SignedOut>
+                </SignedIn>
+                <SignedOut>
+                    <PreloadChild>{children}</PreloadChild>
+                </SignedOut>
+            </ContentFrame>
         </>
     )
 }
@@ -33,8 +35,9 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
     const { setUser } = useUserAccountStore()
     const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
     const { setResources } = useResourceStore()
-    const { data: userMeData, loading: userMeLoading } = useContentFrame('get=user.me')
-    const { data: userPacksData, loading: userPacksLoading } = useContentFrame('get=user.me.packs')
+    const frames = useContentFrames()
+    const { data: userMeData, loading: userMeLoading } = frames?.['get=user.me'] || { data: null, loading: false }
+    const { data: userPacksData, loading: userPacksLoading } = frames?.['get=user.me.packs'] || { data: null, loading: false }
 
     const { session, isSignedIn, isLoaded } = useSession()
 
