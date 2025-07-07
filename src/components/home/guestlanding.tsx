@@ -20,7 +20,7 @@ import {
 import { ReactNode, useMemo, useState } from 'react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/16/solid'
 import Link from '../shared/link'
-import { Logo } from '@/src/components' // Animation configuration
+import { Logo } from '@/src/components'
 
 // Animation configuration
 const animConfig = {

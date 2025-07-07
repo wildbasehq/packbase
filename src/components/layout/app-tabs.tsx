@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { ExpandableTabs } from '@/components/shared/expandable-tabs'
 import { FolderIcon, HomeIcon, MagnifyingGlassIcon, PlusCircleIcon } from '@heroicons/react/20/solid'
 import { useModal } from '@/components/modal/provider.tsx'
@@ -7,16 +11,16 @@ import Card from '@/components/shared/card'
 import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/experimental-button-rework'
 
-export function AppTabs() {
-    const tabs = [
-        { title: 'Your Nest', icon: HomeIcon, href: ['/p/universe', '/p/universe/cosmos'] },
+export function AppTabs({
+    tabs = [
+        { title: 'Your Nest', icon: HomeIcon, href: ['/', ''] },
         { type: 'search', icon: MagnifyingGlassIcon, href: '/search' },
         { type: 'separator' },
         { title: 'Your Stuff', icon: FolderIcon, href: '/stuff' },
         // { title: 'Support', icon: QuestionMarkCircleIcon },
         { title: 'New Howl', icon: PlusCircleIcon },
-    ]
-
+    ],
+}) {
     const { user } = useUserAccountStore()
     const { currentResource } = useResourceStore()
     const { show, hide } = useModal()

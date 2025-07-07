@@ -12,6 +12,7 @@ import { PackCard, PostCard, ProfileCard } from '@/components/search'
 import { Heading, Text } from '@/components/shared/text.tsx'
 import { Alert, AlertDescription, AlertTitle, AppTabs, ExpandableTabs } from '@/src/components'
 import { MagnifyingGlassCircleIcon, RectangleStackIcon, UserGroupIcon, UsersIcon } from '@heroicons/react/20/solid'
+import { SignedIn } from '@clerk/clerk-react'
 
 // Array of greeting messages to randomly display
 const greetings = [
@@ -150,7 +151,9 @@ export default function Search() {
 
     return (
         <div className="flex flex-col h-full">
-            <AppTabs />
+            <SignedIn>
+                <AppTabs />
+            </SignedIn>
             {/* Search header */}
             <div className="sticky top-0 z-10 backdrop-blur-sm border-b pb-4">
                 <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">

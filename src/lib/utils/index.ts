@@ -1,4 +1,6 @@
-import { refreshSession } from '@/lib/api'
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
 
 export async function fetcher<JSON = any>(input: RequestInfo, init?: RequestInit): Promise<JSON> {
     const res = await fetch(input, init)
@@ -67,10 +69,6 @@ globalThis.log = {
 
     error: (prefix, ...content) => {
         console.log(`%c[${prefix}]`, 'color: #DC2626; font-weight: bold;', ...content)
-
-        if (content && content[0] === 401) {
-            refreshSession()
-        }
     },
 
     warn: (prefix, ...content) => {

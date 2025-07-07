@@ -63,3 +63,6 @@ export * from './user/avatar'
 export * from './user/header'
 export * from './user/howl-creator'
 export * from './user/info-col'
+
+// API
+export * from './content-frame'

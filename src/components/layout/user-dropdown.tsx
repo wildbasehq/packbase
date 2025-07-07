@@ -14,18 +14,11 @@ import { SwatchIcon } from '@heroicons/react/16/solid'
 export default function UserDropdown() {
     const [location, setLocation] = useLocation()
 
-    // Dirty get username from localStorage
-    let user: {
-        [key: string]: any
-    } = JSON.parse(localStorage.getItem('user-account') || '{}')
-    if (!user) return null
-    user = user.state?.user || {}
-
     return (
         <SignedIn>
             <UserButton>
                 <UserButton.MenuItems>
-                    <UserButton.Action label="Your Profile" labelIcon={<UserIcon />} onClick={() => setLocation(`/@${user.username}`)} />
+                    <UserButton.Action label="Your Profile" labelIcon={<UserIcon />} onClick={() => setLocation(`/@me`)} />
                 </UserButton.MenuItems>
                 <UserButton.UserProfilePage label="Profile" url="/profile" labelIcon={<UserIcon />}>
                     <ProfileSettings />
