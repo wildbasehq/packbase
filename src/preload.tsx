@@ -6,15 +6,24 @@ import Body from '@/components/layout/body'
 import { setToken, vg } from '@/lib/api'
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib'
 import { useEffect, useState } from 'react'
-import { useSession } from '@clerk/clerk-react'
+import { SignedIn, SignedOut, useSession } from '@clerk/clerk-react'
 import { LogoSpinner, useContentFrame } from '@/src/components'
 import ContentFrame from '@/components/shared/content-frame.tsx'
 
 export default function Preload({ children }: { children: React.ReactNode }) {
     return (
-        <ContentFrame get="user.me" cache silentFail>
-            <PreloadChild>{children}</PreloadChild>
-        </ContentFrame>
+        <>
+            <SignedIn>
+                <ContentFrame get="user.me" cache>
+                    <ContentFrame get="user.me.packs" cache>
+                        <PreloadChild>{children}</PreloadChild>
+                    </ContentFrame>
+                </ContentFrame>
+            </SignedIn>
+            <SignedOut>
+                <PreloadChild>{children}</PreloadChild>
+            </SignedOut>
+        </>
     )
 }
 
@@ -24,12 +33,17 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
     const { setUser } = useUserAccountStore()
     const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
     const { setResources } = useResourceStore()
-    const { data: userMeData, loading } = useContentFrame('get=user.me')
+    const { data: userMeData, loading: userMeLoading } = useContentFrame('get=user.me')
+    const { data: userPacksData, loading: userPacksLoading } = useContentFrame('get=user.me.packs')
 
     const { session, isSignedIn, isLoaded } = useSession()
 
     useEffect(() => {
-        if (!isLoaded || loading) return
+        if (userPacksData && !userPacksLoading) {
+            setResources(userPacksData)
+        }
+
+        if (!isLoaded || userMeLoading) return
         // if (!serviceLoading.startsWith('auth')) return
         vg.server.describeServer
             .get()
@@ -45,11 +59,10 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
                     })
                 }
 
-                setUser(userMeData)
-
                 if (isSignedIn) {
                     session.getToken().then(token => {
                         setToken(token)
+                        setUser(userMeData)
                         setStatus('auth:@me')
 
                         proceed()
@@ -69,7 +82,7 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
                     })
                 return setError(e)
             })
-    }, [session, isSignedIn, loading])
+    }, [session, isSignedIn, userMeLoading, userPacksData, userPacksLoading])
 
     const setStatus = (status: string) => {
         setServiceLoading(prev => {
