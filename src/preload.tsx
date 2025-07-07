@@ -45,11 +45,12 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
                     })
                 }
 
+                setUser(userMeData)
+
                 if (isSignedIn) {
                     session.getToken().then(token => {
                         setToken(token)
                         setStatus('auth:@me')
-                        setUser(userMeData)
 
                         proceed()
                     })
