@@ -24,12 +24,12 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
     const { setUser } = useUserAccountStore()
     const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
     const { setResources } = useResourceStore()
-    const { data: userMeData } = useContentFrame('get=user.me')
+    const { data: userMeData, loading } = useContentFrame('get=user.me')
 
     const { session, isSignedIn, isLoaded } = useSession()
 
     useEffect(() => {
-        if (!isLoaded) return
+        if (!isLoaded || loading) return
         // if (!serviceLoading.startsWith('auth')) return
         vg.server.describeServer
             .get()
@@ -69,7 +69,7 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
                     })
                 return setError(e)
             })
-    }, [session, isSignedIn])
+    }, [session, isSignedIn, loading])
 
     const setStatus = (status: string) => {
         setServiceLoading(prev => {
