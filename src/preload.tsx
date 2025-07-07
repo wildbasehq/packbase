@@ -4,18 +4,27 @@
 
 import Body from '@/components/layout/body'
 import { setToken, vg } from '@/lib/api'
-import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/index'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib'
 import { useEffect, useState } from 'react'
 import { useSession } from '@clerk/clerk-react'
-import { getSelfProfile } from '@/lib/api/cron/profile-update.ts'
-import { LogoSpinner } from '@/src/components'
+import { LogoSpinner, useContentFrame } from '@/src/components'
+import ContentFrame from '@/components/shared/content-frame.tsx'
 
 export default function Preload({ children }: { children: React.ReactNode }) {
+    return (
+        <ContentFrame get="user.me" cache silentFail>
+            <PreloadChild>{children}</PreloadChild>
+        </ContentFrame>
+    )
+}
+
+function PreloadChild({ children }: { children: React.ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`auth`)
     const [error, setError] = useState<any | null>(null)
     const { setUser } = useUserAccountStore()
     const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
     const { setResources } = useResourceStore()
+    const { data: userMeData } = useContentFrame('get=user.me')
 
     const { session, isSignedIn, isLoaded } = useSession()
 
@@ -40,21 +49,9 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                     session.getToken().then(token => {
                         setToken(token)
                         setStatus('auth:@me')
-                        const localUser = localStorage.getItem('user-account')
-                        if (localUser) {
-                            const json = JSON.parse(localUser)
-                            if (json.state.user) {
-                                console.log('Found local user', json.state.user)
-                                const packs = localStorage.getItem('packs')
-                                if (packs) setResources(JSON.parse(packs))
-                                setUser(json.state.user)
-                                proceed()
-                            }
-                        }
+                        setUser(userMeData)
 
-                        getSelfProfile(() => {
-                            proceed()
-                        })
+                        proceed()
                     })
                 } else {
                     setUser(null)
