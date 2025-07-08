@@ -1,17 +1,18 @@
-import { useUIStore } from '@/lib/index'
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
+import { useUIStore } from '@/lib'
 
 const { setUpdateAvailable } = useUIStore.getState()
 
 if (globalThis.check_update_cron) clearInterval(globalThis.check_update_cron)
 globalThis.check_update_cron = setInterval(async () => {
-    // Pull the latest version from the server and compare it with the current version (meta commit-sha)
-    const currentVersion = import.meta.env.CF_PAGES_COMMIT_SHA
-    const response = await fetch('https://packbase.app')
-    const text = await response.text()
-    // Get the commit-sha from the HTML meta
-    const pulledDOM = new DOMParser().parseFromString(text, 'text/html')
-    const pulledVersion = pulledDOM.querySelector('meta[name="commit-sha"]')?.getAttribute('content')
-    if (currentVersion !== pulledVersion) {
-        setUpdateAvailable(pulledVersion)
+    const c = import.meta.env.CF_PAGES_COMMIT_SHA
+    const response = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/server/fwupd/check?c=${c}`)
+    const { u, s } = await response.json()
+
+    if (u) {
+        setUpdateAvailable(s)
     }
 }, 10000)
