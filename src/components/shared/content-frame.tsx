@@ -5,6 +5,7 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { WorkerStore } from '@/lib/workers'
 import { useSession } from '@clerk/clerk-react'
+import { setToken } from '@/lib'
 
 // Get API URL from environment variable
 const API_URL = import.meta.env.VITE_YAPOCK_URL
@@ -270,7 +271,7 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<any>(null)
     const { enqueue } = WorkerStore.getState()
-    const { session } = useSession()
+    const { session, isLoaded } = useSession()
 
     // Get parent context to enable nesting
     const parentContext = useContext(ContentFrameContext)
@@ -287,6 +288,7 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
 
     // Function to make the API request
     const makeRequest = async () => {
+        if (!isLoaded) return
         if (!method || !path) {
             setError(new Error('No request method or path specified'))
             setLoading(false)
@@ -323,6 +325,7 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
 
                     // Add auth token if available
                     const token = await session?.getToken()
+                    setToken(token)
                     if (token) {
                         options.headers = {
                             ...options.headers,
@@ -400,7 +403,7 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
     // Make the initial request when the component mounts or when the request parameters change
     useEffect(() => {
         makeRequest()
-    }, [method, path, JSON.stringify(requestData)])
+    }, [method, path, JSON.stringify(requestData), isLoaded])
 
     // Render an error page if there's an error and no custom error handler
     if (error && !onError && !silentFail) {

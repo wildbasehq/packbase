@@ -3,7 +3,6 @@
  */
 
 import Body from '@/components/layout/body'
-import { setToken, vg } from '@/lib/api'
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib'
 import { useEffect, useState } from 'react'
 import { SignedIn, SignedOut, useSession } from '@clerk/clerk-react'
@@ -13,7 +12,7 @@ import ContentFrame from '@/components/shared/content-frame.tsx'
 export default function Preload({ children }: { children: React.ReactNode }) {
     return (
         <>
-            <ContentFrame silentFail get="server.describeServer" cache>
+            <ContentFrame silentFail get="server.describeServer">
                 <SignedIn>
                     <ContentFrame get="user.me" cache>
                         <ContentFrame get="user.me.packs" cache>
@@ -36,56 +35,43 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
     const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
     const { setResources } = useResourceStore()
     const frames = useContentFrames()
-    const { data: userMeData, loading: userMeLoading } = frames?.['get=user.me'] || { data: null, loading: false }
-    const { data: userPacksData, loading: userPacksLoading } = frames?.['get=user.me.packs'] || { data: null, loading: false }
-
     const { session, isSignedIn, isLoaded } = useSession()
+    const { data: userMeData, loading: userMeLoading } = frames?.['get=user.me'] || { data: null, loading: isSignedIn }
+    const { data: userPacksData, loading: userPacksLoading } = frames?.['get=user.me.packs'] || { data: null, loading: isSignedIn }
+
+    // Needed to be true as this frame is sometimes pushed back
+    const { data: server, loading: describeServerLoading } = frames?.['get=server.describeServer'] || { data: null, loading: true }
 
     useEffect(() => {
         if (userPacksData && !userPacksLoading) {
             setResources(userPacksData)
         }
 
-        if (!isLoaded || userMeLoading) return
+        if (!isLoaded || describeServerLoading) return
+        if (isSignedIn && (userMeLoading || userPacksLoading)) return
         // if (!serviceLoading.startsWith('auth')) return
-        vg.server.describeServer
-            .get()
-            .then(server => {
-                setBucketRoot(server.data.bucketRoot)
-                setMaintenance(server.data.maintenance)
-                setServerCapabilities(server.data.capabilities || [])
 
-                if (server.data.maintenance) {
-                    return setError({
-                        cause: 'Server is under maintenance',
-                        message: server.data.maintenance || `Packbase is currently under maintenance. Please check back later.`,
-                    })
-                }
+        setBucketRoot(server.bucketRoot)
+        setMaintenance(server.maintenance)
+        setServerCapabilities(server.capabilities || [])
 
-                if (isSignedIn) {
-                    session.getToken().then(token => {
-                        setToken(token)
-                        setUser(userMeData)
-                        setStatus('auth:@me')
-
-                        proceed()
-                    })
-                } else {
-                    setUser(null)
-                    proceed()
-                }
+        if (server.maintenance) {
+            return setError({
+                cause: 'Server is under maintenance',
+                message: server.maintenance || `Packbase is currently under maintenance. Please check back later.`,
             })
-            .catch(e => {
-                log.error('Core', e)
-                setStatus('proceeding')
-                if (e?.message.indexOf('Failed') > -1)
-                    return setError({
-                        cause: 'UI & Server could not talk together',
-                        message: `Packbase is offline, or your network is extremely unstable.`,
-                    })
-                return setError(e)
-            })
-    }, [session, isSignedIn, userMeLoading, userPacksData, userPacksLoading])
+        }
+
+        if (isSignedIn) {
+            setUser(userMeData)
+            setStatus('auth:@me')
+
+            proceed()
+        } else {
+            setUser(null)
+            proceed()
+        }
+    }, [session, isSignedIn, userMeLoading, userPacksData, userPacksLoading, describeServerLoading])
 
     const setStatus = (status: string) => {
         setServiceLoading(prev => {

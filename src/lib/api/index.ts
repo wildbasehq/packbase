@@ -36,27 +36,27 @@ export let { supabase, vg } = new VoyageSDK(API_URL, {
 const { enqueue } = WorkerStore.getState()
 
 export const setToken = (token?: string) => {
-    enqueue('voyage-initiate', async () => {
-        globalThis.TOKEN = token
-        let newClient = new VoyageSDK(API_URL, {
-            token,
-            supabase: {
-                URL: import.meta.env.VITE_SUPABASE_URL,
-                key: import.meta.env.VITE_SUPABASE_ANON_KEY,
-            },
-        })
-        vg = newClient.vg
-        supabase = newClient.supabase
-
-        // Expose SDK for plugin development
-        // @ts-ignore womp womp, we dont use this internally. for extension development.
-        window.voyageSDK = newClient
-
-        // Emit authentication event for plugins
-        if (window.packbase) {
-            window.packbase.emit('user:auth:changed', { authenticated: !!token })
-        }
+    // enqueue('voyage-initiate', async () => {
+    globalThis.TOKEN = token
+    let newClient = new VoyageSDK(API_URL, {
+        token,
+        supabase: {
+            URL: import.meta.env.VITE_SUPABASE_URL,
+            key: import.meta.env.VITE_SUPABASE_ANON_KEY,
+        },
     })
+    vg = newClient.vg
+    supabase = newClient.supabase
+
+    // Expose SDK for plugin development
+    // @ts-ignore womp womp, we dont use this internally. for extension development.
+    window.voyageSDK = newClient
+
+    // Emit authentication event for plugins
+    if (window.packbase) {
+        window.packbase.emit('user:auth:changed', { authenticated: !!token })
+    }
+    // })
 }
 
 // export const refreshSession = async () => {
