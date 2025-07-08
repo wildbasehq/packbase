@@ -1,16 +1,20 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 // src/components/feed/MediaGallery.tsx
-import {useState} from 'react'
-import {useUIStore} from '@/lib/state'
-import {Asset} from './types/post'
+import { useState } from 'react'
+import { useUIStore } from '@/lib/state'
+import { Asset } from './types/post'
 import ImageOverlay from './image-overlay'
 
 interface MediaGalleryProps {
-    assets: Asset[];
-    truncate?: boolean;
+    assets: Asset[]
+    truncate?: boolean
 }
 
-export default function MediaGallery({assets, truncate = true}: MediaGalleryProps) {
-    const bucketRoot = useUIStore((state) => state.bucketRoot)
+export default function MediaGallery({ assets, truncate = true }: MediaGalleryProps) {
+    const bucketRoot = useUIStore(state => state.bucketRoot)
     const [overlayOpen, setOverlayOpen] = useState(false)
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
@@ -38,7 +42,7 @@ export default function MediaGallery({assets, truncate = true}: MediaGalleryProp
             <div className={getGridClassName()}>
                 {visibleAssets.map((asset, index) => {
                     const isLastWithMore = hasMore && index === 3
-                    const assetUrl = `${bucketRoot}/profiles/${asset.data.url}`
+                    const assetUrl = `${bucketRoot}/${asset.data.url}`
 
                     return (
                         <div
@@ -47,7 +51,7 @@ export default function MediaGallery({assets, truncate = true}: MediaGalleryProp
                 relative overflow-hidden rounded-md
                 ${visibleAssets.length === 1 ? 'w-full' : 'aspect-square'}
               `}
-                            onClick={(e) => {
+                            onClick={e => {
                                 e.stopPropagation()
                                 openImageOverlay(index)
                             }}
@@ -67,12 +71,7 @@ export default function MediaGallery({assets, truncate = true}: MediaGalleryProp
                                     )}
                                 </>
                             ) : (
-                                <video
-                                    src={assetUrl}
-                                    className="h-full w-full object-cover"
-                                    controls
-                                    onClick={(e) => e.stopPropagation()}
-                                />
+                                <video src={assetUrl} className="h-full w-full object-cover" controls onClick={e => e.stopPropagation()} />
                             )}
                         </div>
                     )
@@ -80,13 +79,7 @@ export default function MediaGallery({assets, truncate = true}: MediaGalleryProp
             </div>
 
             {/* Image overlay for zooming and panning */}
-            {overlayOpen && (
-                <ImageOverlay
-                    assets={assets}
-                    initialIndex={currentImageIndex}
-                    onClose={() => setOverlayOpen(false)}
-                />
-            )}
+            {overlayOpen && <ImageOverlay assets={assets} initialIndex={currentImageIndex} onClose={() => setOverlayOpen(false)} />}
         </>
     )
 }

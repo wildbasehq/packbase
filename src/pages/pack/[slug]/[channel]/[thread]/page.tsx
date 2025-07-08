@@ -111,7 +111,7 @@ function ThreadMessage({
                         {message.assets.map((asset, index) => (
                             <div key={index} className="overflow-hidden rounded-md">
                                 <img
-                                    src={`${bucketRoot}/profiles/${asset.data.url}`}
+                                    src={`${bucketRoot}/${asset.data.url}`}
                                     alt={asset.data.name || 'Attached image'}
                                     className="object-cover"
                                 />

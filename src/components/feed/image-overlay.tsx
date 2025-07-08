@@ -1,23 +1,27 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 // src/components/feed/ImageOverlay.tsx
-import {useEffect, useRef, useState} from 'react'
-import {createPortal} from 'react-dom'
-import {ArrowLeftIcon, ArrowRightIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon} from '@heroicons/react/24/outline'
-import {useUIStore} from '@/lib/state'
-import {Asset} from './types/post'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { ArrowLeftIcon, ArrowRightIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useUIStore } from '@/lib/state'
+import { Asset } from './types/post'
 
 interface ImageOverlayProps {
-    assets: Asset[];
-    initialIndex: number;
-    onClose: () => void;
+    assets: Asset[]
+    initialIndex: number
+    onClose: () => void
 }
 
-export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverlayProps) {
-    const bucketRoot = useUIStore((state) => state.bucketRoot)
+export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOverlayProps) {
+    const bucketRoot = useUIStore(state => state.bucketRoot)
     const [currentIndex, setCurrentIndex] = useState(initialIndex)
     const [scale, setScale] = useState(1)
-    const [position, setPosition] = useState({x: 0, y: 0})
+    const [position, setPosition] = useState({ x: 0, y: 0 })
     const [isDragging, setIsDragging] = useState(false)
-    const [dragStart, setDragStart] = useState({x: 0, y: 0})
+    const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
     const [touchDistance, setTouchDistance] = useState<number | null>(null)
 
     const containerRef = useRef<HTMLDivElement>(null)
@@ -25,7 +29,7 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
     // Filter out video assets
     const imageAssets = assets.filter(asset => asset.type === 'image')
     const currentAsset = imageAssets[currentIndex]
-    const assetUrl = `${bucketRoot}/profiles/${currentAsset?.data.url || ''}`
+    const assetUrl = `${bucketRoot}/${currentAsset?.data.url || ''}`
 
     // Handle keyboard navigation
     useEffect(() => {
@@ -78,7 +82,7 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
     // Reset zoom and position when changing images
     const resetView = () => {
         setScale(1)
-        setPosition({x: 0, y: 0})
+        setPosition({ x: 0, y: 0 })
     }
 
     // Zoom functions
@@ -92,7 +96,7 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
 
             // If zooming out to default, reset position too
             if (newScale === 1) {
-                setPosition({x: 0, y: 0})
+                setPosition({ x: 0, y: 0 })
             }
 
             return newScale
@@ -103,7 +107,7 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
     const handleMouseDown = (e: React.MouseEvent) => {
         if (scale > 1) {
             setIsDragging(true)
-            setDragStart({x: e.clientX - position.x, y: e.clientY - position.y})
+            setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y })
         }
     }
 
@@ -111,7 +115,7 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
         if (isDragging && scale > 1) {
             setPosition({
                 x: e.clientX - dragStart.x,
-                y: e.clientY - dragStart.y
+                y: e.clientY - dragStart.y,
             })
         }
     }
@@ -133,7 +137,7 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
             setIsDragging(true)
             setDragStart({
                 x: e.touches[0].clientX - position.x,
-                y: e.touches[0].clientY - position.y
+                y: e.touches[0].clientY - position.y,
             })
         }
     }
@@ -154,7 +158,7 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
             // Dragging
             setPosition({
                 x: e.touches[0].clientX - dragStart.x,
-                y: e.touches[0].clientY - dragStart.y
+                y: e.touches[0].clientY - dragStart.y,
             })
             e.preventDefault()
         }
@@ -172,9 +176,9 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
             // Zoom to cursor position
             const rect = containerRef.current?.getBoundingClientRect()
             if (rect) {
-                const x = (e.clientX - rect.left) - rect.width / 2
-                const y = (e.clientY - rect.top) - rect.height / 2
-                setPosition({x: -x, y: -y})
+                const x = e.clientX - rect.left - rect.width / 2
+                const y = e.clientY - rect.top - rect.height / 2
+                setPosition({ x: -x, y: -y })
             }
         } else {
             resetView()
@@ -205,45 +209,42 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
                     className="p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700"
                     disabled={scale <= 0.5}
                 >
-                    <MagnifyingGlassPlusIcon className="h-5 w-5"/>
+                    <MagnifyingGlassPlusIcon className="h-5 w-5" />
                 </button>
                 <button
                     onClick={handleZoomOut}
                     className="p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700"
                     disabled={scale >= 3}
                 >
-                    <MagnifyingGlassMinusIcon className="h-5 w-5"/>
+                    <MagnifyingGlassMinusIcon className="h-5 w-5" />
                 </button>
-                <button
-                    onClick={onClose}
-                    className="p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700"
-                >
-                    <XMarkIcon className="h-5 w-5"/>
+                <button onClick={onClose} className="p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700">
+                    <XMarkIcon className="h-5 w-5" />
                 </button>
             </div>
 
             {/* Navigation buttons */}
             {currentIndex > 0 && (
                 <button
-                    onClick={(e) => {
+                    onClick={e => {
                         e.stopPropagation()
                         navigatePrevious()
                     }}
                     className="absolute left-4 p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700"
                 >
-                    <ArrowLeftIcon className="h-5 w-5"/>
+                    <ArrowLeftIcon className="h-5 w-5" />
                 </button>
             )}
 
             {currentIndex < imageAssets.length - 1 && (
                 <button
-                    onClick={(e) => {
+                    onClick={e => {
                         e.stopPropagation()
                         navigateNext()
                     }}
                     className="absolute right-4 p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700"
                 >
-                    <ArrowRightIcon className="h-5 w-5"/>
+                    <ArrowRightIcon className="h-5 w-5" />
                 </button>
             )}
 
@@ -265,15 +266,10 @@ export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverl
                     className="absolute left-1/2 top-1/2 transform transition-transform duration-200 ease-out"
                     style={{
                         transform: `translate(-50%, -50%) translate(${position.x}px, ${position.y}px) scale(${scale})`,
-                        transformOrigin: 'center'
+                        transformOrigin: 'center',
                     }}
                 >
-                    <img
-                        src={assetUrl}
-                        alt=""
-                        className="max-h-screen max-w-screen"
-                        draggable={false}
-                    />
+                    <img src={assetUrl} alt="" className="max-h-screen max-w-screen" draggable={false} />
                 </div>
             </div>
 
