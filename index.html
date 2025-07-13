@@ -77,6 +77,14 @@
         }
     </style>
 
+    <script>
+        // Set dark class on head and body if system is dark
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+            document.body.classList.add('dark');
+        }
+    </script>
+
     <!-- scss -->
     <link href="/src/styles/globals.css" rel="stylesheet">
     <link href="/src/styles/_to-org.scss" rel="stylesheet">
