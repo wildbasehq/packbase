@@ -14,6 +14,7 @@ import PackCard from '@/components/shared/pack/card'
 import { useModal } from '@/components/modal/provider.tsx'
 import { Input } from '@/components/shared/input.tsx'
 import { Description, Field, Label } from '@/components/shared/fieldset.tsx'
+import Rive from '@rive-app/react-canvas'
 
 // Types
 type PrivacyOption = {
@@ -307,27 +308,28 @@ export default function PackAdd() {
         show(<CreatePackModal close={hide} />)
     }
 
-    if (!user || user.anonUser) {
-        return (
-            <div className="py-16 px-4 text-center">
-                <Heading size="xl">Join packs on the platform</Heading>
-                <Text alt className="mt-4 max-w-md mx-auto">
-                    You need to sign in to view and join packs.
-                </Text>
-                <div className="mt-8">
-                    <Button href="/auth/signin">Sign In</Button>
-                </div>
-            </div>
-        )
-    }
+    // if (!user || user.anonUser) {
+    //     return (
+    //         <div className="py-16 px-4 text-center">
+    //             <Heading size="xl">Join packs on the platform</Heading>
+    //             <Text alt className="mt-4 max-w-md mx-auto">
+    //                 You need to sign in to view and join packs.
+    //             </Text>
+    //             <div className="mt-8">
+    //                 <Button href="/auth/signin">Sign In</Button>
+    //             </div>
+    //         </div>
+    //     )
+    // }
 
     return (
         <div className="px-6 py-8 max-w-screen-xl mx-auto space-y-12">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8 p-6">
                 <div className="max-w-md">
-                    <Heading>Find your community</Heading>
+                    <Heading>Find yo' pack</Heading>
                     <Text alt className="mt-2">
-                        Join packs centered around your interests or create your own to connect with others.
+                        Join packs that match your vibe or start your own lil community to find your people. Packs are public, open, weird,
+                        and (hopefully) fun~
                     </Text>
                     <div className="mt-6">
                         <Button onClick={handleCreatePack} color="indigo">
@@ -335,8 +337,8 @@ export default function PackAdd() {
                         </Button>
                     </div>
                 </div>
-                <div className="w-full max-w-xs">
-                    <img src="/img/illustrations/settings/friends.svg" alt="Community illustration" className="w-full h-auto" />
+                <div className="w-full max-w-lg">
+                    <Rive src="/img/rive/pack-bench.riv" stateMachines="Animation" className="w-full h-[18rem]" />
                 </div>
             </div>
 

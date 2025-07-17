@@ -23,6 +23,7 @@
         "@radix-ui/react-hover-card": "^1.0.7",
         "@radix-ui/react-popover": "^1.0.2",
         "@radix-ui/react-tooltip": "^1.0.2",
+        "@rive-app/react-canvas": "^4.22.0",
         "@supabase/supabase-js": "^2.48.1",
         "@tailwindcss/vite": "^4.0.7",
         "@tiptap/core": "^2.4.0",
@@ -421,6 +422,10 @@
     "@react-types/shared": ["@react-types/shared@3.30.0", "", { "peerDependencies": { "react": "^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1" } }, "sha512-COIazDAx1ncDg046cTJ8SFYsX8aS3lB/08LDnbkH/SkdYrFPWDlXMrO/sUam8j1WWM+PJ+4d1mj7tODIKNiFog=="],
 
     "@remirror/core-constants": ["@remirror/core-constants@3.0.0", "", {}, "sha512-42aWfPrimMfDKDi4YegyS7x+/0tlzaqwPQCULLanv3DMIlu96KTJR0fM5isWX2UViOqlGnX6YFgqWepcX+XMNg=="],
+
+    "@rive-app/canvas": ["@rive-app/canvas@2.30.3", "", {}, "sha512-XA97mEZgzzKgiFxpC8iy98oXtIbAbsQYsUwz3xbvhEMxq0Jt6qFoFG5KvD7NgBzHTUe47DzvcVmLnmQdqez+IA=="],
+
+    "@rive-app/react-canvas": ["@rive-app/react-canvas@4.22.0", "", { "dependencies": { "@rive-app/canvas": "2.30.3" }, "peerDependencies": { "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0" } }, "sha512-vk2ryjFYimtfTO1gjQbsHuf5TQt3GXkBBZUFmxaPFNQMRVL9CVTEtagjj6lA61ziFDTZMfVMJfJ0gxPA72g1+Q=="],
 
     "@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.0-beta.11", "", {}, "sha512-L/gAA/hyCSuzTF1ftlzUSI/IKr2POHsv1Dd78GfqkR83KMNuswWD61JxGV2L7nRwBBBSDr6R1gCkdTmoN7W4ag=="],
 
