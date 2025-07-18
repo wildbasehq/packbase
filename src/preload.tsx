@@ -7,7 +7,8 @@ import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib'
 import { useEffect, useState } from 'react'
 import { SignedIn, SignedOut, useSession } from '@clerk/clerk-react'
 import { LogoSpinner, useContentFrames } from '@/src/components'
-import ContentFrame from '@/components/shared/content-frame.tsx'
+import ContentFrame from '@/components/shared/content-frame'
+import NUEModal from '@/components/seen-once/nue-modal'
 
 export default function Preload({ children }: { children: React.ReactNode }) {
     return (
@@ -16,7 +17,11 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                 <SignedIn>
                     <ContentFrame get="user.me" cache>
                         <ContentFrame get="user.me.packs" cache>
-                            <PreloadChild>{children}</PreloadChild>
+                            <PreloadChild>
+                                {/* if query params has `?showNUEtest, show the component*/}
+                                {window.location.search.includes('showNUEtest') && <NUEModal />}
+                                {children}
+                            </PreloadChild>
                         </ContentFrame>
                     </ContentFrame>
                 </SignedIn>

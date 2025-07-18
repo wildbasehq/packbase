@@ -1,8 +1,12 @@
-import {Heading, Text} from '@/components/shared/text'
-import ReactMarkdown from 'react-markdown'
-import {Pre} from '@/components/shared/code.tsx'
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
 
-export default function Markdown({children, ...props}: { children: string; [x: string]: any }) {
+import { Heading, Text } from '@/components/shared/text'
+import ReactMarkdown from 'react-markdown'
+import { Pre } from '@/components/shared/code.tsx'
+
+export default function Markdown({ children, ...props }: { children: string; [x: string]: any }) {
     // Check for numbers followed by a period, and if so, replace with \.
     children = children?.replace(/(\d+)\./g, '$1\\.')
 
@@ -28,26 +32,33 @@ export default function Markdown({children, ...props}: { children: string; [x: s
                     ol(props) {
                         return <ol className="list-decimal pl-4" {...props} />
                     },
-                    pre: (props) => {
-                        return <Pre code={props.children?.toString()} title={''}>
-                            {props.children}
-                        </Pre>
+                    pre: props => {
+                        return (
+                            <Pre code={props.children?.toString()} title={''}>
+                                {props.children}
+                            </Pre>
+                        )
                     },
-                    code: (props) => {
+                    code: props => {
                         return <code className="rounded-md bg-stone-200 px-1.5 py-1 font-mono font-medium text-stone-900" {...props} />
                     },
-                    blockquote: (props) => {
+                    blockquote: props => {
                         return <blockquote className="border-l-4 border-stone-700 pl-4" {...props} />
                     },
-                    a: (props) => {
-                        return <a className="text-stone-400 underline underline-offset-[3px] hover:text-stone-600 transition-colors cursor-pointer" {...props} />
+                    a: props => {
+                        return (
+                            <a
+                                className="text-indigo-500 underline underline-offset-[3px] hover:text-indigo-500/80 transition-colors cursor-pointer"
+                                {...props}
+                            />
+                        )
                     },
-                    hr: (props) => {
+                    hr: props => {
                         return <hr className="mt-4 mb-6 border-t border-stone-300" {...props} />
                     },
-                    img: (props) => {
+                    img: props => {
                         return <img className="rounded-lg border border-stone-200" {...props} />
-                    }
+                    },
                 }}
                 {...props}
             >
