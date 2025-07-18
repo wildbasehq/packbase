@@ -60,34 +60,34 @@ const posts = [
     {
         user: {
             name: 'Dan',
-            avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/d2a4c11c-5007-4ac4-b034-7dfbcde10f51/0/avatar.png?updated=1740511594212',
+            avatar: 'https://profiles.cdn.packbase.app/d2a4c11c-5007-4ac4-b034-7dfbcde10f51/0/avatar.png?updated=1740511594212',
         },
         // content: 'Finally finished this commission of a Dutch Angel Dragon! Really proud of how the wings turned out ✨',
-        image: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/d2a4c11c-5007-4ac4-b034-7dfbcde10f51/79796da0-1030-4ea5-b3b2-f36ecea46d4f/0.png',
+        image: 'https://profiles.cdn.packbase.app/d2a4c11c-5007-4ac4-b034-7dfbcde10f51/79796da0-1030-4ea5-b3b2-f36ecea46d4f/0.png',
     },
     {
         user: {
             name: 'JemZard',
-            avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/52c9daa9-f99c-4384-b61a-2ccacd6b3db8/0/avatar.png?updated=1740576567191',
+            avatar: 'https://profiles.cdn.packbase.app/52c9daa9-f99c-4384-b61a-2ccacd6b3db8/0/avatar.png?updated=1740576567191',
         },
         content: 'guhhh',
-        image: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/52c9daa9-f99c-4384-b61a-2ccacd6b3db8/271ada99-a1b6-4163-9c39-fa13d23a9948/0.gif',
+        image: 'https://profiles.cdn.packbase.app/52c9daa9-f99c-4384-b61a-2ccacd6b3db8/271ada99-a1b6-4163-9c39-fa13d23a9948/0.gif',
     },
     {
         user: {
             name: 'JemZard',
-            avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/52c9daa9-f99c-4384-b61a-2ccacd6b3db8/0/avatar.png?updated=1740576567191',
+            avatar: 'https://profiles.cdn.packbase.app/52c9daa9-f99c-4384-b61a-2ccacd6b3db8/0/avatar.png?updated=1740576567191',
         },
         content: 'guhhh i feel old :(',
-        image: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/52c9daa9-f99c-4384-b61a-2ccacd6b3db8/b31ada27-5523-4141-9410-01179dad6fa1/0.gif',
+        image: 'https://profiles.cdn.packbase.app/52c9daa9-f99c-4384-b61a-2ccacd6b3db8/b31ada27-5523-4141-9410-01179dad6fa1/0.gif',
     },
     {
         user: {
             name: 'Mocha',
-            avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/1d718d4f-8fab-43ef-a7ab-2c51d238fbf6/0/avatar.png',
+            avatar: 'https://profiles.cdn.packbase.app/1d718d4f-8fab-43ef-a7ab-2c51d238fbf6/0/avatar.png',
         },
         content: 'Stares into your soul in a gay kinda way',
-        image: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/1d718d4f-8fab-43ef-a7ab-2c51d238fbf6/09c4291f-2451-4b46-adf5-b14f3eac4ce3/0.png',
+        image: 'https://profiles.cdn.packbase.app/1d718d4f-8fab-43ef-a7ab-2c51d238fbf6/09c4291f-2451-4b46-adf5-b14f3eac4ce3/0.png',
     },
 
     // bottom
@@ -102,15 +102,15 @@ const posts = [
     {
         user: {
             name: 'silica.jello',
-            avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/60544020-69df-4953-abaa-792f037fea4c/0/avatar.jpeg?updated=1741240165016',
+            avatar: 'https://profiles.cdn.packbase.app/60544020-69df-4953-abaa-792f037fea4c/0/avatar.jpeg?updated=1741240165016',
         },
         content: 'NL-1331X XM detection vehicle.\n\nevent van from a game i play\n\ni wanna see it irl someday',
-        image: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/60544020-69df-4953-abaa-792f037fea4c/b520b116-cacc-489b-a8fd-8d7e52e5882b/0.png',
+        image: 'https://profiles.cdn.packbase.app/60544020-69df-4953-abaa-792f037fea4c/b520b116-cacc-489b-a8fd-8d7e52e5882b/0.png',
     },
     {
         user: {
             name: 'Tempest Wolf',
-            avatar: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/3dd43a7e-578e-4bef-a307-7c83c4a6f64d/0/avatar.png?updated=1740970106908',
+            avatar: 'https://profiles.cdn.packbase.app/3dd43a7e-578e-4bef-a307-7c83c4a6f64d/0/avatar.png?updated=1740970106908',
         },
         content:
             'Saw the new Lilo and Stitch trailer~ It looks good, but they gave Pleakly a hologram disguise, taking away his cute frilly outfits~ :c',
@@ -118,7 +118,7 @@ const posts = [
     {
         user: { name: 'swaggypaws', avatar: 'https://robohash.org/swaggypaws' },
         content: 'Just finished these custom paw print shoes! Taking orders for similar designs',
-        image: 'https://udxdytccktvaedirxooa.supabase.co/storage/v1/object/public/profiles/3e133370-0ec2-4825-b546-77de3804c8b1/2682ee79-eddf-4b0c-b07f-649776018e41/0.png',
+        image: 'https://profiles.cdn.packbase.app/3e133370-0ec2-4825-b546-77de3804c8b1/2682ee79-eddf-4b0c-b07f-649776018e41/0.png',
     },
 ]
 
