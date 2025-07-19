@@ -104,7 +104,7 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
                     src={mascotSrc}
                     stateMachine={stateMachine}
                     expression={expression}
-                    isTalking={talking}
+                    talkingState={[talking, setTalking]}
                     talkingDuration={TALKING_DELAY}
                     className="h-96"
                 />

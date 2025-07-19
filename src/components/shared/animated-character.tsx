@@ -37,7 +37,7 @@ export interface AnimatedCharacterProps {
     /**
      * Whether the character is currently talking
      */
-    isTalking?: boolean
+    talkingState?: [boolean, React.Dispatch<React.SetStateAction<boolean>>]
     /**
      * How long the character should talk before stopping (in ms)
      */
@@ -60,7 +60,7 @@ export function AnimatedCharacter({
     src = '/img/rive/mascat-placeholder-please-replace.riv',
     stateMachine = 'State Machine 1',
     expression = Expressions.AMAZED,
-    isTalking = false,
+    talkingState = useState(false),
     talkingDuration = 2000,
     className = '',
     onTalkingComplete,
@@ -72,16 +72,15 @@ export function AnimatedCharacter({
         autoplay,
     })
 
-    const [talking, setTalking] = useState(isTalking)
-    const [currentExpression, setCurrentExpression] = useState(expression)
+    const [talking, setTalking] = talkingState
 
     // Update internal state when props change
     useEffect(() => {
-        setTalking(isTalking)
-    }, [isTalking])
+        updateRiveInput('talk', talking)
+    }, [talking])
 
     useEffect(() => {
-        setCurrentExpression(expression)
+        updateRiveInput('expNUM', expression)
     }, [expression])
 
     // Handle talking timer
@@ -98,22 +97,14 @@ export function AnimatedCharacter({
         }
     }, [talking, talkingDuration, onTalkingComplete])
 
-    // Update Rive animation state
-    useEffect(() => {
+    const updateRiveInput = (inputName: string, value: boolean | number) => {
+        console.log('Updating Rive input', inputName, value)
         rive?.stateMachineInputs(stateMachine)?.forEach(input => {
-            const inputName = input.name
-            switch (inputName) {
-                case 'talk':
-                    input.value = talking
-                    break
-                case 'expNUM':
-                    input.value = currentExpression
-                    break
-                default:
-                    break
+            if (input.name === inputName) {
+                input.value = value
             }
         })
-    }, [rive, talking, currentExpression, stateMachine])
+    }
 
     return <RiveComponent className={className} />
 }
