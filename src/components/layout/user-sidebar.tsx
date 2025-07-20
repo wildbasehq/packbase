@@ -6,12 +6,15 @@ import useWindowSize from '@/src/lib/hooks/use-window-size'
 import { memo, useEffect, useState } from 'react'
 import Tooltip from '../shared/tooltip'
 import { PanelRightClose, PanelRightOpen } from 'lucide-react'
-import { Text } from '@/components/shared/text.tsx'
+import { Heading, Text } from '@/components/shared/text.tsx'
 import UserDropdown from '@/components/layout/user-dropdown.tsx'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import Link from '@/components/shared/link.tsx'
 import { cn } from '@/lib'
-import { ButtonStyles } from '@/src/components'
+import { ButtonStyles, useContentFrame } from '@/src/components'
+import ContentFrame from '@/components/shared/content-frame.tsx'
+import { useInterval } from 'usehooks-ts'
+import UserAvatar from '@/components/shared/user/avatar.tsx'
 
 const DropdownComponent = memo(UserDropdown, () => true)
 
@@ -73,14 +76,62 @@ export default function UserSidebar() {
                     </div>
                 </div>
                 {!collapsed && (
-                    <div className="flex flex-col px-8 pb-8 h-full">
-                        <Text size="sm" alt>
-                            <b>OOPS!!</b> ContentFrame here is missing!!!!
-                        </Text>
+                    <div className="flex flex-col px-4 pb-8 h-full">
+                        <FriendsListContainer />
                         <div className="flex-grow" />
                     </div>
                 )}
             </div>
+        </div>
+    )
+}
+
+function FriendsListContainer() {
+    return (
+        <ContentFrame get="user/me/friends">
+            <FriendsListView />
+        </ContentFrame>
+    )
+}
+
+function FriendsListView() {
+    const { data: friendsResponse, refresh } = useContentFrame('get=user/me/friends')
+
+    const friends = friendsResponse?.friends || []
+
+    useInterval(refresh, 1000)
+
+    return (
+        <div className="flex flex-col space-y-4">
+            {/* No friends */}
+            {friends?.length === 0 && (
+                <div className="items-center justify-between mx-3">
+                    <Heading size="sm">You have no friends. How sad :(</Heading>
+                    <Text size="sm">
+                        Let's go <Link href="/p/new">find you some</Link>.
+                    </Text>
+                </div>
+            )}
+
+            {friends?.length > 0 && (
+                <div className="flex items-center justify-between mx-3">
+                    <Text size="sm">Friends</Text>
+                </div>
+            )}
+
+            {/* Avatar with display name */}
+            {friends?.map(friend => (
+                <Link
+                    href={`/@${friend.username}`}
+                    key={friend.id}
+                    className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
+                >
+                    <div className="flex items-center gap-2">
+                        <UserAvatar name={friend.display_name} size={32} icon={friend.images?.avatar} />
+                        <Text size="sm">{friend.display_name}</Text>
+                    </div>
+                </Link>
+            ))}
         </div>
     )
 }

@@ -348,7 +348,11 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
                         error: !fetchResponse.ok
                             ? {
                                   status: fetchResponse.status,
-                                  message: responseData.summary || { summary: 'Request failed' },
+                                  message:
+                                      responseData.summary ||
+                                      responseData.meta?.message ||
+                                      responseData.code ||
+                                      'Request failed with no error from server',
                               }
                             : null,
                     }
