@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/shared/experimental-button-rework'
 import Markdown from '@/components/shared/markdown.tsx'
 import { AnimatedCharacter, Expressions } from '@/components/shared/animated-character'
+import SelectPills from '@/components/shared/input/select-pills.tsx'
+import { Alert, AlertDescription, Input, InputGroup } from '@/src/components'
 
 /**
  * Character Text Box Modal for user guidance and onboarding
@@ -26,7 +28,19 @@ export interface DialogueStep {
         variant?: 'primary' | 'secondary' | 'danger'
     }[]
     onShow?: () => void
-    onComplete?: () => void
+    onComplete?: (formData?: Record<string, any>) => Promise<void>
+    customComponent?: React.ReactNode
+    form?: {
+        fields: Array<{
+            name: string
+            label: string
+            type: 'text' | 'email' | 'number' | 'textarea' | 'select' | 'checkbox'
+            placeholder?: string
+            options?: Array<{ value: string; label: string; disabled?: boolean }>
+            required?: boolean
+            defaultValue?: string | number | boolean
+        }>
+    }
 }
 
 export interface CharacterTextBoxConfig {
@@ -57,6 +71,9 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
     const [currentStepIndex, setCurrentStepIndex] = useState(0)
     const [talking, setTalking] = useState(true)
     const [expression, setExpression] = useState(Expressions.AMAZED)
+    const [isLoading, setIsLoading] = useState(false)
+    const [formData, setFormData] = useState<Record<string, any>>({})
+    const [formError, setFormError] = useState<string | null>(null)
 
     const currentStep = steps[currentStepIndex]
 
@@ -64,16 +81,48 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
         if (currentStep) {
             setExpression(currentStep.expression ?? Expressions.AMAZED)
             setTalking(true)
+            setFormError(null)
             currentStep.onShow?.()
         }
     }, [currentStepIndex])
 
-    const handleNext = () => {
+    const handleNext = async () => {
+        // Reset any previous form errors
+        setFormError(null)
+
+        // Validate required fields if form exists
+        if (currentStep.form?.fields) {
+            const missingRequiredFields = currentStep.form.fields.filter(
+                field => field.required && (!formData[field.name] || formData[field.name] === '')
+            )
+
+            if (missingRequiredFields.length > 0) {
+                const fieldNames = missingRequiredFields.map(field => field.label).join(', ')
+                setFormError(`Please fill in the required field(s): ${fieldNames}`)
+                setExpression(Expressions.UNIMPRESSED)
+                setTalking(true)
+                return
+            }
+        }
+
+        if (currentStep.onComplete) {
+            setIsLoading(true)
+            try {
+                // Pass form data to onComplete if form exists
+                const stepFormData = currentStep.form ? formData : undefined
+                await currentStep.onComplete(stepFormData)
+            } catch (error) {
+                console.error('Error executing onComplete:', error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
         if (currentStepIndex < steps.length - 1) {
-            currentStep.onComplete?.()
             setCurrentStepIndex(currentStepIndex + 1)
+            // Reset form data when moving to next step
+            setFormData({})
         } else {
-            currentStep.onComplete?.()
             onComplete?.()
         }
     }
@@ -92,14 +141,46 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
         onCancel?.()
     }
 
+    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target
+
+        // Clear error message when user updates form
+        setFormError(null)
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+        }))
+    }
+
+    const handleCheckboxChange = (name: string, checked: boolean) => {
+        // Clear error message when user updates checkbox
+        setFormError(null)
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: checked,
+        }))
+    }
+
+    const handleSelectChange = (name: string, selected: any) => {
+        // Clear error message when user updates select
+        setFormError(null)
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: selected.value || selected.name,
+        }))
+    }
+
     if (!currentStep) {
         return null
     }
 
     return (
-        <Modal showModal={showModal} setShowModal={handleClose} className="relative !bg-muted w-1/2 overflow-visible">
+        <Modal showModal={showModal} setShowModal={handleClose} className="relative !bg-muted w-[52rem] overflow-visible">
             {/* Character mascot */}
-            <div className="absolute -top-6/7 md:-left-1/8 md:!-top-33 pointer-events-none w-1/2">
+            <div className="absolute -top-6/7 md:-left-1/8 md:!-top-13 pointer-events-none w-1/2">
                 <AnimatedCharacter
                     src={mascotSrc}
                     stateMachine={stateMachine}
@@ -134,13 +215,53 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
                 </div>
 
                 {/* Main content area */}
-                <div className="bg-white dark:bg-n-8 p-4 h-52 rounded gap-4 justify-center items-center">
+                <div className="bg-white dark:bg-n-8 p-4 overflow-y-auto h-[18rem] rounded gap-4 justify-center items-center">
                     {/* Text content */}
                     <div className="space-y-4">
                         <Heading size="xl">{currentStep.title}</Heading>
                         <div className="space-y-2">
                             <Markdown>{currentStep.content.join('  \n')}</Markdown>
                         </div>
+
+                        {/* Form element */}
+                        {currentStep.form && (
+                            <div className="mt-4 space-y-3">
+                                {formError && (
+                                    <div className="p-2 mb-2 text-sm font-medium text-red-800 bg-red-100 rounded-md dark:bg-red-900 dark:text-red-200">
+                                        {formError}
+                                    </div>
+                                )}
+                                {currentStep.form.fields.map(field => (
+                                    <InputGroup key={field.name} className="space-y-1">
+                                        {field.type === 'select' ? (
+                                            <SelectPills
+                                                label={field.label + (field.required ? ' *' : '')}
+                                                onChange={selected => handleSelectChange(field.name, selected)}
+                                                options={[
+                                                    ...(field.options?.map(option => ({
+                                                        name: option.label,
+                                                        id: option.value,
+                                                    })) || []),
+                                                ]}
+                                            />
+                                        ) : (
+                                            <Input
+                                                id={field.name}
+                                                name={field.name}
+                                                type={field.type}
+                                                placeholder={field.placeholder}
+                                                required={field.required}
+                                                value={formData[field.name] || field.defaultValue || ''}
+                                                onChange={handleFormChange}
+                                            />
+                                        )}
+                                    </InputGroup>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Custom component */}
+                        {currentStep.customComponent && <div className="mt-4">{currentStep.customComponent}</div>}
 
                         {/* Action buttons */}
                         <div className="flex gap-2 mt-4">
@@ -157,9 +278,13 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
                                 ))
                             ) : (
                                 <>
-                                    {currentStepIndex > 0 && <Button onClick={handlePrevious}>Previous</Button>}
-                                    <Button onClick={handleNext} color="indigo">
-                                        {currentStepIndex < steps.length - 1 ? 'Next' : 'Complete'}
+                                    {currentStepIndex > 0 && (
+                                        <Button onClick={handlePrevious} disabled={isLoading}>
+                                            Previous
+                                        </Button>
+                                    )}
+                                    <Button onClick={handleNext} color="indigo" disabled={isLoading}>
+                                        {isLoading ? 'Loading' : currentStepIndex < steps.length - 1 ? 'Next' : 'Complete'}
                                     </Button>
                                 </>
                             )}
@@ -179,6 +304,35 @@ export function createDebugNUEFlow(): CharacterTextBoxConfig {
                 title: `This is a title!`,
                 content: ['Woa...!!!', "Let's go and *render* **some** __markdown__!.", 'I feel so [sigma](https://ifeelsosigma.com)!'],
                 expression: Expressions.AMAZED,
+                customComponent: (
+                    <Alert variant="info">
+                        <AlertDescription>This is a custom component example that can be included after the content!</AlertDescription>
+                    </Alert>
+                ),
+                onComplete: async () => {
+                    await new Promise(resolve => setTimeout(resolve, 1000))
+                },
+            },
+            {
+                id: 'form-example',
+                title: 'Form Example',
+                content: ['This step includes a form that will be submitted when you click Next.'],
+                expression: Expressions.NORMAL,
+                form: {
+                    fields: [
+                        {
+                            name: 'display_name',
+                            label: 'Display Name',
+                            type: 'text',
+                            placeholder: 'Some name here',
+                            required: true,
+                        },
+                    ],
+                },
+                onComplete: async formData => {
+                    console.log('Form data submitted:', formData)
+                    await new Promise(resolve => setTimeout(resolve, 1000))
+                },
             },
             {
                 id: 'exp1',
@@ -195,7 +349,7 @@ export function createDebugNUEFlow(): CharacterTextBoxConfig {
             {
                 id: 'exp3',
                 title: 'im rlly sad :(',
-                content: [`Expressions.WORRIED ${Expressions.SOBBING}`],
+                content: [`Expressions.SOBBING ${Expressions.SOBBING}`],
                 expression: Expressions.SOBBING,
             },
             {

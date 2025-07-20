@@ -1,13 +1,31 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
 import { Description, Label, Radio, RadioGroup } from '@headlessui/react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
 import { CheckIcon } from '@heroicons/react/24/solid'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type Option = { id: string; name: string; desc?: string; warn?: string; disabled?: boolean }
-export default function SelectPills({ label, id, options }: { label?: string; id?: string; options: Option[] }) {
+export default function SelectPills({
+    label,
+    id,
+    options,
+    onChange,
+}: {
+    label?: string
+    id?: string
+    options: Option[]
+    onChange: (option: Option) => void
+}) {
     const [selected, setSelected] = useState<null | Option>()
 
     if (!selected) setSelected(options[0])
+
+    useEffect(() => {
+        if (onChange) onChange(selected)
+    }, [selected])
     return (
         <fieldset>
             {label && <legend className="text-default select-none text-sm font-medium">{label}</legend>}
@@ -15,7 +33,7 @@ export default function SelectPills({ label, id, options }: { label?: string; id
                 <RadioGroup value={selected} onChange={setSelected} name={id}>
                     {label && <Label className="sr-only select-none">{label}</Label>}
                     <div className="space-y-2">
-                        {options.map((option) => (
+                        {options.map(option => (
                             <Radio
                                 disabled={option.disabled}
                                 key={option.name}
