@@ -88,7 +88,7 @@ export default function UserSidebar() {
 
 function FriendsListContainer() {
     return (
-        <ContentFrame get="user/me/friends">
+        <ContentFrame get="user/me/friends" cache>
             <FriendsListView />
         </ContentFrame>
     )
