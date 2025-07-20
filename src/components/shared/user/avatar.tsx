@@ -75,7 +75,7 @@ function OnlineStatus({ isOnline, size }: { isOnline: boolean; size: string | nu
     return (
         <div
             className={clsx(
-                'absolute bottom-0 right-0 rounded-full border-2 border-white dark:border-black',
+                'absolute -bottom-0.5 -right-0.5 rounded-full border-2 border-white dark:border-zinc-900',
                 isOnline ? 'bg-green-500' : 'bg-gray-400',
                 {
                     'w-2 h-2': size === 'xs' || size === 'sm' || (typeof size === 'number' && size < 32),
