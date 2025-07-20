@@ -128,7 +128,13 @@ function FriendsListView() {
                         className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
                     >
                         <div className="flex items-center gap-2">
-                            <UserAvatar name={friend.display_name} size={32} icon={friend.images_avatar} />
+                            <UserAvatar
+                                name={friend.display_name}
+                                size={32}
+                                icon={friend.images_avatar}
+                                showOnlineStatus={true}
+                                isOnline={friend.online} // Random online status for demo, replace with actual status
+                            />
                             <Text size="sm">{friend.display_name}</Text>
                         </div>
                     </Link>
