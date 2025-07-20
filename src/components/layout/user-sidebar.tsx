@@ -120,18 +120,20 @@ function FriendsListView() {
             )}
 
             {/* Avatar with display name */}
-            {friends?.map(friend => (
-                <Link
-                    href={`/@${friend.username}`}
-                    key={friend.id}
-                    className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
-                >
-                    <div className="flex items-center gap-2">
-                        <UserAvatar name={friend.display_name} size={32} icon={friend.images_avatar} />
-                        <Text size="sm">{friend.display_name}</Text>
-                    </div>
-                </Link>
-            ))}
+            <div className="flex flex-col space-y-2">
+                {friends?.map(friend => (
+                    <Link
+                        href={`/@${friend.username}`}
+                        key={friend.id}
+                        className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
+                    >
+                        <div className="flex items-center gap-2">
+                            <UserAvatar name={friend.display_name} size={32} icon={friend.images_avatar} />
+                            <Text size="sm">{friend.display_name}</Text>
+                        </div>
+                    </Link>
+                ))}
+            </div>
         </div>
     )
 }
