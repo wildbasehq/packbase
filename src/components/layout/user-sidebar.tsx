@@ -99,7 +99,7 @@ function FriendsListView() {
 
     const friends = friendsResponse?.friends || []
 
-    useInterval(refresh, 1000)
+    useInterval(refresh, 60000)
 
     return (
         <div className="flex flex-col space-y-4">
