@@ -135,7 +135,14 @@ function FriendsListView() {
                                 showOnlineStatus={true}
                                 isOnline={friend.online} // Random online status for demo, replace with actual status
                             />
-                            <Text size="sm">{friend.display_name}</Text>
+                            <div className="flex flex-col">
+                                <Text size="sm">{friend.display_name}</Text>
+                                {friend.status && (
+                                    <Text size="xs" alt>
+                                        {friend.status}
+                                    </Text>
+                                )}
+                            </div>
                         </div>
                     </Link>
                 ))}
