@@ -26,10 +26,9 @@ export const ProjectSafeName = 'Packbase'
 
 export const API_URL = import.meta.env.VITE_YAPOCK_URL
 
-export let { supabase, vg } = new VoyageSDK(API_URL, {
+export let { vg } = new VoyageSDK(API_URL, {
     supabase: {
-        URL: import.meta.env.VITE_SUPABASE_URL,
-        key: import.meta.env.VITE_SUPABASE_ANON_KEY,
+        client: {},
     },
 })
 
@@ -41,12 +40,10 @@ export const setToken = (token?: string) => {
     let newClient = new VoyageSDK(API_URL, {
         token,
         supabase: {
-            URL: import.meta.env.VITE_SUPABASE_URL,
-            key: import.meta.env.VITE_SUPABASE_ANON_KEY,
+            client: {},
         },
     })
     vg = newClient.vg
-    supabase = newClient.supabase
 
     // Expose SDK for plugin development
     // @ts-ignore womp womp, we dont use this internally. for extension development.
