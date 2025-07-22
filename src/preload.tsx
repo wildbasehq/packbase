@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import { SignedIn, SignedOut, useSession } from '@clerk/clerk-react'
 import { LogoSpinner, useContentFrames } from '@/src/components'
 import ContentFrame from '@/components/shared/content-frame'
-import NUEModal from '@/components/seen-once/nue-modal'
+import NUEModal, { createNUEFlow } from '@/components/seen-once/nue-modal'
 
 export default function Preload({ children }: { children: React.ReactNode }) {
     return (
@@ -17,11 +17,17 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                 <SignedIn>
                     <ContentFrame get="user.me" cache>
                         <ContentFrame get="user.me.packs" cache>
+                            {/*<WebsocketFrame*/}
+                            {/*    onConnect={() => console.log('Connected to websocket')}*/}
+                            {/*    onDisconnect={() => console.log('Disconnected from websocket')}*/}
+                            {/*    onMessage={message => console.log('Received message:', message)}*/}
+                            {/*>*/}
                             <PreloadChild>
                                 {/* if query params has `?showNUEtest, show the component*/}
-                                {window.location.search.includes('showNUEtest') && <NUEModal />}
+                                {window.location.search.includes('showNUEtest') && <NUEModal config={createNUEFlow()} />}
                                 {children}
                             </PreloadChild>
+                            {/*</WebsocketFrame>*/}
                         </ContentFrame>
                     </ContentFrame>
                 </SignedIn>

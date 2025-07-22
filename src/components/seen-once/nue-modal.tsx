@@ -296,12 +296,29 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
     )
 }
 
+export function createNUEFlow(): CharacterTextBoxConfig {
+    return {
+        steps: [
+            {
+                id: 'welcome',
+                title: `Welcome home~`,
+                content: [
+                    'Welcome to Packbase!',
+                    "I'm here to help you get started with your new Packbase account.",
+                    "I'm **not** an AI, nor am I a bot - I'm here just to help you get started.",
+                ],
+                expression: Expressions.AMAZED,
+            },
+        ],
+    }
+}
+
 export function createDebugNUEFlow(): CharacterTextBoxConfig {
     return {
         steps: [
             {
                 id: 'welcome',
-                title: `This is a title!`,
+                title: `Welcome home~`,
                 content: ['Woa...!!!', "Let's go and *render* **some** __markdown__!.", 'I feel so [sigma](https://ifeelsosigma.com)!'],
                 expression: Expressions.AMAZED,
                 customComponent: (

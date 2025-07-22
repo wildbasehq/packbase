@@ -4,6 +4,7 @@
 
 import { useRive } from '@rive-app/react-canvas'
 import { useEffect, useState } from 'react'
+import { useTimeout } from 'usehooks-ts'
 
 /**
  * Character expression constants
@@ -82,6 +83,10 @@ export function AnimatedCharacter({
     useEffect(() => {
         updateRiveInput('expNUM', expression)
     }, [expression])
+
+    useTimeout(() => {
+        updateRiveInput('expNUM', expression)
+    }, 1000)
 
     // Handle talking timer
     useEffect(() => {
