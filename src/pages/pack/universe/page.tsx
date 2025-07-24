@@ -9,7 +9,10 @@ export default function UniversePack({ useEverythingQuery }: { useEverythingQuer
     return (
         <>
             <Protect>
-                <PackFeedController feedQueryOverride={useEverythingQuery ? '[Where posts:content_type ("markdown")]' : undefined} />
+                <PackFeedController
+                    channelID={useEverythingQuery ? '0' : null}
+                    feedQueryOverride={useEverythingQuery ? '[Where posts:content_type ("markdown")]' : undefined}
+                />
             </Protect>
         </>
     )
