@@ -25,11 +25,13 @@ import {
     SidebarSection,
     SidebarSpacer,
 } from '@/src/components'
-import { QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
+import { QuestionMarkCircleIcon, ShieldExclamationIcon, SparklesIcon } from '@heroicons/react/20/solid'
 import { FaceSmileIcon } from '@heroicons/react/16/solid'
 import { SiDiscord } from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 import { useSession } from '@clerk/clerk-react'
+import Link from '@/components/shared/link.tsx'
+import { XIcon } from 'lucide-react'
 
 function OpenMenuIcon() {
     return (
@@ -73,6 +75,7 @@ function MobileSidebar({ open, close, children }: React.PropsWithChildren<{ open
 
 export function SidebarLayout({ children }: React.PropsWithChildren) {
     let [showSidebar, setShowSidebar] = useState(false)
+    const [showVGSNotice, setShowVGSNotice] = useState(true)
     const { isSignedIn } = useSession()
     const { sidebarContent } = useSidebar()
     // const [location] = useLocation()
@@ -132,6 +135,40 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
                     {/*        }),*/}
                     {/*    }}*/}
                     {/*>*/}
+
+                    {showVGSNotice && (
+                        <div className="sticky top-0 z-20 mx-2 my-2">
+                            <div className="bg-amber-50 border-2 ring-2 ring-amber-500/10 border-amber-500 p-4 rounded shadow-sm dark:bg-amber-900/20 dark:border-amber-600">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0">
+                                        <ShieldExclamationIcon className="h-5 w-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
+                                    </div>
+                                    <div className="ml-3 flex-1">
+                                        <p className="text-sm text-amber-700 dark:text-amber-200">
+                                            <span className="font-medium">Notice:</span> We are currently experiencing higher than normal
+                                            latency due to an issue on the VGS. Some services may be temporarily slower than usual. Please
+                                            check back later, or go to{' '}
+                                            <Link href="https://vgs.packbase.app/stats" target="_blank">
+                                                VGS Health
+                                            </Link>{' '}
+                                            for more information.
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <button
+                                            type="button"
+                                            className="inline-flex rounded p-1.5 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                            onClick={() => setShowVGSNotice(false)}
+                                        >
+                                            <span className="sr-only">Dismiss</span>
+                                            <XIcon className="h-5 w-5" aria-hidden="true" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="relative h-[calc(100vh-1rem)] flex overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
                         {isSignedIn && (
                             <div className="top-0 backdrop-blur border-r h-full flex">

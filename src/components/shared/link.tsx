@@ -29,7 +29,7 @@ const Link = forwardRef(function Link(
                 <a
                     {...shallowProps}
                     href={href}
-                    className={clsx(props.className, 'text-primary')}
+                    className={clsx(props.className, 'text-indigo-500')}
                     ref={ref}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -39,7 +39,7 @@ const Link = forwardRef(function Link(
                 <RouterLink
                     {...shallowProps}
                     to={shallowProps.nref || `~${href}`}
-                    className={clsx('text-primary', props.className)}
+                    className={clsx('text-indigo-500', props.className)}
                     ref={ref}
                 />
             )}
