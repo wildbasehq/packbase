@@ -137,8 +137,8 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
                     {/*>*/}
 
                     {showVGSNotice && (
-                        <div className="sticky top-0 z-20 mx-2 my-2">
-                            <div className="bg-amber-50 border-2 ring-2 ring-amber-500/10 border-amber-500 p-4 rounded shadow-sm dark:bg-amber-900/20 dark:border-amber-600">
+                        <div className="fixed top-0 z-50 mx-2 my-2">
+                            <div className="bg-amber-50 border-2 ring-2 ring-amber-500/10 border-amber-500 p-4 rounded-md shadow-sm dark:bg-amber-900/20 dark:border-amber-600">
                                 <div className="flex items-center">
                                     <div className="flex-shrink-0">
                                         <ShieldExclamationIcon className="h-5 w-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
