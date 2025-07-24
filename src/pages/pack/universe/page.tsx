@@ -5,11 +5,11 @@
 import PackFeedController from '@/pages/pack/components.tsx'
 import { Protect } from '@clerk/clerk-react'
 
-export default function UniversePack() {
+export default function UniversePack({ useEverythingQuery }: { useEverythingQuery?: boolean }) {
     return (
         <>
             <Protect>
-                <PackFeedController />
+                <PackFeedController feedQueryOverride={useEverythingQuery ? '[Where posts:content_type ("markdown")]' : undefined} />
             </Protect>
         </>
     )

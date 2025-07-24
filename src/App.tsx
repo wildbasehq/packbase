@@ -163,7 +163,7 @@ function App() {
 
                                                                     <Route path="/cosmos">
                                                                         <Suspense fallback={<LoadingFallback />}>
-                                                                            <NotFound />
+                                                                            <UniversePack useEverythingQuery />
                                                                         </Suspense>
                                                                     </Route>
 
