@@ -17,11 +17,10 @@ import { toast } from 'sonner'
 import { useModal } from '@/components/modal/provider'
 import { SettingsIcon } from 'lucide-react'
 import { Button } from '@/components/shared/button'
-import { ClipboardIcon, TrashIcon, UserGroupIcon } from '@heroicons/react/20/solid'
+import { ClipboardIcon, UserGroupIcon } from '@heroicons/react/20/solid'
 import { Avatar } from '@/components/shared/avatar'
 import ResourceSettingsGeneral from './pages/general'
 import ResourceSettingsMembers from '@/components/layout/resource-switcher/pages/members.tsx'
-import ResourceDeletePage from './pages/delete'
 import { VerifiedBadge } from '@/components/layout/resource-switcher/pack-badge.tsx'
 import PagedModal from '@/components/shared/paged-modal'
 
@@ -181,11 +180,11 @@ function ResourceSettingsModal() {
                 </PagedModal.Body>
             </PagedModal.Page>
 
-            <PagedModal.Page id="delete" title="Delete This Pack" description="Delete the pack and all data" icon={TrashIcon}>
-                <PagedModal.Body>
-                    <ResourceDeletePage />
-                </PagedModal.Body>
-            </PagedModal.Page>
+            {/*<PagedModal.Page id="delete" title="Delete This Pack" description="Delete the pack and all data" icon={TrashIcon}>*/}
+            {/*    <PagedModal.Body>*/}
+            {/*        <ResourceDeletePage />*/}
+            {/*    </PagedModal.Body>*/}
+            {/*</PagedModal.Page>*/}
         </PagedModal>
     )
 }
