@@ -49,6 +49,7 @@ export default function Markdown({ children, ...props }: { children: string; [x:
                         return (
                             <a
                                 className="text-indigo-500 underline underline-offset-[3px] hover:text-indigo-500/80 transition-colors cursor-pointer"
+                                target="_blank"
                                 {...props}
                             />
                         )

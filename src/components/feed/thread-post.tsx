@@ -126,7 +126,10 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                     <div className="flex-shrink-0 flex flex-col">
                         <UserAvatar user={post.user} size={depth > 0 ? 'md' : 'lg'} className="rounded-full" />
                         {post.pack && post.pack?.slug !== 'universe' && (
-                            <div className="relative h-12 before:absolute before:left-5 before:top-0 before:bottom-0 before:w-px before:bg-border">
+                            <Link
+                                href={`/p/${post.pack.slug}`}
+                                className="relative h-12 before:absolute before:left-5 before:top-0 before:bottom-0 before:w-px before:bg-border"
+                            >
                                 <AvatarButton
                                     src={post.pack.images?.avatar}
                                     alt={post.pack.display_name}
@@ -134,7 +137,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                     className="w-10 h-10 mt-4 aspect-square"
                                     square
                                 />
-                            </div>
+                            </Link>
                         )}
                     </div>
 
@@ -165,9 +168,11 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                         </div>
 
                         {post.pack && post.pack?.slug !== 'universe' && (
-                            <Text size="xs" alt className="mb-1 items-center flex">
-                                <UserGroupIcon className="h-3 w-3 mr-1 inline-flex" /> howl'd in {post.pack.display_name}
-                            </Text>
+                            <Link href={`/p/${post.pack.slug}`}>
+                                <Text size="xs" alt className="mb-1 items-center flex">
+                                    <UserGroupIcon className="h-3 w-3 mr-1 inline-flex" /> howl'd in {post.pack.display_name}
+                                </Text>
+                            </Link>
                         )}
                         {/* Post body */}
                         <div className="whitespace-pre-wrap break-words">
