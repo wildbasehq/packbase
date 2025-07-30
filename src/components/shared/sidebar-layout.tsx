@@ -174,11 +174,11 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
                             </div>
                         )}
                         <div className={cx('mx-auto w-full overflow-hidden h-full', isSignedIn && 'max-w-1/2')}>{children}</div>
-                        {isSignedIn && <UserSidebar />}
                     </div>
                     {/*</motion.main>*/}
                 </main>
             </div>
+            {isSignedIn && <UserSidebar />}
         </div>
     )
 }
