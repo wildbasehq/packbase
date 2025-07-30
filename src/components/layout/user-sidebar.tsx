@@ -33,15 +33,18 @@ export default function UserSidebar() {
             <div className={`flex flex-col w-full ${!collapsed && 'space-y-8'}`}>
                 <div className={`relative flex ${collapsed ? 'flex-col justify-center items-center mt-3' : 'h-14 border-b gap-2'}`}>
                     {collapsed && (
-                        <div className="flex flex-col items-center gap-2">
+                        <div className="flex flex-col items-center gap-4">
                             <DropdownComponent />
+
                             {/* Collapsed search icon */}
                             {collapsed && (
-                                <Tooltip content="Search" side="right" delayDuration={0}>
-                                    <div className="inline-flex items-center justify-center h-8 w-8 p-1.5 rounded cursor-pointer hover:inner-border hover:inner-border-[#e5e5e5] hover:dark:inner-border-[#2e2e2e] hover:unicorn:inner-border-outline/25">
-                                        <MagnifyingGlassIcon className="w-4 h-4" />
-                                    </div>
-                                </Tooltip>
+                                <div className="px-3">
+                                    <Tooltip content="Search" side="right" delayDuration={0}>
+                                        <div className="inline-flex items-center justify-center h-8 w-8 rounded cursor-pointer hover:inner-border hover:inner-border-[#e5e5e5] hover:dark:inner-border-[#2e2e2e] hover:unicorn:inner-border-outline/25">
+                                            <MagnifyingGlassIcon className="w-4 h-4" />
+                                        </div>
+                                    </Tooltip>
+                                </div>
                             )}
                         </div>
                     )}
