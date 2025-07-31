@@ -117,7 +117,9 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
                         <NUEModal
                             config={{
                                 ...createNUEFlow(),
-                                onComplete: () => setShowNUE(false),
+                                onComplete: () => {
+                                    window.location.reload()
+                                },
                                 onCancel: () => {
                                     toast.message('Snoozed until next reload')
                                     setShowNUE(false)
