@@ -147,8 +147,8 @@ export const WebSocketFrame: React.FC<WebSocketFrameProps> = ({
             const response = await fetch(url, options)
             const data = await response.json()
 
-            if (response.ok && data.status === 'online' && data.websocket_url) {
-                return data.websocket_url
+            if (response.ok && data.url) {
+                return data.url
             }
 
             throw new Error(data.message || 'WebSocket URL not available')
@@ -180,6 +180,8 @@ export const WebSocketFrame: React.FC<WebSocketFrameProps> = ({
             if (!url) {
                 throw new Error('No WebSocket URL received from server')
             }
+
+            log.info('Websocket', 'VGS told this client to connect to:', url)
 
             // Add token
             url = `${url}?token=${await session?.getToken()}`

@@ -9,6 +9,7 @@ import { SignedIn, SignedOut, useSession } from '@clerk/clerk-react'
 import { LogoSpinner, useContentFrames } from '@/src/components'
 import ContentFrame from '@/components/shared/content-frame'
 import NUEModal, { createNUEFlow } from '@/components/seen-once/nue-modal'
+import { toast } from 'sonner'
 
 export default function Preload({ children }: { children: React.ReactNode }) {
     return (
@@ -22,11 +23,7 @@ export default function Preload({ children }: { children: React.ReactNode }) {
                             {/*    onDisconnect={() => console.log('Disconnected from websocket')}*/}
                             {/*    onMessage={message => console.log('Received message:', message)}*/}
                             {/*>*/}
-                            <PreloadChild>
-                                {/* if query params has `?showNUEtest, show the component*/}
-                                {window.location.search.includes('showNUEtest') && <NUEModal config={createNUEFlow()} />}
-                                {children}
-                            </PreloadChild>
+                            <PreloadChild>{children}</PreloadChild>
                             {/*</WebsocketFrame>*/}
                         </ContentFrame>
                     </ContentFrame>
@@ -42,11 +39,14 @@ export default function Preload({ children }: { children: React.ReactNode }) {
 function PreloadChild({ children }: { children: React.ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`auth`)
     const [error, setError] = useState<any | null>(null)
+    const [showNUE, setShowNUE] = useState(false)
+
     const { setUser } = useUserAccountStore()
     const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
     const { setResources } = useResourceStore()
     const frames = useContentFrames()
     const { session, isSignedIn, isLoaded } = useSession()
+
     const { data: userMeData, loading: userMeLoading } = frames?.['get=user.me'] || { data: null, loading: isSignedIn }
     const { data: userPacksData, loading: userPacksLoading } = frames?.['get=user.me.packs'] || { data: null, loading: isSignedIn }
 
@@ -98,12 +98,36 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
         setStatus('proceeding')
         setLoading(false)
         setConnecting(false)
+
+        if (
+            !userMeData.display_name ||
+            !userMeData.display_name.trim().length ||
+            !userMeData.about?.bio ||
+            !userMeData.about?.bio.trim().length
+        ) {
+            setShowNUE(true)
+        }
     }
 
     return (
         <>
             {serviceLoading === 'proceeding' ? (
-                children
+                <>
+                    {showNUE && (
+                        <NUEModal
+                            config={{
+                                ...createNUEFlow(),
+                                onComplete: () => setShowNUE(false),
+                                onCancel: () => {
+                                    toast.message('Snoozed until next reload')
+                                    setShowNUE(false)
+                                },
+                            }}
+                        />
+                    )}
+
+                    {children}
+                </>
             ) : (
                 <Body bodyClassName="h-full" className="!h-full items-center justify-center">
                     <LogoSpinner />

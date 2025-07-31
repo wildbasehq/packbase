@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 
-const ProfileSettingsComponent: React.FC = () => {
+const ProfileSettingsComponent: React.FC = ({ noHeader }: { noHeader?: boolean }) => {
     const { user } = useUserAccountStore()
     const bioRef = React.useMemo(() => React.createRef<HTMLTextAreaElement>(), [])
     const displayNameRef = React.useMemo(() => React.createRef<HTMLInputElement>(), [])
@@ -79,13 +79,17 @@ const ProfileSettingsComponent: React.FC = () => {
 
     return (
         <form>
-            <div className="border-b pb-4 mb-4 border-n-5/10">
-                <h1 className="font-bold text-[17px]">Profile Settings</h1>
-            </div>
+            {!noHeader && (
+                <>
+                    <div className="border-b pb-4 mb-4 border-n-5/10">
+                        <h1 className="font-bold text-[17px]">Profile Settings</h1>
+                    </div>
 
-            <div className="mb-4">
-                <p className="text-sm text-muted-foreground">Username can be changed in your "Account" tab.</p>
-            </div>
+                    <div className="mb-4">
+                        <p className="text-sm text-muted-foreground">Username can be changed in your "Account" tab.</p>
+                    </div>
+                </>
+            )}
 
             <div className="col-span-full">
                 <label htmlFor="cover-photo" className="text-default block select-none text-sm font-medium leading-6">

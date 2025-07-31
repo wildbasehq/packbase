@@ -57,7 +57,7 @@ export default function SelectPills({
                                                         <Description as="span" className="text-alt inline">
                                                             <span>{option.desc}</span>{' '}
                                                             {option.warn && (
-                                                                <p className="mt-4 flex">
+                                                                <p className="mt-1 flex items-center text-sm">
                                                                     <QuestionMarkCircleIcon className="text-alt mr-1 h-4 w-6" />
                                                                     <span>{option.warn}</span>
                                                                 </p>

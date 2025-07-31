@@ -9,7 +9,10 @@ import { Button } from '@/components/shared/experimental-button-rework'
 import Markdown from '@/components/shared/markdown.tsx'
 import { AnimatedCharacter, Expressions } from '@/components/shared/animated-character'
 import SelectPills from '@/components/shared/input/select-pills.tsx'
-import { Alert, AlertDescription, Input, InputGroup } from '@/src/components'
+import { Alert, AlertDescription, Checkbox, CheckboxField, Field, Input, InputGroup, Textarea } from '@/src/components'
+import { Label } from '@headlessui/react'
+import { setToken, vg } from '@/lib'
+import { toast } from 'sonner'
 
 /**
  * Character Text Box Modal for user guidance and onboarding
@@ -24,8 +27,8 @@ export interface DialogueStep {
     expression?: number
     buttons?: {
         text: string
-        action: () => void
-        variant?: 'primary' | 'secondary' | 'danger'
+        action: (handlePrevious: () => void, handleNext: () => void) => void
+        variant?: string
     }[]
     onShow?: () => void
     onComplete?: (formData?: Record<string, any>) => Promise<void>
@@ -36,7 +39,7 @@ export interface DialogueStep {
             label: string
             type: 'text' | 'email' | 'number' | 'textarea' | 'select' | 'checkbox'
             placeholder?: string
-            options?: Array<{ value: string; label: string; disabled?: boolean }>
+            options?: Array<{ value: string; label: string; disabled?: boolean; desc?: string; warn?: string }>
             required?: boolean
             defaultValue?: string | number | boolean
         }>
@@ -109,8 +112,7 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
             setIsLoading(true)
             try {
                 // Pass form data to onComplete if form exists
-                const stepFormData = currentStep.form ? formData : undefined
-                await currentStep.onComplete(stepFormData)
+                await currentStep.onComplete(formData)
             } catch (error) {
                 console.error('Error executing onComplete:', error)
             } finally {
@@ -121,7 +123,7 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
         if (currentStepIndex < steps.length - 1) {
             setCurrentStepIndex(currentStepIndex + 1)
             // Reset form data when moving to next step
-            setFormData({})
+            // setFormData({})
         } else {
             onComplete?.()
         }
@@ -220,7 +222,9 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
                     <div className="space-y-4">
                         <Heading size="xl">{currentStep.title}</Heading>
                         <div className="space-y-2">
-                            <Markdown>{currentStep.content.join('  \n')}</Markdown>
+                            {currentStep.content.map((content, i) => (
+                                <Markdown key={i}>{content}</Markdown>
+                            ))}
                         </div>
 
                         {/* Form element */}
@@ -241,9 +245,26 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
                                                     ...(field.options?.map(option => ({
                                                         name: option.label,
                                                         id: option.value,
+                                                        desc: option.desc,
+                                                        disabled: option.disabled,
+                                                        warn: option.warn,
                                                     })) || []),
                                                 ]}
                                             />
+                                        ) : field.type === 'textarea' ? (
+                                            <Field>
+                                                <Textarea placeholder={field.placeholder} name={field.name} onChange={handleFormChange} />
+                                            </Field>
+                                        ) : field.type === 'checkbox' ? (
+                                            <CheckboxField>
+                                                <Checkbox
+                                                    name={field.name}
+                                                    value={field.name}
+                                                    aria-required={field.required}
+                                                    onChange={checked => handleCheckboxChange(field.name, checked)}
+                                                />
+                                                <Label className="text-sm">{field.label}</Label>
+                                            </CheckboxField>
                                         ) : (
                                             <Input
                                                 id={field.name}
@@ -269,7 +290,7 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
                                 currentStep.buttons.map((button, index) => (
                                     <Button
                                         key={index}
-                                        onClick={button.action}
+                                        onClick={() => button.action(handlePrevious, handleNext)}
                                         // @ts-ignore
                                         color={button.variant ?? 'indigo'}
                                     >
@@ -296,23 +317,146 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
     )
 }
 
+/*
+ * The real one
+ */
 export function createNUEFlow(): CharacterTextBoxConfig {
     return {
         steps: [
             {
                 id: 'welcome',
-                title: `Welcome home~`,
+                title: `Welcome home~!`,
                 content: [
                     'Welcome to Packbase!',
                     "I'm here to help you get started with your new Packbase account.",
-                    "I'm **not** an AI, nor am I a bot - I'm here just to help you get started.",
+                    "{img src:'noai_created'}{/img}",
                 ],
+                expression: Expressions.DEFAULT,
+            },
+            {
+                id: 'display-name',
+                title: 'Display Name',
+                content: ['What should everyone call you? (You can change this later!)'],
+                expression: Expressions.NORMAL,
+                form: {
+                    fields: [
+                        {
+                            name: 'display_name',
+                            label: 'Display Name',
+                            type: 'text',
+                            placeholder: 'e.g. GOOD!BOY 🔜MFF   - or -   🐻‍Embrrr❄️   - or -   bob.',
+                            required: true,
+                        },
+                    ],
+                },
+            },
+            {
+                id: 'profile',
+                title: 'About You',
+                content: ["don't be shy now~", '*ok, maybe a little shy, this is public.*'],
                 expression: Expressions.AMAZED,
+                form: {
+                    fields: [
+                        {
+                            name: 'bio',
+                            label: 'Bio',
+                            type: 'textarea',
+                            placeholder: 'Tell us a little about yourself',
+                            required: true,
+                        },
+                    ],
+                },
+            },
+            {
+                id: 'subdomain',
+                title: 'Want a free site?',
+                content: [
+                    'We can give you a free subdomain (your username) for your static site theme, or you can link a custom domain (// ALPHA NOTE: NOT ADDED. TBD //).',
+                    'It must be about you specifically, and it must be unique. Want to host your company? Shove it in a /folder.',
+                ],
+                expression: Expressions.MOTIVATED,
+                form: {
+                    fields: [
+                        {
+                            name: 'subdomain',
+                            label: ' ',
+                            type: 'select',
+                            options: [
+                                {
+                                    value: 'none',
+                                    label: 'Nothing',
+                                },
+                                {
+                                    value: 'free',
+                                    label: 'Subdomain',
+                                },
+                            ],
+                            required: false,
+                        },
+                        {
+                            name: 'domain-agreement',
+                            label: 'I solemly swear that I will follow the law, and that I will only use this subdomain for myself and myself alone.',
+                            type: 'checkbox',
+                            required: true,
+                        },
+                    ],
+                },
+            },
+            {
+                id: 'storage',
+                title: 'Quick thingy about your stuff',
+                content: [
+                    'FYI, everyone gets a 15GB share of our storage for all their content they upload.',
+                    'This storage is shared across anything you upload to Packbase, including your custom site content.',
+                    'If you need more, you can link your own Pixeldrain account for 100% self-managed storage later.',
+                ],
+                expression: Expressions.NORMAL,
+            },
+            {
+                id: 'private-alpha-notice',
+                title: 'readme-or-get-banned-uwu.txt.md',
+                content: [
+                    'We are currently in private alpha, so you will not be able to use all the features of Packbase yet, and we are still working on some of the core features.',
+                    "Please, be kind to one another - **we won't hesitate to ban you for life with no appeals**. We appreciate you taking the time to join and help us make something truly great, but we ask you to be respectful of our time as well. ***Remember***: We're far from a company - we're just a bunch of passionate people who want to make a great community.",
+                    "We want to know how you'd like to use Packbase and what features are missing! After I finish yapping, join /p/support and howl in #ideas to tell us what you think!",
+                ],
+                expression: Expressions.UNIMPRESSED,
+                onComplete: async formData => {
+                    console.log('Form data submitted:', formData)
+                    // @ts-ignore
+                    const token = await window.Clerk?.session?.getToken()
+                    setToken(token)
+                    await vg.user.me
+                        .post({
+                            display_name: formData.display_name,
+                            ...(formData.bio
+                                ? {
+                                      about: {
+                                          bio: formData.bio,
+                                      },
+                                  }
+                                : {}),
+                        })
+                        .then(({ data, error }) => {
+                            console.log('User data:', data)
+                            if (!data || error) {
+                                toast.error(
+                                    "Couldn't save: " +
+                                        (error.value
+                                            ? `${error.status}: ${error.value.summary || error.value.error}`
+                                            : 'Something went wrong')
+                                )
+                            }
+                        })
+                },
             },
         ],
     }
 }
 
+/*
+ * For debugging
+ */
 export function createDebugNUEFlow(): CharacterTextBoxConfig {
     return {
         steps: [
