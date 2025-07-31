@@ -100,10 +100,11 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
         setConnecting(false)
 
         if (
-            !userMeData.display_name ||
-            !userMeData.display_name.trim().length ||
-            !userMeData.about?.bio ||
-            !userMeData.about?.bio.trim().length
+            userMeData &&
+            (!userMeData?.display_name ||
+                !userMeData?.display_name.trim().length ||
+                !userMeData?.about?.bio ||
+                !userMeData?.about?.bio.trim().length)
         ) {
             setShowNUE(true)
         }
