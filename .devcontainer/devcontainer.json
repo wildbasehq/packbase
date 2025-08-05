@@ -1,5 +1,14 @@
 {
-  "name": "Node.js",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-18-bullseye",
-  "postCreateCommand": "npm i"
+  "name": "Bun",
+  "image": "ghcr.io/nhaef/devcontainer-bun:latest",
+  "postCreateCommand": "bun i",
+  "customizations": {
+    "jetbrains": {
+      "settings": {
+        "com.intellij:app:HttpConfigurable.use_proxy_pac": true,
+        "com.intellij:app:EditorSettings.soft_wrap_file_masks": "*.md; *.txt; *.rst; *.adoc; *.mdx",
+        "com.intellij:app:EmmetOptions.previewEnabled": true
+      }
+    }
+  }
 }
