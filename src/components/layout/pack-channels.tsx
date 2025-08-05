@@ -8,7 +8,7 @@ import { useRef, useState } from 'react'
 import { SidebarDivider, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection } from '@/components/shared/sidebar'
 import { FireIcon, InboxIcon, QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
 import InboxPage from '@/pages/inbox/page.tsx'
-import { HashtagIcon, MicrophoneIcon, NewspaperIcon, PaperAirplaneIcon, PlusIcon } from '@heroicons/react/16/solid'
+import { HashtagIcon, MicrophoneIcon, HomeIcon, PaperAirplaneIcon, PlusIcon } from '@heroicons/react/16/solid'
 import Popover from '@/components/shared/popover.tsx'
 import { vg } from '@/lib'
 
@@ -29,9 +29,9 @@ export function PackChannels() {
             <SidebarSection>
                 {currentResource.slug && currentResource.slug !== 'universe' && (
                     <SidebarItem href={`/p/${currentResource.slug}`}>
-                        <NewspaperIcon />
+                        <HomeIcon />
                         <div className="flex flex-col min-w-0">
-                            <SidebarLabel>For You</SidebarLabel>
+                            <SidebarLabel>Home</SidebarLabel>
                         </div>
                     </SidebarItem>
                 )}
