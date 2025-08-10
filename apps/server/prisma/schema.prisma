@@ -1,0 +1,274 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas   = ["auth", "public"]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notice {
+  id         BigInt   @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  type       String   @default("announcement")
+  image      String?
+  user       Json?
+
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model packs {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  display_name      String
+  slug              String              @unique
+  images_avatar     String?
+  description       String?
+  owner_id          String?             @db.Uuid
+  images_header     String?
+  packs_memberships packs_memberships[]
+  packs_pages       packs_pages[]
+  posts             posts[]
+
+  @@index([owner_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model packs_memberships {
+  id        BigInt   @id(map: "packs_memberships_pkey") @default(autoincrement())
+  joined_at DateTime @default(now()) @db.Timestamptz(6)
+  tenant_id String   @db.Uuid
+  user_id   String   @db.Uuid
+  packs     packs    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "public_packs_memberships_tenant_id_fkey")
+
+  @@index([tenant_id], type: Hash)
+  @@index([user_id], type: Hash)
+  @@map("packs.memberships")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model packs_pages {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamp(6)
+  title       String
+  slug        String
+  description String?
+  icon        String?
+  tenant_id   String   @db.Uuid
+  query       String?
+  ticker      String?
+  order       Int      @default(0)
+  packs       packs    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "pack.pages_tenant_id_fkey")
+  posts       posts[]
+  chat_messages chat_messages[]
+  chat_presence chat_presence[]
+
+  @@index([tenant_id], type: Hash)
+  @@map("packs.pages")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model posts {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at      DateTime          @default(now()) @db.Timestamptz(6)
+  tenant_id       String            @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+  content_type    String
+  body            String?
+  user_id         String            @db.Uuid
+  assets          Json[]
+  parent          String?           @db.Uuid
+  channel_id      String?           @db.Uuid
+  posts           posts?            @relation("postsToposts", fields: [parent], references: [id], onDelete: Cascade)
+  other_posts     posts[]           @relation("postsToposts")
+  packs           packs             @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  packs_pages     packs_pages?      @relation(fields: [channel_id], references: [id], onDelete: SetNull)
+  posts_reactions posts_reactions[]
+
+  @@index([parent], type: Hash)
+  @@index([tenant_id], type: Hash)
+  @@index([user_id], type: Hash)
+  @@index([channel_id], type: Hash)
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model posts_reactions {
+  post_id    String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  actor_id   String   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slot       BigInt   @default(0)
+  posts      posts    @relation(fields: [post_id], references: [id], onDelete: Cascade, map: "public_posts_reactions_post_id_fkey")
+
+  @@id([post_id, actor_id], map: "posts_reactions_pkey")
+  @@index([actor_id], type: Hash)
+  @@index([post_id], type: Hash)
+  @@map("posts.reactions")
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model profiles {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  username      String   @unique
+  bio           String?
+  slug          String?
+  display_name  String?
+  images_avatar String?
+  images_header String?
+  type          String?
+  space_type    String   @default("default")
+  post_privacy  String   @default("everyone")
+  invited_by    String?  @db.Uuid
+  owner_id      String
+  last_online   DateTime?
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model profiles_followers {
+  id           BigInt   @id @default(autoincrement())
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  user_id      String   @db.Uuid
+  following_id String   @db.Uuid
+
+  @@index([user_id])
+  @@index([following_id])  // Add this index
+  @@index([user_id, following_id])  // Composite index for better performance
+  @@map("profiles.followers")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model profiles_settings {
+  id   String @id @db.Uuid
+  json Json?  @db.Json
+
+  @@map("profiles.settings")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model user_presence {
+  user_id              String   @id
+  username             String?
+  status_type          Int
+  status_text          String?
+  last_active          BigInt
+  expires_at           BigInt?
+  is_subscribed_to_all Boolean  @default(false)
+  subscribed_users     String[] @default([])
+  connection_count     Int?
+  manually_set_offline Boolean?
+  version              Int?
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model user_themes {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  user_id    String   @db.Uuid
+  name       String
+  html       String
+  css        String
+  is_active  Boolean  @default(false)
+
+  @@index([user_id], type: Hash)
+  @@map("user.themes")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notifications {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  user_id    String    @db.Uuid
+  type       String
+  title      String
+  content    String
+  read       Boolean   @default(false)
+  read_at    DateTime? @db.Timestamptz(6)
+  metadata   Json?
+  related_id String?   @db.Uuid
+
+  @@index([user_id], type: Hash)
+  @@index([read], type: Hash)
+  @@schema("public")
+}
+
+model collectibles {
+  user_id  String
+  badge_id String
+  is_set   Boolean @default(false)
+
+  @@unique([badge_id, user_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model chat_messages {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime     @default(now()) @db.Timestamptz(6)
+  channel_id  String       @db.Uuid
+  user_id     String       @db.Uuid
+  content     String
+  message_type String      @default("text")
+  reply_to    String?      @db.Uuid
+  edited_at   DateTime?    @db.Timestamptz(6)
+  deleted_at  DateTime?    @db.Timestamptz(6)
+  metadata    Json?        @default("{}")
+
+  packs_pages packs_pages  @relation(fields: [channel_id], references: [id], onDelete: Cascade)
+  reply       chat_messages? @relation("ChatMessageReplies", fields: [reply_to], references: [id], onDelete: SetNull)
+  replies     chat_messages[] @relation("ChatMessageReplies")
+  reactions   chat_reactions[]
+
+  @@index([channel_id, created_at])
+  @@index([user_id])
+  @@index([reply_to])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model chat_presence {
+  channel_id  String       @db.Uuid
+  user_id     String       @db.Uuid
+  status      String       @default("online")
+  last_seen   DateTime     @default(now()) @db.Timestamptz(6)
+
+  packs_pages packs_pages  @relation(fields: [channel_id], references: [id], onDelete: Cascade)
+
+  @@id([channel_id, user_id])
+  @@index([channel_id])
+  @@index([user_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model chat_reactions {
+  message_id  String       @db.Uuid
+  user_id     String       @db.Uuid
+  emoji       String
+  created_at  DateTime     @default(now()) @db.Timestamptz(6)
+
+  message     chat_messages @relation(fields: [message_id], references: [id], onDelete: Cascade)
+
+  @@id([message_id, user_id, emoji])
+  @@index([message_id])
+  @@schema("public")
+}

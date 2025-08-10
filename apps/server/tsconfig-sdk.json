@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "./src/routes.ts"
+  ],
+  //  "exclude": [ "node_modules", "dist", "./src/utils/**", "./src/realtime/**" ],
+  "compilerOptions": {
+    "outDir": "./voyagesdk-export",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noImplicitAny": false
+  }
+}

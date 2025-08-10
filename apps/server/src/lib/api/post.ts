@@ -1,0 +1,193 @@
+import {Database} from '@/database.types'
+import {UserProfile} from '@/models/defs'
+import {getUser} from '@/routes/user/[username]'
+import {getPack} from '@/routes/pack/[id]'
+import posthog, {distinctId} from '@/utils/posthog'
+import requiresUserProfile from '@/utils/identity/requires-user-profile'
+import {HTTPError} from '@/lib/class/HTTPError'
+import prisma from '@/db/prisma'
+import createStorage from '@/lib/class/storage'
+
+const HowlCache = new Map<string, Database['public']['Tables']['posts']['Row'] & typeof UserProfile>()
+
+export async function getPost(id: string, post?: (Database['public']['Tables']['posts']['Row'] & typeof UserProfile) | undefined) {
+    const timer = new Date().getTime()
+    const cached = id !== 'universe' ? HowlCache.get(id) : null
+    let data = post || cached
+    if (!data) {
+        if (id === 'universe') {
+            // Set ID to most recent post
+            const randomPost = await prisma.posts.findFirst({
+                select: {id: true},
+                orderBy: {created_at: 'desc'},
+                take: 1
+            })
+            if (!randomPost) {
+                return null
+            }
+            id = randomPost.id
+        }
+
+        try {
+            const fetchData = await prisma.posts.findUnique({
+                where: {id},
+            })
+
+            if (!fetchData) {
+                return null
+            }
+
+            data = fetchData as any
+            if (data && !cached) {
+                HowlCache.set(id, data)
+            }
+        } catch (error: any) {
+            throw HTTPError.serverError({
+                summary: error.message,
+                ...error
+            })
+        }
+    }
+
+    // Wasn't able to do it in the query
+    if (!data) {
+        return null
+    }
+
+    data.created_at = data.created_at.toString()
+
+    data.user = await getUser({
+        by: 'id',
+        value: data.user_id || data.user.id,
+    })
+
+    if (!data.user) {
+        // Assume the user was deleted
+        data.user = {
+            id: '00000000-0000-0000-0000-000000000000',
+            username: 'deleted',
+            display_name: 'Deleted User',
+            about: {
+                bio: 'This user has been deleted.',
+            },
+            images: {
+                avatar: `https://www.gravatar.com/avatar/${data.user_id}?d=mp`,
+                header: null,
+            },
+        }
+    }
+
+    // @ts-ignore - it should be removed
+    delete data.user_id
+
+    const reactions = await prisma.posts_reactions.findMany({
+        where: {post_id: id},
+        select: {actor_id: true, slot: true}
+    })
+
+    if (reactions.length > 0) {
+        data.reactions = {}
+        for (const reaction of reactions) {
+            // Convert BigInt to Number for JSON serialization
+            const slotKey = typeof reaction.slot === 'bigint'
+                ? Number(reaction.slot).toString()
+                // @ts-ignore
+                : reaction.slot.toString()
+
+            if (!data.reactions[slotKey]) data.reactions[slotKey] = []
+            data.reactions[slotKey].push(reaction.actor_id)
+        }
+    }
+
+    // Comments - sorted by created_at
+    const comments = await prisma.posts.findMany({
+        where: {parent: id},
+        orderBy: {created_at: 'asc'},
+    })
+
+    if (comments.length > 0) {
+        data.comments = []
+        for (const comment of comments as any[]) {
+            comment.user = await getUser({
+                by: 'id',
+                value: comment.user_id,
+            })
+            delete comment.user_id
+
+            comment.created_at = comment.created_at.toString()
+            data.comments.push(comment)
+        }
+    }
+
+    data.pack = await getPack(data.tenant_id, 'basic')
+
+    // @ts-ignore - it should be removed
+    delete data.tenant_id
+
+    posthog.capture({
+        distinctId,
+        event: 'Viewed Howl',
+        properties: {
+            fetch_time: new Date().getTime() - timer,
+            howl: data
+        }
+    })
+
+    return data
+}
+
+export async function deletePost({params: {id}, set, user}: {
+    params: { id: string };
+    set: { status: number };
+    user: { sub: string }
+}) {
+    await requiresUserProfile({set, user})
+
+    // Check user ID against post user ID
+    const post = await prisma.posts.findUnique({
+        where: {id},
+        select: {user_id: true, assets: true}
+    })
+
+    if (!post) {
+        set.status = 404
+        return
+    }
+
+    if (post?.user_id !== user?.sub) {
+        set.status = 403
+        throw HTTPError.forbidden({
+            summary: 'You are not the author of this post'
+        })
+    }
+
+    try {
+        await prisma.posts.delete({
+            where: {id}
+        })
+    } catch (error: any) {
+        set.status = 400
+        throw HTTPError.badRequest({
+            summary: error.message,
+            ...error
+        })
+    }
+
+    // If post has assets, delete them too
+    if (post.assets && (post.assets as any).length > 0) {
+        const storage = createStorage('packbase-public-profiles');
+
+        // List files in the user's folder for this post
+        const listResult = await storage.listFiles(user.sub, `${id}`);
+
+        if (listResult.success && listResult.files) {
+            // Delete each file
+            for (const file of listResult.files) {
+                await storage.deleteFile(user.sub, `${id}/${file.name}`);
+            }
+        }
+    }
+
+    HowlCache.delete(id)
+    set.status = 204
+}

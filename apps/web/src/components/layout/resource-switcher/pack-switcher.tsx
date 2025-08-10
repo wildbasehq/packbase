@@ -1,0 +1,138 @@
+/*
+ * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
+ */
+
+import ECGIcon from '@/components/icons/dazzle/ecg'
+import { Logo } from '@/components/shared/logo'
+import { Text } from '@/components/shared/text'
+import Tooltip, { TooltipContent } from '@/components/shared/tooltip'
+import { Button } from '@/components/shared/button'
+import UserAvatar from '@/components/shared/user/avatar'
+import { useResourceStore, useUIStore } from '@/lib/state'
+import { cn } from '@/lib/utils'
+import { UsersIcon } from '@heroicons/react/20/solid'
+import { PlusIcon } from '@heroicons/react/24/solid'
+import { TentTreeIcon } from 'lucide-react'
+import './pack-switcher.component.css'
+import Link from '@/components/shared/link.tsx'
+import { useLocation } from 'wouter'
+import { Protect } from '@clerk/clerk-react'
+import { AnimatePresence, motion } from 'framer-motion'
+
+export default function PackSwitcher() {
+    const { currentResource, setCurrentResource, resources } = useResourceStore()
+    const { resourceDefault, loading, setLoading } = useUIStore()
+    const [, navigate] = useLocation()
+
+    const switchResource = (resource: any) => {
+        if (loading || currentResource.id === resource.id) {
+            if (resource.slug === 'universe') navigate('/p/universe')
+        }
+        setCurrentResource(resource)
+        setLoading(true)
+        navigate(`/p/${resource.slug}`)
+    }
+
+    return (
+        <div className="min-w-16 relative flex h-full flex-col items-center py-2">
+            <Tooltip content="Home" side="right">
+                <div
+                    className={cn(
+                        'hover:show-pill flex h-12 w-12 justify-center cursor-pointer items-center [&>div]:bg-n-1',
+                        currentResource.id === resourceDefault.id
+                            ? 'force-pill [&>div>*]:invert [&>div]:bg-primary'
+                            : 'dark:[&>div>*]:invert dark:[&>div]:bg-n-7'
+                    )}
+                    onClick={() => switchResource(resourceDefault)}
+                >
+                    <Logo noColorTheme className="!w-9.5 !h-9.5" />
+                </div>
+            </Tooltip>
+
+            <div className="h-[1px] w-1/2 bg-n-3 dark:bg-n-7 my-2"></div>
+
+            {resources.map(item => (
+                <Tooltip
+                    key={item.id}
+                    content={
+                        <div>
+                            <TooltipContent>
+                                <Text>{item.display_name}</Text>
+                            </TooltipContent>
+                            <div className="mt-1 grid grid-rows-1 divide-y border-t">
+                                <div className="grid grid-cols-2 gap-2 divide-x px-2 [&>*:not(:first-child)]:pl-2 *:py-1">
+                                    <Text
+                                        className={
+                                            (item.statistics?.heartbeat || 0) < item.statistics?.members ? 'text-tertiary!' : 'text-alt'
+                                        }
+                                    >
+                                        <ECGIcon className="-mt-0.5 inline-flex h-4 w-4" /> {item.statistics?.heartbeat || 0}
+                                    </Text>
+                                    <Text alt>
+                                        <UsersIcon className="-mt-0.5 inline-flex h-4 w-4" /> {item.statistics?.members}
+                                    </Text>
+                                </div>
+
+                                {item.temporary && (
+                                    <div className="px-2 py-1 opacity-75">
+                                        <Text alt>
+                                            <TentTreeIcon className="-mt-0.5 inline-flex h-4 w-4" /> Not a pack member
+                                        </Text>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    }
+                    side="right"
+                    delayDuration={0}
+                >
+                    <div className="relative">
+                        <div
+                            className={cn(
+                                'hover:show-pill off-by-six flex h-12 w-12 justify-center items-center before:!left-[-0.65rem]',
+                                currentResource.id === item.id && 'force-pill'
+                            )}
+                            onClick={() => switchResource(item)}
+                        >
+                            <UserAvatar
+                                name={item.display_name}
+                                size={38}
+                                icon={item.images?.avatar}
+                                className="inline-flex cursor-pointer overflow-hidden !rounded-xl"
+                            />
+                        </div>
+
+                        {/* Pack icon background */}
+                        <AnimatePresence>
+                            {currentResource.id === item.id && (
+                                <motion.div
+                                    key={`pack-bg-${item.id}`}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="absolute inset-0 ring-white/10 -z-1 bg-white dark:bg-zinc-900 h-12 ml-0.5 rounded-tl rounded-bl rounded-out-r w-[calc(3.8rem+1px)] pack-icon-bg"
+                                />
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </Tooltip>
+            ))}
+
+            <Protect>
+                <Tooltip content="Create/Join Pack" side="right" delayDuration={0}>
+                    <Link
+                        href="/p/new"
+                        className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === 'new' && 'force-pill')}
+                    >
+                        <Button variant="ghost" size="icon" className="h-8 w-8 p-1">
+                            <PlusIcon />
+                        </Button>
+                    </Link>
+                </Tooltip>
+            </Protect>
+
+            <div className="grow" />
+        </div>
+    )
+}

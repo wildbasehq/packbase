@@ -1,0 +1,36 @@
+{
+  "_rootDir": "pak/badges/",
+  "name": "badges",
+  "config": {
+    "_type": "datatable",
+    "staff": {
+      "_rootDir": "staff/",
+      "tooltip": {
+        "1": "Alumni",
+        "2": "Wow, I work on this!"
+      },
+      "default": "1.png",
+      "kingless": "1_1.png"
+    },
+    "unlockables": {
+      "_rootDir": "unlockables/",
+      "tooltip": {
+        "cat_invite_1": "Invite drop #1",
+        "cat_invite_2": "Invite drop #2",
+        "cat_invite_3": "Invite drop #3",
+        "cat_invite_4": "Invite drop #4",
+        "cat_invite_5": "Invite drop #5",
+        "cat_invite_6": "Invite drop #6",
+        "cat_invite_7": "Invite drop #7",
+        "cat_invite_8": "Invite drop #8",
+        "cat_invite_9": "Invite drop #9",
+        "cat_invite_10": "Invite drop #10",
+        "cat_invite_11": "Invite drop #11",
+        "cat_invite_12": "Invite drop #12",
+        "cat_invite_13": "A baker's dozen of invites",
+        "cat_invite_14": "Backbone of the community",
+        "cat_invite_15": "The life of the party. We are eternally grateful and forever at your service."
+      }
+    }
+  }
+}

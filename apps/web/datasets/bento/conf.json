@@ -1,0 +1,7 @@
+{
+  "_rootDir": "/img/",
+  "load": [
+    "badges",
+    "default_emote"
+  ]
+}
