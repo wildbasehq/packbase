@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown'
 import { Pre } from '@/components/shared/code.tsx'
 import { createElement } from 'react'
 import CreatedByHumans from '@/src/images/svg/noai/created.svg'
+import { clsx } from 'clsx'
 
 /**
  * @TODO Move this into its own utility
@@ -186,7 +187,7 @@ const GenericHTMLImageHandler = new HowlertagHandler('img', ForwardIMG)
 const Howlertag = new HowlertagConverter()
 Howlertag.addHandler(GenericHTMLImageHandler)
 
-export default function Markdown({ children, ...props }: { children: string; [x: string]: any }) {
+export default function Markdown({ children, componentClassName }: { children: string; componentClassName: string; [x: string]: any }) {
     // Check for numbers followed by a period, and if so, replace with \.
     children = children?.replace(/(\d+)\./g, '$1\\.')
 
@@ -201,22 +202,22 @@ export default function Markdown({ children, ...props }: { children: string; [x:
                             key={index}
                             components={{
                                 h1(props) {
-                                    return <Heading as="h1" size="3xl" {...props} />
+                                    return <Heading as="h1" size="3xl" className={clsx(props.className, componentClassName)} {...props} />
                                 },
                                 h2(props) {
-                                    return <Heading as="h2" size="2xl" {...props} />
+                                    return <Heading as="h2" size="2xl" className={clsx(props.className, componentClassName)} {...props} />
                                 },
                                 h3(props) {
-                                    return <Heading as="h3" size="xl" {...props} />
+                                    return <Heading as="h3" size="xl" className={clsx(props.className, componentClassName)} {...props} />
                                 },
                                 p(props) {
-                                    return <Text {...props} />
+                                    return <Text className={clsx(props.className, componentClassName)} {...props} />
                                 },
                                 ul(props) {
-                                    return <ul className="list-disc pl-4" {...props} />
+                                    return <ul className={clsx('list-disc pl-4', props.className, componentClassName)} {...props} />
                                 },
                                 ol(props) {
-                                    return <ol className="list-decimal pl-4" {...props} />
+                                    return <ol className={clsx('list-decimal pl-4', props.className, componentClassName)} {...props} />
                                 },
                                 pre: props => {
                                     return (
@@ -252,7 +253,6 @@ export default function Markdown({ children, ...props }: { children: string; [x:
                                     return <img className="rounded-lg border border-stone-200" {...props} />
                                 },
                             }}
-                            {...props}
                         >
                             {item}
                         </ReactMarkdown>

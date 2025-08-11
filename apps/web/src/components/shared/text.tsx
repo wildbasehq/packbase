@@ -31,24 +31,27 @@ export function Heading({
 
 export function Text({
     children,
+    as,
     size = 'sm',
     alt,
     ...props
 }: {
     children?: React.ReactNode
+    as?: React.ElementType
     size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl'
     alt?: boolean
     [key: string]: any
 }): JSX.Element {
+    const Comp = as || 'p'
     props.className = cn(
-        'text-default select-none',
+        'text-default select-none prose prose-zinc dark:prose-invert max-w-none',
         props.className,
         textSize[size],
         alt && 'text-muted-foreground',
         '[&_p]:leading-relaxed'
     )
 
-    return <p {...props}>{children}</p>
+    return <Comp {...props}>{children}</Comp>
 }
 
 export function TextLink({ className, ...props }: React.ComponentPropsWithoutRef<typeof Link>) {

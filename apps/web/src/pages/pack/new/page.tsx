@@ -15,6 +15,10 @@ import { useModal } from '@/components/modal/provider.tsx'
 import { Input } from '@/components/shared/input.tsx'
 import { Description, Field, Label } from '@/components/shared/fieldset.tsx'
 import Rive from '@rive-app/react-canvas'
+import { UserGroupIcon } from '@heroicons/react/20/solid'
+import { Separator } from '@radix-ui/react-dropdown-menu'
+import { Select, Textarea } from '@/components/shared'
+import Markdown from '@/components/shared/markdown.tsx'
 
 // Types
 type PrivacyOption = {
@@ -109,102 +113,100 @@ function CreatePackModal({ close }: { close: () => void }) {
     }
 
     return (
-        <div className="p-6 max-w-lg">
-            <h2 className="text-xl font-semibold mb-2">Create a Pack</h2>
-            <p className="text-muted-foreground text-sm mb-6">
-                Packs are communities of people with shared interests and customizable spaces.
-            </p>
-
-            <form onSubmit={createPack}>
-                <div className="mb-6">
-                    <label className="block text-sm font-medium mb-1">
-                        Pack Name
-                        <span className="text-red-500 ml-[0.25rem]">*</span>
-                    </label>
-                    <p className="text-xs text-muted-foreground mb-2">What should people call your community?</p>
-                    <Input name="display_name" value={formData.display_name} onChange={handleInputChange} />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-sm font-medium mb-1">
-                        Pack Slug
-                        <span className="text-red-500 ml-[0.25rem]">*</span>
-                    </label>
-                    <p className="text-xs text-muted-foreground mb-2">Choose wisely - changing this later will reset the pack!</p>
-                    <div className="flex items-center">
-                        <span className="text-muted-foreground text-sm mr-1">packbase.app/p/</span>
-                        <Input name="slug" value={formData.slug} onChange={handleInputChange} />
+        <div className="flex flex-col-reverse sm:w-[50vw] md:flex-row">
+            <div className="flex flex-col justify-between sm:w-1/2 md:border-r">
+                <div className="flex-1 grow p-6 space-y-6 max-w-5/6">
+                    <div className="flex items-center space-x-3">
+                        <div className="inline-flex shrink-0 items-center justify-center rounded-sm bg-muted p-3">
+                            <UserGroupIcon className="size-5" aria-hidden={true} />
+                        </div>
+                        <div className="space-y-0.5">
+                            <Heading>{formData?.display_name || 'Pack Name'}</Heading>
+                            <Text alt>{formData?.slug ? `@${formData.slug}` : 'Pack information will show here'}</Text>
+                        </div>
+                    </div>
+                    <Separator className="my-4" />
+                    <div>
+                        <Heading size="sm">Description</Heading>
+                        <Markdown componentClassName="!leading-6 mt-1 !text-muted-foreground">
+                            {formData?.description || '*Packs that describe what they are are more likely to be discovered!*'}
+                        </Markdown>
+                    </div>
+                    <div>
+                        <Heading size="sm">Tips</Heading>
+                        <Text as="div" alt className="!leading-6 mt-1">
+                            <ul className="list-disc list-inside">
+                                <li>The call sign must be unique, but the name can be anything.</li>
+                            </ul>
+                        </Text>
                     </div>
                 </div>
-
-                <div className="mb-6">
-                    <Field>
-                        <Label>Description</Label>
-                        <Description>Tell others what your pack is all about</Description>
-                        <Input name="description" type="textarea" value={formData.description} onChange={handleInputChange} />
-                    </Field>
-                </div>
-
-                {/*<div className="mb-8">*/}
-                {/*    <label className="block text-sm font-medium mb-2">Privacy</label>*/}
-
-                {/*    <RadioGroup value={selected} onChange={setSelected}>*/}
-                {/*        <Label className="sr-only select-none">Privacy</Label>*/}
-                {/*        <div className="space-y-2">*/}
-                {/*            {PRIVACY_OPTIONS.map(privacyOption => (*/}
-                {/*                <Radio*/}
-                {/*                    key={privacyOption.name}*/}
-                {/*                    value={privacyOption}*/}
-                {/*                    className={({ focus, checked }) =>*/}
-                {/*                        `${focus ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-neutral-300' : ''}*/}
-                {/*                                                                    ${*/}
-                {/*                                                                        checked*/}
-                {/*                                                                            ? 'bg-n-1/70 dark:bg-n-6'*/}
-                {/*                                                                            : 'hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50'*/}
-                {/*                                                                    }*/}
-                {/*                                                                    ring-default flex select-none flex-col justify-center rounded border px-4 py-4 !no-underline transition-all`*/}
-                {/*                    }*/}
-                {/*                >*/}
-                {/*                    {({ checked }) => (*/}
-                {/*                        <div className="flex w-full items-center justify-between">*/}
-                {/*                            <div className="flex items-center">*/}
-                {/*                                <div className="text-sm">*/}
-                {/*                                    <Label className={`font-medium  ${checked ? 'text-default' : 'text-alt'}`}>*/}
-                {/*                                        {privacyOption.name}*/}
-                {/*                                    </Label>*/}
-                {/*                                    <Description className="text-alt inline">*/}
-                {/*                                        <span>{privacyOption.desc}</span>{' '}*/}
-                {/*                                        {privacyOption.warn && (*/}
-                {/*                                            <p className="inline-flex items-center">*/}
-                {/*                                                <QuestionMarkCircleIcon className="text-alt h-4 w-4" />*/}
-                {/*                                                <span className="ml-1">{privacyOption.warn}</span>*/}
-                {/*                                            </p>*/}
-                {/*                                        )}*/}
-                {/*                                    </Description>*/}
-                {/*                                </div>*/}
-                {/*                            </div>*/}
-                {/*                            {checked && (*/}
-                {/*                                <div className="text-default shrink-0">*/}
-                {/*                                    <CheckIcon className="h-6 w-6" />*/}
-                {/*                                </div>*/}
-                {/*                            )}*/}
-                {/*                        </div>*/}
-                {/*                    )}*/}
-                {/*                </Radio>*/}
-                {/*            ))}*/}
-                {/*        </div>*/}
-                {/*    </RadioGroup>*/}
-                {/*</div>*/}
-
-                <div className="flex justify-end space-x-3">
-                    <Button plain type="button" onClick={close}>
+                <div className="flex items-center justify-between border-t p-4">
+                    <Button type="button" plain onClick={close}>
                         Cancel
                     </Button>
-                    <Button color="indigo" type="submit" disabled={submitting}>
-                        {submitting ? <LoadingCircle className="h-4 w-4" /> : 'Create Pack'}
+                    <Button color="indigo" type="submit">
+                        Create
                     </Button>
                 </div>
-            </form>
+            </div>
+
+            <div className="flex-1 space-y-6 sm:w-1/2 p-6 md:px-6 md:pb-8 md:pt-6">
+                <Field>
+                    <div className="flex items-center space-x-3 mb-2">
+                        <Text className="inline-flex size-6 items-center justify-center rounded-sm bg-muted">1</Text>
+                        <Label htmlFor="display_name" className="text-sm font-medium">
+                            Give it a name
+                        </Label>
+                    </div>
+                    <Input
+                        type="text"
+                        name="display_name"
+                        placeholder="My Awesome Pack"
+                        value={formData.display_name}
+                        onChange={handleInputChange}
+                        className="mt-1"
+                    />
+                </Field>
+
+                <Field>
+                    <div className="flex items-center space-x-3 mb-2">
+                        <Text className="inline-flex size-6 items-center justify-center rounded-sm bg-muted">2</Text>
+                        <Label htmlFor="slug" className="text-sm font-medium">
+                            Now a call sign
+                        </Label>
+                    </div>
+                    <Description className="!text-xs">
+                        Used to quickly get to your pack via URL, and optionally show as a flair on profiles.
+                    </Description>
+                    <Input type="text" name="slug" placeholder="rawr" value={formData.slug} onChange={handleInputChange} className="mt-1" />
+                </Field>
+
+                <Field>
+                    <div className="flex items-center space-x-3 mb-2">
+                        <Text className="inline-flex size-6 items-center justify-center rounded-sm bg-muted">3</Text>
+                        <Label htmlFor="description" className="text-sm font-medium">
+                            What are you about?
+                        </Label>
+                    </div>
+                    <Textarea
+                        name="description"
+                        placeholder="A pack for all your rawr needs"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                    />
+                </Field>
+
+                <div>
+                    <div className="flex items-center space-x-3 mb-2">
+                        <Text className="inline-flex size-6 items-center justify-center rounded-sm bg-muted">4</Text>
+                        <Heading className="!text-sm font-medium flex-1">
+                            By clicking "Create", you agree that you have the right to use and act on the information you provide, and that
+                            it does not violate any third-party rights.
+                        </Heading>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
