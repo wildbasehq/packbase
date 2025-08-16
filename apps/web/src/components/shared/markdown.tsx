@@ -187,7 +187,7 @@ const GenericHTMLImageHandler = new HowlertagHandler('img', ForwardIMG)
 const Howlertag = new HowlertagConverter()
 Howlertag.addHandler(GenericHTMLImageHandler)
 
-export default function Markdown({ children, componentClassName }: { children: string; componentClassName: string; [x: string]: any }) {
+export default function Markdown({ children, componentClassName }: { children: string; componentClassName?: string; [x: string]: any }) {
     // Check for numbers followed by a period, and if so, replace with \.
     children = children?.replace(/(\d+)\./g, '$1\\.')
 
