@@ -97,7 +97,9 @@ function CreatePackModal({ close }: { close: () => void }) {
             if (error) {
                 toast.error(
                     `Whoops! ${error.status}: ${
-                        (error.status as unknown as number) === 403 ? 'You are not authorized to perform this action.' : error.value.summary
+                        (error.status as unknown as number) === 403
+                            ? 'You cannot create Packs at this time.'
+                            : error.value.summary || "You might've missed a required property."
                     }${error.value.property ? ` (/${error.value.on}${error.value.property})` : ''}`
                 )
                 setSubmitting(false)
@@ -113,9 +115,9 @@ function CreatePackModal({ close }: { close: () => void }) {
     }
 
     return (
-        <div className="flex flex-col-reverse sm:w-[50vw] md:flex-row">
+        <form onSubmit={createPack} className="flex flex-col-reverse sm:w-[50vw] md:flex-row">
             <div className="flex flex-col justify-between sm:w-1/2 md:border-r">
-                <div className="flex-1 grow p-6 space-y-6 max-w-5/6">
+                <div className="flex-1 grow p-6 space-y-6">
                     <div className="flex items-center space-x-3">
                         <div className="inline-flex shrink-0 items-center justify-center rounded-sm bg-muted p-3">
                             <UserGroupIcon className="size-5" aria-hidden={true} />
@@ -137,6 +139,7 @@ function CreatePackModal({ close }: { close: () => void }) {
                         <Text as="div" alt className="!leading-6 mt-1">
                             <ul className="list-disc list-inside">
                                 <li>The call sign must be unique, but the name can be anything.</li>
+                                <li>After pack creation, don't forget to add an icon and banner image!</li>
                             </ul>
                         </Text>
                     </div>
@@ -207,7 +210,7 @@ function CreatePackModal({ close }: { close: () => void }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     )
 }
 
