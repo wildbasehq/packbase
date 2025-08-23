@@ -83,7 +83,7 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
         <div className="relative flex w-full bg-white isolate min-h-svh max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
             {/* Sidebar on desktop */}
             {isSignedIn && (
-                <div className="fixed inset-y-0 left-0 z-10 max-lg:hidden flex h-full">
+                <div className="fixed inset-y-0 left-0 z-20 max-lg:hidden flex h-full">
                     <PackSwitcher />
                 </div>
             )}
@@ -169,7 +169,7 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
 
                     <div className="relative h-[calc(100vh-1rem)] flex overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
                         {isSignedIn && (
-                            <div className="top-0 backdrop-blur border-r h-full flex">
+                            <div className="top-0 backdrop-blur border-r h-full flex z-10">
                                 <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                             </div>
                         )}
