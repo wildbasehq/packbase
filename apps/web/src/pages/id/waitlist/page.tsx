@@ -19,6 +19,7 @@ export default function IDWaitlist() {
                     Packbase Usage Policy & Data Handling terms &rarr;
                 </Link>
             </Text>
+            <Text alt>Average waitlist flow: ~14 days &mdash; Based on last 30 members.</Text>
         </div>
     )
 }
