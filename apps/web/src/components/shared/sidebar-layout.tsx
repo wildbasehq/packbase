@@ -94,9 +94,9 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
                             </div>
                             <div className="ml-3 flex-1">
                                 <Markdown componentClassName="text-sm !text-amber-700 dark:!text-amber-200">
-                                    **Notice:** Some images are not loading due to an issue with our storage provider - This only affects
-                                    content older than 30 days **and** hosted on Packbase. Content hosted yourself is not affected. We're
-                                    working on a fix and will remove this notice once it's resolved.
+                                    **Notice (UPDATED #2):** We're still working out an issue with our storage provider in regards to some
+                                    images - This only affects a small number of content hosted on Packbase. Content hosted yourself is not
+                                    affected.
                                 </Markdown>
                             </div>
                             <div>
