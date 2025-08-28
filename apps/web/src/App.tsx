@@ -154,9 +154,6 @@ function App() {
                                                             </Route>
 
                                                             <Route path="/universe" nest>
-                                                                <SignedOut>
-                                                                    <Redirect to="/" />
-                                                                </SignedOut>
                                                                 <UniversePackLayout>
                                                                     <Route path="/">
                                                                         <Suspense fallback={<LoadingFallback />}>
@@ -165,9 +162,15 @@ function App() {
                                                                     </Route>
 
                                                                     <Route path="/cosmos">
-                                                                        <Suspense fallback={<LoadingFallback />}>
-                                                                            <UniversePack useEverythingQuery />
-                                                                        </Suspense>
+                                                                        <SignedOut>
+                                                                            <Redirect to="/" />
+                                                                        </SignedOut>
+
+                                                                        <SignedIn>
+                                                                            <Suspense fallback={<LoadingFallback />}>
+                                                                                <UniversePack useEverythingQuery />
+                                                                            </Suspense>
+                                                                        </SignedIn>
                                                                     </Route>
 
                                                                     <Route path="/:channel/:id" nest>

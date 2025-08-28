@@ -14,6 +14,7 @@ import { useUIStore, vg } from '@/lib'
 import { FeedPostData, LogoSpinner } from '@/src/components'
 import { toast } from 'sonner'
 import Markdown from '@/components/shared/markdown.tsx'
+import { SignedIn } from '@clerk/clerk-react'
 
 function ThreadMessage({
     message,
@@ -254,9 +255,11 @@ export default function PackChannelThread() {
             </div>
 
             {/* Chat Input */}
-            <div className="border-t p-4">
-                <ChatBox placeholder={`Reply to howl...`} onSend={handleSendMessage} value={newMessage} onChange={setNewMessage} />
-            </div>
+            <SignedIn>
+                <div className="border-t p-4">
+                    <ChatBox placeholder={`Reply to howl...`} onSend={handleSendMessage} value={newMessage} onChange={setNewMessage} />
+                </div>
+            </SignedIn>
         </div>
     )
 }
