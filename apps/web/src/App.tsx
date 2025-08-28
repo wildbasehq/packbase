@@ -223,7 +223,7 @@ function App() {
                                                         </ChatLayout>
                                                     </Route>
 
-                                                    <Route path={/^\/@(?<slug>[^\/]+)\/?$/}>
+                                                    <Route path={/^\/(%40|@)(?<slug>[^\/]+)\/?$/}>
                                                         <Suspense fallback={<LoadingFallback />}>
                                                             <UserProfile />
                                                         </Suspense>
