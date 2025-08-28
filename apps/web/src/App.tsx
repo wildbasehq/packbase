@@ -2,7 +2,7 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { lazy, Suspense } from 'react'
+import React, { lazy, Suspense, useEffect } from 'react'
 import { Text } from '@/components/shared/text.tsx'
 import { SidebarLayout } from '@/components/shared/sidebar-layout.tsx'
 import { Providers } from './provider.tsx'
@@ -19,6 +19,7 @@ import PackChannelThread from '@/pages/pack/[slug]/[channel]/[thread]/page.tsx'
 import Preload from '@/src/preload.tsx'
 import ChatLayout from '@/pages/c/layout.tsx'
 import NotSelected from '@/pages/c/not-selected.tsx'
+import { ProjectName, ProjectSafeName } from '@/lib'
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
@@ -51,6 +52,58 @@ const LoadingFallback = () => (
 )
 
 function App() {
+    useEffect(() => {
+        const styles = {
+            subtitle: 'color: #4a90e2; font-size: 14px; font-weight: bold;',
+            info: 'color: #666; font-size: 12px;',
+            accent: 'color: #ff6b35; font-weight: bold;',
+            success: 'color: #27ae60; font-weight: bold;',
+        }
+
+        console.log(
+            `%c      _                    
+__/\\_| |__   __ _ ___  ___ 
+\\    / '_ \\ / _\` / __|/ _ \\
+/_  _\\ |_) | (_| \\__ \\  __/
+  \\/ |_.__/ \\__,_|___/\\___|
+  
+  (c) Wildbase 2025
+`,
+            'color: #ff6b35;'
+        )
+
+        console.log('')
+        console.log("Welcome. Don't run random scripts people send to you. That'd be fucking stupid as shit.")
+        console.log('')
+
+        console.log(`%cℹ️  ${ProjectName}:`, styles.accent)
+        console.log(`%c   • Framework: Vite, React ${React.version}`, styles.info)
+        console.log(`%c   • Language: TypeScript`, styles.info)
+        console.log(`%c   • Build: ${process.env.NODE_ENV || 'development'}`, styles.info)
+        console.log(`%c   • Advert. CN: ${ProjectSafeName}`, styles.info)
+        console.log('')
+
+        console.log('%c`base()`', 'color: #9b59b6; font-style: italic;')
+        ;(window as any).base = () =>
+            console.log(`Dear user,
+
+Big tech doesn't work for you. They don't know what a creative site is, they don't even know what being creative truly means. Every little byte of code to them is money - nothing more.
+
+On the Internet, you have the power to make whatever the hell you want. Make a site with just basic <a>links</a>, a bio about yourself, whatever it may be; it's art. It's **your** art.
+
+"But a site can't be art" some say. "It's just a website."
+
+If you spend hours making a page that embodies you, that's art.
+
+What i'm trying to say is, do what you want, make what you want.
+At the end of the day,
+only you know what's good
+for you.
+
+Thanks for being a crucial part of the internet.
+        `)
+    }, [])
+
     return (
         <Providers>
             <SidebarProvider>
