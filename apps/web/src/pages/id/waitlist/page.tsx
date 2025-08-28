@@ -5,10 +5,19 @@
 import Link from '@/components/shared/link'
 import { Waitlist } from '@clerk/clerk-react'
 import { Text } from '@/components/shared/text.tsx'
+import { Alert, AlertDescription, AlertTitle } from '@/src/components'
 
 export default function IDWaitlist() {
     return (
         <div className="space-y-4">
+            <Alert variant="destructive" className="shadow-xs mb-4">
+                <AlertTitle>Age Requirement Changes</AlertTitle>
+                <AlertDescription>
+                    On 10th of December 2025, we will be changing the age requirement to 18+, but content you can and cannot upload will be
+                    the same.
+                </AlertDescription>
+            </Alert>
+
             <div className="shadow-xs ring-1 ring-n-5/10 rounded overflow-clip">
                 <Waitlist signInUrl="/id/login" />
             </div>

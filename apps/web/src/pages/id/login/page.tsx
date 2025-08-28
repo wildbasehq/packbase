@@ -13,11 +13,11 @@ export default function IDLogin() {
 
     return (
         <>
-            <Alert className="shadow-xs ring-1 ring-n-5/10 border-0 mb-4">
-                <AlertTitle>Signing in after 30/05/2025?</AlertTitle>
+            <Alert variant="destructive" className="shadow-xs mb-4">
+                <AlertTitle>Age Requirement Changes</AlertTitle>
                 <AlertDescription>
-                    After that date, you'll need access to your email to sign in. If you no longer have access to this email address,
-                    contact the email provider, or contact us if you have proof of ownership.
+                    On 10th of December 2025, we will be changing the age requirement to 18+, but content you can and cannot upload will be
+                    the same.
                 </AlertDescription>
             </Alert>
             <div className="shadow-xs ring-1 ring-n-5/10 rounded overflow-clip">
