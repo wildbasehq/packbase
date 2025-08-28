@@ -77,7 +77,7 @@ function MobileSidebar({ open, close, children }: React.PropsWithChildren<{ open
 
 export function SidebarLayout({ children }: React.PropsWithChildren) {
     let [showSidebar, setShowSidebar] = useState(false)
-    const [showVGSNotice, setShowVGSNotice] = useState(true)
+    // const [showVGSNotice, setShowVGSNotice] = useState(true)
     const { isSignedIn } = useSession()
     const { sidebarContent } = useSidebar()
     // const [location] = useLocation()
@@ -85,39 +85,39 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
 
     return (
         <div className="w-full bg-white isolate min-h-svh max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
-            {showVGSNotice && (
-                <div className="top-0 z-50 mx-2 my-2">
-                    <div className="bg-amber-50 border-2 ring-2 ring-amber-500/10 border-amber-500 p-4 rounded-md shadow-sm dark:bg-amber-900/20 dark:border-amber-600">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <ShieldExclamationIcon className="h-5 w-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />
-                            </div>
-                            <div className="ml-3 flex-1">
-                                <Markdown componentClassName="text-sm !text-amber-700 dark:!text-amber-200">
-                                    **Notice (UPDATED #2):** We're still working out an issue with our storage provider in regards to some
-                                    images - This only affects a small number of content hosted on Packbase. Content hosted yourself is not
-                                    affected.
-                                </Markdown>
-                            </div>
-                            <div>
-                                <button
-                                    type="button"
-                                    className="inline-flex rounded p-1.5 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                    onClick={() => setShowVGSNotice(false)}
-                                >
-                                    <span className="sr-only">Dismiss</span>
-                                    <XIcon className="h-5 w-5" aria-hidden="true" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/*{showVGSNotice && (*/}
+            {/*    <div className="top-0 z-50 mx-2 my-2">*/}
+            {/*        <div className="bg-amber-50 border-2 ring-2 ring-amber-500/10 border-amber-500 p-4 rounded-md shadow-sm dark:bg-amber-900/20 dark:border-amber-600">*/}
+            {/*            <div className="flex items-center">*/}
+            {/*                <div className="flex-shrink-0">*/}
+            {/*                    <ShieldExclamationIcon className="h-5 w-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />*/}
+            {/*                </div>*/}
+            {/*                <div className="ml-3 flex-1">*/}
+            {/*                    <Markdown componentClassName="text-sm !text-amber-700 dark:!text-amber-200">*/}
+            {/*                        **Notice (UPDATED #2):** We're still working out an issue with our storage provider in regards to some*/}
+            {/*                        images - This only affects a small number of content hosted on Packbase. Content hosted yourself is not*/}
+            {/*                        affected.*/}
+            {/*                    </Markdown>*/}
+            {/*                </div>*/}
+            {/*                <div>*/}
+            {/*                    <button*/}
+            {/*                        type="button"*/}
+            {/*                        className="inline-flex rounded p-1.5 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500"*/}
+            {/*                        onClick={() => setShowVGSNotice(false)}*/}
+            {/*                    >*/}
+            {/*                        <span className="sr-only">Dismiss</span>*/}
+            {/*                        <XIcon className="h-5 w-5" aria-hidden="true" />*/}
+            {/*                    </button>*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*)}*/}
 
             <div className="relative flex">
                 {/* Sidebar on desktop */}
                 {isSignedIn && (
-                    <div className={cn('fixed inset-y-0 left-0 z-20 max-lg:hidden flex h-full', showVGSNotice && 'top-20')}>
+                    <div className={cn('fixed inset-y-0 left-0 z-20 max-lg:hidden flex h-full' /**,showVGSNotice && 'top-20'**/)}>
                         <PackSwitcher />
                     </div>
                 )}
