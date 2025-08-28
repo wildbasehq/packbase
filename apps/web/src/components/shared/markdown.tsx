@@ -5,9 +5,38 @@
 import { Heading, Text } from '@/components/shared/text'
 import ReactMarkdown from 'react-markdown'
 import { Pre } from '@/components/shared/code.tsx'
-import { createElement } from 'react'
+import { createElement, Children, isValidElement, cloneElement } from 'react'
 import CreatedByHumans from '@/src/images/svg/noai/created.svg'
 import { clsx } from 'clsx'
+
+// Dot SVG component
+const DotIcon = ({ className }: { className?: string }) => (
+    <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <circle cx="3" cy="3" r="3" fill="currentColor" />
+    </svg>
+)
+
+// Custom UL component that uses dot SVG and replaces li with Text
+const CustomUL = ({ children, className, ...props }: any) => {
+    const processedChildren = Children.map(children, child => {
+        if (isValidElement(child) && child.type === 'li') {
+            return (
+                <div className="flex items-start gap-2 my-1" key={child.key}>
+                    <DotIcon className="mt-1.5 text-stone-500 flex-shrink-0" />
+                    {/* @ts-ignore */}
+                    <Text className="flex-1">{child.props.children}</Text>
+                </div>
+            )
+        }
+        return child
+    })
+
+    return (
+        <div className={clsx('space-y-2', className)} {...props}>
+            {processedChildren}
+        </div>
+    )
+}
 
 /**
  * @TODO Move this into its own utility
@@ -214,10 +243,24 @@ export default function Markdown({ children, componentClassName }: { children: s
                                     return <Text className={clsx(props.className, componentClassName)} {...props} />
                                 },
                                 ul(props) {
-                                    return <ul className={clsx('list-disc pl-4', props.className, componentClassName)} {...props} />
+                                    return (
+                                        <CustomUL
+                                            className={clsx('text-sm text-default select-none', props.className, componentClassName)}
+                                            {...props}
+                                        />
+                                    )
                                 },
                                 ol(props) {
-                                    return <ol className={clsx('list-decimal pl-4', props.className, componentClassName)} {...props} />
+                                    return (
+                                        <ol
+                                            className={clsx(
+                                                'text-sm text-default select-none list-decimal pl-4 space-y-1',
+                                                props.className,
+                                                componentClassName
+                                            )}
+                                            {...props}
+                                        />
+                                    )
                                 },
                                 pre: props => {
                                     return (

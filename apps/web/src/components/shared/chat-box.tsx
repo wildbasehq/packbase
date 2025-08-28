@@ -193,7 +193,7 @@ export function ChatBox({
                                 </Button>
                             )
                         })}
-                        <div className="h-6 w-px bg-n-3 dark:bg-n-6 mx-2" />
+                        {/*<div className="h-6 w-px bg-n-3 dark:bg-n-6 mx-2" />*/}
                         {showMentions && (
                             <Button
                                 plain
@@ -205,15 +205,6 @@ export function ChatBox({
                                 <AtSign data-slot="icon" className="h-4 w-4" />
                             </Button>
                         )}
-                        <Button
-                            plain
-                            className="h-8 w-8 p-0 shrink-0"
-                            onClick={() => insertMarkdown('#')}
-                            title="Reference channel"
-                            type="button"
-                        >
-                            <Hash className="h-4 w-4" />
-                        </Button>
                     </div>
                 </div>
             )}

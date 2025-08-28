@@ -36,6 +36,8 @@ interface ContentFrameProps {
     id?: string
     /** Whether to silently fail if the request fails */
     silentFail?: boolean
+    /** Refresh interval in seconds. If provided, data will be automatically refreshed at this interval */
+    refreshInterval?: number
 }
 
 /**
@@ -266,6 +268,7 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
     onError,
     id,
     silentFail = false,
+    refreshInterval,
 }) => {
     const [responseData, setResponseData] = useState<any>(null)
     const [loading, setLoading] = useState<boolean>(true)
@@ -275,6 +278,9 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
 
     // Get parent context to enable nesting
     const parentContext = useContext(ContentFrameContext)
+
+    // State to track the refresh interval timer
+    const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
 
     // Determine the method and path
     const method = get ? 'get' : post ? 'post' : put ? 'put' : deleteMethod ? 'delete' : patch ? 'patch' : null
@@ -408,6 +414,31 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
     useEffect(() => {
         makeRequest()
     }, [method, path, JSON.stringify(requestData), isLoaded])
+
+    // Set up automatic refresh interval if specified
+    useEffect(() => {
+        // Clear any existing interval
+        if (intervalId) {
+            clearInterval(intervalId)
+            setIntervalId(null)
+        }
+
+        // Set up new interval if refreshInterval is provided and valid
+        if (refreshInterval && refreshInterval > 0 && isLoaded && method && path) {
+            const id = setInterval(() => {
+                makeRequest()
+            }, refreshInterval * 1000) // Convert seconds to milliseconds
+
+            setIntervalId(id)
+        }
+
+        // Cleanup function to clear interval on unmount or dependency change
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId)
+            }
+        }
+    }, [refreshInterval, isLoaded, method, path, JSON.stringify(requestData)])
 
     // Render an error page if there's an error and no custom error handler
     if (error && !onError && !silentFail) {

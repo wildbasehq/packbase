@@ -68,7 +68,7 @@ const RetentionOrders = {
     DAYS_90: '90 days',
     DAYS_30: '30 days',
     UNTIL_PROFILE_DEL_OR_LAW: 'Until profile deletion or as required by law',
-    NEVER_BROWSER_ONLY: 'Never - Stored in browser, but sent to API & disposed of after processing',
+    NEVER_BROWSER_ONLY: 'Never - Stored in browser',
 }
 
 export const termsConfig: TermsConfig = {
@@ -103,7 +103,6 @@ export const termsConfig: TermsConfig = {
             purpose: 'Service provisioning and access control',
             retention: RetentionOrders.UNTIL_WID_DEL,
         },
-        { type: 'Password (encrypted)', purpose: 'Account security', retention: RetentionOrders.UNTIL_WID_DEL },
         {
             type: 'Multi-factor authentication settings',
             purpose: 'Account security',
@@ -366,6 +365,7 @@ export const termsConfig: TermsConfig = {
                                 'Repeated violations lead to permanent account termination',
                                 'Illegal content will be reported to authorities',
                                 'Appeals can be submitted within 30 days',
+                                'A generalised summary of reports and the action we have taken will be public under the content. No one will be identified.',
                             ],
                         },
                     ],
@@ -402,12 +402,12 @@ export const termsConfig: TermsConfig = {
                 },
                 {
                     type: 'heading',
-                    content: 'Wildbase Security T2',
+                    content: 'Wildbase Security Tier 2',
                     level: 3,
                 },
                 {
                     type: 'text',
-                    content: 'We maintain compliance with Wildbase Security T2, which means:',
+                    content: 'We maintain compliance with Wildbase Security Tier 2, which means:',
                 },
                 {
                     type: 'list',
@@ -425,7 +425,7 @@ export const termsConfig: TermsConfig = {
                 {
                     type: 'text',
                     content:
-                        'Wildbase Security T1-4 an in-house security standard that ensures the confidentiality, integrity, and availability of our systems and data from transit to rest.',
+                        'Wildbase Security (1 - 4) an in-house security standard that ensures the confidentiality, integrity, and availability of our systems and data from transit to rest.',
                 },
                 {
                     type: 'heading',
@@ -440,7 +440,7 @@ export const termsConfig: TermsConfig = {
                 {
                     type: 'text',
                     content:
-                        'In addition to the data listed below, we use PostHog analytics to collect anonymous usage data that helps us improve our services. This includes information about how you interact with Packbase, such as pages visited, features used, and performance metrics. All analytics data is processed in accordance with our privacy commitments and is retained for no more than 90 days.',
+                        'No analytical data about you is collected from the site. We may occasionally run math algorithms towards the database (hereinafter "Experiments", "Science") to improve our services, but no sensitive or private information is used in these calculations, and as such, we cannot identify you from these calculations. Whenever we run these, the results are publicly available and can be viewed by anyone.',
                 },
                 {
                     type: 'table',

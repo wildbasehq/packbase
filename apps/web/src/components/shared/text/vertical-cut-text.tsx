@@ -138,7 +138,7 @@ const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
 
         return (
             <span
-                className={cn(containerClassName, 'flex flex-wrap whitespace-pre-wrap', splitBy === 'lines' && 'flex-col')}
+                className={cn(containerClassName, 'flex flex-wrap whitespace-normal', splitBy === 'lines' && 'flex-col')}
                 onClick={onClick}
                 ref={containerRef}
                 {...props}
@@ -157,7 +157,7 @@ const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
                     return (
                         <span key={wordIndex} aria-hidden="true" className={cn('inline-flex overflow-hidden', wordLevelClassName)}>
                             {wordObj.characters.map((char, charIndex) => (
-                                <span className={cn(elementLevelClassName, 'whitespace-pre-wrap relative')} key={charIndex}>
+                                <span className={cn(elementLevelClassName, 'whitespace-normal relative')} key={charIndex}>
                                     <motion.span
                                         custom={previousCharsCount + charIndex}
                                         initial="hidden"

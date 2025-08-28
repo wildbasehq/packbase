@@ -1,33 +1,36 @@
-import {YapockType} from '@/index'
-import {t} from 'elysia'
-import {UserProfile} from '@/models/defs'
-import posthog, {distinctId} from '@/utils/posthog'
-import {HTTPError} from '@/lib/class/HTTPError'
-import prisma from '@/db/prisma'
-import clerkClient from '@/db/auth'
+import { YapockType } from '@/index';
+import { t } from 'elysia';
+import { UserProfile } from '@/models/defs';
+import posthog, { distinctId } from '@/utils/posthog';
+import { HTTPError } from '@/lib/class/HTTPError';
+import prisma from '@/db/prisma';
+import clerkClient from '@/db/auth';
 
-export const UserCache = new Map<string, typeof UserProfile & {
-    expires_after: number;
-}>()
+export const UserCache = new Map<
+    string,
+    typeof UserProfile & {
+        expires_after: number;
+    }
+>();
 
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({params, user, set}) => {
+        async ({ params, user, set }) => {
             const userRes = await getUser({
                 by: 'username',
                 value: params.username,
-                user
-            })
+                user,
+            });
 
             if (!userRes) {
-                set.status = 404
+                set.status = 404;
                 throw HTTPError.notFound({
                     summary: 'The user was not found.',
-                })
+                });
             }
 
-            return userRes
+            return userRes;
         },
         {
             params: t.Object({
@@ -41,13 +44,17 @@ export default (app: YapockType) =>
             },
             response: {
                 404: t.Undefined(),
-                200: UserProfile
-            }
+                200: UserProfile,
+            },
         },
     );
 
-export async function getUser({by, value, user, scope}: { by: string; value: string; user?: any; scope?: string }) {
-    const timer = new Date().getTime()
+export async function getUserClerkByID(id: string) {
+    return await clerkClient.users.getUser(id);
+}
+
+export async function getUser({ by, value, user, scope }: { by: string; value: string; user?: any; scope?: string }) {
+    const timer = new Date().getTime();
     // let cached: typeof UserProfile & { expires_after: number } | undefined
     //
     // UserCache.forEach((v, k) => {
@@ -56,50 +63,52 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
     //     }
     // })
 
-    let data
-    let clerkUser
+    let data;
+    let clerkUser;
     // if (!cached || cached.expires_after < Date.now()) {
     //     if (cached) UserCache.delete(cached.id)
 
     try {
         // Create a dynamic where condition based on the 'by' parameter
-        const whereCondition = {[by]: value}
+        const whereCondition = { [by]: value };
 
         if (by === 'username') {
             const userFind = await clerkClient.users.getUserList({
-                username: [value]
-            })
+                username: [value],
+            });
 
-            clerkUser = userFind.data?.find(u => u.username === value)
+            clerkUser = userFind.data?.find((u) => u.username === value);
 
-            whereCondition.owner_id = clerkUser?.id
+            whereCondition.owner_id = clerkUser?.id;
         }
 
         const userData = await prisma.profiles.findFirst({
             where: whereCondition,
-            ...(scope === 'basic' ? {
-                select: {
-                    id: true,
-                    owner_id: true,
-                    display_name: true,
-                    bio: true,
-                }
-            } : {})
-        })
+            ...(scope === 'basic'
+                ? {
+                      select: {
+                          id: true,
+                          owner_id: true,
+                          display_name: true,
+                          bio: true,
+                      },
+                  }
+                : {}),
+        });
 
         if (!userData) {
-            return null
+            return null;
         }
 
         if (by !== 'username') {
-            clerkUser = await clerkClient.users.getUser(userData.owner_id)
+            clerkUser = await clerkClient.users.getUser(userData.owner_id);
         }
 
-        data = userData
-        data.username = clerkUser.username
+        data = userData;
+        data.username = clerkUser.username;
     } catch (error: any) {
         // Handle specific Prisma errors if needed
-        throw error
+        throw error;
     }
     // } else {
     //     const {expires_after, ...profile} = cached
@@ -107,23 +116,23 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
     //     data = profile
     // }
 
-    if (!data) return
+    if (!data) return;
 
     // Cache for 5 minutes
     // UserCache.set(data.id, {...data, expires_after: Date.now() + 1000 * 60 * 5})
 
     data.about = {
         bio: data.bio,
-    }
-    delete data.bio
+    };
+    delete data.bio;
 
     data.images = {
         avatar: clerkUser.imageUrl || null,
         header: data.images_header,
-    }
+    };
 
-    delete data.images_avatar
-    delete data.images_header
+    delete data.images_avatar;
+    delete data.images_header;
 
     if (user) {
         // Check if following
@@ -131,12 +140,12 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
             const followingData = await prisma.profiles_followers.findFirst({
                 where: {
                     user_id: user.sub,
-                    following_id: data.id
-                }
-            })
+                    following_id: data.id,
+                },
+            });
 
             if (followingData) {
-                data.following = true
+                data.following = true;
             }
         } catch (error) {
             // If there's an error, we'll just continue without setting following status
@@ -146,11 +155,11 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
     const userBadges = await prisma.collectibles.findFirst({
         where: {
             user_id: data.id,
-            is_set: true
-        }
-    })
+            is_set: true,
+        },
+    });
     if (userBadges) {
-        data.badge = userBadges.badge_id
+        data.badge = userBadges.badge_id;
     }
 
     posthog.capture({
@@ -160,9 +169,9 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
             // cached: !!cached,
             fetch_time: new Date().getTime() - timer,
             username: data.username,
-            user_id: data.id
+            user_id: data.id,
         },
-    })
+    });
 
-    return data
+    return data;
 }

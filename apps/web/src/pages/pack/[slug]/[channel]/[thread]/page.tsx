@@ -71,7 +71,7 @@ function ThreadMessage({
                         </Text>
                     </div>
                     <div className="mt-1">
-                        <Text size="sm" className="leading-relaxed whitespace-pre-wrap">
+                        <Text size="sm" className="leading-relaxed whitespace-normal">
                             {message.body}
                         </Text>
                     </div>

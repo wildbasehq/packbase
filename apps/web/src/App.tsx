@@ -34,6 +34,7 @@ const TermsPage = lazy(() => import('@/pages/terms/page.tsx'))
 const ThankYouFriends = lazy(() => import('@/pages/thanks/page.tsx'))
 const UserProfile = lazy(() => import('@/pages/user/[...slug]/page.tsx'))
 const SearchPage = lazy(() => import('@/pages/search/page.tsx'))
+const ChatThreadPage = lazy(() => import('@/pages/c/[id]/page.tsx'))
 
 // Playground
 const Playground = lazy(() => import('@/pages/playground/page.tsx'))
@@ -212,12 +213,12 @@ function App() {
                                                                     <Suspense fallback={<LoadingFallback />}>
                                                                         <NotSelected />
                                                                     </Suspense>
+                                                                </Route>
 
-                                                                    <Route path="/:slug">
-                                                                        <Suspense fallback={<LoadingFallback />}>
-                                                                            some component here
-                                                                        </Suspense>
-                                                                    </Route>
+                                                                <Route path="/:id">
+                                                                    <Suspense fallback={<LoadingFallback />}>
+                                                                        <ChatThreadPage />
+                                                                    </Suspense>
                                                                 </Route>
                                                             </Switch>
                                                         </ChatLayout>

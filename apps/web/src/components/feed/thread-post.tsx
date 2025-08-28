@@ -175,7 +175,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                             </Link>
                         )}
                         {/* Post body */}
-                        <div className="whitespace-pre-wrap break-words">
+                        <div className="whitespace-normal break-words">
                             <Markdown>{post.body}</Markdown>
                         </div>
 
