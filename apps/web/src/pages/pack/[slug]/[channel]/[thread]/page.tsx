@@ -13,6 +13,7 @@ import { formatRelativeTime } from '@/lib/utils/date.ts'
 import { useUIStore, vg } from '@/lib'
 import { FeedPostData, LogoSpinner } from '@/src/components'
 import { toast } from 'sonner'
+import Markdown from '@/components/shared/markdown.tsx'
 
 function ThreadMessage({
     message,
@@ -71,9 +72,7 @@ function ThreadMessage({
                         </Text>
                     </div>
                     <div className="mt-1">
-                        <Text size="sm" className="leading-relaxed whitespace-normal">
-                            {message.body}
-                        </Text>
+                        <Markdown className="leading-relaxed whitespace-normal">{message.body}</Markdown>
                     </div>
 
                     {/* Reactions */}
