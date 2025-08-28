@@ -299,7 +299,7 @@ export const termsConfig: TermsConfig = {
                     type: 'list',
                     listType: 'unordered',
                     items: [
-                        'You must be at least 16 years old to use Packbase',
+                        'You must be at least 18 years old to use Packbase',
                         'You are responsible for maintaining the confidentiality of your account',
                         'You agree not to use Packbase for any unlawful purposes',
                     ],
@@ -554,9 +554,9 @@ export const termsConfig: TermsConfig = {
                     type: 'list',
                     listType: 'unordered',
                     items: [
-                        'We do not knowingly collect personal information from children under 16, and as such, comply with COPPA.',
-                        'If we learn we have collected personal information from a child under 16, we will delete that information in accordance with our breach policy (L4).',
-                        "By law, as our minimum age is 16, parents cannot review, delete, or refuse further collection of their child's information.",
+                        'We do not knowingly collect personal information from those under 18, and as such, comply with COPPA.',
+                        'If we learn we have collected personal information from a person under 18, we will delete that information in accordance with our breach policy.',
+                        "By law, as our minimum age is 18, parents cannot review, delete, or refuse further collection of their child's information.",
                     ],
                 },
                 {
