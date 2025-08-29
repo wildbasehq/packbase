@@ -58,9 +58,51 @@ function MessagesList() {
     const [loadingOlder, setLoadingOlder] = React.useState(false)
     const [hasMoreMessages, setHasMoreMessages] = React.useState(true)
     const scrollContainerRef = React.useRef<HTMLDivElement>(null)
+    
+    // Editing state
+    const [editingMessageId, setEditingMessageId] = React.useState<string | null>(null)
+    const [editContent, setEditContent] = React.useState('')
 
     const channel = channelFrame?.data as any
     const { session } = useSession()
+
+    // Edit helper functions
+    const startEdit = (messageId: string, currentContent: string) => {
+        setEditingMessageId(messageId)
+        setEditContent(currentContent || '')
+    }
+
+    const cancelEdit = () => {
+        setEditingMessageId(null)
+        setEditContent('')
+    }
+
+    const saveEdit = async (messageId: string) => {
+        if (!editContent.trim()) return
+        
+        try {
+            const token = await session?.getToken()
+            const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${messageId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({ content: editContent.trim() }),
+            })
+            
+            if (res.ok) {
+                const updatedMessage = await res.json()
+                // Update the message in the local data
+                messagesFrame.data = messagesFrame.data.map((msg: any) =>
+                    msg.id === messageId ? { ...msg, content: updatedMessage.content, edited_at: updatedMessage.edited_at } : msg
+                )
+                cancelEdit()
+            }
+        } catch (error) {
+            console.error('Failed to edit message:', error)
+        }
+    }
 
     // Function to load older messages
     const loadOlderMessages = async () => {
@@ -215,28 +257,164 @@ function MessagesList() {
                                     <span className="text-sm font-medium">{author.name}</span>
                                     <span className="text-[11px] text-muted-foreground">{timeLabel}</span>
                                 </div>
-                                <div className="text-sm whitespace-normal break-words">
-                                    <div className={first._isPending ? 'opacity-60' : ''}>
-                                        <Markdown>{first.content ?? <i className="text-muted-foreground">deleted</i>}</Markdown>
-                                        {first._isPending && (
+                                <div className="text-sm whitespace-normal break-words group/message relative">
+                                    {editingMessageId === first.id ? (
+                                        <div className="space-y-2">
+                                            <textarea
+                                                value={editContent}
+                                                onChange={(e) => setEditContent(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Escape') {
+                                                        cancelEdit()
+                                                    } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                                                        e.preventDefault()
+                                                        saveEdit(first.id)
+                                                    }
+                                                }}
+                                                className="w-full p-2 text-sm border border-border rounded resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                                                rows={3}
+                                                autoFocus
+                                            />
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => saveEdit(first.id)}
+                                                    className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                                                >
+                                                    Save
+                                                </button>
+                                                <button
+                                                    onClick={cancelEdit}
+                                                    className="px-3 py-1 text-xs bg-muted text-muted-foreground rounded hover:bg-muted/80"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className={first._isPending ? 'opacity-60' : ''}>
+                                            <Markdown>{first.content ?? <i className="text-muted-foreground">deleted</i>}</Markdown>
+                                            {first._isPending && (
+                                                <span className="ml-2 text-xs text-muted-foreground">
+                                                    <span className="animate-pulse">Sending...</span>
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                    {me && g.authorId === me.id && !first._isPending && !first.deleted_at && (
+                                        <div className="absolute -top-2 right-0 opacity-0 group-hover/message:opacity-100 transition-opacity bg-background border border-border rounded-md shadow-sm p-1 flex gap-1">
+                                            <button
+                                                className="text-xs px-2 py-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                                                onClick={() => startEdit(first.id, first.content)}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="text-xs px-2 py-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                                                onClick={async () => {
+                                                    try {
+                                                        const token = await session?.getToken()
+                                                        const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${first.id}`, {
+                                                            method: 'DELETE',
+                                                            headers: {
+                                                                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                                                            },
+                                                        })
+                                                        if (res.ok) {
+                                                            // Optimistically update the message to show as deleted
+                                                            messagesFrame.data = messagesFrame.data.map((msg: any) =>
+                                                                msg.id === first.id ? { ...msg, deleted_at: new Date().toISOString(), content: null } : msg
+                                                            )
+                                                        }
+                                                    } catch (error) {
+                                                        console.error('Failed to delete message:', error)
+                                                    }
+                                                }}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        {g.items.slice(1).map((m: any) => (
+                            <div key={m.id} className="pl-11 mt-1 text-sm whitespace-normal break-words group/message relative">
+                                {editingMessageId === m.id ? (
+                                    <div className="space-y-2">
+                                        <textarea
+                                            value={editContent}
+                                            onChange={(e) => setEditContent(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Escape') {
+                                                    cancelEdit()
+                                                } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                                                    e.preventDefault()
+                                                    saveEdit(m.id)
+                                                }
+                                            }}
+                                            className="w-full p-2 text-sm border border-border rounded resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                                            rows={3}
+                                            autoFocus
+                                        />
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => saveEdit(m.id)}
+                                                className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                onClick={cancelEdit}
+                                                className="px-3 py-1 text-xs bg-muted text-muted-foreground rounded hover:bg-muted/80"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className={m._isPending ? 'opacity-60' : ''}>
+                                        <Markdown>{m.content ?? <i className="text-muted-foreground">deleted</i>}</Markdown>
+                                        {m._isPending && (
                                             <span className="ml-2 text-xs text-muted-foreground">
                                                 <span className="animate-pulse">Sending...</span>
                                             </span>
                                         )}
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        {g.items.slice(1).map((m: any) => (
-                            <div key={m.id} className="pl-11 mt-1 text-sm whitespace-normal break-words">
-                                <div className={m._isPending ? 'opacity-60' : ''}>
-                                    <Markdown>{m.content ?? <i className="text-muted-foreground">deleted</i>}</Markdown>
-                                    {m._isPending && (
-                                        <span className="ml-2 text-xs text-muted-foreground">
-                                            <span className="animate-pulse">Sending...</span>
-                                        </span>
-                                    )}
-                                </div>
+                                )}
+                                {me && m.author_id === me.id && !m._isPending && !m.deleted_at && (
+                                    <div className="absolute -top-2 right-0 opacity-0 group-hover/message:opacity-100 transition-opacity bg-background border border-border rounded-md shadow-sm p-1 flex gap-1">
+                                        <button
+                                            className="text-xs px-2 py-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                                            onClick={() => startEdit(m.id, m.content)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            className="text-xs px-2 py-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                                            onClick={async () => {
+                                                try {
+                                                    const token = await session?.getToken()
+                                                    const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${m.id}`, {
+                                                        method: 'DELETE',
+                                                        headers: {
+                                                            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                                                        },
+                                                    })
+                                                    if (res.ok) {
+                                                        // Optimistically update the message to show as deleted
+                                                        messagesFrame.data = messagesFrame.data.map((msg: any) =>
+                                                            msg.id === m.id ? { ...msg, deleted_at: new Date().toISOString(), content: null } : msg
+                                                        )
+                                                    }
+                                                } catch (error) {
+                                                    console.error('Failed to delete message:', error)
+                                                }
+                                            }}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>

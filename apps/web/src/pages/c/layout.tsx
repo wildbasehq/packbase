@@ -63,12 +63,17 @@ function ChannelsList() {
                     <SidebarItem key={c.id} href={`/c/${c.id}`}>
                         <div className="flex items-center gap-2 min-w-0">
                             <Avatar src={avatarSrc} alt={name} initials={avatarSrc ? undefined : initials} className="size-6" />
-                            <div className="flex flex-col min-w-0">
+                            <div className="flex flex-col min-w-0 flex-1">
                                 <SidebarLabel>{name}</SidebarLabel>
                                 {c.last_message?.content ? (
                                     <SidebarLabel className="text-muted-foreground truncate">{c.last_message.content}</SidebarLabel>
                                 ) : null}
                             </div>
+                            {c.unread_count > 0 && (
+                                <div className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full min-w-[1.25rem] h-5 flex items-center justify-center font-medium shrink-0">
+                                    {c.unread_count > 99 ? '99+' : c.unread_count}
+                                </div>
+                            )}
                         </div>
                     </SidebarItem>
                 )

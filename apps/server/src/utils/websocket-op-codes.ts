@@ -9,4 +9,9 @@ export const WSOPCode = {
 
     // Events
     READY: 4,
+
+    // DM Events
+    DM_MESSAGE_CREATE: 10,
+    DM_MESSAGE_UPDATE: 11,
+    DM_MESSAGE_DELETE: 12,
 }
