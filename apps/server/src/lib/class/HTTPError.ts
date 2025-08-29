@@ -206,6 +206,13 @@ export class HTTPError extends Error {
     }
 
     /**
+     * Create a Payload Too Large (413) error
+     */
+    static payloadTooLarge(params: { summary: string; [key: string]: any }) {
+        return new HTTPError({...params, status: 413})
+    }
+
+    /**
      * Create a Validation Error (422) error
      */
     static validation(params: { summary: string; [key: string]: any }) {

@@ -3,6 +3,7 @@ import { YapockType } from '@/index';
 import prisma from '@/db/prisma';
 import { HTTPError } from '@/lib/class/HTTPError';
 import mapChannel from '@/utils/channels/mapChannel';
+import { CommonErrorResponses, DM_ERROR_CODES } from '../schemas/errors';
 
 // Channel response schemas
 const RecipientResponse = t.Object({
@@ -39,7 +40,10 @@ export default (app: YapockType) =>
             async ({ set, user }) => {
                 if (!user?.sub) {
                     set.status = 401;
-                    throw HTTPError.unauthorized({ summary: 'Unauthorized' });
+                    throw HTTPError.unauthorized({ 
+                        summary: 'Authentication required to access DM channels',
+                        code: DM_ERROR_CODES.UNAUTHORIZED 
+                    });
                 }
 
                 const links = await prisma.dm_participants.findMany({
@@ -62,6 +66,7 @@ export default (app: YapockType) =>
                 },
                 response: {
                     200: t.Array(ChannelResponse),
+                    401: CommonErrorResponses[401],
                 },
             },
         )
@@ -71,13 +76,19 @@ export default (app: YapockType) =>
             async ({ set, user, body }) => {
                 if (!user?.sub) {
                     set.status = 401;
-                    throw HTTPError.unauthorized({ summary: 'Unauthorized' });
+                    throw HTTPError.unauthorized({ 
+                        summary: 'Authentication required to create DM channels',
+                        code: DM_ERROR_CODES.UNAUTHORIZED 
+                    });
                 }
 
                 const { userId } = body as { userId?: string };
                 if (!userId) {
                     set.status = 400;
-                    throw HTTPError.badRequest({ summary: 'userId is required' });
+                    throw HTTPError.badRequest({ 
+                        summary: 'User ID is required to create a DM channel',
+                        code: DM_ERROR_CODES.USER_ID_REQUIRED 
+                    });
                 }
 
                 // Support self-DM: if userId is self, find or create a solo channel
@@ -132,6 +143,10 @@ export default (app: YapockType) =>
                     tags: ['DM'],
                 },
                 body: t.Object({ userId: t.String() }),
-                response: { 200: ChannelResponse },
+                response: { 
+                    200: ChannelResponse,
+                    400: CommonErrorResponses[400],
+                    401: CommonErrorResponses[401],
+                },
             },
         );

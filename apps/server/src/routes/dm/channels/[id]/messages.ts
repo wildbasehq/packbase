@@ -2,6 +2,7 @@ import { t } from 'elysia';
 import { YapockType } from '@/index';
 import prisma from '@/db/prisma';
 import { HTTPError } from '@/lib/class/HTTPError';
+import { CommonErrorResponses, DM_ERROR_CODES } from '../../schemas/errors';
 
 // Message response schema
 const MessageResponse = t.Object({
@@ -24,7 +25,10 @@ export default (app: YapockType) =>
             async ({ set, user, params, query }) => {
                 if (!user?.sub) {
                     set.status = 401;
-                    throw HTTPError.unauthorized({ summary: 'Unauthorized' });
+                    throw HTTPError.unauthorized({ 
+                        summary: 'Authentication required to access DM messages',
+                        code: DM_ERROR_CODES.UNAUTHORIZED 
+                    });
                 }
 
                 const { id } = params as { id: string };
@@ -32,7 +36,10 @@ export default (app: YapockType) =>
                 const isParticipant = await prisma.dm_participants.findFirst({ where: { channel_id: id, user_id: user.sub } });
                 if (!isParticipant) {
                     set.status = 403;
-                    throw HTTPError.forbidden({ summary: 'Not a participant of this channel' });
+                    throw HTTPError.forbidden({ 
+                        summary: 'You are not a participant in this DM channel',
+                        code: DM_ERROR_CODES.NOT_PARTICIPANT 
+                    });
                 }
 
                 const { limit: limitQ, before, after } = query as any;
@@ -77,7 +84,11 @@ export default (app: YapockType) =>
             },
             {
                 detail: { description: 'List messages in a DM channel', tags: ['DM'] },
-                response: { 200: t.Array(MessageResponse) },
+                response: { 
+                    200: t.Array(MessageResponse),
+                    401: CommonErrorResponses[401],
+                    403: CommonErrorResponses[403],
+                },
             },
         )
         // POST /dm/channels/:id/messages
@@ -86,26 +97,38 @@ export default (app: YapockType) =>
             async ({ set, user, params, body }) => {
                 if (!user?.sub) {
                     set.status = 401;
-                    throw HTTPError.unauthorized({ summary: 'Unauthorized' });
+                    throw HTTPError.unauthorized({ 
+                        summary: 'Authentication required to send DM messages',
+                        code: DM_ERROR_CODES.UNAUTHORIZED 
+                    });
                 }
 
                 const { id } = params as { id: string };
                 const { content } = body as { content?: string };
                 if (!content || !content.trim()) {
                     set.status = 400;
-                    throw HTTPError.badRequest({ summary: 'Content is required' });
+                    throw HTTPError.badRequest({ 
+                        summary: 'Message content is required and cannot be empty',
+                        code: DM_ERROR_CODES.CONTENT_REQUIRED 
+                    });
                 }
 
                 // Enforce max length (4k chars)
                 if (content.length > 4000) {
                     set.status = 413;
-                    throw HTTPError.payloadTooLarge({ summary: 'Content exceeds maximum length of 4000 characters' });
+                    throw HTTPError.payloadTooLarge({ 
+                        summary: 'Message content exceeds maximum length of 4000 characters',
+                        code: DM_ERROR_CODES.CONTENT_TOO_LONG 
+                    });
                 }
 
                 const isParticipant = await prisma.dm_participants.findFirst({ where: { channel_id: id, user_id: user.sub } });
                 if (!isParticipant) {
                     set.status = 403;
-                    throw HTTPError.forbidden({ summary: 'Not a participant of this channel' });
+                    throw HTTPError.forbidden({ 
+                        summary: 'You are not a participant in this DM channel',
+                        code: DM_ERROR_CODES.NOT_PARTICIPANT 
+                    });
                 }
 
                 const message = await prisma.dm_messages.create({
@@ -129,6 +152,12 @@ export default (app: YapockType) =>
             {
                 detail: { description: 'Send a message to a DM channel', tags: ['DM'] },
                 body: t.Object({ content: t.String() }),
-                response: { 200: MessageResponse },
+                response: { 
+                    200: MessageResponse,
+                    400: CommonErrorResponses[400],
+                    401: CommonErrorResponses[401],
+                    403: CommonErrorResponses[403],
+                    413: CommonErrorResponses[413],
+                },
             },
         );

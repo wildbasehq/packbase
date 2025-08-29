@@ -25,7 +25,7 @@ Target: highly performant and quick UX reactions for Direct Messages.
 1. [x] Align API response contracts across DM endpoints
    - [x] Ensure all timestamps are serialized as ISO 8601 strings (e.g., created_at) consistently for GET/POST/PATCH/DELETE and mapChannel payloads
    - [x] Standardize response shapes and field names (snake_case vs camelCase) and document in Swagger
-   - [ ] Add explicit 4xx/5xx error shapes with machine-readable codes and user-friendly messages
+   - [x] Add explicit 4xx/5xx error shapes with machine-readable codes and user-friendly messages
 2. [x] Harden message validation and limits on the server
    - [x] Enforce max length for dm_messages.content (e.g., 4k chars) and return 413/400 accordingly
    - [x] Trim and reject empty/whitespace-only content on POST/PATCH (already partially enforced)
