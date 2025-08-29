@@ -42,11 +42,11 @@ export default async function mapChannel(channelId: string, currentUserId: strin
                   channel_id: lastMessage.channel_id,
                   author_id: lastMessage.author_id,
                   content: lastMessage.deleted_at ? null : lastMessage.content,
-                  created_at: lastMessage.created_at,
-                  edited_at: lastMessage.edited_at,
-                  deleted_at: lastMessage.deleted_at,
+                  created_at: lastMessage.created_at.toISOString(),
+                  edited_at: lastMessage.edited_at?.toISOString(),
+                  deleted_at: lastMessage.deleted_at?.toISOString(),
               }
             : null,
-        created_at: channel.created_at,
+        created_at: channel.created_at.toISOString(),
     };
 }

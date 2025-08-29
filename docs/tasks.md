@@ -2,13 +2,33 @@
 
 An ordered, actionable checklist covering architectural and code-level improvements across server, client, data model, performance, security, testing, and DevOps.
 
-1. [ ] Align API response contracts across DM endpoints
-   - [ ] Ensure all timestamps are serialized as ISO 8601 strings (e.g., created_at) consistently for GET/POST/PATCH/DELETE and mapChannel payloads
-   - [ ] Standardize response shapes and field names (snake_case vs camelCase) and document in Swagger
+## P0: Performance & UX Acceleration for DMs
+Target: highly performant and quick UX reactions for Direct Messages.
+- Scope
+  - UI: apps\\web\\src\\pages\\c (channel pages and layout)
+  - API: apps\\server\\src\\routes\\dm (channels and messages routes)
+- Latency budgets (perceived by user)
+  - Send: message appears instantly via optimistic insert (≤ 150 ms perceived); server reconciliation < 1 s.
+  - Initial channel open: first messages visible ≤ 500 ms on broadband; skeletons should render within 100 ms.
+  - Scrolling: keep main-thread work under ~8 ms/frame; avoid scroll jank > 16 ms.
+- Prioritized actions (reference existing sections below)
+  1) Optimistic send and failure recovery (see item 8): temp id + pending state; disable send during post; reconcile or error toast.
+  2) Virtualize long message lists (see item 14) to keep DOM small and scrolling smooth.
+  3) Pagination and scroll behavior (see item 9, 17, 32): before=<id> for older messages; de-dup/ordering; preserve scroll position; near-bottom auto-scroll only.
+  4) Data layer performance (see item 11, 39): abort fetch on unmount/change; dedupe in-flight; SWR-like caching with TTL; ETag/304 support.
+  5) Server and HTTP caching (see item 23, 17): ETag based on last message id + count; document before/after usage; consider Server-Timing headers.
+  6) Observability for UX responsiveness (see item 21, 35): RUM/custom performance marks in UI; Server-Timing in API; synthetic test asserts send/receive budget.
+  7) Perceived performance improvements (see item 12, 16): toasts on failure; skeleton loaders; disabled/loading states.
+- Rollout & flags (see item 25)
+  - Feature-flag transport choice (WS/SSE/Polling) and polling/backoff tuning for safe rollout.
+
+1. [x] Align API response contracts across DM endpoints
+   - [x] Ensure all timestamps are serialized as ISO 8601 strings (e.g., created_at) consistently for GET/POST/PATCH/DELETE and mapChannel payloads
+   - [x] Standardize response shapes and field names (snake_case vs camelCase) and document in Swagger
    - [ ] Add explicit 4xx/5xx error shapes with machine-readable codes and user-friendly messages
-2. [ ] Harden message validation and limits on the server
-   - [ ] Enforce max length for dm_messages.content (e.g., 4k chars) and return 413/400 accordingly
-   - [ ] Trim and reject empty/whitespace-only content on POST/PATCH (already partially enforced)
+2. [x] Harden message validation and limits on the server
+   - [x] Enforce max length for dm_messages.content (e.g., 4k chars) and return 413/400 accordingly
+   - [x] Trim and reject empty/whitespace-only content on POST/PATCH (already partially enforced)
    - [ ] Validate message_type and reply_to (if provided) with referential integrity checks
 3. [ ] Add server-side rate limiting for messaging
    - [ ] Per-user and per-channel limits (e.g., 20/min per channel, 60/min global), return 429 on violation
@@ -29,13 +49,13 @@ An ordered, actionable checklist covering architectural and code-level improveme
    - [ ] Broadcast to channel participants only; authenticate and authorize subscriptions
    - [ ] Fall back to incremental polling using after=<last_id|timestamp> with ETag/If-None-Match support
    - [ ] Remove or increase 1s polling once real-time is in place
-8. [ ] Add client-side optimistic UI for sending messages
-   - [ ] Insert a temporary message with a client-generated id; show pending state and disable send button while posting
-   - [ ] Reconcile success by replacing the temp message; handle failure with error toast and retry affordance
-9. [ ] Implement infinite scroll and pagination on the client
-   - [ ] Use GET /dm/channels/:id/messages?before=<id> to load older messages on scroll-up
-   - [ ] De-duplicate messages and maintain stable ordering when merging pages
-   - [ ] Auto-scroll to bottom on first load and when user is near bottom
+8. [x] Add client-side optimistic UI for sending messages
+   - [x] Insert a temporary message with a client-generated id; show pending state and disable send button while posting
+   - [x] Reconcile success by replacing the temp message; handle failure with error toast and retry affordance
+9. [x] Implement infinite scroll and pagination on the client
+   - [x] Use GET /dm/channels/:id/messages?before=<id> to load older messages on scroll-up
+   - [x] De-duplicate messages and maintain stable ordering when merging pages
+   - [x] Auto-scroll to bottom on first load and when user is near bottom
 10. [ ] Expose message editing and deletion in the UI
     - [ ] Add message action menu (edit/delete) visible for author-only
     - [ ] Inline edit form with escape-to-cancel and optimistic update for PATCH

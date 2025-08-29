@@ -4,6 +4,33 @@ import prisma from '@/db/prisma';
 import { HTTPError } from '@/lib/class/HTTPError';
 import mapChannel from '@/utils/channels/mapChannel';
 
+// Channel response schemas
+const RecipientResponse = t.Object({
+  id: t.String(),
+  username: t.String(),
+  display_name: t.Union([t.String(), t.Null()]),
+  images_avatar: t.Union([t.String(), t.Null()]),
+})
+
+const MessageResponse = t.Object({
+  id: t.String(),
+  channel_id: t.String(),
+  author_id: t.String(),
+  content: t.Union([t.String(), t.Null()]),
+  created_at: t.String(),
+  edited_at: t.Union([t.String(), t.Null()]),
+  deleted_at: t.Union([t.String(), t.Null()]),
+})
+
+const ChannelResponse = t.Object({
+  id: t.String(),
+  type: t.String(),
+  recipients: t.Array(RecipientResponse),
+  last_message_id: t.Union([t.String(), t.Null()]),
+  last_message: t.Union([MessageResponse, t.Null()]),
+  created_at: t.String(),
+})
+
 export default (app: YapockType) =>
     app
         // GET /dm/channels - list all DM channels for current user
@@ -34,7 +61,7 @@ export default (app: YapockType) =>
                     tags: ['DM'],
                 },
                 response: {
-                    200: t.Array(t.Any()),
+                    200: t.Array(ChannelResponse),
                 },
             },
         )
@@ -105,6 +132,6 @@ export default (app: YapockType) =>
                     tags: ['DM'],
                 },
                 body: t.Object({ userId: t.String() }),
-                response: { 200: t.Any() },
+                response: { 200: ChannelResponse },
             },
         );

@@ -3,6 +3,19 @@ import { YapockType } from '@/index'
 import prisma from '@/db/prisma'
 import { HTTPError } from '@/lib/class/HTTPError'
 
+// Message response schema
+const MessageResponse = t.Object({
+  id: t.String(),
+  channel_id: t.String(),
+  author_id: t.String(),
+  content: t.Union([t.String(), t.Null()]),
+  message_type: t.String(),
+  created_at: t.String(),
+  edited_at: t.Union([t.String(), t.Null()]),
+  deleted_at: t.Union([t.String(), t.Null()]),
+  reply_to: t.Union([t.String(), t.Null()]),
+})
+
 export default (app: YapockType) =>
   app
     // PATCH /dm/messages/:id
@@ -16,7 +29,13 @@ export default (app: YapockType) =>
       const { content } = body as { content?: string }
       if (!content || !content.trim()) {
         set.status = 400
-        throw HTTPError.badRequest({ summary: 'content is required' })
+        throw HTTPError.badRequest({ summary: 'Content is required' })
+      }
+
+      // Enforce max length (4k chars)
+      if (content.length > 4000) {
+        set.status = 413
+        throw HTTPError.payloadTooLarge({ summary: 'Content exceeds maximum length of 4000 characters' })
       }
 
       const msg = await prisma.dm_messages.findUnique({ where: { id } })
@@ -31,11 +50,23 @@ export default (app: YapockType) =>
       }
 
       const updated = await prisma.dm_messages.update({ where: { id }, data: { content: content.trim(), edited_at: new Date() } })
-      return updated
+      
+      // Return with consistent timestamp serialization
+      return {
+        id: updated.id,
+        channel_id: updated.channel_id,
+        author_id: updated.author_id,
+        content: updated.content,
+        message_type: updated.message_type,
+        created_at: updated.created_at.toISOString(),
+        edited_at: updated.edited_at?.toISOString(),
+        deleted_at: updated.deleted_at?.toISOString(),
+        reply_to: updated.reply_to,
+      }
     }, {
       detail: { description: 'Edit a DM message by id', tags: ['DM'] },
       body: t.Object({ content: t.String() }),
-      response: { 200: t.Any() }
+      response: { 200: MessageResponse }
     })
     // DELETE /dm/messages/:id (soft delete)
     .delete('', async ({ set, user, params }) => {
@@ -58,8 +89,20 @@ export default (app: YapockType) =>
       }
 
       const updated = await prisma.dm_messages.update({ where: { id }, data: { deleted_at: new Date() } })
-      return updated
+      
+      // Return with consistent timestamp serialization
+      return {
+        id: updated.id,
+        channel_id: updated.channel_id,
+        author_id: updated.author_id,
+        content: updated.content,
+        message_type: updated.message_type,
+        created_at: updated.created_at.toISOString(),
+        edited_at: updated.edited_at?.toISOString(),
+        deleted_at: updated.deleted_at?.toISOString(),
+        reply_to: updated.reply_to,
+      }
     }, {
       detail: { description: 'Delete (soft) a DM message by id', tags: ['DM'] },
-      response: { 200: t.Any() }
+      response: { 200: MessageResponse }
     })

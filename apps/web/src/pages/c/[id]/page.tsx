@@ -10,6 +10,8 @@ import { Avatar } from '@/components/shared/avatar.tsx'
 import { useSession } from '@clerk/clerk-react'
 import Markdown from '@/components/shared/markdown.tsx'
 import { useUserAccountStore } from '@/lib'
+import React from 'react'
+import { toast } from 'sonner'
 
 export default function ChatThreadPage() {
     const { id } = useParams<{ id: string }>()
@@ -53,8 +55,59 @@ function MessagesList() {
     const { data: messages, loading } = messagesFrame
     const channelFrame = messagesFrame.parent
     const { user: me } = useUserAccountStore()
+    const [loadingOlder, setLoadingOlder] = React.useState(false)
+    const [hasMoreMessages, setHasMoreMessages] = React.useState(true)
+    const scrollContainerRef = React.useRef<HTMLDivElement>(null)
 
     const channel = channelFrame?.data as any
+    const { session } = useSession()
+
+    // Function to load older messages
+    const loadOlderMessages = async () => {
+        if (loadingOlder || !hasMoreMessages || !messages?.length) return
+        
+        setLoadingOlder(true)
+        try {
+            const token = await session?.getToken()
+            const oldestMessage = messages[messages.length - 1] // Messages are in desc order from API
+            const channelId = channel?.id || messagesFrame.signature?.split('.')[2]
+            
+            const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/channels/${channelId}/messages?before=${oldestMessage.id}&limit=50`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+            })
+            
+            if (res.ok) {
+                const olderMessages = await res.json()
+                if (olderMessages.length === 0) {
+                    setHasMoreMessages(false)
+                } else {
+                    // Deduplicate and merge
+                    const existingIds = new Set(messages.map((m: any) => m.id))
+                    const newMessages = olderMessages.filter((m: any) => !existingIds.has(m.id))
+                    messagesFrame.data = [...messages, ...newMessages]
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load older messages:', error)
+        } finally {
+            setLoadingOlder(false)
+        }
+    }
+
+    // Scroll event handler
+    const handleScroll = () => {
+        const container = scrollContainerRef.current
+        if (!container) return
+        
+        // Load more when scrolled near the top (within 200px)
+        if (container.scrollTop <= 200 && !loadingOlder) {
+            loadOlderMessages()
+        }
+    }
 
     if (loading) {
         return (
@@ -124,7 +177,18 @@ function MessagesList() {
     }
 
     return (
-        <div className="flex-1 overflow-auto p-4 space-y-3">
+        <div 
+            ref={scrollContainerRef}
+            className="flex-1 overflow-auto p-4 space-y-3"
+            onScroll={handleScroll}
+        >
+            {loadingOlder && hasMoreMessages && (
+                <div className="flex justify-center py-2">
+                    <div className="text-xs text-muted-foreground">
+                        <span className="animate-pulse">Loading older messages...</span>
+                    </div>
+                </div>
+            )}
             {groups.map((g, idx) => {
                 if (g.type === 'day') {
                     return (
@@ -152,13 +216,27 @@ function MessagesList() {
                                     <span className="text-[11px] text-muted-foreground">{timeLabel}</span>
                                 </div>
                                 <div className="text-sm whitespace-normal break-words">
-                                    <Markdown>{first.content ?? <i className="text-muted-foreground">deleted</i>}</Markdown>
+                                    <div className={first._isPending ? 'opacity-60' : ''}>
+                                        <Markdown>{first.content ?? <i className="text-muted-foreground">deleted</i>}</Markdown>
+                                        {first._isPending && (
+                                            <span className="ml-2 text-xs text-muted-foreground">
+                                                <span className="animate-pulse">Sending...</span>
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         {g.items.slice(1).map((m: any) => (
                             <div key={m.id} className="pl-11 mt-1 text-sm whitespace-normal break-words">
-                                <Markdown>{m.content ?? <i className="text-muted-foreground">deleted</i>}</Markdown>
+                                <div className={m._isPending ? 'opacity-60' : ''}>
+                                    <Markdown>{m.content ?? <i className="text-muted-foreground">deleted</i>}</Markdown>
+                                    {m._isPending && (
+                                        <span className="ml-2 text-xs text-muted-foreground">
+                                            <span className="animate-pulse">Sending...</span>
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -170,11 +248,36 @@ function MessagesList() {
 
 function MessageComposer({ channelId }: { channelId: string }) {
     const { session } = useSession()
+    const { user: me } = useUserAccountStore()
     // get the nearest frame (messages) to refresh after send
     const messagesFrame = useContentFrame()
+    const [isPosting, setIsPosting] = React.useState(false)
 
     const onSend = async (content: string) => {
+        if (isPosting || !me) return
+        
         const token = await session?.getToken()
+        setIsPosting(true)
+        
+        // Generate temporary ID and create optimistic message
+        const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        const tempMessage = {
+            id: tempId,
+            channel_id: channelId,
+            author_id: me.id,
+            content,
+            message_type: 'text',
+            created_at: new Date().toISOString(),
+            edited_at: null,
+            deleted_at: null,
+            reply_to: null,
+            _isPending: true,
+        }
+
+        // Optimistically add the message
+        const currentMessages = messagesFrame.data || []
+        messagesFrame.data = [...currentMessages, tempMessage]
+        
         try {
             const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/channels/${channelId}/messages`, {
                 method: 'POST',
@@ -185,16 +288,35 @@ function MessageComposer({ channelId }: { channelId: string }) {
                 },
                 body: JSON.stringify({ content }),
             })
-            if (!res.ok) throw new Error('Failed to send')
-            messagesFrame.refresh()
-        } catch (_) {
-            // no-op for now
+            
+            if (!res.ok) {
+                throw new Error(`Failed to send message: ${res.status}`)
+            }
+            
+            const realMessage = await res.json()
+            
+            // Replace temp message with real one
+            messagesFrame.data = messagesFrame.data.map((msg: any) => 
+                msg.id === tempId ? realMessage : msg
+            )
+        } catch (error) {
+            // Remove temp message on failure and show error
+            messagesFrame.data = messagesFrame.data.filter((msg: any) => msg.id !== tempId)
+            
+            // TODO: Show error toast/notification
+            console.error('Failed to send message:', error)
+        } finally {
+            setIsPosting(false)
         }
     }
 
     return (
         <div className="p-3 border-t">
-            <ChatBox placeholder="Message..." onSend={onSend} />
+            <ChatBox 
+                placeholder="Message..." 
+                onSend={onSend}
+                disabled={isPosting}
+            />
         </div>
     )
 }

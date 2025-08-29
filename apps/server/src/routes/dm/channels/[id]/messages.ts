@@ -3,6 +3,19 @@ import { YapockType } from '@/index';
 import prisma from '@/db/prisma';
 import { HTTPError } from '@/lib/class/HTTPError';
 
+// Message response schema
+const MessageResponse = t.Object({
+  id: t.String(),
+  channel_id: t.String(),
+  author_id: t.String(),
+  content: t.Union([t.String(), t.Null()]),
+  message_type: t.String(),
+  created_at: t.String(),
+  edited_at: t.Union([t.String(), t.Null()]),
+  deleted_at: t.Union([t.String(), t.Null()]),
+  reply_to: t.Union([t.String(), t.Null()]),
+})
+
 export default (app: YapockType) =>
     app
         // GET /dm/channels/:id/messages
@@ -64,7 +77,7 @@ export default (app: YapockType) =>
             },
             {
                 detail: { description: 'List messages in a DM channel', tags: ['DM'] },
-                response: { 200: t.Array(t.Any()) },
+                response: { 200: t.Array(MessageResponse) },
             },
         )
         // POST /dm/channels/:id/messages
@@ -80,7 +93,13 @@ export default (app: YapockType) =>
                 const { content } = body as { content?: string };
                 if (!content || !content.trim()) {
                     set.status = 400;
-                    throw HTTPError.badRequest({ summary: 'content is required' });
+                    throw HTTPError.badRequest({ summary: 'Content is required' });
+                }
+
+                // Enforce max length (4k chars)
+                if (content.length > 4000) {
+                    set.status = 413;
+                    throw HTTPError.payloadTooLarge({ summary: 'Content exceeds maximum length of 4000 characters' });
                 }
 
                 const isParticipant = await prisma.dm_participants.findFirst({ where: { channel_id: id, user_id: user.sub } });
@@ -101,15 +120,15 @@ export default (app: YapockType) =>
                     author_id: message.author_id,
                     content: message.content,
                     message_type: message.message_type,
-                    created_at: message.created_at,
-                    edited_at: message.edited_at,
-                    deleted_at: message.deleted_at,
+                    created_at: message.created_at.toISOString(),
+                    edited_at: message.edited_at?.toISOString(),
+                    deleted_at: message.deleted_at?.toISOString(),
                     reply_to: message.reply_to,
                 };
             },
             {
                 detail: { description: 'Send a message to a DM channel', tags: ['DM'] },
                 body: t.Object({ content: t.String() }),
-                response: { 200: t.Any() },
+                response: { 200: MessageResponse },
             },
         );
