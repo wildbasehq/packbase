@@ -17,13 +17,11 @@ export default function ChatThreadPage() {
 
     return (
         <div className="flex flex-col h-full w-full">
-            <ContentFrame get={`user.me`}>
-                <ContentFrame get={`dm.channels.${id}`}>
-                    <ChannelHeader />
-                    <ContentFrame get={`dm.channels.${id}.messages`} cache refreshInterval={1}>
-                        <MessagesList />
-                        <MessageComposer channelId={id} />
-                    </ContentFrame>
+            <ContentFrame get={`dm.channels.${id}`} cache>
+                <ChannelHeader />
+                <ContentFrame get={`dm.channels.${id}.messages`} cache refreshInterval={1}>
+                    <MessagesList />
+                    <MessageComposer channelId={id} />
                 </ContentFrame>
             </ContentFrame>
         </div>
