@@ -154,6 +154,8 @@ export async function updateUser({ username, display_name, slug, space_type, pos
 
     try {
         if (!userProfile) {
+            // This really shouldn't happen.
+            // @TODO - remove this check and throw an error. Worried that this might occur somewhere outside of verifyToken.
             await prisma.profiles.create({
                 // @ts-expect-error
                 data: newProfile,
