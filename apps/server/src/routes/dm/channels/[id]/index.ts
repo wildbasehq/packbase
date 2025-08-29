@@ -3,7 +3,7 @@ import { YapockType } from '@/index';
 import prisma from '@/db/prisma';
 import { HTTPError } from '@/lib/class/HTTPError';
 import mapChannel from '@/utils/channels/mapChannel';
-import { CommonErrorResponses, DM_ERROR_CODES } from '../../schemas/errors';
+import { CommonErrorResponses, DM_ERROR_CODES } from '@/utils/dm/errors';
 
 export default (app: YapockType) =>
     app
@@ -30,6 +30,19 @@ export default (app: YapockType) =>
                         code: DM_ERROR_CODES.NOT_PARTICIPANT 
                     });
                 }
+
+                // Mark channel as read by updating last_read_at
+                await prisma.dm_participants.update({
+                    where: {
+                        channel_id_user_id: {
+                            channel_id: id,
+                            user_id: user.sub,
+                        },
+                    },
+                    data: {
+                        last_read_at: new Date(),
+                    },
+                });
 
                 const payload = await mapChannel(id, user.sub);
                 if (!payload) {

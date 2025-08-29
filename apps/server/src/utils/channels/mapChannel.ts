@@ -1,11 +1,12 @@
 import prisma from '@/db/prisma';
-import { getUserClerkByID } from '@/routes/user/[username]';
+import { getUserClerkByID } from '@/utils/clerk';
 
 export default async function mapChannel(channelId: string, currentUserId: string) {
-    const [channel, participants, lastMessage] = await Promise.all([
+    const [channel, participants, lastMessage, currentUserParticipant] = await Promise.all([
         prisma.dm_channels.findUnique({ where: { id: channelId } }),
         prisma.dm_participants.findMany({ where: { channel_id: channelId } }),
         prisma.dm_messages.findFirst({ where: { channel_id: channelId }, orderBy: { created_at: 'desc' } }),
+        prisma.dm_participants.findFirst({ where: { channel_id: channelId, user_id: currentUserId } }),
     ]);
 
     if (!channel) return undefined;
@@ -21,6 +22,26 @@ export default async function mapChannel(channelId: string, currentUserId: strin
 
     const recipientClerk = await getUserClerkByID(recipientProfile.owner_id);
     const recipientProfileAvatar = recipientClerk?.imageUrl;
+
+    // Compute unread count: messages created after user's last_read_at
+    let unread_count = 0;
+    if (currentUserParticipant?.last_read_at) {
+        unread_count = await prisma.dm_messages.count({
+            where: {
+                channel_id: channelId,
+                created_at: { gt: currentUserParticipant.last_read_at },
+                deleted_at: null, // Don't count deleted messages
+            }
+        });
+    } else {
+        // If never read, count all non-deleted messages
+        unread_count = await prisma.dm_messages.count({
+            where: {
+                channel_id: channelId,
+                deleted_at: null,
+            }
+        });
+    }
 
     return {
         id: channel.id,
@@ -48,5 +69,6 @@ export default async function mapChannel(channelId: string, currentUserId: strin
               }
             : null,
         created_at: channel.created_at.toISOString(),
+        unread_count,
     };
 }

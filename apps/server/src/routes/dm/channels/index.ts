@@ -3,7 +3,7 @@ import { YapockType } from '@/index';
 import prisma from '@/db/prisma';
 import { HTTPError } from '@/lib/class/HTTPError';
 import mapChannel from '@/utils/channels/mapChannel';
-import { CommonErrorResponses, DM_ERROR_CODES } from '../schemas/errors';
+import { CommonErrorResponses, DM_ERROR_CODES } from '@/utils/dm/errors';
 
 // Channel response schemas
 const RecipientResponse = t.Object({
@@ -30,6 +30,7 @@ const ChannelResponse = t.Object({
   last_message_id: t.Union([t.String(), t.Null()]),
   last_message: t.Union([MessageResponse, t.Null()]),
   created_at: t.String(),
+  unread_count: t.Number(),
 })
 
 export default (app: YapockType) =>

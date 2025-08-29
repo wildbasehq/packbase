@@ -29,17 +29,17 @@ Target: highly performant and quick UX reactions for Direct Messages.
 2. [x] Harden message validation and limits on the server
    - [x] Enforce max length for dm_messages.content (e.g., 4k chars) and return 413/400 accordingly
    - [x] Trim and reject empty/whitespace-only content on POST/PATCH (already partially enforced)
-   - [ ] Validate message_type and reply_to (if provided) with referential integrity checks
-3. [ ] Add server-side rate limiting for messaging
-   - [ ] Per-user and per-channel limits (e.g., 20/min per channel, 60/min global), return 429 on violation
-   - [ ] Expose Retry-After header and log limit events for abuse monitoring
-4. [ ] Sanitize Markdown rendering to prevent XSS
-   - [ ] Use rehype-sanitize (or equivalent) with a safe allowlist for Markdown in web/components/shared/markdown.tsx
-   - [ ] Disable/strip raw HTML by default; only allow explicit safe embeds/components
-   - [ ] Add link rel="noopener noreferrer" target handling and URL validation
-5. [ ] Decouple server utilities from route files
-   - [ ] Move getUserClerkByID imported by utils/channels/mapChannel.ts into a dedicated server/utils/auth or clerk service module
-   - [ ] Add caching for Clerk avatar lookups; avoid N+1 in mapChannel (batch or memoize)
+   - [x] Validate message_type and reply_to (if provided) with referential integrity checks
+3. [x] Add server-side rate limiting for messaging
+   - [x] Per-user and per-channel limits (e.g., 20/min per channel, 60/min global), return 429 on violation
+   - [x] Expose Retry-After header and log limit events for abuse monitoring
+4. [x] Sanitize Markdown rendering to prevent XSS
+   - [x] Use rehype-sanitize (or equivalent) with a safe allowlist for Markdown in web/components/shared/markdown.tsx
+   - [x] Disable/strip raw HTML by default; only allow explicit safe embeds/components
+   - [x] Add link rel="noopener noreferrer" target handling and URL validation
+5. [x] Decouple server utilities from route files
+   - [x] Move getUserClerkByID imported by utils/channels/mapChannel.ts into a dedicated server/utils/auth or clerk service module
+   - [x] Add caching for Clerk avatar lookups; avoid N+1 in mapChannel (batch or memoize)
 6. [ ] Implement unread counts and read receipts
    - [ ] Update dm_participants.last_read_at when a channel is viewed
    - [ ] Compute unread counts per channel on the server for sidebar listing

@@ -2,7 +2,9 @@ import { t } from 'elysia';
 import { YapockType } from '@/index';
 import prisma from '@/db/prisma';
 import { HTTPError } from '@/lib/class/HTTPError';
-import { CommonErrorResponses, DM_ERROR_CODES } from '../../schemas/errors';
+import { CommonErrorResponses, DM_ERROR_CODES } from '@/utils/dm/errors';
+import { CreateMessageBody, MESSAGE_TYPES, validateMessageType } from '@/utils/dm/validation';
+import { DMRateLimiter } from '@/utils/dm/rate-limiter';
 
 // Message response schema
 const MessageResponse = t.Object({
@@ -104,7 +106,30 @@ export default (app: YapockType) =>
                 }
 
                 const { id } = params as { id: string };
-                const { content } = body as { content?: string };
+                
+                // Check rate limits before processing
+                const rateLimiter = DMRateLimiter.getInstance();
+                const rateLimitResult = rateLimiter.checkLimits(user.sub, id);
+                
+                if (!rateLimitResult.allowed) {
+                    set.status = 429;
+                    set.headers['Retry-After'] = rateLimitResult.retryAfterSeconds?.toString() || '60';
+                    set.headers['X-RateLimit-Limit'] = rateLimitResult.limit.toString();
+                    set.headers['X-RateLimit-Remaining'] = rateLimitResult.remaining.toString();
+                    set.headers['X-RateLimit-Reset'] = rateLimitResult.resetAt.toString();
+                    
+                    throw HTTPError.tooManyRequests({ 
+                        summary: `Rate limit exceeded. Try again in ${rateLimitResult.retryAfterSeconds} seconds.`,
+                        code: DM_ERROR_CODES.RATE_LIMIT_EXCEEDED 
+                    });
+                }
+
+                const { content, message_type, reply_to } = body as {
+                    content?: string; 
+                    message_type?: string; 
+                    reply_to?: string; 
+                };
+                
                 if (!content || !content.trim()) {
                     set.status = 400;
                     throw HTTPError.badRequest({ 
@@ -122,6 +147,34 @@ export default (app: YapockType) =>
                     });
                 }
 
+                // Validate message_type if provided
+                const validatedMessageType = message_type || MESSAGE_TYPES.TEXT;
+                if (!validateMessageType(validatedMessageType)) {
+                    set.status = 400;
+                    throw HTTPError.badRequest({ 
+                        summary: `Invalid message type. Must be one of: ${Object.values(MESSAGE_TYPES).join(', ')}`,
+                        code: DM_ERROR_CODES.INVALID_MESSAGE_TYPE 
+                    });
+                }
+
+                // Validate reply_to referential integrity if provided
+                if (reply_to) {
+                    const replyMessage = await prisma.dm_messages.findFirst({
+                        where: { 
+                            id: reply_to,
+                            channel_id: id, // Must be in same channel
+                            deleted_at: null, // Cannot reply to deleted messages
+                        }
+                    });
+                    if (!replyMessage) {
+                        set.status = 400;
+                        throw HTTPError.badRequest({ 
+                            summary: 'Invalid reply_to: referenced message not found, not in this channel, or has been deleted',
+                            code: DM_ERROR_CODES.INVALID_REPLY_TO 
+                        });
+                    }
+                }
+
                 const isParticipant = await prisma.dm_participants.findFirst({ where: { channel_id: id, user_id: user.sub } });
                 if (!isParticipant) {
                     set.status = 403;
@@ -132,10 +185,19 @@ export default (app: YapockType) =>
                 }
 
                 const message = await prisma.dm_messages.create({
-                    data: { channel_id: id, author_id: user.sub, content: content.trim() },
+                    data: { 
+                        channel_id: id, 
+                        author_id: user.sub, 
+                        content: content.trim(),
+                        message_type: validatedMessageType,
+                        reply_to: reply_to || null,
+                    },
                 });
 
                 await prisma.dm_channels.update({ where: { id }, data: { last_message_id: message.id } });
+
+                // Record the message for rate limiting after successful creation
+                rateLimiter.recordMessage(user.sub, id);
 
                 return {
                     id: message.id,
@@ -151,13 +213,14 @@ export default (app: YapockType) =>
             },
             {
                 detail: { description: 'Send a message to a DM channel', tags: ['DM'] },
-                body: t.Object({ content: t.String() }),
+                body: CreateMessageBody,
                 response: { 
                     200: MessageResponse,
                     400: CommonErrorResponses[400],
                     401: CommonErrorResponses[401],
                     403: CommonErrorResponses[403],
                     413: CommonErrorResponses[413],
+                    422: CommonErrorResponses[422],
                 },
             },
         );

@@ -4,10 +4,46 @@
 
 import { Heading, Text } from '@/components/shared/text'
 import ReactMarkdown from 'react-markdown'
+import rehypeSanitize from 'rehype-sanitize'
 import { Pre } from '@/components/shared/code.tsx'
 import { createElement, Children, isValidElement, cloneElement } from 'react'
 import CreatedByHumans from '@/src/images/svg/noai/created.svg'
 import { clsx } from 'clsx'
+
+// Safe sanitization schema for Markdown
+const sanitizeSchema = {
+    allowedTags: [
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'p', 'br', 'div', 'span',
+        'ul', 'ol', 'li',
+        'blockquote',
+        'pre', 'code',
+        'a', 'img',
+        'strong', 'em', 'u', 'del',
+        'hr'
+    ],
+    allowedAttributes: {
+        'a': ['href', 'title', 'target', 'rel'],
+        'img': ['src', 'alt', 'title', 'width', 'height'],
+        'code': ['className'],
+        'pre': ['className'],
+        '*': ['className'] // Allow className on any element for styling
+    },
+    allowedSchemes: ['http', 'https', 'mailto'],
+    allowedSchemesByTag: {
+        'img': ['http', 'https', 'data'] // Allow data URLs for images (base64)
+    }
+}
+
+// URL validation helper
+const isValidUrl = (url: string): boolean => {
+    try {
+        const urlObj = new URL(url)
+        return ['http:', 'https:', 'mailto:'].includes(urlObj.protocol)
+    } catch {
+        return false
+    }
+}
 
 // Dot SVG component
 const DotIcon = ({ className }: { className?: string }) => (
@@ -229,6 +265,9 @@ export default function Markdown({ children, componentClassName }: { children: s
                     return (
                         <ReactMarkdown
                             key={index}
+                            rehypePlugins={[
+                                [rehypeSanitize, sanitizeSchema]
+                            ]}
                             components={{
                                 h1(props) {
                                     return <Heading as="h1" size="3xl" className={clsx(props.className, componentClassName)} {...props} />
@@ -281,10 +320,16 @@ export default function Markdown({ children, componentClassName }: { children: s
                                     return <blockquote className="border-l-4 border-stone-700 pl-4" {...props} />
                                 },
                                 a: props => {
+                                    // Validate URL and add security attributes
+                                    const href = props.href || ''
+                                    const isValid = isValidUrl(href)
+                                    
                                     return (
                                         <a
                                             className="text-indigo-500 underline underline-offset-[3px] hover:text-indigo-500/80 transition-colors cursor-pointer"
                                             target="_blank"
+                                            rel="noopener noreferrer"
+                                            href={isValid ? href : '#'}
                                             {...props}
                                         />
                                     )
@@ -293,7 +338,18 @@ export default function Markdown({ children, componentClassName }: { children: s
                                     return <hr className="mt-4 mb-6 border-t border-stone-300" {...props} />
                                 },
                                 img: props => {
-                                    return <img className="rounded-lg border border-stone-200" {...props} />
+                                    // Validate image URL for security
+                                    const src = props.src || ''
+                                    const isValid = src.startsWith('data:') || isValidUrl(src)
+                                    
+                                    return (
+                                        <img 
+                                            className="rounded-lg border border-stone-200" 
+                                            src={isValid ? src : '/img/placeholder.png'}
+                                            alt={props.alt || 'Image'}
+                                            {...props} 
+                                        />
+                                    )
                                 },
                             }}
                         >

@@ -49,9 +49,6 @@ export default (app: YapockType) =>
         },
     );
 
-export async function getUserClerkByID(id: string) {
-    return await clerkClient.users.getUser(id);
-}
 
 export async function getUser({ by, value, user, scope }: { by: string; value: string; user?: any; scope?: string }) {
     const timer = new Date().getTime();
