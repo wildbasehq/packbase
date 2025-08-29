@@ -81,6 +81,16 @@ function MessagesList() {
     const saveEdit = async (messageId: string) => {
         if (!editContent.trim()) return
 
+        // Store original content for rollback
+        const originalMessage = messagesFrame.data.find((msg: any) => msg.id === messageId)
+        const originalContent = originalMessage?.content
+
+        // Optimistic update: immediately show edited content
+        messagesFrame.data = messagesFrame.data.map((msg: any) =>
+            msg.id === messageId ? { ...msg, content: editContent.trim(), edited_at: new Date().toISOString() } : msg
+        )
+        cancelEdit()
+
         try {
             const token = await session?.getToken()
             const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${messageId}`, {
@@ -94,14 +104,24 @@ function MessagesList() {
 
             if (res.ok) {
                 const updatedMessage = await res.json()
-                // Update the message in the local data
+                // Update with server response to get accurate edited_at timestamp
                 messagesFrame.data = messagesFrame.data.map((msg: any) =>
                     msg.id === messageId ? { ...msg, content: updatedMessage.content, edited_at: updatedMessage.edited_at } : msg
                 )
-                cancelEdit()
+            } else {
+                // Revert optimistic update on API failure
+                messagesFrame.data = messagesFrame.data.map((msg: any) =>
+                    msg.id === messageId ? { ...msg, content: originalContent, edited_at: originalMessage?.edited_at } : msg
+                )
+                toast.error('Failed to save changes')
             }
         } catch (error) {
             console.error('Failed to edit message:', error)
+            // Revert optimistic update on network error
+            messagesFrame.data = messagesFrame.data.map((msg: any) =>
+                msg.id === messageId ? { ...msg, content: originalContent, edited_at: originalMessage?.edited_at } : msg
+            )
+            toast.error('Failed to save changes')
         }
     }
 
@@ -119,9 +139,12 @@ function MessagesList() {
                 messagesFrame.data = messagesFrame.data.map((msg: any) =>
                     msg.id === messageId ? { ...msg, deleted_at: new Date().toISOString(), content: null } : msg
                 )
+            } else {
+                toast.error('Failed to delete message')
             }
         } catch (error) {
             console.error('Failed to delete message:', error)
+            toast.error('Failed to delete message')
         }
     }
 
@@ -156,9 +179,12 @@ function MessagesList() {
                     const newMessages = olderMessages.filter((m: any) => !existingIds.has(m.id))
                     messagesFrame.data = [...messages, ...newMessages]
                 }
+            } else {
+                toast.error('Failed to load older messages')
             }
         } catch (error) {
             console.error('Failed to load older messages:', error)
+            toast.error('Failed to load older messages')
         } finally {
             setLoadingOlder(false)
         }
@@ -336,8 +362,8 @@ function MessageComposer({ channelId }: { channelId: string }) {
             // Remove temp message on failure and show error
             messagesFrame.data = messagesFrame.data.filter((msg: any) => msg.id !== tempId)
 
-            // TODO: Show error toast/notification
             console.error('Failed to send message:', error)
+            toast.error('Failed to send message')
         } finally {
             setIsPosting(false)
         }

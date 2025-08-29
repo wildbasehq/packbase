@@ -38,6 +38,8 @@ interface ContentFrameProps {
     silentFail?: boolean
     /** Refresh interval in seconds. If provided, data will be automatically refreshed at this interval */
     refreshInterval?: number
+    /** Cache TTL in seconds. If provided, cached data older than this will be considered stale (default: 300 = 5 minutes) */
+    cacheTTL?: number
 }
 
 /**
@@ -175,9 +177,10 @@ class IndexedDBCache {
     /**
      * Get a cached response from IndexedDB
      * @param id - The unique ID for the cached response
-     * @returns The cached response or null if not found
+     * @param ttlSeconds - TTL in seconds, if provided will check expiration
+     * @returns The cached response or null if not found/expired
      */
-    async get(id: string): Promise<any> {
+    async get(id: string, ttlSeconds?: number): Promise<{ data: any; isStale: boolean } | null> {
         if (!this.db) {
             await this.init()
         }
@@ -193,7 +196,22 @@ class IndexedDBCache {
             const request = store.get(id)
 
             request.onsuccess = () => {
-                resolve(request.result ? request.result.data : null)
+                const result = request.result
+                if (!result) {
+                    resolve(null)
+                    return
+                }
+
+                // Check TTL if provided
+                if (ttlSeconds) {
+                    const now = Date.now()
+                    const age = (now - result.timestamp) / 1000 // Convert to seconds
+                    const isStale = age > ttlSeconds
+                    resolve({ data: result.data, isStale })
+                } else {
+                    // No TTL check, return data as fresh
+                    resolve({ data: result.data, isStale: false })
+                }
             }
 
             request.onerror = () => {
@@ -269,6 +287,7 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
     id,
     silentFail = false,
     refreshInterval,
+    cacheTTL = 300, // Default 5 minutes
 }) => {
     const [responseData, setResponseData] = useState<any>(null)
     const [loading, setLoading] = useState<boolean>(true)
@@ -281,6 +300,12 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
 
     // State to track the refresh interval timer
     const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
+    
+    // AbortController for cancelling requests
+    const abortControllerRef = React.useRef<AbortController | null>(null)
+    
+    // In-flight request tracking for deduplication
+    const inFlightRequestsRef = React.useRef<Map<string, Promise<any>>>(new Map())
 
     // Determine the method and path
     const method = get ? 'get' : post ? 'post' : put ? 'put' : deleteMethod ? 'delete' : patch ? 'patch' : null
@@ -301,18 +326,55 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
             return
         }
 
+        // Cancel any existing request
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort()
+        }
+
+        // Create new AbortController for this request
+        abortControllerRef.current = new AbortController()
+        const signal = abortControllerRef.current.signal
+
+        // Check if there's already an in-flight request for this signature
+        const existingRequest = inFlightRequestsRef.current.get(requestId)
+        if (existingRequest) {
+            try {
+                const result = await existingRequest
+                if (!signal.aborted) {
+                    setResponseData(result)
+                    setLoading(false)
+                    setError(null)
+                }
+                return
+            } catch (err) {
+                // If existing request failed, continue with new request
+            }
+        }
+
         try {
             // If caching is enabled, try to get from IndexedDB first
+            let shouldFetchFresh = true
             if (cache) {
-                const cachedData = await indexedDBCache.get(requestId)
-                if (cachedData) {
-                    setResponseData(cachedData)
+                const cachedResult = await indexedDBCache.get(requestId, cacheTTL)
+                if (cachedResult && !signal.aborted) {
+                    setResponseData(cachedResult.data)
                     setLoading(false)
+                    
+                    // If data is not stale, we don't need to fetch fresh data
+                    if (!cachedResult.isStale) {
+                        shouldFetchFresh = false
+                    }
+                    // If data is stale, we'll serve it but continue to fetch fresh data (stale-while-revalidate)
                 }
             }
+            
+            // Skip fetch if we have fresh cached data
+            if (!shouldFetchFresh) {
+                return
+            }
 
-            // Make the API request
-            enqueue(`content-frame-${requestId}`, async () => {
+            // Create and store the request promise for deduplication
+            const requestPromise = enqueue(`content-frame-${requestId}`, async () => {
                 try {
                     // Convert dot notation path to URL path
                     const urlPath = path.split('.').join('/')
@@ -327,6 +389,7 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
                             'Content-Type': 'application/json',
                             Accept: 'application/json',
                         },
+                        signal,
                     }
 
                     // Add auth token if available
@@ -344,9 +407,19 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
                         options.body = JSON.stringify(requestData)
                     }
 
+                    // Check if request was aborted
+                    if (signal.aborted) {
+                        throw new Error('Request aborted')
+                    }
+
                     // Make the fetch request
                     const fetchResponse = await fetch(url, options)
                     const responseData = await fetchResponse.json()
+
+                    // Check if request was aborted after fetch
+                    if (signal.aborted) {
+                        throw new Error('Request aborted')
+                    }
 
                     // Format response to match expected structure
                     const response = {
@@ -368,16 +441,25 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
                         throw response.error
                     }
 
-                    // Update state with the response data
-                    setResponseData(response.data)
-                    setLoading(false)
-                    setError(null)
+                    // Update state with the response data (only if not aborted)
+                    if (!signal.aborted) {
+                        setResponseData(response.data)
+                        setLoading(false)
+                        setError(null)
+                    }
 
                     // Cache the response if caching is enabled
-                    if (cache) {
+                    if (cache && !signal.aborted) {
                         await indexedDBCache.set(requestId, response.data)
                     }
+
+                    return response.data
                 } catch (err) {
+                    // Don't update state if request was aborted
+                    if (signal.aborted) {
+                        throw err
+                    }
+
                     setError({
                         message: err.message,
                         url: path,
@@ -388,9 +470,23 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
                     if (onError) {
                         onError(err)
                     }
+                    
+                    throw err
+                } finally {
+                    // Clean up in-flight request tracking
+                    inFlightRequestsRef.current.delete(requestId)
                 }
             })
+
+            // Store the promise in the tracking map
+            inFlightRequestsRef.current.set(requestId, requestPromise)
+
+            // Await the request result
+            await requestPromise
         } catch (err) {
+            // Clean up in-flight request tracking on error
+            inFlightRequestsRef.current.delete(requestId)
+            
             setError({
                 message: err.message,
                 url: path,
@@ -409,6 +505,18 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
         setLoading(true)
         await makeRequest()
     }
+
+    // Cleanup effect to abort requests on unmount or dependency change
+    useEffect(() => {
+        return () => {
+            // Abort any in-flight request when component unmounts or dependencies change
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort()
+            }
+            // Clear in-flight request tracking
+            inFlightRequestsRef.current.clear()
+        }
+    }, [method, path, JSON.stringify(requestData)])
 
     // Make the initial request when the component mounts or when the request parameters change
     useEffect(() => {

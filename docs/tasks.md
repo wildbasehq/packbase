@@ -53,11 +53,11 @@ Target: highly performant and quick UX reactions for Direct Messages.
    - [x] Auto-scroll to bottom on first load and when user is near bottom
 9. [x] Expose message editing and deletion in the UI
    - [x] Add message action menu (edit/delete) visible for author-only
-   - [ ] Inline edit form with escape-to-cancel and optimistic update for PATCH
+   - [x] Inline edit form with escape-to-cancel and optimistic update for PATCH
    - [ ] Soft delete UI to show “deleted” placeholder (already handled by content=null in renderer)
-10. [ ] Improve ContentFrame data layer robustness
-    - [ ] Ensure fetch abort on unmount or dependency change; dedupe in-flight requests by signature
-    - [ ] Provide SWR-like caching semantics (stale-while-revalidate) with configurable TTL
+10. [x] Improve ContentFrame data layer robustness
+    - [x] Ensure fetch abort on unmount or dependency change; dedupe in-flight requests by signature
+    - [x] Provide SWR-like caching semantics (stale-while-revalidate) with configurable TTL
     - [ ] Standardize error propagation; add per-frame onError callbacks and global error boundary
     - [ ] Support ETag/Last-Modified and 304 handling to reduce payloads
 11. [ ] Strengthen error handling and user feedback in the client
