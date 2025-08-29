@@ -103,14 +103,14 @@ export default function UserSidebar() {
 
 function FriendsListContainer({ collapsed }: { collapsed: boolean }) {
     return (
-        <ContentFrame get="user/me/friends" cache>
+        <ContentFrame get="user.me.friends" cache>
             <FriendsListView collapsed={collapsed} />
         </ContentFrame>
     )
 }
 
 function FriendsListView({ collapsed }: { collapsed: boolean }) {
-    const { data: friendsResponse, refresh } = useContentFrame('get=user/me/friends')
+    const { data: friendsResponse, refresh } = useContentFrame('get=user.me.friends')
 
     const friends = friendsResponse?.friends || []
 

@@ -16,8 +16,8 @@ export default function Preload({ children }: { children: React.ReactNode }) {
         <>
             <ContentFrame silentFail get="server.describeServer">
                 <SignedIn>
-                    <ContentFrame get="user.me" cache>
-                        <ContentFrame get="user.me.packs" cache>
+                    <ContentFrame get="user.me">
+                        <ContentFrame get="user.me.packs">
                             {/*<WebsocketFrame*/}
                             {/*    onConnect={() => console.log('Connected to websocket')}*/}
                             {/*    onDisconnect={() => console.log('Disconnected from websocket')}*/}

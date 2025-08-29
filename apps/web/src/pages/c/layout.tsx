@@ -25,7 +25,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 function ChatSidebarContent() {
     return (
         <>
-            <ContentFrame get="dm.channels" cache>
+            <ContentFrame get="dm.channels">
                 <SidebarSection>
                     <NewDMForm />
                     <ChannelsList />
