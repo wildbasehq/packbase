@@ -9,6 +9,7 @@ import { ChatBox } from '@/components/shared/chat-box.tsx'
 import { Avatar } from '@/components/shared/avatar.tsx'
 import { useSession } from '@clerk/clerk-react'
 import Markdown from '@/components/shared/markdown.tsx'
+import { useUserAccountStore } from '@/lib'
 
 export default function ChatThreadPage() {
     const { id } = useParams<{ id: string }>()
@@ -53,10 +54,9 @@ function MessagesList() {
     const messagesFrame = useContentFrame()
     const { data: messages, loading } = messagesFrame
     const channelFrame = messagesFrame.parent
-    const userFrame = channelFrame?.parent
+    const { user: me } = useUserAccountStore()
 
     const channel = channelFrame?.data as any
-    const me = userFrame?.data as any
 
     if (loading) {
         return (
@@ -75,14 +75,14 @@ function MessagesList() {
             const name = me.display_name || me.username || 'You'
             return {
                 name,
-                avatar: me.images_avatar || null,
+                images_avatar: me.images?.avatar || null,
                 initials: (name || 'Y').slice(0, 1),
             }
         }
         const name = recipient?.display_name || recipient?.username || 'Friend'
         return {
             name,
-            avatar: recipient?.images_avatar || null,
+            images_avatar: recipient?.images_avatar || null,
             initials: (name || 'F').slice(0, 1),
         }
     }
@@ -143,9 +143,9 @@ function MessagesList() {
                     <div key={`grp-${idx}`} className="group">
                         <div className="flex gap-3">
                             <Avatar
-                                src={author.avatar}
+                                src={author.images_avatar}
                                 alt={author.name}
-                                initials={author.avatar ? undefined : author.initials}
+                                initials={author.images_avatar ? undefined : author.initials}
                                 className="size-8 mt-1"
                             />
                             <div className="min-w-0">
