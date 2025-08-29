@@ -318,7 +318,7 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
                     const urlPath = path.split('.').join('/')
 
                     // Construct the full API URL
-                    const url = `${API_URL}${urlPath}`
+                    const url = `${API_URL}/${urlPath}`
 
                     // Set up fetch options
                     const options: RequestInit = {
