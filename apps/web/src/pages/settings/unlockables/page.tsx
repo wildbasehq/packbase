@@ -16,16 +16,6 @@ import { vg } from '@/lib/api'
 const UnlockableSettings: React.FC = () => {
     return (
         <div className="h-full overflow-y-auto">
-            <div className="flex items-center justify-center p-6">
-                <InviteFestivalIcon />
-                <Heading
-                    size="2xl"
-                    className="bg-gradient-to-r animate-logo-hue from-amber-600 to-orange-600 bg-clip-text text-transparent dark:from-amber-400 dark:to-orange-400"
-                >
-                    Invite Festival
-                </Heading>
-            </div>
-
             <React.Suspense
                 fallback={
                     <div className="flex h-96 items-center justify-center">
@@ -40,75 +30,6 @@ const UnlockableSettings: React.FC = () => {
 }
 
 export default UnlockableSettings
-
-const InviteFestivalIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" className="mr-3 inline-block h-10 w-10">
-        {/* Background circular glow */}
-        <circle cx="120" cy="120" r="100" fill="url(#festivalGlow)" />
-
-        {/* Envelope Base */}
-        <path d="M70 100 L120 130 L170 100 L170 160 L70 160 Z" fill="#fbbf24" stroke="#b45309" strokeWidth="3" strokeLinejoin="round" />
-        <path d="M70 100 L120 130 L170 100 L170 90 L70 90 Z" fill="#fcd34d" stroke="#b45309" strokeWidth="3" strokeLinejoin="round" />
-
-        {/* Confetti Pieces */}
-        <g id="confetti">
-            {/* Left side confetti */}
-            <rect x="45" y="70" width="8" height="18" rx="2" fill="#ec4899" transform="rotate(-30, 45, 70)" />
-            <rect x="60" y="60" width="6" height="14" rx="1" fill="#06b6d4" transform="rotate(25, 60, 60)" />
-            <rect x="55" y="95" width="7" height="16" rx="2" fill="#8b5cf6" transform="rotate(-15, 55, 95)" />
-            <circle cx="65" cy="80" r="4" fill="#f43f5e" />
-            <circle cx="50" cy="110" r="3" fill="#10b981" />
-
-            {/* Right side confetti */}
-            <rect x="180" y="65" width="8" height="18" rx="2" fill="#f43f5e" transform="rotate(30, 180, 65)" />
-            <rect x="170" y="60" width="6" height="14" rx="1" fill="#8b5cf6" transform="rotate(-25, 170, 60)" />
-            <rect x="185" y="95" width="7" height="16" rx="2" fill="#06b6d4" transform="rotate(15, 185, 95)" />
-            <circle cx="175" cy="80" r="4" fill="#ec4899" />
-            <circle cx="190" cy="110" r="3" fill="#fcd34d" />
-
-            {/* Top confetti */}
-            <rect x="105" y="40" width="8" height="18" rx="2" fill="#10b981" transform="rotate(15, 105, 40)" />
-            <rect x="125" y="45" width="7" height="16" rx="2" fill="#f43f5e" transform="rotate(-10, 125, 45)" />
-            <circle cx="115" cy="60" r="4" fill="#8b5cf6" />
-            <circle cx="135" cy="55" r="3" fill="#06b6d4" />
-        </g>
-
-        {/* Ribbon on envelope */}
-        <path d="M90 125 Q120 145 150 125" stroke="#ef4444" strokeWidth="5" fill="none" />
-        <circle cx="120" cy="125" r="10" fill="#ef4444" />
-        <path d="M115 125 L120 130 L125 125" fill="white" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
-
-        {/* Star bursts */}
-        <g id="starbursts">
-            <path d="M60 55 L63 63 L70 65 L63 67 L60 75 L57 67 L50 65 L57 63 Z" fill="#facc15" />
-            <path d="M180 55 L183 63 L190 65 L183 67 L180 75 L177 67 L170 65 L177 63 Z" fill="#facc15" />
-        </g>
-
-        {/* Sparkle effects */}
-        <g id="sparkles" fill="#fef3c7">
-            <circle cx="85" cy="75" r="2" />
-            <circle cx="155" cy="75" r="2" />
-            <circle cx="50" cy="140" r="2" />
-            <circle cx="190" cy="140" r="2" />
-            <circle cx="70" cy="180" r="2" />
-            <circle cx="170" cy="180" r="2" />
-            <circle cx="120" cy="190" r="2" />
-        </g>
-
-        {/* Party hat */}
-        <path d="M130 70 L150 100 L110 100 Z" fill="#a855f7" stroke="#7e22ce" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M130 70 L130 100" stroke="#7e22ce" strokeWidth="1" strokeDasharray="3,2" />
-        <circle cx="130" cy="65" r="5" fill="#f43f5e" />
-
-        {/* Gradients and other defs */}
-        <defs>
-            <radialGradient id="festivalGlow" cx="120" cy="120" r="100" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#ffe4b5" stopOpacity="0.7" />
-                <stop offset="100%" stopColor="#ffe4b5" stopOpacity="0" />
-            </radialGradient>
-        </defs>
-    </svg>
-)
 
 // Trophy Case Display component with shelves and glass effect
 const TrophyCase = ({ children, title }) => {

@@ -8,7 +8,8 @@ import { UserIcon } from '@heroicons/react/24/solid'
 import ProfileSettings from '@/pages/settings/general/page.tsx'
 import { useLocation } from 'wouter'
 import TemplateSettings from '@/pages/settings/template/page.tsx'
-import { SwatchIcon } from '@heroicons/react/16/solid'
+import { SwatchIcon, TrophyIcon } from '@heroicons/react/16/solid'
+import UnlockableSettings from '@/pages/settings/unlockables/page.tsx'
 
 export default function UserDropdown() {
     const [location, setLocation] = useLocation()
@@ -25,6 +26,9 @@ export default function UserDropdown() {
                 {/*<UserButton.UserProfilePage label="Invite" url="/invite" labelIcon={<EnvelopeOpenIcon />}>*/}
                 {/*    <InviteSettings />*/}
                 {/*</UserButton.UserProfilePage>*/}
+                <UserButton.UserProfilePage label="Badges" url="/badges" labelIcon={<TrophyIcon />}>
+                    <UnlockableSettings />
+                </UserButton.UserProfilePage>
                 <UserButton.UserProfilePage label="Theme" url="/theme" labelIcon={<SwatchIcon />}>
                     <TemplateSettings />
                 </UserButton.UserProfilePage>
