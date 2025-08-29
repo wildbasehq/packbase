@@ -56,7 +56,7 @@ export default async function verifyToken(req: any) {
 
                 // Add collectible using UnlockablesManager
                 const unlocableManager = new UnlockablesManager(clerkClient);
-                await unlocableManager.processUnlockables(user.userId, user.sub);
+                await unlocableManager.processUnlockables(user.userId);
             }
         }
     } catch (e) {

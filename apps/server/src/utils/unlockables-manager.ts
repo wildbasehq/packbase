@@ -62,14 +62,14 @@ export class UnlockablesManager {
         return this.config.baseUnlockables.filter((unlockable) => !currentUnlockables.includes(unlockable));
     }
 
-    private async addUnlockable(userId: string, unlockable: string, currentUnlockables: string[] = []): Promise<boolean> {
+    private async addUnlockable(ownerId: string, unlockable: string, currentUnlockables: string[] = []): Promise<boolean> {
         if (currentUnlockables.includes(unlockable)) {
             return false;
         }
 
         prisma.collectibles.create({
             data: {
-                user_id: userId,
+                user_id: ownerId,
                 badge_id: unlockable,
             },
         });
@@ -89,12 +89,12 @@ export class UnlockablesManager {
      * @param increment
      * @returns Promise<boolean> - Whether any unlockables were added
      */
-    async processUnlockables(ownerId: string, userId: string, specificUnlockable?: string | null, increment?: boolean): Promise<boolean> {
+    async processUnlockables(ownerId: string, specificUnlockable?: string | null, increment?: boolean): Promise<boolean> {
         try {
             const userProfile = await this.getUserProfile(ownerId);
             const userBadges = await prisma.collectibles.findMany({
                 where: {
-                    user_id: userId,
+                    user_id: ownerId,
                 },
             });
             const currentUnlockables = userBadges?.map((badge) => badge.badge_id) || [];
@@ -107,7 +107,7 @@ export class UnlockablesManager {
 
             // Handle first invite achievement if configured
             if (this.config.firstUnlockable) {
-                unlockableAdded = await this.addUnlockable(userId, this.config.firstUnlockable, currentUnlockables);
+                unlockableAdded = await this.addUnlockable(ownerId, this.config.firstUnlockable, currentUnlockables);
                 if (unlockableAdded) {
                     currentUnlockables.push(this.config.firstUnlockable);
                 }
@@ -115,12 +115,12 @@ export class UnlockablesManager {
 
             // Handle specific unlockable if provided
             if (specificUnlockable) {
-                return await this.addUnlockable(userId, specificUnlockable, currentUnlockables);
+                return await this.addUnlockable(ownerId, specificUnlockable, currentUnlockables);
             }
 
             // Handle tiered unlockables
             if (this.config.tieredUnlockables[invited]) {
-                unlockableAdded = (await this.addUnlockable(userId, this.config.tieredUnlockables[invited], currentUnlockables)) || unlockableAdded;
+                unlockableAdded = (await this.addUnlockable(ownerId, this.config.tieredUnlockables[invited], currentUnlockables)) || unlockableAdded;
 
                 currentUnlockables.push(this.config.tieredUnlockables[invited]);
             }
@@ -131,7 +131,7 @@ export class UnlockablesManager {
 
                 if (availableUnlockables.length > 0) {
                     const randomUnlockable = this.getRandomUnlockable(availableUnlockables);
-                    unlockableAdded = (await this.addUnlockable(userId, randomUnlockable, currentUnlockables)) || unlockableAdded;
+                    unlockableAdded = (await this.addUnlockable(ownerId, randomUnlockable, currentUnlockables)) || unlockableAdded;
                 }
             }
 
