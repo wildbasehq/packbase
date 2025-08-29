@@ -149,6 +149,11 @@ function NewDMForm() {
 
     return (
         <form onSubmit={onSubmit} className="mb-3 space-y-2">
+            {/* debug input to force dm creation */}
+            <Input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+            <Button type="submit" className="w-full" disabled={submitting}>
+                Start DM
+            </Button>
             <Button outline className="w-full" type="button" onClick={onSelfDM} disabled={submitting}>
                 Jump to Your Basecamp
             </Button>
