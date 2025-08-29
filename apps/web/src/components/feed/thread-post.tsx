@@ -18,6 +18,7 @@ import { Text } from '@/components/shared/text.tsx'
 import { AvatarButton, FeedPostData, LoadingCircle } from '@/src/components'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { UserGroupIcon } from '@heroicons/react/16/solid'
+import { BentoGenericUnlockableBadge, BentoStaffBadge } from '@/lib/utils/pak.tsx'
 
 interface ThreadPostProps {
     post: FeedPostData
@@ -148,6 +149,17 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 <Link href={`/@${post.user?.username}/`} className="font-semibold hover:underline text-default">
                                     {post.user?.display_name || post.user?.username}
                                 </Link>
+                                {post.user?.type && (
+                                    <BentoStaffBadge type={post.user?.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />
+                                )}
+                                {post.user?.badge && (
+                                    <BentoGenericUnlockableBadge
+                                        type={post.user?.badge}
+                                        className="ml-1 inline-flex h-5 w-5"
+                                        width={20}
+                                        height={20}
+                                    />
+                                )}
                                 <Text className="text-sm" alt>
                                     @{post.user?.username}
                                 </Text>

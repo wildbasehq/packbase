@@ -10,4 +10,6 @@ export interface UserProfileBasic {
         avatar?: string
         header?: string
     }
+    badge?: string
+    type?: '1' | '2'
 }
