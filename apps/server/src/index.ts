@@ -48,7 +48,7 @@ declare global {
 import './db/auth';
 import { HTTPError } from '@/lib/class/HTTPError';
 
-const Yapock = new Elysia()
+const Yapock = new Elysia({})
     .use(
         cors({
             allowedHeaders: '*',
@@ -70,9 +70,11 @@ const Yapock = new Elysia()
         }
         return response;
     })
-    .onError(({ error, request }) => {
+    .onError(({ code, error, request }) => {
         // Ensure JSON response
         try {
+            if (code === 'VALIDATION') return error.validator.Errors(error.value).First().message;
+
             return new HTTPError(error as any).toJSON();
         } catch (_) {
             return error;

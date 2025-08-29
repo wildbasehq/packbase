@@ -49,7 +49,6 @@ export default (app: YapockType) =>
         },
     );
 
-
 export async function getUser({ by, value, user, scope }: { by: string; value: string; user?: any; scope?: string }) {
     const timer = new Date().getTime();
     // let cached: typeof UserProfile & { expires_after: number } | undefined
