@@ -10,6 +10,8 @@ import { HTTPError } from '@/lib/class/HTTPError';
 import prisma from '@/db/prisma';
 import requiresToken from '@/utils/identity/requires-token';
 import createStorage from '@/lib/class/storage';
+import { UnlockablesManager } from '@/utils/unlockables-manager';
+import clerkClient from '@/db/auth';
 
 export default (app: YapockType) =>
     app
@@ -35,9 +37,19 @@ export default (app: YapockType) =>
                     };
                 }
 
+                const unlockedBadges = await prisma.collectibles.findMany({
+                    where: {
+                        user_id: user.sub,
+                    },
+                    select: {
+                        badge_id: true,
+                    },
+                });
+
                 userProfile.metadata = {
                     ...user.user_metadata,
                     ...user.app_metadata,
+                    unlockables: unlockedBadges.map((badge) => badge.badge_id),
                 };
 
                 return userProfile;
