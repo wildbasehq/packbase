@@ -152,7 +152,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 {post.user?.type && (
                                     <BentoStaffBadge
                                         type={post.user?.type}
-                                        className="mt-1 ml-1 inline-flex h-5 w-5"
+                                        className="relative top-1 ml-1 inline-flex h-5 w-5"
                                         width={20}
                                         height={20}
                                     />
@@ -160,7 +160,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 {post.user?.badge && (
                                     <BentoGenericUnlockableBadge
                                         type={post.user?.badge}
-                                        className="mt-1 ml-1 inline-flex h-5 w-5"
+                                        className="relative top-1 ml-1 inline-flex h-5 w-5"
                                         width={20}
                                         height={20}
                                     />
