@@ -7,31 +7,31 @@ import { CommonErrorResponses, DM_ERROR_CODES } from '@/utils/dm/errors';
 
 // Channel response schemas
 const RecipientResponse = t.Object({
-  id: t.String(),
-  username: t.String(),
-  display_name: t.Union([t.String(), t.Null()]),
-  images_avatar: t.Union([t.String(), t.Null()]),
-})
+    id: t.String(),
+    username: t.String(),
+    display_name: t.Union([t.String(), t.Null()]),
+    images_avatar: t.Union([t.String(), t.Null()]),
+});
 
 const MessageResponse = t.Object({
-  id: t.String(),
-  channel_id: t.String(),
-  author_id: t.String(),
-  content: t.Union([t.String(), t.Null()]),
-  created_at: t.String(),
-  edited_at: t.Union([t.String(), t.Null()]),
-  deleted_at: t.Union([t.String(), t.Null()]),
-})
+    id: t.String(),
+    channel_id: t.String(),
+    author_id: t.String(),
+    content: t.Optional(t.String()),
+    created_at: t.String(),
+    edited_at: t.Optional(t.String()),
+    deleted_at: t.Optional(t.String()),
+});
 
 const ChannelResponse = t.Object({
-  id: t.String(),
-  type: t.String(),
-  recipients: t.Array(RecipientResponse),
-  last_message_id: t.Union([t.String(), t.Null()]),
-  last_message: t.Union([MessageResponse, t.Null()]),
-  created_at: t.String(),
-  unread_count: t.Number(),
-})
+    id: t.String(),
+    type: t.String(),
+    recipients: t.Array(RecipientResponse),
+    last_message_id: t.Optional(t.String()),
+    last_message: t.Optional(MessageResponse),
+    created_at: t.String(),
+    unread_count: t.Number(),
+});
 
 export default (app: YapockType) =>
     app
@@ -41,9 +41,9 @@ export default (app: YapockType) =>
             async ({ set, user }) => {
                 if (!user?.sub) {
                     set.status = 401;
-                    throw HTTPError.unauthorized({ 
+                    throw HTTPError.unauthorized({
                         summary: 'Authentication required to access DM channels',
-                        code: DM_ERROR_CODES.UNAUTHORIZED 
+                        code: DM_ERROR_CODES.UNAUTHORIZED,
                     });
                 }
 
@@ -77,18 +77,18 @@ export default (app: YapockType) =>
             async ({ set, user, body }) => {
                 if (!user?.sub) {
                     set.status = 401;
-                    throw HTTPError.unauthorized({ 
+                    throw HTTPError.unauthorized({
                         summary: 'Authentication required to create DM channels',
-                        code: DM_ERROR_CODES.UNAUTHORIZED 
+                        code: DM_ERROR_CODES.UNAUTHORIZED,
                     });
                 }
 
                 const { userId } = body as { userId?: string };
                 if (!userId) {
                     set.status = 400;
-                    throw HTTPError.badRequest({ 
+                    throw HTTPError.badRequest({
                         summary: 'User ID is required to create a DM channel',
-                        code: DM_ERROR_CODES.USER_ID_REQUIRED 
+                        code: DM_ERROR_CODES.USER_ID_REQUIRED,
                     });
                 }
 
@@ -144,7 +144,7 @@ export default (app: YapockType) =>
                     tags: ['DM'],
                 },
                 body: t.Object({ userId: t.String() }),
-                response: { 
+                response: {
                     200: ChannelResponse,
                     400: CommonErrorResponses[400],
                     401: CommonErrorResponses[401],

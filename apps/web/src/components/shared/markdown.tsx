@@ -13,26 +13,41 @@ import { clsx } from 'clsx'
 // Safe sanitization schema for Markdown
 const sanitizeSchema = {
     allowedTags: [
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        'p', 'br', 'div', 'span',
-        'ul', 'ol', 'li',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'p',
+        'br',
+        'div',
+        'span',
+        'ul',
+        'ol',
+        'li',
         'blockquote',
-        'pre', 'code',
-        'a', 'img',
-        'strong', 'em', 'u', 'del',
-        'hr'
+        'pre',
+        'code',
+        'a',
+        'img',
+        'strong',
+        'em',
+        'u',
+        'del',
+        'hr',
     ],
     allowedAttributes: {
-        'a': ['href', 'title', 'target', 'rel'],
-        'img': ['src', 'alt', 'title', 'width', 'height'],
-        'code': ['className'],
-        'pre': ['className'],
-        '*': ['className'] // Allow className on any element for styling
+        a: ['href', 'title', 'target', 'rel'],
+        img: ['src', 'alt', 'title', 'width', 'height'],
+        code: ['className'],
+        pre: ['className'],
+        '*': ['className'], // Allow className on any element for styling
     },
     allowedSchemes: ['http', 'https', 'mailto'],
     allowedSchemesByTag: {
-        'img': ['http', 'https', 'data'] // Allow data URLs for images (base64)
-    }
+        img: ['http', 'https', 'data'], // Allow data URLs for images (base64)
+    },
 }
 
 // URL validation helper
@@ -99,7 +114,7 @@ class HowlertagHandler {
     }
 
     matches(text: string): boolean {
-        return text.includes(`{${this.tag}`)
+        return text.includes?.(`{${this.tag}`)
     }
 
     parse(text: string): { content: string; props: any } {
@@ -254,7 +269,7 @@ Howlertag.addHandler(GenericHTMLImageHandler)
 
 export default function Markdown({ children, componentClassName }: { children: string; componentClassName?: string; [x: string]: any }) {
     // Check for numbers followed by a period, and if so, replace with \.
-    children = children?.replace(/(\d+)\./g, '$1\\.')
+    if (children?.replace) children = children?.replace(/(\d+)\./g, '$1\\.')
 
     const convertedContent = Howlertag.convert(children)
 
@@ -265,9 +280,7 @@ export default function Markdown({ children, componentClassName }: { children: s
                     return (
                         <ReactMarkdown
                             key={index}
-                            rehypePlugins={[
-                                [rehypeSanitize, sanitizeSchema]
-                            ]}
+                            rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
                             components={{
                                 h1(props) {
                                     return <Heading as="h1" size="3xl" className={clsx(props.className, componentClassName)} {...props} />
@@ -323,7 +336,7 @@ export default function Markdown({ children, componentClassName }: { children: s
                                     // Validate URL and add security attributes
                                     const href = props.href || ''
                                     const isValid = isValidUrl(href)
-                                    
+
                                     return (
                                         <a
                                             className="text-indigo-500 underline underline-offset-[3px] hover:text-indigo-500/80 transition-colors cursor-pointer"
@@ -341,13 +354,13 @@ export default function Markdown({ children, componentClassName }: { children: s
                                     // Validate image URL for security
                                     const src = props.src || ''
                                     const isValid = src.startsWith('data:') || isValidUrl(src)
-                                    
+
                                     return (
-                                        <img 
-                                            className="rounded-lg border border-stone-200" 
+                                        <img
+                                            className="rounded-lg border border-stone-200"
                                             src={isValid ? src : '/img/placeholder.png'}
                                             alt={props.alt || 'Image'}
-                                            {...props} 
+                                            {...props}
                                         />
                                     )
                                 },

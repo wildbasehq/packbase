@@ -9,6 +9,7 @@ import { Avatar } from '@/components/shared/avatar.tsx'
 import { useSession } from '@clerk/clerk-react'
 import { useLocation } from 'wouter'
 import { useState } from 'react'
+import { Text } from '@/components/shared/text.tsx'
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -154,9 +155,12 @@ function NewDMForm() {
 
     return (
         <form onSubmit={onSubmit} className="mb-3 space-y-2">
+            <Text alt size="xs">
+                A dirty way to start a DM, for now
+            </Text>
             {/* debug input to force dm creation */}
             <Input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
-            <Button type="submit" className="w-full" disabled={submitting}>
+            <Button color="indigo" type="submit" className="w-full" disabled={submitting}>
                 Start DM
             </Button>
             <Button outline className="w-full" type="button" onClick={onSelfDM} disabled={submitting}>
