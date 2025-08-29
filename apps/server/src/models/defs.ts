@@ -1,50 +1,55 @@
 import { t } from 'elysia';
 import emojiRegex from 'emoji-regex';
 
-export const UserProfile = t.Object({
-    id: t.Optional(t.String()),
-    type: t.Optional(t.String()),
-    username: t.Optional(
-        t.String({
-            minLength: 2,
-            maxLength: 40,
-            pattern: '^(?=.{2,40}$)(?![_.-])(?!.*[_.-]{2})[\\w.-]+(?<![_.-])$',
-        }),
-    ),
-    display_name: t.Optional(
-        t.String({
-            maxLength: 20,
-        }),
-    ),
-    badge: t.Optional(t.String()),
-    about: t.Optional(
-        t.Partial(
-            t.Object({
-                bio: t.String({
-                    maxLength: 256,
-                }),
-                flair: t.String({
-                    maxLength: 12,
-                }),
+export const UserProfile = t.Object(
+    {
+        id: t.Optional(t.String()),
+        type: t.Optional(t.String()),
+        username: t.Optional(
+            t.String({
+                minLength: 2,
+                maxLength: 40,
+                pattern: '^(?=.{2,40}$)(?![_.-])(?!.*[_.-]{2})[\\w.-]+(?<![_.-])$',
             }),
         ),
-    ),
-    space_type: t.Optional(t.Union([t.Literal('default'), t.Literal('custom_free'), t.Literal('custom_unrestricted')])),
-    post_privacy: t.Optional(t.Union([t.Literal('everyone'), t.Literal('followers'), t.Literal('friends'), t.Literal('private')])),
-    images: t.Optional(
-        t.Object({
-            avatar: t.Optional(t.Any()),
-            header: t.Optional(t.Any()),
-        }),
-    ),
-    following: t.Optional(t.Boolean()),
-    invite_code: t.Optional(
-        t.String({
-            minLength: 24,
-            maxLength: 37,
-        }),
-    ),
-});
+        display_name: t.Optional(
+            t.String({
+                maxLength: 20,
+            }),
+        ),
+        badge: t.Optional(t.String()),
+        about: t.Optional(
+            t.Partial(
+                t.Object({
+                    bio: t.String({
+                        maxLength: 256,
+                    }),
+                    flair: t.String({
+                        maxLength: 12,
+                    }),
+                }),
+            ),
+        ),
+        space_type: t.Optional(t.Union([t.Literal('default'), t.Literal('custom_free'), t.Literal('custom_unrestricted')])),
+        post_privacy: t.Optional(t.Union([t.Literal('everyone'), t.Literal('followers'), t.Literal('friends'), t.Literal('private')])),
+        images: t.Optional(
+            t.Object({
+                avatar: t.Optional(t.Any()),
+                header: t.Optional(t.Any()),
+            }),
+        ),
+        following: t.Optional(t.Boolean()),
+        invite_code: t.Optional(
+            t.String({
+                minLength: 24,
+                maxLength: 37,
+            }),
+        ),
+    },
+    {
+        additionalProperties: true,
+    },
+);
 
 export const UserProfileWithInviteCode = t.Intersect([
     UserProfile,
