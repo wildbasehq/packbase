@@ -73,7 +73,10 @@ const Yapock = new Elysia({})
     .onError(({ code, error, request }) => {
         // Ensure JSON response
         try {
-            if (code === 'VALIDATION') return error.validator.Errors(error.value).First().message;
+            if (code === 'VALIDATION')
+                return {
+                    ...error.validator.Errors(error.value).First(),
+                };
 
             return new HTTPError(error as any).toJSON();
         } catch (_) {
