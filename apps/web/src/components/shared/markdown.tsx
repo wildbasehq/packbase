@@ -114,6 +114,7 @@ class HowlertagHandler {
     }
 
     matches(text: string): boolean {
+        if (!text) return false
         return text.includes?.(`{${this.tag}`)
     }
 
