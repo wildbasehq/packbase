@@ -20,7 +20,7 @@ export default (app: YapockType) =>
 
             const userBadge = await prisma.collectibles.findFirst({
                 where: {
-                    user_id: user.sub,
+                    user_id: user.userId,
                     badge_id: body.badge,
                 },
             });
@@ -33,7 +33,7 @@ export default (app: YapockType) =>
             // Set any `is_set` to false, set body.badge (badge_id) as true.
             await prisma.collectibles.updateMany({
                 where: {
-                    user_id: user.sub,
+                    user_id: user.userId,
                 },
                 data: {
                     is_set: false,
@@ -42,7 +42,7 @@ export default (app: YapockType) =>
 
             await prisma.collectibles.updateMany({
                 where: {
-                    user_id: user.sub,
+                    user_id: user.userId,
                     badge_id: body.badge,
                 },
                 data: {

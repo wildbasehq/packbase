@@ -154,7 +154,7 @@ export async function getUser({ by, value, user, scope }: { by: string; value: s
 
     const userBadges = await prisma.collectibles.findFirst({
         where: {
-            user_id: data.id,
+            user_id: data.owner_id,
             is_set: true,
         },
     });
