@@ -5,11 +5,12 @@ import { Heading, Text } from '@/components/shared/text'
 import { useUserAccountStore } from '@/lib/index'
 import { BentoGenericUnlockableBadge } from '@/lib/utils/pak'
 import badgeConfig from '@/datasets/bento/pak/badges/pak.json'
-import { LockClosedIcon, TrophyIcon, UserCircleIcon } from '@heroicons/react/24/solid'
+import { LockClosedIcon, TrophyIcon, CheckCircleIcon } from '@heroicons/react/24/solid'
 import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
 import { toast } from 'sonner'
-import { CrawlText } from '@/components/shared/crawl-text'
 import { vg } from '@/lib/api'
+import Card from '@/components/shared/card'
+import { Badge } from '@/components/shared/badge'
 
 // We'll import the existing component since it's already well-designed for this purpose
 // This is essentially a wrapper to make it fit nicely in our settings dialog
@@ -19,7 +20,7 @@ const UnlockableSettings: React.FC = () => {
             <React.Suspense
                 fallback={
                     <div className="flex h-96 items-center justify-center">
-                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-300 border-t-amber-600"></div>
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-blue-600"></div>
                     </div>
                 }
             >
@@ -31,329 +32,161 @@ const UnlockableSettings: React.FC = () => {
 
 export default UnlockableSettings
 
-// Trophy Case Display component with shelves and glass effect
-const TrophyCase = ({ children, title }) => {
+// Simple card wrapper for sections
+const BadgeSection = ({ children, title }) => {
     return (
-        <div className="relative mt-8">
-            {/* Trophy case header with wood texture */}
-            <div className="relative z-10 rounded-t-xl bg-gradient-to-r from-amber-800 to-amber-700 p-4 text-center shadow-md">
-                <div
-                    className="absolute inset-0 opacity-10 mix-blend-overlay"
-                    style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.2' fill-rule='evenodd'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1zM0 23h20v20H0V23zm22 0h20v20H22V23z'/%3E%3C/g%3E%3C/svg%3E")`,
-                        backgroundSize: '50px 50px',
-                    }}
-                />
-                <Heading className="text-amber-100">{title}</Heading>
+        <Card className="mt-6">
+            <div className="mb-4">
+                <Heading className="text-lg">{title}</Heading>
             </div>
+            {children}
+        </Card>
+    )
+}
 
-            {/* Trophy case body with wooden frame */}
-            <div className="relative rounded-b-xl border-8 border-t-0 border-amber-700 bg-amber-800">
-                {/* Inner case with texture */}
-                <div className="relative bg-gradient-to-b from-amber-100 to-amber-200 p-1 dark:from-zinc-800 dark:to-zinc-900">
-                    {/* Wood grain texture overlay */}
-                    <div
-                        className="absolute inset-0 opacity-5 mix-blend-overlay"
-                        style={{
-                            backgroundImage: `url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1zM0 23h20v20H0V23zm22 0h20v20H22V23z'/%3E%3C/g%3E%3C/svg%3E")`,
-                            backgroundSize: '50px 50px',
-                        }}
-                    />
-
-                    {/* Glass effect overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
-
-                    {/* Trophy case content */}
-                    <div className="relative z-10 p-4">{children}</div>
-                </div>
-
-                {/* Screws in corners for decoration */}
-                {/*<div className="absolute -left-3 -top-3 h-4 w-4 rounded-full bg-white dark:bg-zinc-900"/>*/}
-                {/*<div className="absolute -right-3 -top-3 h-4 w-4 rounded-full bg-white dark:bg-zinc-900"/>*/}
-                {/*<div className="absolute -left-3 -bottom-3 h-4 w-4 rounded-full bg-white dark:bg-zinc-900"/>*/}
-                {/*<div className="absolute -right-3 -bottom-3 h-4 w-4 rounded-full bg-white dark:bg-zinc-900"/>*/}
-            </div>
+// Clean section header
+const SectionHeader = ({ title, featured = false }) => {
+    return (
+        <div className="mb-4">
+            <Heading className={`text-base ${featured ? 'text-blue-700 dark:text-blue-400' : 'text-zinc-700 dark:text-zinc-300'}`}>
+                {title}
+            </Heading>
+            <div className="mt-2 h-px bg-border" />
         </div>
     )
 }
 
-// Trophy shelf component
-const TrophyShelf = ({ title, children, featured = false }) => {
-    return (
-        <div className={`mb-8 ${featured ? 'relative z-10' : ''}`}>
-            {/* Shelf label */}
-            <div className="mb-2 flex items-center">
-                <div className="h-px flex-grow bg-amber-800/30 dark:bg-zinc-600/50" />
-                <Text
-                    className={`mx-3 text-sm font-bold uppercase tracking-widest ${featured ? 'text-amber-800 dark:text-amber-400' : 'text-zinc-500'}`}
-                >
-                    {title}
-                </Text>
-                <div className="h-px flex-grow bg-amber-800/30 dark:bg-zinc-600/50" />
-            </div>
-
-            {/* Shelf content */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">{children}</div>
-
-            {/* Shelf display stand with shadow */}
-            <div className="relative mt-2 h-2 rounded-full bg-amber-800/20 dark:bg-zinc-700/20 shadow-md" />
-        </div>
-    )
-}
-
-// Badge trophy display with stand
-const BadgeTrophy = ({ badge, isSelected, locked = false, onSelect }) => {
-    const [isHovered, setIsHovered] = useState(false)
+// Clean badge card display
+const BadgeCard = ({ badge, isSelected, locked = false, onSelect }) => {
     const badgeDescription = badgeConfig.config.unlockables.tooltip[badge.type] || 'Mystery Badge'
-
-    // Badge pedestal styles
-    const baseStyles = locked
-        ? 'border-zinc-300 bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800'
-        : isSelected
-          ? 'border-amber-500 bg-amber-100 dark:border-amber-500 dark:bg-amber-900/30'
-          : 'border-zinc-200 bg-white hover:border-amber-300 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-amber-600'
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            whileHover={
-                !locked
-                    ? {
-                          y: -5,
-                          transition: { duration: 0.2 },
-                      }
-                    : {}
-            }
-            className={`relative cursor-pointer select-none overflow-hidden text-center ${locked ? 'opacity-60' : ''}`}
+            transition={{ duration: 0.2 }}
+            whileHover={!locked ? { y: -2 } : {}}
+            className={`relative cursor-pointer transition-all ${locked ? 'opacity-50' : ''}`}
             onClick={() => !locked && onSelect(badge)}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
         >
-            {/* Trophy pedestal with glass dome effect */}
-            <div
-                className={`relative mx-auto flex h-28 w-24 flex-col items-center justify-center rounded-lg border-2 p-3 shadow-md ${baseStyles}`}
+            <Card
+                className={`p-4 text-center transition-all ${
+                    locked ? 'bg-muted' : isSelected ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-950/30' : 'hover:bg-muted/50'
+                }`}
             >
                 {/* Badge display */}
-                <div className="relative">
+                <div className="flex justify-center mb-3">
                     {locked ? (
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-300 dark:bg-zinc-700">
-                            <LockClosedIcon className="h-8 w-8 text-zinc-500 dark:text-zinc-500" />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted-foreground/20">
+                            <LockClosedIcon className="h-6 w-6 text-muted-foreground" />
                         </div>
                     ) : (
-                        <motion.div
-                            animate={
-                                isHovered || isSelected
-                                    ? {
-                                          y: [0, -5, 0],
-                                          rotate: [0, -5, 5, 0],
-                                      }
-                                    : {}
-                            }
-                            transition={{
-                                duration: 0.8,
-                                ease: 'easeInOut',
-                            }}
-                        >
-                            <BentoGenericUnlockableBadge type={badge.type} className="h-16 w-16" />
-                        </motion.div>
+                        <BentoGenericUnlockableBadge type={badge.type} className="h-12 w-12" />
                     )}
-
-                    {/* Glass dome reflection effect */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/30 to-transparent pointer-events-none" />
                 </div>
 
-                {/* Trophy pedestal base */}
-                <div
-                    className={`absolute bottom-0 h-5 w-full rounded-b-lg ${
-                        isSelected ? 'bg-amber-200 dark:bg-amber-800/30' : 'bg-zinc-100 dark:bg-zinc-700'
-                    }`}
-                />
+                {/* Badge name */}
+                <Text className={`text-xs ${isSelected && !locked ? 'font-semibold' : ''}`}>{locked ? 'Locked' : badgeDescription}</Text>
 
                 {/* Selection indicator */}
                 {isSelected && !locked && (
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -bottom-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-amber-500 text-white shadow-lg dark:border-zinc-800"
-                    >
-                        <UserCircleIcon className="h-4 w-4" />
-                    </motion.div>
+                    <div className="absolute top-2 right-2">
+                        <CheckCircleIcon className="h-4 w-4 text-blue-600" />
+                    </div>
                 )}
-            </div>
-
-            {/* Badge name */}
-            <Text
-                className={`mt-2 truncate text-xs ${
-                    isSelected && !locked ? 'font-bold text-amber-800 dark:text-amber-400' : 'text-zinc-600 dark:text-zinc-400'
-                }`}
-            >
-                {locked ? 'Locked' : badgeDescription}
-            </Text>
+            </Card>
         </motion.div>
     )
 }
 
-// Progress display with level indicators
+// Clean progress display
 const ProgressDisplay = ({ value }) => {
-    // For animation sequence
     const [animatedValue, setAnimatedValue] = useState(0)
 
     useEffect(() => {
-        // Animate progress value
-        const interval = setInterval(() => {
-            setAnimatedValue(prev => {
-                if (prev < value) return prev + 1
-                clearInterval(interval)
-                return prev
-            })
-        }, 30)
-
-        return () => clearInterval(interval)
+        const timer = setTimeout(() => setAnimatedValue(value), 100)
+        return () => clearTimeout(timer)
     }, [value])
 
-    // Calculate which milestone badges are earned
     const milestones = [
-        { value: 15, label: 'Bronze', earned: value >= 15 },
-        { value: 20, label: 'Silver', earned: value >= 20 },
-        { value: 30, label: 'Gold', earned: value >= 30 },
+        { value: 15, label: 'Bronze', color: 'amber' },
+        { value: 20, label: 'Silver', color: 'zinc' },
+        { value: 30, label: 'Gold', color: 'yellow' },
     ]
 
+    const currentLevel =
+        value >= 30 ? 'Gold Collector' : value >= 20 ? 'Silver Collector' : value >= 15 ? 'Bronze Collector' : 'Novice Collector'
+
     return (
-        <div className="relative overflow-hidden rounded-xl border-8 border-amber-700 bg-amber-100 p-6 dark:bg-zinc-800">
-            {/* Wood grain texture overlay */}
-            <div
-                className="absolute inset-0 opacity-5 mix-blend-overlay"
-                style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1zM0 23h20v20H0V23zm22 0h20v20H22V23z'/%3E%3C/g%3E%3C/svg%3E")`,
-                    backgroundSize: '50px 50px',
-                }}
-            />
-
-            {/* Reflective overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
-
-            <div className="relative">
-                <div className="mb-6 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <TrophyIcon className="h-6 w-6 text-amber-600 dark:text-amber-500" />
-                        <Heading>Trophy Case Level</Heading>
-                    </div>
-
-                    <div className="flex items-baseline space-x-2">
-                        <Text className="text-zinc-500 dark:text-zinc-400">Invited:</Text>
-                        <Text className="text-xl font-bold text-amber-600 dark:text-amber-400">{animatedValue}</Text>
-                    </div>
+        <Card className="p-6">
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                    <TrophyIcon className="h-5 w-5 text-muted-foreground" />
+                    <Heading>Progress Overview</Heading>
                 </div>
+                <div className="text-right">
+                    <Text className="text-sm text-muted-foreground">Invited Users</Text>
+                    <Text className="text-2xl font-bold">{animatedValue}</Text>
+                </div>
+            </div>
 
-                {/* Progress path with achievements */}
-                <div className="relative mb-12 mt-8">
-                    {/* Path line */}
-                    <div className="absolute top-4 h-1 w-full rounded-full bg-zinc-300 dark:bg-zinc-600" />
-
-                    {/* Progress fill */}
+            {/* Progress bar */}
+            <div className="mb-6">
+                <div className="flex justify-between mb-2">
+                    <Text className="text-sm font-medium">Current Level: {currentLevel}</Text>
+                    <Text className="text-sm text-muted-foreground">{Math.min((value / 30) * 100, 100).toFixed(0)}%</Text>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
                     <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min((animatedValue / 30) * 100, 100)}%` }}
                         transition={{ duration: 1, ease: 'easeOut' }}
-                        className="absolute top-4 h-1 rounded-full bg-amber-500"
+                        className="bg-blue-600 h-2 rounded-full"
                     />
-
-                    {/* Milestone markers */}
-                    <div className="relative flex justify-between -mx-1">
-                        {/* Starting point */}
-                        <div className="flex flex-col items-center mr-[calc(100%/4)]">
-                            <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ delay: 0.2 }}
-                                className="z-10 h-8 w-8 rounded-full bg-amber-500 p-1"
-                            >
-                                <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-amber-600 dark:bg-zinc-900 dark:text-amber-400">
-                                    <TrophyIcon className="h-4 w-4" />
-                                </div>
-                            </motion.div>
-                            <Text className="mt-2 text-xs font-medium text-amber-700 dark:text-amber-400">Start</Text>
-                        </div>
-
-                        {/* Milestone markers */}
-                        {milestones.map((milestone, index) => (
-                            <div key={milestone.value} className="flex flex-col items-center">
-                                <motion.div
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: milestone.earned ? 1 : 0.8 }}
-                                    transition={{
-                                        delay: milestone.earned ? 0.3 + index * 0.2 : 0,
-                                        type: 'spring',
-                                        stiffness: 500,
-                                        damping: 30,
-                                    }}
-                                    className={`z-10 flex h-8 w-8 items-center justify-center rounded-full p-1 ${
-                                        milestone.earned ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-600'
-                                    }`}
-                                >
-                                    <div
-                                        className={`flex h-full w-full items-center justify-center rounded-full text-xs font-bold ${
-                                            milestone.earned
-                                                ? 'bg-white text-amber-600 dark:bg-zinc-900 dark:text-amber-400'
-                                                : 'bg-white text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500'
-                                        }`}
-                                    >
-                                        {milestone.value}
-                                    </div>
-                                </motion.div>
-                                <Text
-                                    className={`mt-2 text-xs font-medium ${
-                                        milestone.earned ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400'
-                                    }`}
-                                >
-                                    {milestone.label}
-                                </Text>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Current level status */}
-                <div className="rounded-lg bg-white/50 p-4 dark:bg-zinc-700/40">
-                    <Text className="font-medium">
-                        Current Level:{' '}
-                        {value >= 30
-                            ? 'Gold Collector'
-                            : value >= 20
-                              ? 'Silver Collector'
-                              : value >= 15
-                                ? 'Bronze Collector'
-                                : 'Novice Collector'}
-                    </Text>
-                    {value < 30 ? (
-                        <Text alt className="mt-1 text-sm">
-                            Next tier:{' '}
-                            {value < 15
-                                ? `Bronze (${15 - value} more invites needed)`
-                                : value < 20
-                                  ? `Silver (${20 - value} more invites needed)`
-                                  : `Gold (${30 - value} more invites needed)`}
-                        </Text>
-                    ) : (
-                        <Text className="mt-1 text-sm animate-logo-hue text-amber-600 dark:text-amber-400">
-                            From the bottom of our hearts, thank you. We are eternally grateful for your contributions to the Packbase
-                            community, and forever indebted to you. We hope you enjoy Packbase!
-                            <br />
-                            <br />
-                            'Til next time,
-                            <br />
-                            Rek & the Packbase Team
-                        </Text>
-                    )}
                 </div>
             </div>
-        </div>
+
+            {/* Milestones */}
+            <div className="grid grid-cols-3 gap-4 mb-6">
+                {milestones.map(milestone => (
+                    <div key={milestone.value} className="text-center">
+                        {/* @ts-ignore */}
+                        <Badge color={value >= milestone.value ? milestone.color : 'zinc'}>{milestone.label}</Badge>
+                        <Text className="text-xs text-muted-foreground mt-1">{milestone.value} invites</Text>
+                    </div>
+                ))}
+            </div>
+
+            {/* Next tier info */}
+            {value < 30 ? (
+                <div className="bg-muted rounded-lg p-4">
+                    <Text className="text-sm">
+                        Next tier:{' '}
+                        {value < 15
+                            ? `Bronze (${15 - value} more invites needed)`
+                            : value < 20
+                              ? `Silver (${20 - value} more invites needed)`
+                              : `Gold (${30 - value} more invites needed)`}
+                    </Text>
+                </div>
+            ) : (
+                <div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/30 dark:to-amber-950/30 rounded-lg p-4">
+                    <Text className="text-sm">
+                        From the bottom of our hearts, thank you. We are eternally grateful for your contributions to the Packbase
+                        community, and forever indebted to you. We hope you enjoy Packbase!
+                        <br />
+                        <br />
+                        'Til next time,
+                        <br />
+                        Rek & the Packbase Team
+                    </Text>
+                </div>
+            )}
+        </Card>
     )
 }
 
-// Main Unlockables Trophy Case component
+// Main Unlockables component with clean design
 function TrophyCaseUnlockables() {
     const { user } = useUserAccountStore()
     const [selectedBadge, setSelectedBadge] = useState(null)
@@ -393,7 +226,6 @@ function TrophyCaseUnlockables() {
     // Handle badge selection
     const handleBadgeSelect = badge => {
         if (badge.locked) return
-        // if (selectedBadge?.id === badge.id) return
         setSelectedBadge(badge)
         updateUserBadge(badge.type)
     }
@@ -420,12 +252,13 @@ function TrophyCaseUnlockables() {
             {/* Progress display */}
             <ProgressDisplay value={invitedCount} />
 
-            {/* Trophy Case for premium badges */}
+            {/* Special badges section */}
             {specialBadges.some(badge => !badge.locked) && (
-                <TrophyCase title="Premium Collection">
-                    <TrophyShelf title="Special Achievements" featured={true}>
+                <BadgeSection title="Premium Collection">
+                    <SectionHeader title="Special Achievements" featured={true} />
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                         {specialBadges.map(badge => (
-                            <BadgeTrophy
+                            <BadgeCard
                                 key={badge.id}
                                 badge={badge}
                                 locked={badge.locked}
@@ -433,66 +266,51 @@ function TrophyCaseUnlockables() {
                                 onSelect={handleBadgeSelect}
                             />
                         ))}
-                    </TrophyShelf>
-                </TrophyCase>
+                    </div>
+                </BadgeSection>
             )}
 
-            {/* Main Trophy Case */}
-            <TrophyCase title="Badge Collection">
+            {/* Regular badges section */}
+            <BadgeSection title="Badge Collection">
                 {regularBadges.length > 0 ? (
-                    <TrophyShelf title="Standard Badges">
-                        {regularBadges.map(badge => (
-                            <BadgeTrophy
-                                key={badge.id}
-                                badge={badge}
-                                locked={badge.locked}
-                                isSelected={!badge.locked && selectedBadge?.type === badge.type}
-                                onSelect={handleBadgeSelect}
-                            />
-                        ))}
-                    </TrophyShelf>
+                    <>
+                        <SectionHeader title="Available Badges" />
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                            {regularBadges.map(badge => (
+                                <BadgeCard
+                                    key={badge.id}
+                                    badge={badge}
+                                    locked={badge.locked}
+                                    isSelected={!badge.locked && selectedBadge?.type === badge.type}
+                                    onSelect={handleBadgeSelect}
+                                />
+                            ))}
+                        </div>
+                    </>
                 ) : (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex flex-col items-center justify-center py-12 text-center"
-                    >
-                        <motion.div
-                            animate={{
-                                y: [0, -10, 0],
-                                rotate: [0, 5, 0, -5, 0],
-                            }}
-                            transition={{
-                                duration: 3,
-                                repeat: Infinity,
-                                repeatType: 'loop',
-                            }}
-                            className="mb-4 rounded-full bg-amber-100 p-5 dark:bg-amber-900/30"
-                        >
-                            <QuestionMarkCircleIcon className="h-10 w-10 text-amber-600 dark:text-amber-400" />
-                        </motion.div>
-                        <Text className="max-w-md text-zinc-600 dark:text-zinc-400">
-                            Your trophy case is empty! Invite friends to Packbase to earn your first badge and start building your
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <div className="mb-4 rounded-full bg-muted p-5">
+                            <QuestionMarkCircleIcon className="h-10 w-10 text-muted-foreground" />
+                        </div>
+                        <Text className="max-w-md text-muted-foreground">
+                            Your badge collection is empty! Invite friends to Packbase to earn your first badge and start building your
                             collection.
                         </Text>
-                    </motion.div>
+                    </div>
                 )}
-            </TrophyCase>
+            </BadgeSection>
 
-            {/* Instructions for badge selection */}
+            {/* Instructions */}
             {availableBadges.length > 0 && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="mt-6 rounded-lg bg-amber-50 p-4 text-center dark:bg-amber-900/20"
-                >
-                    <Text className="text-sm">
-                        <TrophyIcon className="mr-1 inline h-4 w-4" />
-                        Click on an unlocked badge to display it on your profile.
-                        {isUpdatingBadge && ' Updating...'}
-                    </Text>
-                </motion.div>
+                <Card className="mt-6">
+                    <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg text-center">
+                        <Text className="text-sm flex items-center justify-center gap-2">
+                            <TrophyIcon className="h-4 w-4" />
+                            Click on an unlocked badge to display it on your profile.
+                            {isUpdatingBadge && <span className="text-blue-600">Updating...</span>}
+                        </Text>
+                    </div>
+                </Card>
             )}
         </Container>
     )
