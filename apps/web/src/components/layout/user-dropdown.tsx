@@ -26,9 +26,9 @@ export default function UserDropdown() {
                 {/*<UserButton.UserProfilePage label="Invite" url="/invite" labelIcon={<EnvelopeOpenIcon />}>*/}
                 {/*    <InviteSettings />*/}
                 {/*</UserButton.UserProfilePage>*/}
-                <UserButton.UserProfilePage label="Badges" url="/badges" labelIcon={<TrophyIcon />}>
-                    <UnlockableSettings />
-                </UserButton.UserProfilePage>
+                {/*<UserButton.UserProfilePage label="Badges" url="/badges" labelIcon={<TrophyIcon />}>*/}
+                {/*    <UnlockableSettings />*/}
+                {/*</UserButton.UserProfilePage>*/}
                 <UserButton.UserProfilePage label="Theme" url="/theme" labelIcon={<SwatchIcon />}>
                     <TemplateSettings />
                 </UserButton.UserProfilePage>
