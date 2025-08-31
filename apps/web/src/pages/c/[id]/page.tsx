@@ -333,7 +333,7 @@ function MessagesList() {
             )}
 
             <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3" onScroll={handleScroll}>
-                {recipient.id === me.id && (
+                {recipient?.id === me?.id && (
                     <div className="flex flex-col mt-30 gap-2">
                         <Heading>
                             <HomeModernIcon className="inline-flex -mt-1 mr-1 h-5 w-5" />
