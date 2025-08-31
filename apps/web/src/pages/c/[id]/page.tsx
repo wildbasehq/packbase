@@ -4,7 +4,7 @@ import ContentFrame from '@/components/shared/content-frame.tsx'
 import { Avatar } from '@/components/shared/avatar.tsx'
 import { useSession } from '@clerk/clerk-react'
 import { useUserAccountStore } from '@/lib'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { MessageGroup } from '@/components/chat/MessageGroup'
 import { ChatBox } from '@/components/shared/chat-box.tsx'
@@ -54,25 +54,22 @@ function ChannelHeader() {
 function MessagesList() {
     const messagesFrame = useContentFrame()
     const { data: rawMessages, loading } = messagesFrame
-    const messages = Array.isArray(rawMessages) ? rawMessages : []
+    const messages = useMemo(() => (Array.isArray(rawMessages) ? rawMessages : []), [rawMessages])
     const channelFrame = messagesFrame.parent
     const { user: me } = useUserAccountStore()
     const { session } = useSession()
 
-    // State management
     const [loadingOlder, setLoadingOlder] = useState(false)
     const [hasMoreMessages, setHasMoreMessages] = useState(true)
     const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
     const [editContent, setEditContent] = useState('')
     const [isUserScrolled, setIsUserScrolled] = useState(false)
 
-    // Refs
     const scrollContainerRef = useRef<HTMLDivElement>(null)
     const scrollBottomRef = useRef<HTMLDivElement>(null)
 
     const channel = channelFrame?.data as any
 
-    // Scroll management functions
     const scrollToBottom = useCallback((behavior: 'smooth' | 'auto' = 'smooth') => {
         scrollBottomRef.current?.scrollIntoView({ behavior })
     }, [])
@@ -88,68 +85,72 @@ function MessagesList() {
         const container = scrollContainerRef.current
         if (!container) return
 
-        // Check if at bottom
         const isAtBottom = checkIfScrolledToBottom()
         setIsUserScrolled(!isAtBottom)
 
-        // Load more when scrolled near the top
         if (container.scrollTop <= 200 && !loadingOlder && hasMoreMessages) {
             loadOlderMessages()
         }
     }, [checkIfScrolledToBottom, loadingOlder, hasMoreMessages])
 
-    // Auto-scroll on new messages
     useEffect(() => {
         if (!isUserScrolled && messages.length > 0) {
             scrollToBottom()
         }
     }, [messages, isUserScrolled, scrollToBottom])
 
-    // Edit functions
-    const startEdit = (messageId: string, currentContent: string) => {
+    const startEdit = useCallback((messageId: string, currentContent: string) => {
         setEditingMessageId(messageId)
         setEditContent(currentContent || '')
-    }
+    }, [])
 
-    const cancelEdit = () => {
+    const cancelEdit = useCallback(() => {
         setEditingMessageId(null)
         setEditContent('')
-    }
+    }, [])
 
-    const saveEdit = async (messageId: string) => {
-        if (!editContent.trim()) return
+    const saveEdit = useCallback(
+        async (messageId: string) => {
+            if (!editContent.trim()) return
 
-        const originalMessage = messages.find((msg: any) => msg.id === messageId)
-        const originalContent = originalMessage?.content
+            const originalMessage = messages.find((msg: any) => msg.id === messageId)
+            const originalContent = originalMessage?.content
 
-        // Optimistic update
-        messagesFrame.data = Array.isArray(messagesFrame.data)
-            ? messagesFrame.data.map((msg: any) =>
-                  msg.id === messageId ? { ...msg, content: editContent.trim(), edited_at: new Date().toISOString() } : msg
-              )
-            : []
-        cancelEdit()
+            messagesFrame.data = Array.isArray(messagesFrame.data)
+                ? messagesFrame.data.map((msg: any) =>
+                      msg.id === messageId ? { ...msg, content: editContent.trim(), edited_at: new Date().toISOString() } : msg
+                  )
+                : []
+            cancelEdit()
 
-        try {
-            const token = await session?.getToken()
-            const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${messageId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
-                body: JSON.stringify({ content: editContent.trim() }),
-            })
+            try {
+                const token = await session?.getToken()
+                const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${messageId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                    body: JSON.stringify({ content: editContent.trim() }),
+                })
 
-            if (res.ok) {
-                const updatedMessage = await res.json()
-                messagesFrame.data = Array.isArray(messagesFrame.data)
-                    ? messagesFrame.data.map((msg: any) =>
-                          msg.id === messageId ? { ...msg, content: updatedMessage.content, edited_at: updatedMessage.edited_at } : msg
-                      )
-                    : []
-            } else {
-                // Revert on failure
+                if (res.ok) {
+                    const updatedMessage = await res.json()
+                    messagesFrame.data = Array.isArray(messagesFrame.data)
+                        ? messagesFrame.data.map((msg: any) =>
+                              msg.id === messageId ? { ...msg, content: updatedMessage.content, edited_at: updatedMessage.edited_at } : msg
+                          )
+                        : []
+                } else {
+                    messagesFrame.data = Array.isArray(messagesFrame.data)
+                        ? messagesFrame.data.map((msg: any) =>
+                              msg.id === messageId ? { ...msg, content: originalContent, edited_at: originalMessage?.edited_at } : msg
+                          )
+                        : []
+                    toast.error('Failed to save changes')
+                }
+            } catch (error) {
+                console.error('Failed to edit message:', error)
                 messagesFrame.data = Array.isArray(messagesFrame.data)
                     ? messagesFrame.data.map((msg: any) =>
                           msg.id === messageId ? { ...msg, content: originalContent, edited_at: originalMessage?.edited_at } : msg
@@ -157,44 +158,39 @@ function MessagesList() {
                     : []
                 toast.error('Failed to save changes')
             }
-        } catch (error) {
-            console.error('Failed to edit message:', error)
-            // Revert on error
-            messagesFrame.data = Array.isArray(messagesFrame.data)
-                ? messagesFrame.data.map((msg: any) =>
-                      msg.id === messageId ? { ...msg, content: originalContent, edited_at: originalMessage?.edited_at } : msg
-                  )
-                : []
-            toast.error('Failed to save changes')
-        }
-    }
+        },
+        [cancelEdit, editContent, messages, messagesFrame, session]
+    )
 
-    const deleteMessage = async (messageId: string) => {
-        try {
-            const token = await session?.getToken()
-            const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${messageId}`, {
-                method: 'DELETE',
-                headers: {
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
-            })
+    const deleteMessage = useCallback(
+        async (messageId: string) => {
+            try {
+                const token = await session?.getToken()
+                const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${messageId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                })
 
-            if (res.ok) {
-                messagesFrame.data = Array.isArray(messagesFrame.data)
-                    ? messagesFrame.data.map((msg: any) =>
-                          msg.id === messageId ? { ...msg, deleted_at: new Date().toISOString(), content: null } : msg
-                      )
-                    : []
-            } else {
+                if (res.ok) {
+                    messagesFrame.data = Array.isArray(messagesFrame.data)
+                        ? messagesFrame.data.map((msg: any) =>
+                              msg.id === messageId ? { ...msg, deleted_at: new Date().toISOString(), content: null } : msg
+                          )
+                        : []
+                } else {
+                    toast.error('Failed to delete message')
+                }
+            } catch (error) {
+                console.error('Failed to delete message:', error)
                 toast.error('Failed to delete message')
             }
-        } catch (error) {
-            console.error('Failed to delete message:', error)
-            toast.error('Failed to delete message')
-        }
-    }
+        },
+        [messagesFrame, session]
+    )
 
-    const loadOlderMessages = async () => {
+    const loadOlderMessages = useCallback(async () => {
         if (loadingOlder || !hasMoreMessages || !messages.length) return
 
         setLoadingOlder(true)
@@ -233,9 +229,72 @@ function MessagesList() {
         } finally {
             setLoadingOlder(false)
         }
-    }
+    }, [loadingOlder, hasMoreMessages, messages, channel, messagesFrame, session])
 
-    // Loading state
+    const recipient = useMemo(() => channel?.recipients?.[0], [channel])
+
+    const getAuthorInfo = useCallback(
+        (authorId: string) => {
+            if (me && authorId === me.id) {
+                const name = me.display_name || me.username || 'You'
+                return {
+                    name,
+                    images_avatar: me.images?.avatar || null,
+                    initials: (name || 'Y').slice(0, 1),
+                }
+            }
+            const name = recipient?.display_name || recipient?.username || 'Friend'
+            return {
+                name,
+                images_avatar: recipient?.images_avatar || null,
+                initials: (name || 'F').slice(0, 1),
+            }
+        },
+        [me, recipient]
+    )
+
+    const groups = useMemo(() => {
+        type Group = { type: 'group'; authorId: string; startAt: Date; items: any[] } | { type: 'day'; label: string }
+        const result: Group[] = []
+        const asc = [...messages].reverse()
+        const thresholdMs = 5 * 60 * 1000
+        let lastDay: string | null = null
+
+        const formatDay = (d: Date) => {
+            const today = new Date()
+            const yest = new Date()
+            yest.setDate(today.getDate() - 1)
+            const sameDay = (a: Date, b: Date) =>
+                a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+            if (sameDay(d, today)) return 'Today'
+            if (sameDay(d, yest)) return 'Yesterday'
+            return d.toLocaleDateString()
+        }
+
+        for (const m of asc) {
+            const ts = new Date(m.created_at)
+            const day = formatDay(ts)
+
+            if (lastDay !== day) {
+                result.push({ type: 'day', label: day })
+                lastDay = day
+            }
+
+            const last = result[result.length - 1]
+            if (last && last.type === 'group' && last.authorId === m.author_id && ts.getTime() - last.startAt.getTime() <= thresholdMs) {
+                last.items.push(m)
+            } else {
+                result.push({
+                    type: 'group',
+                    authorId: m.author_id,
+                    startAt: ts,
+                    items: [m],
+                })
+            }
+        }
+        return result
+    }, [messages])
+
     if (loading) {
         return (
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -246,69 +305,7 @@ function MessagesList() {
         )
     }
 
-    const recipient = channel?.recipients?.[0]
-
-    const getAuthorInfo = (authorId: string) => {
-        if (me && authorId === me.id) {
-            const name = me.display_name || me.username || 'You'
-            return {
-                name,
-                images_avatar: me.images?.avatar || null,
-                initials: (name || 'Y').slice(0, 1),
-            }
-        }
-        const name = recipient?.display_name || recipient?.username || 'Friend'
-        return {
-            name,
-            images_avatar: recipient?.images_avatar || null,
-            initials: (name || 'F').slice(0, 1),
-        }
-    }
-
-    const formatDay = (d: Date) => {
-        const today = new Date()
-        const yest = new Date()
-        yest.setDate(today.getDate() - 1)
-
-        const sameDay = (a: Date, b: Date) =>
-            a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
-
-        if (sameDay(d, today)) return 'Today'
-        if (sameDay(d, yest)) return 'Yesterday'
-        return d.toLocaleDateString()
-    }
-
-    // Group messages
-    type Group = { type: 'group'; authorId: string; startAt: Date; items: any[] } | { type: 'day'; label: string }
-
-    const groups: Group[] = []
-    const asc = [...messages].reverse()
-    const thresholdMs = 5 * 60 * 1000
-    let lastDay: string | null = null
-
-    for (const m of asc) {
-        const ts = new Date(m.created_at)
-        const day = formatDay(ts)
-
-        if (lastDay !== day) {
-            groups.push({ type: 'day', label: day })
-            lastDay = day
-        }
-
-        const last = groups[groups.length - 1]
-        if (last && last.type === 'group' && last.authorId === m.author_id && ts.getTime() - last.startAt.getTime() <= thresholdMs) {
-            last.items.push(m)
-        } else {
-            groups.push({
-                type: 'group',
-                authorId: m.author_id,
-                startAt: ts,
-                items: [m],
-            })
-        }
-    }
-
-    if (!asc.length) {
+    if (!messages.length) {
         return (
             <div className="flex-1 overflow-y-auto p-4 text-sm text-muted-foreground flex items-center justify-center">No messages yet</div>
         )
@@ -316,7 +313,6 @@ function MessagesList() {
 
     return (
         <div className="flex-1 flex flex-col relative overflow-hidden">
-            {/* Scroll to bottom banner */}
             {isUserScrolled && (
                 <div className="absolute w-full z-50">
                     <button

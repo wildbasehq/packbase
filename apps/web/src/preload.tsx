@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 export default function Preload({ children }: { children: React.ReactNode }) {
     return (
         <>
-            <ContentFrame silentFail get="server.describeServer">
+            <ContentFrame get="server.describeServer">
                 <SignedIn>
                     <ContentFrame get="user.me">
                         <ContentFrame get="user.me.packs">
