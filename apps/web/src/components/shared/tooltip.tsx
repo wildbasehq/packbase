@@ -1,13 +1,14 @@
-import {ReactNode} from 'react'
+import { ReactNode } from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
-import {Text} from '@/components/shared/text'
+import { Heading, Text } from '@/components/shared/text'
+import { motion } from 'motion/react'
 
 export default function Tooltip({
-                                    children,
-                                    content,
-                                    delayDuration,
-                                    side,
-                                }: {
+    children,
+    content,
+    delayDuration,
+    side,
+}: {
     children: ReactNode
     content: ReactNode | string
     delayDuration?: number
@@ -17,31 +18,48 @@ export default function Tooltip({
         return <>{children}</>
     }
 
+    const animateDirection = side === 'top' || side === 'bottom' ? 'y' : 'x'
+
     return (
         <TooltipPrimitive.Provider delayDuration={typeof delayDuration !== undefined ? delayDuration : 100}>
             <TooltipPrimitive.Root>
                 <TooltipPrimitive.Trigger className="inline-flex" asChild>
                     {children}
                 </TooltipPrimitive.Trigger>
-                <TooltipPrimitive.Content
-                    sideOffset={4}
-                    side={side || 'top'}
-                    className="!z-[999] hidden max-w-[20rem] items-center rounded-md border bg-card drop-shadow-lg sm:block"
-                >
-                    {typeof content === 'string' ? (
-                        <Text size="xs" className="px-2 py-1.5 text-center">
+                <TooltipPrimitive.Portal>
+                    <TooltipPrimitive.Content asChild side={side || 'top'}>
+                        <motion.div
+                            className="rounded bg-n-8 max-w-76 px-3 py-2 text-sm select-none text-white [&>*]:!text-white shadow-md dark:bg-n-7 relative"
+                            initial={{ opacity: 0, [animateDirection]: -5, rotateX: -20 }}
+                            animate={{ opacity: 1, [animateDirection]: 0, rotateX: 0 }}
+                            exit={{ opacity: 0, [animateDirection]: -5, rotateX: -20 }}
+                            transition={{
+                                duration: 0.3,
+                                ease: [0.16, 1, 0.3, 1], // Custom ease curve for a subtle fold effect
+                            }}
+                            style={{
+                                transformOrigin: `${side || 'top'} center`,
+                                perspective: '800px',
+                            }}
+                        >
                             {content}
-                        </Text>
-                    ) : (
-                        content
-                    )}
-                    <TooltipPrimitive.Arrow className="fill-n-1 dark:fill-n-7"/>
-                </TooltipPrimitive.Content>
+                            <TooltipPrimitive.Arrow className="fill-n-8 dark:fill-n-7" />
+                        </motion.div>
+                    </TooltipPrimitive.Content>
+                </TooltipPrimitive.Portal>
             </TooltipPrimitive.Root>
         </TooltipPrimitive.Provider>
     )
 }
 
-export function TooltipContent({children}: { children: ReactNode }) {
-    return <div className="px-2 py-1.5">{children}</div>
+export function TooltipBody({ children }: { children: ReactNode }) {
+    return <div className="p-4 flex flex-col gap-2">{children}</div>
+}
+
+export function TooltipTitle({ children }: { children: ReactNode }) {
+    return <Heading className="font-semibold">{children}</Heading>
+}
+
+export function TooltipDescription({ children }: { children: ReactNode }) {
+    return <Text size="xs">{children}</Text>
 }

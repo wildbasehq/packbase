@@ -4,8 +4,8 @@
 
 import ECGIcon from '@/components/icons/dazzle/ecg'
 import { Logo } from '@/components/shared/logo'
-import { Text } from '@/components/shared/text'
-import Tooltip, { TooltipContent } from '@/components/shared/tooltip'
+import { Heading, Text } from '@/components/shared/text'
+import Tooltip, { TooltipTitle } from '@/components/shared/tooltip'
 import { Button } from '@/components/shared/button'
 import UserAvatar from '@/components/shared/user/avatar'
 import { useResourceStore, useUIStore } from '@/lib/state'
@@ -52,40 +52,7 @@ export default function PackSwitcher() {
             <div className="h-[1px] w-1/2 bg-n-3 dark:bg-n-7 my-2"></div>
 
             {resources.map(item => (
-                <Tooltip
-                    key={item.id}
-                    content={
-                        <div>
-                            <TooltipContent>
-                                <Text>{item.display_name}</Text>
-                            </TooltipContent>
-                            <div className="mt-1 grid grid-rows-1 divide-y border-t">
-                                <div className="grid grid-cols-2 gap-2 divide-x px-2 [&>*:not(:first-child)]:pl-2 *:py-1">
-                                    <Text
-                                        className={
-                                            (item.statistics?.heartbeat || 0) < item.statistics?.members ? 'text-tertiary!' : 'text-alt'
-                                        }
-                                    >
-                                        <ECGIcon className="-mt-0.5 inline-flex h-4 w-4" /> {item.statistics?.heartbeat || 0}
-                                    </Text>
-                                    <Text alt>
-                                        <UsersIcon className="-mt-0.5 inline-flex h-4 w-4" /> {item.statistics?.members}
-                                    </Text>
-                                </div>
-
-                                {item.temporary && (
-                                    <div className="px-2 py-1 opacity-75">
-                                        <Text alt>
-                                            <TentTreeIcon className="-mt-0.5 inline-flex h-4 w-4" /> Not a pack member
-                                        </Text>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    }
-                    side="right"
-                    delayDuration={0}
-                >
+                <Tooltip key={item.id} content={item.display_name} side="right" delayDuration={0}>
                     <div className="relative">
                         <div
                             className={cn(
