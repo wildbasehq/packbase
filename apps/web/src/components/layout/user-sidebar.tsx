@@ -103,7 +103,7 @@ export default function UserSidebar() {
 
 function FriendsListContainer({ collapsed }: { collapsed: boolean }) {
     return (
-        <ContentFrame get="user.me.friends" cache>
+        <ContentFrame get="user.me.friends">
             <FriendsListView collapsed={collapsed} />
         </ContentFrame>
     )

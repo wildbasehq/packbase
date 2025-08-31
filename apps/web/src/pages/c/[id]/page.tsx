@@ -20,7 +20,7 @@ export default function ChatThreadPage() {
             <ContentFrame get={`dm.channels.${id}`}>
                 <ChannelHeader />
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    <ContentFrame get={`dm.channels.${id}.messages`} cache refreshInterval={1}>
+                    <ContentFrame get={`dm.channels.${id}.messages`} refreshInterval={1}>
                         <MessagesList />
                     </ContentFrame>
                     <MessageComposer channelId={id} />
