@@ -1,7 +1,3 @@
-/*
- * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
- */
-
 import React from 'react'
 import { Avatar } from '@/components/shared/avatar.tsx'
 import { MessageContent } from './MessageContent'
@@ -38,14 +34,20 @@ export function MessageGroup({
     onSaveEdit,
     onCancelEdit,
     onDeleteMessage,
-    onEditContentChange
+    onEditContentChange,
 }: MessageGroupProps) {
     const first = group.items[0]
-    const timeLabel = new Date(first.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+    const isPending = first._isPending
+    const timeLabel = isPending
+        ? 'Sending...'
+        : new Date(first.created_at).toLocaleTimeString([], {
+              hour: 'numeric',
+              minute: '2-digit',
+          })
     const isOwnMessage = currentUserId && group.authorId === currentUserId
 
     return (
-        <div className="group">
+        <div className={`group ${isPending ? 'opacity-70' : ''}`}>
             <div className="flex gap-3">
                 <Avatar
                     src={author.images_avatar}
@@ -53,10 +55,13 @@ export function MessageGroup({
                     initials={author.images_avatar ? undefined : author.initials}
                     className="size-8 mt-1"
                 />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2">
                         <span className="text-sm font-medium">{author.name}</span>
-                        <span className="text-[11px] text-muted-foreground">{timeLabel}</span>
+                        <span className={`text-[11px] ${isPending ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
+                            {isPending && <span className="inline-block mr-1 animate-spin">⟳</span>}
+                            {timeLabel}
+                        </span>
                     </div>
                     <MessageContent
                         message={first}
@@ -67,7 +72,7 @@ export function MessageGroup({
                         onSaveEdit={() => onSaveEdit(first.id)}
                         onCancelEdit={onCancelEdit}
                         onDelete={() => onDeleteMessage(first.id)}
-                        showActions={isOwnMessage}
+                        showActions={isOwnMessage && !isPending}
                     />
                 </div>
             </div>
@@ -82,7 +87,7 @@ export function MessageGroup({
                         onSaveEdit={() => onSaveEdit(m.id)}
                         onCancelEdit={onCancelEdit}
                         onDelete={() => onDeleteMessage(m.id)}
-                        showActions={isOwnMessage}
+                        showActions={isOwnMessage && !m._isPending}
                     />
                 </div>
             ))}

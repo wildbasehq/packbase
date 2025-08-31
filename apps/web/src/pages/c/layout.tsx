@@ -3,7 +3,7 @@
  */
 
 import { SidebarPortal } from '@/lib/context/sidebar-context.tsx'
-import { SidebarDivider, SidebarItem, SidebarLabel, SidebarSection, Button, Input } from '@/src/components'
+import { SidebarDivider, SidebarItem, SidebarLabel, SidebarSection, Button, Input, BadgeButton } from '@/src/components'
 import ContentFrame, { useContentFrame } from '@/components/shared/content-frame.tsx'
 import { Avatar } from '@/components/shared/avatar.tsx'
 import { useSession } from '@clerk/clerk-react'
@@ -25,7 +25,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 function ChatSidebarContent() {
     return (
         <>
-            <ContentFrame get="dm.channels">
+            <ContentFrame get="dm.channels" refreshInterval={5}>
                 <SidebarSection>
                     <NewDMForm />
                     <ChannelsList />
@@ -62,19 +62,17 @@ function ChannelsList() {
                 const initials = (rec?.display_name || rec?.username || '?').slice(0, 1)
                 return (
                     <SidebarItem key={c.id} href={`/c/${c.id}`}>
-                        <div className="flex items-center gap-2 min-w-0">
-                            <Avatar src={avatarSrc} alt={name} initials={avatarSrc ? undefined : initials} className="size-6" />
-                            <div className="flex flex-col min-w-0 flex-1">
-                                <SidebarLabel>{name}</SidebarLabel>
-                                {c.last_message?.content ? (
-                                    <SidebarLabel className="text-muted-foreground truncate">{c.last_message.content}</SidebarLabel>
-                                ) : null}
-                            </div>
-                            {c.unread_count > 0 && (
-                                <div className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full min-w-[1.25rem] h-5 flex items-center justify-center font-medium shrink-0">
-                                    {c.unread_count > 99 ? '99+' : c.unread_count}
+                        <div className="flex justify-between items-center w-full">
+                            <div className="flex items-center gap-2">
+                                <Avatar src={avatarSrc} alt={name} initials={avatarSrc ? undefined : initials} className="size-6" />
+                                <div className="flex flex-col min-w-0 flex-1">
+                                    <SidebarLabel>{name}</SidebarLabel>
+                                    {c.last_message?.content ? (
+                                        <SidebarLabel className="text-muted-foreground truncate">{c.last_message.content}</SidebarLabel>
+                                    ) : null}
                                 </div>
-                            )}
+                            </div>
+                            {c.unread_count > 0 && <BadgeButton color="indigo">{c.unread_count > 99 ? '99+' : c.unread_count}</BadgeButton>}
                         </div>
                     </SidebarItem>
                 )

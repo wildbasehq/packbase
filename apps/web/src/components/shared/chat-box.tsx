@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '@/src/components'
 import { Text } from './text'
 import { cn } from '@/lib/utils'
-import { AtSign, Bold, Code, Hash, Italic, Link2, List, ListOrdered, Paperclip, Quote, Smile, Strikethrough } from 'lucide-react'
+import { AtSign, Bold, Code, Italic, Link2, List, ListOrdered, Paperclip, Quote, Smile, Strikethrough } from 'lucide-react'
 import { PaperAirplaneIcon } from '@heroicons/react/16/solid'
 
 interface ChatBoxProps {
@@ -69,6 +69,13 @@ export function ChatBox({
             textareaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`
         }
     }, [currentValue, maxHeight])
+
+    // Focus textarea when disabled changes to false
+    useEffect(() => {
+        if (!disabled && textareaRef.current) {
+            textareaRef.current.focus()
+        }
+    }, [disabled])
 
     const insertMarkdown = (syntax: string, wrap = false) => {
         if (!textareaRef.current) return

@@ -1,7 +1,3 @@
-/*
- * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
- */
-
 import React from 'react'
 import Markdown from '@/components/shared/markdown.tsx'
 import { MessageEditor } from './MessageEditor'
@@ -30,30 +26,28 @@ export function MessageContent({
     onCancelEdit,
     onDelete,
     showActions = true,
-    className
+    className,
 }: MessageContentProps) {
+    const isPending = message._isPending
+
     return (
         <div className={`text-sm whitespace-normal break-words group/message relative ${className || ''}`}>
             {isEditing ? (
-                <MessageEditor
-                    content={editContent}
-                    onContentChange={onEditContentChange}
-                    onSave={onSaveEdit}
-                    onCancel={onCancelEdit}
-                />
+                <MessageEditor content={editContent} onContentChange={onEditContentChange} onSave={onSaveEdit} onCancel={onCancelEdit} />
             ) : (
-                <div className={message._isPending ? 'opacity-60' : ''}>
-                    <Markdown>{message.content ?? <i className="text-muted-foreground">deleted</i>}</Markdown>
-                    {message._isPending && (
-                        <span className="ml-2 text-xs text-muted-foreground">
-                            <span className="animate-pulse">Sending...</span>
-                        </span>
+                <div className={isPending ? 'relative' : ''}>
+                    {message.content ? <Markdown>{message.content}</Markdown> : <i className="text-muted-foreground">deleted</i>}
+                    {isPending && (
+                        <div className="absolute -right-2 -top-1">
+                            <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full text-[10px] font-medium">
+                                <span className="animate-spin text-xs">⟳</span>
+                                <span>Sending</span>
+                            </div>
+                        </div>
                     )}
                 </div>
             )}
-            {showActions && !message._isPending && !message.deleted_at && (
-                <MessageActions onEdit={onStartEdit} onDelete={onDelete} />
-            )}
+            {showActions && !message.deleted_at && <MessageActions onEdit={onStartEdit} onDelete={onDelete} />}
         </div>
     )
 }
