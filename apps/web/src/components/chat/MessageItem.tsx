@@ -11,7 +11,7 @@ interface MessageItemProps {
   showAvatar?: boolean
 }
 
-export function MessageItem({ message, isOwn, onClick, showAvatar = true }: MessageItemProps) {
+export const MessageItem = React.memo<MessageItemProps>(({ message, isOwn, onClick, showAvatar = true }) => {
   if (message.senderType === 'system' || message.senderType === 'assistant') {
     return (
       <div className="flex w-full justify-center py-2">
@@ -49,4 +49,12 @@ export function MessageItem({ message, isOwn, onClick, showAvatar = true }: Mess
       </div>
     </div>
   )
-}
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.message.id === nextProps.message.id &&
+    prevProps.message.content === nextProps.message.content &&
+    prevProps.message.user?.id === nextProps.message.user?.id &&
+    prevProps.isOwn === nextProps.isOwn &&
+    prevProps.showAvatar === nextProps.showAvatar
+  )
+})

@@ -3,7 +3,19 @@
  */
 
 // types/terms.ts
-export const BANNED_COUNTRIES = ['North Korea', 'Iran', 'Syria', 'Cuba', 'Belarus', 'Russia', 'Sudan', 'Venezuela', 'Zimbabwe', 'Myanmar']
+export const BANNED_COUNTRIES = [
+    'North Korea',
+    'Israel',
+    'Iran',
+    'Syria',
+    'Cuba',
+    'Belarus',
+    'Russia',
+    'Sudan',
+    'Venezuela',
+    'Zimbabwe',
+    'Myanmar',
+].sort()
 
 export interface ContentBlock {
     type: 'text' | 'list' | 'table' | 'card' | 'heading'
@@ -393,40 +405,40 @@ export const termsConfig: TermsConfig = {
         {
             id: 'privacy-policy',
             title: 'Privacy Policy',
-            level: 1,
+            level: 2,
             content: [
                 {
                     type: 'heading',
                     content: 'Compliance and Security',
                     level: 2,
                 },
-                {
-                    type: 'heading',
-                    content: 'Wildbase Security Tier 2',
-                    level: 3,
-                },
-                {
-                    type: 'text',
-                    content: 'We maintain compliance with Wildbase Security Tier 2, which means:',
-                },
-                {
-                    type: 'list',
-                    listType: 'unordered',
-                    items: [
-                        'Annual audits of our security controls',
-                        'Continuous monitoring and logging of system activity',
-                        'Regular assessment of security, availability, and confidentiality controls',
-                        'Documented change management procedures',
-                        'Data encryption at rest and in transit',
-                        'Regular security updates and patch management',
-                        '24/7 security monitoring and incident response',
-                    ],
-                },
-                {
-                    type: 'text',
-                    content:
-                        'Wildbase Security (1 - 4) an in-house security standard that ensures the confidentiality, integrity, and availability of our systems and data from transit to rest.',
-                },
+                // {
+                //     type: 'heading',
+                //     content: 'Wildbase Security Tier 2',
+                //     level: 3,
+                // },
+                // {
+                //     type: 'text',
+                //     content: 'We maintain compliance with Wildbase Security Tier 2, which means:',
+                // },
+                // {
+                //     type: 'list',
+                //     listType: 'unordered',
+                //     items: [
+                //         'Annual audits of our security controls',
+                //         'Continuous monitoring and logging of system activity',
+                //         'Regular assessment of security, availability, and confidentiality controls',
+                //         'Documented change management procedures',
+                //         'Data encryption at rest and in transit',
+                //         'Regular security updates and patch management',
+                //         '24/7 security monitoring and incident response',
+                //     ],
+                // },
+                // {
+                //     type: 'text',
+                //     content:
+                //         'Wildbase Security (1 - 4) an in-house security standard that ensures the confidentiality, integrity, and availability of our systems and data from transit to rest.',
+                // },
                 {
                     type: 'heading',
                     content: 'Data Collection and Processing',
@@ -456,7 +468,8 @@ export const termsConfig: TermsConfig = {
                 },
                 {
                     type: 'text',
-                    content: 'Under the General Data Protection Regulation (GDPR), you have the following rights:',
+                    content:
+                        'Under the General Data Protection Regulation (GDPR), you have the following rights regardless of your region:',
                 },
                 {
                     type: 'list',
@@ -473,7 +486,7 @@ export const termsConfig: TermsConfig = {
                 {
                     type: 'text',
                     content:
-                        'To exercise these rights, go to your profile settings then "Data Access", or email support@packbase.app. We will respond to your request and comply with GDPR regardless of your region.',
+                        'To exercise these rights, go to your profile settings then "Security", or email support@packbase.app. We will respond to your request and comply with GDPR regardless of your region, data privacy to us is a basic human right.',
                 },
                 {
                     type: 'heading',
@@ -501,29 +514,12 @@ export const termsConfig: TermsConfig = {
                 {
                     type: 'heading',
                     content: 'No Data Selling Policy',
-                    level: 3,
+                    level: 2,
                 },
                 {
                     type: 'text',
                     content:
                         'Packbase maintains a strict no-data-selling policy. We do not sell, rent, lease, or otherwise transfer your personal data to third parties for monetary or other valuable consideration under any circumstances. Additionally, we do not have any contracts, partnerships, or relationships with data brokers or data aggregation services. Your data is collected solely for the purpose of providing and improving our services as outlined in this privacy policy.',
-                },
-                {
-                    type: 'card',
-                    style: 'info',
-                    title: 'Our Commitment to Your Privacy',
-                    content: [
-                        {
-                            type: 'text',
-                            content:
-                                'We believe that your personal data belongs to you. Our business model does not rely on monetizing user data through sales to third parties. Instead, we focus on delivering a high-quality service that users choose to support directly.',
-                        },
-                        {
-                            type: 'text',
-                            content:
-                                'We hereby make a legally binding promise that we will never sell your personal data or the Packbase platform to third parties for the purpose of data monetization or exploitation. This promise forms part of our contract with you and can be enforced through appropriate legal channels. We understand the importance of this commitment and are willing to be legally bound by it. This clause is applied retroactively, and applicable to any data collected after January 1, 2022 ("Database Seeded Date").',
-                        },
-                    ],
                 },
                 {
                     type: 'heading',
@@ -543,7 +539,12 @@ export const termsConfig: TermsConfig = {
                 {
                     type: 'text',
                     content:
-                        'We reserve the right to modify this list at any time. Attempts to access our services from banned regions through proxies, VPNs, or other circumvention methods violate our terms of service and may result in immediate account termination.',
+                        'We reserve the right to modify this list at any time without notice. Attempts to access our services from banned regions through proxies, VPNs, or other circumvention methods violate our terms of service and may result in immediate account termination.',
+                },
+                {
+                    type: 'text',
+                    content:
+                        "A usage of a VPN is allowed, as long as it's not for circumventing these terms. We are not liable of any damages caused by you utilising any kind of VPN.",
                 },
                 {
                     type: 'heading',
@@ -556,7 +557,6 @@ export const termsConfig: TermsConfig = {
                     items: [
                         'We do not knowingly collect personal information from those under 18, and as such, comply with COPPA.',
                         'If we learn we have collected personal information from a person under 18, we will delete that information in accordance with our breach policy.',
-                        "By law, as our minimum age is 18, parents cannot review, delete, or refuse further collection of their child's information.",
                     ],
                 },
                 {
@@ -615,16 +615,17 @@ export const termsConfig: TermsConfig = {
                 {
                     type: 'text',
                     content:
-                        'We use certain third-party services to help us operate and improve Packbase. These services may process your data as follows:',
+                        'We use certain first-party and third-party services to help us operate and improve Packbase. These services comply with our data policy:',
                 },
                 {
                     type: 'list',
                     listType: 'unordered',
                     items: [
-                        'PostHog: Used for analytics to understand user behavior and improve our services. PostHog processes anonymized usage data.',
+                        'Wildbase: Wildbase staff may internally see all but encrypted data for moderation, legal and/or regulatory requirements.',
+                        'QA Wolf (a.k.a "QAW"): Used for Quality Assurance, and can only see publicly available data.',
+                        'Resend: For some critical account information and an opt-in update mailing list.',
                         'Clerk: Used for authentication and user management. Clerk processes account credentials and authentication data.',
-                        'Supabase: Used for database and storage services. Supabase stores user content and profile information.',
-                        'Payment processors: If you make purchases, payment information is processed by secure payment providers (primarily Stripe). We do not store your credit card details on our servers; this information is securely managed by Stripe and accessed through Clerk. Payment information is only retained by Stripe to process your transactions and for legal compliance purposes. We do not have any access to your card details and related information.',
+                        'Stripe via Clerk: If you make purchases, payment information is processed by Stripe. We do not store your credit card details on our servers; this information is securely managed by Stripe and accessed through Clerk. Payment information is only retained by Stripe to process your transactions and for legal compliance purposes. We do not have any access to your card details and related information.',
                     ],
                 },
                 {
@@ -643,32 +644,12 @@ export const termsConfig: TermsConfig = {
                         'When required by law or valid legal process',
                         'With your explicit consent',
                         'To protect our legal rights or the safety of users',
-                        'In connection with a merger, acquisition, or sale of assets, with appropriate safeguards for your data',
-                    ],
-                },
-                {
-                    type: 'heading',
-                    content: 'Data Subject Requests',
-                    level: 2,
-                },
-                {
-                    type: 'text',
-                    content: 'To request access, modification, or deletion of your personal data:',
-                },
-                {
-                    type: 'list',
-                    listType: 'ordered',
-                    items: [
-                        'Login to the specified account',
-                        'Verify your identity',
-                        'Go to your account settings',
-                        'Go to "Data Access"',
-                        'Choose the corresponding option that suits the request',
                     ],
                 },
                 {
                     type: 'text',
-                    content: 'We will respond to all requests within 30 days.',
+                    content:
+                        "If Packbase is sold to a merger, you'll be asked whether or not you want your data to be owned by the specified merger. If we get no response from you, or you disagree, your data will be permanently erased before the merge begins.",
                 },
                 {
                     type: 'heading',
@@ -685,7 +666,7 @@ export const termsConfig: TermsConfig = {
         {
             id: 'governing-law',
             title: 'Governing Law',
-            level: 1,
+            level: 3,
             content: [
                 {
                     type: 'text',

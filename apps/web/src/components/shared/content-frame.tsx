@@ -2,6 +2,7 @@ import React, { createContext, ReactNode, useContext, useMemo } from 'react'
 import useSWR from 'swr'
 import { useSession } from '@clerk/clerk-react'
 import { setToken } from '@/lib'
+import { useDebouncedCallback } from 'use-debounce'
 
 const API_URL = import.meta.env.VITE_YAPOCK_URL
 
@@ -80,6 +81,40 @@ export const useContentFrameByPath = (partialSignature: string) => {
         current = current.parent
     }
     return null
+}
+
+/** Hook to get only data from ContentFrame to avoid unnecessary re-renders */
+export const useContentFrameData = (targetSignature?: string) => {
+    const context = useContentFrame(targetSignature)
+    return useMemo(() => ({
+        data: context.data,
+        loading: context.loading,
+        error: context.error,
+        isRevalidating: context.isRevalidating
+    }), [context.data, context.loading, context.error, context.isRevalidating])
+}
+
+/** Hook to get only actions from ContentFrame to avoid unnecessary re-renders */
+export const useContentFrameActions = (targetSignature?: string) => {
+    const context = useContentFrame(targetSignature)
+    return useMemo(() => ({
+        refresh: context.refresh,
+        mutate: context.mutate
+    }), [context.refresh, context.mutate])
+}
+
+/** Hook to get ContentFrame with debounced refresh to reduce API calls */
+export const useDebouncedContentFrame = (
+    targetSignature?: string, 
+    debounceMs: number = 1000
+) => {
+    const context = useContentFrame(targetSignature)
+    const debouncedRefresh = useDebouncedCallback(context.refresh, debounceMs)
+    
+    return useMemo(() => ({
+        ...context,
+        refresh: debouncedRefresh
+    }), [context, debouncedRefresh])
 }
 
 /** Basic fetcher that uses session token */

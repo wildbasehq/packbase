@@ -24,7 +24,7 @@ interface MessageGroupProps {
     onEditContentChange: (content: string) => void
 }
 
-export function MessageGroup({
+export const MessageGroup = React.memo<MessageGroupProps>(({
     group,
     author,
     editingMessageId,
@@ -35,7 +35,7 @@ export function MessageGroup({
     onCancelEdit,
     onDeleteMessage,
     onEditContentChange,
-}: MessageGroupProps) {
+}) => {
     const first = group.items[0]
     const isPending = first._isPending
     const timeLabel = isPending
@@ -93,4 +93,18 @@ export function MessageGroup({
             ))}
         </div>
     )
-}
+}, (prevProps, nextProps) => {
+    return (
+        prevProps.group.items.length === nextProps.group.items.length &&
+        prevProps.group.items.every((item, i) =>
+            item.id === nextProps.group.items[i]?.id &&
+            item.content === nextProps.group.items[i]?.content &&
+            item.edited_at === nextProps.group.items[i]?.edited_at
+        ) &&
+        prevProps.editingMessageId === nextProps.editingMessageId &&
+        prevProps.editContent === nextProps.editContent &&
+        prevProps.author.name === nextProps.author.name &&
+        prevProps.author.images_avatar === nextProps.author.images_avatar &&
+        prevProps.currentUserId === nextProps.currentUserId
+    )
+})
