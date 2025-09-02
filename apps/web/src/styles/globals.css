@@ -130,5 +130,5 @@
   word-break: break-word;
   hyphens: auto;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
