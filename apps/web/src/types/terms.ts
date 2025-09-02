@@ -311,7 +311,7 @@ export const termsConfig: TermsConfig = {
                     type: 'list',
                     listType: 'unordered',
                     items: [
-                        'You must be at least 18 years old to use Packbase',
+                        'You must be at least 16 years old (or 18 years old starting the 10th of December 2025) to use Packbase',
                         'You are responsible for maintaining the confidentiality of your account',
                         'You agree not to use Packbase for any unlawful purposes',
                     ],
@@ -555,8 +555,8 @@ export const termsConfig: TermsConfig = {
                     type: 'list',
                     listType: 'unordered',
                     items: [
-                        'We do not knowingly collect personal information from those under 18, and as such, comply with COPPA.',
-                        'If we learn we have collected personal information from a person under 18, we will delete that information in accordance with our breach policy.',
+                        'We do not knowingly collect personal information from those under 16 (or 18 years old starting the 10th of December 2025), and as such, comply with COPPA.',
+                        'If we learn we have collected personal information from a person under 16 (or 18 years old starting the 10th of December 2025), we will delete that information in accordance with our breach policy.',
                     ],
                 },
                 {
