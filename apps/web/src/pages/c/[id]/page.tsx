@@ -1,15 +1,19 @@
 import { useParams } from 'wouter'
-import { useContentFrame } from '@/src/components'
+import { useContentFrame, useContentFrameMutation } from '@/components/shared/content-frame.tsx'
 import ContentFrame from '@/components/shared/content-frame.tsx'
 import { Avatar } from '@/components/shared/avatar.tsx'
 import { useSession } from '@clerk/clerk-react'
 import { useUserAccountStore } from '@/lib'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 import { MessageGroup } from '@/components/chat/MessageGroup'
 import { ChatBox } from '@/components/shared/chat-box.tsx'
 import { Heading, Text } from '@/components/shared/text.tsx'
 import { HomeModernIcon } from '@heroicons/react/24/solid'
+import { useNormalizedMessages } from '@/components/chat/useNormalizedMessages'
+import { useEditingState, useScrollState, useLoadingState } from '@/components/chat/useChatContext'
+import { usePerformanceMonitor } from '@/components/chat/usePerformanceMonitor'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function ChatThreadPage() {
     const { id } = useParams<{ id: string }>()
@@ -17,11 +21,11 @@ export default function ChatThreadPage() {
 
     return (
         <div className="flex flex-col h-full w-full overflow-hidden">
-            <ContentFrame get={`dm.channels.${id}`}>
-                <ChannelHeader />
+            <ContentFrame get={`dm.channels.${id}`} id={`channel-${id}`}>
+                <ChannelHeader channelId={id} />
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    <ContentFrame get={`dm.channels.${id}.messages`} refreshInterval={1}>
-                        <MessagesList />
+                    <ContentFrame get={`dm.channels.${id}.messages`} refetchInterval={5} id={`messages-${id}`}>
+                        <MessagesList channelId={id} />
                     </ContentFrame>
                     <MessageComposer channelId={id} />
                 </div>
@@ -30,8 +34,8 @@ export default function ChatThreadPage() {
     )
 }
 
-function ChannelHeader() {
-    const { data: channel, loading } = useContentFrame()
+function ChannelHeader({ channelId }: { channelId: string }) {
+    const { data: channel, isLoading } = useContentFrame('get', `dm.channels.${channelId}`, undefined, { id: `channel-${channelId}` })
     const rec = channel?.recipients?.[0]
     const name = rec?.display_name || rec?.username || 'Direct Message'
     const avatarSrc = rec?.images_avatar || null
@@ -39,7 +43,7 @@ function ChannelHeader() {
 
     return (
         <div className="border-b p-3 flex-shrink-0">
-            {loading ? (
+            {isLoading ? (
                 <div className="h-5 w-40 bg-muted animate-pulse rounded" />
             ) : channel ? (
                 <div className="flex items-center gap-3">
@@ -51,24 +55,26 @@ function ChannelHeader() {
     )
 }
 
-function MessagesList() {
-    const messagesFrame = useContentFrame()
-    const { data: rawMessages, loading } = messagesFrame
-    const messages = useMemo(() => (Array.isArray(rawMessages) ? rawMessages : []), [rawMessages])
-    const channelFrame = messagesFrame.parent
+function MessagesList({ channelId }: { channelId: string }) {
+    usePerformanceMonitor('MessagesList')
+
+    const { data: messages, isLoading } = useContentFrame('get', `dm.channels.${channelId}.messages`, undefined, {
+        id: `messages-${channelId}`,
+        refetchInterval: 5,
+    })
+    const { data: channel } = useContentFrame('get', `dm.channels.${channelId}`, undefined, { id: `channel-${channelId}` })
+    const messageArray = useMemo(() => (Array.isArray(messages) ? messages : []), [messages])
+    const normalizedMessages = useNormalizedMessages(messageArray)
     const { user: me } = useUserAccountStore()
     const { session } = useSession()
 
-    const [loadingOlder, setLoadingOlder] = useState(false)
-    const [hasMoreMessages, setHasMoreMessages] = useState(true)
-    const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
-    const [editContent, setEditContent] = useState('')
-    const [isUserScrolled, setIsUserScrolled] = useState(false)
+    const { editingMessageId, editContent, setEditingMessage, setEditContent, cancelEdit } = useEditingState()
+    const { isUserScrolled, setUserScrolled } = useScrollState()
+    const { loadingOlder, hasMoreMessages, setLoadingOlder, setHasMoreMessages } = useLoadingState()
+    const queryClient = useQueryClient()
 
     const scrollContainerRef = useRef<HTMLDivElement>(null)
     const scrollBottomRef = useRef<HTMLDivElement>(null)
-
-    const channel = channelFrame?.data as any
 
     const scrollToBottom = useCallback((behavior: 'smooth' | 'auto' = 'smooth') => {
         scrollBottomRef.current?.scrollIntoView({ behavior })
@@ -86,7 +92,7 @@ function MessagesList() {
         if (!container) return
 
         const isAtBottom = checkIfScrolledToBottom()
-        setIsUserScrolled(!isAtBottom)
+        setUserScrolled(!isAtBottom)
 
         if (container.scrollTop <= 200 && !loadingOlder && hasMoreMessages) {
             loadOlderMessages()
@@ -94,33 +100,22 @@ function MessagesList() {
     }, [checkIfScrolledToBottom, loadingOlder, hasMoreMessages])
 
     useEffect(() => {
-        if (!isUserScrolled && messages.length > 0) {
+        if (!isUserScrolled && messageArray.length > 0) {
             scrollToBottom()
         }
-    }, [messages, isUserScrolled, scrollToBottom])
+    }, [messageArray, isUserScrolled, scrollToBottom])
 
-    const startEdit = useCallback((messageId: string, currentContent: string) => {
-        setEditingMessageId(messageId)
-        setEditContent(currentContent || '')
-    }, [])
-
-    const cancelEdit = useCallback(() => {
-        setEditingMessageId(null)
-        setEditContent('')
-    }, [])
+    const startEdit = useCallback(
+        (messageId: string, currentContent: string) => {
+            setEditingMessage(messageId, currentContent || '')
+        },
+        [setEditingMessage]
+    )
 
     const saveEdit = useCallback(
         async (messageId: string) => {
             if (!editContent.trim()) return
 
-            const originalMessage = messages.find((msg: any) => msg.id === messageId)
-            const originalContent = originalMessage?.content
-
-            messagesFrame.data = Array.isArray(messagesFrame.data)
-                ? messagesFrame.data.map((msg: any) =>
-                      msg.id === messageId ? { ...msg, content: editContent.trim(), edited_at: new Date().toISOString() } : msg
-                  )
-                : []
             cancelEdit()
 
             try {
@@ -135,31 +130,16 @@ function MessagesList() {
                 })
 
                 if (res.ok) {
-                    const updatedMessage = await res.json()
-                    messagesFrame.data = Array.isArray(messagesFrame.data)
-                        ? messagesFrame.data.map((msg: any) =>
-                              msg.id === messageId ? { ...msg, content: updatedMessage.content, edited_at: updatedMessage.edited_at } : msg
-                          )
-                        : []
+                    await queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
                 } else {
-                    messagesFrame.data = Array.isArray(messagesFrame.data)
-                        ? messagesFrame.data.map((msg: any) =>
-                              msg.id === messageId ? { ...msg, content: originalContent, edited_at: originalMessage?.edited_at } : msg
-                          )
-                        : []
                     toast.error('Failed to save changes')
                 }
             } catch (error) {
                 console.error('Failed to edit message:', error)
-                messagesFrame.data = Array.isArray(messagesFrame.data)
-                    ? messagesFrame.data.map((msg: any) =>
-                          msg.id === messageId ? { ...msg, content: originalContent, edited_at: originalMessage?.edited_at } : msg
-                      )
-                    : []
                 toast.error('Failed to save changes')
             }
         },
-        [cancelEdit, editContent, messages, messagesFrame, session]
+        [cancelEdit, editContent, channelId, session]
     )
 
     const deleteMessage = useCallback(
@@ -174,11 +154,7 @@ function MessagesList() {
                 })
 
                 if (res.ok) {
-                    messagesFrame.data = Array.isArray(messagesFrame.data)
-                        ? messagesFrame.data.map((msg: any) =>
-                              msg.id === messageId ? { ...msg, deleted_at: new Date().toISOString(), content: null } : msg
-                          )
-                        : []
+                    queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
                 } else {
                     toast.error('Failed to delete message')
                 }
@@ -187,17 +163,16 @@ function MessagesList() {
                 toast.error('Failed to delete message')
             }
         },
-        [messagesFrame, session]
+        [channelId, session]
     )
 
     const loadOlderMessages = useCallback(async () => {
-        if (loadingOlder || !hasMoreMessages || !messages.length) return
+        if (loadingOlder || !hasMoreMessages || !messageArray.length) return
 
         setLoadingOlder(true)
         try {
             const token = await session?.getToken()
-            const oldestMessage = messages[messages.length - 1]
-            const channelId = channel?.id || messagesFrame.signature?.split('.')[2]
+            const oldestMessage = messageArray[messageArray.length - 1]
 
             const res = await fetch(
                 `${import.meta.env.VITE_YAPOCK_URL}/dm/channels/${channelId}/messages?before=${oldestMessage.id}&limit=50`,
@@ -215,10 +190,7 @@ function MessagesList() {
                 if (olderMessages.length === 0) {
                     setHasMoreMessages(false)
                 } else {
-                    const currentData = Array.isArray(messagesFrame.data) ? messagesFrame.data : []
-                    const existingIds = new Set(currentData.map((m: any) => m.id))
-                    const newMessages = olderMessages.filter((m: any) => !existingIds.has(m.id))
-                    messagesFrame.data = [...currentData, ...newMessages]
+                    queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
                 }
             } else {
                 toast.error('Failed to load older messages')
@@ -229,7 +201,7 @@ function MessagesList() {
         } finally {
             setLoadingOlder(false)
         }
-    }, [loadingOlder, hasMoreMessages, messages, channel, messagesFrame, session])
+    }, [loadingOlder, hasMoreMessages, messageArray, channelId, session])
 
     const recipient = useMemo(() => channel?.recipients?.[0], [channel])
 
@@ -253,49 +225,9 @@ function MessagesList() {
         [me, recipient]
     )
 
-    const groups = useMemo(() => {
-        type Group = { type: 'group'; authorId: string; startAt: Date; items: any[] } | { type: 'day'; label: string }
-        const result: Group[] = []
-        const asc = [...messages].reverse()
-        const thresholdMs = 5 * 60 * 1000
-        let lastDay: string | null = null
+    const groups = normalizedMessages.groups
 
-        const formatDay = (d: Date) => {
-            const today = new Date()
-            const yest = new Date()
-            yest.setDate(today.getDate() - 1)
-            const sameDay = (a: Date, b: Date) =>
-                a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
-            if (sameDay(d, today)) return 'Today'
-            if (sameDay(d, yest)) return 'Yesterday'
-            return d.toLocaleDateString()
-        }
-
-        for (const m of asc) {
-            const ts = new Date(m.created_at)
-            const day = formatDay(ts)
-
-            if (lastDay !== day) {
-                result.push({ type: 'day', label: day })
-                lastDay = day
-            }
-
-            const last = result[result.length - 1]
-            if (last && last.type === 'group' && last.authorId === m.author_id && ts.getTime() - last.startAt.getTime() <= thresholdMs) {
-                last.items.push(m)
-            } else {
-                result.push({
-                    type: 'group',
-                    authorId: m.author_id,
-                    startAt: ts,
-                    items: [m],
-                })
-            }
-        }
-        return result
-    }, [messages])
-
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
                 <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
@@ -305,19 +237,19 @@ function MessagesList() {
         )
     }
 
-    if (!messages.length) {
+    if (!messageArray.length) {
         return (
             <div className="flex-1 overflow-y-auto p-4 text-sm text-muted-foreground flex items-center justify-center">No messages yet</div>
         )
     }
 
     return (
-        <div className="flex-1 flex flex-col relative overflow-hidden">
+        <div className="flex-1 flex flex-col w-full relative overflow-hidden">
             {isUserScrolled && (
                 <div className="absolute w-full z-50">
                     <button
                         onClick={() => {
-                            setIsUserScrolled(false)
+                            setUserScrolled(false)
                             scrollToBottom('auto')
                         }}
                         className="flex items-center justify-center h-8 gap-2 bg-gradient-to-b from-indigo-400 to-indigo-600 text-primary-foreground rounded-b-md w-full transition-all hover:h-12"
@@ -385,71 +317,26 @@ function MessagesList() {
 }
 
 function MessageComposer({ channelId }: { channelId: string }) {
-    const { session } = useSession()
     const { user: me } = useUserAccountStore()
-    const messagesFrame = useContentFrame()
-    const [isPosting, setIsPosting] = useState(false)
+    const queryClient = useQueryClient()
+
+    const sendMessage = useContentFrameMutation('post', `dm/channels/${channelId}/messages`, {
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
+        },
+        onError: () => {
+            toast.error('Failed to send message')
+        },
+    })
 
     const onSend = async (content: string) => {
-        if (isPosting || !me) return
-
-        const token = await session?.getToken()
-        setIsPosting(true)
-
-        // Generate temporary ID
-        const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-        const tempMessage = {
-            id: tempId,
-            channel_id: channelId,
-            author_id: me.id,
-            content,
-            message_type: 'text',
-            created_at: new Date().toISOString(),
-            edited_at: null,
-            deleted_at: null,
-            reply_to: null,
-            _isPending: true,
-        }
-
-        // Optimistically add the message
-        const currentMessages = Array.isArray(messagesFrame.data) ? messagesFrame.data : []
-        messagesFrame.data = [...currentMessages, tempMessage]
-
-        try {
-            const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/channels/${channelId}/messages`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
-                body: JSON.stringify({ content }),
-            })
-
-            if (!res.ok) {
-                throw new Error(`Failed to send message: ${res.status}`)
-            }
-
-            const realMessage = await res.json()
-
-            // Replace temp message with real one
-            messagesFrame.data = Array.isArray(messagesFrame.data)
-                ? messagesFrame.data.map((msg: any) => (msg.id === tempId ? realMessage : msg))
-                : [realMessage]
-        } catch (error) {
-            // Remove temp message on failure
-            messagesFrame.data = Array.isArray(messagesFrame.data) ? messagesFrame.data.filter((msg: any) => msg.id !== tempId) : []
-
-            console.error('Failed to send message:', error)
-            toast.error('Failed to send message')
-        } finally {
-            setIsPosting(false)
-        }
+        if (sendMessage.isPending || !me) return
+        sendMessage.mutate({ content })
     }
 
     return (
         <div className="p-3 border-t">
-            <ChatBox placeholder="Message..." onSend={onSend} disabled={isPosting} />
+            <ChatBox placeholder="Message..." onSend={onSend} disabled={sendMessage.isPending} />
         </div>
     )
 }

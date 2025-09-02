@@ -110,11 +110,11 @@ function FriendsListContainer({ collapsed }: { collapsed: boolean }) {
 }
 
 function FriendsListView({ collapsed }: { collapsed: boolean }) {
-    const { data: friendsResponse, refresh } = useContentFrame('get=user.me.friends')
+    const { data: friendsResponse, refetch } = useContentFrame('get', 'user.me.friends', undefined, { id: 'user.me.friends' })
 
     const friends = friendsResponse?.friends || []
 
-    useInterval(refresh, 60000)
+    useInterval(refetch, 60000)
 
     /*
      * Small avatars only list

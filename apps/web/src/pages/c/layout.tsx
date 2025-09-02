@@ -4,12 +4,13 @@
 
 import { SidebarPortal } from '@/lib/context/sidebar-context.tsx'
 import { SidebarDivider, SidebarItem, SidebarLabel, SidebarSection, Button, Input, BadgeButton } from '@/src/components'
-import ContentFrame, { useContentFrame } from '@/components/shared/content-frame.tsx'
+import ContentFrame, { useContentFrame, useContentFrameMutation } from '@/components/shared/content-frame.tsx'
 import { Avatar } from '@/components/shared/avatar.tsx'
-import { useSession } from '@clerk/clerk-react'
 import { useLocation } from 'wouter'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Text } from '@/components/shared/text.tsx'
+import { usePerformanceMonitor } from '@/components/chat/usePerformanceMonitor.ts'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -25,7 +26,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 function ChatSidebarContent() {
     return (
         <>
-            <ContentFrame get="dm.channels" refreshInterval={5}>
+            <ContentFrame get="dm.channels" refetchInterval={5} id="channels">
                 <SidebarSection>
                     <NewDMForm />
                     <ChannelsList />
@@ -37,9 +38,39 @@ function ChatSidebarContent() {
 }
 
 function ChannelsList() {
-    const { data: channels, loading } = useContentFrame()
+    usePerformanceMonitor('ChannelsList')
+    let { data: channelsFrame, isLoading } = useContentFrame('get', 'dm.channels', undefined, { id: 'channels' })
+    // sort by last_message.created_at (most recent first)
+    const channels = useMemo(() => {
+        if (!Array.isArray(channelsFrame)) return channelsFrame
+        return channelsFrame
+            .map(channel => {
+                return {
+                    id: channel.id,
+                    type: channel.type,
+                    last_message: {
+                        created_at: channel.last_message?.created_at,
+                        content: channel.last_message?.content,
+                    },
+                    unread_count: channel.unread_count,
+                    recipients: channel.recipients,
+                }
+            })
+            .sort((a: any, b: any) => {
+                const aTime = a.last_message?.created_at
+                const bTime = b.last_message?.created_at
 
-    if (loading) {
+                // Channels without messages go to the bottom
+                if (!aTime && !bTime) return 0
+                if (!aTime) return 1
+                if (!bTime) return -1
+
+                // Sort by timestamp descending (newest first)
+                return new Date(bTime).getTime() - new Date(aTime).getTime()
+            })
+    }, [JSON.stringify(channelsFrame)])
+
+    if (isLoading) {
         return (
             <div className="p-2 space-y-2">
                 <div className="h-4 w-32 bg-muted animate-pulse rounded" />
@@ -82,72 +113,50 @@ function ChannelsList() {
 }
 
 function NewDMForm() {
-    const { session } = useSession()
-    const channelsFrame = useContentFrame() // parent ContentFrame (dm.channels)
     const [, setLocation] = useLocation()
     const [username, setUsername] = useState('')
-    const [submitting, setSubmitting] = useState(false)
+    const queryClient = useQueryClient()
+
+    const createChannel = useContentFrameMutation('post', 'dm/channels', {
+        onSuccess: channel => {
+            setLocation(`/c/${channel.id}`)
+            queryClient.invalidateQueries({ queryKey: ['channels'] })
+        },
+    })
 
     const startDM = async (userId: string) => {
-        const token = await session?.getToken()
-        const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/channels`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            body: JSON.stringify({ userId }),
-        })
-        if (!res.ok) throw new Error('failed')
-        const channel = await res.json()
-        // Navigate to the channel and refresh list
-        setLocation(`/c/${channel.id}`)
-        channelsFrame.refresh()
+        createChannel.mutate({ userId })
     }
+
+    const { refetch: fetchUser } = useContentFrame('get', `user/${encodeURIComponent(username.trim())}`, undefined, {
+        enabled: false,
+    })
+
+    const { refetch: fetchMe } = useContentFrame('get', 'user/me', undefined, {
+        enabled: false,
+    })
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!username.trim()) return
-        setSubmitting(true)
+
         try {
-            const token = await session?.getToken()
-            const profileRes = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/user/${encodeURIComponent(username.trim())}`, {
-                headers: {
-                    Accept: 'application/json',
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
-            })
-            if (!profileRes.ok) throw new Error('user not found')
-            const profile = await profileRes.json()
+            const { data: profile } = await fetchUser()
             if (!profile?.id) throw new Error('invalid user')
             await startDM(profile.id)
             setUsername('')
         } catch (_) {
             // TODO: surface error to user later
-        } finally {
-            setSubmitting(false)
         }
     }
 
     const onSelfDM = async () => {
-        setSubmitting(true)
         try {
-            const token = await session?.getToken()
-            const meRes = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/user/me`, {
-                headers: {
-                    Accept: 'application/json',
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
-            })
-            if (!meRes.ok) throw new Error('failed')
-            const me = await meRes.json()
-            if (!me?.id) throw new Error('invalid me')
-            await startDM(me.id)
+            const { data: meData } = await fetchMe()
+            if (!meData?.id) throw new Error('invalid me')
+            await startDM(meData.id)
         } catch (_) {
             // no-op
-        } finally {
-            setSubmitting(false)
         }
     }
 
@@ -158,10 +167,10 @@ function NewDMForm() {
             </Text>
             {/* debug input to force dm creation */}
             <Input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
-            <Button color="indigo" type="submit" className="w-full" disabled={submitting}>
+            <Button color="indigo" type="submit" className="w-full" disabled={createChannel.isPending}>
                 Start DM
             </Button>
-            <Button outline className="w-full" type="button" onClick={onSelfDM} disabled={submitting}>
+            <Button outline className="w-full" type="button" onClick={onSelfDM} disabled={createChannel.isPending}>
                 Jump to Your Basecamp
             </Button>
         </form>

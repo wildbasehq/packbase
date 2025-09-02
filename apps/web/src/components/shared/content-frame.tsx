@@ -1,8 +1,7 @@
-import React, { createContext, ReactNode, useContext, useMemo } from 'react'
-import useSWR from 'swr'
+import React, { ReactNode } from 'react'
 import { useSession } from '@clerk/clerk-react'
 import { setToken } from '@/lib'
-import { useDebouncedCallback } from 'use-debounce'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const API_URL = import.meta.env.VITE_YAPOCK_URL
 
@@ -16,7 +15,7 @@ interface ContentFrameProps {
     data?: any
     onError?: (error: ContentFrameError) => void
     id?: string
-    refreshInterval?: number
+    refetchInterval?: number
 }
 
 interface ContentFrameError {
@@ -27,105 +26,17 @@ interface ContentFrameError {
     timestamp: number
 }
 
-interface ContentFrameContextType {
-    data: any
-    loading: boolean
-    error: ContentFrameError | null
-    refresh: () => void
-    mutate: (data?: any) => void
-    signature: string
-    parent?: ContentFrameContextType
-    isRevalidating?: boolean
-}
-
-/** Context for ContentFrame hierarchy */
-const ContentFrameContext = createContext<ContentFrameContextType | null>(null)
-
-/** Hook to get current ContentFrame context */
-export const useContentFrame = (targetSignature?: string) => {
-    const context = useContext(ContentFrameContext)
-    if (!context) throw new Error('useContentFrame must be used within a ContentFrame')
-
-    if (!targetSignature) return context
-
-    let current: ContentFrameContextType | undefined = context
-    while (current) {
-        if (current.signature === targetSignature) return current
-        current = current.parent
+const createApiCall = async (method: string, path: string, requestData?: any, token?: string) => {
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
     }
-    throw new Error(`ContentFrame with signature "${targetSignature}" not found in parent chain`)
-}
-
-/** Hook to get all frames in parent chain */
-export const useContentFrames = () => {
-    const context = useContext(ContentFrameContext)
-    if (!context) throw new Error('useContentFrames must be used within a ContentFrame')
-
-    const frames: Record<string, ContentFrameContextType> = {}
-    let current: ContentFrameContextType | undefined = context
-    while (current) {
-        frames[current.signature] = current
-        current = current.parent
-    }
-    return frames
-}
-
-/** Hook to find frame by partial signature */
-export const useContentFrameByPath = (partialSignature: string) => {
-    const context = useContext(ContentFrameContext)
-    if (!context) throw new Error('useContentFrameByPath must be used within a ContentFrame')
-
-    let current: ContentFrameContextType | undefined = context
-    while (current) {
-        if (current.signature.includes(partialSignature)) return current
-        current = current.parent
-    }
-    return null
-}
-
-/** Hook to get only data from ContentFrame to avoid unnecessary re-renders */
-export const useContentFrameData = (targetSignature?: string) => {
-    const context = useContentFrame(targetSignature)
-    return useMemo(() => ({
-        data: context.data,
-        loading: context.loading,
-        error: context.error,
-        isRevalidating: context.isRevalidating
-    }), [context.data, context.loading, context.error, context.isRevalidating])
-}
-
-/** Hook to get only actions from ContentFrame to avoid unnecessary re-renders */
-export const useContentFrameActions = (targetSignature?: string) => {
-    const context = useContentFrame(targetSignature)
-    return useMemo(() => ({
-        refresh: context.refresh,
-        mutate: context.mutate
-    }), [context.refresh, context.mutate])
-}
-
-/** Hook to get ContentFrame with debounced refresh to reduce API calls */
-export const useDebouncedContentFrame = (
-    targetSignature?: string, 
-    debounceMs: number = 1000
-) => {
-    const context = useContentFrame(targetSignature)
-    const debouncedRefresh = useDebouncedCallback(context.refresh, debounceMs)
-    
-    return useMemo(() => ({
-        ...context,
-        refresh: debouncedRefresh
-    }), [context, debouncedRefresh])
-}
-
-/** Basic fetcher that uses session token */
-const fetcher = (url: string, method: string, body?: any, token?: string) => async () => {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/json' }
     if (token) headers['Authorization'] = `Bearer ${token}`
 
-    const res = await fetch(`${API_URL}/${url.split('.').join('/')}`, {
+    const res = await fetch(`${API_URL}/${path.split('.').join('/')}`, {
         method: method.toUpperCase(),
         headers,
-        body: method !== 'get' && method !== 'delete' && body ? JSON.stringify(body) : undefined,
+        body: method !== 'get' && method !== 'delete' && requestData ? JSON.stringify(requestData) : undefined,
     })
 
     const json = await res.json()
@@ -133,7 +44,7 @@ const fetcher = (url: string, method: string, body?: any, token?: string) => asy
         throw {
             message: json?.summary || json?.meta?.message || 'Request failed',
             status: res.status,
-            url,
+            url: path,
             code: json?.code,
             timestamp: Date.now(),
         } as ContentFrameError
@@ -141,7 +52,83 @@ const fetcher = (url: string, method: string, body?: any, token?: string) => asy
     return json?.data ?? json
 }
 
-/** ContentFrame component using SWR */
+export const useContentFrame = (
+    method?: string,
+    path?: string,
+    requestData?: any,
+    options?: {
+        id?: string
+        refetchInterval?: number
+        enabled?: boolean
+    }
+) => {
+    const { session, isLoaded, isSignedIn } = useSession()
+
+    const queryKey = options?.id || (method && path ? [method, path, requestData] : null)
+
+    const query = useQuery({
+        queryKey: queryKey ? [queryKey] : undefined,
+        queryFn: async () => {
+            // if (!session || !method || !path) return null
+            const token = isSignedIn ? await session.getToken() : null
+            if (token) setToken(token)
+            return createApiCall(method, path, requestData, token)
+        },
+        enabled: isLoaded && !!method && !!path && options?.enabled !== false,
+        refetchInterval: options?.refetchInterval ? options.refetchInterval * 1000 : undefined,
+    })
+
+    return {
+        data: query.data,
+        error: query.error
+            ? ({
+                  message: (query.error as any)?.message || 'Request failed',
+                  status: (query.error as any)?.status,
+                  url: path,
+                  code: (query.error as any)?.code,
+                  timestamp: Date.now(),
+              } as ContentFrameError)
+            : null,
+        isLoading: query.isLoading,
+        refetch: query.refetch,
+    }
+}
+
+export const useContentFrameMutation = (
+    method: string,
+    path: string,
+    options?: {
+        onSuccess?: (data: any) => void
+        onError?: (error: ContentFrameError) => void
+    }
+) => {
+    const { session, isSignedIn } = useSession()
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: async (requestData?: any) => {
+            // if (!session) throw new Error('Not authenticated')
+            const token = isSignedIn ? await session.getToken() : null
+            if (token) setToken(token)
+            return createApiCall(method, path, requestData, token)
+        },
+        onSuccess: data => {
+            queryClient.invalidateQueries()
+            options?.onSuccess?.(data)
+        },
+        onError: error => {
+            const contentFrameError: ContentFrameError = {
+                message: (error as any)?.message || 'Request failed',
+                status: (error as any)?.status,
+                url: path,
+                code: (error as any)?.code,
+                timestamp: Date.now(),
+            }
+            options?.onError?.(contentFrameError)
+        },
+    })
+}
+
 export const ContentFrame: React.FC<ContentFrameProps> = ({
     children,
     get,
@@ -152,46 +139,21 @@ export const ContentFrame: React.FC<ContentFrameProps> = ({
     data: requestData,
     onError,
     id,
-    refreshInterval,
+    refetchInterval,
 }) => {
-    const { session, isLoaded } = useSession()
-
     const method = get ? 'get' : post ? 'post' : put ? 'put' : deleteMethod ? 'delete' : patch ? 'patch' : null
     const path = get || post || put || deleteMethod || patch
-    const signature = id || `${method}=${path}`
 
-    const parentContext = useContext(ContentFrameContext)
-
-    /** Fetcher that waits for session token */
-    const fetcherWithToken = async () => {
-        if (!method || !path) throw new Error('No method or path specified')
-        if (!isLoaded || !session) return null
-        const token = await session.getToken()
-        if (token) setToken(token)
-        return fetcher(path, method, requestData, token)()
-    }
-
-    const { data, error, mutate, isValidating } = useSWR(method && path && isLoaded ? signature : null, fetcherWithToken, {
-        refreshInterval: refreshInterval ? refreshInterval * 1000 : 0,
-        revalidateOnFocus: true,
-        onError: (err: any) => onError?.(err),
+    const { error } = useContentFrame(method || undefined, path || undefined, requestData, {
+        id,
+        refetchInterval,
     })
 
-    const contextValue = useMemo(
-        () => ({
-            data,
-            loading: !data && !error,
-            error: error ?? null,
-            refresh: () => mutate(),
-            mutate,
-            signature,
-            parent: parentContext || undefined,
-            isRevalidating: isValidating,
-        }),
-        [data, error, mutate, signature, parentContext, isValidating]
-    )
+    if (error && onError) {
+        onError(error)
+    }
 
-    return <ContentFrameContext.Provider value={contextValue}>{children}</ContentFrameContext.Provider>
+    return <>{children}</>
 }
 
 export default ContentFrame

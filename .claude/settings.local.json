@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run check-types:*)"
+      "Bash(npm run check-types:*)",
+      "Bash(bun run:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

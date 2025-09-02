@@ -6,32 +6,26 @@ import Body from '@/components/layout/body'
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib'
 import { useEffect, useState } from 'react'
 import { SignedIn, SignedOut, useSession } from '@clerk/clerk-react'
-import { LogoSpinner, useContentFrames } from '@/src/components'
-import ContentFrame from '@/components/shared/content-frame'
+import { LogoSpinner } from '@/src/components'
+import { useContentFrame } from '@/components/shared/content-frame'
 import NUEModal, { createNUEFlow } from '@/components/seen-once/nue-modal'
 import { toast } from 'sonner'
 
 export default function Preload({ children }: { children: React.ReactNode }) {
     return (
         <>
-            <ContentFrame get="server.describeServer">
-                <SignedIn>
-                    <ContentFrame get="user.me">
-                        <ContentFrame get="user.me.packs">
-                            {/*<WebsocketFrame*/}
-                            {/*    onConnect={() => console.log('Connected to websocket')}*/}
-                            {/*    onDisconnect={() => console.log('Disconnected from websocket')}*/}
-                            {/*    onMessage={message => console.log('Received message:', message)}*/}
-                            {/*>*/}
-                            <PreloadChild>{children}</PreloadChild>
-                            {/*</WebsocketFrame>*/}
-                        </ContentFrame>
-                    </ContentFrame>
-                </SignedIn>
-                <SignedOut>
-                    <PreloadChild>{children}</PreloadChild>
-                </SignedOut>
-            </ContentFrame>
+            <SignedIn>
+                {/*<WebsocketFrame*/}
+                {/*    onConnect={() => console.log('Connected to websocket')}*/}
+                {/*    onDisconnect={() => console.log('Disconnected from websocket')}*/}
+                {/*    onMessage={message => console.log('Received message:', message)}*/}
+                {/*>*/}
+                <PreloadChild>{children}</PreloadChild>
+                {/*</WebsocketFrame>*/}
+            </SignedIn>
+            <SignedOut>
+                <PreloadChild>{children}</PreloadChild>
+            </SignedOut>
         </>
     )
 }
@@ -44,21 +38,26 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
     const { setUser } = useUserAccountStore()
     const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
     const { setResources } = useResourceStore()
-    const frames = useContentFrames()
     const { session, isSignedIn, isLoaded } = useSession()
 
-    const { data: userMeData, loading: userMeLoading } = frames?.['get=user.me'] || { data: null, loading: isSignedIn }
-    const { data: userPacksData, loading: userPacksLoading } = frames?.['get=user.me.packs'] || { data: null, loading: isSignedIn }
-
-    // Needed to be true as this frame is sometimes pushed back
-    const { data: server, loading: describeServerLoading } = frames?.['get=server.describeServer'] || { data: null, loading: true }
+    const { data: userMeData, isLoading: userMeLoading } = useContentFrame('get', 'user.me', undefined, {
+        id: 'user.me',
+        enabled: isSignedIn,
+    })
+    const { data: userPacksData, isLoading: userPacksLoading } = useContentFrame('get', 'user.me.packs', undefined, {
+        id: 'user.me.packs',
+        enabled: isSignedIn,
+    })
+    const { data: server } = useContentFrame('get', 'server.describeServer', undefined, {
+        id: 'server.describeServer',
+    })
 
     useEffect(() => {
         if (userPacksData && !userPacksLoading) {
             setResources(userPacksData)
         }
 
-        if (!isLoaded || describeServerLoading) return
+        if (!isLoaded || !server) return
         if (isSignedIn && (userMeLoading || userPacksLoading)) return
         // if (!serviceLoading.startsWith('auth')) return
 
@@ -82,7 +81,7 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
             setUser(null)
             proceed()
         }
-    }, [session, isSignedIn, userMeLoading, userPacksData, userPacksLoading, describeServerLoading])
+    }, [session, isSignedIn, userMeLoading, userPacksData, userPacksLoading, server])
 
     const setStatus = (status: string) => {
         setServiceLoading(prev => {
@@ -102,9 +101,9 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
         if (
             userMeData &&
             (!userMeData?.display_name ||
-                !userMeData?.display_name.trim().length ||
+                !userMeData?.display_name?.trim().length ||
                 !userMeData?.about?.bio ||
-                !userMeData?.about?.bio.trim().length)
+                !userMeData?.about?.bio?.trim().length)
         ) {
             setShowNUE(true)
         }

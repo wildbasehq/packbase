@@ -31,7 +31,7 @@ export function MessageContent({
     const isPending = message._isPending
 
     return (
-        <div className={`text-sm whitespace-normal break-words group/message relative ${className || ''}`}>
+        <div className={`text-sm whitespace-normal message-content group/message relative ${className || ''}`}>
             {isEditing ? (
                 <MessageEditor content={editContent} onContentChange={onEditContentChange} onSave={onSaveEdit} onCancel={onCancelEdit} />
             ) : (

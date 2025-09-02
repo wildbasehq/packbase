@@ -44,7 +44,7 @@ export function Text({
 }): JSX.Element {
     const Comp = as || 'p'
     props.className = cn(
-        'text-default select-none prose prose-zinc dark:prose-invert max-w-none',
+        'text-default select-none prose prose-zinc dark:prose-invert max-w-none break-words',
         props.className,
         textSize[size],
         alt && 'text-muted-foreground',

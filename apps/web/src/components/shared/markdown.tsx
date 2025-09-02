@@ -6,7 +6,7 @@ import { Heading, Text } from '@/components/shared/text'
 import ReactMarkdown from 'react-markdown'
 import rehypeSanitize from 'rehype-sanitize'
 import { Pre } from '@/components/shared/code.tsx'
-import { createElement, Children, isValidElement, cloneElement } from 'react'
+import { createElement, Children, isValidElement } from 'react'
 import CreatedByHumans from '@/src/images/svg/noai/created.svg'
 import { clsx } from 'clsx'
 
@@ -275,7 +275,7 @@ export default function Markdown({ children, componentClassName }: { children: s
     const convertedContent = Howlertag.convert(children)
 
     return (
-        <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full">
+        <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full break-words message-content">
             {convertedContent.map((item, index) => {
                 if (typeof item === 'string') {
                     return (
