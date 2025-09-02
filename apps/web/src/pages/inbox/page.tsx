@@ -100,7 +100,7 @@ export default function InboxPage({ onClose }) {
             open={[open, setOpen]}
             className="w-full sm:w-[400px]"
             navbar={
-                <div className="flex justify-between items-center w-full">
+                <div className="flex justify-between items-center w-full overflow-hidden">
                     <div className="flex items-center">
                         <DialogTitle>Inbox</DialogTitle>
                         {notifications?.filter(n => !n.read).length > 0 && (
