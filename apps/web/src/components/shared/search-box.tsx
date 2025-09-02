@@ -68,7 +68,7 @@ export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = tru
         <form
             onSubmit={handleSubmit}
             className={cn(
-                'w-full flex items-center ring-1 shadow-xs ring-default rounded-xl px-4 py-2 !text-lg transition-colors font-medium duration-300 !h-12 z-[1]',
+                'w-full [&>div]:w-full flex items-center ring-1 shadow-xs ring-default rounded-xl px-4 py-2 !text-lg transition-colors font-medium duration-300 !h-12 z-[1]',
                 gradientBorderAnimationClass,
                 query?.startsWith('[')
                     ? `after:opacity-100
@@ -85,7 +85,7 @@ export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = tru
                 placeholder={placeholder}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                className="w-full focus-within:!ring-0 !bg-transparent z-[2]"
+                className="w-full focus-within:!ring-0 !bg-transparent z-[2] !max-w-full"
                 inputClassName="pl-8 w-full"
             />
         </form>
