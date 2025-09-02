@@ -24,11 +24,15 @@ export default async function verifyToken(req: any) {
                 console.log('URGENT: Creating new user profile for ', user.userId);
                 const emailHash = await Bun.password.hash(user.sessionClaims.email.trim().toLowerCase());
                 // Check user email in invites
-                const isInvited = await prisma.invites.findFirst({
-                    where: {
-                        email: emailHash,
-                    },
-                });
+                let isInvited = null;
+
+                try {
+                    isInvited = await prisma.invites.findFirst({
+                        where: {
+                            email: emailHash,
+                        },
+                    });
+                } catch (_) {}
 
                 const newProfile = await prisma.profiles.create({
                     data: {
