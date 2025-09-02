@@ -7,12 +7,14 @@ import { motion } from 'framer-motion'
 import { AlertCircle, Clock, Filter, Loader2, RefreshCw, Search as SearchIcon, X } from 'lucide-react'
 import { useSearch, useUserAccountStore, vg } from '@/lib'
 import { useDebounce } from 'use-debounce'
-import { SearchApiResponse, SearchResult } from './types'
+import { SearchApiResponse, RawSearchApiResponse, SearchResult } from './types'
 import { PackCard, PostCard, ProfileCard } from '@/components/search'
 import { Heading, Text } from '@/components/shared/text.tsx'
 import { Alert, AlertDescription, AlertTitle, AppTabs, ExpandableTabs } from '@/src/components'
 import { MagnifyingGlassCircleIcon, RectangleStackIcon, UserGroupIcon, UsersIcon } from '@heroicons/react/20/solid'
 import { SignedIn } from '@clerk/clerk-react'
+import { SearchBox } from '@/components/shared/search-box.tsx'
+import { Button } from '@/components/shared/experimental-button-rework.tsx'
 
 // Array of greeting messages to randomly display
 const greetings = [
@@ -49,7 +51,7 @@ export default function Search() {
     const { user } = useUserAccountStore()
 
     const [results, setResults] = useState<SearchApiResponse>({
-        results: { profiles: [], packs: [], posts: [] },
+        data: { profiles: [], packs: [], posts: [] },
         count: 0,
         query: '',
     })
@@ -83,7 +85,7 @@ export default function Search() {
 
             if (!debouncedQuery || debouncedQuery.trim() === '') {
                 setResults({
-                    results: { profiles: [], packs: [], posts: [] },
+                    data: { profiles: [], packs: [], posts: [] },
                     count: 0,
                     query: '',
                 })
@@ -96,7 +98,7 @@ export default function Search() {
                 setIsLoading(true)
                 setError(null)
 
-                const searchResults = await vg.search.get({
+                const searchResults: { data?: RawSearchApiResponse; error?: string } = await vg.search.get({
                     query: {
                         q: debouncedQuery,
                         ...(activeCategory !== 'Everything' && {
@@ -107,13 +109,35 @@ export default function Search() {
                 if (searchResults.error) {
                     throw new Error(searchResults.error)
                 }
-                setResults(
-                    searchResults.data || {
-                        results: { profiles: [], packs: [], posts: [] },
-                        count: 0,
-                        query: debouncedQuery,
+
+                console.log(searchResults.data)
+
+                // Handle the case where there's only one allowed table and data is an array
+                let normalizedData = { profiles: [], packs: [], posts: [] }
+
+                if (activeCategory !== 'Everything' && Array.isArray(searchResults.data?.data)) {
+                    // Single table case - data is an array of results
+                    const tableKey = activeCategory.toLowerCase() as 'profiles' | 'packs' | 'posts'
+                    normalizedData[tableKey] = searchResults.data.data
+                } else if (
+                    searchResults.data?.data &&
+                    typeof searchResults.data.data === 'object' &&
+                    !Array.isArray(searchResults.data.data)
+                ) {
+                    // Multiple tables case - data is an object with table arrays
+                    const data = searchResults.data.data as { profiles?: SearchResult[]; packs?: SearchResult[]; posts?: SearchResult[] }
+                    normalizedData = {
+                        profiles: data.profiles || [],
+                        packs: data.packs || [],
+                        posts: data.posts || [],
                     }
-                )
+                }
+
+                setResults({
+                    data: normalizedData,
+                    count: searchResults.data?.count || 0,
+                    query: debouncedQuery,
+                })
             } catch (err) {
                 console.error('Error fetching search results:', err)
                 if (err.message?.includes('NOT_FOUND')) {
@@ -133,14 +157,14 @@ export default function Search() {
     useEffect(() => {
         if (activeCategory === 'Everything') {
             // Combine all result types
-            const allResults = [...(results.results?.profiles || []), ...(results.results?.packs || []), ...(results.results?.posts || [])]
+            const allResults = [...(results.data?.profiles || []), ...(results.data?.packs || []), ...(results.data?.posts || [])]
             setFilteredResults(allResults)
         } else if (activeCategory === 'Profiles') {
-            setFilteredResults(results.results?.profiles || [])
+            setFilteredResults(results.data?.profiles || [])
         } else if (activeCategory === 'Packs') {
-            setFilteredResults(results.results?.packs || [])
+            setFilteredResults(results.data?.packs || [])
         } else if (activeCategory === 'Posts') {
-            setFilteredResults(results.results?.posts || [])
+            setFilteredResults(results.data?.posts || [])
         }
     }, [results, activeCategory])
 
@@ -151,13 +175,11 @@ export default function Search() {
 
     return (
         <div className="flex flex-col h-full">
-            <SignedIn>
-                <AppTabs />
-            </SignedIn>
             {/* Search header */}
             <div className="sticky top-0 z-10 backdrop-blur-sm border-b pb-4">
                 <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
                     <h1 className="text-2xl font-medium mb-4">{greeting}</h1>
+                    <SearchBox />
 
                     {/* Active filters/info display */}
                     {query && (
@@ -276,9 +298,9 @@ export default function Search() {
                             </p>
                         </div>
                     ) : filteredResults.length === 0 &&
-                      (!results.results?.profiles || results.results?.profiles.length === 0) &&
-                      (!results.results?.packs || results.results?.packs.length === 0) &&
-                      (!results.results?.posts || results.results?.posts.length === 0) ? (
+                      (!results.data?.profiles || results.data?.profiles.length === 0) &&
+                      (!results.data?.packs || results.data?.packs.length === 0) &&
+                      (!results.data?.posts || results.data?.posts.length === 0) ? (
                         <div className="py-16 flex flex-col items-center text-center">
                             <div className="bg-accent/50 p-6 rounded-full mb-4">
                                 <SearchIcon className="h-8 w-8 text-muted-foreground" />
@@ -290,13 +312,10 @@ export default function Search() {
                                 Woah, we couldn't find anything for "{query}". Try searching for something else?
                             </Text>
                             {activeCategory !== 'Everything' && (
-                                <button
-                                    onClick={() => setActiveCategory('Everything')}
-                                    className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
-                                >
-                                    <Filter className="h-4 w-4" />
+                                <Button outline onClick={() => setActiveCategory('Everything')}>
+                                    <Filter data-slot="icon" className="inline-flex h-4 w-4" />
                                     <span>Clear filters</span>
-                                </button>
+                                </Button>
                             )}
                         </div>
                     ) : (

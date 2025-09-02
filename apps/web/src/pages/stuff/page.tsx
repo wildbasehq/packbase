@@ -6,7 +6,7 @@ import { sampleBentoItems } from '@/components/bento/sample-items'
 
 function EmptyState() {
     return (
-        <div className="absolute flex justify-center items-center h-[calc(100vh-14rem)] lg:w-[calc(100%-24rem)] top-14 lg:ml-96 overflow-hidden grow">
+        <div className="absolute flex justify-center items-center h-[calc(100vh-14rem)] top-14 lg:pl-18 w-full overflow-hidden grow">
             <div className="h-full flex items-center justify-center">
                 <div className="w-full max-w-2xl">
                     <div className="flex flex-col items-center justify-center">
@@ -72,7 +72,7 @@ function BentoContent() {
     }
 
     return (
-        <div className="absolute h-[calc(100vh-14rem)] lg:w-[calc(100%-26rem)] top-14 lg:ml-96 overflow-auto">
+        <div className="absolute h-[calc(100vh-14rem)] w-full top-14 lg:pl-18 overflow-auto">
             <div className="p-4">
                 <BentoGrid items={items} onLayoutChange={handleLayoutChange} onRemoveItem={handleRemoveItem} />
             </div>

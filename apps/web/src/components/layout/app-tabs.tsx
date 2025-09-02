@@ -13,7 +13,7 @@ import { Button } from '@/components/shared/experimental-button-rework'
 
 export function AppTabs({
     tabs = [
-        { title: 'Your Nest', icon: HomeIcon, href: ['/', ''] },
+        { title: 'Your Nest', icon: HomeIcon, href: ['/', '', '/p/universe', '/p/universe/cosmos'] },
         { type: 'search', icon: MagnifyingGlassIcon, href: '/search' },
         { type: 'separator' },
         { title: 'Your Stuff', icon: FolderIcon, href: '/stuff' },

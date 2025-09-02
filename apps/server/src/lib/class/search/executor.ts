@@ -1,184 +1,207 @@
 /**
  * Query executor for the search API
  * Executes queries represented by AST nodes against the database
+ *
+ * Features:
+ * - Supports UUID prefix in searchable fields (e.g., 'uuid:id' for exact UUID matching)
+ * - Type-safe table and column validation
+ * - Robust error handling with specific error codes
+ * - Full-text search across configurable fields
+ * - Support for complex expressions (AND, OR, NOT, comparisons, wildcards, fuzzy search)
  */
 
-import {PrismaClient} from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 import {
-    QueryNode, WhereClauseNode, TableRefNode, ColumnRefNode, ExpressionNode,
-    NodeType, AndExprNode, OrExprNode, NotExprNode, EqualsExprNode,
-    GreaterThanExprNode, LessThanExprNode, GreaterThanEqualsExprNode,
-    LessThanEqualsExprNode, BetweenExprNode, ExistsExprNode, SortExprNode,
-    WildcardExprNode, FuzzyExprNode, ExactExprNode, CaseExprNode,
-    StringLiteralNode, NumberLiteralNode, BooleanLiteralNode,
-    SearchResult, SearchError
-} from './types'
+    QueryNode,
+    WhereClauseNode,
+    TableRefNode,
+    ColumnRefNode,
+    ExpressionNode,
+    NodeType,
+    AndExprNode,
+    OrExprNode,
+    NotExprNode,
+    EqualsExprNode,
+    GreaterThanExprNode,
+    LessThanExprNode,
+    GreaterThanEqualsExprNode,
+    LessThanEqualsExprNode,
+    BetweenExprNode,
+    ExistsExprNode,
+    SortExprNode,
+    WildcardExprNode,
+    FuzzyExprNode,
+    ExactExprNode,
+    CaseExprNode,
+    StringLiteralNode,
+    NumberLiteralNode,
+    BooleanLiteralNode,
+    SearchResult,
+    SearchError,
+} from './types';
 
 // Import Prisma client
-import prisma from '@/db/prisma'
+import prisma from '@/db/prisma';
+import { isValidUUID } from '@/utils/dm/validation';
 
 export class SearchExecutionError extends Error {
-    code: string
-    details?: any
+    readonly code: string;
+    readonly details?: unknown;
 
-    constructor(message: string, code: string = 'EXECUTION_ERROR', details?: any) {
-        super(message)
-        this.name = 'SearchExecutionError'
-        this.code = code
-        this.details = details
+    constructor(message: string, code: string = 'EXECUTION_ERROR', details?: unknown) {
+        super(message);
+        this.name = 'SearchExecutionError';
+        this.code = code;
+        this.details = details;
     }
+}
+
+const ERROR_CODES = {
+    INVALID_TABLE: 'INVALID_TABLE',
+    TABLE_NOT_ALLOWED: 'TABLE_NOT_ALLOWED',
+    COLUMN_NOT_SEARCHABLE: 'COLUMN_NOT_SEARCHABLE',
+    MISSING_COLUMN: 'MISSING_COLUMN',
+    QUERY_EXECUTION_ERROR: 'QUERY_EXECUTION_ERROR',
+    UNSUPPORTED_EXPRESSION: 'UNSUPPORTED_EXPRESSION',
+    UNEXPECTED_ERROR: 'UNEXPECTED_ERROR',
+} as const;
+
+interface TableConfig {
+    idField: string;
+    searchableFields: string[];
 }
 
 /**
- * Map of valid table names to their ID field names
- * This ensures we only query tables that exist and have UUID IDs
+ * Map of valid table names to their configuration
+ * Fields with 'uuid:' prefix are treated as UUID fields requiring exact matches
  */
-const VALID_TABLES: Record<string, { idField: string, searchableFields: string[] }> = {
-    'packs': {
+const VALID_TABLES: Record<string, TableConfig> = {
+    packs: {
         idField: 'id',
-        searchableFields: ['display_name', 'slug', 'description']
+        searchableFields: ['display_name', 'slug', 'description', 'uuid:id'],
     },
-    'packs_pages': {
+    packs_pages: {
         idField: 'id',
-        searchableFields: ['title', 'slug']
+        searchableFields: ['title', 'slug', 'uuid:id'],
     },
-    'posts': {
+    posts: {
         idField: 'id',
-        searchableFields: ['content_type', 'body', 'tenant_id', 'channel_id']
+        searchableFields: ['content_type', 'body', 'uuid:tenant_id', 'uuid:channel_id', 'uuid:id'],
     },
-    'profiles': {
+    profiles: {
         idField: 'id',
-        searchableFields: ['username', 'bio', 'slug', 'display_name']
+        searchableFields: ['username', 'bio', 'slug', 'display_name', 'uuid:id'],
     },
-    'user_themes': {
+    user_themes: {
         idField: 'id',
-        searchableFields: ['name', 'html', 'css']
-    }
-}
+        searchableFields: ['name', 'html', 'css', 'uuid:id'],
+    },
+} as const;
+
+type ValidTableName = keyof typeof VALID_TABLES;
 
 /**
  * Executor class for search queries
  */
 export class QueryExecutor {
-    private namedQueries: Map<string, QueryNode> = new Map()
-    private allowedTables?: string[]
+    private readonly namedQueries = new Map<string, QueryNode>();
+    private readonly allowedTables?: ReadonlySet<string>;
 
-    /**
-     * Create a new QueryExecutor
-     * @param allowedTables Optional list of tables that are allowed to be searched
-     */
-    constructor(allowedTables?: string[]) {
-        this.allowedTables = allowedTables?.map(table => table.toLowerCase())
+    constructor(allowedTables?: readonly string[]) {
+        this.allowedTables = allowedTables ? new Set(allowedTables.map((table) => table.toLowerCase())) : undefined;
     }
 
     /**
-     * Execute a search query
+     * Execute a search query against the database
      * @param query The query node to execute
-     * @returns Array of search results (UUIDs)
+     * @returns Promise resolving to array of search results containing IDs and table names
+     * @throws SearchExecutionError when query execution fails
      */
     async execute(query: QueryNode): Promise<SearchResult[]> {
         try {
-            let results: SearchResult[] = []
+            let results: SearchResult[] = [];
 
             // Check if the whereClause is an OR expression between WHERE clauses
+            // @ts-ignore
             if (query.whereClause.type === NodeType.OR_EXPR) {
                 // Execute both sides of the OR and combine the results
-                const orExpr = query.whereClause as OrExprNode
+                const orExpr = query.whereClause as unknown as OrExprNode;
 
                 // Execute left side
-                let leftResults: SearchResult[] = []
+                let leftResults: SearchResult[] = [];
                 if (orExpr.left.type === NodeType.WHERE_CLAUSE) {
-                    leftResults = await this.executeWhereClause(orExpr.left as WhereClauseNode)
+                    leftResults = await this.executeWhereClause(orExpr.left as WhereClauseNode);
                 } else if (orExpr.left.type === NodeType.OR_EXPR) {
                     // Recursively handle nested OR expressions
                     const nestedQuery: QueryNode = {
                         type: NodeType.QUERY,
+                        // @ts-ignore
                         whereClause: orExpr.left,
-                        position: orExpr.left.position
-                    }
-                    leftResults = await this.execute(nestedQuery)
+                        position: orExpr.left.position,
+                    };
+                    leftResults = await this.execute(nestedQuery);
                 }
 
                 // Execute right side
-                let rightResults: SearchResult[] = []
+                let rightResults: SearchResult[] = [];
                 if (orExpr.right.type === NodeType.WHERE_CLAUSE) {
-                    rightResults = await this.executeWhereClause(orExpr.right as WhereClauseNode)
+                    rightResults = await this.executeWhereClause(orExpr.right as WhereClauseNode);
                 } else if (orExpr.right.type === NodeType.OR_EXPR) {
                     // Recursively handle nested OR expressions
                     const nestedQuery: QueryNode = {
                         type: NodeType.QUERY,
+                        // @ts-ignore
                         whereClause: orExpr.right,
-                        position: orExpr.right.position
-                    }
-                    rightResults = await this.execute(nestedQuery)
+                        position: orExpr.right.position,
+                    };
+                    rightResults = await this.execute(nestedQuery);
                 }
 
                 // Combine the results
-                results = [...leftResults, ...rightResults]
+                results = [...leftResults, ...rightResults];
             } else {
                 // Process a single WHERE clause
-                results = await this.executeWhereClause(query.whereClause)
+                results = await this.executeWhereClause(query.whereClause);
             }
 
             // Apply sorting if specified
             if (query.sortExpr) {
-                return this.applySorting(results, query.sortExpr)
+                return this.applySorting(results, query.sortExpr);
             }
 
-            return results
+            return results;
         } catch (error) {
             if (error instanceof SearchExecutionError) {
-                throw error
+                throw error;
             }
 
-            throw new SearchExecutionError(
-                error instanceof Error ? error.message : String(error),
-                'UNEXPECTED_ERROR',
-                error
-            )
+            throw new SearchExecutionError(error instanceof Error ? error.message : String(error), ERROR_CODES.UNEXPECTED_ERROR, error);
         }
     }
 
     /**
-     * Execute a WHERE clause
-     * @param whereClause The WHERE clause to execute
-     * @returns Array of search results
+     * Execute a WHERE clause against a specific table
+     * @param whereClause The WHERE clause node containing table and conditions
+     * @returns Promise resolving to array of search results
+     * @throws SearchExecutionError for invalid tables, columns, or query execution errors
      */
     private async executeWhereClause(whereClause: WhereClauseNode): Promise<SearchResult[]> {
-        const tableName = whereClause.table.name.toLowerCase()
+        const tableName = whereClause.table.name.toLowerCase();
 
-        // Validate table name
-        if (!VALID_TABLES[tableName]) {
-            throw new SearchExecutionError(
-                `Invalid table name: ${tableName}`,
-                'INVALID_TABLE'
-            )
-        }
-
-        // Check if table is in the allowlist
-        if (this.allowedTables && this.allowedTables.length > 0 && !this.allowedTables.includes(tableName)) {
-            throw new SearchExecutionError(
-                `Table '${tableName}' is not in the allowed tables list`,
-                'TABLE_NOT_ALLOWED'
-            )
-        }
+        this.validateTable(tableName);
 
         // Get table configuration
-        const tableConfig = VALID_TABLES[tableName]
+        const tableConfig = VALID_TABLES[tableName];
 
-        // Check if column is searchable
-        if (whereClause.column && !tableConfig.searchableFields.includes(whereClause.column.name)) {
-            throw new SearchExecutionError(
-                `Column '${whereClause.column.name}' is not searchable`,
-                'COLUMN_NOT_SEARCHABLE'
-            )
+        if (whereClause.column) {
+            this.validateColumn(whereClause.column.name, tableConfig);
         }
 
         // Build the query
-        const query: any = {}
+        const query: any = {};
 
         // Add condition to the query
-        const condition = await this.buildCondition(whereClause.condition, tableName, whereClause.column?.name)
+        const condition = await this.buildCondition(whereClause.condition, tableName, whereClause.column?.name);
 
         // Execute the query
         try {
@@ -186,341 +209,265 @@ export class QueryExecutor {
             const queryResult = await (prisma as any)[tableName].findMany({
                 where: condition,
                 select: {
-                    [tableConfig.idField]: true
+                    [tableConfig.idField]: true,
                 },
                 orderBy: {
-                    'created_at': 'desc'
-                }
-            })
+                    created_at: 'desc',
+                },
+            });
 
             // Map results to SearchResult objects
             return queryResult.map((item: any) => ({
                 id: item[tableConfig.idField],
-                table: tableName
-            }))
+                table: tableName,
+            }));
         } catch (error) {
             throw new SearchExecutionError(
                 `Error executing query on table ${tableName}: ${error instanceof Error ? error.message : String(error)}`,
-                'QUERY_EXECUTION_ERROR',
-                error
-            )
+                ERROR_CODES.QUERY_EXECUTION_ERROR,
+                error,
+            );
         }
     }
 
     /**
-     * Build a condition object for Prisma from an expression node
-     * @param expr The expression node
-     * @param tableName The current table name
-     * @param columnName Optional column name for column-specific queries
-     * @returns Prisma condition object
+     * Build a Prisma condition object from an expression node
+     * Handles different expression types (AND, OR, EQUALS, etc.) and converts them to Prisma query format
+     * @param expr The expression node to convert
+     * @param tableName The target table name for validation
+     * @param columnName Optional specific column for targeted queries
+     * @returns Promise resolving to Prisma-compatible condition object
+     * @throws SearchExecutionError for unsupported expressions or missing required parameters
      */
-    private async buildCondition(
-        expr: ExpressionNode,
-        tableName: string,
-        columnName?: string
-    ): Promise<any> {
-        const tableConfig = VALID_TABLES[tableName]
+    private async buildCondition(expr: ExpressionNode, tableName: string, columnName?: string): Promise<any> {
+        const tableConfig = VALID_TABLES[tableName];
 
         switch (expr.type) {
             case NodeType.AND_EXPR: {
-                const andExpr = expr as AndExprNode
-                const leftCondition = await this.buildCondition(andExpr.left, tableName, columnName)
-                const rightCondition = await this.buildCondition(andExpr.right, tableName, columnName)
+                const andExpr = expr as AndExprNode;
+                const leftCondition = await this.buildCondition(andExpr.left, tableName, columnName);
+                const rightCondition = await this.buildCondition(andExpr.right, tableName, columnName);
 
                 return {
-                    AND: [leftCondition, rightCondition]
-                }
+                    AND: [leftCondition, rightCondition],
+                };
             }
 
             case NodeType.OR_EXPR: {
-                const orExpr = expr as OrExprNode
-                const leftCondition = await this.buildCondition(orExpr.left, tableName, columnName)
-                const rightCondition = await this.buildCondition(orExpr.right, tableName, columnName)
+                const orExpr = expr as OrExprNode;
+                const leftCondition = await this.buildCondition(orExpr.left, tableName, columnName);
+                const rightCondition = await this.buildCondition(orExpr.right, tableName, columnName);
 
                 return {
-                    OR: [leftCondition, rightCondition]
-                }
+                    OR: [leftCondition, rightCondition],
+                };
             }
 
             case NodeType.NOT_EXPR: {
-                const notExpr = expr as NotExprNode
-                const condition = await this.buildCondition(notExpr.expr, tableName, columnName)
+                const notExpr = expr as NotExprNode;
+                const condition = await this.buildCondition(notExpr.expr, tableName, columnName);
 
                 return {
-                    NOT: condition
-                }
+                    NOT: condition,
+                };
             }
 
             case NodeType.EQUALS_EXPR: {
-                const equalsExpr = expr as EqualsExprNode
-                const value = this.getLiteralValue(equalsExpr.value)
+                const equalsExpr = expr as EqualsExprNode;
+                const value = this.getLiteralValue(equalsExpr.value);
 
                 if (columnName) {
-                    // Column-specific query
-                    return {
-                        [columnName]: value
-                    }
+                    return this.buildColumnCondition(columnName, value, tableConfig);
                 } else {
-                    // Full-text search across all searchable fields
-                    return {
-                        OR: tableConfig.searchableFields.map(field => {
-                            // For UUID fields like 'id', we need to use a different approach
-                            // if (field === 'id') {
-                            //   return {
-                            //     [field]: {
-                            //       equals: String(value)
-                            //     }
-                            //   };
-                            // }
-                            // For fields that might not support contains with mode
-                            if (field === 'content_type') {
-                                return {
-                                    [field]: {
-                                        equals: String(value)
-                                    }
-                                }
-                            }
-                            // For other text fields, use contains with insensitive mode
-                            return {
-                                [field]: {
-                                    contains: String(value),
-                                    mode: 'insensitive'
-                                }
-                            }
-                        })
-                    }
+                    return this.buildFullTextSearch(value, tableConfig);
                 }
             }
 
             case NodeType.GREATER_THAN_EXPR: {
-                const gtExpr = expr as GreaterThanExprNode
-                const value = this.getLiteralValue(gtExpr.value)
+                const gtExpr = expr as GreaterThanExprNode;
+                const value = this.getLiteralValue(gtExpr.value);
 
                 if (!columnName) {
-                    throw new SearchExecutionError(
-                        'Column name is required for comparison operators',
-                        'MISSING_COLUMN'
-                    )
+                    throw new SearchExecutionError('Column name is required for comparison operators', ERROR_CODES.MISSING_COLUMN);
                 }
 
                 return {
                     [columnName]: {
-                        gt: value
-                    }
-                }
+                        gt: value,
+                    },
+                };
             }
 
             case NodeType.LESS_THAN_EXPR: {
-                const ltExpr = expr as LessThanExprNode
-                const value = this.getLiteralValue(ltExpr.value)
+                const ltExpr = expr as LessThanExprNode;
+                const value = this.getLiteralValue(ltExpr.value);
 
                 if (!columnName) {
-                    throw new SearchExecutionError(
-                        'Column name is required for comparison operators',
-                        'MISSING_COLUMN'
-                    )
+                    throw new SearchExecutionError('Column name is required for comparison operators', ERROR_CODES.MISSING_COLUMN);
                 }
 
                 return {
                     [columnName]: {
-                        lt: value
-                    }
-                }
+                        lt: value,
+                    },
+                };
             }
 
             case NodeType.GREATER_THAN_EQUALS_EXPR: {
-                const gteExpr = expr as GreaterThanEqualsExprNode
-                const value = this.getLiteralValue(gteExpr.value)
+                const gteExpr = expr as GreaterThanEqualsExprNode;
+                const value = this.getLiteralValue(gteExpr.value);
 
                 if (!columnName) {
-                    throw new SearchExecutionError(
-                        'Column name is required for comparison operators',
-                        'MISSING_COLUMN'
-                    )
+                    throw new SearchExecutionError('Column name is required for comparison operators', ERROR_CODES.MISSING_COLUMN);
                 }
 
                 return {
                     [columnName]: {
-                        gte: value
-                    }
-                }
+                        gte: value,
+                    },
+                };
             }
 
             case NodeType.LESS_THAN_EQUALS_EXPR: {
-                const lteExpr = expr as LessThanEqualsExprNode
-                const value = this.getLiteralValue(lteExpr.value)
+                const lteExpr = expr as LessThanEqualsExprNode;
+                const value = this.getLiteralValue(lteExpr.value);
 
                 if (!columnName) {
-                    throw new SearchExecutionError(
-                        'Column name is required for comparison operators',
-                        'MISSING_COLUMN'
-                    )
+                    throw new SearchExecutionError('Column name is required for comparison operators', ERROR_CODES.MISSING_COLUMN);
                 }
 
                 return {
                     [columnName]: {
-                        lte: value
-                    }
-                }
+                        lte: value,
+                    },
+                };
             }
 
             case NodeType.BETWEEN_EXPR: {
-                const betweenExpr = expr as BetweenExprNode
-                const startValue = this.getLiteralValue(betweenExpr.start)
-                const endValue = this.getLiteralValue(betweenExpr.end)
+                const betweenExpr = expr as BetweenExprNode;
+                const startValue = this.getLiteralValue(betweenExpr.start);
+                const endValue = this.getLiteralValue(betweenExpr.end);
 
                 if (!columnName) {
-                    throw new SearchExecutionError(
-                        'Column name is required for BETWEEN operator',
-                        'MISSING_COLUMN'
-                    )
+                    throw new SearchExecutionError('Column name is required for BETWEEN operator', ERROR_CODES.MISSING_COLUMN);
                 }
 
                 return {
                     [columnName]: {
                         gte: startValue,
-                        lte: endValue
-                    }
-                }
+                        lte: endValue,
+                    },
+                };
             }
 
             case NodeType.EXISTS_EXPR: {
                 if (!columnName) {
-                    throw new SearchExecutionError(
-                        'Column name is required for EXISTS operator',
-                        'MISSING_COLUMN'
-                    )
+                    throw new SearchExecutionError('Column name is required for EXISTS operator', ERROR_CODES.MISSING_COLUMN);
                 }
 
                 return {
                     [columnName]: {
-                        not: null
-                    }
-                }
+                        not: null,
+                    },
+                };
             }
 
             case NodeType.WILDCARD_EXPR: {
-                const wildcardExpr = expr as WildcardExprNode
-                const pattern = wildcardExpr.pattern
+                const wildcardExpr = expr as WildcardExprNode;
+                const pattern = wildcardExpr.pattern;
 
                 // Convert wildcard pattern to regex pattern
-                const regexPattern = pattern
-                    .replace(/\*/g, '.*')
-                    .replace(/\?/g, '.')
+                const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.');
 
                 if (columnName) {
                     // Column-specific query
                     return {
                         [columnName]: {
                             contains: pattern.replace(/\*/g, ''),
-                            mode: 'insensitive'
-                        }
-                    }
+                            mode: 'insensitive',
+                        },
+                    };
                 } else {
                     // Full-text search across all searchable fields
                     return {
-                        OR: tableConfig.searchableFields.map(field => ({
+                        OR: tableConfig.searchableFields.map((field) => ({
                             [field]: {
                                 contains: pattern.replace(/\*/g, ''),
-                                mode: 'insensitive'
-                            }
-                        }))
-                    }
+                                mode: 'insensitive',
+                            },
+                        })),
+                    };
                 }
             }
 
             case NodeType.FUZZY_EXPR: {
-                const fuzzyExpr = expr as FuzzyExprNode
-                const term = fuzzyExpr.term
-                const distance = fuzzyExpr.distance
+                const fuzzyExpr = expr as FuzzyExprNode;
+                const term = fuzzyExpr.term;
+                const distance = fuzzyExpr.distance;
 
-                // For fuzzy matching, we'll use a simplified approach with contains
-                // A more sophisticated implementation would use a proper fuzzy matching algorithm
                 if (columnName) {
-                    // Column-specific query
-                    return {
-                        [columnName]: {
-                            contains: term,
-                            mode: 'insensitive'
-                        }
-                    }
+                    return this.buildColumnCondition(columnName, term, tableConfig);
                 } else {
-                    // Full-text search across all searchable fields
-                    return {
-                        OR: tableConfig.searchableFields.map(field => ({
-                            [field]: {
-                                contains: term,
-                                mode: 'insensitive'
-                            }
-                        }))
-                    }
+                    return this.buildFullTextSearch(term, tableConfig);
                 }
             }
 
             case NodeType.EXACT_EXPR: {
-                const exactExpr = expr as ExactExprNode
-                const term = exactExpr.term
+                const exactExpr = expr as ExactExprNode;
+                const term = exactExpr.term;
 
                 if (columnName) {
                     // Column-specific query
                     return {
-                        [columnName]: term
-                    }
+                        [columnName]: term,
+                    };
                 } else {
                     // Full-text search across all searchable fields
                     return {
-                        OR: tableConfig.searchableFields.map(field => ({
-                            [field]: term
-                        }))
-                    }
+                        OR: tableConfig.searchableFields.map((field) => ({
+                            [field]: term,
+                        })),
+                    };
                 }
             }
 
             case NodeType.CASE_EXPR: {
-                const caseExpr = expr as CaseExprNode
+                const caseExpr = expr as CaseExprNode;
                 // This will be used to set the mode for subsequent queries
                 // Since we're not actually executing this directly, we'll return a placeholder
-                return {}
+                return {};
             }
 
             case NodeType.WHERE_CLAUSE: {
                 // Handle nested query
-                const nestedResults = await this.executeWhereClause(expr as WhereClauseNode)
+                const nestedResults = await this.executeWhereClause(expr as WhereClauseNode);
 
                 // Extract IDs from nested results
-                const nestedIds = nestedResults.map(result => result.id)
+                const nestedIds = nestedResults.map((result) => result.id);
 
                 // Use the IDs to filter the current table
                 if (columnName) {
                     return {
                         [columnName]: {
-                            in: nestedIds
-                        }
-                    }
+                            in: nestedIds,
+                        },
+                    };
                 } else {
                     return {
                         id: {
-                            in: nestedIds
-                        }
-                    }
+                            in: nestedIds,
+                        },
+                    };
                 }
             }
 
             default:
-                throw new SearchExecutionError(
-                    `Unsupported expression type: ${expr.type}`,
-                    'UNSUPPORTED_EXPRESSION'
-                )
+                throw new SearchExecutionError(`Unsupported expression type: ${expr.type}`, 'UNSUPPORTED_EXPRESSION');
         }
     }
 
-    /**
-     * Get the value from a literal node
-     * @param node The literal node
-     * @returns The literal value
-     */
-    private getLiteralValue(node: StringLiteralNode | NumberLiteralNode | BooleanLiteralNode): any {
-        return node.value
+    private getLiteralValue(node: StringLiteralNode | NumberLiteralNode | BooleanLiteralNode): string | number | boolean {
+        return node.value;
     }
 
     /**
@@ -530,51 +477,125 @@ export class QueryExecutor {
      * @returns Sorted search results
      */
     private applySorting(results: SearchResult[], sortExpr: SortExprNode): SearchResult[] {
-        const field = sortExpr.field
-        const direction = sortExpr.direction
+        const field = sortExpr.field;
+        const direction = sortExpr.direction;
 
         // Sort the results
         return [...results].sort((a, b) => {
             if (field === 'id') {
                 // Sort by ID
-                return direction === 'ASC'
-                    ? a.id.localeCompare(b.id)
-                    : b.id.localeCompare(a.id)
+                return direction === 'ASC' ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id);
             } else if (field === 'table') {
                 // Sort by table name
-                return direction === 'ASC'
-                    ? a.table.localeCompare(b.table)
-                    : b.table.localeCompare(a.table)
+                return direction === 'ASC' ? a.table.localeCompare(b.table) : b.table.localeCompare(a.table);
             } else if (field === 'score' && a.score !== undefined && b.score !== undefined) {
                 // Sort by score
-                return direction === 'ASC'
-                    ? a.score - b.score
-                    : b.score - a.score
+                return direction === 'ASC' ? a.score - b.score : b.score - a.score;
             }
 
             // Default sort by ID
-            return direction === 'ASC'
-                ? a.id.localeCompare(b.id)
-                : b.id.localeCompare(a.id)
-        })
+            return direction === 'ASC' ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id);
+        });
     }
 
-    /**
-     * Store a named query
-     * @param name The name of the query
-     * @param query The query node
-     */
+    private validateTable(tableName: string): void {
+        if (!VALID_TABLES[tableName as ValidTableName]) {
+            throw new SearchExecutionError(`Invalid table name: ${tableName}`, ERROR_CODES.INVALID_TABLE);
+        }
+
+        if (this.allowedTables && !this.allowedTables.has(tableName)) {
+            throw new SearchExecutionError(`Table '${tableName}' is not in the allowed tables list`, ERROR_CODES.TABLE_NOT_ALLOWED);
+        }
+    }
+
+    private validateColumn(columnName: string, tableConfig: TableConfig): void {
+        const isSearchable = tableConfig.searchableFields.some((field) => {
+            if (field.startsWith('uuid:')) {
+                return field.slice(5) === columnName;
+            }
+            return field === columnName;
+        });
+
+        if (!isSearchable) {
+            throw new SearchExecutionError(`Column '${columnName}' is not searchable`, ERROR_CODES.COLUMN_NOT_SEARCHABLE);
+        }
+    }
+
+    private isUuidField(fieldName: string, tableConfig: TableConfig): boolean {
+        return tableConfig.searchableFields.includes(`uuid:${fieldName}`);
+    }
+
+    private buildColumnCondition(columnName: string, value: any, tableConfig: TableConfig): any {
+        if (this.isUuidField(columnName, tableConfig)) {
+            if (isValidUUID(String(value))) {
+                return {
+                    [columnName]: {
+                        equals: String(value),
+                    },
+                };
+            }
+            return null;
+        }
+
+        if (columnName === 'content_type') {
+            return {
+                [columnName]: {
+                    equals: String(value),
+                },
+            };
+        }
+
+        return {
+            [columnName]: {
+                contains: String(value),
+                mode: 'insensitive',
+            },
+        };
+    }
+
+    private buildFullTextSearch(value: any, tableConfig: TableConfig): any {
+        const conditions = tableConfig.searchableFields
+            .map((field) => {
+                const isUuidField = field.startsWith('uuid:');
+                const actualFieldName = isUuidField ? field.slice(5) : field;
+
+                if (isUuidField) {
+                    if (isValidUUID(String(value))) {
+                        return {
+                            [actualFieldName]: {
+                                equals: String(value),
+                            },
+                        };
+                    }
+                    return null;
+                }
+
+                if (actualFieldName === 'content_type') {
+                    return {
+                        [actualFieldName]: {
+                            equals: String(value),
+                        },
+                    };
+                }
+
+                return {
+                    [actualFieldName]: {
+                        contains: String(value),
+                        mode: 'insensitive',
+                    },
+                };
+            })
+            .filter((condition) => condition !== null);
+
+        return conditions.length > 0 ? { OR: conditions } : {};
+    }
+
     storeNamedQuery(name: string, query: QueryNode): void {
-        this.namedQueries.set(name, query)
+        this.namedQueries.set(name, query);
     }
 
-    /**
-     * Get a named query
-     * @param name The name of the query
-     * @returns The query node or undefined if not found
-     */
     getNamedQuery(name: string): QueryNode | undefined {
-        return this.namedQueries.get(name)
+        return this.namedQueries.get(name);
     }
 }
 
@@ -585,6 +606,6 @@ export class QueryExecutor {
  * @returns Array of search results (UUIDs)
  */
 export async function executeQuery(query: QueryNode, allowedTables?: string[]): Promise<SearchResult[]> {
-    const executor = new QueryExecutor(allowedTables)
-    return await executor.execute(query)
+    const executor = new QueryExecutor(allowedTables);
+    return await executor.execute(query);
 }

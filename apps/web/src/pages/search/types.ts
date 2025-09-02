@@ -35,11 +35,22 @@ export interface SearchResult {
 }
 
 export interface SearchApiResponse {
-    results: {
+    data: {
         profiles: SearchResult[]
         packs: SearchResult[]
         posts: SearchResult[]
     }
+    count: number
+    query: string
+}
+
+// Raw API response that can be either object or array
+export interface RawSearchApiResponse {
+    data: {
+        profiles: SearchResult[]
+        packs: SearchResult[]
+        posts: SearchResult[]
+    } | SearchResult[] // Can be an array when there's only one allowed table
     count: number
     query: string
 }
