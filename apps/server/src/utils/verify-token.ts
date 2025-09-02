@@ -22,7 +22,8 @@ export default async function verifyToken(req: any) {
 
             if (!user.sub) {
                 console.log('URGENT: Creating new user profile for ', user.userId);
-                const emailHash = await Bun.password.hash(user.sessionClaims.email.trim().toLowerCase());
+                console.log(user);
+                const emailHash = user.sessionClaims?.email ? await Bun.password.hash(user.sessionClaims?.email?.trim().toLowerCase()) : 'ENULL';
                 // Check user email in invites
                 let isInvited = null;
 
