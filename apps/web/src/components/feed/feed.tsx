@@ -334,9 +334,9 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', 
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
                             <div className="md:col-span-3">
                                 <Text className="text-sm">
-                                    UI v8 is close to being ready, and we'd like to test an experimental feed. Your feed will be split into
-                                    different categories, with more emphasis around Packs. Additionally, howl cards will be tweaked
-                                    slightly.
+                                    UI v8 is close to being ready, and we'd like to temporarily test an experimental feed on release. Your
+                                    feed will be split into different categories, with more emphasis around Packs. Additionally, howl cards
+                                    will be tweaked slightly.
                                 </Text>
 
                                 <div className="mt-4">
