@@ -15,6 +15,7 @@ import FeedEmpty from './feed-empty'
 import FeedMaintenance from './feed-maintenance'
 import FeedError from './feed-error'
 import FloatingComposeButton from './floating-compose-button'
+import useWindowSize from '@/lib/hooks/use-window-size.ts'
 
 // Define reducer for feed state management
 type FeedAction =
@@ -79,6 +80,8 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', 
     const isMountedRef = useRef(false)
     const fetchCompletedRef = useRef(false)
     const prevPackIDRef = useRef(packID)
+
+    const { isMobile } = useWindowSize()
 
     const [state, dispatch] = useReducer(feedReducer, {
         posts: [],
@@ -318,6 +321,8 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', 
         <div className="relative pb-20">
             {/* Main content area */}
             {content}
+
+            {!isMobile && <FloatingComposeButton />}
         </div>
     )
 }
