@@ -109,13 +109,8 @@ Thanks for being a crucial part of the internet.
             <SidebarProvider>
                 <Console />
 
-                <div className="absolute bottom-0 left-0 z-40 w-full h-12 bg-sidebar sm:hidden">
-                    <div className="flex items-center justify-center h-full">
-                        <Text size="xs" className="text-center">
-                            Mobile is unsupported! We won't take bug reports for mobile during the alpha. A mobile app is being worked on
-                            and coming soon.
-                        </Text>
-                    </div>
+                <div className="absolute bottom-0 left-0 z-40 w-full sm:hidden">
+                    <AppTabs className="border-0 !rounded-none !rounded-t-md ring-1 ring-default items-center justify-center" />
                 </div>
 
                 <SidebarLayout>

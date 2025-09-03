@@ -318,9 +318,6 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', 
         <div className="relative pb-20">
             {/* Main content area */}
             {content}
-
-            {/* Floating compose button */}
-            <FloatingComposeButton />
         </div>
     )
 }

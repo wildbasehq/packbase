@@ -199,7 +199,7 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
                                 <motion.div
                                     variants={{
                                         initial: { width: 0, opacity: 0 },
-                                        animate: { width: '24rem', opacity: 1 },
+                                        animate: { width: '100%', opacity: 1 },
                                         exit: { width: 0, opacity: 0 },
                                     }}
                                     initial="initial"
@@ -209,7 +209,7 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
                                     className="overflow-hidden whitespace-nowrap relative z-[2]"
                                     layout
                                 >
-                                    <SearchBox />
+                                    <SearchBox inAppTab />
                                 </motion.div>
                             )}
                         </AnimatePresence>

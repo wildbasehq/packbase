@@ -10,9 +10,10 @@ interface SearchBoxProps {
     placeholder?: string
     onSearch?: (value: string) => void
     autoFocus?: boolean
+    inAppTab?: boolean
 }
 
-export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = true }: SearchBoxProps) {
+export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = true, inAppTab }: SearchBoxProps) {
     const { query, setQuery } = useSearch()
     const inputRef = React.useRef<HTMLInputElement>(null)
 
@@ -68,8 +69,9 @@ export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = tru
         <form
             onSubmit={handleSubmit}
             className={cn(
-                'w-full [&>div]:w-full flex items-center ring-1 shadow-xs ring-default rounded-xl px-4 py-2 !text-lg transition-colors font-medium duration-300 !h-12 z-[1]',
-                gradientBorderAnimationClass,
+                'w-full [&>div]:w-full flex items-center rounded-xl !text-lg transition-colors font-medium duration-300 z-[1]',
+                inAppTab ? 'px-0 py-0' : 'px-4 py-2 !h-12 ring-1 shadow-xs ring-default',
+                inAppTab ?? gradientBorderAnimationClass,
                 query?.startsWith('[')
                     ? `after:opacity-100
                             ${gradientDirection === 'forward' ? 'after:bg-[position:100%_100%]' : 'after:bg-[position:0_0]'}
@@ -77,7 +79,7 @@ export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = tru
                     : ''
             )}
         >
-            <div className="bg-card absolute inset-0 w-full h-full z-[1] rounded transition-opacity duration-300" />
+            {!inAppTab && <div className="absolute inset-0 w-full h-full z-[1] rounded transition-opacity duration-300" />}
             <Input
                 combined
                 ref={inputRef}
@@ -86,7 +88,7 @@ export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = tru
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 className="w-full focus-within:!ring-0 !bg-transparent z-[2] !max-w-full"
-                inputClassName="pl-8 w-full"
+                inputClassName={cn('w-full', !inAppTab ? 'pl-8 w-full' : '')}
             />
         </form>
     )

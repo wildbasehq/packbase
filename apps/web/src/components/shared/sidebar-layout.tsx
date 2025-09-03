@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 import { useResourceStore } from '@/lib/state'
 import { NavbarItem } from '@/components/layout'
 import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher.tsx'
-import UserSidebar from '@/components/layout/user-sidebar.tsx'
+import UserSidebar, { UserActionsContainer } from '@/components/layout/user-sidebar.tsx'
 import cx from 'classnames'
 import { useSidebar } from '@/lib/context/sidebar-context'
 import ResourceSwitcher from '@/components/layout/resource-switcher'
@@ -25,15 +25,13 @@ import {
     SidebarSection,
     SidebarSpacer,
 } from '@/src/components'
-import { QuestionMarkCircleIcon, ShieldExclamationIcon, SparklesIcon } from '@heroicons/react/20/solid'
+import { QuestionMarkCircleIcon, SparklesIcon } from '@heroicons/react/20/solid'
 import { FaceSmileIcon } from '@heroicons/react/16/solid'
 import { SiDiscord } from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 import { useSession } from '@clerk/clerk-react'
-import { XIcon } from 'lucide-react'
 import { cn } from '@/lib'
-import { Text } from '@/components/shared/text.tsx'
-import Markdown from '@/components/shared/markdown.tsx'
+import useWindowSize from '@/lib/hooks/use-window-size.ts'
 
 function OpenMenuIcon() {
     return (
@@ -80,6 +78,7 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
     // const [showVGSNotice, setShowVGSNotice] = useState(true)
     const { isSignedIn } = useSession()
     const { sidebarContent } = useSidebar()
+    const { isMobile } = useWindowSize()
     // const [location] = useLocation()
     // const isStuffPage = location === '/stuff'
 
@@ -127,17 +126,19 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
                     <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                 </MobileSidebar>
 
-                {/* Navbar on mobile */}
-                <header className="flex items-center px-4 lg:hidden z-10">
-                    <div className="py-2.5">
-                        <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
-                            <OpenMenuIcon />
-                        </NavbarItem>
-                    </div>
-                </header>
-
                 {/* Content */}
                 <div className="flex flex-col flex-1 relative">
+                    {/* Navbar on mobile */}
+                    <header className="flex items-center px-4 gap-4 lg:hidden z-10">
+                        <div className="py-2.5">
+                            <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
+                                <OpenMenuIcon />
+                            </NavbarItem>
+                        </div>
+                        <div className="flex gap-4 w-full">
+                            <UserActionsContainer />
+                        </div>
+                    </header>
                     {/*<div className="hidden lg:block">{navbar}</div>*/}
                     {/*{isStuffPage && <YourStuffPage />}*/}
                     <main className={`py-2 lg:min-w-0 lg:pr-2 ${isSignedIn ? 'lg:pl-18' : 'lg:pl-2'}`}>
@@ -169,7 +170,7 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
                         {/*>*/}
 
                         <div className="relative h-[calc(100vh-1rem)] flex overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-                            {isSignedIn && (
+                            {isSignedIn && !isMobile && (
                                 <div className="top-0 backdrop-blur border-r h-full flex z-10">
                                     <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                                 </div>

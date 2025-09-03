@@ -68,28 +68,7 @@ export default function UserSidebar() {
                             )}
                         </div>
 
-                        {!collapsed && (
-                            <>
-                                {/* Search button */}
-                                <Link
-                                    href="/search"
-                                    className={cn(
-                                        'relative flex text-default flex-grow items-center py-1.5 px-2 rounded-lg border before:shadow-none isolate border-optical',
-                                        ButtonStyles.colors.light
-                                    )}
-                                >
-                                    <div className="mr-1.5">
-                                        <MagnifyingGlassIcon className="w-3 h-3" />
-                                    </div>
-                                    <Text size="sm">Search</Text>
-                                </Link>
-
-                                {/* User avatar */}
-                                <div className="flex justify-end items-center">
-                                    <DropdownComponent />
-                                </div>
-                            </>
-                        )}
+                        {!collapsed && <UserActionsContainer />}
                     </div>
                 </div>
                 <div className={!collapsed ? 'flex flex-col px-4 pb-8 h-full' : 'relative flex flex-col justify-center items-center mt-3'}>
@@ -98,6 +77,31 @@ export default function UserSidebar() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export function UserActionsContainer() {
+    return (
+        <>
+            {/* Search button */}
+            <Link
+                href="/search"
+                className={cn(
+                    'relative flex text-default flex-grow items-center py-1.5 px-2 rounded-lg border before:shadow-none isolate border-optical',
+                    ButtonStyles.colors.light
+                )}
+            >
+                <div className="mr-1.5">
+                    <MagnifyingGlassIcon className="w-3 h-3" />
+                </div>
+                <Text size="sm">Search</Text>
+            </Link>
+
+            {/* User avatar */}
+            <div className="flex justify-end items-center">
+                <DropdownComponent />
+            </div>
+        </>
     )
 }
 

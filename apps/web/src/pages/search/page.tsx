@@ -15,6 +15,7 @@ import { MagnifyingGlassCircleIcon, RectangleStackIcon, UserGroupIcon, UsersIcon
 import { SignedIn } from '@clerk/clerk-react'
 import { SearchBox } from '@/components/shared/search-box.tsx'
 import { Button } from '@/components/shared/experimental-button-rework.tsx'
+import useWindowSize from '@/lib/hooks/use-window-size.ts'
 
 // Array of greeting messages to randomly display
 const greetings = [
@@ -61,6 +62,7 @@ export default function Search() {
     const [error, setError] = useState<string | null>(null)
     const [greeting, setGreeting] = useState<string>('')
     const [activeCategory, setActiveCategory] = useState('Everything')
+    const { isMobile } = useWindowSize()
 
     // Debounce the search query with 3 seconds delay
     const [debouncedQuery] = useDebounce<string>(query, 500)
@@ -179,7 +181,7 @@ export default function Search() {
             <div className="sticky top-0 z-10 backdrop-blur-sm border-b pb-4">
                 <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
                     <h1 className="text-2xl font-medium mb-4">{greeting}</h1>
-                    <SearchBox />
+                    {!isMobile && <SearchBox />}
 
                     {/* Active filters/info display */}
                     {query && (
