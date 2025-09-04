@@ -132,3 +132,17 @@
   max-width: 100%;
   overflow: visible;
 }
+
+@layer utilities {
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-show::-webkit-scrollbar {
+        display: block;
+    }
+}

@@ -8,6 +8,10 @@ export interface Theme {
     html: string
     css: string
     is_active?: boolean
+    pack_id?: string
+    user_id?: string
+    created_at?: string
+    updated_at?: string
 }
 
 // Validation result from the API

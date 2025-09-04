@@ -323,41 +323,10 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', 
 
     return (
         <div className="relative pb-20">
-            <div className="flex flex-col items-center justify-center pb-12">
-                <Alert className="max-w-2xl shadow-xs">
-                    <AlertTitle className="flex items-center gap-2">
-                        <WrenchScrewdriverIcon className="h-5 w-5" />
-                        Your feed is getting split up!
-                    </AlertTitle>
-
-                    <AlertDescription className="mt-2">
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
-                            <div className="md:col-span-3">
-                                <Text className="text-sm">
-                                    UI v8 is close to being ready, and we'd like to temporarily test an experimental feed on release. Your
-                                    feed will be split into different categories, with more emphasis around Packs. Additionally, howl cards
-                                    will be tweaked slightly.
-                                </Text>
-
-                                <div className="mt-4">
-                                    <Button color="indigo" href="https://discord.gg/StuuK55gYA" target="_blank">
-                                        Feedback via Discord
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-end pr-12 md:col-span-2">
-                                <img src={WrenchCharacter} alt="Maintenance character" className="h-42 w-auto" />
-                            </div>
-                        </div>
-                    </AlertDescription>
-                </Alert>
-            </div>
-
             {/* Main content area */}
             {content}
 
-            {!isMobile && <FloatingComposeButton />}
+            {/*{!isMobile && <FloatingComposeButton />}*/}
         </div>
     )
 }

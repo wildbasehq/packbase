@@ -17,15 +17,23 @@ export function Heading({
     as,
     children,
     size = 'base',
+    alt,
     ...props
 }: {
     as?: React.ElementType
     children?: React.ReactNode
     size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl'
+    alt?: boolean
     [key: string]: any
 }): JSX.Element {
     const Comp = as || 'h1'
-    props.className = cn('text-default select-none', props.className, textSize[size], 'font-medium leading-none tracking-tight')
+    props.className = cn(
+        'select-none',
+        props.className,
+        textSize[size],
+        'font-medium leading-none tracking-tight',
+        alt ? 'text-muted-foreground' : 'text-default'
+    )
     return <Comp {...props}>{children}</Comp>
 }
 

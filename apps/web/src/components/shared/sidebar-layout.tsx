@@ -83,7 +83,7 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
     // const isStuffPage = location === '/stuff'
 
     return (
-        <div className="w-full bg-white isolate min-h-svh max-lg:flex-col lg:bg-zinc-100 dark:bg-zinc-900 dark:lg:bg-zinc-950">
+        <div className="w-full isolate min-h-svh max-lg:flex-col bg-white dark:bg-primary-midnight md:bg-primary-midnight">
             {/*{showVGSNotice && (*/}
             {/*    <div className="top-0 z-50 mx-2 my-2">*/}
             {/*        <div className="bg-amber-50 border-2 ring-2 ring-amber-500/10 border-amber-500 p-4 rounded-md shadow-sm dark:bg-amber-900/20 dark:border-amber-600">*/}
@@ -169,9 +169,9 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
                         {/*    }}*/}
                         {/*>*/}
 
-                        <div className="relative h-[calc(100vh-1rem)] flex overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
+                        <div className="relative h-[calc(100vh-1rem)] !z-10 flex overflow-hidden grow lg:rounded-lg lg:rounded-br-none lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-n-8 dark:lg:ring-white/10">
                             {isSignedIn && !isMobile && (
-                                <div className="top-0 backdrop-blur border-r h-full flex z-10">
+                                <div className="top-0 backdrop-blur border-r h-full flex z-20">
                                     <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                                 </div>
                             )}

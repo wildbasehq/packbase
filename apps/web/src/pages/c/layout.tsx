@@ -6,13 +6,34 @@ import { SidebarPortal } from '@/lib/context/sidebar-context.tsx'
 import { SidebarDivider, SidebarItem, SidebarLabel, SidebarSection, Button, Input, BadgeButton } from '@/src/components'
 import ContentFrame, { useContentFrame, useContentFrameMutation } from '@/components/shared/content-frame.tsx'
 import { Avatar } from '@/components/shared/avatar.tsx'
-import { useLocation } from 'wouter'
-import { useMemo, useState } from 'react'
+import { useLocation, useParams } from 'wouter'
+import { useEffect, useMemo, useState } from 'react'
 import { Text } from '@/components/shared/text.tsx'
 import { usePerformanceMonitor } from '@/components/chat/usePerformanceMonitor.ts'
 import { useQueryClient } from '@tanstack/react-query'
+import { useUserAccountStore } from '@/lib'
+import { HomeModernIcon } from '@heroicons/react/24/solid'
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
+    const { id } = useParams<{ id: string }>()
+    const [, setLocation] = useLocation()
+    const queryClient = useQueryClient()
+
+    const createChannel = useContentFrameMutation('post', 'dm/channels', {
+        onSuccess: channel => {
+            setLocation(`/${channel.id}`)
+            queryClient.invalidateQueries({ queryKey: ['channels'] })
+        },
+    })
+
+    const startDM = async (userId: string) => {
+        createChannel.mutate({ userId })
+    }
+
+    useEffect(() => {
+        if (id?.startsWith('sw:')) startDM(id.replace('sw:', ''))
+    }, [id])
+
     return (
         <>
             <SidebarPortal>
@@ -94,9 +115,9 @@ function ChannelsList() {
                 return (
                     <SidebarItem key={c.id} href={`/c/${c.id}`}>
                         <div className="flex justify-between items-center w-full">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 w-full">
                                 <Avatar src={avatarSrc} alt={name} initials={avatarSrc ? undefined : initials} className="size-6" />
-                                <div className="flex flex-col min-w-0 flex-1">
+                                <div className="flex flex-col min-w-0 flex-1 overflow-hidden wrap-break-word w-full">
                                     <SidebarLabel>{name}</SidebarLabel>
                                     {c.last_message?.content ? (
                                         <SidebarLabel className="text-muted-foreground truncate">{c.last_message.content}</SidebarLabel>
@@ -114,8 +135,8 @@ function ChannelsList() {
 
 function NewDMForm() {
     const [, setLocation] = useLocation()
-    const [username, setUsername] = useState('')
     const queryClient = useQueryClient()
+    const { user } = useUserAccountStore()
 
     const createChannel = useContentFrameMutation('post', 'dm/channels', {
         onSuccess: channel => {
@@ -128,51 +149,20 @@ function NewDMForm() {
         createChannel.mutate({ userId })
     }
 
-    const { refetch: fetchUser } = useContentFrame('get', `user/${encodeURIComponent(username.trim())}`, undefined, {
-        enabled: false,
-    })
-
-    const { refetch: fetchMe } = useContentFrame('get', 'user/me', undefined, {
-        enabled: false,
-    })
-
-    const onSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!username.trim()) return
-
-        try {
-            const { data: profile } = await fetchUser()
-            if (!profile?.id) throw new Error('invalid user')
-            await startDM(profile.id)
-            setUsername('')
-        } catch (_) {
-            // TODO: surface error to user later
-        }
-    }
-
     const onSelfDM = async () => {
         try {
-            const { data: meData } = await fetchMe()
-            if (!meData?.id) throw new Error('invalid me')
-            await startDM(meData.id)
+            if (!user?.id) throw new Error('invalid me')
+            await startDM(user.id)
         } catch (_) {
             // no-op
         }
     }
 
     return (
-        <form onSubmit={onSubmit} className="mb-3 space-y-2">
-            <Text alt size="xs">
-                A dirty way to start a DM, for now
-            </Text>
-            {/* debug input to force dm creation */}
-            <Input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
-            <Button color="indigo" type="submit" className="w-full" disabled={createChannel.isPending}>
-                Start DM
-            </Button>
+        <div className="mb-3 space-y-2">
             <Button outline className="w-full" type="button" onClick={onSelfDM} disabled={createChannel.isPending}>
-                Jump to Your Basecamp
+                <HomeModernIcon data-slot="icon" /> Your Basecamp
             </Button>
-        </form>
+        </div>
     )
 }

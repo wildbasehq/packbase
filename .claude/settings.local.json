@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm run check-types:*)",
       "Bash(bun run:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(turbo check-types:*)"
     ],
     "deny": [],
     "ask": []

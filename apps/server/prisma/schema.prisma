@@ -35,6 +35,7 @@ model packs {
   packs_memberships packs_memberships[]
   packs_pages       packs_pages[]
   posts             posts[]
+  pack_themes       pack_themes[]
 
   @@index([owner_id])
   @@schema("public")
@@ -189,6 +190,25 @@ model user_themes {
 
   @@index([user_id], type: Hash)
   @@map("user.themes")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model pack_themes {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  pack_id    String   @db.Uuid
+  name       String
+  html       String
+  css        String
+  is_active  Boolean  @default(false)
+
+  packs packs @relation(fields: [pack_id], references: [id], onDelete: Cascade)
+
+  @@index([pack_id], type: Hash)
+  @@index([pack_id, is_active])
+  @@map("pack.themes")
   @@schema("public")
 }
 

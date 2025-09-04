@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'wouter'
 import { PackChannels } from '@/src/components'
 import { SidebarPortal } from '@/lib/context/sidebar-context.tsx'
+import { CustomTheme } from '@/components/shared/theme/custom-theme'
 
 export default function PackLayout({ children }: { children: React.ReactNode }) {
     const { resourceDefault, loading, setLoading, setNavigation } = useUIStore()
@@ -168,6 +169,9 @@ export default function PackLayout({ children }: { children: React.ReactNode }) 
                 <PackChannels />
             </SidebarPortal>
 
+            {currentResource && (
+                <CustomTheme packId={currentResource.id} />
+            )}
             {children}
         </>
     )

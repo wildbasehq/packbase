@@ -127,7 +127,8 @@ Thanks for being a crucial part of the internet.
 
                                     <ClerkLoaded>
                                         <Preload>
-                                            <div id="NGRoot" className="h-full overflow-y-auto">
+                                            <div id="NGRoot" className="h-full overflow-y-auto scrollbar-hide">
+                                                <div className="absolute bottom-0 left-0 right-0 h-24 z-10 bg-gradient-to-t from-white to-transparent pointer-events-none dark:from-n-8"></div>
                                                 <WaitlistCheck />
                                                 <SignedOut>
                                                     <div className="flex fixed top-4 z-40 w-full">
@@ -258,21 +259,23 @@ Thanks for being a crucial part of the internet.
                                                     </Route>
 
                                                     <Route path="/c" nest>
-                                                        <ChatLayout>
-                                                            <Switch>
-                                                                <Route path="/">
+                                                        <Switch>
+                                                            <Route path="/">
+                                                                <ChatLayout>
                                                                     <Suspense fallback={<LoadingFallback />}>
                                                                         <NotSelected />
                                                                     </Suspense>
-                                                                </Route>
+                                                                </ChatLayout>
+                                                            </Route>
 
-                                                                <Route path="/:id">
+                                                            <Route path="/:id">
+                                                                <ChatLayout>
                                                                     <Suspense fallback={<LoadingFallback />}>
                                                                         <ChatThreadPage />
                                                                     </Suspense>
-                                                                </Route>
-                                                            </Switch>
-                                                        </ChatLayout>
+                                                                </ChatLayout>
+                                                            </Route>
+                                                        </Switch>
                                                     </Route>
 
                                                     <Route path={/^\/(%40|@)(?<slug>[^\/]+)\/?$/}>

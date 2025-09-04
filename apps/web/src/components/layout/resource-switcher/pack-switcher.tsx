@@ -8,7 +8,7 @@ import { Heading, Text } from '@/components/shared/text'
 import Tooltip, { TooltipTitle } from '@/components/shared/tooltip'
 import { Button } from '@/components/shared/button'
 import UserAvatar from '@/components/shared/user/avatar'
-import { useResourceStore, useUIStore } from '@/lib/state'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import { cn } from '@/lib/utils'
 import { UsersIcon } from '@heroicons/react/20/solid'
 import { PlusIcon } from '@heroicons/react/24/solid'
@@ -22,12 +22,17 @@ import { AnimatePresence, motion } from 'framer-motion'
 export default function PackSwitcher() {
     const { currentResource, setCurrentResource, resources } = useResourceStore()
     const { resourceDefault, loading, setLoading } = useUIStore()
+    const {
+        user: { id: user_id },
+    } = useUserAccountStore()
     const [, navigate] = useLocation()
 
     const switchResource = (resource: any) => {
         if (loading || currentResource.id === resource.id) {
             if (resource.slug === 'universe') navigate('/p/universe')
         }
+
+        resource.is_owner = currentResource.owner_id === user_id
         setCurrentResource(resource)
         setLoading(true)
         navigate(`/p/${resource.slug}`)
@@ -78,7 +83,7 @@ export default function PackSwitcher() {
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.3 }}
-                                    className="absolute inset-0 ring-white/10 -z-1 bg-white dark:bg-zinc-900 h-12 ml-0.5 rounded-tl rounded-bl rounded-out-r w-[calc(3.8rem+1px)] pack-icon-bg"
+                                    className="absolute inset-0 ring-white/10 -z-1 bg-white dark:bg-zinc-900 h-12 rounded-tl rounded-bl rounded-out-r w-[calc(4rem)] pack-icon-bg"
                                 />
                             )}
                         </AnimatePresence>

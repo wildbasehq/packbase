@@ -15,7 +15,7 @@ import LogoutIcon from '@/components/icons/logout'
 import { vg } from '@/lib/api'
 import { toast } from 'sonner'
 import { useModal } from '@/components/modal/provider'
-import { SettingsIcon } from 'lucide-react'
+import { PaletteIcon, SettingsIcon } from 'lucide-react'
 import { Button } from '@/components/shared/button'
 import { ClipboardIcon, UserGroupIcon } from '@heroicons/react/20/solid'
 import { Avatar } from '@/components/shared/avatar'
@@ -23,6 +23,7 @@ import ResourceSettingsGeneral from './pages/general'
 import ResourceSettingsMembers from '@/components/layout/resource-switcher/pages/members.tsx'
 import { VerifiedBadge } from '@/components/layout/resource-switcher/pack-badge.tsx'
 import PagedModal from '@/components/shared/paged-modal'
+import ResourceSettingsTheme from '@/components/layout/resource-switcher/pages/theme.tsx'
 
 export default function ResourceSwitcher() {
     const hoverCancelSFX = '/sounds/switch-hover-s.ogg'
@@ -177,6 +178,12 @@ function ResourceSettingsModal() {
             <PagedModal.Page id="members" title="Members" description="Manage pack members" icon={UserGroupIcon}>
                 <PagedModal.Body>
                     <ResourceSettingsMembers />
+                </PagedModal.Body>
+            </PagedModal.Page>
+
+            <PagedModal.Page id="theme" title="Theme" icon={PaletteIcon}>
+                <PagedModal.Body>
+                    <ResourceSettingsTheme />
                 </PagedModal.Body>
             </PagedModal.Page>
 

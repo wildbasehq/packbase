@@ -7,9 +7,10 @@ import Markdown from '@/components/shared/markdown'
 import UserAvatar from '@/components/shared/user/avatar'
 import { vg } from '@/lib/api'
 import { toast } from 'sonner'
-import { Button } from '@/components/shared/button'
+import { Button } from '@/components/shared/experimental-button-rework'
 import { useUserAccountStore } from '@/lib/state'
 import { useState } from 'react'
+import { ChatBubbleLeftEllipsisIcon } from '@heroicons/react/16/solid'
 
 // @TODO: Unify user and pack headers.
 export default function ProfileHeader({ ...props }: any) {
@@ -53,10 +54,18 @@ export default function ProfileHeader({ ...props }: any) {
                             </div>
                         </div>
                     </div>
-                    {user && user.id !== profile.id && (
-                        <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0" id="profile-content-follow-button-container">
-                            <UserFollowButton user={profile} />
-                        </div>
+                    {user && (
+                        <>
+                            <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0" id="profile-content-follow-button-container">
+                                <UserFollowButton user={profile} />
+                            </div>
+
+                            <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0">
+                                <Button outline href={`/c/sw:${profile.id}`}>
+                                    <ChatBubbleLeftEllipsisIcon data-slot="icon" /> DM
+                                </Button>
+                            </div>
+                        </>
                     )}
                 </div>
                 <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden" id="profile-content-info-mobile-container">
@@ -98,7 +107,7 @@ function UserFollowButton({ user }: { user: any }) {
     }
 
     return (
-        <Button onClick={following ? unfollow : follow} variant={following ? 'destructive' : 'primary'} disabled={submitting}>
+        <Button onClick={following ? unfollow : follow} color={(following ? 'red' : 'indigo') as 'red' | 'indigo'} disabled={submitting}>
             {following ? 'Unfollow' : 'Follow'}
         </Button>
     )

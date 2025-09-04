@@ -257,7 +257,7 @@ function Hero() {
                 <div className="mt-12 space-y-4 sm:space-y-0 sm:flex sm:justify-center sm:gap-4">
                     {links.map(link =>
                         link.tooltip ? (
-                            <Tooltip content={link.tooltip} delayDuration={0}>
+                            <Tooltip content={link.tooltip} delayDuration={0} side="top">
                                 <Button href={link.href} color={(link.primary ? 'indigo' : 'zinc') as 'indigo' | 'zinc'}>
                                     {link.name} <ArrowUpRightIcon className="inline-flex w-4 h-4 text-white" />
                                 </Button>

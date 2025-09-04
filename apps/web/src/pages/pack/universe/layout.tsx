@@ -28,6 +28,12 @@ function UniverseSidebarContent() {
                         <SidebarLabel>Following</SidebarLabel>
                     </div>
                 </SidebarItem>
+                <SidebarItem href="/f/me:friends">
+                    <UserGroupIcon />
+                    <div className="flex flex-col min-w-0">
+                        <SidebarLabel>Friends</SidebarLabel>
+                    </div>
+                </SidebarItem>
                 <SidebarItem href="/p/universe/cosmos">
                     <NewspaperIcon />
                     <div className="flex flex-col min-w-0">
