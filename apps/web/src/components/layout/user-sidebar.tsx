@@ -278,7 +278,7 @@ function PackMembersContainer({ collapsed }: { collapsed: boolean }) {
                             <UserAvatar
                                 name={friend.display_name}
                                 size={32}
-                                icon={friend.images_avatar}
+                                icon={friend.images?.avatar}
                                 showOnlineStatus={true}
                                 isOnline={friend.online} // Random online status for demo, replace with actual status
                             />
