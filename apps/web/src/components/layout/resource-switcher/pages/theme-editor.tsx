@@ -121,7 +121,7 @@ monaco.languages.html.htmlDefaults.setModeConfiguration({
 })
 
 // Create a wrapper component for Monaco
-const MonacoEditorWrapper = ({ language, defaultValue, onChange, isUserTheme = false }) => {
+const MonacoEditorWrapper = ({ language, defaultValue, onChange }) => {
     const [isEditorReady, setIsEditorReady] = useState(false)
     const containerRef = useRef(null)
     const editorRef = useRef(null)
@@ -512,10 +512,10 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
 
                     <div className="flex-1 border rounded-lg overflow-hidden mt-4">
                         {activeTabIndex === 0 && (
-                            <MonacoEditorWrapper language="html" defaultValue={currentTheme.html} onChange={handleHtmlChange} isUserTheme={!!currentTheme.user_id} />
+                            <MonacoEditorWrapper language="html" defaultValue={currentTheme.html} onChange={handleHtmlChange} />
                         )}
                         {activeTabIndex === 1 && (
-                            <MonacoEditorWrapper language="css" defaultValue={currentTheme.css} onChange={handleCssChange} isUserTheme={!!currentTheme.user_id} />
+                            <MonacoEditorWrapper language="css" defaultValue={currentTheme.css} onChange={handleCssChange} />
                         )}
                     </div>
                 </div>
