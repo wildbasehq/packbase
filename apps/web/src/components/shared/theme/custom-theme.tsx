@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { vg } from '@/lib/api'
 import { Theme } from '@/lib/api/theme'
-import { PackThemeAPI, PackTheme } from '@/lib/api/pack-theme'
+import { PackThemeAPI } from '@/lib/api/pack-theme'
 
 // Component to render custom theme HTML and CSS for users or packs
 interface CustomThemeProps {
@@ -10,7 +10,7 @@ interface CustomThemeProps {
 }
 
 export function CustomTheme({ userId, packId }: CustomThemeProps) {
-    const [theme, setTheme] = useState<Theme | PackTheme | null>(null)
+    const [theme, setTheme] = useState<Theme | null>(null)
 
     useEffect(() => {
         if (userId && !packId) {
