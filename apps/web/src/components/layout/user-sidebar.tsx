@@ -236,7 +236,7 @@ function PackMembersContainer({ collapsed }: { collapsed: boolean }) {
                                     name={member.display_name}
                                     size={32}
                                     icon={member.images?.avatar}
-                                    showOnlineStatus={true}
+                                    showOnlineStatus={false}
                                     isOnline={member.online}
                                 />
                             </div>
@@ -268,25 +268,25 @@ function PackMembersContainer({ collapsed }: { collapsed: boolean }) {
 
             {/* Avatar with display name */}
             <div className="flex flex-col space-y-2">
-                {members?.map(friend => (
+                {members?.map(member => (
                     <Link
-                        href={`/@${friend.username}`}
-                        key={friend.id}
+                        href={`/@${member.username}`}
+                        key={member.id}
                         className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
                     >
                         <div className="flex items-center gap-2">
                             <UserAvatar
-                                name={friend.display_name}
+                                name={member.display_name}
                                 size={32}
-                                icon={friend.images?.avatar}
-                                showOnlineStatus={true}
-                                isOnline={friend.online} // Random online status for demo, replace with actual status
+                                icon={member.images?.avatar}
+                                showOnlineStatus={false}
+                                isOnline={member.online} // Random online status for demo, replace with actual status
                             />
                             <div className="flex flex-col">
-                                <Text size="sm">{friend.display_name}</Text>
-                                {friend.status && (
+                                <Text size="sm">{member.display_name || member.username}</Text>
+                                {member.status && (
                                     <Text size="xs" alt>
-                                        {friend.status}
+                                        {member.status}
                                     </Text>
                                 )}
                             </div>
