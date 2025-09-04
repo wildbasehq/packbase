@@ -83,7 +83,7 @@ export default function PackSwitcher() {
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.3 }}
-                                    className="absolute inset-0 ring-white/10 -z-1 bg-white dark:bg-zinc-900 h-12 rounded-tl rounded-bl rounded-out-r w-[calc(4rem)] pack-icon-bg"
+                                    className="absolute inset-0 ring-white/10 -z-1 bg-white dark:bg-n-8 h-12 rounded-tl rounded-bl rounded-out-r w-[calc(4rem)] pack-icon-bg"
                                 />
                             )}
                         </AnimatePresence>
