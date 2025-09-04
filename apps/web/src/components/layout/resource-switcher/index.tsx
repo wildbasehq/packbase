@@ -181,11 +181,11 @@ function ResourceSettingsModal() {
                 </PagedModal.Body>
             </PagedModal.Page>
 
-            <PagedModal.Page id="theme" title="Theme" icon={PaletteIcon}>
-                <PagedModal.Body>
-                    <ResourceSettingsTheme />
-                </PagedModal.Body>
-            </PagedModal.Page>
+            {/*<PagedModal.Page id="theme" title="Theme" icon={PaletteIcon}>*/}
+            {/*    <PagedModal.Body>*/}
+            {/*        <ResourceSettingsTheme />*/}
+            {/*    </PagedModal.Body>*/}
+            {/*</PagedModal.Page>*/}
 
             {/*<PagedModal.Page id="delete" title="Delete This Pack" description="Delete the pack and all data" icon={TrashIcon}>*/}
             {/*    <PagedModal.Body>*/}
