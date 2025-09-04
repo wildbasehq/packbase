@@ -235,7 +235,7 @@ function PackMembersContainer({ collapsed }: { collapsed: boolean }) {
                                 <UserAvatar
                                     name={member.display_name}
                                     size={32}
-                                    icon={member.images_avatar}
+                                    icon={member.images?.avatar}
                                     showOnlineStatus={true}
                                     isOnline={member.online}
                                 />
