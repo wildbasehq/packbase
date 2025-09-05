@@ -33,7 +33,7 @@ export default function UserSidebar() {
     }, [isMobile])
 
     return (
-        <div className={`h-screen ${collapsed ? 'w-14 min-w-[3.5rem]' : 'w-80 min-w-[20rem]'} hidden md:flex z-10`}>
+        <div className={`h-screen relative ${collapsed ? 'w-14 min-w-[3.5rem]' : 'w-80 min-w-[20rem]'} hidden md:flex z-10`}>
             <div className="flex flex-col w-full">
                 <div
                     className={`relative dark text-default flex ${collapsed ? 'flex-col justify-center items-center mt-3' : 'h-14 gap-2'}`}
@@ -58,6 +58,7 @@ export default function UserSidebar() {
                     )}
 
                     <div className="flex justify-end items-center w-full gap-2 p-3">
+                        <div className="w-4"></div>
                         <div className="flex justify-start items-center gap-1">
                             {!isMobile && (
                                 <Tooltip
@@ -80,10 +81,14 @@ export default function UserSidebar() {
                     </div>
                 </div>
 
+                {!collapsed && (
+                    <div className="absolute bg-white -z-10 h-[calc(3rem+1px)] w-7 top-2 -left-4 transform skew-x-28 rounded-tr rounded-out-br after:right-[calc(var(--rounded-out-radius-br)*-1--1px)]"></div>
+                )}
+
                 <div
                     className={cn(
                         !collapsed
-                            ? 'bg-white dark:bg-n-8 border-t-1 border-r-1 border-b-1 mr-2 rounded-tr-md rounded-br-md rounded-tl-none rounded-out-lt-xl -ml-2 flex flex-col px-4 pb-8 h-full'
+                            ? 'bg-white dark:bg-n-8 border-r-1 border-b-1 mr-2 rounded-tr-md rounded-br-md rounded-tl-none rounded-out-lt-xl -ml-2 flex flex-col px-4 pb-8 h-full'
                             : 'relative flex flex-col justify-center items-center mt-3',
                         'pt-8 mb-2 relative border-zinc-950/5 dark:border-white/5 dark:mb-[calc(0.5rem-1px)]'
                     )}

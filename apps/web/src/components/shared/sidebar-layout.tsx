@@ -169,13 +169,13 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
                         {/*    }}*/}
                         {/*>*/}
 
-                        <div className="relative h-[calc(100vh-1rem)] !z-10 flex overflow-hidden grow lg:rounded-lg lg:rounded-br-none lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-n-8 dark:lg:ring-white/10">
+                        <div className="relative h-[calc(100vh-1rem)] flex overflow-hidden grow lg:rounded-lg lg:rounded-br-none lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-n-8 dark:lg:ring-white/10">
                             {isSignedIn && !isMobile && (
-                                <div className="top-0 backdrop-blur border-r h-full flex z-20">
+                                <div className="top-0 backdrop-blur border-r h-full flex z-50">
                                     <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                                 </div>
                             )}
-                            <div className={cx('mx-auto w-full overflow-hidden h-full')}>{children}</div>
+                            <div className={cx('mx-auto w-full overflow-hidden h-full z-30')}>{children}</div>
                         </div>
                         {/*</motion.main>*/}
                     </main>
