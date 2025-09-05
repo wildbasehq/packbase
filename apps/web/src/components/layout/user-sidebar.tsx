@@ -12,10 +12,8 @@ import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import Link from '@/components/shared/link.tsx'
 import { cn, useResourceStore } from '@/lib'
 import { ButtonStyles, useContentFrame } from '@/src/components'
-import ContentFrame from '@/components/shared/content-frame.tsx'
 import { useDarkMode, useInterval, useLocalStorage } from 'usehooks-ts'
 import UserAvatar from '@/components/shared/user/avatar.tsx'
-import { useParams } from 'wouter'
 
 const DropdownComponent = memo(UserDropdown, () => true)
 

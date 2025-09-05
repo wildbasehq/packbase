@@ -20,9 +20,8 @@ import {
 import { ReactNode, useMemo, useState } from 'react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/16/solid'
 import Link from '../shared/link'
-import { Logo } from '@/src/components'
-
-import LandingBackground from '@/src/images/png/landing-bg.jpg' // Animation configuration
+import { Logo, Badge } from '@/src/components'
+import LandingBackground from '@/src/images/png/landing-bg.jpg'
 
 // Animation configuration
 const animConfig = {
@@ -127,7 +126,7 @@ interface AnimatedCardProps {
     className: string
     initialY: number
     delayTime: number
-    children: React.ReactNode
+    children: ReactNode
 }
 
 const AnimatedCard = ({ className, initialY, delayTime, children }: AnimatedCardProps) => (
@@ -145,43 +144,6 @@ const AnimatedCard = ({ className, initialY, delayTime, children }: AnimatedCard
         {children}
     </motion.div>
 )
-
-function TopRowCards() {
-    return (
-        <div className="absolute top-0 left-0 right-0 w-full">
-            <div className="flex w-[115%] -ml-[5%]">
-                <AnimatedCard
-                    className="w-1/2 -mt-12 overflow-hidden transform rounded-lg ring-default ring-2 h-36 md:h-48 lg:h-64 bg-card rotate-6"
-                    initialY={animConfig.offset.top}
-                    delayTime={animConfig.delay.outer}
-                >
-                    <FakePost user={posts[0].user} content={posts[0].content} image={posts[0].image} />
-                </AnimatedCard>
-                <AnimatedCard
-                    className="w-1/2 -mt-10 -ml-12 overflow-hidden transform rounded-lg ring-default ring-2 h-36 md:h-48 lg:h-64 bg-card rotate-1"
-                    initialY={animConfig.offset.top}
-                    delayTime={animConfig.delay.adjacent}
-                >
-                    <FakePost user={posts[1].user} content={posts[1].content} image={posts[1].image} />
-                </AnimatedCard>
-                <AnimatedCard
-                    className="w-1/2 -mt-4 z-[2] transform ring-default ring-2 rounded-lg -ml-36 h-36 md:h-48 lg:h-64 bg-card -rotate-2 overflow-hidden"
-                    initialY={animConfig.offset.top}
-                    delayTime={animConfig.delay.center}
-                >
-                    <FakePost user={posts[2].user} content={posts[2].content} image={posts[2].image} />
-                </AnimatedCard>
-                <AnimatedCard
-                    className="w-1/2 -mt-1.5 overflow-hidden transform rounded-lg ring-default ring-2 -ml-28 h-36 md:h-48 lg:h-64 bg-card rotate-3"
-                    initialY={animConfig.offset.top}
-                    delayTime={animConfig.delay.adjacent}
-                >
-                    <FakePost user={posts[3].user} content={posts[3].content} image={posts[3].image} />
-                </AnimatedCard>
-            </div>
-        </div>
-    )
-}
 
 function BottomRowCards() {
     return (
@@ -220,7 +182,7 @@ function BottomRowCards() {
 
 function Hero() {
     return (
-        <div className="relative overflow-hidden h-full">
+        <div className="relative overflow-hidden h-screen border-b">
             {/* Background image absolute covering the whole screen */}
             <img
                 src={LandingBackground}
@@ -254,16 +216,23 @@ function Hero() {
                     </VerticalCutReveal>
                 </Heading>
 
+                <div className="mt-8 p-6 max-w-2xl mx-auto bg-sidebar rounded-xl transform skew-x-4 ring-1 ring-default shadow">
+                    <Text className="text-lg sm:text-xl font-medium transform -skew-x-4">
+                        Join the Pack-based social platform where <HighlightedText>communities come first</HighlightedText>. No ads, no
+                        algorithms, just authentic conversations in your own space.
+                    </Text>
+                </div>
+
                 <div className="mt-12 space-y-4 sm:space-y-0 sm:flex sm:justify-center sm:gap-4">
-                    {links.map(link =>
+                    {links.map((link, index) =>
                         link.tooltip ? (
-                            <Tooltip content={link.tooltip} delayDuration={0} side="top">
+                            <Tooltip key={index} content={link.tooltip} delayDuration={0} side="top">
                                 <Button href={link.href} color={(link.primary ? 'indigo' : 'zinc') as 'indigo' | 'zinc'}>
                                     {link.name} <ArrowUpRightIcon className="inline-flex w-4 h-4 text-white" />
                                 </Button>
                             </Tooltip>
                         ) : (
-                            <Button href={link.href} color={(link.primary ? 'indigo' : 'zinc') as 'indigo' | 'zinc'}>
+                            <Button key={index} href={link.href} color={(link.primary ? 'indigo' : 'zinc') as 'indigo' | 'zinc'}>
                                 {link.name}
                             </Button>
                         )
@@ -318,7 +287,7 @@ function FakePost({
 }
 
 // Reusable highlighted text component with randomized clip path
-function HighlightedText({ children, width = '110%' }: { children: ReactNode; width?: string }) {
+function HighlightedText({ children, width = '100%' }: { children: ReactNode; width?: string }) {
     // Generate random wavy SVG path for highlight
     const svgPath = useMemo(() => {
         const segments = 10
@@ -430,8 +399,8 @@ function FeaturePromiseGrid() {
     const features = [
         {
             icon: 'SparklesIcon',
-            title: 'Community First',
-            description: 'Built for communities, not advertisers. Your data stays private and your experience stays clean.',
+            title: 'Pack-Based Communities',
+            description: 'Create or join intimate communities with their own identity, customs, and conversations.',
         },
         {
             icon: 'ShieldCheckIcon',
@@ -440,28 +409,27 @@ function FeaturePromiseGrid() {
         },
         {
             icon: 'CubeTransparentIcon',
-            title: 'Full Customization',
-            description: 'Complete HTML/CSS customization for your community space and profile, making it truly yours.',
+            title: 'Complete Customization',
+            description: 'Full HTML/CSS theming for your Profile, Pack, and UI, as well as custom domains for your own personal website',
         },
         {
             icon: 'BoltIcon',
             title: 'Lightning Fast',
-            description: "We're partnered with multiple storage and caching providers which directly benefit you.",
+            description: 'Built with cutting-edge tech and partnered with top-tier infrastructure providers for speed.',
             accordion:
-                'Packbase is built using highly optimised and extremely f###ing fast tech, including some that are experimental not yet publicly available and have been given to us by partners under an agreement.',
+                'Packbase is built using optimized and up-coming tech, including some that are experimental and not yet publicly available, given to us by partners under agreement.',
         },
         {
             icon: 'GlobeAltIcon',
-            title: 'Open Platform',
-            description:
-                "By the end of the private alpha, we'll be making 100% of our spending and income public and chunks of our code open-source.",
+            title: 'Transparent & Open',
+            description: "By the end of private alpha, we'll make our spending and income public, plus open-source key components.",
         },
         {
             icon: 'HeartIcon',
             title: 'Forever Free',
-            description: "No hidden fees, no premium tiers, no forced paywalls. Any fees, we waive if you can't pay for any reason.",
+            description: 'Core features always free. 15GB free storage, or bring your own.',
             accordion:
-                "While Packbase is completely free to use with all core features, we do offer optional one-time payments for expanded storage capabilities. The free tier includes unlimited storage with a 10MB per file limit, which is sufficient for most users. For those needing to upload larger files, we offer a simple $1 per 10MB increase, as a one-time permanent upgrade to your account. This helps us cover our server costs while keeping the platform accessible. If you're unable to pay for any reason, please reach out - we'll provide these upgrades at no cost to you.",
+                "Packbase gives everyone 15GB of free object storage, but if that's not enough, you can link a Pixeldrain account to have full custody over the data you upload. If you need more and don't want to host it yourself, we can give you more free of charge, just ask.",
         },
     ]
 
@@ -479,7 +447,16 @@ function FeaturePromiseGrid() {
     }
 
     return (
-        <Container className="py-16">
+        <Container className="py-24">
+            <div className="text-center mb-16">
+                <Heading size="3xl" className="mb-4">
+                    How <HighlightedText>social</HighlightedText> should be built
+                </Heading>
+                <Text className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                    Classic forums, reimagined for today's communities without the data mining. You <i>don't</i> have to sacrifice your data
+                    and sanity to communicate, you know that right?
+                </Text>
+            </div>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 {features.map((feature, index) => {
                     const IconComponent = getIcon(feature.icon)
@@ -543,6 +520,203 @@ function FeaturePromiseGrid() {
     )
 }
 
+function PackShowcase() {
+    const packs = [
+        {
+            name: 'Furry Artists',
+            members: '2.4k',
+            description: 'Share your art, get feedback, and connect with fellow creators',
+            color: 'bg-gradient-to-br from-purple-500 to-pink-500',
+            avatar: '🎨',
+        },
+        {
+            name: 'Tech Talk',
+            members: '1.8k',
+            description: 'Discuss the latest in technology, programming, and innovation',
+            color: 'bg-gradient-to-br from-blue-500 to-cyan-500',
+            avatar: '⚡',
+        },
+        {
+            name: 'Gaming Hub',
+            members: '3.1k',
+            description: 'Share gameplay, reviews, and connect with fellow gamers',
+            color: 'bg-gradient-to-br from-green-500 to-emerald-500',
+            avatar: '🎮',
+        },
+        {
+            name: 'Coffee Corner',
+            members: '956',
+            description: 'For coffee enthusiasts to share brewing tips and favorite beans',
+            color: 'bg-gradient-to-br from-amber-500 to-orange-500',
+            avatar: '☕',
+        },
+    ]
+
+    return (
+        <Container className="py-24">
+            <div className="text-center mb-16">
+                <Heading size="3xl" className="mb-4">
+                    Discover Your <HighlightedText>Pack</HighlightedText>
+                </Heading>
+                <Text className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                    Every community has its own space, customization, and culture. Find where you belong, or create your own.
+                </Text>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {packs.map((pack, index) => (
+                    <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="group relative overflow-hidden rounded-xl bg-white dark:bg-zinc-800 ring-1 ring-default hover:ring-2 hover:ring-indigo-500/50 transition-all cursor-pointer"
+                    >
+                        <div className={`absolute inset-0 ${pack.color} opacity-10 group-hover:opacity-20 transition-opacity`} />
+                        <div className="relative p-6">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className={`w-12 h-12 rounded-lg ${pack.color} flex items-center justify-center text-xl`}>
+                                    {pack.avatar}
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-default">{pack.name}</h3>
+                                    <p className="text-sm text-muted-foreground">{pack.members} members</p>
+                                </div>
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{pack.description}</p>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </Container>
+    )
+}
+
+function MigrationSection() {
+    const platforms = [
+        {
+            id: 'furaffinity',
+            name: 'Fur Affinity',
+            icon: '🦊',
+            description: 'Seamlessly import your gallery and submissions',
+            features: ['Gallery & submissions', 'Journals & stories', 'Shadow comments (displays as "From FA: {user}")'],
+            color: 'from-orange-500 to-amber-500',
+        },
+        {
+            id: 'phpbb',
+            name: 'PhpBB Forums',
+            icon: '💬',
+            description: 'Complete forum migration with all threads and user data',
+            features: [
+                'Full thread history',
+                'User accounts (Optional - requires contacting support)',
+                'Forum structure',
+                'Attachments & media',
+            ],
+            color: 'from-blue-500 to-indigo-500',
+        },
+    ]
+
+    return (
+        <Container className="relative py-24 z-10">
+            <div className="text-center mb-16">
+                <Badge className="mb-6" color="orange">
+                    Coming Soon! (Contact support for earlier access. Must be &gt;500 member count)
+                </Badge>
+                <Heading size="3xl" className="mb-4">
+                    Bring Your <HighlightedText>Community</HighlightedText> With You
+                </Heading>
+                <Text className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                    Switching platforms shouldn't mean starting over. We'll handle the heavy lifting and migrate your entire community's
+                    history, preserving years of conversations, connections, and content.
+                </Text>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                {platforms.map(platform => (
+                    <div className="relative overflow-hidden rounded-2xl p-8 cursor-pointer transition-all ring-1 ring-default hover:ring-2 hover:ring-indigo-500/50 shadow-md bg-white dark:bg-zinc-800">
+                        {/* Gradient overlay */}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-5`} />
+
+                        <div className="relative">
+                            <div className="flex items-start gap-4 mb-4">
+                                <div
+                                    className={`w-14 h-14 rounded-xl bg-gradient-to-br ${platform.color} flex items-center justify-center text-2xl shadow-lg`}
+                                >
+                                    {platform.icon}
+                                </div>
+                                <div className="flex-1">
+                                    <Heading as="h3" size="xl" className="font-bold text-default mb-1">
+                                        {platform.name}
+                                    </Heading>
+                                    <Text alt>{platform.description}</Text>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2 mt-6">
+                                {platform.features.map((feature, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        <div className="w-5 h-5 rounded-full bg-green-500/20 dark:bg-green-400/20 flex items-center justify-center">
+                                            <svg
+                                                className="w-3 h-3 text-green-600 dark:text-green-400"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <Text size="sm">{feature}</Text>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Migration process */}
+            <div className="mt-16 p-8 rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 ring-1 ring-default">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="text-center">
+                        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                            <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">1</span>
+                        </div>
+                        <Heading size="lg" className="mb-2">
+                            Export Your Data
+                        </Heading>
+                        <Text alt size="sm">
+                            Use your platform's export tools or our guided process to prepare your data
+                        </Text>
+                    </div>
+                    <div className="text-center">
+                        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                            <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">2</span>
+                        </div>
+                        <Heading size="lg" className="mb-2">
+                            We Handle the Rest
+                        </Heading>
+                        <Text alt size="sm">
+                            The rats in our servers handle the migration for you and can take a while.
+                        </Text>
+                    </div>
+                    <div className="text-center">
+                        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                            <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">3</span>
+                        </div>
+                        <Heading size="lg" className="mb-2">
+                            Welcome Home
+                        </Heading>
+                        <Text alt size="sm">
+                            Your community continues right where it left off, with all history intact
+                        </Text>
+                    </div>
+                </div>
+            </div>
+        </Container>
+    )
+}
+
 export default function GuestLanding() {
     const links = {
         Packbase: [
@@ -571,14 +745,16 @@ export default function GuestLanding() {
         ],
     }
     return (
-        <div className="h-full overflow-x-hidden overflow-y-auto bg-zinc-100 dark:bg-zinc-950">
-            <div className="relative z-30 h-full bg-white rounded-md ring-2 ring-default dark:bg-zinc-900 shadow-xl overflow-hidden">
+        <div className="h-full overflow-x-hidden overflow-y-auto scrollbar-hide bg-zinc-100 dark:bg-zinc-950">
+            <div className="relative z-30 bg-white mb-80 rounded-md ring-2 ring-default dark:bg-zinc-900 shadow-xl">
                 <Hero />
-                {/*<StopBeingPrey />*/}
-                {/*<FeaturePromiseGrid />*/}
+                <FeaturePromiseGrid />
+                <PackShowcase />
+                <MigrationSection />
             </div>
+
             {/* Minimal footer */}
-            <div className="sticky bottom-0 left-0 z-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80 h-80">
+            <div className="absolute bottom-0 z-10 left-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80 h-80">
                 <div className="flex items-end justify-end w-full h-80 border-x border-n-2/80 dark:border-n-6/80">
                     {/* Horizontal dotted border at the top of items */}
                     <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80" style={{ top: '2rem' }}></div>

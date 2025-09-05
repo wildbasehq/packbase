@@ -4,7 +4,15 @@
       "Bash(npm run check-types:*)",
       "Bash(bun run:*)",
       "WebSearch",
-      "Bash(turbo check-types:*)"
+      "Bash(turbo check-types:*)",
+      "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\shared/**)",
+      "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\shared/**)",
+      "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\layout/**)",
+      "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\home/**)",
+      "Read(/C:\\meow\\dev\\korat-hb\\apps\\web/**)",
+      "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\home/**)",
+      "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\shared\\text/**)",
+      "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\shared/**)"
     ],
     "deny": [],
     "ask": []
