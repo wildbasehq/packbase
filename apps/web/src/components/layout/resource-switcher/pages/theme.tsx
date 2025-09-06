@@ -29,9 +29,9 @@ export default function ResourceSettingsTheme() {
         setCurrentTheme({
             pack_id: packId,
             name: 'New Pack Theme',
-            html: '<div class="some-class p-4 ring-1 ring-default rounded-lg">\n  <h1>Welcome to our Pack!</h1>\n  <p>Customize this space to make your pack unique.</p>\n</div>',
+            html: '<div class="some-class p-4 ring-1 ring-default rounded-lg">\n\t<h1>Welcome to the jank editor!</h1>\n\t<p>Make something fun.</p>\n</div>\n',
             css: '/* Add your custom CSS here */\n.some-class {\n  /* Some styles for that HTML element */\n}',
-            is_active: false,
+            is_active: true,
         })
         setIsEditorOpen(true)
     }
