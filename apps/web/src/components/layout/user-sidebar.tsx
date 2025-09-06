@@ -80,7 +80,7 @@ export default function UserSidebar() {
                 </div>
 
                 {!collapsed && (
-                    <div className="absolute bg-white dark:bg-n-8 -z-10 h-[calc(3rem+1px)] w-7 top-2 -left-4 transform skew-x-28 rounded-tr rounded-out-br after:right-[calc(var(--rounded-out-radius-br)*-1--1px)]"></div>
+                    <div className="absolute bg-white dark:bg-n-8 -z-10 h-[calc(3rem+1px)] w-7 top-2 -left-4 transform skew-x-24 rounded-tr rounded-out-br after:right-[calc(var(--rounded-out-radius-br)*-1--1px)]"></div>
                 )}
 
                 <div
