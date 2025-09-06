@@ -8,12 +8,9 @@ import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 import HTMLMonacoLinter from 'monaco-html-linter'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/20/solid'
-import CharmingTabs from '@/components/charm/tabs.tsx'
 import { PackThemeAPI } from '@/lib/api/pack-theme.ts'
 import ShowLightbulbIconMode = monaco.editor.ShowLightbulbIconMode
-import { Checkbox } from '@/components/shared/input/checkbox.tsx'
-import { Label, Tab, TabGroup } from '@headlessui/react'
-import { CheckboxField, Tabs } from '@/src/components'
+import { Tabs } from '@/src/components'
 import { Theme, ThemeAPI } from '@/lib/api/theme.ts'
 
 // HTML linter configuration for themes
@@ -138,12 +135,15 @@ const MonacoEditorWrapper = ({ language, defaultValue, onChange }) => {
                         value: defaultValue,
                         language: language,
                         theme: 'vs-dark',
-                        minimap: { enabled: false },
+                        minimap: { enabled: true },
                         fontSize: 14,
                         lineNumbers: 'on',
                         roundedSelection: true,
                         scrollBeyondLastLine: false,
                         automaticLayout: true,
+                        autoIndent: 'full',
+                        insertSpaces: false,
+                        tabSize: 4,
                         padding: { top: 16 },
                         formatOnPaste: true,
                         formatOnType: true,
