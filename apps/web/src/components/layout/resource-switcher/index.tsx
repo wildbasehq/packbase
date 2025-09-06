@@ -15,23 +15,17 @@ import LogoutIcon from '@/components/icons/logout'
 import { vg } from '@/lib/api'
 import { toast } from 'sonner'
 import { useModal } from '@/components/modal/provider'
-import { PaletteIcon, SettingsIcon } from 'lucide-react'
 import { Button } from '@/components/shared/button'
-import { ClipboardIcon, UserGroupIcon } from '@heroicons/react/20/solid'
+import { ClipboardIcon, Cog6ToothIcon, UserGroupIcon } from '@heroicons/react/20/solid'
 import { Avatar } from '@/components/shared/avatar'
 import ResourceSettingsGeneral from './pages/general'
 import ResourceSettingsMembers from '@/components/layout/resource-switcher/pages/members.tsx'
 import { VerifiedBadge } from '@/components/layout/resource-switcher/pack-badge.tsx'
 import PagedModal from '@/components/shared/paged-modal'
 import ResourceSettingsTheme from '@/components/layout/resource-switcher/pages/theme.tsx'
+import { SwatchIcon } from '@heroicons/react/16/solid'
 
 export default function ResourceSwitcher() {
-    const hoverCancelSFX = '/sounds/switch-hover-s.ogg'
-
-    const [heavyHoverSound] = useSound('/sounds/switch-hover-s.ogg', {
-        playbackRate: 0.3,
-    })
-
     const { currentResource } = useResourceStore()
 
     const { loading, connecting } = useUIStore()
@@ -115,7 +109,7 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
                             <div>
                                 {/* mt-1 to offset button */}
                                 <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer">
-                                    <SettingsIcon className="h-5 w-5" />
+                                    <Cog6ToothIcon className="h-5 w-5" />
                                 </Button>
                             </div>
                         )}
@@ -181,11 +175,11 @@ function ResourceSettingsModal() {
                 </PagedModal.Body>
             </PagedModal.Page>
 
-            {/*<PagedModal.Page id="theme" title="Theme" icon={PaletteIcon}>*/}
-            {/*    <PagedModal.Body>*/}
-            {/*        <ResourceSettingsTheme />*/}
-            {/*    </PagedModal.Body>*/}
-            {/*</PagedModal.Page>*/}
+            <PagedModal.Page id="theme" title="Theme" icon={SwatchIcon}>
+                <PagedModal.Body>
+                    <ResourceSettingsTheme />
+                </PagedModal.Body>
+            </PagedModal.Page>
 
             {/*<PagedModal.Page id="delete" title="Delete This Pack" description="Delete the pack and all data" icon={TrashIcon}>*/}
             {/*    <PagedModal.Body>*/}
