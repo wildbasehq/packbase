@@ -22,9 +22,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 export default function PackSwitcher() {
     const { currentResource, setCurrentResource, resources } = useResourceStore()
     const { resourceDefault, loading, setLoading } = useUIStore()
-    const {
-        user: { id: user_id },
-    } = useUserAccountStore()
+    const { user } = useUserAccountStore()
     const [, navigate] = useLocation()
 
     const switchResource = (resource: any) => {
@@ -32,7 +30,7 @@ export default function PackSwitcher() {
             if (resource.slug === 'universe') navigate('/p/universe')
         }
 
-        resource.is_owner = currentResource.owner_id === user_id
+        resource.is_owner = currentResource.owner_id === user?.id
         setCurrentResource(resource)
         setLoading(true)
         navigate(`/p/${resource.slug}`)
