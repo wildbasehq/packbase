@@ -38,12 +38,12 @@ export default function UserAvatar({
         height: typeof size === 'number' ? size : sizes[size],
     }
 
-    if ((!user || !user.images?.avatar) && !icon) {
+    if ((!user || (!user.images?.avatar && !user.images_avatar)) && !icon) {
         return (
             <div
                 className={clsx(props.className, `relative items-center justify-center overflow-hidden rounded-md bg-n-5 text-white`)}
                 style={props.style}
-                title={`${props.display_name}'s avatar`}
+                title={`${user?.username || user?.display_name || props.display_name}'s avatar`}
             >
                 <BoringAvatar
                     variant="beam"
