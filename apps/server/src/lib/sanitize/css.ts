@@ -187,7 +187,7 @@ const DANGEROUS_VALUES: Record<string, Set<string> | RegExp | ((value: string) =
 
     // Visibility and interactions
     visibility: new Set(['hidden', 'collapse']),
-    opacity: (value: string) => parseFloat(value) < 0.2, // Very transparent elements
+    // opacity: (value: string) => parseFloat(value) < 0.2, // Very transparent elements
 
     // Content control
     content: /url\(|attr\(/i,
@@ -222,6 +222,58 @@ const DANGEROUS_VALUES: Record<string, Set<string> | RegExp | ((value: string) =
 };
 
 /**
+ * Extracts keyframes blocks from CSS using brace counting
+ * @param css The CSS string to extract keyframes from
+ * @returns Object containing array of keyframe blocks and remaining CSS
+ */
+function extractKeyframes(css: string): { keyframes: Array<{ full: string; name: string; body: string }>; remainingCSS: string } {
+    const keyframes: Array<{ full: string; name: string; body: string }> = [];
+    let remainingCSS = css;
+    let startIndex = 0;
+
+    while (true) {
+        const keyframeStart = remainingCSS.indexOf('@keyframes', startIndex);
+        if (keyframeStart === -1) break;
+
+        // Find the opening brace
+        const openBrace = remainingCSS.indexOf('{', keyframeStart);
+        if (openBrace === -1) break;
+
+        // Extract the keyframe name
+        const declaration = remainingCSS.substring(keyframeStart, openBrace).trim();
+
+        // Count braces to find the complete keyframes block
+        let braceCount = 1;
+        let i = openBrace + 1;
+
+        while (i < remainingCSS.length && braceCount > 0) {
+            if (remainingCSS[i] === '{') braceCount++;
+            else if (remainingCSS[i] === '}') braceCount--;
+            i++;
+        }
+
+        if (braceCount === 0) {
+            const keyframeBlock = remainingCSS.substring(keyframeStart, i);
+            const body = remainingCSS.substring(openBrace + 1, i - 1);
+
+            keyframes.push({
+                full: keyframeBlock,
+                name: declaration,
+                body: body,
+            });
+
+            // Remove the keyframe block from remaining CSS
+            remainingCSS = `${remainingCSS.substring(0, keyframeStart)}__KEYFRAME_${keyframes.length - 1}__${remainingCSS.substring(i)}`;
+            startIndex = keyframeStart + ('__KEYFRAME_' + (keyframes.length - 1) + '__').length;
+        } else {
+            break;
+        }
+    }
+
+    return { keyframes, remainingCSS };
+}
+
+/**
  * Sanitizes CSS using a whitelist approach and pattern detection
  * @param css The CSS string to sanitize
  * @returns The sanitized CSS string
@@ -248,12 +300,28 @@ export function sanitizeCSS(css: string): string {
     if (cssWithoutComments.includes('{')) {
         // Process structured CSS with selectors
         const result = [];
-        // Updated regex pattern to capture declarations with newlines properly
+
+        // First extract and handle @keyframes rules
+        const { keyframes, remainingCSS: processedCSS } = extractKeyframes(cssWithoutComments);
+
+        // Process each keyframe
+        const sanitizedKeyframes: string[] = [];
+        for (const keyframe of keyframes) {
+            const sanitizedBody = sanitizeKeyframesBody(keyframe.body);
+            if (sanitizedBody) {
+                sanitizedKeyframes.push(`${keyframe.name} {\n${sanitizedBody}}`);
+            }
+        }
+
+        // Then handle regular CSS rules
         const ruleRegex = /([^{]+)\{([\s\S]*?)\}/g;
         let ruleMatch;
 
-        while ((ruleMatch = ruleRegex.exec(cssWithoutComments)) !== null) {
+        while ((ruleMatch = ruleRegex.exec(processedCSS)) !== null) {
             const selector = ruleMatch[1].trim();
+            // Skip empty selectors or keyframe placeholders
+            if (!selector || selector.startsWith('__KEYFRAME_')) continue;
+
             // Pass the raw declaration block to preserve all formatting
             const declarations = sanitizeDeclarations(ruleMatch[2]);
 
@@ -261,6 +329,15 @@ export function sanitizeCSS(css: string): string {
                 // Preserve the original formatting by not adding extra spaces
                 result.push(`${selector} {\n${declarations}}`);
             }
+        }
+
+        // Add sanitized keyframes back
+        result.unshift(...sanitizedKeyframes);
+
+        // Replace keyframe placeholders in any remaining text
+        let finalCSS = processedCSS.replace(ruleRegex, '');
+        for (let i = 0; i < sanitizedKeyframes.length; i++) {
+            finalCSS = finalCSS.replace(`__KEYFRAME_${i}__`, '');
         }
 
         // Determine line ending from original input
@@ -279,6 +356,28 @@ export function sanitizeCSS(css: string): string {
 
     // Restore comments in the sanitized CSS
     return sanitizedCSS.replace(/__COMMENT_(\d+)__/g, (_, index) => comments[parseInt(index, 10)]);
+}
+
+function sanitizeKeyframesBody(keyframesBody: string): string {
+    const result: string[] = [];
+    // Match keyframe selectors (0%, 50%, 100%, from, to) and their declaration blocks
+    const keyframeRegex = /([^{]+)\{([\s\S]*?)\}/g;
+    let match;
+
+    while ((match = keyframeRegex.exec(keyframesBody)) !== null) {
+        const keyframeSelector = match[1].trim();
+        const declarations = match[2];
+
+        // Validate keyframe selector (should be percentage, 'from', or 'to')
+        if (/^(from|to|\d+(\.\d+)?%)$/.test(keyframeSelector)) {
+            const sanitizedDeclarations = sanitizeDeclarations(declarations);
+            if (sanitizedDeclarations) {
+                result.push(`  ${keyframeSelector} {\n    ${sanitizedDeclarations.replace(/\n/g, '\n    ').trim()}\n  }\n`);
+            }
+        }
+    }
+
+    return result.join('\n');
 }
 
 function sanitizeDeclarations(css: string): string {

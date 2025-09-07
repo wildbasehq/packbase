@@ -162,7 +162,7 @@ export default function ResourceSettingsTheme() {
                         <Heading className="text-xl mb-4">
                             {currentTheme.id ? `Edit Pack Theme: ${currentTheme.name}` : 'Create New Pack Theme'}
                         </Heading>
-                        <Text alt>⚠️ Pack themes are visible to all pack members and visitors.</Text>
+                        <Text alt>⚠️ This is horribly jank. Sorry! We're rewriting it soon :(</Text>
                         <div className="pt-8 h-[calc(100vh-12rem)]">
                             <Suspense fallback={<div className="flex items-center justify-center h-full">Loading editor...</div>}>
                                 <ThemeEditor theme={currentTheme} onSave={handleSaveTheme} onCancel={() => setIsEditorOpen(false)} />
