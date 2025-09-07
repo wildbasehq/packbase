@@ -1,5 +1,4 @@
 import { t } from 'elysia';
-import supabase from '@/utils/supabase/client';
 import { getPack, getPackMembership, PackMembershipCache } from './index';
 import { YapockType } from '@/index';
 import requiresUserProfile from '@/utils/identity/requires-user-profile';

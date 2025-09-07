@@ -1,5 +1,4 @@
 import { YapockType } from '@/index';
-import { t } from 'elysia';
 import { PackPageCreateBody, PackPageEditBody, PackPageReorderBody } from '@/models/defs';
 import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { pack } from '@/lib/packs/permissions';
@@ -40,7 +39,7 @@ export default (app: YapockType) =>
             // Create a new page
             .post(
                 '',
-                async ({ params: { id }, set, user, body }) => {
+                async ({ params: { id }, set, user, body }: any) => {
                     await requiresUserProfile({ set, user });
                     await pack.requiresOwnership({ set, user, id });
 
@@ -142,7 +141,7 @@ export default (app: YapockType) =>
             // Update a page
             .put(
                 '/:pageId',
-                async ({ params: { id, pageId }, set, user, body }) => {
+                async ({ params: { id, pageId }, set, user, body }: any) => {
                     await requiresUserProfile({ set, user });
                     await pack.requiresOwnership({ set, user, id });
 
@@ -215,7 +214,7 @@ export default (app: YapockType) =>
             // Delete a page
             .delete(
                 '/:pageId',
-                async ({ params: { id, pageId }, set, user }) => {
+                async ({ params: { id, pageId }, set, user }: any) => {
                     await requiresUserProfile({ set, user });
                     await pack.requiresOwnership({ set, user, id });
 
@@ -256,7 +255,7 @@ export default (app: YapockType) =>
             // Reorder pages
             .post(
                 '/reorder',
-                async ({ params: { id }, set, user, body }) => {
+                async ({ params: { id }, set, user, body }: any) => {
                     await requiresUserProfile({ set, user });
                     await pack.requiresOwnership({ set, user, id });
 

@@ -1,5 +1,4 @@
 import { t } from 'elysia';
-import supabase from '@/utils/supabase/client';
 import { YapockType } from '@/index';
 import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { ErrorTypebox } from '@/utils/errors';
@@ -10,7 +9,7 @@ export default (app: YapockType) =>
     app
         .post(
             '',
-            async ({ params: { id }, body: { slot = 0 }, set, user, error }) => {
+            async ({ params: { id }, body: { slot = 0 }, set, user }: any) => {
                 await requiresUserProfile({ set, user });
 
                 if (slot !== 0) {
@@ -90,7 +89,7 @@ export default (app: YapockType) =>
         )
         .delete(
             '',
-            async ({ params: { id }, body: { slot = 0 }, set, user, error }) => {
+            async ({ params: { id }, set, user }) => {
                 await requiresUserProfile({ set, user });
 
                 try {

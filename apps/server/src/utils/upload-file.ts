@@ -1,4 +1,3 @@
-import sharp from 'sharp';
 import createStorage from '@/lib/storage';
 
 export default async function uploadFile(bucket: string, path: string, base64: string, upsert: boolean = false, animated: boolean = true) {

@@ -1,4 +1,3 @@
-import supabase from '@/utils/supabase/client';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 
