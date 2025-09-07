@@ -12,7 +12,11 @@
       "Read(/C:\\meow\\dev\\korat-hb\\apps\\web/**)",
       "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\home/**)",
       "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\shared\\text/**)",
-      "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\shared/**)"
+      "Read(/C:\\meow\\dev\\korat-hb\\apps\\web\\src\\components\\shared/**)",
+      "Bash(mkdir:*)",
+      "Bash(npx tsc:*)",
+      "Bash(bunx tsc:*)",
+      "Bash(bun test:*)"
     ],
     "deny": [],
     "ask": []

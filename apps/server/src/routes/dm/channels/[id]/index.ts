@@ -1,7 +1,7 @@
 import { t } from 'elysia';
 import { YapockType } from '@/index';
 import prisma from '@/db/prisma';
-import { HTTPError } from '@/lib/class/HTTPError';
+import { HTTPError } from '@/lib/HTTPError';
 import mapChannel from '@/utils/channels/mapChannel';
 import { CommonErrorResponses, DM_ERROR_CODES } from '@/utils/dm/errors';
 
@@ -13,9 +13,9 @@ export default (app: YapockType) =>
             async ({ set, user, params }) => {
                 if (!user?.sub) {
                     set.status = 401;
-                    throw HTTPError.unauthorized({ 
+                    throw HTTPError.unauthorized({
                         summary: 'Authentication required to access DM channel',
-                        code: DM_ERROR_CODES.UNAUTHORIZED 
+                        code: DM_ERROR_CODES.UNAUTHORIZED,
                     });
                 }
 
@@ -25,9 +25,9 @@ export default (app: YapockType) =>
                 const isParticipant = await prisma.dm_participants.findFirst({ where: { channel_id: id, user_id: user.sub } });
                 if (!isParticipant) {
                     set.status = 403;
-                    throw HTTPError.forbidden({ 
+                    throw HTTPError.forbidden({
                         summary: 'You are not a participant in this DM channel',
-                        code: DM_ERROR_CODES.NOT_PARTICIPANT 
+                        code: DM_ERROR_CODES.NOT_PARTICIPANT,
                     });
                 }
 
@@ -47,9 +47,9 @@ export default (app: YapockType) =>
                 const payload = await mapChannel(id, user.sub);
                 if (!payload) {
                     set.status = 404;
-                    throw HTTPError.notFound({ 
+                    throw HTTPError.notFound({
                         summary: 'DM channel not found or no longer accessible',
-                        code: DM_ERROR_CODES.CHANNEL_NOT_FOUND 
+                        code: DM_ERROR_CODES.CHANNEL_NOT_FOUND,
                     });
                 }
 
@@ -57,7 +57,7 @@ export default (app: YapockType) =>
             },
             {
                 detail: { description: 'Get a DM channel by id', tags: ['DM'] },
-                response: { 
+                response: {
                     200: t.Any(),
                     401: CommonErrorResponses[401],
                     403: CommonErrorResponses[403],

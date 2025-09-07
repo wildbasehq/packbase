@@ -1,5 +1,5 @@
 import { YapockType } from '@/index';
-import { HTTPError } from '@/lib/class/HTTPError';
+import { HTTPError } from '@/lib/HTTPError';
 import validateThemeContent from '@/lib/themes/validateThemeContent';
 import { t } from 'elysia';
 import { pack } from '@/lib/packs/permissions';

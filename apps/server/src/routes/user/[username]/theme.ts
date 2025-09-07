@@ -1,30 +1,30 @@
-import {YapockType} from '@/index'
-import {t} from 'elysia'
-import {HTTPError} from '@/lib/class/HTTPError'
-import {getUser} from './index'
-import {Theme} from '@/models/themes.model'
-import prisma from '@/db/prisma'
+import { YapockType } from '@/index';
+import { t } from 'elysia';
+import { HTTPError } from '@/lib/HTTPError';
+import { getUser } from './index';
+import { Theme } from '@/models/themes.model';
+import prisma from '@/db/prisma';
 
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({params, set}) => {
+        async ({ params, set }) => {
             let user = await getUser({
                 by: 'username',
                 value: params.username,
-            })
+            });
 
             // Try ID
             user ??= await getUser({
                 by: 'id',
                 value: params.username,
-            })
+            });
 
             if (!user) {
-                set.status = 404
+                set.status = 404;
                 throw HTTPError.notFound({
                     summary: 'The user was not found.',
-                })
+                });
             }
 
             // Find the active theme for the user
@@ -32,25 +32,25 @@ export default (app: YapockType) =>
                 const themeData = await prisma.user_themes.findFirst({
                     where: {
                         user_id: user.id,
-                        is_active: true
-                    }
-                })
+                        is_active: true,
+                    },
+                });
 
                 if (!themeData) {
-                    set.status = 404
+                    set.status = 404;
                     throw HTTPError.notFound({
                         summary: 'No active theme found for this user.',
-                    })
+                    });
                 }
 
-                return themeData
+                return themeData;
             } catch (error) {
                 // For errors, return a 500
-                set.status = 500
+                set.status = 500;
                 throw HTTPError.serverError({
                     summary: 'Failed to fetch theme.',
-                    detail: error.message
-                })
+                    detail: error.message,
+                });
             }
         },
         {
@@ -66,7 +66,7 @@ export default (app: YapockType) =>
             response: {
                 200: Theme,
                 404: t.Undefined(),
-                500: t.Undefined()
-            }
+                500: t.Undefined(),
+            },
         },
-    )
+    );

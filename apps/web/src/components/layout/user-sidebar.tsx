@@ -148,13 +148,7 @@ function FriendsListContainer({ collapsed }: { collapsed: boolean }) {
                             className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded-md"
                         >
                             <div className="flex items-center gap-2">
-                                <UserAvatar
-                                    name={friend.display_name}
-                                    size={32}
-                                    icon={friend.images_avatar}
-                                    showOnlineStatus={true}
-                                    isOnline={friend.online}
-                                />
+                                <UserAvatar user={friend} size={32} showOnlineStatus={true} />
                             </div>
                         </Link>
                     </Tooltip>
@@ -190,13 +184,7 @@ function FriendsListContainer({ collapsed }: { collapsed: boolean }) {
                         className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
                     >
                         <div className="flex items-center gap-2">
-                            <UserAvatar
-                                name={friend.display_name}
-                                size={32}
-                                icon={friend.images_avatar}
-                                showOnlineStatus={true}
-                                isOnline={friend.online} // Random online status for demo, replace with actual status
-                            />
+                            <UserAvatar user={friend} size={32} showOnlineStatus={true} />
                             <div className="flex flex-col">
                                 <Text size="sm">{friend.display_name}</Text>
                                 {friend.status && (
@@ -235,13 +223,7 @@ function PackMembersContainer({ collapsed }: { collapsed: boolean }) {
                             className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded-md"
                         >
                             <div className="flex items-center gap-2">
-                                <UserAvatar
-                                    name={member.display_name}
-                                    size={32}
-                                    icon={member.images?.avatar}
-                                    showOnlineStatus={false}
-                                    isOnline={member.online}
-                                />
+                                <UserAvatar user={member} size={32} showOnlineStatus={false} />
                             </div>
                         </Link>
                     </Tooltip>
@@ -278,13 +260,7 @@ function PackMembersContainer({ collapsed }: { collapsed: boolean }) {
                         className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
                     >
                         <div className="flex items-center gap-2">
-                            <UserAvatar
-                                name={member.display_name}
-                                size={32}
-                                icon={member.images?.avatar}
-                                showOnlineStatus={false}
-                                isOnline={member.online} // Random online status for demo, replace with actual status
-                            />
+                            <UserAvatar user={member} size={32} showOnlineStatus={false} />
                             <div className="flex flex-col">
                                 <Text size="sm">{member.display_name || member.username}</Text>
                                 {member.status && (

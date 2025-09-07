@@ -46,7 +46,7 @@ declare global {
 
 // Trigger clerk connection
 import './db/auth';
-import { HTTPError } from '@/lib/class/HTTPError';
+import { HTTPError } from '@/lib/HTTPError';
 
 const Yapock = new Elysia({})
     .use(
@@ -71,6 +71,7 @@ const Yapock = new Elysia({})
         return response;
     })
     .onError(({ code, error, request }) => {
+        console.log(code, error);
         // Ensure JSON response
         try {
             if (code === 'VALIDATION')

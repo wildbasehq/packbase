@@ -20,17 +20,15 @@ export default function FeedList({ posts, hasMore, onLoadMore, onPostDelete }: F
                 dataLength={posts.length}
                 next={onLoadMore}
                 hasMore={hasMore}
-                loader={<FeedLoading message="Loading more threads..." />}
+                loader={<FeedLoading message="Loading more howls..." />}
                 scrollThreshold={0.8}
                 endMessage={
-                    <Text className="py-8 text-center text-muted-foreground dark:text-neutral-400">
-                        You've reached the end of the threads.
-                    </Text>
+                    <Text className="py-8 text-center text-muted-foreground dark:text-neutral-400">You've reached the end of howls.</Text>
                 }
             >
-                <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
+                <div className="space-y-4">
                     {posts.map(post => (
-                        <div key={post.id} className="py-6 first:pt-0 px-4">
+                        <div key={post.id}>
                             <FeedPost post={post} postState={[posts, () => {}]} onDelete={() => onPostDelete(post.id)} />
                         </div>
                     ))}

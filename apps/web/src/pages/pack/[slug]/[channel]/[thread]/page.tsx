@@ -170,11 +170,11 @@ export default function PackChannelThread() {
 
             // Emit thread opened event for plugins
             if (window.packbase) {
-                window.packbase.emit('thread:opened', {
+                window.packbase.emit('howl:opened', {
                     threadId: id,
                     channelId: channel,
                     packSlug: slug,
-                    title: howl.data.title || 'Untitled Thread',
+                    title: howl.data.title || 'Untitled Howl',
                     postCount: (howl.data.comments?.length || 0) + 1,
                 })
             }

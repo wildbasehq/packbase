@@ -433,7 +433,7 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
                             type="text"
                             value={currentTheme.name}
                             onChange={e => handleNameChange(e.target.value)}
-                            className="text-lg font-semibold bg-transparent border-none focus:ring-0 p-0"
+                            className="text-lg font-semibold rounded-md px-2 border focus:ring-0"
                             placeholder="Theme name"
                         />
                     </div>

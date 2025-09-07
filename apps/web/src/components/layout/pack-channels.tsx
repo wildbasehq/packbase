@@ -12,12 +12,6 @@ import { HashtagIcon, MicrophoneIcon, HomeIcon, PaperAirplaneIcon, PlusIcon } fr
 import Popover from '@/components/shared/popover.tsx'
 import { vg } from '@/lib'
 
-const availableIcons = {
-    ArrowUpRight: ArrowUpRightIcon,
-    Sparkles: SparklesIcon,
-    Fire: FireIcon,
-}
-
 export function PackChannels() {
     const { navigation } = useUIStore()
     const { currentResource } = useResourceStore()
@@ -73,14 +67,6 @@ export function PackChannels() {
             </SidebarSection>
         </>
     )
-}
-
-function DynamicIcon({ name, ...props }: any) {
-    // icon://IconName
-    // @ts-ignore
-    const Icon = availableIcons[name.replace('icon://', '')]
-    if (!Icon) return <QuestionMarkCircleIcon {...props} />
-    return <Icon {...props} />
 }
 
 function Channel({

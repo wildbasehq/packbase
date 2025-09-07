@@ -792,7 +792,7 @@ export default function GuestLanding() {
                             <span className="font-wildbase-bold">base</span>
                         </span>
                         <span className="text-xs tracking-tight ml-22 text-default-alt font-wildbase-medium">
-                            &copy; 2025 ✱base. Landing hero (c) Aniplex
+                            &copy; 2025 ✱base. Not a company! Landing hero (c) Aniplex
                         </span>
                     </h1>
                 </div>

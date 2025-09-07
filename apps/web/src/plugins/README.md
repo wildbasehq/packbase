@@ -64,15 +64,15 @@ window.packbase.emit('my-plugin:feature-activated', {
 
 Packbase emits the following events that plugins can listen for:
 
-| Event Name | Description | Data Structure |
-|------------|-------------|----------------|
-| `message:received` | Fired when a new message is received | `{ messageId, content, author, timestamp }` |
-| `message:sent` | Fired when the user sends a message | `{ messageId, content, timestamp }` |
-| `thread:opened` | Fired when a thread is opened | `{ threadId, channelId, title }` |
-| `user:login` | Fired when a user logs in | `{ userId, username }` |
-| `user:logout` | Fired when a user logs out | `{}` |
-| `plugin:registered` | Fired when a plugin is registered | `{ pluginId, pluginInfo }` |
-| `plugin:unregistered` | Fired when a plugin is unregistered | `{ pluginId, pluginInfo }` |
+| Event Name            | Description                          | Data Structure                              |
+|-----------------------|--------------------------------------|---------------------------------------------|
+| `message:received`    | Fired when a new message is received | `{ messageId, content, author, timestamp }` |
+| `message:sent`        | Fired when the user sends a message  | `{ messageId, content, timestamp }`         |
+| `howl:opened`         | Fired when a howl is opened          | `{ howlId, channelId, title }`              |
+| `user:login`          | Fired when a user logs in            | `{ userId, username }`                      |
+| `user:logout`         | Fired when a user logs out           | `{}`                                        |
+| `plugin:registered`   | Fired when a plugin is registered    | `{ pluginId, pluginInfo }`                  |
+| `plugin:unregistered` | Fired when a plugin is unregistered  | `{ pluginId, pluginInfo }`                  |
 
 ## Plugin API Reference
 

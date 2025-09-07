@@ -1,7 +1,7 @@
 import { t } from 'elysia';
 import { YapockType } from '@/index';
 import prisma from '@/db/prisma';
-import { HTTPError } from '@/lib/class/HTTPError';
+import { HTTPError } from '@/lib/HTTPError';
 import { CommonErrorResponses, DM_ERROR_CODES } from '@/utils/dm/errors';
 import { CreateMessageBody, MESSAGE_TYPES, validateMessageType } from '@/utils/dm/validation';
 import { DMRateLimiter } from '@/utils/dm/rate-limiter';

@@ -1,25 +1,25 @@
-import {FeedController} from '@/lib/class/FeedController'
+import { FeedController } from '@/lib/FeedController';
 
 async function testFeedPerformance() {
-    const userId = process.argv.find(arg => arg.startsWith('--userId='))?.split('=')[1] || 'test-user-id'
-    const feedController = new FeedController()
+    const userId = process.argv.find((arg) => arg.startsWith('--userId='))?.split('=')[1] || 'test-user-id';
+    const feedController = new FeedController();
 
-    console.time('Feed Loading')
+    console.time('Feed Loading');
 
     try {
-        const homeResult = await feedController.getHomeFeed(userId, 1)
-        console.log(`Home feed loaded ${homeResult.data.length} posts`)
+        const homeResult = await feedController.getHomeFeed(userId, 1);
+        console.log(`Home feed loaded ${homeResult.data.length} posts`);
 
         // Test user feed
-        const userResult = await feedController.getUserFeed(userId, 1)
-        console.log(`User feed loaded ${userResult.data.length} posts`)
+        const userResult = await feedController.getUserFeed(userId, 1);
+        console.log(`User feed loaded ${userResult.data.length} posts`);
 
         // You can test other feed types here
     } catch (error) {
-        console.error('Error:', error)
+        console.error('Error:', error);
     }
 
-    console.timeEnd('Feed Loading')
+    console.timeEnd('Feed Loading');
 }
 
-testFeedPerformance()
+testFeedPerformance();

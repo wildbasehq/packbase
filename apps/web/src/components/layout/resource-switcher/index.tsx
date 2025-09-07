@@ -24,6 +24,7 @@ import { VerifiedBadge } from '@/components/layout/resource-switcher/pack-badge.
 import PagedModal from '@/components/shared/paged-modal'
 import ResourceSettingsTheme from '@/components/layout/resource-switcher/pages/theme.tsx'
 import { SwatchIcon } from '@heroicons/react/16/solid'
+import { useContentFrame } from '@/src/components'
 
 export default function ResourceSwitcher() {
     const { currentResource } = useResourceStore()
@@ -143,6 +144,9 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
 
 function ResourceSettingsModal() {
     const { currentResource } = useResourceStore()
+    const { data } = useContentFrame('get', `pack/${currentResource.id}/settings`)
+    // Get unique categories that are ONLY strings.
+    const packSettingsCategories = [...new Set<string>(data?.map(obj => obj.definition.category).filter(Boolean))]
 
     // Create the resource profile footer component
     const ResourceProfileFooter = (
@@ -180,6 +184,12 @@ function ResourceSettingsModal() {
                     <ResourceSettingsTheme />
                 </PagedModal.Body>
             </PagedModal.Page>
+
+            {packSettingsCategories?.map(category => (
+                <PagedModal.Page id={category} title={category.toTitleCase()} icon={Cog6ToothIcon}>
+                    <PagedModal.Body>Hewwo from {category}!!!!</PagedModal.Body>
+                </PagedModal.Page>
+            ))}
 
             {/*<PagedModal.Page id="delete" title="Delete This Pack" description="Delete the pack and all data" icon={TrashIcon}>*/}
             {/*    <PagedModal.Body>*/}

@@ -19,6 +19,8 @@ import { AvatarButton, FeedPostData, LoadingCircle } from '@/src/components'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { UserGroupIcon } from '@heroicons/react/16/solid'
 import { BentoGenericUnlockableBadge, BentoStaffBadge } from '@/lib/utils/pak.tsx'
+import Card from '@/components/shared/card.tsx'
+import UserInfoCol from '@/components/shared/user/info-col.tsx'
 
 interface ThreadPostProps {
     post: FeedPostData
@@ -115,7 +117,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
     }
 
     return (
-        <div className={`relative ${!isRoot ? 'ml-12' : ''} ${threadLineClass}`}>
+        <Card className={`relative !border-0 !border-t border-muted !max-w-full ${!isRoot ? 'ml-12' : ''} ${threadLineClass}`}>
             <div className={`relative ${!isRoot ? 'pt-3' : ''}`}>
                 {/* Thread connector dot */}
                 {/*{!isRoot && (*/}
@@ -145,7 +147,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                     {/* Content */}
                     <div className="flex-1 min-w-0 -mt-1">
                         <div className="flex items-center justify-between mb-1">
-                            <div className="flex items-baseline gap-2">
+                            <UserInfoCol user={post.user} className="flex items-baseline gap-2">
                                 <Link href={`/@${post.user?.username}/`} className="font-semibold hover:underline text-default">
                                     {post.user?.display_name || post.user?.username}
                                 </Link>
@@ -174,7 +176,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 <Link href={`/p/universe/all/${post.id}`}>
                                     <time className="text-sm text-muted-foreground">{formatRelativeTime(post.created_at)}</time>
                                 </Link>
-                            </div>
+                            </UserInfoCol>
 
                             {/* Delete button for author */}
                             {isAuthor && (
@@ -282,6 +284,6 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                     </div>
                 )}
             </div>
-        </div>
+        </Card>
     )
 }

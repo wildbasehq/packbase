@@ -3,7 +3,7 @@ import { YapockType } from '@/index';
 import { getPack } from '@/routes/pack/[id]';
 import { ErrorTypebox } from '@/utils/errors';
 import { PackResponse } from '@/models/defs';
-import { HTTPError } from '@/lib/class/HTTPError';
+import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 
 export default (app: YapockType) =>

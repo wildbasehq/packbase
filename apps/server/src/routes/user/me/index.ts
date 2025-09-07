@@ -6,10 +6,10 @@ import { YapockType } from '@/index';
 import { getUser, UserCache } from '@/routes/user/[username]';
 import { t } from 'elysia';
 import BannedUsernames from '@/tables/banned_usernames.json';
-import { HTTPError } from '@/lib/class/HTTPError';
+import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import requiresToken from '@/utils/identity/requires-token';
-import createStorage from '@/lib/class/storage';
+import createStorage from '@/lib/storage';
 import { UnlockablesManager } from '@/utils/unlockables-manager';
 import clerkClient from '@/db/auth';
 

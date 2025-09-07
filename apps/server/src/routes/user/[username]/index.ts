@@ -2,7 +2,7 @@ import { YapockType } from '@/index';
 import { t } from 'elysia';
 import { UserProfile } from '@/models/defs';
 import posthog, { distinctId } from '@/utils/posthog';
-import { HTTPError } from '@/lib/class/HTTPError';
+import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import clerkClient from '@/db/auth';
 

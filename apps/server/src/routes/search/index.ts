@@ -5,12 +5,12 @@
 import { t } from 'elysia';
 import { YapockType } from '@/index';
 import { ErrorTypebox } from '@/utils/errors';
-import { HTTPError } from '@/lib/class/HTTPError';
-import { search, SearchApiError, SearchResult } from '@/lib/class/search';
+import { HTTPError } from '@/lib/HTTPError';
+import { search, SearchApiError, SearchResult } from '@/lib/search';
 import { getUser } from '@/routes/user/[username]';
 import { getPack } from '@/routes/pack/[id]';
 import { getPost } from '@/lib/api/post';
-import { BulkPostLoader } from '@/lib/class/BulkPostLoader';
+import { BulkPostLoader } from '@/lib/BulkPostLoader';
 import posthog, { distinctId } from '@/utils/posthog';
 
 const log = require('debug')('vg:search');

@@ -1,5 +1,5 @@
-import sharp from 'sharp'
-import createStorage from '@/lib/class/storage'
+import sharp from 'sharp';
+import createStorage from '@/lib/storage';
 
 export default async function uploadFile(bucket: string, path: string, base64: string, upsert: boolean = false, animated: boolean = true) {
     // Extract user ID from the path (assuming format: userId/...)
@@ -21,8 +21,8 @@ export default async function uploadFile(bucket: string, path: string, base64: s
 
         return {
             data: {
-                path: result.path
-            }
+                path: result.path,
+            },
         };
     }
 
@@ -35,7 +35,7 @@ export default async function uploadFile(bucket: string, path: string, base64: s
 
     return {
         data: {
-            path: result.path
-        }
+            path: result.path,
+        },
     };
 }

@@ -303,9 +303,9 @@ export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', 
 
     let content
     if (isLoading && !hasPosts) {
-        content = <FeedLoading isMasonry={false} message="Loading threads..." />
+        content = <FeedLoading isMasonry={false} message="Loading howls..." />
     } else if (hasEmptyPosts) {
-        content = <FeedEmpty message="No threads yet. Be the first to start a conversation!" />
+        content = <FeedEmpty message="No howls yet. Be the first to start a conversation!" />
     } else {
         content = (
             <FeedList

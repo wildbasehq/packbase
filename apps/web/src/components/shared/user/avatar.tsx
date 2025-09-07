@@ -4,6 +4,7 @@
 
 import BoringAvatar from 'boring-avatars'
 import { clsx } from 'clsx'
+import Link from '@/components/shared/link.tsx'
 
 export default function UserAvatar({
     user,
@@ -56,6 +57,7 @@ export default function UserAvatar({
         )
     } else {
         return (
+            // <Link href={`/@${user?.username}`}>
             <div className="relative" style={props.style}>
                 <img
                     width={1024}
@@ -67,6 +69,7 @@ export default function UserAvatar({
                 />
                 {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size} />}
             </div>
+            // </Link>
         )
     }
 }

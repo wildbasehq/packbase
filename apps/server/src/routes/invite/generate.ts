@@ -4,7 +4,7 @@ import { t } from 'elysia';
 import { YapockType } from '@/index';
 import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { ErrorTypebox } from '@/utils/errors';
-import { HTTPError } from '@/lib/class/HTTPError';
+import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import clerkClient from '@/db/auth';
 import { Invitation } from '@clerk/backend';

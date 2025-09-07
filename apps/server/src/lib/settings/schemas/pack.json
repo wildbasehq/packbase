@@ -1,0 +1,22 @@
+{
+  "model": "pack",
+  "version": "1.0.0",
+  "settings": {
+    "trinkets": {
+      "type": "number",
+      "default": 0,
+      "userModifiable": false,
+      "description": "Pack value-less currency",
+      "db": "profiles.trinkets"
+    },
+    "theme": {
+      "type": "string",
+      "values": ["light", "dark", "auto"],
+      "default": "auto",
+      "userModifiable": true,
+      "description": "User interface theme preference",
+      "category": "appearance",
+      "db": "profiles.theme"
+    }
+  }
+}
