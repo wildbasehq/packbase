@@ -37,7 +37,7 @@ export default function UserAvatar({
         height: typeof size === 'number' ? size : sizes[size],
     }
 
-    const isOnline = user.online
+    const isOnline = user?.online
 
     if ((!user || (!user.images?.avatar && !user.images_avatar)) && !icon) {
         return (
