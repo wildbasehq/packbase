@@ -11,7 +11,6 @@ export default function UserAvatar({
     size = 'lg',
     icon,
     showOnlineStatus = false,
-    isOnline = false,
     ...props
 }: {
     user?: any // object - @todo: type this
@@ -37,6 +36,8 @@ export default function UserAvatar({
         width: typeof size === 'number' ? size : sizes[size],
         height: typeof size === 'number' ? size : sizes[size],
     }
+
+    const isOnline = user.online
 
     if ((!user || (!user.images?.avatar && !user.images_avatar)) && !icon) {
         return (
