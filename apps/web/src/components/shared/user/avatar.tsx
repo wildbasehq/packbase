@@ -62,7 +62,7 @@ export default function UserAvatar({
                 <img
                     width={1024}
                     height={1024}
-                    src={user?.images?.avatar || icon}
+                    src={user?.images?.avatar || user?.images_avatar || icon}
                     alt={`${user?.username || props.display_name}'s avatar`}
                     {...props}
                     className={clsx(props.className, `inline-flex items-center justify-center overflow-hidden rounded-md text-white`)}
