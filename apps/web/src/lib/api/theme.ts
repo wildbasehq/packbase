@@ -132,22 +132,22 @@ export function useThemes() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
+    const fetchThemes = async () => {
+        try {
+            setLoading(true)
+            const data = await ThemeAPI.getAll()
+            setThemes(data)
+            setError(null)
+        } catch (err) {
+            setError('Failed to fetch themes')
+            console.error(err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     // Fetch themes on mount
     useEffect(() => {
-        const fetchThemes = async () => {
-            try {
-                setLoading(true)
-                const data = await ThemeAPI.getAll()
-                setThemes(data)
-                setError(null)
-            } catch (err) {
-                setError('Failed to fetch themes')
-                console.error(err)
-            } finally {
-                setLoading(false)
-            }
-        }
-
         fetchThemes()
     }, [])
 
@@ -155,12 +155,7 @@ export function useThemes() {
     const addTheme = async (theme: Theme) => {
         const newTheme = await ThemeAPI.create(theme)
         if (newTheme) {
-            // If the new theme is active, deactivate all others
-            if (newTheme.is_active) {
-                setThemes(prev => prev.map(t => ({ ...t, is_active: t.id === newTheme.id })))
-            } else {
-                setThemes(prev => [...prev, newTheme])
-            }
+            fetchThemes()
             return newTheme
         }
         return null
@@ -170,12 +165,7 @@ export function useThemes() {
     const updateTheme = async (id: string, theme: Partial<Theme>) => {
         const updatedTheme = await ThemeAPI.update(id, theme)
         if (updatedTheme) {
-            // If the updated theme is active, deactivate all others
-            if (updatedTheme.is_active) {
-                setThemes(prev => prev.map(t => ({ ...t, is_active: t.id === updatedTheme.id })))
-            } else {
-                setThemes(prev => prev.map(t => (t.id === id ? updatedTheme : t)))
-            }
+            fetchThemes()
             return updatedTheme
         }
         return null
@@ -185,7 +175,7 @@ export function useThemes() {
     const deleteTheme = async (id: string) => {
         const success = await ThemeAPI.delete(id)
         if (success) {
-            setThemes(prev => prev.filter(t => t.id !== id))
+            fetchThemes()
         }
         return success
     }

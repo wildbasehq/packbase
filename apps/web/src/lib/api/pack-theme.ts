@@ -140,23 +140,25 @@ export function usePackThemes(packId: string) {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
+    const fetchThemes = async () => {
+        if (!packId) return
+
+        try {
+            setLoading(true)
+            const data = await PackThemeAPI.getAll(packId)
+            setThemes(data)
+            setError(null)
+        } catch (err) {
+            setError('Failed to fetch pack themes')
+            console.error(err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     // Fetch themes on mount
     useEffect(() => {
         if (!packId) return
-
-        const fetchThemes = async () => {
-            try {
-                setLoading(true)
-                const data = await PackThemeAPI.getAll(packId)
-                setThemes(data)
-                setError(null)
-            } catch (err) {
-                setError('Failed to fetch pack themes')
-                console.error(err)
-            } finally {
-                setLoading(false)
-            }
-        }
 
         fetchThemes()
     }, [packId])
@@ -165,12 +167,7 @@ export function usePackThemes(packId: string) {
     const addTheme = async (theme: Omit<Theme, 'id' | 'pack_id' | 'created_at' | 'updated_at'>) => {
         const newTheme = await PackThemeAPI.create(packId, theme)
         if (newTheme) {
-            // If the new theme is active, deactivate all others
-            if (newTheme.is_active) {
-                setThemes(prev => prev.map(t => ({ ...t, is_active: t.id === newTheme.id })))
-            } else {
-                setThemes(prev => [...prev, newTheme])
-            }
+            fetchThemes()
             return newTheme
         }
         return null
@@ -180,12 +177,7 @@ export function usePackThemes(packId: string) {
     const updateTheme = async (themeId: string, theme: Partial<Omit<Theme, 'id' | 'pack_id' | 'created_at' | 'updated_at'>>) => {
         const updatedTheme = await PackThemeAPI.update(packId, themeId, theme)
         if (updatedTheme) {
-            // If the updated theme is active, deactivate all others
-            if (updatedTheme.is_active) {
-                setThemes(prev => prev.map(t => ({ ...t, is_active: t.id === updatedTheme.id })))
-            } else {
-                setThemes(prev => prev.map(t => (t.id === themeId ? updatedTheme : t)))
-            }
+            fetchThemes()
             return updatedTheme
         }
         return null
@@ -195,7 +187,7 @@ export function usePackThemes(packId: string) {
     const deleteTheme = async (themeId: string) => {
         const success = await PackThemeAPI.delete(packId, themeId)
         if (success) {
-            setThemes(prev => prev.filter(t => t.id !== themeId))
+            fetchThemes()
         }
         return success
     }
