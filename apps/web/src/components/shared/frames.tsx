@@ -28,6 +28,15 @@ function InnerCSS({ children }: { children: React.ReactNode }) {
             doc?.head.append(ele.cloneNode(true))
         })
         // }
+
+        // dark mode support
+        if (document.documentElement.classList.contains('dark')) {
+            doc?.documentElement.classList.add('dark')
+        } else if (doc?.documentElement.classList.contains('dark')) {
+            doc?.documentElement.classList.remove('dark')
+        }
+
+        doc?.body.classList.add('bg-white', 'dark:bg-n-8')
     }, [doc])
 
     return children
