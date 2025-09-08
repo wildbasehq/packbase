@@ -3,7 +3,6 @@
  */
 
 import React, { lazy, Suspense, useEffect } from 'react'
-import { Text } from '@/components/shared/text.tsx'
 import { SidebarLayout } from '@/components/shared/sidebar-layout.tsx'
 import { Providers } from './provider.tsx'
 import { SidebarProvider } from '@/lib/context/sidebar-context'
@@ -127,8 +126,7 @@ Thanks for being a crucial part of the internet.
 
                                     <ClerkLoaded>
                                         <Preload>
-                                            <div id="NGRoot" className="h-full overflow-y-auto scrollbar-hide">
-                                                <div className="absolute bottom-0 left-0 right-0 h-24 z-10 bg-gradient-to-t from-white to-transparent pointer-events-none dark:from-n-8"></div>
+                                            <div id="NGRoot" className="h-full overflow-y-auto">
                                                 <WaitlistCheck />
                                                 <SignedOut>
                                                     <div className="flex fixed top-4 z-40 w-full">

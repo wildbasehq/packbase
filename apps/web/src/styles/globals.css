@@ -103,22 +103,22 @@
   body {
     @apply bg-background text-foreground;
   }
-}
 
-.bg-card {
-  @apply bg-white dark:bg-n-7;
-}
+    .bg-card {
+        @apply bg-white dark:bg-n-7;
+    }
 
-.bg-card\/75 {
-  @apply bg-white/75 dark:bg-n-7/75;
-}
+    .bg-card\/75 {
+        @apply bg-white/75 dark:bg-n-7/75;
+    }
 
-.bg-card-solid {
-  @apply bg-white dark:bg-n-7;
-}
+    .bg-card-solid {
+        @apply bg-white dark:bg-n-7;
+    }
 
-.shimmer-template {
-  @apply before:absolute before:border-n-5 before:inset-0 before:border-t before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-n-5/5 before:to-transparent;
+    .shimmer-template {
+        @apply before:absolute before:border-n-5 before:inset-0 before:border-t before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-n-5/5 before:to-transparent;
+    }
 }
 
 /* Tailwind classes are now used for grid layout styling */

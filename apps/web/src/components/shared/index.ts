@@ -66,3 +66,6 @@ export * from './user/info-col'
 
 // API
 export * from './content-frame'
+
+// Frames
+export * from './frames'
