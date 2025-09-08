@@ -119,7 +119,7 @@ export function validateThemeContent(content: ThemeContent, dryRun: boolean = fa
         //     }
         // }
 
-        result.css = beautifyCSS(result.css);
+        result.css = beautifyCSS(content.css);
     }
 
     return result;
