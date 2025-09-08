@@ -164,7 +164,7 @@ export default function PackLayout({ children }: { children: React.ReactNode }) 
         )
 
     return (
-        <SafeFrame>
+        <SafeFrame className="w-full h-full">
             <SidebarPortal>
                 <PackChannels />
             </SidebarPortal>
