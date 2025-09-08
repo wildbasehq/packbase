@@ -11,7 +11,7 @@ import { FaceFrownIcon } from '@heroicons/react/24/solid'
 import { OrbitIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useParams } from 'wouter'
-import { PackChannels } from '@/src/components'
+import { PackChannels, SafeFrame } from '@/src/components'
 import { SidebarPortal } from '@/lib/context/sidebar-context.tsx'
 import { CustomTheme } from '@/components/shared/theme/custom-theme'
 
@@ -164,15 +164,13 @@ export default function PackLayout({ children }: { children: React.ReactNode }) 
         )
 
     return (
-        <>
+        <SafeFrame>
             <SidebarPortal>
                 <PackChannels />
             </SidebarPortal>
 
-            {currentResource && (
-                <CustomTheme packId={currentResource.id} />
-            )}
+            {currentResource && <CustomTheme packId={currentResource.id} />}
             {children}
-        </>
+        </SafeFrame>
     )
 }
