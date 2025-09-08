@@ -37,14 +37,16 @@ export default (app: YapockType) =>
                 let sanitizedHTML = existingTheme.html;
                 let sanitizedCSS = existingTheme.css;
 
-                if (body.html || body.css) {
-                    const validatedContent = validateThemeContent({
-                        html: body.html || existingTheme.html,
-                        css: body.css || existingTheme.css,
-                    });
+                if (existingTheme.html !== body.html || existingTheme.css !== body.css) {
+                    if (body.html || body.css) {
+                        const validatedContent = validateThemeContent({
+                            html: body.html || existingTheme.html,
+                            css: body.css || existingTheme.css,
+                        });
 
-                    if (body.html) sanitizedHTML = validatedContent.html;
-                    if (body.css) sanitizedCSS = validatedContent.css;
+                        if (body.html) sanitizedHTML = validatedContent.html;
+                        if (body.css) sanitizedCSS = validatedContent.css;
+                    }
                 }
 
                 const updateData = {
