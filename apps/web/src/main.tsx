@@ -44,17 +44,17 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <div
-            className="h-12 w-screen"
-            style={{
-                position: 'fixed',
-                zIndex: '99999',
-                opacity: 0.2,
-                pointerEvents: 'none',
-                backgroundImage: 'url("/img/devel.symbolic.svg")',
-                backgroundRepeat: 'repeat-x',
-            }}
-        />
+        {/*<div*/}
+        {/*    className="h-12 w-screen"*/}
+        {/*    style={{*/}
+        {/*        position: 'fixed',*/}
+        {/*        zIndex: '99999',*/}
+        {/*        opacity: 0.2,*/}
+        {/*        pointerEvents: 'none',*/}
+        {/*        backgroundImage: 'url("/img/devel.symbolic.svg")',*/}
+        {/*        backgroundRepeat: 'repeat-x',*/}
+        {/*    }}*/}
+        {/*/>*/}
         <ClerkProvider
             publishableKey={PUBLISHABLE_KEY}
             afterSignOutUrl="/"
