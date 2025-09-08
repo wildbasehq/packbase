@@ -102,24 +102,24 @@ export function validateThemeContent(content: ThemeContent, dryRun: boolean = fa
     // Only sanitize CSS if it's provided
     if (content.css) {
         // Sanitize CSS
-        const sanitizedCSS = sanitizeCSS(content.css);
+        // const sanitizedCSS = sanitizeCSS(content.css);
 
         // Store sanitized content
-        result.css = sanitizedCSS;
+        // result.css = sanitizedCSS;
 
         // Check if sanitized CSS is too different from original (potential attack)
-        if (sanitizedCSS.length < content.css.length * SIMILARITY_THRESHOLD) {
-            result.isValid = false;
-            result.cssIssue = 'CSS contains too many unsafe properties or values';
+        // if (sanitizedCSS.length < content.css.length * SIMILARITY_THRESHOLD) {
+        //     result.isValid = false;
+        //     result.cssIssue = 'CSS contains too many unsafe properties or values';
+        //
+        //     if (!dryRun) {
+        //         throw HTTPError.badRequest({
+        //             summary: 'CSS contains too many unsafe properties or values.',
+        //         });
+        //     }
+        // }
 
-            if (!dryRun) {
-                throw HTTPError.badRequest({
-                    summary: 'CSS contains too many unsafe properties or values.',
-                });
-            }
-        }
-
-        // result.css = beautifyCSS(result.css);
+        result.css = beautifyCSS(result.css);
     }
 
     return result;
