@@ -25,6 +25,7 @@ import PagedModal from '@/components/shared/paged-modal'
 import ResourceSettingsTheme from '@/components/layout/resource-switcher/pages/theme.tsx'
 import { SwatchIcon } from '@heroicons/react/16/solid'
 import { useContentFrame } from '@/src/components'
+import ServerConfigRender, { decideCategoryDescription } from '@/components/shared/input/server-config-render.tsx'
 
 export default function ResourceSwitcher() {
     const { currentResource } = useResourceStore()
@@ -146,7 +147,18 @@ function ResourceSettingsModal() {
     const { currentResource } = useResourceStore()
     const { data } = useContentFrame('get', `pack/${currentResource.id}/settings`)
     // Get unique categories that are ONLY strings.
-    const packSettingsCategories = [...new Set<string>(data?.map(obj => obj.definition.category).filter(Boolean))]
+    const packSettingsCategories =
+        data?.reduce(
+            (acc, obj) => {
+                const category = obj.definition.category
+                if (category) {
+                    if (!acc[category]) acc[category] = []
+                    acc[category].push(obj)
+                }
+                return acc
+            },
+            {} as Record<string, any[]>
+        ) ?? {}
 
     // Create the resource profile footer component
     const ResourceProfileFooter = (
@@ -185,9 +197,16 @@ function ResourceSettingsModal() {
                 </PagedModal.Body>
             </PagedModal.Page>
 
-            {packSettingsCategories?.map(category => (
-                <PagedModal.Page id={category} title={category.toTitleCase()} icon={Cog6ToothIcon}>
-                    <PagedModal.Body>Hewwo from {category}!!!!</PagedModal.Body>
+            {Object.keys(packSettingsCategories || {})?.map(category => (
+                <PagedModal.Page
+                    id={category}
+                    title={category.toTitleCase()}
+                    description={decideCategoryDescription(category)}
+                    icon={Cog6ToothIcon}
+                >
+                    <PagedModal.Body>
+                        <ServerConfigRender config={packSettingsCategories[category]} />
+                    </PagedModal.Body>
                 </PagedModal.Page>
             ))}
 

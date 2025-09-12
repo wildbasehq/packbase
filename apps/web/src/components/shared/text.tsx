@@ -6,7 +6,7 @@ import Link from './link'
 const textSize = {
     xs: 'text-xs',
     sm: 'text-sm',
-    base: 'text-base',
+    md: 'text-base',
     lg: 'text-lg',
     xl: 'text-xl',
     '2xl': 'text-2xl',
@@ -16,13 +16,13 @@ const textSize = {
 export function Heading({
     as,
     children,
-    size = 'base',
+    size = 'md',
     alt,
     ...props
 }: {
     as?: React.ElementType
     children?: React.ReactNode
-    size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl'
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
     alt?: boolean
     [key: string]: any
 }): JSX.Element {
@@ -46,7 +46,7 @@ export function Text({
 }: {
     children?: React.ReactNode
     as?: React.ElementType
-    size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl'
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
     alt?: boolean
     [key: string]: any
 }): JSX.Element {

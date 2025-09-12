@@ -7,16 +7,35 @@
       "default": 0,
       "userModifiable": false,
       "description": "Pack value-less currency",
-      "db": "profiles.trinkets"
+      "category": "server_configuration"
     },
-    "theme": {
+
+    "created_at": {
       "type": "string",
-      "values": ["light", "dark", "auto"],
-      "default": "auto",
+      "userModifiable": false,
+      "category": "server_configuration",
+      "db": "packs.created_at"
+    },
+    "owner_id": {
+      "type": "string",
+      "userModifiable": false,
+      "category": "server_configuration",
+      "db": "packs.owner_id"
+    },
+    "container_type": {
+      "type": "string",
+      "values": ["channels", "kanban"],
       "userModifiable": true,
-      "description": "User interface theme preference",
-      "category": "appearance",
-      "db": "profiles.theme"
+      "description": "How your pack's content is displayed. The underlying data remains the same, but it's up to the UI how to display the content.",
+      "category": "server_configuration",
+      "db": "packs.container_type"
+    },
+
+    "alpha_note": {
+      "type": "string",
+      "default": "Your pack will soon live in it's own transferable database for better data ownership. Most of these settings aren't accessible right now, but are here for you to see what data we have on your Pack. Yes this note is in the schema. No I do not care.",
+      "userModifiable": false,
+      "category": "server_configuration"
     }
   }
 }

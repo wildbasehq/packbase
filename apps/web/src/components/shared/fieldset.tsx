@@ -27,7 +27,8 @@ export function Field({ className, ...props }: { className?: string } & Omit<Hea
             className={clsx(
                 className,
                 '[&>[data-slot=label]+[data-slot=control]]:mt-3',
-                '[&>[data-slot=label]+[data-slot=description]]:mt-1',
+                // '[&>[data-slot=label]+[data-slot=description]]:mt-1',
+                '[&>[data-slot=label]+[data-slot=description]]:line-height-0',
                 '[&>[data-slot=description]+[data-slot=control]]:mt-3',
                 '[&>[data-slot=control]+[data-slot=description]]:mt-3',
                 '[&>[data-slot=control]+[data-slot=error]]:mt-3',
@@ -42,7 +43,7 @@ export function Label({ className, ...props }: { className?: string } & Omit<Hea
         <Headless.Label
             data-slot="label"
             {...props}
-            className={clsx(className, 'text-base/6 text-zinc-950 select-none data-disabled:opacity-50 sm:text-sm/6 dark:text-white')}
+            className={clsx(className, 'text-base/6 select-none data-disabled:opacity-50 sm:text-sm/6')}
         />
     )
 }

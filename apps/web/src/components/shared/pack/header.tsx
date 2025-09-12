@@ -1,5 +1,5 @@
 import Markdown from '@/components/shared/markdown'
-import { Heading } from '@/components/shared/text'
+import { Heading, Text } from '@/components/shared/text'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { vg } from '@/lib/api'
 import { toast } from 'sonner'
@@ -31,7 +31,7 @@ export default function PackHeader({ ...props }: any) {
                             <Heading>{pack.display_name || pack.slug}</Heading>
                             {/* Small @username */}
                             <div className="flex items-center">
-                                <p className="text-alt-2 truncate text-sm font-medium">@{pack.slug}</p>
+                                <Text alt>@{pack.slug}</Text>
                             </div>
                         </div>
                     </div>

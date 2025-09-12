@@ -8,6 +8,7 @@ import { Text } from '@/components/shared/text'
 import { FeedPost } from '@/components/feed'
 import { FeedListProps } from './types/feed'
 import FeedLoading from './feed-loading'
+import PagedContainer, { PagedContentLoadStatus } from '@/components/shared/paged-container.tsx'
 
 /**
  * Renders a linear list of feed posts in thread style
@@ -15,13 +16,12 @@ import FeedLoading from './feed-loading'
 export default function FeedList({ posts, hasMore, onLoadMore, onPostDelete }: FeedListProps) {
     return (
         <div className="max-w-2xl mx-auto">
-            <InfiniteScroll
-                scrollableTarget="NGRoot"
-                dataLength={posts.length}
-                next={onLoadMore}
-                hasMore={hasMore}
+            <PagedContainer
+                onNeedsContent={function (page: number): PagedContentLoadStatus {
+                    console.log('Function not implemented.', page)
+                    return PagedContentLoadStatus.ERROR
+                }}
                 loader={<FeedLoading message="Loading more howls..." />}
-                scrollThreshold={0.8}
                 endMessage={
                     <Text className="py-8 text-center text-muted-foreground dark:text-neutral-400">You've reached the end of howls.</Text>
                 }
@@ -33,7 +33,7 @@ export default function FeedList({ posts, hasMore, onLoadMore, onPostDelete }: F
                         </div>
                     ))}
                 </div>
-            </InfiniteScroll>
+            </PagedContainer>
         </div>
     )
 }

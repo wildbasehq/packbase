@@ -7,11 +7,12 @@ import { FeedController } from '@/lib/FeedController';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import createStorage from '@/lib/storage';
+import Baozi from '@/lib/events';
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ body: { tenant_id, channel_id, assets, body, content_type }, set, user }: any) => {
+        async ({ body: { tenant_id, channel_id, assets, body, content_type }, set, user }) => {
             await requiresUserProfile({ set, user });
 
             if (tenant_id === 'universe') tenant_id = '00000000-0000-0000-0000-000000000000';
@@ -64,17 +65,17 @@ export default (app: YapockType) =>
                 }
             }
 
+            const dbCreate = await Baozi.trigger('HOWL_CREATE', {
+                tenant_id,
+                channel_id,
+                content_type,
+                body,
+                user_id: user.sub,
+            });
+
             let data;
             try {
-                data = await prisma.posts.create({
-                    data: {
-                        tenant_id,
-                        channel_id,
-                        content_type,
-                        body,
-                        user_id: user.sub,
-                    },
-                });
+                data = await prisma.posts.create({ data: dbCreate });
             } catch (error) {
                 set.status = 400;
                 throw HTTPError.fromError(error);

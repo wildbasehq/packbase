@@ -18,8 +18,8 @@
     "dets": "^0.16.4"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^1.0.15",
     "@aws-sdk/client-s3": "^3.848.0",
-    "fast-xml-parser": "^4.3.2",
     "@clerk/backend": "^1.32.2",
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/swagger": "^1.1.5",
@@ -30,6 +30,7 @@
     "@types/js-beautify": "^1.14.3",
     "@types/lru-cache": "^7.10.10",
     "@types/node": "^22.13.9",
+    "ai": "^5.0.41",
     "async-lock": "^1.4.1",
     "base64-arraybuffer": "^1.0.2",
     "debug": "^4.3.4",
@@ -37,6 +38,7 @@
     "elysia-autoload": "^1.5.1",
     "emoji-regex": "^10.3.0",
     "esbuild-plugin-autoload": "^0.2.1",
+    "fast-xml-parser": "^4.3.2",
     "ink": "^6.0.1",
     "isomorphic-dompurify": "^1.9.0",
     "jose": "^5.1.3",

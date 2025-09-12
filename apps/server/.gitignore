@@ -105,3 +105,6 @@ dist
 
 # Direnv
 .direnv
+
+# PLugins
+plugins/

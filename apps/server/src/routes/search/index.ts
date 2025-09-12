@@ -35,7 +35,7 @@ const SearchErrorSchema = t.Object({
     query: t.Optional(t.String()),
 });
 
-export default (app: YapockType) =>
+const SearchAPI = (app: YapockType) =>
     app.get(
         '',
         async ({ query, set }) => {
@@ -183,3 +183,5 @@ export default (app: YapockType) =>
             },
         },
     );
+
+export default SearchAPI;

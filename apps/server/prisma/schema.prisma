@@ -32,6 +32,7 @@ model packs {
   description       String?
   owner_id          String?             @db.Uuid
   images_header     String?
+  container_type    String?
   packs_memberships packs_memberships[]
   packs_pages       packs_pages[]
   posts             posts[]
@@ -43,11 +44,12 @@ model packs {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model packs_memberships {
-  id        BigInt   @id(map: "packs_memberships_pkey") @default(autoincrement())
-  joined_at DateTime @default(now()) @db.Timestamptz(6)
-  tenant_id String   @db.Uuid
-  user_id   String   @db.Uuid
-  packs     packs    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "public_packs_memberships_tenant_id_fkey")
+  id          BigInt   @id(map: "packs_memberships_pkey") @default(autoincrement())
+  joined_at   DateTime @default(now()) @db.Timestamptz(6)
+  tenant_id   String   @db.Uuid
+  user_id     String   @db.Uuid
+  packs       packs    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "public_packs_memberships_tenant_id_fkey")
+  permissions String?
 
   @@index([tenant_id], type: Hash)
   @@index([user_id], type: Hash)

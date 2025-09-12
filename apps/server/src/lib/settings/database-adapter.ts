@@ -24,10 +24,12 @@ export class PrismaDatabaseAdapter implements DatabaseAdapter {
     }
 
     async getSetting(table: string, column: string, whereCondition: Record<string, any>): Promise<any> {
+        console.log(table, column, whereCondition);
         const result = await this.prisma[table].findUnique({
             where: whereCondition,
             select: { [column]: true },
         });
+        if (column.endsWith('_at')) return result?.[column].toString();
         return result?.[column];
     }
 }

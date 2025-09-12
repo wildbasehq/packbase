@@ -18,7 +18,7 @@ export type AccessCondition = Condition | LogicalCondition;
 export interface SettingDefinition {
     type: SettingType;
     values?: any[];
-    default: any;
+    default?: any;
     userModifiable: boolean;
     condition?: AccessCondition;
     description?: string;

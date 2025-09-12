@@ -42,7 +42,7 @@ export class Settings {
             ...options,
         };
 
-        this.dbAdapter = dbAdapter;
+        this.dbAdapter = dbAdapter || new PrismaDatabaseAdapter(prisma);
         this.cacheManager = new CacheManager(this.options.cacheExpirationMs);
         this.auditLogger = new AuditLogger(this.options.enableAuditLogging);
     }

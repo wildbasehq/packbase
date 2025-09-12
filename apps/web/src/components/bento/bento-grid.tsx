@@ -165,7 +165,7 @@ export const BentoGrid: React.FC<BentoGridProps> = ({ items, onLayoutChange, onR
                             >
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="bento-item-drag-handle flex-1 h-8 cursor-move flex items-center">
-                                        <Heading size="base" className="truncate">
+                                        <Heading size="md" className="truncate">
                                             {item.title}
                                         </Heading>
                                     </div>

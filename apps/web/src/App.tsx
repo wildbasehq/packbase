@@ -31,7 +31,6 @@ const PackHome = lazy(() => import('@/pages/pack/[slug]/page.tsx'))
 const NotFound = lazy(() => import('@/src/not-found.tsx'))
 const PackAdd = lazy(() => import('@/pages/pack/new/page.tsx'))
 const TermsPage = lazy(() => import('@/pages/terms/page.tsx'))
-const ThankYouFriends = lazy(() => import('@/pages/thanks/page.tsx'))
 const UserProfile = lazy(() => import('@/pages/user/[...slug]/page.tsx'))
 const SearchPage = lazy(() => import('@/pages/search/page.tsx'))
 const ChatThreadPage = lazy(() => import('@/pages/c/[id]/page.tsx'))
@@ -160,12 +159,6 @@ Thanks for being a crucial part of the internet.
                                                     <Route path="/terms">
                                                         <Suspense fallback={<LoadingFallback />}>
                                                             <TermsPage />
-                                                        </Suspense>
-                                                    </Route>
-
-                                                    <Route path="/thanks">
-                                                        <Suspense fallback={<LoadingFallback />}>
-                                                            <ThankYouFriends />
                                                         </Suspense>
                                                     </Route>
 

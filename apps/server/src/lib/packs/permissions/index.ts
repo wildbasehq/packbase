@@ -55,7 +55,7 @@ async function hasPermission(permissions: string | number, permission: number) {
 
         try {
             const data = await prisma.packs_memberships.findFirst({
-                where: { id: permissions },
+                where: { user_id: permissions },
                 select: { permissions: true },
             });
             if (!data) throw new Error('Membership not found');
