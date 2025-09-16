@@ -1,38 +1,40 @@
-import clerkClient from '@/db/auth';
-import { UnlockablesManager } from '@/utils/unlockables-manager';
+import clerkClient from '@/db/auth'
+import { UnlockablesManager } from '@/utils/unlockables-manager'
 
 export default async function verifyToken(req: any) {
-    let user;
+    let user
     try {
-        const authReq = await clerkClient.authenticateRequest(req, {
-            authorizedParties: ['https://packbase.app', 'http://localhost:5173', 'http://localhost:8000'],
-        });
+        const shadowReq = req.clone()
+        const authReq = await clerkClient.authenticateRequest(shadowReq, {
+            authorizedParties: ['https://packbase.app', 'http://localhost:5173', 'http://localhost:8000', 'http://localhost:5933'],
+        })
 
         if (authReq.isSignedIn) {
-            user = authReq.toAuth();
-            if (!user.userId) return;
+            user = authReq.toAuth()
+            if (!user.userId) return
 
             const userID = await prisma.profiles.findFirst({
                 where: {
                     owner_id: user.userId,
                 },
-            });
+            })
 
-            user.sub = userID?.id;
+            user.sub = userID?.id
 
             if (!user.sub) {
-                console.log('URGENT: Creating new user profile for ', user.userId);
-                const emailHash = user.sessionClaims?.email ? await Bun.password.hash(user.sessionClaims?.email?.trim().toLowerCase()) : 'ENULL';
+                console.log('URGENT: Creating new user profile for ', user.userId)
+                const emailHash = user.sessionClaims?.email ? await Bun.password.hash(user.sessionClaims?.email?.trim().toLowerCase()) : 'ENULL'
                 // Check user email in invites
-                let isInvited = null;
+                let isInvited = null
 
                 try {
                     isInvited = await prisma.invites.findFirst({
                         where: {
                             email: emailHash,
                         },
-                    });
-                } catch (_) {}
+                    })
+                } catch (_) {
+                }
 
                 const newProfile = await prisma.profiles.create({
                     data: {
@@ -41,30 +43,30 @@ export default async function verifyToken(req: any) {
                         username: user.sessionClaims.nickname,
                         ...(isInvited
                             ? {
-                                  invited_by: isInvited.invited_by,
-                              }
+                                invited_by: isInvited.invited_by,
+                            }
                             : {}),
                     },
-                });
+                })
 
                 // Delete the invite
                 if (isInvited) {
                     await prisma.invites.delete({
                         where: {
-                            id: isInvited.id,
+                            invite_id: isInvited.id,
                         },
-                    });
+                    })
                 }
 
-                user.sub = newProfile.id;
+                user.sub = newProfile.id
 
                 // Add collectible using UnlockablesManager
-                const unlocableManager = new UnlockablesManager(clerkClient);
-                await unlocableManager.processUnlockables(user.userId);
+                const unlocableManager = new UnlockablesManager(clerkClient)
+                await unlocableManager.processUnlockables(user.userId)
             }
         }
     } catch (e) {
-        console.log(e);
+        console.log(e)
     }
-    return user;
+    return user
 }

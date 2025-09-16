@@ -134,6 +134,14 @@ const SearchAPI = (app: YapockType) =>
 
                 log(`[${requestTime}ms] ${query.q}`);
 
+                // Removes classification from the results
+                if (query.allowedTables?.includes('posts')) {
+                    trueResults.posts = trueResults.posts.map((post) => {
+                        delete post.classification;
+                        return post;
+                    });
+                }
+
                 return {
                     data: query.allowedTables?.length === 1 ? trueResults[query.allowedTables[0]] : trueResults,
                     count: Object.keys(trueResults).reduce((acc, key) => acc + trueResults[key].length, 0),

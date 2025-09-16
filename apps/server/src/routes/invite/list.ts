@@ -1,7 +1,6 @@
 import {t} from 'elysia'
 import {YapockType} from '@/index'
 import requiresUserProfile from '@/utils/identity/requires-user-profile'
-import supabase from '@/utils/supabase/client'
 import prisma from '@/db/prisma'
 
 export default (app: YapockType) => app
@@ -9,16 +8,15 @@ export default (app: YapockType) => app
         await requiresUserProfile({set, user})
 
         // 'id' as 'invite_code'
-        let invites = await prisma.waitlist.findMany({
-            where: { owner_id: user.sub },
-            select: { id: true, owner_id: true, created_at: true }
-        });
+        let invites = await prisma.invites.findMany({
+            where: {invited_by: user.sub},
+            select: {id: true, invite_id: true, created_at: true}
+        })
         if (!invites) invites = []
 
         return invites.map((invite: any) => {
             return {
-                invite_code: invite.id,
-                owner_id: invite.owner_id,
+                invite_id: invite.invite_id,
                 created_at: invite.created_at.toISOString(),
             }
         })
@@ -30,9 +28,8 @@ export default (app: YapockType) => app
         },
         response: {
             200: t.Array(t.Object({
-                invite_code: t.String(),
-                owner_id: t.String(),
-                created_at: t.String(),
+                invite_id: t.String(),
+                created_at: t.String()
             })),
             404: t.Void()
         }

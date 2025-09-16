@@ -269,6 +269,14 @@ export const HowlResponse = t.Object({
             icon: t.Optional(t.String()),
         }),
     ),
+    // classification: t.Optional(
+    //     t.Object({
+    //         label: t.String(),
+    //         rheoAgrees: t.Boolean(),
+    //     }, {
+    //         description: 'For internal debugging use only.',
+    //     })
+    // ),
 });
 
 export const PackPageCreateBody = t.Object({

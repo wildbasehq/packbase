@@ -99,6 +99,7 @@ class NaiveBayesTextClassifier {
     }
 
     predict(text: string, options?: string[]): { label: string; score: number } | null {
+        console.log('need to classify', text)
         const labels = this.labels();
         if (!labels.length && !options?.length) return null;
         let best = options?.[0] || labels[0];
@@ -160,10 +161,12 @@ export class LocalInference {
      * Runs an action: generate a JSON result conforming to the given schema.
      * For supported schemas, uses local logic; otherwise, falls back (if enabled).
      */
-    async action<T>(schema: z.ZodType<T>, opts: InferenceActionOptions): Promise<T> {
+    async action<S extends z.ZodTypeAny>(schema: S, opts: InferenceActionOptions): Promise<z.infer<S>> {
         const prompt = opts.prompt || "";
         try {
             const candidate = this.generateLocally(schema, prompt);
+            console.log('prompt', prompt)
+            console.log('candidate', candidate)
             // Validate strictly against the provided schema
             return schema.parse(candidate);
         } catch (err) {
@@ -178,7 +181,7 @@ export class LocalInference {
     /**
      * Local generator that only returns values we can confidently support.
      */
-    private generateLocally<T>(schema: z.ZodType<T>, prompt: string): unknown {
+    private generateLocally<S extends z.ZodTypeAny>(schema: S, prompt: string): unknown {
         // Handle ZodEnum directly (classification)
         const def: any = (schema as any)._def;
         const enumTypeName = (z as any).ZodFirstPartyTypeKind?.ZodEnum ?? "ZodEnum";
@@ -244,8 +247,8 @@ export class AgentInference {
     private model: string;
     private provider = createOpenAICompatible({
         name: 'do',
-        apiKey: 'sk-do-sHQ3m1EQrG4M6CtyHEvHvQA06isAOPfqnvbe9vSO-WU4-8KWNX7fOCbBMj',
-        baseURL: 'https://inference.do-ai.run/v1',
+        apiKey: process.env.AGENT_INFERENCE_API_KEY,
+        baseURL: process.env.AGENT_INFERENCE_API_ENDPOINT,
         includeUsage: true, // Include usage information in streaming responses
     });
 
@@ -254,13 +257,13 @@ export class AgentInference {
         this.model = "openai-gpt-oss-20b";
     }
 
-    async action<T>(schema: z.ZodType<T>, opts: InferenceActionOptions): Promise<T> {
+    async action<S extends z.ZodTypeAny>(schema: S, opts: InferenceActionOptions): Promise<z.infer<S>> {
         const res = await generateObject({
             model: this.provider(this.model),
             prompt: opts.prompt,
-            schema,
+            schema: schema as any,
         });
-        // res.object is validated to match the schema by the SDK
-        return res.object as T;
+        // Validate and narrow via Zod to avoid deep generic inference at callsite
+        return schema.parse(res.object);
     }
 }

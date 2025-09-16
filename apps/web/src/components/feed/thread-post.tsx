@@ -5,6 +5,7 @@
 // src/components/feed/thread-post.tsx
 import { useState } from 'react'
 import { ChatBubbleLeftIcon, ChevronRightIcon, HeartIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { CheckIcon, FaceSmileIcon, XMarkIcon } from '@heroicons/react/16/solid'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import { toast } from 'sonner'
 import { vg } from '@/lib/api'
@@ -116,6 +117,26 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
         }
     }
 
+    const showClassification = () => {
+        switch(post.classification.label.split(' ')[0].toLowerCase()) {
+            case 'satire':
+                return <Text size="xs" alt className={`${post.classification.rheoAgrees ? '!text-green-500' : '!text-red-500'} mb-1 items-center flex`}>
+                    <FaceSmileIcon className="w-4 h-4 mr-1 inline-flex" />
+                    {post.classification.label}
+                </Text>
+            case 'hostile':
+                return <Text size="xs" alt className={`${post.classification.rheoAgrees ? '!text-green-500' : '!text-red-500'} mb-1 items-center flex`}>
+                    <XMarkIcon className="w-4 h-4 mr-1 inline-flex" />
+                    {post.classification.label}
+                </Text>
+            case 'friendly':
+                return <Text size="xs" alt className={`${post.classification.rheoAgrees ? '!text-green-500' : '!text-red-500'} mb-1 items-center flex`}>
+                    <CheckIcon className="w-4 h-4 mr-1 inline-flex" />
+                    {post.classification.label}
+                </Text>
+        }
+    }
+
     return (
         <Card className={`relative !border-0 !border-t border-muted !max-w-full ${!isRoot ? 'ml-12' : ''} ${threadLineClass}`}>
             <div className={`relative ${!isRoot ? 'pt-3' : ''}`}>
@@ -204,6 +225,12 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 <MediaGallery assets={post.assets} />
                             </div>
                         )}
+
+                        {post.classification && (
+                            <div className="mt-3">
+                                {showClassification()}
+                            </div>
+                            )}
 
                         {isRoot && signedInUser && (
                             <div className="flex items-center gap-4 mt-3">

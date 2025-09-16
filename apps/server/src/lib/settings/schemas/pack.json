@@ -22,14 +22,6 @@
       "category": "server_configuration",
       "db": "packs.owner_id"
     },
-    "container_type": {
-      "type": "string",
-      "values": ["channels", "kanban"],
-      "userModifiable": true,
-      "description": "How your pack's content is displayed. The underlying data remains the same, but it's up to the UI how to display the content.",
-      "category": "server_configuration",
-      "db": "packs.container_type"
-    },
 
     "alpha_note": {
       "type": "string",

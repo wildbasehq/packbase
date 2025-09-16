@@ -73,6 +73,8 @@ export default (app: YapockType) =>
                 user_id: user.sub,
             });
 
+            console.log('dbCreate', dbCreate);
+
             let data;
             try {
                 data = await prisma.posts.create({ data: dbCreate });

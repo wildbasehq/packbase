@@ -219,6 +219,12 @@ export const SafetyTrainingData: TextExample[] = [
     { text: "This is pure magic in words", label: "friendly" },
     { text: "You're doing phenomenal work", label: "friendly" },
     { text: "This is so wonderfully expressed", label: "friendly" },
+    { text: "My pronouns are she/her", label: "friendly" },
+    { text: "My pronouns are they/them", label: "friendly" },
+    { text: "My pronouns are he/him", label: "friendly" },
+    { text: "My pronouns are she/her", label: "friendly" },
+    { text: "My pronouns are they/them", label: "friendly" },
+    { text: "My pronouns are he/they", label: "friendly" },
 
     // --- HOSTILE (100) ---
     { text: "This is absolute garbage", label: "hostile" },
@@ -433,7 +439,8 @@ export const SafetyTrainingData: TextExample[] = [
     { text: "You're hopelessly unoriginal", label: "hostile" },
     { text: "This is catastrophically terrible", label: "hostile" },
     { text: "Hitler did nothing wrong", label: "hostile" },
-    { text: "nigga", label: "hostile" },
+    { text: "Nigga", label: "hostile" },
+    { text: "My pronouns are no/thanks", label: "hostile" },
 
     // --- SATIRE (100) ---
     { text: "Breaking: World ends, influencers still vlogging", label: "satire" },

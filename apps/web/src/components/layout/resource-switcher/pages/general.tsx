@@ -2,8 +2,8 @@ import { Heading, Text } from '@/components/shared/text.tsx'
 import { Alert, AlertDescription, AlertTitle } from '@/components/shared/alert.tsx'
 import { UserCircleIcon } from '@heroicons/react/24/solid'
 import UserAvatar from '@/components/shared/user/avatar.tsx'
-import { Button } from '@/components/shared/button.tsx'
-import { Input } from '@/components/shared/input/text.tsx'
+import { Button } from '@/components/shared/experimental-button-rework'
+import { Input, Textarea, Field, Label } from '@/components/shared'
 import { vg } from '@/lib/api'
 import { toast } from 'sonner'
 import { createRef, useEffect, useState } from 'react'
@@ -16,7 +16,7 @@ export default function ResourceSettingsGeneral() {
     const [profilePicPreview, setProfilePicPreview] = useState<string | undefined>()
     const [headerPicUpload, setHeaderPicUpload] = useState<File | undefined>()
     const [headerPicPreview, setHeaderPicPreview] = useState<string | undefined>()
-
+    const [submitting, setSubmitting] = useState<boolean>(false)
     useEffect(() => {
         if (profilePicUpload) {
             const reader = new FileReader()
@@ -79,6 +79,7 @@ export default function ResourceSettingsGeneral() {
 
     const aggregateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setSubmitting(true)
         let packUpdate: any = {}
         if (profilePicPreview) {
             packUpdate.images = { avatar: profilePicPreview }
@@ -136,11 +137,14 @@ export default function ResourceSettingsGeneral() {
             .catch(e => {
                 toast.error(e.status)
             })
+            .finally(() => {
+                setSubmitting(false)
+            })
     }
 
     return (
         <form onSubmit={aggregateSubmit}>
-            <div className="flex flex-1 flex-col gap-4">
+            <div className="flex flex-1 flex-col gap-4 pb-12">
                 <div>
                     <Heading>Settings</Heading>
                     <Text alt>Change pack settings</Text>
@@ -161,7 +165,7 @@ export default function ResourceSettingsGeneral() {
                         <label htmlFor="avatar" className="text-default block select-none text-sm font-medium leading-6">
                             Photo
                         </label>
-                        <input
+                        <Input
                             type="file"
                             name="avatar"
                             accept="image/*"
@@ -175,7 +179,7 @@ export default function ResourceSettingsGeneral() {
                             ) : (
                                 <UserAvatar icon={profilePicPreview} size="lg" />
                             )}
-                            <Button asChild variant="outline" onClick={() => document.getElementById('avatar')?.click()}>
+                            <Button outline onClick={() => document.getElementById('avatar')?.click()}>
                                 <div>Upload</div>
                             </Button>
                         </div>
@@ -196,7 +200,7 @@ export default function ResourceSettingsGeneral() {
                                 onChange={e => setHeaderPicUpload(e.target.files?.[0] || undefined)}
                             />
                             <div className="mt-2 flex items-center gap-x-3">
-                                <Button asChild variant="outline" onClick={() => document.getElementById('header')?.click()}>
+                                <Button outline onClick={() => document.getElementById('header')?.click()}>
                                     <div>Upload</div>
                                 </Button>
                             </div>
@@ -214,25 +218,32 @@ export default function ResourceSettingsGeneral() {
                     </div>
 
                     {Object.keys(fields).map((key, i) => (
-                        <div key={i}>
+                        fields[key].type === 'textarea' ? (<Field key={i}>
+                            <Label htmlFor={snakeToTitle(key)}>
+                                {snakeToTitle(key)}
+                            </Label>
+                            <Textarea
+                                ref={fields[key].ref}
+                                name={snakeToTitle(key)}
+                                resizable
+                            />
+                        </Field>) : (<Field key={i}>
+                            <Label htmlFor={snakeToTitle(key)}>
+                                {snakeToTitle(key)}
+                            </Label>
                             <Input
                                 ref={fields[key].ref}
                                 name={snakeToTitle(key)}
-                                label={snakeToTitle(key)}
                                 type={fields[key].type || 'text'}
-                                rows={4}
                             />
-                        </div>
+                        </Field>)
                     ))}
                 </div>
             </div>
 
             {/* buttons */}
-            <div className="flex justify-end gap-4">
-                {/*<Button variant="ghost" onClick={() => hide()}>*/}
-                {/*    Cancel*/}
-                {/*</Button>*/}
-                <Button variant="primary">Save</Button>
+            <div className="flex justify-end gap-4 mt-4 fixed bottom-4 right-8">
+                <Button color="indigo" type="submit" disabled={submitting}>{submitting ? 'Saving...' : 'Save'}</Button>
             </div>
         </form>
     )

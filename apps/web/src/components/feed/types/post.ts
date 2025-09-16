@@ -29,6 +29,10 @@ export interface FeedPostData {
     reactions?: Record<string, string[]>;
     assets?: Asset[];
     comments?: FeedPostData[];
+    classification?: {
+        label: string;
+        rheoAgrees: boolean;
+    };
 }
 
 export interface FeedPostProps {

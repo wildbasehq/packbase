@@ -32,7 +32,6 @@ model packs {
   description       String?
   owner_id          String?             @db.Uuid
   images_header     String?
-  container_type    String?
   packs_memberships packs_memberships[]
   packs_pages       packs_pages[]
   posts             posts[]
@@ -96,6 +95,7 @@ model posts {
   packs           packs             @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
   packs_pages     packs_pages?      @relation(fields: [channel_id], references: [id], onDelete: SetNull)
   posts_reactions posts_reactions[]
+  classification  Json?
 
   @@index([parent], type: Hash)
   @@index([tenant_id], type: Hash)
@@ -243,6 +243,7 @@ model collectibles {
 
 model invites {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invite_id  String   @unique
   invited_by String   @db.Uuid
   email      String
   created_at DateTime @default(now()) @db.Timestamptz(6)
