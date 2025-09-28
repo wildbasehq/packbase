@@ -34,51 +34,16 @@ interface ThreadPostProps {
 }
 
 export default function ThreadPost({ post, signedInUser, onDelete, onComment, isRoot = true, depth = 0 }: ThreadPostProps) {
-    const [isSubmittingReaction, setIsSubmittingReaction] = useState(false)
     const [showReplyForm, setShowReplyForm] = useState(false)
     const [replyText, setReplyText] = useState('')
     const [isSubmittingReply, setIsSubmittingReply] = useState(false)
 
-    const hasReacted = post.reactions?.['thumbs_up']?.includes(signedInUser?.id || '')
-    const reactionCount = post.reactions?.['thumbs_up']?.length || 0
     const isAuthor = post.user?.id === signedInUser?.id
     const maxDepth = 4
     const showNested = depth < maxDepth
 
     // Thread line styling
     const threadLineClass = depth > 0 ? 'before:absolute before:left-16 before:top-0 before:bottom-0 before:w-px before:bg-border' : ''
-
-    const handleReaction = async () => {
-        if (!signedInUser || isSubmittingReaction) return
-        setIsSubmittingReaction(true)
-
-        try {
-            const howlReact = vg.howl({ id: post.id }).react
-            const { error } = await (hasReacted ? howlReact.delete({ slot: 'thumbs_up' }) : howlReact.post({ slot: 'thumbs_up' }))
-
-            if (error) {
-                const errorMessage = error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'
-                toast.error(errorMessage)
-                return
-            }
-
-            // Update local state
-            if (!post.reactions) {
-                post.reactions = { thumbs_up: [] }
-            }
-
-            if (hasReacted) {
-                post.reactions['thumbs_up'] = post.reactions['thumbs_up'].filter(id => id !== signedInUser?.id)
-            } else {
-                post.reactions['thumbs_up'].push(signedInUser!.id)
-            }
-        } catch (err) {
-            toast.error('Failed to update reaction')
-            console.error(err)
-        } finally {
-            setIsSubmittingReaction(false)
-        }
-    }
 
     const handleSubmitReply = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -102,7 +67,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                 body: replyText.trim(),
                 user: signedInUser,
                 created_at: new Date().toISOString(),
-                reactions: {},
+                reactions: [],
             }
 
             onComment(newComment)
