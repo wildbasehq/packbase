@@ -22,7 +22,7 @@ export interface SearchPageParams {
 }
 
 export async function fetchFeedPage({ packID, page = 1 }: FeedPageParams): Promise<FeedPageResult> {
-    const response = await vg.feed({ id: packID }).get({ query: { page, limit: 10 } })
+    const response = await vg.feed({ id: packID }).get({ query: { page } })
 
     return {
         posts: response.data?.data || [],
@@ -32,7 +32,7 @@ export async function fetchFeedPage({ packID, page = 1 }: FeedPageParams): Promi
 
 export async function fetchSearchPage({ channelID, q, page }: SearchPageParams): Promise<FeedPageResult> {
     const query = q || `[Where posts:channel_id ("${channelID}")]`
-    const response = await vg.search.get({ query: { page, limit: 10, q: query } })
+    const response = await vg.search.get({ query: { page, q: query } })
 
     return {
         posts: response.data?.data?.posts || [],
