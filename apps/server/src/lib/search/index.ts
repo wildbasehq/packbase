@@ -117,9 +117,9 @@ export async function search(query: string, options: SearchOptions = {}): Promis
             results = results.slice(options.offset);
         }
 
-        // slice FROM BOTTOM
+        // slice the last N results
         if (options.limit !== undefined && options.limit > 0) {
-            results = results.slice(-options.limit);
+            results = results.slice(0, options.limit);
         }
 
         // Remove metadata if not requested

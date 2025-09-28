@@ -56,7 +56,7 @@ const SearchAPI = (app: YapockType) =>
 
                 // Parse limit and offset
                 const limit = query.limit ? parseInt(query.limit, 10) : 30;
-                const offset = query.offset ? parseInt(query.offset, 10) : query.page ? parseInt(query.page, 10) * limit : 0;
+                const offset = query.offset ? parseInt(query.offset, 10) : query.page && query.page !== '1' ? parseInt(query.page, 10) * limit : 0;
 
                 // Parse allowed tables
                 let allowedTables = ['profiles', 'packs', 'posts'];
