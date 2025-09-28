@@ -95,11 +95,11 @@ ${SafetyTrainingData.map((item) => `    { text: ${JSON.stringify(item.text)}, la
 }
 
 // On startup, assign to Baozi manager
-const rheo = new Rheo();
-Baozi.on('HOWL_CREATE', async (data: typeof HowlResponse) => {
-    const classification = await rheo.classify(data.body);
-    return {
-        ...data,
-        classification,
-    };
-});
+// const rheo = new Rheo();
+// Baozi.on('HOWL_CREATE', async (data: typeof HowlResponse) => {
+//     const classification = await rheo.classify(data.body);
+//     return {
+//         ...data,
+//         classification,
+//     };
+// });
