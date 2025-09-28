@@ -52,7 +52,7 @@ export default (app: YapockType) =>
         {
             query: t.Optional(
                 t.Object({
-                    search: t.String(),
+                    search: t.Optional(t.String()),
                 }),
             ),
             detail: {
