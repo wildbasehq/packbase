@@ -8,20 +8,17 @@
  * The action() method in both classes accepts a Zod schema and returns only JSON that conforms to it.
  */
 
-import {z} from 'zod'
-import {generateObject} from 'ai'
-import {createOpenAICompatible} from '@ai-sdk/openai-compatible'
-
+import { z } from 'zod';
+import { generateObject } from 'ai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import path from 'node:path';
+import fs from 'node:fs';
 
 /**
  * Basic text tokenization utilities.
  */
 function tokenize(text: string): string[] {
-    return (text || "")
-        .toLowerCase()
-        .replace(/[^\p{L}\p{N}\s]/gu, " ")
-        .split(/\s+/g)
-        .filter(Boolean);
+    return text.toLowerCase().split(/\s+/g).filter(Boolean);
 }
 
 function overlapScore(aTokens: string[], bTokens: string[]): number {
@@ -48,7 +45,9 @@ class NaiveBayesTextClassifier {
     private alpha = 1; // Laplace smoothing
 
     train(examples: Array<{ text: string; label: string }>): void {
-        for (const { text, label } of examples) {
+        const startDate = Date.now();
+        for (let i = 0; i < examples.length; i++) {
+            const { text, label } = examples[i];
             const tokens = tokenize(text);
             this.totalDocs++;
             this.labelDocCounts.set(label, (this.labelDocCounts.get(label) || 0) + 1);
@@ -62,6 +61,26 @@ class NaiveBayesTextClassifier {
                 this.labelTotalTokens.set(label, (this.labelTotalTokens.get(label) || 0) + 1);
             }
         }
+        const endDate = Date.now();
+        console.log('Training time:', endDate - startDate, 'ms');
+
+        // Save to `rheo-weights.json`
+        // fs.writeFileSync(
+        //     path.join(__dirname, 'rheo-weights.json'),
+        //     JSON.stringify(
+        //         {
+        //             // map to json
+        //             labelDocCounts: Object.fromEntries(this.labelDocCounts.entries()),
+        //             labelTokenCounts: Object.fromEntries(this.labelTokenCounts.entries()),
+        //             labelTotalTokens: Object.fromEntries(this.labelTotalTokens.entries()),
+        //             vocabulary: Array.from(this.vocabulary),
+        //             totalDocs: this.totalDocs,
+        //             alpha: this.alpha,
+        //         },
+        //         null,
+        //         2,
+        //     ),
+        // );
     }
 
     private labels(): string[] {
@@ -79,6 +98,30 @@ class NaiveBayesTextClassifier {
         const total = this.labelTotalTokens.get(label) || 0;
         const V = this.vocabulary.size || 1;
         return Math.log((tokenCount + this.alpha) / (total + this.alpha * V));
+    }
+
+    private contributingTokens(text: string, label: string): Array<{ token: string; inputCount: number; labelCount: number; logLikelihood: number }> {
+        const tokens = tokenize(text);
+        const labelTokCounts = this.labelTokenCounts.get(label) || new Map<string, number>();
+        const seen = new Map<string, number>();
+        for (const t of tokens) {
+            seen.set(t, (seen.get(t) || 0) + 1);
+        }
+        const contributions: Array<{ token: string; inputCount: number; labelCount: number; logLikelihood: number }> = [];
+        for (const [token, inputCount] of seen.entries()) {
+            const labelCount = labelTokCounts.get(token) || 0;
+            if (labelCount > 0) {
+                contributions.push({
+                    token,
+                    inputCount,
+                    labelCount,
+                    logLikelihood: this.logLikelihoodToken(label, token),
+                });
+            }
+        }
+        // Sort by absolute contribution (descending) for readability
+        contributions.sort((a, b) => Math.abs(b.logLikelihood) - Math.abs(a.logLikelihood));
+        return contributions;
     }
 
     /**
@@ -99,23 +142,30 @@ class NaiveBayesTextClassifier {
     }
 
     predict(text: string, options?: string[]): { label: string; score: number } | null {
-        console.log('need to classify', text)
         const labels = this.labels();
         if (!labels.length && !options?.length) return null;
         let best = options?.[0] || labels[0];
         let bestScore = -Infinity;
+        let bestContrib: Array<{ token: string; inputCount: number; labelCount: number; logLikelihood: number }> = [];
         for (const label of labels) {
             const score = this.scoreTextAgainstLabel(text, label);
             if (score > bestScore) {
                 bestScore = score;
                 best = label;
+                bestContrib = this.contributingTokens(text, label);
             }
+        }
+        if (bestContrib.length) {
+            const tokenSummary = bestContrib.map((c) => `${c.token} x${c.inputCount} (label:${c.labelCount}, ll:${c.logLikelihood.toFixed(3)})`).join(', ');
+            console.log(`rheo tokens for ${best}: ${tokenSummary}`);
+        } else {
+            console.log(`rheo tokens for ${best}: (no trained token overlap)`);
         }
         return { label: best || 'RHEO_CANNOT_CLASSIFY', score: bestScore };
     }
 }
 
-export type TextExample = { text: string; label: string };
+export type TextExample = { text: string; label: string; reasoning?: string };
 
 export interface InferenceActionOptions {
     // Freeform text prompt or content to classify/interpret.
@@ -162,11 +212,9 @@ export class LocalInference {
      * For supported schemas, uses local logic; otherwise, falls back (if enabled).
      */
     async action<S extends z.ZodTypeAny>(schema: S, opts: InferenceActionOptions): Promise<z.infer<S>> {
-        const prompt = opts.prompt || "";
+        const prompt = opts.prompt || '';
         try {
             const candidate = this.generateLocally(schema, prompt);
-            console.log('prompt', prompt)
-            console.log('candidate', candidate)
             // Validate strictly against the provided schema
             return schema.parse(candidate);
         } catch (err) {
@@ -184,8 +232,8 @@ export class LocalInference {
     private generateLocally<S extends z.ZodTypeAny>(schema: S, prompt: string): unknown {
         // Handle ZodEnum directly (classification)
         const def: any = (schema as any)._def;
-        const enumTypeName = (z as any).ZodFirstPartyTypeKind?.ZodEnum ?? "ZodEnum";
-        const objTypeName = (z as any).ZodFirstPartyTypeKind?.ZodObject ?? "ZodObject";
+        const enumTypeName = (z as any).ZodFirstPartyTypeKind?.ZodEnum ?? 'ZodEnum';
+        const objTypeName = (z as any).ZodFirstPartyTypeKind?.ZodObject ?? 'ZodObject';
 
         if (def?.typeName === enumTypeName) {
             const options: string[] = def.values as string[];
@@ -194,11 +242,11 @@ export class LocalInference {
 
         // Handle { label: z.enum([...]) }
         if (def?.typeName === objTypeName) {
-            const shape = typeof def.shape === "function" ? def.shape() : def.shape;
-            if (shape && typeof shape === "object") {
+            const shape = typeof def.shape === 'function' ? def.shape() : def.shape;
+            if (shape && typeof shape === 'object') {
                 const keys = Object.keys(shape);
-                if (keys.length === 1 && keys[0] === "label") {
-                    const innerDef: any = shape["label"]?._def;
+                if (keys.length === 1 && keys[0] === 'label') {
+                    const innerDef: any = shape['label']?._def;
                     if (innerDef?.typeName === enumTypeName) {
                         const options: string[] = innerDef.values as string[];
                         const label = this.predictFromOptions(prompt, options);
@@ -209,29 +257,16 @@ export class LocalInference {
         }
 
         // Unsupported schema locally
-        throw new Error(
-            "LocalInference cannot handle this schema. Enable fallback or use a supported enum/label schema."
-        );
+        throw new Error('LocalInference cannot handle this schema. Enable fallback or use a supported enum/label schema.');
     }
 
     private predictFromOptions(text: string, options: string[]): string | undefined {
         if (this.classifier) {
             const prediction = this.classifier.predict(text, options);
-            return prediction?.label || 'RHEO_CANNOT_CLASSIFY'
+            return prediction?.label || 'RHEO_CANNOT_CLASSIFY';
         }
 
-        // Heuristic overlap if no classifier is trained
-        const tokens = tokenize(text);
-        let best = options[0];
-        let bestScore = -Infinity;
-        for (const opt of options) {
-            const score = overlapScore(tokens, tokenize(opt));
-            if (score > bestScore) {
-                best = opt;
-                bestScore = score;
-            }
-        }
-        return best;
+        return undefined;
     }
 }
 
@@ -254,16 +289,20 @@ export class AgentInference {
 
     constructor(opts?: AgentInferenceOptions) {
         // The model string is resolved by the AI SDK provider configuration at runtime.
-        this.model = "openai-gpt-oss-20b";
+        this.model = 'openai-gpt-5-nano';
     }
 
     async action<S extends z.ZodTypeAny>(schema: S, opts: InferenceActionOptions): Promise<z.infer<S>> {
         const res = await generateObject({
             model: this.provider(this.model),
+            system: fs.readFileSync(path.join(__dirname, 'prompt.txt'), 'utf8'),
             prompt: opts.prompt,
             schema: schema as any,
         });
         // Validate and narrow via Zod to avoid deep generic inference at callsite
-        return schema.parse(res.object);
+        return schema.parse({
+            label: res.object.label,
+            rationale: res.object.rationale,
+        });
     }
 }

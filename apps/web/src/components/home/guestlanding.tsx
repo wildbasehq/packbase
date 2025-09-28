@@ -216,7 +216,7 @@ function Hero() {
                     </VerticalCutReveal>
                 </Heading>
 
-                <div className="mt-8 p-6 max-w-2xl mx-auto bg-sidebar rounded-xl transform skew-x-4 ring-1 ring-default shadow">
+                <div className="mt-8 p-6 max-w-2xl mx-auto bg-sidebar rounded transform skew-x-4 ring-1 ring-default shadow">
                     <Text className="text-lg sm:text-xl font-medium transform -skew-x-4">
                         Join the Pack-based social platform where <HighlightedText>communities come first</HighlightedText>. No ads, no
                         algorithms, just authentic conversations in your own space.
@@ -570,12 +570,12 @@ function PackShowcase() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="group relative overflow-hidden rounded-xl bg-white dark:bg-zinc-800 ring-1 ring-default hover:ring-2 hover:ring-indigo-500/50 transition-all cursor-pointer"
+                        className="group relative overflow-hidden rounded bg-white dark:bg-zinc-800 ring-1 ring-default hover:ring-2 hover:ring-indigo-500/50 transition-all cursor-pointer"
                     >
                         <div className={`absolute inset-0 ${pack.color} opacity-10 group-hover:opacity-20 transition-opacity`} />
                         <div className="relative p-6">
                             <div className="flex items-center gap-3 mb-3">
-                                <div className={`w-12 h-12 rounded-lg ${pack.color} flex items-center justify-center text-xl`}>
+                                <div className={`w-12 h-12 rounded-xl ${pack.color} flex items-center justify-center text-xl`}>
                                     {pack.avatar}
                                 </div>
                                 <div>
@@ -634,7 +634,7 @@ function MigrationSection() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                 {platforms.map(platform => (
-                    <div className="relative overflow-hidden rounded-2xl p-8 cursor-pointer transition-all ring-1 ring-default hover:ring-2 hover:ring-indigo-500/50 shadow-md bg-white dark:bg-zinc-800">
+                    <div className="relative overflow-hidden rounded p-8 cursor-pointer transition-all ring-1 ring-default hover:ring-2 hover:ring-indigo-500/50 shadow-md bg-white dark:bg-zinc-800">
                         {/* Gradient overlay */}
                         <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-5`} />
 
@@ -676,7 +676,7 @@ function MigrationSection() {
             </div>
 
             {/* Migration process */}
-            <div className="mt-16 p-8 rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 ring-1 ring-default">
+            <div className="mt-16 p-8 rounded bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 ring-1 ring-default">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="text-center">
                         <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
@@ -746,7 +746,7 @@ export default function GuestLanding() {
     }
     return (
         <div className="h-full overflow-x-hidden overflow-y-auto scrollbar-hide bg-zinc-100 dark:bg-zinc-950">
-            <div className="relative z-30 bg-white mb-80 rounded-md ring-2 ring-default dark:bg-zinc-900 shadow-xl">
+            <div className="relative z-30 bg-white mb-80 rounded ring-2 ring-default dark:bg-zinc-900 shadow-xl">
                 <Hero />
                 <FeaturePromiseGrid />
                 <PackShowcase />

@@ -4,24 +4,20 @@ import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { ErrorTypebox } from '@/utils/errors';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
+import clerkClient from '@/db/auth';
+import { NotificationManager } from '@/utils/NotificationManager';
+import { getUserClerkByID } from '@/utils/clerk';
 
 export default (app: YapockType) =>
     app
         .post(
             '',
-            async ({ params: { id }, body: { slot = 0 }, set, user }: any) => {
+            async ({ params: { id }, body: { slot = '👍' }, set, user }: any) => {
                 await requiresUserProfile({ set, user });
-
-                if (slot !== 0) {
-                    set.status = 400;
-                    throw HTTPError.badRequest({
-                        summary: 'Only slot 0 is supported for now.',
-                    });
-                }
 
                 let postExists;
                 try {
-                    postExists = await prisma.posts.findUnique({ where: { id } });
+                    postExists = await prisma.posts.findUnique({ where: { id }, select: { user_id: true, body: true } });
                 } catch (postError) {
                     set.status = 500;
                     throw HTTPError.fromError(postError);
@@ -37,9 +33,11 @@ export default (app: YapockType) =>
                         where: {
                             post_id: id,
                             actor_id: user.sub,
+                            slot,
                         },
                         select: {
                             created_at: true,
+                            slot: true,
                         },
                     });
                 } catch (reactionError) {
@@ -53,17 +51,40 @@ export default (app: YapockType) =>
                     });
                 }
 
+                // Count all reactions for this post
+                const reactionCount = await prisma.posts_reactions.count({
+                    where: {
+                        post_id: id,
+                    },
+                });
+
+                if (reactionCount >= 10) {
+                    set.status = 400;
+                    throw HTTPError.badRequest({
+                        summary: 'Too many reactions.',
+                    });
+                }
+
                 try {
                     await prisma.posts_reactions.create({
                         data: {
                             post_id: id,
-                            slot: slot,
+                            slot,
                             actor_id: user.sub,
                         },
                     });
                 } catch (insertError) {
                     throw HTTPError.fromError(insertError);
                 }
+
+                await NotificationManager.createNotification(postExists.user_id, 'howl_react', `${user.sessionClaims.nickname} reacted :${slot}:`, postExists.body, {
+                    post_id: id,
+                    user: {
+                        id: user.sub,
+                        username: user.sessionClaims.nickname,
+                        images_avatar: (await getUserClerkByID(user.userId).then((user) => user?.imageUrl)) || null,
+                    },
+                });
 
                 set.status = 201;
             },
@@ -73,9 +94,9 @@ export default (app: YapockType) =>
                     tags: ['Howl'],
                 },
                 body: t.Object({
-                    slot: t.Number({
-                        minimum: 0,
-                        default: 0,
+                    slot: t.String({
+                        minimum: 1,
+                        default: '👍',
                     }),
                 }),
                 response: {
@@ -112,9 +133,9 @@ export default (app: YapockType) =>
                 },
                 body: t.Object({
                     slot: t.Optional(
-                        t.Number({
-                            minimum: 0,
-                            default: 0,
+                        t.String({
+                            minimum: 1,
+                            default: '👍',
                         }),
                     ),
                 }),

@@ -1,36 +1,36 @@
 {
-  "_rootDir": "pak/badges/",
-  "name": "badges",
-  "config": {
-    "_type": "datatable",
-    "staff": {
-      "_rootDir": "staff/",
-      "tooltip": {
-        "1": "Alumni",
-        "2": "Wow, I work on this!"
-      },
-      "default": "1.png",
-      "kingless": "1_1.png"
-    },
-    "unlockables": {
-      "_rootDir": "unlockables/",
-      "tooltip": {
-        "cat_invite_1": "Invite drop #1",
-        "cat_invite_2": "Invite drop #2",
-        "cat_invite_3": "Invite drop #3",
-        "cat_invite_4": "Invite drop #4",
-        "cat_invite_5": "Invite drop #5",
-        "cat_invite_6": "Invite drop #6",
-        "cat_invite_7": "Invite drop #7",
-        "cat_invite_8": "Invite drop #8",
-        "cat_invite_9": "Invite drop #9",
-        "cat_invite_10": "Invite drop #10",
-        "cat_invite_11": "Invite drop #11",
-        "cat_invite_12": "Invite drop #12",
-        "cat_invite_13": "A baker's dozen of invites",
-        "cat_invite_14": "Backbone of the community",
-        "cat_invite_15": "The life of the party. We are eternally grateful and forever at your service."
-      }
+    "_rootDir": "pak/badges/",
+    "name": "badges",
+    "config": {
+        "_type": "datatable",
+        "staff": {
+            "_rootDir": "staff/",
+            "tooltip": {
+                "1": "Alumni",
+                "2": "Wow, I work on this!"
+            },
+            "default": "1.png",
+            "kingless": "1_1.png"
+        },
+        "unlockables": {
+            "_rootDir": "unlockables/",
+            "tooltip": {
+                "cat_badge_1": "badge drop #1",
+                "cat_badge_2": "badge drop #2",
+                "cat_badge_3": "badge drop #3",
+                "cat_badge_4": "badge drop #4",
+                "cat_badge_5": "badge drop #5",
+                "cat_badge_6": "badge drop #6",
+                "cat_badge_7": "badge drop #7",
+                "cat_badge_8": "badge drop #8",
+                "cat_badge_9": "badge drop #9",
+                "cat_badge_10": "badge drop #10",
+                "cat_badge_11": "badge drop #11",
+                "cat_badge_12": "badge drop #12",
+                "cat_badge_13": "Trinket collector",
+                "cat_badge_14": "Backbone of the community",
+                "cat_badge_15": "The life of the party. We are eternally grateful and forever at your service."
+            }
+        }
     }
-  }
 }

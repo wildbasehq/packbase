@@ -4,95 +4,97 @@
 
 <!doctype html>
 <html class="overflow-hidden" lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <link href="/src/favicon.ico" rel="icon" type="image/svg+xml"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <meta content="Packbase" name="description"/>
-    <meta content="%CF_PAGES_COMMIT_SHA%" name="commit-sha"/>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="darkreader-lock" />
+        <link href="/src/favicon.ico" rel="icon" type="image/svg+xml" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <meta content="Packbase" name="description" />
+        <meta content="%CF_PAGES_COMMIT_SHA%" name="commit-sha" />
 
-    <style>
-        @font-face {
-            font-family: "Lexend";
-            src: url('@/src/fonts/lexend-variable.ttf') format('truetype');
-        }
+        <style>
+            @font-face {
+                font-family: 'Lexend';
+                src: url('@/src/fonts/lexend-variable.ttf') format('truetype');
+            }
 
-        @font-face {
-            font-family: "New Spirit Bold";
-            src: url('@/src/fonts/new-spirit-bold.otf') format('truetype');
-        }
+            @font-face {
+                font-family: 'New Spirit Bold';
+                src: url('@/src/fonts/new-spirit-bold.otf') format('truetype');
+            }
 
-        /* Instrument Serif, Regular and Italic  */
-        @font-face {
-            font-family: "Instrument Serif";
-            src: url('@/src/fonts/instrument-serif-regular.ttf') format('truetype');
-        }
+            /* Instrument Serif, Regular and Italic  */
+            @font-face {
+                font-family: 'Instrument Serif';
+                src: url('@/src/fonts/instrument-serif-regular.ttf') format('truetype');
+            }
 
-        @font-face {
-            font-family: "Instrument Serif Italic";
-            src: url('@/src/fonts/instrument-serif-italic.ttf') format('truetype');
-        }
+            @font-face {
+                font-family: 'Instrument Serif Italic';
+                src: url('@/src/fonts/instrument-serif-italic.ttf') format('truetype');
+            }
 
-        @font-face {
-            font-family: "Wildbase Regular";
-            src: url('@/src/fonts/wildbase-regular.woff2') format('woff2');
-        }
+            @font-face {
+                font-family: 'Wildbase Regular';
+                src: url('@/src/fonts/wildbase-regular.woff2') format('woff2');
+            }
 
-        @font-face {
-            font-family: "Wildbase Medium";
-            src: url('@/src/fonts/wildbase-medium.woff2') format('woff2');
-        }
+            @font-face {
+                font-family: 'Wildbase Medium';
+                src: url('@/src/fonts/wildbase-medium.woff2') format('woff2');
+            }
 
-        @font-face {
-            font-family: "Wildbase Bold";
-            src: url('@/src/fonts/wildbase-bold.woff2') format('woff2');
-        }
+            @font-face {
+                font-family: 'Wildbase Bold';
+                src: url('@/src/fonts/wildbase-bold.woff2') format('woff2');
+            }
 
-        :root {
-            font-family: 'Lexend', sans-serif;
-        }
+            :root {
+                font-family: 'Lexend', sans-serif;
+            }
 
-        .font-new-spirit-bold {
-            font-family: 'New Spirit Bold', sans-serif;
-        }
+            .font-new-spirit-bold {
+                font-family: 'New Spirit Bold', sans-serif;
+            }
 
-        .font-instrument-serif-regular {
-            font-family: 'Instrument Serif', sans-serif;
-        }
+            .font-instrument-serif-regular {
+                font-family: 'Instrument Serif', sans-serif;
+            }
 
-        .font-instrument-serif-italic {
-            font-family: 'Instrument Serif Italic', sans-serif;
-        }
+            .font-instrument-serif-italic {
+                font-family: 'Instrument Serif Italic', sans-serif;
+            }
 
-        .font-wildbase-regular {
-            font-family: 'Wildbase Regular', sans-serif;
-        }
+            .font-wildbase-regular {
+                font-family: 'Wildbase Regular', sans-serif;
+            }
 
-        .font-wildbase-medium {
-            font-family: 'Wildbase Medium', sans-serif;
-        }
+            .font-wildbase-medium {
+                font-family: 'Wildbase Medium', sans-serif;
+            }
 
-        .font-wildbase-bold {
-            font-family: 'Wildbase Bold', sans-serif;
-        }
-    </style>
+            .font-wildbase-bold {
+                font-family: 'Wildbase Bold', sans-serif;
+            }
+        </style>
 
-    <script>
-        // Set dark class on head and body if system is dark
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-            document.body.classList.add('dark');
-        }
-    </script>
+        <!-- scss -->
+        <link href="/src/styles/globals.css" rel="stylesheet" />
+        <link href="/src/styles/_to-org.scss" rel="stylesheet" />
 
-    <!-- scss -->
-    <link href="/src/styles/globals.css" rel="stylesheet">
-    <link href="/src/styles/_to-org.scss" rel="stylesheet">
+        <title>Packbase</title>
+    </head>
+    <body class="h-full overflow-hidden bg-n-1 dark:bg-n-9">
+        <div class="text-n-8 dark:text-white" id="root"></div>
 
-    <title>Packbase</title>
-</head>
-<body class="h-full overflow-hidden bg-n-1 dark:bg-n-9">
-<div class="text-n-8 dark:text-white" id="root"></div>
-<script src="/src/main.tsx" type="module"></script>
-</body>
+        <script>
+            // Set dark class on head and body if system is dark
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark')
+                document.body.classList.add('dark')
+            }
+        </script>
+
+        <script src="/src/main.tsx" type="module"></script>
+    </body>
 </html>

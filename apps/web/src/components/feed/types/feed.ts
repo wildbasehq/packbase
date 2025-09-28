@@ -17,6 +17,8 @@ export interface FeedProps {
     packID?: string
     channelID?: string
     feedQueryOverride?: string
+    titleOverride?: string
+    dontShowCompose?: boolean
 }
 
 export interface FeedState {
@@ -41,8 +43,9 @@ export interface FeedViewControlsProps {
 
 export interface FeedListProps {
     posts: FeedPostData[]
-    hasMore: boolean
-    onLoadMore: () => void
+    pages?: number
+    hasMore?: boolean
+    onLoadMore: (page: number) => Promise<void>
     onPostDelete: (postId: string) => void
 }
 

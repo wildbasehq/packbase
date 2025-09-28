@@ -1,4 +1,4 @@
-import {defineConfig} from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import * as path from 'node:path'
@@ -10,6 +10,7 @@ export default defineConfig({
             '@/pages': path.resolve(__dirname, './src/pages'),
             '@/src': path.resolve(__dirname, './src'),
             '@/lib': path.resolve(__dirname, './src/lib'),
+            '@/audio': path.resolve(__dirname, './src/audio'),
             '@/styles': path.resolve(__dirname, './src/styles'),
             '@/public': path.resolve(__dirname, './public'),
             '@/datasets': path.resolve(__dirname, './datasets'),
@@ -19,10 +20,7 @@ export default defineConfig({
     define: {
         'import.meta.env.CF_PAGES_COMMIT_SHA': `"${process.env.CF_PAGES_COMMIT_SHA}"` || '"synced"',
     },
-    plugins: [
-        react(),
-        tailwindcss()
-    ],
+    plugins: [react(), tailwindcss()],
     build: {
         target: 'esnext',
         minify: 'esbuild',
@@ -71,16 +69,12 @@ export default defineConfig({
     },
 
     optimizeDeps: {
-        include: [
-            'react',
-            'react-dom',
-            'react/jsx-runtime'
-        ]
+        include: ['react', 'react-dom', 'react/jsx-runtime'],
     },
 
     css: {
         modules: {
             generateScopedName: '[name]__[local]__[hash:base64:5]',
-        }
+        },
     },
 })

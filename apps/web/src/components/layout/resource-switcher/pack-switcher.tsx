@@ -2,17 +2,14 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import ECGIcon from '@/components/icons/dazzle/ecg'
 import { Logo } from '@/components/shared/logo'
-import { Heading, Text } from '@/components/shared/text'
-import Tooltip, { TooltipTitle } from '@/components/shared/tooltip'
+import Tooltip from '@/components/shared/tooltip'
 import { Button } from '@/components/shared/button'
 import UserAvatar from '@/components/shared/user/avatar'
 import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import { cn } from '@/lib/utils'
-import { UsersIcon } from '@heroicons/react/20/solid'
+import { BuildingStorefrontIcon } from '@heroicons/react/20/solid'
 import { PlusIcon } from '@heroicons/react/24/solid'
-import { TentTreeIcon } from 'lucide-react'
 import './pack-switcher.component.css'
 import Link from '@/components/shared/link.tsx'
 import { useLocation } from 'wouter'
@@ -37,8 +34,8 @@ export default function PackSwitcher() {
     }
 
     return (
-        <div className="min-w-16 relative flex h-full flex-col items-center py-2">
-            <Tooltip content="Home" side="right">
+        <div className="w-18 relative flex h-full flex-col items-center py-2 bg-n-9">
+            <Tooltip content="Your Nest" side="right" delayDuration={0}>
                 <div
                     className={cn(
                         'hover:show-pill flex h-12 w-12 justify-center cursor-pointer items-center [&>div]:bg-n-1',
@@ -52,7 +49,19 @@ export default function PackSwitcher() {
                 </div>
             </Tooltip>
 
-            <div className="h-[1px] w-1/2 bg-n-3 dark:bg-n-7 my-2"></div>
+            <Tooltip content="(LIMITED - FOR INVITE ALPHA) Trinket Exchange" side="right" delayDuration={0}>
+                <div
+                    className={cn(
+                        'hover:show-pill flex justify-center mt-1 h-9.5 w-9.5 rounded-xl items-center',
+                        currentResource.id === 'store' ? 'force-pill bg-primary [&>svg>*]:text-white' : 'bg-n-1 dark:bg-n-7'
+                    )}
+                    onClick={() => navigate('~/store')}
+                >
+                    <BuildingStorefrontIcon className="w-5 h-5  " />
+                </div>
+            </Tooltip>
+
+            <div className="h-[1px] w-1/2 bg-n-3 dark:bg-n-7 mt-2 mb-1"></div>
 
             {resources.map(item => (
                 <Tooltip key={item.id} content={item.display_name} side="right" delayDuration={0}>
@@ -81,7 +90,7 @@ export default function PackSwitcher() {
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ duration: 0.3 }}
-                                    className="absolute inset-0 ring-white/10 -z-1 bg-white dark:bg-n-8 h-12 rounded-tl rounded-bl rounded-out-r w-[calc(4rem)] pack-icon-bg"
+                                    className="absolute inset-0 ring-white/10 -z-1 rounded-l-xl bg-white dark:bg-n-8 h-12 rounded-out-r w-[calc(3.75rem)] pack-icon-bg"
                                 />
                             )}
                         </AnimatePresence>

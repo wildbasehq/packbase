@@ -17,7 +17,7 @@
 }
 
 .border-default {
-  @apply border-neutral-300 dark:border-neutral-800;
+  @apply border-n-2 dark:border-n-6/50;
 }
 
 .divide-default {
@@ -41,7 +41,7 @@
 }
 
 .border-default-alt {
-  @apply border-neutral-300 dark:border-neutral-800;
+  @apply border-n-2 dark:border-n-6/50;
 }
 
 .divide-default {

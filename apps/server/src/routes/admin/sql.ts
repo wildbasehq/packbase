@@ -52,12 +52,21 @@ function loadWhitelist(): Set<string> {
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ body, set }) => {
+        async ({ body, set, logAudit }) => {
             // Body shape: { query: string, params?: any[] }
             const { query, params } = (body || {}) as { query?: string; params?: any[] };
 
             if (!query || typeof query !== 'string') {
                 set.status = 400;
+                await logAudit({
+                    action: 'VALIDATION_ERROR',
+                    model_id: 'unknown',
+                    model_type: 'admin.sql',
+                    model_object: {
+                        reason: 'Missing query',
+                        params,
+                    },
+                });
                 return { error: 'Missing query' };
             }
 
@@ -69,6 +78,16 @@ export default (app: YapockType) =>
 
                 if (!table) {
                     set.status = 400;
+                    await logAudit({
+                        action: 'VALIDATION_ERROR',
+                        model_id: 'unknown',
+                        model_type: 'admin.sql',
+                        model_object: {
+                            reason: 'Destructive query detected but target table could not be determined',
+                            query,
+                            params,
+                        },
+                    });
                     return { error: 'Destructive query detected but target table could not be determined' };
                 }
 
@@ -80,6 +99,16 @@ export default (app: YapockType) =>
                 const allowed = Array.from(candidates).some((c) => whitelist.has(c));
                 if (!allowed) {
                     set.status = 403;
+                    await logAudit({
+                        action: 'WHITELIST_DENY',
+                        model_id: table,
+                        model_type: 'admin.sql',
+                        model_object: {
+                            query,
+                            params,
+                            whitelist: Array.from(whitelist),
+                        },
+                    });
                     return { error: 'Table not whitelisted for destructive operations', table, whitelist: Array.from(whitelist) };
                 }
             }
@@ -92,13 +121,48 @@ export default (app: YapockType) =>
                 // Use Unsafe variants since this endpoint explicitly allows raw queries from admins
                 if (isSelect || (isWith && !isDestructive)) {
                     const result = await (params && Array.isArray(params) ? prisma.$queryRawUnsafe(query, ...params) : prisma.$queryRawUnsafe(query));
+                    await logAudit({
+                        action: 'READ_OK',
+                        model_id: extractTargetTable(query) || 'query',
+                        model_type: 'admin.sql',
+                        model_object: {
+                            query,
+                            params,
+                            isDestructive: false,
+                            resultType: 'rows',
+                            rowsCount: Array.isArray(result) ? result.length : undefined,
+                        },
+                    });
                     return { ok: true, type: 'query', rows: result };
                 } else {
                     const affected = await (params && Array.isArray(params) ? prisma.$executeRawUnsafe(query, ...params) : prisma.$executeRawUnsafe(query));
+                    await logAudit({
+                        action: 'WRITE_OK',
+                        model_id: extractTargetTable(query) || 'execute',
+                        model_type: 'admin.sql',
+                        model_object: {
+                            query,
+                            params,
+                            isDestructive: true,
+                            affected,
+                        },
+                    });
                     return { ok: true, type: 'execute', affected };
                 }
             } catch (e: any) {
                 set.status = 500;
+                await logAudit({
+                    action: 'EXEC_ERROR',
+                    model_id: extractTargetTable(query) || 'unknown',
+                    model_type: 'admin.sql',
+                    model_object: {
+                        query,
+                        params,
+                        isDestructive,
+                        errorMessage: e?.message,
+                        errorCode: e?.code,
+                    },
+                });
                 return { error: 'Query failed', message: e?.message, code: e?.code };
             }
         },

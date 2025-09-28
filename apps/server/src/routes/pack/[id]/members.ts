@@ -1,10 +1,16 @@
 import { YapockType } from '@/index';
 import { getUser } from '@/routes/user/[username]';
 import prisma from '@/db/prisma';
+import { isValidUUID } from '@/utils/dm/validation';
 
 export default (app: YapockType) =>
     app.get('', async ({ params: { id }, set, user }) => {
         // await requiresUserProfile({set, user})
+
+        if (!isValidUUID(id)) {
+            set.status = 404;
+            return;
+        }
 
         const packExists = await prisma.packs.findUnique({
             where: { id },

@@ -105,7 +105,7 @@ export const defaultExtensions = [
             if (node.type.name === 'heading') {
                 return `Heading ${node.attrs.level}`
             }
-            return "'/' to add stuff, or just start writing..."
+            return "What's on your mind?"
         },
         includeChildren: true,
     }),

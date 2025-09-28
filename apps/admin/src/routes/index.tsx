@@ -1,113 +1,58 @@
-import { AILabel, AILabelContent, ErrorBoundary } from '@carbon/react'
-import adminSql from '@/lib/adminSql'
-import { useEffect, useMemo, useState } from 'react'
-import { Download, Save, TrashCan } from '@carbon/icons-react'
-import CarbonDataTable, { BatchAction, Column } from '@/components/CarbonDataTable'
-import { rowsToCsv, saveCsv } from '@/components/csv'
+import { Button, ErrorBoundary, InlineLoading } from '@carbon/react'
+import { useEffect, useState } from 'react'
 import { ErrorEmptyState } from '@carbon/ibm-products'
+import { Link, useLocation } from 'wouter'
+import { listQueryPages } from '@/lib/queryPages'
 
-interface PostType {
-    body: string
-    content_type: string
-    id: string
-    tenant_id: string
-    user_id: string
-    rheo_classification: string
-    created_at: string
-    classification: {
-        label: string
-        rheoAgrees: boolean
-    }
-}
-
-function PostTable() {
-    const [postList, setPostList] = useState<PostType[]>()
+function QueryPageList() {
+    const [isLoading, setIsLoading] = useState(true)
+    const [pages, setPages] = useState<Awaited<ReturnType<typeof listQueryPages>>>([])
+    const [, navigate] = useLocation()
 
     useEffect(() => {
-        adminSql({ query: 'SELECT * FROM posts' })
-            .then(sql => {
-                if (sql.ok && sql.type === 'query') {
-                    setPostList(
-                        (sql.rows as PostType[]).map(post => ({
-                            ...post,
-                            rheo_classification: `${post.classification?.label?.split(' ')[0] || 'RHEO_CANNOT_CLASSIFY'}`,
-                        })) || []
-                    )
-                }
-            })
-            .catch(error => {
-                throw new Error(error)
-            })
+        void load()
+        async function load() {
+            setIsLoading(true)
+            try {
+                const data = await listQueryPages()
+                setPages(data)
+            } finally {
+                setIsLoading(false)
+            }
+        }
     }, [])
 
-    const columns: ReadonlyArray<Column<PostType>> = useMemo(
-        () => [
-            { header: 'ID', key: 'id' },
-            { header: 'Content Type', key: 'content_type' },
-            { header: 'Body', key: 'body' },
-            { header: 'User ID', key: 'user_id' },
-            { header: 'Tenant ID', key: 'tenant_id' },
-            {
-                header: 'Classification',
-                key: 'rheo_classification',
-                decorator: (
-                    <AILabel align="bottom" className="ai-label-container">
-                        <AILabelContent>
-                            <div>
-                                <p className="secondary">AI Explained</p>
-                                <h2 className="ai-label-heading">600</h2>
-                                <p className="secondary !font-bold">Samples Trained</p>
-                                <p className="secondary">
-                                    Rheo is currently learning to classify text. Accuracy is expected to improve over time.
-                                </p>
-                                <hr />
-                                <p className="secondary">Model Type</p>
-                                <p className="bold">rheo-classify-xxs-001</p>
-                            </div>
-                        </AILabelContent>
-                    </AILabel>
-                ),
-            },
-            { header: 'Created At', key: 'created_at' },
-        ],
-        []
-    )
+    return (
+        <div className="!p-6">
+            <div className="!mb-4 !flex items-center justify-between">
+                <div>
+                    <h2>Hi there!</h2>
+                    <p>These are the pages available to you.</p>
+                </div>
+                <Button onClick={() => navigate('~/query/new')}>Create</Button>
+            </div>
 
-    const actions: ReadonlyArray<BatchAction<PostType>> = useMemo(
-        () => [
-            {
-                id: 'delete',
-                label: 'Delete',
-                icon: TrashCan,
-                onClick: selected => {
-                    const ids = selected.map(r => r.id)
-                    adminSql({ query: 'DELETE FROM posts WHERE id = ANY($1::uuid[])', params: [ids] }).then(sql => {
-                        if (sql.ok && sql.type === 'execute') {
-                            alert('Deleted ' + sql.affected + ' posts')
-                            setPostList((postList || []).filter(post => !ids.includes(post.id)))
-                        }
-                    })
-                },
-            },
-            {
-                id: 'download',
-                label: 'Download',
-                icon: Download,
-                onClick: selected => {
-                    if (!selected.length) {
-                        alert('No rows selected')
-                        return
-                    }
-                    const csv = rowsToCsv(selected, columns)
-                    const date = new Date().toISOString().slice(0, 10)
-                    void saveCsv(csv, `posts_${date}.csv`)
-                },
-            },
-        ],
-        [columns, postList]
+            {isLoading ? (
+                <InlineLoading description="Loading" />
+            ) : pages.length ? (
+                <div className="grid gap-3">
+                    {pages.map(p => (
+                        <Link key={p.id} href={`/query/${p.slug}`}>
+                            <a
+                                className="block !no-underline"
+                                style={{ border: '1px solid var(--cds-border-subtle-01)', borderRadius: 6, padding: 12 }}
+                            >
+                                <div className="!font-semibold">{p.title}</div>
+                                {!!p.description && <div className="!text-text-secondary">{p.description}</div>}
+                            </a>
+                        </Link>
+                    ))}
+                </div>
+            ) : (
+                <div>No pages yet.</div>
+            )}
+        </div>
     )
-
-    return <CarbonDataTable<PostType> title="Posts" rows={postList || []} columns={columns} batchActions={actions} />
 }
 
 export default function RouteIndex() {
@@ -130,7 +75,7 @@ export default function RouteIndex() {
                 />
             }
         >
-            <PostTable />
+            <QueryPageList />
         </ErrorBoundary>
     )
 }

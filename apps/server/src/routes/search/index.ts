@@ -56,7 +56,7 @@ const SearchAPI = (app: YapockType) =>
 
                 // Parse limit and offset
                 const limit = query.limit ? parseInt(query.limit, 10) : 30;
-                const offset = query.offset ? parseInt(query.offset, 10) : undefined;
+                const offset = query.offset ? parseInt(query.offset, 10) : query.page ? parseInt(query.page, 10) * limit : 0;
 
                 // Parse allowed tables
                 let allowedTables = ['profiles', 'packs', 'posts'];
@@ -82,7 +82,7 @@ const SearchAPI = (app: YapockType) =>
                 }
                 // Execute the search
                 const results = await search(query.q, {
-                    limit,
+                    limit: limit + 1,
                     offset,
                     // includeMetadata: query.includeMetadata === 'true',
                     // allowedTables
@@ -146,6 +146,8 @@ const SearchAPI = (app: YapockType) =>
                     data: query.allowedTables?.length === 1 ? trueResults[query.allowedTables[0]] : trueResults,
                     count: Object.keys(trueResults).reduce((acc, key) => acc + trueResults[key].length, 0),
                     query: query.q,
+                    pages: Math.ceil(results.length / limit),
+                    has_more: results.length > limit,
                 };
             } catch (error) {
                 // Handle search errors
@@ -169,6 +171,7 @@ const SearchAPI = (app: YapockType) =>
         {
             query: t.Object({
                 q: t.String(),
+                page: t.Optional(t.String()),
                 limit: t.Optional(t.String()),
                 offset: t.Optional(t.String()),
                 includeMetadata: t.Optional(t.String()),
@@ -183,6 +186,8 @@ const SearchAPI = (app: YapockType) =>
                     data: t.Any(),
                     count: t.Number(),
                     query: t.String(),
+                    pages: t.Optional(t.Number()),
+                    has_more: t.Optional(t.Boolean()),
                 }),
                 400: t.Object({
                     error: SearchErrorSchema,

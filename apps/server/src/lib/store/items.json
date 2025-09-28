@@ -1,0 +1,122 @@
+{
+    "cat_badge_1": {
+        "id": "cat_badge_1",
+        "title": "Generic Badge 1",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_2": {
+        "id": "cat_badge_2",
+        "title": "Generic Badge 2",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_3": {
+        "id": "cat_badge_3",
+        "title": "Generic Badge 3",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_4": {
+        "id": "cat_badge_4",
+        "title": "Generic Badge 4",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_5": {
+        "id": "cat_badge_5",
+        "title": "Generic Badge 5",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_6": {
+        "id": "cat_badge_6",
+        "title": "Generic Badge 6",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_7": {
+        "id": "cat_badge_7",
+        "title": "Generic Badge 7",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_8": {
+        "id": "cat_badge_8",
+        "title": "Generic Badge 8",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_9": {
+        "id": "cat_badge_9",
+        "title": "Generic Badge 9",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_10": {
+        "id": "cat_badge_10",
+        "title": "Generic Badge 10",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_11": {
+        "id": "cat_badge_11",
+        "title": "Generic Badge 11",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_12": {
+        "id": "cat_badge_12",
+        "title": "Generic Badge 12",
+        "description": "Display a generic badge on your profile.",
+        "type": "badge",
+        "price": 5,
+        "stackable": false
+    },
+    "cat_badge_13": {
+        "id": "cat_badge_13",
+        "title": "Cat on a Cat",
+        "description": "It's a cat on a cat.",
+        "type": "badge",
+        "price": 25,
+        "stackable": false
+    },
+    "cat_badge_14": {
+        "id": "cat_badge_14",
+        "title": "Royally Popular",
+        "description": "how did you get so many trinkets...",
+        "type": "badge",
+        "price": 50,
+        "stackable": false
+    },
+    "cat_badge_15": {
+        "id": "cat_badge_15",
+        "title": "Life of the Party",
+        "description": "If you bought this, it means you believed in this enough to invite a bunch of people.",
+        "type": "badge",
+        "price": 75,
+        "stackable": false
+    }
+}

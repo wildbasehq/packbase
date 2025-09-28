@@ -18,7 +18,7 @@ export default (app: YapockType) =>
             const { limit = 20, cursor, unread_only = false } = query;
 
             try {
-                const result = await NotificationManager.getUserNotifications(user.sub, limit, cursor, unread_only);
+                const result = await NotificationManager.getUserNotifications(user.sub, limit as number, cursor, !!unread_only);
 
                 // Format dates to ISO strings for consistent API response
                 const formattedData = result.data.map((notification) => ({

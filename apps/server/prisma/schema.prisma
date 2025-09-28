@@ -10,6 +10,8 @@ datasource db {
   schemas   = ["auth", "public"]
 }
 
+
+
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model notice {
   id         BigInt   @id @default(autoincrement())
@@ -109,10 +111,10 @@ model posts_reactions {
   post_id    String   @db.Uuid
   created_at DateTime @default(now()) @db.Timestamptz(6)
   actor_id   String   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  slot       BigInt   @default(0)
+  slot       String   @default("thumbs_up")
   posts      posts    @relation(fields: [post_id], references: [id], onDelete: Cascade, map: "public_posts_reactions_post_id_fkey")
 
-  @@id([post_id, actor_id], map: "posts_reactions_pkey")
+  @@id([post_id, actor_id, slot], map: "posts_reactions_pkey")
   @@index([actor_id], type: Hash)
   @@index([post_id], type: Hash)
   @@map("posts.reactions")
@@ -232,12 +234,16 @@ model notifications {
   @@schema("public")
 }
 
-model collectibles {
+model inventory {
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id  String
-  badge_id String
-  is_set   Boolean @default(false)
+  item_id  String
+  amount   Int      @default(1)
+  type     String   @default("item")
+  // For "badges"
+  is_set   Boolean  @default(false)
 
-  @@unique([badge_id, user_id])
+  @@unique([item_id, user_id])
   @@schema("public")
 }
 
@@ -349,5 +355,47 @@ model dm_messages {
   @@index([channel_id, created_at])
   @@index([author_id])
   @@index([reply_to])
+  @@schema("public")
+}
+
+model admin_query_pages {
+  id          String   @id
+  slug        String   @unique(map: "admin_query_pages_slug_idx")
+  title       String
+  description String?
+  sql         String
+  mapping     Json
+  custom_js   String?
+  delete_key  String?
+  delete_sql  String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@schema("public")
+}
+
+model admin_audit_log {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String   @db.Uuid
+  action      String
+  model_type  String
+  model_id    String
+  model_object Json
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@schema("public")
+}
+
+/// Value-less virtual currency balances for users and packs
+model currency {
+  /// ID of the owner (e.g., "user:<uuid>" or "pack:<uuid>")
+  parent_id  String   @id
+  /// Currency type (e.g., "trinket")
+  type       String
+  /// Current balance (non-negative integer)
+  amount     Int      @default(0)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
   @@schema("public")
 }

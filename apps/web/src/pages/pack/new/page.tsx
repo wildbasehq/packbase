@@ -73,6 +73,8 @@ function CreatePackModal({ close }: { close: () => void }) {
         description: '',
     })
 
+    document.title = `Create Pack • ${formData.display_name || 'Pack Name'}`
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
         setFormData(prev => ({
@@ -115,11 +117,11 @@ function CreatePackModal({ close }: { close: () => void }) {
     }
 
     return (
-        <form onSubmit={createPack} className="flex flex-col-reverse sm:w-[50vw] md:flex-row">
-            <div className="flex flex-col justify-between sm:w-1/2 md:border-r">
+        <form onSubmit={createPack} className="flex flex-col-reverse w-full md:max-w-2xl lg:max-w-4xl md:flex-row">
+            <div className="flex flex-col justify-between md:w-1/2 md:border-r">
                 <div className="flex-1 grow p-6 space-y-6">
                     <div className="flex items-center space-x-3">
-                        <div className="inline-flex shrink-0 items-center justify-center rounded-sm bg-muted p-3">
+                        <div className="inline-flex shrink-0 items-center justify-center rounded-xl bg-muted/50 p-3">
                             <UserGroupIcon className="size-5" aria-hidden={true} />
                         </div>
                         <div className="space-y-0.5">
@@ -139,7 +141,7 @@ function CreatePackModal({ close }: { close: () => void }) {
                         <Text as="div" alt className="!leading-6 mt-1">
                             <ul className="list-disc list-inside">
                                 <li>The call sign must be unique, but the name can be anything.</li>
-                                <li>After pack creation, don't forget to add an icon and banner image!</li>
+                                <li>After creation, don't forget to add an icon and banner image!</li>
                             </ul>
                         </Text>
                     </div>
@@ -154,10 +156,10 @@ function CreatePackModal({ close }: { close: () => void }) {
                 </div>
             </div>
 
-            <div className="flex-1 space-y-6 sm:w-1/2 p-6 md:px-6 md:pb-8 md:pt-6">
+            <div className="flex-1 space-y-6 md:w-1/2 p-6 md:px-6 md:pb-8 md:pt-6">
                 <Field>
                     <div className="flex items-center space-x-3 mb-2">
-                        <Text className="inline-flex size-6 items-center justify-center rounded-sm bg-muted">1</Text>
+                        <Text className="inline-flex size-6 items-center justify-center rounded-lg bg-muted/50">1</Text>
                         <Label htmlFor="display_name" className="text-sm font-medium">
                             Give it a name
                         </Label>
@@ -174,7 +176,7 @@ function CreatePackModal({ close }: { close: () => void }) {
 
                 <Field>
                     <div className="flex items-center space-x-3 mb-2">
-                        <Text className="inline-flex size-6 items-center justify-center rounded-sm bg-muted">2</Text>
+                        <Text className="inline-flex size-6 items-center justify-center rounded-lg bg-muted/50">2</Text>
                         <Label htmlFor="slug" className="text-sm font-medium">
                             Now a call sign
                         </Label>
@@ -187,7 +189,7 @@ function CreatePackModal({ close }: { close: () => void }) {
 
                 <Field>
                     <div className="flex items-center space-x-3 mb-2">
-                        <Text className="inline-flex size-6 items-center justify-center rounded-sm bg-muted">3</Text>
+                        <Text className="inline-flex size-6 items-center justify-center rounded-lg bg-muted/50">3</Text>
                         <Label htmlFor="description" className="text-sm font-medium">
                             What are you about?
                         </Label>
@@ -202,7 +204,7 @@ function CreatePackModal({ close }: { close: () => void }) {
 
                 <div>
                     <div className="flex items-center space-x-3 mb-2">
-                        <Text className="inline-flex size-6 items-center justify-center rounded-sm bg-muted">4</Text>
+                        <Text className="inline-flex size-6 items-center justify-center rounded-lg bg-muted/50">4</Text>
                         <Heading className="!text-sm font-medium flex-1">
                             By clicking "Create", you agree that you have the right to use and act on the information you provide, and that
                             it does not violate any third-party rights.
@@ -299,6 +301,8 @@ export default function PackAdd() {
     const { setCurrentResource } = useResourceStore()
     const user = useUserAccountStore(state => state.user)
     const { show, hide } = useModal()
+
+    document.title = 'Packbase • Discover Packs'
 
     useEffect(() => {
         setCurrentResource({

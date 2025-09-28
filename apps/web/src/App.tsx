@@ -6,7 +6,6 @@ import React, { lazy, Suspense, useEffect } from 'react'
 import { SidebarLayout } from '@/components/shared/sidebar-layout.tsx'
 import { Providers } from './provider.tsx'
 import { SidebarProvider } from '@/lib/context/sidebar-context'
-import Console from '@/components/shared/console.tsx'
 import { AppTabs, GuestLanding, LogoSpinner } from '@/src/components'
 import Body from '@/components/layout/body.tsx'
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut } from '@clerk/clerk-react'
@@ -19,6 +18,7 @@ import Preload from '@/src/preload.tsx'
 import ChatLayout from '@/pages/c/layout.tsx'
 import NotSelected from '@/pages/c/not-selected.tsx'
 import { ProjectName, ProjectSafeName } from '@/lib'
+import BrowserCheck from '@/components/modal/browser-check.tsx'
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
@@ -34,6 +34,11 @@ const TermsPage = lazy(() => import('@/pages/terms/page.tsx'))
 const UserProfile = lazy(() => import('@/pages/user/[...slug]/page.tsx'))
 const SearchPage = lazy(() => import('@/pages/search/page.tsx'))
 const ChatThreadPage = lazy(() => import('@/pages/c/[id]/page.tsx'))
+
+// Store
+const StoreLayout = lazy(() => import('@/pages/store/layout.tsx'))
+const StorePage = lazy(() => import('@/pages/store/page.tsx'))
+const StoreItemPage = lazy(() => import('@/pages/store/[item]/page.tsx'))
 
 // Playground
 const Playground = lazy(() => import('@/pages/playground/page.tsx'))
@@ -104,9 +109,10 @@ Thanks for being a crucial part of the internet.
 
     return (
         <Providers>
-            <SidebarProvider>
-                <Console />
+            {/* Browser check */}
+            <BrowserCheck />
 
+            <SidebarProvider>
                 <div className="absolute bottom-0 left-0 z-40 w-full sm:hidden">
                     <AppTabs className="border-0 !rounded-none !rounded-t-md ring-1 ring-default items-center justify-center" />
                 </div>
@@ -125,7 +131,7 @@ Thanks for being a crucial part of the internet.
 
                                     <ClerkLoaded>
                                         <Preload>
-                                            <div id="NGRoot" className="h-full overflow-y-auto">
+                                            <div id="NGRoot" className="h-full overflow-y-auto overflow-x-hidden">
                                                 <WaitlistCheck />
                                                 <SignedOut>
                                                     <div className="flex fixed top-4 z-40 w-full">
@@ -140,6 +146,7 @@ Thanks for being a crucial part of the internet.
                                                         />
                                                     </div>
                                                 </SignedOut>
+
                                                 <Switch>
                                                     <Route path="/">
                                                         <SignedIn>
@@ -182,6 +189,18 @@ Thanks for being a crucial part of the internet.
                                                                     </Suspense>
                                                                 </Route>
                                                             </IDLayout>
+                                                        </Suspense>
+                                                    </Route>
+
+                                                    <Route path="/store" nest>
+                                                        <Suspense fallback={<LoadingFallback />}>
+                                                            <StoreLayout>
+                                                                <Route path="/">
+                                                                    <Suspense fallback={<LoadingFallback />}>
+                                                                        <StorePage />
+                                                                    </Suspense>
+                                                                </Route>
+                                                            </StoreLayout>
                                                         </Suspense>
                                                     </Route>
 

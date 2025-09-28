@@ -3,17 +3,18 @@
  */
 
 import useWindowSize from '@/src/lib/hooks/use-window-size'
-import { memo, useEffect } from 'react'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import Tooltip from '../shared/tooltip'
-import { PanelRightClose, PanelRightOpen } from 'lucide-react'
 import { Heading, Text } from '@/components/shared/text.tsx'
 import UserDropdown from '@/components/layout/user-dropdown.tsx'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import Link from '@/components/shared/link.tsx'
-import { cn, useResourceStore } from '@/lib'
-import { ButtonStyles, useContentFrame } from '@/src/components'
+import { useResourceStore } from '@/lib'
+import { TabsLayout, Tab, useContentFrame } from '@/src/components'
 import { useDarkMode, useInterval, useLocalStorage } from 'usehooks-ts'
 import UserAvatar from '@/components/shared/user/avatar.tsx'
+import { InboxContent, UserMultipleAccounts } from '@/components/icons/plump'
+import InboxPage from '@/pages/inbox/page'
 
 const DropdownComponent = memo(UserDropdown, () => true)
 
@@ -22,7 +23,13 @@ export default function UserSidebar() {
         currentResource: { id: pack_id, standalone },
     } = useResourceStore()
     const [collapsed, setCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
+    const [sidebarWidth, setSidebarWidth] = useLocalStorage<number>('user-sidebar-width', 320)
     const isMobile = useWindowSize().windowSize.width! < 1280
+    const [isResizing, setIsResizing] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
+
+    const MIN_EXPANDED_PX = 320 // was min-w-[20rem]
+    const MAX_EXPANDED_PX = 640
 
     useEffect(() => {
         if (!collapsed) {
@@ -30,72 +37,94 @@ export default function UserSidebar() {
         }
     }, [isMobile])
 
+    const startResize = useCallback(() => {
+        if (!containerRef.current) return
+        setIsResizing(true)
+
+        const { right } = containerRef.current.getBoundingClientRect()
+
+        const onMove = (x: number) => {
+            // Dragging the LEFT edge: width is the distance from cursor to the container's right edge
+            const rawWidth = Math.max(0, right - x)
+
+            const clamped = Math.min(MAX_EXPANDED_PX, Math.max(MIN_EXPANDED_PX, rawWidth))
+            setSidebarWidth(clamped)
+        }
+
+        const onMouseMove = (e: MouseEvent) => onMove(e.clientX)
+        const onTouchMove = (e: TouchEvent) => onMove(e.touches[0]?.clientX ?? 0)
+        const stop = () => {
+            setIsResizing(false)
+            window.removeEventListener('mousemove', onMouseMove)
+            window.removeEventListener('mouseup', stop)
+            window.removeEventListener('touchmove', onTouchMove)
+            window.removeEventListener('touchend', stop)
+        }
+
+        window.addEventListener('mousemove', onMouseMove)
+        window.addEventListener('mouseup', stop)
+        window.addEventListener('touchmove', onTouchMove, { passive: false })
+        window.addEventListener('touchend', stop)
+    }, [collapsed])
+
+    const onHandleMouseDown = useCallback(
+        (e: React.MouseEvent<HTMLDivElement>) => {
+            e.preventDefault()
+            startResize()
+        },
+        [startResize]
+    )
+
+    const onHandleTouchStart = useCallback(
+        (e: React.TouchEvent<HTMLDivElement>) => {
+            e.preventDefault()
+            startResize()
+        },
+        [startResize]
+    )
+
     return (
-        <div className={`h-screen relative ${collapsed ? 'w-14 min-w-[3.5rem]' : 'w-80 min-w-[20rem]'} hidden md:flex z-10`}>
-            <div className="flex flex-col w-full">
-                <div
-                    className={`relative dark text-default flex ${collapsed ? 'flex-col justify-center items-center mt-3' : 'h-14 gap-2'}`}
-                >
-                    {collapsed && (
-                        <div className="flex flex-col items-center gap-4">
-                            <DropdownComponent />
-
-                            {/* Collapsed search icon */}
-                            {collapsed && (
-                                <div className="px-3">
-                                    <Tooltip content="Search" side="right" delayDuration={0}>
-                                        <Link href="/search" className="text-default">
-                                            <div className="inline-flex items-center justify-center h-8 w-8 rounded cursor-pointer">
-                                                <MagnifyingGlassIcon className="w-4 h-4" />
-                                            </div>
-                                        </Link>
-                                    </Tooltip>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <div className="flex justify-end items-center w-full gap-2 p-3">
-                        <div className="w-4"></div>
-                        <div className="flex justify-start items-center gap-1">
-                            {!isMobile && (
-                                <Tooltip
-                                    key={collapsed}
-                                    content={collapsed ? 'Expand' : 'Collapse'}
-                                    side={collapsed ? 'right' : 'bottom'}
-                                    delayDuration={0}
-                                >
-                                    <div
-                                        className="inline-flex items-center justify-center h-8 w-8 p-1.5 rounded cursor-pointer"
-                                        onClick={() => setCollapsed(!collapsed)}
-                                    >
-                                        {collapsed ? <PanelRightOpen className="w-4 h-4" /> : <PanelRightClose className="h-6 w-6" />}
-                                    </div>
-                                </Tooltip>
-                            )}
-                        </div>
-
-                        {!collapsed && <UserActionsContainer />}
+        <div
+            ref={containerRef}
+            className={`h-screen relative hidden transition-all bg-muted dark:bg-n-8 ${collapsed ? 'translate-x-full p-0' : 'p-1 z-10'} md:flex ${isResizing ? 'select-none cursor-col-resize !transition-none' : ''}`}
+            style={{
+                // width: collapsed ? 0 : sidebarWidth,
+                minWidth: collapsed ? 0 : (sidebarWidth ?? MIN_EXPANDED_PX),
+                maxWidth: collapsed ? 0 : (sidebarWidth ?? MAX_EXPANDED_PX),
+                flex: '0 0 auto', // Prevent flexbox from resizing
+                overflow: 'hidden', // Prevent content from overflowing if forcibly resized
+            }}
+        >
+            {!collapsed && (
+                <>
+                    <div className="flex flex-col w-full">
+                        <TabsLayout
+                            defaultIndex={0}
+                            suffix={<UserActionsContainer />}
+                            className="h-full"
+                            contentClassName="h-[calc(100vh-3.75rem)] relative pt-8 z-10 bg-white border dark:bg-n-8 rounded-tr rounded-b-xl flex flex-col overflow-y-auto px-4 pb-8 h-full"
+                            headerClassName="rounded-tr rounded-out-lt-3xl"
+                        >
+                            <Tab title="People" icon={UserMultipleAccounts}>
+                                {pack_id && !standalone && <PackMembersContainer />}
+                                {(!pack_id || standalone) && <FriendsListContainer />}
+                                <div className="flex-grow" />
+                            </Tab>
+                            <Tab title="Notifications" icon={InboxContent}>
+                                <InboxPage />
+                            </Tab>
+                        </TabsLayout>
                     </div>
-                </div>
-
-                {!collapsed && (
-                    <div className="absolute bg-white dark:bg-n-8 -z-10 h-[calc(3rem+1px)] w-7 top-2 -left-4 transform skew-x-24 rounded-tr rounded-out-br after:right-[calc(var(--rounded-out-radius-br)*-1--1px)]"></div>
-                )}
-
-                <div
-                    className={cn(
-                        !collapsed
-                            ? 'bg-white dark:bg-n-8 border-r-1 border-b-1 mr-2 rounded-tr-md rounded-br-md rounded-tl-none rounded-out-lt-xl -ml-2 flex flex-col px-4 pb-8 h-full'
-                            : 'relative flex flex-col justify-center items-center mt-3',
-                        'pt-8 mb-2 relative border-zinc-950/5 dark:border-white/5 dark:mb-[calc(0.5rem-1px)]'
+                    {/* Resize handle on the left edge */}
+                    {!isMobile && (
+                        <div
+                            className="absolute left-0 top-0 h-full w-1.5 cursor-col-resize z-20 bg-transparent transition-[background-color] hover:bg-muted-foreground"
+                            onMouseDown={onHandleMouseDown}
+                            onTouchStart={onHandleTouchStart}
+                        />
                     )}
-                >
-                    {pack_id && !standalone && <PackMembersContainer collapsed={collapsed} />}
-                    {(!pack_id || standalone) && <FriendsListContainer collapsed={collapsed} />}
-                    <div className="flex-grow" />
-                </div>
-            </div>
+                </>
+            )}
         </div>
     )
 }
@@ -105,57 +134,20 @@ export function UserActionsContainer() {
 
     return (
         <>
-            {/* Search button */}
-            <Link
-                href="/search"
-                className={cn(
-                    'relative flex flex-grow items-center py-1.5 px-2 rounded-lg border before:shadow-none isolate border-optical',
-                    !isDarkMode ? ButtonStyles.colors.light : ButtonStyles.colors.dark
-                )}
-            >
-                <div className="mr-1.5">
-                    <MagnifyingGlassIcon className="w-3 h-3" />
-                </div>
-                <Text size="sm">Search</Text>
-            </Link>
-
             {/* User avatar */}
-            <div className="flex justify-end items-center">
+            <div className="flex mr-2 items-center animate-scale-in">
                 <DropdownComponent />
             </div>
         </>
     )
 }
 
-function FriendsListContainer({ collapsed }: { collapsed: boolean }) {
+function FriendsListContainer() {
     const { data: friendsResponse, refetch } = useContentFrame('get', 'user.me.friends', undefined, { id: 'user.me.friends' })
 
     const friends = friendsResponse?.friends || []
 
     useInterval(refetch, 60000)
-
-    /*
-     * Small avatars only list
-     */
-    if (collapsed) {
-        return (
-            <div className="flex flex-col space-y-4">
-                {friends?.map(friend => (
-                    <Tooltip content={friend.display_name || `@${friend.username}`} side="right" delayDuration={0}>
-                        <Link
-                            href={`/@${friend.username}`}
-                            key={friend.id}
-                            className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded-md"
-                        >
-                            <div className="flex items-center gap-2">
-                                <UserAvatar user={friend} size={32} showOnlineStatus={true} />
-                            </div>
-                        </Link>
-                    </Tooltip>
-                ))}
-            </div>
-        )
-    }
 
     return (
         <div className="flex flex-col space-y-4">
@@ -201,36 +193,13 @@ function FriendsListContainer({ collapsed }: { collapsed: boolean }) {
     )
 }
 
-function PackMembersContainer({ collapsed }: { collapsed: boolean }) {
+function PackMembersContainer() {
     const {
         currentResource: { id },
     } = useResourceStore()
     const { data: members, refetch } = useContentFrame('get', `pack.${id}.members`, undefined, { id: `pack.${id}.members` })
 
     useInterval(refetch, 60000)
-
-    /*
-     * Small avatars only list
-     */
-    if (collapsed) {
-        return (
-            <div className="flex flex-col space-y-4">
-                {members?.map(member => (
-                    <Tooltip content={member.display_name || `@${member.username}`} side="right" delayDuration={0}>
-                        <Link
-                            href={`/@${member.username}`}
-                            key={member.id}
-                            className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded-md"
-                        >
-                            <div className="flex items-center gap-2">
-                                <UserAvatar user={member} size={32} showOnlineStatus={false} />
-                            </div>
-                        </Link>
-                    </Tooltip>
-                ))}
-            </div>
-        )
-    }
 
     return (
         <div className="flex flex-col space-y-4">

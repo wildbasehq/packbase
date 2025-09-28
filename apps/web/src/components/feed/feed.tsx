@@ -3,326 +3,131 @@
  */
 
 // src/components/feed/feed.tsx
-import { useEffect, useReducer, useRef } from 'react'
-import { toast } from 'sonner'
-import { vg } from '@/lib/api'
-import { useUIStore } from '@/lib/state'
-import { WorkerStore } from '@/lib/workers'
-import { FeedProps, FeedState } from './types/feed'
+import { useEffect, useRef } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSearchParams } from 'wouter'
+import { useSession } from '@clerk/clerk-react'
+import { useResourceStore, useUIStore } from '@/lib/state'
+import { setToken } from '@/lib'
+import { FeedProps } from './types/feed'
+import { fetchFeedPage, fetchSearchPage, FeedPageResult } from './fetchers'
 import FeedList from './feed-list'
 import FeedLoading from './feed-loading'
-import FeedEmpty from './feed-empty'
 import FeedMaintenance from './feed-maintenance'
 import FeedError from './feed-error'
-import FloatingComposeButton from './floating-compose-button'
 import useWindowSize from '@/lib/hooks/use-window-size.ts'
+import { FloatingCompose } from './index'
+import { useLocalStorage } from 'usehooks-ts'
 
-// Define reducer for feed state management
-type FeedAction =
-    | { type: 'LOADING_START' }
-    | { type: 'LOADING_END' }
-    | { type: 'SET_POSTS'; posts: any[]; hasMore: boolean }
-    | { type: 'APPEND_POSTS'; posts: any[]; hasMore: boolean }
-    | { type: 'REMOVE_POST'; postId: string }
-    | { type: 'SET_PAGE'; page: number }
-    | { type: 'SET_ERROR'; error: Error | null }
-
-function feedReducer(state: FeedState, action: FeedAction): FeedState {
-    switch (action.type) {
-        case 'LOADING_START':
-            return { ...state, isLoading: true }
-        case 'LOADING_END':
-            return { ...state, isLoading: false }
-        case 'SET_POSTS':
-            if (!action.posts || !Array.isArray(action.posts)) {
-                return {
-                    ...state,
-                    isLoading: false,
-                    error: new Error('Invalid posts data'),
-                }
-            }
-            return {
-                posts: [...action.posts],
-                hasMore: action.hasMore,
-                currentPage: 2,
-                isLoading: false,
-                error: null,
-            }
-        case 'APPEND_POSTS':
-            if (!action.posts || !Array.isArray(action.posts)) {
-                return state
-            }
-            return {
-                ...state,
-                posts: [...state.posts, ...action.posts],
-                hasMore: action.hasMore,
-                currentPage: state.currentPage + 1,
-                isLoading: false,
-            }
-        case 'REMOVE_POST':
-            return {
-                ...state,
-                posts: state.posts.filter(post => post.id !== action.postId),
-            }
-        case 'SET_PAGE':
-            return { ...state, currentPage: action.page }
-        case 'SET_ERROR':
-            return { ...state, error: action.error, isLoading: false }
-        default:
-            return state
-    }
-}
-
-export default function Feed({ packID = '00000000-0000-0000-0000-000000000000', channelID, feedQueryOverride }: FeedProps) {
+export default function Feed({
+    packID = '00000000-0000-0000-0000-000000000000',
+    channelID,
+    feedQueryOverride,
+    titleOverride,
+    dontShowCompose,
+}: FeedProps) {
     const { maintenance } = useUIStore()
-    const { enqueue } = WorkerStore()
-
-    const isMountedRef = useRef(false)
-    const fetchCompletedRef = useRef(false)
+    const { currentResource } = useResourceStore()
+    const { session, isSignedIn } = useSession()
+    const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
+    const queryClient = useQueryClient()
     const prevPackIDRef = useRef(packID)
+    const prevChannelIDRef = useRef(channelID)
 
     const { isMobile } = useWindowSize()
 
-    const [state, dispatch] = useReducer(feedReducer, {
-        posts: [],
-        isLoading: true,
-        hasMore: false,
-        currentPage: 1,
-        error: null,
-    })
+    // Read page from URL
+    const [searchParams, setSearchParams] = useSearchParams()
+    const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
+    const setPage = (newPage: number) => setSearchParams({ page: newPage.toString() })
 
-    useEffect(() => {
-        if (isMountedRef.current && packID === prevPackIDRef.current) {
-            return
-        }
+    // Determine if this is a search or feed query
+    const isSearch = !!channelID || !!feedQueryOverride
+    const queryKey = isSearch ? ['search', channelID, feedQueryOverride, page] : ['feed', packID, page]
 
-        isMountedRef.current = true
-        prevPackIDRef.current = packID
-        fetchCompletedRef.current = false
-
-        dispatch({ type: 'LOADING_START' })
-        dispatch({ type: 'SET_PAGE', page: 1 })
-
-        fetchInitialPosts()
-
-        return () => {}
-    }, [packID])
-
-    const fetchInitialPosts = async () => {
-        if (fetchCompletedRef.current) {
-            return
-        }
-
-        try {
-            let data, error
-            let retryCount = 0
-            const maxRetries = 1
-
-            while (retryCount <= maxRetries) {
-                try {
-                    let response
-                    if (channelID) {
-                        response = await vg.search.get({
-                            query: {
-                                q: feedQueryOverride || '[Where posts:channel_id ("' + channelID + '")]',
-                                allowedTables: ['posts'],
-                            },
-                        })
-                    } else {
-                        response = await vg.feed({ id: packID }).get({ query: { page: 1 } })
-                    }
-
-                    data = response.data
-                    error = response.error
-
-                    if (error && (error.status === 401 || error.status === 403)) {
-                        retryCount++
-                        await new Promise(resolve => setTimeout(resolve, 500))
-                        continue
-                    }
-
-                    break
-                } catch (requestErr) {
-                    retryCount++
-                    if (retryCount <= maxRetries) {
-                        await new Promise(resolve => setTimeout(resolve, 500))
-                        continue
-                    }
-                    throw requestErr
-                }
-            }
-
-            if (error) {
-                if (retryCount > maxRetries || (error.status !== 401 && error.status !== 403)) {
-                    toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong loading the feed')
-                    dispatch({
-                        type: 'SET_ERROR',
-                        error: new Error(error.status || 'Failed to load feed'),
-                    })
-                }
-                dispatch({ type: 'LOADING_END' })
-                fetchCompletedRef.current = true
-                return
-            }
-
-            if (!data || !data.data) {
-                dispatch({ type: 'LOADING_END' })
-                fetchCompletedRef.current = true
-                return
-            }
-
-            if (data.data.length > 0) {
-                try {
-                    enqueue(`howl-dl-${packID}`, async cache => {
-                        cache.replace(data.data)
-                    })
-                } catch (cacheErr) {}
-
-                const posts = [...data.data]
-
-                dispatch({
-                    type: 'SET_POSTS',
-                    posts,
-                    hasMore: data.has_more,
+    // Single query for the current page
+    const { data, isLoading, error } = useQuery<FeedPageResult>({
+        queryKey,
+        queryFn: async () => {
+            if (isSearch) {
+                return fetchSearchPage({
+                    channelID: channelID!,
+                    q: feedQueryOverride,
+                    page,
                 })
             } else {
-                dispatch({ type: 'LOADING_END' })
+                return fetchFeedPage({
+                    packID,
+                    page,
+                })
             }
+        },
+        enabled: isSignedIn,
+        placeholderData: previousData => previousData,
+        staleTime: 5 * 60 * 1000, // 5 minutes
+    })
 
-            fetchCompletedRef.current = true
-        } catch (err) {
-            toast.error('Failed to load posts')
-            dispatch({
-                type: 'SET_ERROR',
-                error: err instanceof Error ? err : new Error('Unknown error'),
-            })
-            dispatch({ type: 'LOADING_END' })
-
-            fetchCompletedRef.current = true
-        }
-    }
+    const posts = data?.posts || []
+    const hasMore = data?.hasMore || false
 
     useEffect(() => {
-        const refreshInterval = setInterval(() => {
-            if (state.posts.length > 0) {
-                fetchPosts('auto-refresh', true)
-            }
-        }, 60000)
+        document.title = `${titleOverride || currentResource?.display_name || (currentResource?.id?.startsWith('0000') ? 'Home' : 'Packbase')} • P${page}`
+    }, [page, titleOverride, currentResource])
 
-        return () => {
-            clearInterval(refreshInterval)
+    // Reset to page 1 when packID or channelID changes
+    useEffect(() => {
+        if (packID !== prevPackIDRef.current || channelID !== prevChannelIDRef.current) {
+            prevPackIDRef.current = packID
+            prevChannelIDRef.current = channelID
+            setPage(1)
         }
-    }, [])
+    }, [packID, channelID, setPage])
 
-    const fetchPosts = async (source = 'manual', checkForNew = false) => {
-        const page = checkForNew ? 1 : state.currentPage
-
-        try {
-            const { data, error } = channelID
-                ? await vg.search.get({
-                      query: {
-                          q: feedQueryOverride || '[Where posts:channel_id ("' + channelID + '")]',
-                          allowedTables: ['posts'],
-                          limit: 10,
-                          offset: (page - 1) * 10,
-                      },
-                  })
-                : await vg.feed({ id: packID }).get({ query: { page } })
-
-            if (error) {
-                toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong loading the feed')
-                return
-            }
-
-            if (!data?.data) {
-                return
-            }
-
-            if (checkForNew) {
-                if (data.data.length === 0) {
-                    return
-                }
-
-                const newPostIds = data.data.map((post: any) => post.id)
-                const existingPostIds = state.posts.map(post => post.id)
-                const hasNewPosts = newPostIds.some(id => !existingPostIds?.includes(id))
-
-                if (hasNewPosts) {
-                    toast.message('New threads available', {
-                        action: {
-                            label: 'Refresh',
-                            onClick: () => {
-                                dispatch({ type: 'SET_POSTS', posts: data.data, hasMore: data.has_more })
-
-                                try {
-                                    enqueue(`howl-dl-${packID}`, async cache => {
-                                        cache.replace(data.data)
-                                    })
-                                } catch (err) {}
-                            },
-                        },
-                    })
-                }
-            } else {
-                if (page === 1) {
-                    dispatch({ type: 'SET_POSTS', posts: data.data, hasMore: data.has_more })
-                } else {
-                    dispatch({ type: 'APPEND_POSTS', posts: data.data, hasMore: data.has_more })
-                }
-
-                try {
-                    enqueue(`howl-dl-${packID}-${source}`, async cache => {
-                        if (page === 1) {
-                            cache.replace(data.data)
-                        } else {
-                            cache.replace([...state.posts, ...data.data])
-                        }
-                    })
-                } catch (err) {}
-            }
-        } catch (err) {
-            toast.error('Failed to load posts')
+    useEffect(() => {
+        if (dontShowCompose) {
+            setUserSidebarCollapsed(false)
         }
+    }, [dontShowCompose])
+
+    // Handle post deletion
+    const handleDeletePost = (_postId: string) => {
+        // Invalidate current page query to refresh
+        queryClient.invalidateQueries({ queryKey })
     }
 
-    const handleDeletePost = (postId: string) => {
-        dispatch({ type: 'REMOVE_POST', postId })
+    // Handle load more for pagination
+    const handleLoadMore = async (requestedPage: number): Promise<void> => {
+        // Navigate to the requested page
+        setPage(requestedPage)
+    }
+
+    // Handle compose refresh - invalidate base query keys
+    const handleComposeRefresh = async (): Promise<void> => {
+        const baseKey = isSearch ? ['search', channelID, feedQueryOverride] : ['feed', packID]
+        await queryClient.invalidateQueries({ queryKey: baseKey, exact: false })
     }
 
     if (maintenance) {
         return <FeedMaintenance message={maintenance} />
     }
 
-    if (state.error) {
-        return <FeedError error={state.error} />
+    if (error) {
+        return <FeedError error={error as Error} />
     }
 
-    const isLoading = state.isLoading
-    const hasEmptyPosts = !state.isLoading && (!state.posts || state.posts.length === 0)
-    const hasPosts = state.posts && state.posts.length > 0
-
     let content
-    if (isLoading && !hasPosts) {
+    if (isLoading && page === 1) {
         content = <FeedLoading isMasonry={false} message="Loading howls..." />
-    } else if (hasEmptyPosts) {
-        content = <FeedEmpty message="No howls yet. Be the first to start a conversation!" />
     } else {
-        content = (
-            <FeedList
-                posts={state.posts || []}
-                hasMore={state.hasMore}
-                onLoadMore={() => fetchPosts('infinite-scroll')}
-                onPostDelete={handleDeletePost}
-            />
-        )
+        content = <FeedList posts={posts} hasMore={hasMore} onLoadMore={handleLoadMore} onPostDelete={handleDeletePost} />
     }
 
     return (
-        <div className="relative pb-20">
+        <div className="relative pb-20 max-w-3xl space-y-4 mx-auto">
+            {!dontShowCompose && <FloatingCompose onShouldFeedRefresh={handleComposeRefresh} />}
+
             {/* Main content area */}
             {content}
-
-            {!isMobile && <FloatingComposeButton />}
         </div>
     )
 }

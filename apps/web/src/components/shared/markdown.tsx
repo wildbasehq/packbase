@@ -293,12 +293,12 @@ export default function Markdown({ children, componentClassName }: { children: s
                                     return <Heading as="h3" size="xl" className={clsx(props.className, componentClassName)} {...props} />
                                 },
                                 p(props) {
-                                    return <Text className={clsx(props.className, componentClassName)} {...props} />
+                                    return <Text className={clsx('!select-auto', props.className, componentClassName)} {...props} />
                                 },
                                 ul(props) {
                                     return (
                                         <CustomUL
-                                            className={clsx('text-sm text-default select-none', props.className, componentClassName)}
+                                            className={clsx('text-sm text-default', props.className, componentClassName)}
                                             {...props}
                                         />
                                     )

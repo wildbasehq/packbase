@@ -57,7 +57,7 @@ export default function UserProfile() {
                     <CustomTheme userId={user.id} />
 
                     <div className="p-8" id="profile-feed">
-                        <Feed packID={user.id} />
+                        <Feed packID={user.id} dontShowCompose />
                     </div>
                 </>
             )}

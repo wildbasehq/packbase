@@ -16,6 +16,7 @@ import {
     DropdownButton,
     DropdownItem,
     DropdownMenu,
+    FloatingCompose,
     Sidebar,
     SidebarBody,
     SidebarFooter,
@@ -32,6 +33,8 @@ import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 import { useSession } from '@clerk/clerk-react'
 import { cn } from '@/lib'
 import useWindowSize from '@/lib/hooks/use-window-size.ts'
+import ResizablePanel from '@/components/shared/resizable'
+import { News } from '../ui/sidebar-news'
 
 function OpenMenuIcon() {
     return (
@@ -79,11 +82,12 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
     const { isSignedIn } = useSession()
     const { sidebarContent } = useSidebar()
     const { isMobile } = useWindowSize()
+    const [sidebarWidth, setSidebarWidth] = useState<number>(320)
     // const [location] = useLocation()
     // const isStuffPage = location === '/stuff'
 
     return (
-        <div className="w-full isolate min-h-svh max-lg:flex-col bg-white dark:bg-primary-midnight md:bg-primary-midnight">
+        <div className="w-full isolate min-h-svh max-lg:flex-col bg-muted dark:bg-n-8">
             {/*{showVGSNotice && (*/}
             {/*    <div className="top-0 z-50 mx-2 my-2">*/}
             {/*        <div className="bg-amber-50 border-2 ring-2 ring-amber-500/10 border-amber-500 p-4 rounded-md shadow-sm dark:bg-amber-900/20 dark:border-amber-600">*/}
@@ -114,13 +118,6 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
             {/*)}*/}
 
             <div className="relative flex">
-                {/* Sidebar on desktop */}
-                {isSignedIn && (
-                    <div className={cn('fixed inset-y-0 left-0 z-20 max-lg:hidden flex h-full' /**,showVGSNotice && 'top-20'**/)}>
-                        <PackSwitcher />
-                    </div>
-                )}
-
                 {/* Sidebar on mobile */}
                 <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
                     <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
@@ -141,7 +138,12 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
                     </header>
                     {/*<div className="hidden lg:block">{navbar}</div>*/}
                     {/*{isStuffPage && <YourStuffPage />}*/}
-                    <main className={`py-2 lg:min-w-0 lg:pr-2 ${isSignedIn ? 'lg:pl-18' : 'lg:pl-2'}`}>
+                    <main className="lg:min-w-0 flex">
+                        {isSignedIn && (
+                            <div className={cn('w-fit max-lg:hidden flex h-full' /**,showVGSNotice && 'top-20'**/)}>
+                                <PackSwitcher />
+                            </div>
+                        )}
                         {/*<motion.main*/}
                         {/*    // key={isStuffPage ? 'settings' : 'default'}*/}
                         {/*    className={`pb-2 lg:min-w-0 lg:pr-2 ${user ? 'lg:pl-96' : 'lg:pl-2'} ${isStuffPage ? '!z-10' : 'z-0'}`}*/}
@@ -169,12 +171,21 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
                         {/*    }}*/}
                         {/*>*/}
 
-                        <div className="relative h-[calc(100vh-1rem)] flex overflow-hidden grow lg:rounded-lg lg:rounded-br-none lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-n-8 dark:lg:ring-white/10">
+                        <div className="relative h-screen flex overflow-hidden grow lg:rounded-br-none lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-n-8 dark:lg:ring-white/10">
                             {isSignedIn && !isMobile && (
-                                <div className="top-0 backdrop-blur border-r h-full flex z-50">
-                                    <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
-                                </div>
+                                // Sidebar content for desktop
+                                <ResizablePanel
+                                    className="relative top-0 backdrop-blur border-r h-full flex z-50"
+                                    width={sidebarWidth}
+                                    onResize={setSidebarWidth}
+                                    minWidth={240}
+                                    maxWidth={560}
+                                >
+                                    <SidebarContentContainer width={sidebarWidth}>{sidebarContent}</SidebarContentContainer>
+                                </ResizablePanel>
                             )}
+
+                            {/* Content */}
                             <div className={cx('mx-auto w-full overflow-hidden h-full z-30')}>{children}</div>
                         </div>
                         {/*</motion.main>*/}
@@ -186,12 +197,13 @@ export function SidebarLayout({ children }: React.PropsWithChildren) {
     )
 }
 
-function SidebarContentContainer({ children }: { children: React.ReactNode }) {
+function SidebarContentContainer({ children, width }: { children: React.ReactNode; width?: number }) {
     const { currentResource } = useResourceStore()
+    const [articlesUnread, setArticlesUnread] = useState(false)
     return (
-        <div className="flex flex-col w-80">
+        <div className="flex flex-col" style={{ width: width ?? 320 }}>
             {!currentResource.standalone && (
-                <nav aria-label="Sections" className="flex flex-col min-h-14 w-80">
+                <nav aria-label="Sections" className="flex flex-col min-h-14" style={{ width: width ?? 320 }}>
                     <div className="relative flex h-full items-center px-5 py-2 overflow-hidden">
                         <div className="w-full">
                             <ResourceSwitcher />
@@ -199,7 +211,7 @@ function SidebarContentContainer({ children }: { children: React.ReactNode }) {
                     </div>
                 </nav>
             )}
-            <Sidebar className="w-full max-w-[320px]">
+            <Sidebar className="w-full">
                 <SidebarBody>
                     {!children &&
                         // Skeleton
@@ -222,7 +234,7 @@ function SidebarContentContainer({ children }: { children: React.ReactNode }) {
                                 <SidebarLabel>Help</SidebarLabel>
                             </DropdownButton>
                             <DropdownMenu anchor="top">
-                                <DropdownItem href="https://packbase.wildbase.xyz" target="_blank">
+                                <DropdownItem href="https://work.wildbase.xyz/maniphest/query/all/" target="_blank">
                                     <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon" />
                                     <SidebarLabel>Feedback</SidebarLabel>
                                 </DropdownItem>
@@ -236,15 +248,23 @@ function SidebarContentContainer({ children }: { children: React.ReactNode }) {
                                 </DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
-                        <SidebarItem href="https://changelog.packbase.app" target="_blank">
+                        <SidebarItem href="https://blog.packbase.app" target="_blank">
                             <SparklesIcon />
-                            <SidebarLabel external>Changelog</SidebarLabel>
+                            <SidebarLabel external>Blog</SidebarLabel>
                         </SidebarItem>
                     </SidebarSection>
                 </SidebarBody>
 
-                <SidebarFooter>
+                <SidebarFooter className={articlesUnread ? 'bg-gradient-to-b from-transparent to-muted/50' : ''}>
                     <SidebarHeading>(c) ✱base - Private alpha, things break!</SidebarHeading>
+                    <div className="bottom-0 w-full">
+                        <News
+                            toggleUnread={setArticlesUnread}
+                            onArticleLoaded={() => {
+                                setArticlesUnread(true)
+                            }}
+                        />
+                    </div>
                 </SidebarFooter>
             </Sidebar>
         </div>

@@ -4,22 +4,20 @@
 
 import PlaceholderNotification from '@/components/icons/placeholder-notification.tsx'
 import { Heading, Text } from '@/components/shared/text.tsx'
-import { Slideover } from '@/components/modal/slideover.tsx'
-import { useEffect, useState } from 'react'
-import { DialogTitle } from '@/components/shared/dialog.tsx'
-import Card from '@/components/shared/card.tsx'
+import { useEffect, useMemo, useState } from 'react'
 import { LoadingCircle } from '@/components/icons'
 import { Button } from '@/components/shared/experimental-button-rework'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime } from '@/lib/utils/date'
 import { useNotifications } from '@/lib/providers/notifications-provider'
 import { Notification } from '@/lib/api/inbox'
-import { Badge } from '@/components/shared/badge'
+import UserAvatar from '@/components/shared/user/avatar'
+import { useLocation } from 'wouter'
 
-export default function InboxPage({ onClose }) {
-    const [open, setOpen] = useState(false)
+export default function InboxPage() {
     const { notifications, loading, loadingMore, error, hasMore, cursor, fetchNotifications, markAsRead, markAllAsRead, reset } =
         useNotifications()
+    const [, navigate] = useLocation()
 
     // Load more notifications
     const loadMore = () => {
@@ -28,146 +26,126 @@ export default function InboxPage({ onClose }) {
         }
     }
 
-    // Initial fetch
+    // Initial fetch & cleanup
     useEffect(() => {
         fetchNotifications()
+        markAllAsRead()
 
-        // Reset store when component unmounts
         return () => {
             reset()
         }
     }, [])
 
-    useEffect(() => {
-        setOpen(true)
-    }, [])
+    // Derived counts for header
+    const unreadCount = useMemo(() => notifications.filter(n => !n.read).length, [notifications])
 
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            if (!open) {
-                onClose()
+    // Dedicated click handler to mark a single notification as read
+    const handleNotificationClick = async (notification: Notification) => {
+        if (!notification.read) {
+            await markAsRead(notification.id)
+        }
+
+        if (notification.metadata) {
+            // Switch between type
+            switch (notification.type) {
+                case 'howl_comment':
+                    navigate(`/p/universe/all/${notification.metadata.post_id}`)
+                    break
+                default:
+                    break
             }
-        }, 250)
-        return () => clearTimeout(timeout)
-    }, [open, onClose])
+        }
+    }
 
-    // Notification item component
+    // Twitter-style notification row
     const NotificationItem = ({ notification }: { notification: Notification }) => {
+        const actor = (notification.metadata && (notification.metadata.actor || notification.metadata.user)) as any
+        const primary = notification.title
+        const secondary = notification.content
+        const isUnread = !notification.read
+
         return (
-            <Card
-                className={cn(
-                    'mb-2 cursor-pointer transition-all hover:bg-n-1 dark:hover:bg-n-7 overflow-hidden',
-                    !notification.read ? 'border-l-4 border-l-primary' : 'pl-4'
-                )}
-                onClick={() => markAsRead(notification.id)}
+            <div
+                role="button"
+                tabIndex={0}
+                onClick={() => handleNotificationClick(notification)}
+                onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') handleNotificationClick(notification)
+                }}
+                className={cn('w-full px-4 py-3 flex gap-3 items-start transition-colors cursor-pointer', 'hover:bg-muted outline-none')}
             >
-                <div className="flex flex-col">
-                    <div className="flex justify-between items-start mb-1">
-                        <div className="flex items-center">
-                            <Heading size="sm" className="font-medium">
-                                {notification.title}
-                            </Heading>
-                            {!notification.read && (
-                                <Badge color="indigo" className="ml-2 text-xs">
-                                    New
-                                </Badge>
-                            )}
+                <div className="shrink-0">
+                    <UserAvatar user={actor} size={40} className="!rounded-full" />
+                </div>
+                <div className="min-w-0 flex-1">
+                    <div className="flex items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                            <div className={cn('text-sm', isUnread ? 'font-semibold' : 'font-medium')}>{primary}</div>
+                            {secondary && <div className="text-sm text-muted-foreground">{secondary}</div>}
                         </div>
-                        <Text alt className="text-xs">
-                            {formatRelativeTime(notification.created_at)}
-                        </Text>
-                    </div>
-                    <Text className="text-sm mb-2">{notification.content}</Text>
-                    <div className="flex justify-between items-center">
-                        {notification.type && (
-                            <Badge color="indigo" className="text-xs">
-                                {notification.type}
-                            </Badge>
-                        )}
-                        {notification.related_id && (
-                            <Text alt className="text-xs">
-                                ID: {notification.related_id.substring(0, 8)}...
-                            </Text>
-                        )}
+                        <div className="flex items-center gap-2">
+                            <time className="text-xs text-muted-foreground whitespace-nowrap">
+                                {formatRelativeTime(notification.created_at)}
+                            </time>
+                            {isUnread && <span className="inline-block w-2 h-2 rounded-full bg-indigo-500" />}
+                        </div>
                     </div>
                 </div>
-            </Card>
+            </div>
         )
     }
 
     return (
-        <Slideover
-            open={[open, setOpen]}
-            className="w-full sm:w-[400px]"
-            navbar={
-                <div className="flex justify-between items-center w-full overflow-hidden">
-                    <div className="flex items-center">
-                        <DialogTitle>Inbox</DialogTitle>
-                        {notifications?.filter(n => !n.read).length > 0 && (
-                            <Badge color="indigo" className="ml-2">
-                                {notifications.filter(n => !n.read).length}
-                            </Badge>
-                        )}
+        <div className="flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+                <div>
+                    <Heading size="md">Notifications</Heading>
+                    <Text className="text-muted-foreground text-sm">{unreadCount} unread</Text>
+                </div>
+            </div>
+
+            {/* Body */}
+            {loading ? (
+                <div className="flex flex-col items-center justify-center h-full">
+                    <LoadingCircle className="mb-4 h-8 w-8" />
+                    <Text>Loading notifications...</Text>
+                </div>
+            ) : error ? (
+                <div className="flex flex-col items-center justify-center h-full">
+                    <Text className="text-red-500 mb-2">{error}</Text>
+                    <Button onClick={() => fetchNotifications(undefined)}>Try Again</Button>
+                </div>
+            ) : notifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full">
+                    <PlaceholderNotification className="mb-4 text-card w-full" />
+                    <Heading>You're all caught up!</Heading>
+                    <Text className="text-center text-muted-foreground">Nothing to see here yet.</Text>
+                </div>
+            ) : (
+                <div className="flex flex-col rounded-2xl overflow-hidden border bg-card">
+                    <div className="divide-y divide-border">
+                        {notifications.map(notification => (
+                            <NotificationItem key={notification.id} notification={notification} />
+                        ))}
                     </div>
-                    {notifications.length > 0 && (
-                        <Button outline onClick={markAllAsRead} className="text-xs mr-2">
-                            Mark all as read
-                        </Button>
+
+                    {hasMore && (
+                        <div className="flex justify-center p-3">
+                            <Button outline onClick={loadMore} disabled={loadingMore}>
+                                {loadingMore ? (
+                                    <>
+                                        <LoadingCircle className="mr-2 h-4 w-4" />
+                                        Loading...
+                                    </>
+                                ) : (
+                                    'Load more'
+                                )}
+                            </Button>
+                        </div>
                     )}
                 </div>
-            }
-        >
-            <div className="flex flex-col h-full">
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center h-full">
-                        <LoadingCircle className="mb-4 h-8 w-8" />
-                        <Text>Loading notifications...</Text>
-                    </div>
-                ) : error ? (
-                    <div className="flex flex-col items-center justify-center h-full">
-                        <Text className="text-red-500 mb-2">{error}</Text>
-                        <Button onClick={() => fetchNotifications()}>Try Again</Button>
-                    </div>
-                ) : notifications.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full">
-                        <PlaceholderNotification className="mb-4 text-neutral-50 dark:text-n-8" />
-                        <Heading size="xl">Nothing here, bud!</Heading>
-                        <Text className="text-center">You don't have any notifications yet.</Text>
-                    </div>
-                ) : (
-                    <div className="flex flex-col">
-                        <div className="flex justify-between mb-4">
-                            <Button outline onClick={() => fetchNotifications(null, false)}>
-                                All
-                            </Button>
-                            <Button outline onClick={() => fetchNotifications(null, true)}>
-                                Unread
-                            </Button>
-                        </div>
-
-                        <div className="space-y-2 mb-4">
-                            {notifications.map(notification => (
-                                <NotificationItem key={notification.id} notification={notification} />
-                            ))}
-                        </div>
-
-                        {hasMore && (
-                            <div className="flex justify-center mb-4">
-                                <Button outline onClick={loadMore} disabled={loadingMore}>
-                                    {loadingMore ? (
-                                        <>
-                                            <LoadingCircle className="mr-2 h-4 w-4" />
-                                            Loading...
-                                        </>
-                                    ) : (
-                                        'Load More'
-                                    )}
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-        </Slideover>
+            )}
+        </div>
     )
 }

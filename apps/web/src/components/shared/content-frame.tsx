@@ -49,7 +49,7 @@ const createApiCall = async (method: string, path: string, requestData?: any, to
             timestamp: Date.now(),
         } as ContentFrameError
     }
-    return json?.data ?? json
+    return json
 }
 
 export const useContentFrame = (
@@ -80,6 +80,7 @@ export const useContentFrame = (
 
     return {
         data: query.data,
+        raw: query,
         error: query.error
             ? ({
                   message: (query.error as any)?.message || 'Request failed',

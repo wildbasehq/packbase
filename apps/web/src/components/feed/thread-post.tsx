@@ -22,6 +22,7 @@ import { UserGroupIcon } from '@heroicons/react/16/solid'
 import { BentoGenericUnlockableBadge, BentoStaffBadge } from '@/lib/utils/pak.tsx'
 import Card from '@/components/shared/card.tsx'
 import UserInfoCol from '@/components/shared/user/info-col.tsx'
+import { ServerReactionStack } from '../ui/reaction-stack'
 
 interface ThreadPostProps {
     post: FeedPostData
@@ -38,14 +39,14 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
     const [replyText, setReplyText] = useState('')
     const [isSubmittingReply, setIsSubmittingReply] = useState(false)
 
-    const hasReacted = post.reactions?.['0']?.includes(signedInUser?.id || '')
-    const reactionCount = post.reactions?.['0']?.length || 0
+    const hasReacted = post.reactions?.['thumbs_up']?.includes(signedInUser?.id || '')
+    const reactionCount = post.reactions?.['thumbs_up']?.length || 0
     const isAuthor = post.user?.id === signedInUser?.id
     const maxDepth = 4
     const showNested = depth < maxDepth
 
     // Thread line styling
-    const threadLineClass = depth > 0 ? 'before:absolute before:left-4 before:top-0 before:bottom-0 before:w-px before:bg-border' : ''
+    const threadLineClass = depth > 0 ? 'before:absolute before:left-16 before:top-0 before:bottom-0 before:w-px before:bg-border' : ''
 
     const handleReaction = async () => {
         if (!signedInUser || isSubmittingReaction) return
@@ -53,7 +54,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
 
         try {
             const howlReact = vg.howl({ id: post.id }).react
-            const { error } = await (hasReacted ? howlReact.delete({ slot: 0 }) : howlReact.post({ slot: 0 }))
+            const { error } = await (hasReacted ? howlReact.delete({ slot: 'thumbs_up' }) : howlReact.post({ slot: 'thumbs_up' }))
 
             if (error) {
                 const errorMessage = error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'
@@ -63,13 +64,13 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
 
             // Update local state
             if (!post.reactions) {
-                post.reactions = { '0': [] }
+                post.reactions = { thumbs_up: [] }
             }
 
             if (hasReacted) {
-                post.reactions['0'] = post.reactions['0'].filter(id => id !== signedInUser?.id)
+                post.reactions['thumbs_up'] = post.reactions['thumbs_up'].filter(id => id !== signedInUser?.id)
             } else {
-                post.reactions['0'].push(signedInUser!.id)
+                post.reactions['thumbs_up'].push(signedInUser!.id)
             }
         } catch (err) {
             toast.error('Failed to update reaction')
@@ -117,34 +118,9 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
         }
     }
 
-    const showClassification = () => {
-        switch(post.classification.label.split(' ')[0].toLowerCase()) {
-            case 'satire':
-                return <Text size="xs" alt className={`${post.classification.rheoAgrees ? '!text-green-500' : '!text-red-500'} mb-1 items-center flex`}>
-                    <FaceSmileIcon className="w-4 h-4 mr-1 inline-flex" />
-                    {post.classification.label}
-                </Text>
-            case 'hostile':
-                return <Text size="xs" alt className={`${post.classification.rheoAgrees ? '!text-green-500' : '!text-red-500'} mb-1 items-center flex`}>
-                    <XMarkIcon className="w-4 h-4 mr-1 inline-flex" />
-                    {post.classification.label}
-                </Text>
-            case 'friendly':
-                return <Text size="xs" alt className={`${post.classification.rheoAgrees ? '!text-green-500' : '!text-red-500'} mb-1 items-center flex`}>
-                    <CheckIcon className="w-4 h-4 mr-1 inline-flex" />
-                    {post.classification.label}
-                </Text>
-        }
-    }
-
     return (
-        <Card className={`relative !border-0 !border-t border-muted !max-w-full ${!isRoot ? 'ml-12' : ''} ${threadLineClass}`}>
+        <Card className={`relative !border-0 !max-w-full ${!isRoot ? '!pl-12' : ''} ${threadLineClass}`}>
             <div className={`relative ${!isRoot ? 'pt-3' : ''}`}>
-                {/* Thread connector dot */}
-                {/*{!isRoot && (*/}
-                {/*    <div className="absolute left-6 top-3 -translate-x-1/2 w-2 h-2 bg-neutral-300 dark:bg-neutral-700 rounded-full z-10" />*/}
-                {/*)}*/}
-
                 <div className="flex gap-3">
                     {/* Avatar */}
                     <div className="flex-shrink-0 flex flex-col">
@@ -226,28 +202,9 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                             </div>
                         )}
 
-                        {post.classification && (
-                            <div className="mt-3">
-                                {showClassification()}
-                            </div>
-                            )}
-
                         {isRoot && signedInUser && (
                             <div className="flex items-center gap-4 mt-3">
-                                <button
-                                    onClick={handleReaction}
-                                    disabled={isSubmittingReaction}
-                                    className="flex items-center gap-1 text-muted-foreground hover:text-red-500 transition-colors disabled:opacity-50"
-                                >
-                                    {isSubmittingReaction ? (
-                                        <LoadingCircle />
-                                    ) : hasReacted ? (
-                                        <HeartIconSolid className="w-5 h-5 text-red-500" />
-                                    ) : (
-                                        <HeartIcon className="w-5 h-5" />
-                                    )}
-                                    {reactionCount > 0 && <span className="text-sm">{reactionCount}</span>}
-                                </button>
+                                <ServerReactionStack entityId={post.id} allowAdd={true} max={10} initialReactions={post.reactions} />
 
                                 <button
                                     onClick={() => setShowReplyForm(!showReplyForm)}

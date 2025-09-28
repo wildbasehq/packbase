@@ -76,6 +76,7 @@ export default function Search() {
     // Set typing state when query changes
     useEffect(() => {
         if (query) {
+            document.title = 'Packbase • Searching...'
             setIsTyping(true)
         }
     }, [query])
@@ -83,6 +84,7 @@ export default function Search() {
     // Fetch search results when debounced query changes
     useEffect(() => {
         const fetchResults = async () => {
+            document.title = 'Packbase • Searching...'
             setIsTyping(false)
 
             if (!debouncedQuery || debouncedQuery.trim() === '') {
@@ -93,6 +95,7 @@ export default function Search() {
                 })
                 setFilteredResults([])
                 setIsLoading(false)
+                document.title = `Packbase • Search`
                 return
             }
 
@@ -112,8 +115,7 @@ export default function Search() {
                     throw new Error(searchResults.error)
                 }
 
-                console.log(searchResults.data)
-
+                document.title = `Packbase • ${activeCategory}`
                 // Handle the case where there's only one allowed table and data is an array
                 let normalizedData = { profiles: [], packs: [], posts: [] }
 

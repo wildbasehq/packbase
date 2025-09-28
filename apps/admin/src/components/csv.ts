@@ -10,6 +10,7 @@ export function escapeCsv(value: unknown): string {
 }
 
 export function rowsToCsv<RowType extends object>(rows: RowType[], columns: ReadonlyArray<CsvColumn<RowType>>): string {
+    console.log('rowsToCsv', rows, columns)
     const headerRow = columns.map(c => c.header).join(',')
     const dataRows = rows.map(row => columns.map(c => escapeCsv(row[c.key])).join(','))
     return [headerRow, ...dataRows].join('\r\n')

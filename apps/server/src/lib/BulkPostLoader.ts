@@ -11,9 +11,10 @@ export class BulkPostLoader {
      * Load multiple posts with a single query, including user data and reactions
      *
      * @param postIds Array of post IDs to fetch
+     * @param currentUserId Optional current user ID for reaction context
      * @returns Object mapping post IDs to their complete data
      */
-    async loadPosts(postIds: string[]): Promise<Record<string, any>> {
+    async loadPosts(postIds: string[], currentUserId?: string): Promise<Record<string, any>> {
         if (!postIds.length) return {};
 
         try {
@@ -21,6 +22,17 @@ export class BulkPostLoader {
             const posts = await prisma.posts.findMany({
                 where: {
                     id: { in: postIds },
+                },
+                select: {
+                    id: true,
+                    created_at: true,
+                    user_id: true,
+                    tenant_id: true,
+                    channel_id: true,
+                    content_type: true,
+                    body: true,
+                    assets: true,
+                    parent: true,
                 },
             });
 
@@ -32,7 +44,7 @@ export class BulkPostLoader {
                 postsMap[post.id] = {
                     ...post,
                     created_at: post.created_at.toISOString(),
-                    reactions: {},
+                    reactions: [],
                     comments: [],
                 };
             });
@@ -106,15 +118,40 @@ export class BulkPostLoader {
                 };
             });
 
-            // Organize reactions by post ID and slot
+            // Transform reactions into the new Reaction type structure
+            const reactionsByPost: Record<string, Record<string, { emoji: string; users: string[] }>> = {};
+
+            // First, organize reactions by post ID and slot
             reactions.forEach((reaction) => {
-                const post = postsMap[reaction.post_id];
+                const postId = reaction.post_id;
+                const slot = reaction.slot;
+
+                if (!reactionsByPost[postId]) {
+                    reactionsByPost[postId] = {};
+                }
+
+                if (!reactionsByPost[postId][slot]) {
+                    reactionsByPost[postId][slot] = {
+                        emoji: slot, // Use slot as emoji for now, could be enhanced later
+                        users: [],
+                    };
+                }
+
+                reactionsByPost[postId][slot].users.push(reaction.actor_id);
+            });
+
+            // Transform into Reaction type structure
+            Object.keys(reactionsByPost).forEach((postId) => {
+                const post = postsMap[postId];
                 if (post) {
-                    const slot = reaction.slot.toString();
-                    if (!post.reactions[slot]) {
-                        post.reactions[slot] = [];
-                    }
-                    post.reactions[slot].push(reaction.actor_id);
+                    const postReactions = Object.entries(reactionsByPost[postId]).map(([key, data]) => ({
+                        key,
+                        emoji: data.emoji,
+                        count: data.users.length,
+                        reactedByMe: currentUserId ? data.users.includes(currentUserId) : false,
+                    }));
+
+                    post.reactions = postReactions;
                 }
             });
 
@@ -172,7 +209,7 @@ export class BulkPostLoader {
                 delete post.channel_id;
 
                 // Clean up empty collections
-                if (Object.keys(post.reactions).length === 0) {
+                if (post.reactions.length === 0) {
                     delete post.reactions;
                 }
 
@@ -213,15 +250,16 @@ export class BulkPostLoader {
                 const userAvatar = await getClerkAvatar(profile.owner_id);
 
                 // Metadata
-                const userBadges = await prisma.collectibles.findFirst({
+                const userBadges = await prisma.inventory.findFirst({
                     where: {
-                        user_id: profile.owner_id,
+                        user_id: profile.id,
+                        type: 'badge',
                         is_set: true,
                     },
                 });
 
                 if (userBadges) {
-                    profileBuild.badge = userBadges.badge_id;
+                    profileBuild.badge = userBadges.item_id;
                 }
 
                 if (userAvatar) {
@@ -256,11 +294,7 @@ export class BulkPostLoader {
                 },
             });
 
-            // Convert BigInt slot values to numbers to make them JSON serializable
-            return (data || []).map((reaction) => ({
-                ...reaction,
-                slot: typeof reaction.slot === 'bigint' ? Number(reaction.slot) : reaction.slot,
-            }));
+            return data || [];
         } catch (error) {
             console.error('Error fetching reactions:', error);
             return [];

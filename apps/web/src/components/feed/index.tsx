@@ -9,7 +9,7 @@ export { default as FeedList } from './feed-list'
 
 // Thread-based components
 export { default as ThreadPost } from './thread-post'
-export { default as FloatingComposeButton } from './floating-compose-button'
+export { default as FloatingCompose } from './floating-compose'
 
 // State components
 export { default as FeedLoading } from './feed-loading'

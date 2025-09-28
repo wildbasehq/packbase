@@ -11,16 +11,18 @@ export default function Popover({
     children,
     content,
     align = 'center',
+    forceMobile = false,
 }: {
     children: ReactNode
     content: ReactNode | string
     align?: 'center' | 'start' | 'end'
+    forceMobile?: boolean
 }) {
     const { isMobile, isDesktop } = useWindowSize()
     if (!isMobile && !isDesktop) return <>{children}</>
     return (
         <>
-            {isMobile && (
+            {(isMobile || forceMobile) && (
                 <Drawer.Root>
                     <Drawer.Trigger>{children}</Drawer.Trigger>
                     <Drawer.Portal>
@@ -28,7 +30,7 @@ export default function Popover({
                     </Drawer.Portal>
                 </Drawer.Root>
             )}
-            {isDesktop && (
+            {isDesktop && !forceMobile && (
                 <PopoverPrimitive.Root>
                     <PopoverPrimitive.Trigger className="inline-flex cursor-pointer" asChild>
                         {children}

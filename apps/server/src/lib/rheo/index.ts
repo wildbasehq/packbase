@@ -1,32 +1,28 @@
-import {AgentInference, LocalInference, type AgentInferenceOptions, type LocalInferenceOptions} from './brain'
-import {z} from 'zod'
-import {printNode, zodToTs} from 'zod-to-ts'
-import debug from 'debug'
-import Baozi from '../events'
-import {HowlResponse} from '@/models/defs'
-import {SafetyTrainingData} from './dataset/safety-classification'
+import { AgentInference, LocalInference, type AgentInferenceOptions, type LocalInferenceOptions } from './brain';
+import { z } from 'zod';
+import { printNode, zodToTs } from 'zod-to-ts';
+import debug from 'debug';
+import Baozi from '../events';
+import { HowlResponse } from '@/models/defs';
+import { SafetyTrainingData } from './dataset/safety-classification';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const log = {
     info: debug('vg:rheo'),
     error: debug('vg:rheo:error'),
-}
+};
 
 const classifySchema = z.object({
     label: z.enum(['hostile', 'friendly', 'satire', 'illegal', 'spam']).describe('What label to give this text.'),
-})
+});
 
 // Break heavy generic inference from zod-to-ts to avoid TS deep instantiation errors
-const classifySchemaTs: string = printNode(zodToTs(classifySchema).node)
-
-const notes = [
-    '"friendly" is also neutral.',
-    'Making fun of pronouns, LGBTQ+, or other protected classes is hostile.',
-    '"Fake" pronouns like "nick/her" (sounds like a racial slur) are hostile.',
-]
+const classifySchemaTs: string = printNode(zodToTs(classifySchema).node);
 
 export default class Rheo {
-    brain: LocalInference
-    agent: AgentInference
+    brain: LocalInference;
+    agent: AgentInference;
 
     /**
      * Creates a prompt string for text classification that enforces JSON response format.
@@ -42,49 +38,68 @@ export default class Rheo {
      * // "Classify this text, taking into account the context if any: This is great!
      * //  Respond only as a JSON document - do not respond with backticks or any other text..."
      */
-    prompt(strings: TemplateStringsArray, ...values: any[]) {
-        return (
-            'Classify this text, taking into account the context if any:\n"' +
-            String.raw({raw: strings}, ...values) +
-            `"\n- ${notes.join('\n- ')}\nRespond only as a JSON document - do not respond with backticks or any other text, and strictly conform to the following` +
-            'typescript schema, paying attention to comments as requirements: ' +
-            classifySchemaTs
-        )
+    prompt(string) {
+        return 'Classify this text, taking into account the context if any:\n"' + string + '"';
     }
 
     constructor(opts?: { brain: LocalInferenceOptions; agent: AgentInferenceOptions }) {
-        this.brain = new LocalInference(opts?.brain)
-        this.agent = new AgentInference(opts?.agent)
-        this.brain.trainTextClassifier(SafetyTrainingData)
+        this.brain = new LocalInference(opts?.brain);
+        this.agent = new AgentInference(opts?.agent);
+        this.brain.trainTextClassifier(SafetyTrainingData);
     }
 
     async classify(text: string) {
         // @TODO - we currently run both as Rheo isn't in the position to confidently classify text.
-        log.info('classifying text', text)
-        const rheoLabel = await this.brain.action(classifySchema, {prompt: text})
-        const agentLabel = await this.agent.action(classifySchema, {
-            prompt: this.prompt`${text}`,
-        })
+        log.info('classifying text', this.prompt(text));
+        const rheoLabel = await this.brain.action(classifySchema, { prompt: text });
+        const agentLabel = await this.agent.action(
+            z.object({
+                label: z.enum(['hostile', 'friendly', 'satire', 'illegal', 'spam']).describe('What label to give this text.'),
+                rationale: z.string().describe('Why you chose this label.'),
+            }),
+            {
+                prompt: this.prompt(text),
+            },
+        );
 
-        console.log('rheoLabel', rheoLabel)
-        console.log('agentLabel', agentLabel)
-        console.log('text', text)
+        console.log('rheoLabel', rheoLabel);
+        console.log('agentLabel', agentLabel);
+        console.log('text', text);
 
-        const rheoAgrees = rheoLabel.label === agentLabel.label
+        const rheoAgrees = rheoLabel.label === agentLabel.label;
+
+        if (!rheoAgrees) {
+            // Check if safety training data already has this text
+            if (!SafetyTrainingData.some((item) => item.text === text)) {
+                // Add to safety-classification.ts
+                SafetyTrainingData.push({ text: text, label: agentLabel.label, reasoning: agentLabel.rationale });
+                fs.writeFileSync(
+                    path.join(__dirname, 'dataset/safety-classification.ts'),
+                    // Pretty print with newlines
+                    `import type { TextExample } from '../brain.ts';
+
+export const SafetyTrainingData: TextExample[] = [
+${SafetyTrainingData.map((item) => `    { text: ${JSON.stringify(item.text)}, label: ${JSON.stringify(item.label)}, reasoning: ${JSON.stringify(item.reasoning)} },`).join('\n')}
+];
+`,
+                );
+            }
+        }
 
         return {
-            label: `${rheoLabel.label} (ReMod: "${agentLabel.label}"${rheoAgrees ? '' : ' - RLHF'})`,
+            label: `${rheoLabel.label} (ReMod: "${agentLabel.label}")`,
+            rationale: agentLabel.rationale,
             rheoAgrees,
-        }
+        };
     }
 }
 
 // On startup, assign to Baozi manager
-const rheo = new Rheo()
+const rheo = new Rheo();
 Baozi.on('HOWL_CREATE', async (data: typeof HowlResponse) => {
-    const classification = await rheo.classify(data.body)
+    const classification = await rheo.classify(data.body);
     return {
         ...data,
-        classification
-    }
-})
+        classification,
+    };
+});

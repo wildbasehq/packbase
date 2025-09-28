@@ -15,6 +15,7 @@ import { FeedPostData, LogoSpinner } from '@/src/components'
 import { toast } from 'sonner'
 import Markdown from '@/components/shared/markdown.tsx'
 import { SignedIn } from '@clerk/clerk-react'
+import { ServerReactionStack } from '@/components/ui/reaction-stack'
 
 function ThreadMessage({
     message,
@@ -26,30 +27,8 @@ function ThreadMessage({
     currentUserId?: string
 }) {
     const bucketRoot = useUIStore(state => state.bucketRoot)
-    // Map reaction slots to emoji representations
-    const reactionEmojis = {
-        '0': '👍',
-        '1': '❤️',
-        '2': '🔥',
-        '3': '😂',
-        '4': '😮',
-        '5': '😢',
-        '6': '🙏',
-        '7': '👎',
-        '8': '🚀',
-        '9': '🎉',
-    }
-
-    // Transform reactions to UI format
-    const formattedReactions = message.reactions
-        ? Object.entries(message.reactions)
-              .filter(([_, users]) => users && users.length > 0)
-              .map(([slot, users]) => ({
-                  emoji: reactionEmojis[slot as keyof typeof reactionEmojis] || '👍',
-                  count: users?.length || 0,
-                  userReacted: users?.includes(currentUserId) || false,
-              }))
-        : []
+    // Use the new Reaction type structure directly
+    const formattedReactions = message.reactions || []
 
     return (
         <div className={`group relative ${isOriginalPost ? 'pb-4' : 'py-2'}`}>
@@ -77,23 +56,7 @@ function ThreadMessage({
                     </div>
 
                     {/* Reactions */}
-                    {formattedReactions.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                            {formattedReactions.map((reaction, index) => (
-                                <button
-                                    key={index}
-                                    className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs border transition-colors ${
-                                        reaction.userReacted
-                                            ? 'bg-primary/10 border-primary/20 text-primary dark:bg-primary/20 dark:border-primary/30 dark:text-primary-text-cosmos'
-                                            : 'bg-n-1 border-n-3 text-n-6 hover:bg-n-2 dark:bg-n-7 dark:border-n-6 dark:text-n-3 dark:hover:bg-n-6'
-                                    }`}
-                                >
-                                    <span>{reaction.emoji}</span>
-                                    <span>{reaction.count}</span>
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                    <ServerReactionStack entityId={message.id} allowAdd={true} max={10} initialReactions={message.reactions} />
                 </div>
 
                 {/* Message actions */}

@@ -27,7 +27,7 @@ export class FeedController {
     /**
      * Get feed data based on feed type and parameters
      */
-    async getFeed(feedId: string, userId: string, page: number = 1): Promise<{ data: any[]; has_more: boolean }> {
+    async getFeed(feedId: string, selfUserId: string, page: number = 1): Promise<{ data: any[]; has_more: boolean }> {
         const timer = Date.now();
 
         // Handle universe ID
@@ -40,16 +40,16 @@ export class FeedController {
 
             // Determine feed type and process accordingly
             if (feedId === 'universe:home') {
-                result = await this.getHomeFeed(userId, page);
+                result = await this.getHomeFeed(selfUserId, page);
             } else {
                 const idType = feedId.startsWith('00000000') ? 1 : await this.getIDType(feedId);
 
                 if (idType === 1) {
                     // Pack feed
-                    result = await this.getPackFeed(feedId, page);
+                    result = await this.getPackFeed(feedId, page, selfUserId);
                 } else {
                     // User feed (default)
-                    result = await this.getUserFeed(feedId, page);
+                    result = await this.getUserFeed(feedId, page, selfUserId);
                 }
             }
 
@@ -65,17 +65,17 @@ export class FeedController {
     /**
      * Get user's home feed using bulk loading
      */
-    async getHomeFeed(userId: string, page: number): Promise<{ data: any[]; has_more: boolean }> {
+    async getHomeFeed(selfUserId: string, page: number): Promise<{ data: any[]; has_more: boolean }> {
         // Check cache for this page
-        const cacheKey = `home:${userId}:${page}`;
+        const cacheKey = `home:${selfUserId}:${page}`;
 
         try {
             // Get user's following and packs in parallel
-            const [following, packs] = await Promise.all([this.getUserFollowing(userId), this.getUserPacks(userId)]);
+            const [following, packs] = await Promise.all([this.getUserFollowing(selfUserId), this.getUserPacks(selfUserId)]);
 
             // Get IDs to filter by
             const followingIds = following.map((f) => f.following_id);
-            followingIds.push(userId); // Include user's own posts
+            followingIds.push(selfUserId); // Include user's own posts
             const packIds = packs.map((p) => p.tenant_id);
 
             // Build query to get post IDs using Prisma
@@ -109,7 +109,7 @@ export class FeedController {
             });
 
             // Process post IDs and load full post data
-            const result = await this.processPostIds(postIdData);
+            const result = await this.processPostIds(postIdData, selfUserId);
 
             // Cache the results
             FeedController.homeFeedCache.set(cacheKey, {
@@ -129,7 +129,7 @@ export class FeedController {
     /**
      * Get feed posts from a specific user using bulk loading
      */
-    async getUserFeed(userId: string, page: number): Promise<{ data: any[]; has_more: boolean }> {
+    async getUserFeed(userId: string, page: number, selfUserId?: string): Promise<{ data: any[]; has_more: boolean }> {
         // Check cache
         const cacheKey = `user:${userId}:${page}`;
 
@@ -147,7 +147,7 @@ export class FeedController {
             });
 
             // Process post IDs and load full post data
-            const result = await this.processPostIds(postIdData);
+            const result = await this.processPostIds(postIdData, selfUserId);
 
             // Cache the result
             FeedController.userFeedCache.set(cacheKey, {
@@ -167,7 +167,7 @@ export class FeedController {
     /**
      * Get feed posts from a specific pack using bulk loading
      */
-    async getPackFeed(packId: string, page: number): Promise<{ data: any[]; has_more: boolean }> {
+    async getPackFeed(packId: string, page: number, userId?: string): Promise<{ data: any[]; has_more: boolean }> {
         // Check cache
         const cacheKey = `pack:${packId}:${page}`;
 
@@ -187,7 +187,7 @@ export class FeedController {
             });
 
             // Process post IDs and load full post data
-            const result = await this.processPostIds(postIdData);
+            const result = await this.processPostIds(postIdData, userId);
 
             // Cache the result
             FeedController.packFeedCache.set(cacheKey, {
@@ -208,7 +208,7 @@ export class FeedController {
      * Process post IDs into full post data
      * This helper method eliminates code duplication across different feed types
      */
-    private async processPostIds(postIdData: any[] | null): Promise<{ data: any[]; has_more: boolean }> {
+    private async processPostIds(postIdData: any[] | null, selfUserId?: string): Promise<{ data: any[]; has_more: boolean }> {
         if (!postIdData?.length) {
             return { data: [], has_more: false };
         }
@@ -217,7 +217,7 @@ export class FeedController {
         const postIds = postIdData.map((post) => post.id);
 
         // Load all posts in bulk
-        const postsMap = await this.bulkPostLoader.loadPosts(postIds);
+        const postsMap = await this.bulkPostLoader.loadPosts(postIds, selfUserId);
 
         // Maintain original order
         const posts = postIds.map((id) => postsMap[id]).filter((post) => post !== undefined);

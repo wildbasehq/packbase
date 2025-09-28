@@ -32,7 +32,7 @@ export type BatchAction<RowType extends object> = {
 }
 
 export type CarbonDataTableProps<RowType extends { id: string }> = {
-    title: string
+    title?: string
     rows: ReadonlyArray<RowType>
     columns: ReadonlyArray<Column<RowType>>
     batchActions?: ReadonlyArray<BatchAction<RowType>>
@@ -59,6 +59,8 @@ export function CarbonDataTable<RowType extends { id: string }>(props: CarbonDat
                 getSelectionProps,
             }) => {
                 const batchActionProps = getBatchActionProps()
+                const idToRow = new Map((rows as any[]).map(r => [r.id, r]))
+                const selectedOriginalRows = (selectedRows as any[]).map(r => idToRow.get(r.id)).filter(Boolean) as RowType[]
 
                 return (
                     <TableContainer title={title} {...getTableContainerProps()}>
@@ -70,7 +72,7 @@ export function CarbonDataTable<RowType extends { id: string }>(props: CarbonDat
                                             key={action.id}
                                             tabIndex={batchActionProps.shouldShowBatchActions ? 0 : -1}
                                             renderIcon={action.icon as any}
-                                            onClick={() => action.onClick(selectedRows as any)}
+                                            onClick={() => action.onClick(selectedOriginalRows)}
                                         >
                                             {action.label}
                                         </TableBatchAction>
@@ -106,7 +108,7 @@ export function CarbonDataTable<RowType extends { id: string }>(props: CarbonDat
                                         <TableSelectRow {...getSelectionProps({ row })} onChange={() => {}} />
                                         {row.cells.map((cell: any) => (
                                             <TableCell {...getCellProps({ cell })} key={cell.id}>
-                                                {cell.value}
+                                                {JSON.stringify(cell.value)}
                                             </TableCell>
                                         ))}
                                     </TableRow>

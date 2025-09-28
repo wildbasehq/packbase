@@ -243,18 +243,12 @@ export const HowlResponse = t.Object({
     ),
     user: UserProfile,
     reactions: t.Optional(
-        t.Partial(
+        t.Array(
             t.Object({
-                '0': t.Array(t.String()),
-                '1': t.Array(t.String()),
-                '2': t.Array(t.String()),
-                '3': t.Array(t.String()),
-                '4': t.Array(t.String()),
-                '5': t.Array(t.String()),
-                '6': t.Array(t.String()),
-                '7': t.Array(t.String()),
-                '8': t.Array(t.String()),
-                '9': t.Array(t.String()),
+                key: t.String(),
+                emoji: t.String(),
+                count: t.Number(),
+                reactedByMe: t.Optional(t.Boolean()),
             }),
         ),
     ),
@@ -270,12 +264,16 @@ export const HowlResponse = t.Object({
         }),
     ),
     // classification: t.Optional(
-    //     t.Object({
-    //         label: t.String(),
-    //         rheoAgrees: t.Boolean(),
-    //     }, {
-    //         description: 'For internal debugging use only.',
-    //     })
+    //     t.Object(
+    //         {
+    //             label: t.String(),
+    //             rheoAgrees: t.Boolean(),
+    //             rationale: t.Optional(t.String()),
+    //         },
+    //         {
+    //             description: 'For internal debugging use only.',
+    //         },
+    //     ),
     // ),
 });
 

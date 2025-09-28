@@ -10,6 +10,8 @@ import VoyageSDK from 'voyagesdk-ts'
 
 import './cron/check-update.ts'
 import { WorkerStore } from '@/lib/workers'
+import { getSelfProfile } from './cron/profile-update.ts'
+import { formatRelativeTime } from '../utils/date.ts'
 
 /**
  * The name of the project. All Wildbase projects should have a name
@@ -35,6 +37,9 @@ export let { vg } = new VoyageSDK(API_URL, {
 const { enqueue } = WorkerStore.getState()
 
 export const setToken = (token?: string) => {
+    // skip if token is the same
+    if (globalThis.TOKEN === token) return
+
     // enqueue('voyage-initiate', async () => {
     globalThis.TOKEN = token
     let newClient = new VoyageSDK(API_URL, {
@@ -56,20 +61,34 @@ export const setToken = (token?: string) => {
     // })
 }
 
-// export const refreshSession = async () => {
-//     if (!globalThis.TOKEN) return
-//     enqueue('refresh-session', async () => {
-//         const { data, error } = await supabase.auth.refreshSession()
-//         const { session, user } = data || {}
-//         if (error || !session) {
-//             alert('Oops! Voyage lost this session, your page will refresh')
-//             window.location.reload()
-//         }
-//
-//         setToken(session?.access_token, session?.expires_at)
-//
-//         getSelfProfile()
-//
-//         log.info('Wild ID', 'Token refreshed, will refresh in', session.expires_in)
-//     })
-// }
+export const refreshSession = async () => {
+    const timeToKnock = globalThis.LAST_TOKEN_REFRESHED + 30000 - Date.now()
+    if (!globalThis.TOKEN || timeToKnock > 0) return
+
+    log.info('Wild ID', `↻ Token last knocked ${formatRelativeTime(globalThis.LAST_TOKEN_REFRESHED)}`)
+    const oldToken = globalThis.TOKEN
+    enqueue(
+        'refresh-session',
+        async () => {
+            globalThis.LAST_TOKEN_REFRESHED = Date.now()
+            const token = await window.Clerk?.session.getToken()
+            if (!token) {
+                alert('Oops! Voyage lost this session, your page will refresh')
+                window.location.reload()
+            }
+
+            const hasTokenChanged = oldToken !== token
+            log.info('Wild ID', 'Token knocked, changed? ', hasTokenChanged)
+            if (hasTokenChanged) {
+                setToken(token)
+
+                // getSelfProfile()
+            }
+        },
+        {
+            priority: 'critical',
+        }
+    )
+}
+
+setInterval(refreshSession, 1000)

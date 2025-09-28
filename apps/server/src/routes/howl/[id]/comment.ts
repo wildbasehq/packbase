@@ -4,6 +4,9 @@ import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { ErrorTypebox } from '@/utils/errors';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
+import { NotificationManager } from '@/utils/NotificationManager';
+import clerkClient from '@/db/auth';
+import { getUserClerkByID } from '@/utils/clerk';
 
 export default (app: YapockType) =>
     app.post(
@@ -21,7 +24,7 @@ export default (app: YapockType) =>
             try {
                 postExists = await prisma.posts.findUnique({
                     where: { id },
-                    select: { id: true },
+                    select: { user_id: true, id: true },
                 });
             } catch (postError) {
                 set.status = 500;
@@ -44,6 +47,15 @@ export default (app: YapockType) =>
                     },
                     select: {
                         id: true,
+                    },
+                });
+
+                await NotificationManager.createNotification(postExists.user_id, 'howl_comment', `${user.sessionClaims.nickname} replied`, body, {
+                    post_id: id,
+                    user: {
+                        id: user.sub,
+                        username: user.sessionClaims.nickname,
+                        images_avatar: (await getUserClerkByID(user.userId).then((user) => user?.imageUrl)) || null,
                     },
                 });
             } catch (insertError) {

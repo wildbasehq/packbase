@@ -423,9 +423,6 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                 expression: Expressions.UNIMPRESSED,
                 onComplete: async formData => {
                     console.log('Form data submitted:', formData)
-                    // @ts-ignore
-                    const token = await window.Clerk?.session?.getToken()
-                    setToken(token)
                     await vg.user.me
                         .post({
                             display_name: formData.display_name,

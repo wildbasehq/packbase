@@ -148,14 +148,15 @@ export async function getUser({ by, value, user, scope }: { by: string; value: s
         }
     }
 
-    const userBadges = await prisma.collectibles.findFirst({
+    const userBadges = await prisma.inventory.findFirst({
         where: {
             user_id: data.owner_id,
+            type: 'badge',
             is_set: true,
         },
     });
     if (userBadges) {
-        data.badge = userBadges.badge_id;
+        data.badge = userBadges.item_id;
     }
 
     posthog.capture({

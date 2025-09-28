@@ -19,12 +19,13 @@ import {
     SideNavMenuItem,
     SkipToContent,
 } from '@carbon/react'
-import { Notification, Search } from '@carbon/icons-react'
+// import { Notification, Search } from '@carbon/icons-react'
 import { useNavStore } from './stores/navStore'
-import { Route } from 'wouter'
+import { Route, Switch } from 'wouter'
 import RouteIndex from '@/routes'
+import RouteQueryNew from '@/routes/query-new'
+import RouteQueryView from '@/routes/query-view'
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react'
-// @ts-expect-error no types available for this package.
 import { NonEntitledSection } from '@carbon/ibm-security'
 import ReturnTo from './components/ReturnTo'
 
@@ -49,7 +50,8 @@ function App() {
                                             isActive={isSideNavExpanded}
                                             aria-expanded={isSideNavExpanded}
                                         />
-                                        <HeaderName href="#" prefix="✱">
+                                        <HeaderName href="/" prefix="">
+                                            <img src="/logo.svg" alt="Rheo" className="!w-6 invert !mr-3" />
                                             Rheo
                                         </HeaderName>
                                         <HeaderNavigation aria-label="Wildbase Rheo">
@@ -71,7 +73,7 @@ function App() {
                                             isRail
                                             onSideNavBlur={onClickSideNavExpand}
                                             href="#main-content"
-                                            className="!mt-5"
+                                            className="!mt-6"
                                         >
                                             <SideNavItems>
                                                 <HeaderSideNavItems hasDivider>
@@ -121,6 +123,16 @@ function App() {
                         <Route path="/">
                             <RouteIndex />
                         </Route>
+                        <Route path="/query" nest>
+                            <Switch>
+                                <Route path="/new">
+                                    <RouteQueryNew />
+                                </Route>
+                                <Route path="/:slug">
+                                    <RouteQueryView />
+                                </Route>
+                            </Switch>
+                        </Route>
                     </div>
                 </SignedIn>
 
@@ -142,7 +154,7 @@ function App() {
                             minHeight: '701px',
                         }}
                         subTitle="Other places:"
-                        title="You aren't the intended audience for this content. Please contact your administrator for support."
+                        title="You need a license to access this content. Please contact your administrator for support."
                     />
                 </SignedOut>
 

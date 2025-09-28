@@ -40,7 +40,7 @@ export function SidebarSection({ className, ...props }: React.ComponentPropsWith
 
     return (
         <LayoutGroup id={id}>
-            <div {...props} data-slot="section" className={clsx(className, 'flex flex-col gap-0.5')} />
+            <div {...props} data-slot="section" className={clsx(className, 'flex flex-col gap-1')} />
         </LayoutGroup>
     )
 }
@@ -75,7 +75,7 @@ export const SidebarItem = forwardRef(function SidebarItem(
     }
     let classes = clsx(
         // Base
-        'flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left text-base/6 font-medium text-default sm:py-2 sm:text-sm/5',
+        'flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left text-base/6 font-medium text-default sm:py-2 sm:text-sm/5',
         // Leading icon/icon-only
         '*:data-[slot=icon]:size-6 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:fill-n-5 sm:*:data-[slot=icon]:size-5',
         // Trailing icon (down chevron or similar)
@@ -87,7 +87,7 @@ export const SidebarItem = forwardRef(function SidebarItem(
         // Active
         'data-active:bg-n-2/25 data-active:*:data-[slot=icon]:fill-n-9',
         // Current - added shadow-inner for subtle inner shadow when current
-        'data-current:shadow-inner data-current:*:data-[slot=icon]:fill-n-9 dark:shadow-n-9 data-current:dark:bg-n-8',
+        'data-current:shadow-inner data-current:bg-n-1/25 data-current:*:data-[slot=icon]:fill-n-9 dark:shadow-n-9 data-current:dark:bg-n-8',
         // Same with hover
         'data-hover:shadow-inner dark:shadow-n-9',
         // Dark mode

@@ -18,10 +18,11 @@ export default (app: YapockType) =>
         }) => {
             requiresToken({ set, user });
 
-            const userBadge = await prisma.collectibles.findFirst({
+            const userBadge = await prisma.inventory.findFirst({
                 where: {
-                    user_id: user.userId,
-                    badge_id: body.badge,
+                    user_id: user.sub,
+                    item_id: body.badge,
+                    type: 'badge',
                 },
             });
 
@@ -31,19 +32,21 @@ export default (app: YapockType) =>
             }
 
             // Set any `is_set` to false, set body.badge (badge_id) as true.
-            await prisma.collectibles.updateMany({
+            await prisma.inventory.updateMany({
                 where: {
-                    user_id: user.userId,
+                    user_id: user.sub,
+                    type: 'badge',
                 },
                 data: {
                     is_set: false,
                 },
             });
 
-            await prisma.collectibles.updateMany({
+            await prisma.inventory.updateMany({
                 where: {
-                    user_id: user.userId,
-                    badge_id: body.badge,
+                    user_id: user.sub,
+                    item_id: body.badge,
+                    type: 'badge',
                 },
                 data: {
                     is_set: true,

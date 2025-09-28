@@ -86,17 +86,15 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
     });
 
     if (reactions.length > 0) {
-        data.reactions = {};
+        data.reactions = [];
         for (const reaction of reactions) {
-            // Convert BigInt to Number for JSON serialization
-            const slotKey =
-                typeof reaction.slot === 'bigint'
-                    ? Number(reaction.slot).toString()
-                    : // @ts-ignore
-                      reaction.slot.toString();
+            const slotKey = reaction.slot;
 
-            if (!data.reactions[slotKey]) data.reactions[slotKey] = [];
-            data.reactions[slotKey].push(reaction.actor_id);
+            data.reactions.push({
+                key: slotKey,
+                emoji: slotKey,
+                count: reactions.filter((r) => r.slot === slotKey).length,
+            });
         }
     }
 
@@ -124,6 +122,7 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
 
     // @ts-ignore - it should be removed
     delete data.tenant_id;
+    delete data.classification;
 
     posthog.capture({
         distinctId,

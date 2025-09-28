@@ -13,9 +13,14 @@ export function formatRelativeTime(dateString: string): string {
         return 'invalid date'
     }
 
+    // Less than 10 seconds ago
+    if (seconds < 10) {
+        return 'just now'
+    }
+
     // Less than a minute ago
     if (seconds < 60) {
-        return 'just now'
+        return `${seconds}s ago`
     }
 
     // Minutes ago (up to 60 minutes)
@@ -46,7 +51,7 @@ export function formatRelativeTime(dateString: string): string {
     const options: Intl.DateTimeFormatOptions = {
         year: now.getFullYear() !== date.getFullYear() ? 'numeric' : undefined,
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
     }
 
     return date.toLocaleDateString(undefined, options)
