@@ -6,16 +6,24 @@ import { useEffect } from 'react'
 export default function BrowserCheck() {
     const { show, hide } = useModal()
     // Search navigator.userAgentData for Chromium.
-    const browserEngine =
-        navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase() === 'chromium') ||
-        navigator.userAgent.toLowerCase().includes('chrom')
+    const browserEngine = // @ts-ignore
+    navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase() === 'chromium')
 
-    const isOpera =
-        navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase() === 'opera') ||
-        navigator.userAgent.toLowerCase().includes('opera')
+    const isOpera = // @ts-ignore
+    navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase() === 'opera')
 
     useEffect(() => {
-        if (isOpera) {
+        // @ts-ignore
+        if (!navigator.userAgentData) {
+            show(
+                <Alert variant="destructive" className="max-w-md !rounded-2xl">
+                    <AlertTitle>Your browser has no user agent data.</AlertTitle>
+                    <AlertDescription>
+                        We'll assume you're on a Gecko/Firefox based browser, which may disable some features.
+                    </AlertDescription>
+                </Alert>
+            )
+        } else if (isOpera) {
             show(
                 <Alert variant="destructive" className="max-w-md !rounded-2xl">
                     <AlertTitle>Use anything else.</AlertTitle>

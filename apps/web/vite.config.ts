@@ -20,6 +20,7 @@ export default defineConfig({
     define: {
         'import.meta.env.CF_PAGES_COMMIT_SHA': `"${process.env.CF_PAGES_COMMIT_SHA}"` || '"synced"',
     },
+    // @ts-ignore
     plugins: [react(), tailwindcss()],
     build: {
         target: 'esnext',

@@ -258,12 +258,7 @@ function SidebarContentContainer({ children, width }: { children: React.ReactNod
                 <SidebarFooter className={articlesUnread ? 'bg-gradient-to-b from-transparent to-muted/50' : ''}>
                     <SidebarHeading>(c) ✱base - Private alpha, things break!</SidebarHeading>
                     <div className="bottom-0 w-full">
-                        <News
-                            toggleUnread={setArticlesUnread}
-                            onArticleLoaded={() => {
-                                setArticlesUnread(true)
-                            }}
-                        />
+                        <News toggleUnread={setArticlesUnread} />
                     </div>
                 </SidebarFooter>
             </Sidebar>

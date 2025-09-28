@@ -39,10 +39,6 @@ const ChatThreadPage = lazy(() => import('@/pages/c/[id]/page.tsx'))
 const StoreLayout = lazy(() => import('@/pages/store/layout.tsx'))
 const StorePage = lazy(() => import('@/pages/store/page.tsx'))
 const StoreItemPage = lazy(() => import('@/pages/store/[item]/page.tsx'))
-
-// Playground
-const Playground = lazy(() => import('@/pages/playground/page.tsx'))
-
 // Lazy load components
 const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
 
@@ -166,12 +162,6 @@ Thanks for being a crucial part of the internet.
                                                     <Route path="/terms">
                                                         <Suspense fallback={<LoadingFallback />}>
                                                             <TermsPage />
-                                                        </Suspense>
-                                                    </Route>
-
-                                                    <Route path="/playground">
-                                                        <Suspense fallback={<LoadingFallback />}>
-                                                            <Playground />
                                                         </Suspense>
                                                     </Route>
 

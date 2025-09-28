@@ -100,19 +100,6 @@ function Channel({
     )
 }
 
-function InboxButton() {
-    const [open, setOpen] = useState(false)
-    return (
-        <>
-            {open && <InboxPage onClose={() => setOpen(false)} />}
-            <SidebarItem onClick={() => setOpen(true)}>
-                <InboxIcon />
-                <SidebarLabel>Inbox</SidebarLabel>
-            </SidebarItem>
-        </>
-    )
-}
-
 function AddChannelButton() {
     return (
         <Popover content={<AddChannelPopover />}>

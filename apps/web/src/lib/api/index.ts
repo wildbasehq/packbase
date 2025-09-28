@@ -10,7 +10,6 @@ import VoyageSDK from 'voyagesdk-ts'
 
 import './cron/check-update.ts'
 import { WorkerStore } from '@/lib/workers'
-import { getSelfProfile } from './cron/profile-update.ts'
 import { formatRelativeTime } from '../utils/date.ts'
 
 /**
@@ -71,6 +70,7 @@ export const refreshSession = async () => {
         'refresh-session',
         async () => {
             globalThis.LAST_TOKEN_REFRESHED = Date.now()
+            // @ts-ignore
             const token = await window.Clerk?.session.getToken()
             if (!token) {
                 alert('Oops! Voyage lost this session, your page will refresh')

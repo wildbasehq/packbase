@@ -17,18 +17,8 @@ import Markdown from '@/components/shared/markdown.tsx'
 import { SignedIn } from '@clerk/clerk-react'
 import { ServerReactionStack } from '@/components/ui/reaction-stack'
 
-function ThreadMessage({
-    message,
-    isOriginalPost = false,
-    currentUserId = 'user-1',
-}: {
-    message: FeedPostData
-    isOriginalPost?: boolean
-    currentUserId?: string
-}) {
+function ThreadMessage({ message, isOriginalPost = false }: { message: FeedPostData; isOriginalPost?: boolean; currentUserId?: string }) {
     const bucketRoot = useUIStore(state => state.bucketRoot)
-    // Use the new Reaction type structure directly
-    const formattedReactions = message.reactions || []
 
     return (
         <div className={`group relative ${isOriginalPost ? 'pb-4' : 'py-2'}`}>
