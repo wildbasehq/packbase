@@ -38,7 +38,7 @@ const SearchErrorSchema = t.Object({
 const SearchAPI = (app: YapockType) =>
     app.get(
         '',
-        async ({ query, set, user: { id: userId } }) => {
+        async ({ query, set, user }) => {
             const timeStart = new Date().getTime();
             try {
                 // Validate query parameter
@@ -118,7 +118,7 @@ const SearchAPI = (app: YapockType) =>
 
                 if (postIds.length > 0) {
                     const postLoader = new BulkPostLoader();
-                    const postsMap = await postLoader.loadPosts(postIds, userId);
+                    const postsMap = await postLoader.loadPosts(postIds, user?.sub);
                     trueResults.posts = postIds.map((id) => postsMap[id]).filter((post) => post !== undefined);
                 }
 
