@@ -62,18 +62,19 @@ export default (app: YapockType) =>
             response: {
                 200: t.Object({
                     has_more: t.Boolean(),
-                    packs: t.Array(
-                        t.Union([
-                            PackResponse,
-                            t.Object({
-                                id: t.Literal('00000000-0000-0000-0000-000000000000'),
-                                display_name: t.String({
-                                    default: 'Universe',
-                                }),
-                                slug: t.Literal('universe'),
-                            }),
-                        ]),
-                    ),
+                    // packs: t.Array(
+                    //     t.Union([
+                    //         PackResponse,
+                    //         t.Object({
+                    //             id: t.Literal('00000000-0000-0000-0000-000000000000'),
+                    //             display_name: t.String({
+                    //                 default: 'Universe',
+                    //             }),
+                    //             slug: t.Literal('universe'),
+                    //         }),
+                    //     ]),
+                    // ),
+                    packs: t.Array(t.Any()),
                     hidden: t.Number(),
                 }),
                 500: ErrorTypebox,
