@@ -1,19 +1,19 @@
 import { t } from 'elysia';
 import { getPack, getPackMembership, PackMembershipCache } from './index';
 import { YapockType } from '@/index';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { pack } from '@/lib/packs/permissions';
 import { ErrorTypebox } from '@/utils/errors';
 import { FeedController } from '@/lib/FeedController';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
+import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app
         .post(
             '',
             async ({ params: { id }, set, user }) => {
-                await requiresUserProfile({ set, user });
+                await requiresToken({ set, user });
 
                 const packExists = await getPack(id, 'id');
                 if (!packExists) {
@@ -73,8 +73,8 @@ export default (app: YapockType) =>
         )
         .delete(
             '',
-            async ({ params: { id }, set, user, error }) => {
-                await requiresUserProfile({ set, user, error });
+            async ({ params: { id }, set, user }) => {
+                await requiresToken({ set, user });
 
                 const packExists = await getPack(id, 'id');
                 if (!packExists) {

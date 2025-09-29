@@ -3,10 +3,10 @@ import { UserProfile } from '@/models/defs';
 import { getUser } from '@/routes/user/[username]';
 import { getPack } from '@/routes/pack/[id]';
 import posthog, { distinctId } from '@/utils/posthog';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import createStorage from '@/lib/storage';
+import requiresToken from '@/utils/identity/requires-token';
 
 const HowlCache = new Map<string, Database['public']['Tables']['posts']['Row'] & typeof UserProfile>();
 
@@ -137,7 +137,7 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
 }
 
 export async function deletePost({ params: { id }, set, user }: { params: { id: string }; set: { status: number }; user: { sub: string } }) {
-    await requiresUserProfile({ set, user });
+    await requiresToken({ set, user });
 
     // Check user ID against post user ID
     const post = await prisma.posts.findUnique({

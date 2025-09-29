@@ -1,11 +1,11 @@
 import { similarity } from '@/utils/similarity';
 import { YapockType } from '@/index';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { PackCreateBody, PackResponse } from '@/models/defs';
 import { getPack } from '@/routes/pack/[id]';
 import { ErrorTypebox } from '@/utils/errors';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
+import requiresToken from '@/utils/identity/requires-token';
 
 const banned = ['universe', 'new', 'settings'];
 
@@ -13,7 +13,7 @@ export default (app: YapockType) =>
     app.post(
         '',
         async ({ body: { display_name, slug, description }, set, user }) => {
-            await requiresUserProfile({ set, user });
+            await requiresToken({ set, user });
 
             slug = slug.toLowerCase();
             for (const route of banned) {

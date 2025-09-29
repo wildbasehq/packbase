@@ -1,19 +1,19 @@
 import { t } from 'elysia';
 import uploadFile from '@/utils/upload-file';
 import { YapockType } from '@/index';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { HowlBody } from '@/models/defs';
 import { FeedController } from '@/lib/FeedController';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import createStorage from '@/lib/storage';
 import Baozi from '@/lib/events';
+import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({ body: { tenant_id, channel_id, assets, body, content_type }, set, user }) => {
-            await requiresUserProfile({ set, user });
+            await requiresToken({ set, user });
 
             if (tenant_id === 'universe') tenant_id = '00000000-0000-0000-0000-000000000000';
 

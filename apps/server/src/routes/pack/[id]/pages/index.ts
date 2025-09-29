@@ -1,10 +1,10 @@
 import { YapockType } from '@/index';
 import { PackPageCreateBody, PackPageEditBody, PackPageReorderBody } from '@/models/defs';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { pack } from '@/lib/packs/permissions';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import { PackCache } from '../index';
+import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app.group('', (app) =>
@@ -40,7 +40,7 @@ export default (app: YapockType) =>
             .post(
                 '',
                 async ({ params: { id }, set, user, body }: any) => {
-                    await requiresUserProfile({ set, user });
+                    await requiresToken({ set, user });
                     await pack.requiresOwnership({ set, user, id });
 
                     // Check if the pack exists
@@ -142,7 +142,7 @@ export default (app: YapockType) =>
             .put(
                 '/:pageId',
                 async ({ params: { id, pageId }, set, user, body }: any) => {
-                    await requiresUserProfile({ set, user });
+                    await requiresToken({ set, user });
                     await pack.requiresOwnership({ set, user, id });
 
                     // Check if the page exists
@@ -215,7 +215,7 @@ export default (app: YapockType) =>
             .delete(
                 '/:pageId',
                 async ({ params: { id, pageId }, set, user }: any) => {
-                    await requiresUserProfile({ set, user });
+                    await requiresToken({ set, user });
                     await pack.requiresOwnership({ set, user, id });
 
                     // Check if the page exists
@@ -256,7 +256,7 @@ export default (app: YapockType) =>
             .post(
                 '/reorder',
                 async ({ params: { id }, set, user, body }: any) => {
-                    await requiresUserProfile({ set, user });
+                    await requiresToken({ set, user });
                     await pack.requiresOwnership({ set, user, id });
 
                     // Check if the page exists

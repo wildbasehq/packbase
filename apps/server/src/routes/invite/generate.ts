@@ -2,12 +2,12 @@
 
 import { t } from 'elysia';
 import { YapockType } from '@/index';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { ErrorTypebox } from '@/utils/errors';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import clerkClient from '@/db/auth';
 import { Invitation } from '@clerk/backend';
+import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app.post(
@@ -18,7 +18,7 @@ export default (app: YapockType) =>
                 return;
             }
 
-            await requiresUserProfile({ set, user });
+            await requiresToken({ set, user });
 
             let is_admin = user.sessionClaims?.roles?.includes('admin');
 
@@ -72,7 +72,7 @@ export default (app: YapockType) =>
             let inviteCreated: Invitation | undefined = undefined;
             try {
                 inviteCreated = await clerkClient.invitations.createInvitation({
-                    emailAddress: body.email,
+                    emailAddress: body.email.trim().toLowerCase(),
                     notify: true,
                 });
 

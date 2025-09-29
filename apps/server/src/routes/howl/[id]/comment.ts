@@ -1,18 +1,18 @@
 import { YapockType } from '@/index';
 import { t } from 'elysia';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { ErrorTypebox } from '@/utils/errors';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import { NotificationManager } from '@/utils/NotificationManager';
 import clerkClient from '@/db/auth';
 import { getUserClerkByID } from '@/utils/clerk';
+import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({ params: { id }, body: { body }, set, user, error }) => {
-            await requiresUserProfile({ set, user });
+            await requiresToken({ set, user });
 
             body = body.trim();
             if (body.length === 0) {

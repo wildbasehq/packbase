@@ -1,19 +1,19 @@
 import { t } from 'elysia';
 import { YapockType } from '@/index';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { ErrorTypebox } from '@/utils/errors';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import clerkClient from '@/db/auth';
 import { NotificationManager } from '@/utils/NotificationManager';
 import { getUserClerkByID } from '@/utils/clerk';
+import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app
         .post(
             '',
             async ({ params: { id }, body: { slot = '👍' }, set, user }: any) => {
-                await requiresUserProfile({ set, user });
+                await requiresToken({ set, user });
 
                 let postExists;
                 try {
@@ -111,7 +111,7 @@ export default (app: YapockType) =>
         .delete(
             '',
             async ({ params: { id }, set, user }) => {
-                await requiresUserProfile({ set, user });
+                await requiresToken({ set, user });
 
                 try {
                     await prisma.posts_reactions.deleteMany({

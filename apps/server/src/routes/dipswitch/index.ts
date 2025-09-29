@@ -1,42 +1,43 @@
-import {YapockType} from '@/index'
-import {t} from 'elysia'
-import requiresUserProfile from '@/utils/identity/requires-user-profile'
-import {ErrorTypebox} from '@/utils/errors'
-import prisma from '@/db/prisma'
+import { YapockType } from '@/index';
+import { t } from 'elysia';
+import { ErrorTypebox } from '@/utils/errors';
+import prisma from '@/db/prisma';
+import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app
         .post(
             '',
-            async ({set, body, user, error}) => {
-                await requiresUserProfile({set, user})
+            async ({ set, body, user, error }) => {
+                await requiresToken({ set, user });
 
-                let {dpk, dpv}: { dpk: string; dpv: any } = body
+                let { dpk, dpv }: { dpk: string; dpv: any } = body;
 
-                let {json, dp} = await getDPObject(user.sub)
-                if (!json) return error(500, {
-                    summary: 'DP failure when grabbing json object!'
-                })
+                let { json, dp } = await getDPObject(user.sub);
+                if (!json)
+                    return error(500, {
+                        summary: 'DP failure when grabbing json object!',
+                    });
 
-                if (!dpv || dpv.length === 0) dpv = 1
-                dp[dpk] = dpv
+                if (!dpv || dpv.length === 0) dpv = 1;
+                dp[dpk] = dpv;
 
-                json.dp = dp
+                json.dp = dp;
 
                 let insertData;
                 try {
                     insertData = await prisma.profiles_settings.upsert({
                         where: { id: user.sub },
                         update: { json },
-                        create: { id: user.sub, json }
+                        create: { id: user.sub, json },
                     });
                 } catch (err) {
                     console.error(err);
                     return error(500, {
-                        summary: err.message || 'Internal error when importing to profiles.settings!'
+                        summary: err.message || 'Internal error when importing to profiles.settings!',
                     });
                 }
-                return insertData
+                return insertData;
             },
             {
                 detail: {
@@ -48,28 +49,31 @@ export default (app: YapockType) =>
                     dpv: t.String(),
                 }),
                 response: {
-                    200: t.Object({}, {
-                        additionalProperties: t.Any(),
-                    }),
-                    500: ErrorTypebox
-                }
+                    200: t.Object(
+                        {},
+                        {
+                            additionalProperties: t.Any(),
+                        },
+                    ),
+                    500: ErrorTypebox,
+                },
             },
         )
         .get(
             '',
-            async ({query, user, error, set}) => {
-                await requiresUserProfile({set, user})
+            async ({ query, user, error, set }) => {
+                await requiresToken({ set, user });
 
-                const {dpk} = query
+                const { dpk } = query;
 
-                let {dp} = await getDPObject(user.sub)
+                let { dp } = await getDPObject(user.sub);
 
                 if (dpk) {
-                    if (!dp[dpk]) return error(404, null)
+                    if (!dp[dpk]) return error(404, null);
 
-                    return dp[dpk]
+                    return dp[dpk];
                 } else {
-                    return dp
+                    return dp;
                 }
             },
             {
@@ -77,30 +81,38 @@ export default (app: YapockType) =>
                     description: 'Gets a specific dipswitch.',
                     tags: ['Users'],
                 },
-                query: t.Optional(t.Object({
-                    dpk: t.Optional(t.String()),
-                })),
+                query: t.Optional(
+                    t.Object({
+                        dpk: t.Optional(t.String()),
+                    }),
+                ),
                 response: {
-                    200: t.Union([t.String(), t.Object({}, {
-                        additionalProperties: t.Any(),
-                    })]),
-                    404: t.Null()
-                }
+                    200: t.Union([
+                        t.String(),
+                        t.Object(
+                            {},
+                            {
+                                additionalProperties: t.Any(),
+                            },
+                        ),
+                    ]),
+                    404: t.Null(),
+                },
             },
         );
 
 export async function getDPObject(userID: string) {
     let json: {
         dp: {
-            [key: string]: any
-        }
+            [key: string]: any;
+        };
     } = {
         dp: {},
-    }
+    };
     let data;
     try {
         data = await prisma.profiles_settings.findUnique({
-            where: { id: userID }
+            where: { id: userID },
         });
 
         if (!data) {
@@ -108,20 +120,20 @@ export async function getDPObject(userID: string) {
             data = await prisma.profiles_settings.create({
                 data: {
                     id: userID,
-                    json: {}
-                }
+                    json: {},
+                },
             });
         }
     } catch (error) {
         throw error;
     }
 
-    json = data.json
-    let dp = json.dp
-    if (!dp) dp = {}
+    json = data.json;
+    let dp = json.dp;
+    if (!dp) dp = {};
 
     return {
         json,
         dp,
-    }
+    };
 }

@@ -3,11 +3,11 @@ import { t } from 'elysia';
 import packCalculateHeartbeat from '@/lib/packs/calculate-heartbeat';
 import uploadFile from '@/utils/upload-file';
 import { PackEditBody, PackResponse } from '@/models/defs';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { pack } from '@/lib/packs/permissions';
 import posthog, { distinctId } from '@/utils/posthog';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
+import requiresToken from '@/utils/identity/requires-token';
 
 export const PackCache = new Map<string, any>();
 export const PackMembershipCache = new Map<string, any>();
@@ -44,7 +44,7 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({ params: { id }, set, user, body }: { params: { id: string }; set: any; user: any; body: any }) => {
-                await requiresUserProfile({ set, user });
+                await requiresToken({ set, user });
                 await pack.requiresOwnership({ set, user, id });
                 const newBody: {
                     [key: string]: any;

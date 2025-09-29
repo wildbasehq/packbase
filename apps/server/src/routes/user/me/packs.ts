@@ -1,17 +1,17 @@
 import { YapockType } from '@/index';
 import { getPack } from '@/routes/pack/[id]';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { t } from 'elysia';
 import { PackResponse } from '@/models/defs';
 import { ErrorTypebox } from '@/utils/errors';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
+import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app.get(
         '',
         async ({ set, user }) => {
-            await requiresUserProfile({ set, user });
+            await requiresToken({ set, user });
 
             return await getUserPacks({ user, set });
         },

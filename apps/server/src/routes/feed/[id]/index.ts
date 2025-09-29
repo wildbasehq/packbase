@@ -2,8 +2,8 @@ import { FeedController } from '@/lib/FeedController';
 import { YapockType } from '@/index';
 import { t } from 'elysia';
 import { HowlResponse } from '@/models/defs';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { HTTPError } from '@/lib/HTTPError';
+import requiresToken from '@/utils/identity/requires-token';
 
 // Initialize a shared instance of controllers
 const feedController = new FeedController();
@@ -24,7 +24,7 @@ export default (app: YapockType) =>
             try {
                 // Special handling for home feed - requires authentication
                 if (id === 'universe:home') {
-                    await requiresUserProfile({ set, user });
+                    await requiresToken({ set, user });
                 }
 
                 // Get feed data

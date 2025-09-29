@@ -2,17 +2,17 @@ import { YapockType } from '@/index';
 import { t } from 'elysia';
 import { getUser } from '@/routes/user/[username]/index';
 import { ErrorTypebox } from '@/utils/errors';
-import requiresUserProfile from '@/utils/identity/requires-user-profile';
 import { FeedController } from '@/lib/FeedController';
 import { HTTPError } from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
+import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app
         .post(
             '',
-            async ({ user, params, set, error }) => {
-                await requiresUserProfile({ set, user });
+            async ({ user, params, set }) => {
+                await requiresToken({ set, user });
                 const followUser = await getUser({
                     by: 'username',
                     value: params.username,
@@ -71,8 +71,8 @@ export default (app: YapockType) =>
         )
         .delete(
             '',
-            async ({ params, set, user, error }) => {
-                await requiresUserProfile({ set, user });
+            async ({ params, set, user }) => {
+                await requiresToken({ set, user });
                 const followUser = await getUser({
                     by: 'username',
                     value: params.username,
