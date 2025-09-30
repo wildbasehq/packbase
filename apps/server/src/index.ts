@@ -9,22 +9,21 @@ JSON.stringify = (obj) =>
         return value;
     });
 
-import { Elysia } from 'elysia';
-import { cors } from '@elysiajs/cors';
+import {Elysia} from 'elysia';
+import {cors} from '@elysiajs/cors';
 import Debug from 'debug';
 import verifyToken from '@/utils/verify-token';
-import { swagger } from '@elysiajs/swagger';
-import { autoload } from 'elysia-autoload';
+import {swagger} from '@elysiajs/swagger';
+import {autoload} from 'elysia-autoload';
 import deleteNulls from '@/utils/delete-nulls';
 import fs from 'node:fs/promises';
-import posthog, { distinctId } from '@/utils/posthog';
+import posthog, {distinctId} from '@/utils/posthog';
 // Trigger clerk connection
 import './db/auth';
 import './lib/rheo';
-import { HTTPError } from '@/lib/HTTPError';
+import {HTTPError} from '@/lib/HTTPError';
 import clerkClient from './db/auth';
 import prisma from '@/db/prisma';
-import { randomUUID } from 'crypto';
 
 const isCluster = process.argv.includes('--cluster');
 const isBuildingSDK = process.argv.includes('--build-sdk');
@@ -32,15 +31,18 @@ const isTestingStartupTime = process.argv.includes('--close-on-success');
 
 const log = !isTestingStartupTime
     ? {
-          info: Debug('vg:init'),
-          request: Debug('vg:request'),
-          error: Debug('vg:init:error'),
-      }
+        info: Debug('vg:init'),
+        request: Debug('vg:request'),
+        error: Debug('vg:init:error'),
+    }
     : {
-          info: () => {},
-          request: () => {},
-          error: () => {},
-      };
+        info: () => {
+        },
+        request: () => {
+        },
+        error: () => {
+        },
+    };
 
 log.info(`Server${isCluster ? ' (cluster)' : ''} \x1b[38;5;244mSTART\x1b[0m: Awake!!`);
 
@@ -61,14 +63,19 @@ const Yapock = new Elysia({})
             maxAge: 86400,
         }),
     )
-    .resolve(async ({ request, query }): Promise<any> => {
+    .resolve(async ({request, query}): Promise<any> => {
         if (request.headers.get('authentication')) request.headers.set('Authorization', request.headers.get('authentication'));
         if (query.token) request.headers.set('Authorization', `Bearer ${query.token}`);
         request.headers.set('Authorization', request.headers.get('Authorization')?.replace('Bearer ', ''));
 
         const user = await verifyToken(request);
 
-        async function logAudit({ action, model_id, model_type, model_object }: { action: string; model_id: string; model_type: string; model_object: any }) {
+        async function logAudit({action, model_id, model_type, model_object}: {
+            action: string;
+            model_id: string;
+            model_type: string;
+            model_object: any
+        }) {
             // Attempt to write audit log, but never block the response on failure
             try {
                 const userId: string = (user && (user.sub as string)) || '00000000-0000-0000-0000-000000000000';
@@ -103,12 +110,22 @@ const Yapock = new Elysia({})
             if (user?.userId) {
                 const privateMetadata = await clerkClient.users.getUser(user?.userId).then((user) => user.privateMetadata);
                 if (privateMetadata?.type !== 'admin') {
-                    await auditIfAdminSql('UNAUTHORIZED', { reason: 'Not admin' });
-                    throw HTTPError.notFound({ summary: 'NOT_FOUND' });
+                    await auditIfAdminSql('UNAUTHORIZED', {reason: 'Not admin'});
+                    throw HTTPError.notFound({summary: 'NOT_FOUND'});
                 }
+
+                // Continuing, set their last_online
+                await prisma.profiles.update({
+                    where: {
+                        id: user?.sub,
+                    },
+                    data: {
+                        last_online: new Date()
+                    }
+                })
             } else {
-                await auditIfAdminSql('UNAUTHENTICATED', { reason: 'No user' });
-                throw HTTPError.notFound({ summary: 'NOT_FOUND' });
+                await auditIfAdminSql('UNAUTHENTICATED', {reason: 'No user'});
+                throw HTTPError.notFound({summary: 'NOT_FOUND'});
             }
         }
 
@@ -128,16 +145,16 @@ const Yapock = new Elysia({})
             });
         }
 
-        if (user?.sub) return { user, logAudit };
+        if (user?.sub) return {user, logAudit};
     })
 
-    .onAfterHandle(({ response, request }) => {
+    .onAfterHandle(({response, request}) => {
         if (!request.url.includes('/docs')) {
             return deleteNulls(response);
         }
     })
 
-    .onError(({ code, error, request }) => {
+    .onError(({code, error, request}) => {
         console.log(code, error);
         // Ensure JSON response
         try {
@@ -156,12 +173,12 @@ const Yapock = new Elysia({})
         await autoload({
             ...(isBuildingSDK
                 ? {
-                      types: {
-                          output: './routes.ts',
-                          typeName: 'Packbase',
-                          useExport: true,
-                      },
-                  }
+                    types: {
+                        output: './routes.ts',
+                        typeName: 'Packbase',
+                        useExport: true,
+                    },
+                }
                 : {}),
         }),
     )
@@ -187,7 +204,7 @@ const Yapock = new Elysia({})
      *               memory?: number,
      *             }
      */
-    .get('/health', async ({ response }) => {
+    .get('/health', async ({response}) => {
         const health = {
             status: 'OK',
             message: 'Server is healthy',
@@ -259,7 +276,7 @@ setTimeout(async () => {
             const index = modules.indexOf(module);
             if (module.endsWith('.ts')) {
                 log.info(`Running migration ${module}`);
-                const { default: func } = await import(`./migrate/${module}`);
+                const {default: func} = await import(`./migrate/${module}`);
                 await func();
 
                 if (index === modules.length - 1) {
@@ -279,5 +296,6 @@ setTimeout(async () => {
 
 type YapockTypeDerivative = typeof Yapock;
 declare module '@/index' {
-    interface YapockType extends YapockTypeDerivative {}
+    interface YapockType extends YapockTypeDerivative {
+    }
 }
