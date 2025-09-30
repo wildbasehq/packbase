@@ -113,16 +113,6 @@ const Yapock = new Elysia({})
                     await auditIfAdminSql('UNAUTHORIZED', {reason: 'Not admin'});
                     throw HTTPError.notFound({summary: 'NOT_FOUND'});
                 }
-
-                // Continuing, set their last_online
-                await prisma.profiles.update({
-                    where: {
-                        id: user?.sub,
-                    },
-                    data: {
-                        last_online: new Date()
-                    }
-                })
             } else {
                 await auditIfAdminSql('UNAUTHENTICATED', {reason: 'No user'});
                 throw HTTPError.notFound({summary: 'NOT_FOUND'});
@@ -145,7 +135,18 @@ const Yapock = new Elysia({})
             });
         }
 
-        if (user?.sub) return {user, logAudit};
+        if (user?.sub) {
+            // set their last_online
+            await prisma.profiles.update({
+                where: {
+                    id: user?.sub,
+                },
+                data: {
+                    last_online: new Date()
+                }
+            })
+            return {user, logAudit};
+        }
     })
 
     .onAfterHandle(({response, request}) => {
