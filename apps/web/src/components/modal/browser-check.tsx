@@ -2,9 +2,11 @@ import {Button, Divider} from '../shared'
 import {Alert, AlertDescription, AlertTitle} from '../shared/alert'
 import {useModal} from './provider'
 import {useEffect} from 'react'
+import useLocalStorage from '@/lib/hooks/use-local-storage.ts'
 
 export default function BrowserCheck() {
     const {show, hide} = useModal()
+    const [hasSeenWarningModal, setHasSeenWarningModal] = useLocalStorage('has-seen-browser-warning-modal', false)
     // Search navigator.userAgentData for Chromium.
     const browserEngine = // @ts-ignore
         navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase().includes('chrom'))
@@ -12,7 +14,14 @@ export default function BrowserCheck() {
     const isOpera = // @ts-ignore
         navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase().includes('opera'))
 
+    const dismiss = () => {
+        setHasSeenWarningModal(true)
+        hide()
+    }
+
     useEffect(() => {
+        if (hasSeenWarningModal) return
+
         // @ts-ignore
         if (!navigator.userAgentData) {
             show(
@@ -21,6 +30,9 @@ export default function BrowserCheck() {
                     <AlertDescription>
                         We'll assume you're on a Gecko/Firefox based browser, which may disable some features.
                     </AlertDescription>
+                    <Button className="w-full mt-2" color="orange" onClick={dismiss}>
+                        Continue Anyway
+                    </Button>
                 </Alert>
             )
         } else if (isOpera) {
@@ -42,7 +54,7 @@ export default function BrowserCheck() {
                         You're free to continue, but bug reports WILL be rejected. Unlike some other sites, Packbase has no safeguards to
                         stop Opera from injecting itself on the page - you chose to use this browser, so we won't stop you.
                     </AlertDescription>
-                    <Button className="w-full mt-2" color="orange" onClick={hide}>
+                    <Button className="w-full mt-2" color="orange" onClick={dismiss}>
                         Continue Anyway
                     </Button>
                 </Alert>
@@ -57,7 +69,7 @@ export default function BrowserCheck() {
                     </AlertDescription>
                     <Divider className="my-2"/>
                     <AlertDescription>You're free to continue, but some bug reports may be rejected.</AlertDescription>
-                    <Button className="w-full mt-2" color="orange" onClick={hide}>
+                    <Button className="w-full mt-2" color="orange" onClick={dismiss}>
                         Continue Anyway
                     </Button>
                 </Alert>
