@@ -1,16 +1,16 @@
-import { Button, Divider } from '../shared'
-import { Alert, AlertDescription, AlertTitle } from '../shared/alert'
-import { useModal } from './provider'
-import { useEffect } from 'react'
+import {Button, Divider} from '../shared'
+import {Alert, AlertDescription, AlertTitle} from '../shared/alert'
+import {useModal} from './provider'
+import {useEffect} from 'react'
 
 export default function BrowserCheck() {
-    const { show, hide } = useModal()
+    const {show, hide} = useModal()
     // Search navigator.userAgentData for Chromium.
     const browserEngine = // @ts-ignore
-    navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase() === 'chromium')
+        navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase().includes('chrom'))
 
     const isOpera = // @ts-ignore
-    navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase() === 'opera')
+        navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase().includes('opera'))
 
     useEffect(() => {
         // @ts-ignore
@@ -32,12 +32,12 @@ export default function BrowserCheck() {
                         no benefit to you, and harvests your data which is <b>on by default, probably on right now</b>. It's also partly
                         owned by a company that made 360 Secure Browser, which is known to have a hidden backdoor, as well as other software
                         with spyware, financial username/password stealing, and more.
-                        <br />
-                        <br />
+                        <br/>
+                        <br/>
                         Care more about your privacy; Use any open-source browser instead. While we don't support Gecko or Firefox based
                         browsers, it would be INFINITELY better than what you're on now.
                     </AlertDescription>
-                    <Divider className="my-2" />
+                    <Divider className="my-2"/>
                     <AlertDescription>
                         You're free to continue, but bug reports WILL be rejected. Unlike some other sites, Packbase has no safeguards to
                         stop Opera from injecting itself on the page - you chose to use this browser, so we won't stop you.
@@ -55,7 +55,7 @@ export default function BrowserCheck() {
                         Due to a multitude of quirks, we cannot support Gecko-based and WebKit-based browsers. For the best experience,
                         please use a Chromium-based browser instead.
                     </AlertDescription>
-                    <Divider className="my-2" />
+                    <Divider className="my-2"/>
                     <AlertDescription>You're free to continue, but some bug reports may be rejected.</AlertDescription>
                     <Button className="w-full mt-2" color="orange" onClick={hide}>
                         Continue Anyway
