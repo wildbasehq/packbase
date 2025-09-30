@@ -23,48 +23,44 @@ export default function BrowserCheck() {
         if (hasSeenWarningModal) return
 
         // @ts-ignore
-        if (!navigator.userAgentData) {
-            show(
-                <Alert variant="destructive" className="max-w-md !rounded-2xl">
-                    <AlertTitle>Your browser has no user agent data.</AlertTitle>
-                    <AlertDescription>
-                        We'll assume you're on a Gecko/Firefox based browser, which may disable some features.
-                    </AlertDescription>
-                    <Button className="w-full mt-2" color="orange" onClick={dismiss}>
-                        Continue Anyway
-                    </Button>
-                </Alert>
-            )
-        } else if (isOpera) {
+        if (isOpera) {
             show(
                 <Alert variant="destructive" className="max-w-md !rounded-2xl">
                     <AlertTitle>Use anything else.</AlertTitle>
                     <AlertDescription>
-                        We - among many other sites - are going against Opera GX. It is a bloated, slow, and insecure browser that provides
-                        no benefit to you, and harvests your data which is <b>on by default, probably on right now</b>. It's also partly
-                        owned by a company that made 360 Secure Browser, which is known to have a hidden backdoor, as well as other software
+                        We - among many other sites - are going against Opera GX. It is a bloated, slow, and insecure
+                        browser that provides
+                        no benefit to you, and harvests your data which is <b>on by default, probably on right now</b>.
+                        It's also partly
+                        owned by a company that made 360 Secure Browser, which is known to have a hidden backdoor, as
+                        well as other software
                         with spyware, financial username/password stealing, and more.
                         <br/>
                         <br/>
-                        Care more about your privacy; Use any open-source browser instead. While we don't support Gecko or Firefox based
+                        Care more about your privacy; Use any open-source browser instead. While we don't support Gecko
+                        or Firefox based
                         browsers, it would be INFINITELY better than what you're on now.
                     </AlertDescription>
                     <Divider className="my-2"/>
                     <AlertDescription>
-                        You're free to continue, but bug reports WILL be rejected. Unlike some other sites, Packbase has no safeguards to
-                        stop Opera from injecting itself on the page - you chose to use this browser, so we won't stop you.
+                        You're free to continue, but bug reports WILL be rejected. Unlike some other sites, Packbase has
+                        no safeguards to
+                        stop Opera from injecting itself on the page - you chose to use this browser, so we won't stop
+                        you.
                     </AlertDescription>
                     <Button className="w-full mt-2" color="orange" onClick={dismiss}>
                         Continue Anyway
                     </Button>
                 </Alert>
             )
-        } else if (!browserEngine) {
+            // @ts-ignore
+        } else if (!browserEngine || !navigator.userAgentData) {
             show(
                 <Alert variant="destructive" className="max-w-md !rounded-2xl">
                     <AlertTitle>Your browser is not supported.</AlertTitle>
                     <AlertDescription>
-                        Due to a multitude of quirks, we cannot support Gecko-based and WebKit-based browsers. For the best experience,
+                        Due to a multitude of quirks, we cannot support Gecko-based and WebKit-based browsers. For the
+                        best experience,
                         please use a Chromium-based browser instead.
                     </AlertDescription>
                     <Divider className="my-2"/>
