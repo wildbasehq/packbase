@@ -1,13 +1,11 @@
 import StarterKit from '@tiptap/starter-kit'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
-import TiptapImage from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
 import TiptapUnderline from '@tiptap/extension-underline'
 import TextStyle from '@tiptap/extension-text-style'
-import { Markdown } from 'tiptap-markdown'
+import {Markdown} from 'tiptap-markdown'
 import SlashCommand from './slash-command'
-import { InputRule } from '@tiptap/core'
-import UploadImagesPlugin from '@/components/novel/ui/editor/plugins/upload-images'
+import {InputRule} from '@tiptap/core'
 import UpdatedImage from './updated-image'
 import CustomKeymap from './custom-keymap'
 
@@ -63,10 +61,10 @@ export const defaultExtensions = [
             return [
                 new InputRule({
                     find: /^(?:---|—-|___\s|\*\*\*\s)$/,
-                    handler: ({ state, range }) => {
+                    handler: ({state, range}) => {
                         const attributes = {}
 
-                        const { tr } = state
+                        const {tr} = state
                         const start = range.from
                         let end = range.to
 
@@ -85,23 +83,13 @@ export const defaultExtensions = [
     //         class: 'text-stone-400 underline underline-offset-[3px] hover:text-stone-600 transition-colors cursor-pointer',
     //     },
     // }),
-    TiptapImage.extend({
-        addProseMirrorPlugins() {
-            return [UploadImagesPlugin()]
-        },
-    }).configure({
-        allowBase64: true,
-        HTMLAttributes: {
-            class: 'rounded-lg border border-stone-200',
-        },
-    }),
     UpdatedImage.configure({
         HTMLAttributes: {
             class: 'rounded-lg border border-stone-200',
         },
     }),
     Placeholder.configure({
-        placeholder: ({ node }) => {
+        placeholder: ({node}) => {
             if (node.type.name === 'heading') {
                 return `Heading ${node.attrs.level}`
             }

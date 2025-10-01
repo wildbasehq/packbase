@@ -1,5 +1,5 @@
-import { create } from 'zustand'
-import { resourceDefault } from './resource'
+import {create} from 'zustand'
+import {resourceDefault} from '@/src/lib'
 
 /**
  * Resource UI store, not persistent

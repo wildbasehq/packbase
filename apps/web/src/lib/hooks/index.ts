@@ -1,6 +1,5 @@
 export * from './use-component-visible'
 export * from './use-intersection-observer'
-export * from './use-local-storage'
 export * from './use-scroll'
 export * from './use-window-size'
 export * from './use-worker-status'

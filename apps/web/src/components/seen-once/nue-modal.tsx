@@ -3,16 +3,16 @@
  */
 
 import Modal from '@/components/modal'
-import { Heading } from '@/components/shared/text.tsx'
-import { useEffect, useState } from 'react'
-import { Button } from '@/components/shared/experimental-button-rework'
+import {Heading} from '@/components/shared/text.tsx'
+import {Activity, ChangeEvent, ReactNode, useEffect, useState} from 'react'
+import {Button} from '@/components/shared'
 import Markdown from '@/components/shared/markdown.tsx'
-import { AnimatedCharacter, Expressions } from '@/components/shared/animated-character'
+import {AnimatedCharacter, Expressions} from '@/components/shared/animated-character'
 import SelectPills from '@/components/shared/input/select-pills.tsx'
-import { Alert, AlertDescription, Checkbox, CheckboxField, Field, Input, InputGroup, Textarea } from '@/src/components'
-import { Label } from '@headlessui/react'
-import { setToken, vg } from '@/lib'
-import { toast } from 'sonner'
+import {Alert, AlertDescription, Checkbox, CheckboxField, Field, Input, InputGroup, Textarea} from '@/src/components'
+import {Label} from '@headlessui/react'
+import {isVisible, vg} from '@/lib'
+import {toast} from 'sonner'
 
 /**
  * Character Text Box Modal for user guidance and onboarding
@@ -32,7 +32,7 @@ export interface DialogueStep {
     }[]
     onShow?: () => void
     onComplete?: (formData?: Record<string, any>) => Promise<void>
-    customComponent?: React.ReactNode
+    customComponent?: ReactNode
     form?: {
         fields: Array<{
             name: string
@@ -60,7 +60,7 @@ interface CharacterTextBoxProps {
     config?: CharacterTextBoxConfig
 }
 
-export default function NUEModal({ config }: CharacterTextBoxProps) {
+export default function NUEModal({config}: CharacterTextBoxProps) {
     const {
         steps,
         mascotSrc = '/img/rive/mascat-placeholder-please-replace.riv',
@@ -68,7 +68,7 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
         onComplete,
         onCancel,
         showModal = true,
-        allowSkip = true,
+        allowSkip = false,
     } = config || createDebugNUEFlow()
 
     const [currentStepIndex, setCurrentStepIndex] = useState(0)
@@ -140,11 +140,12 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
     }
 
     const handleClose = () => {
+        if (!allowSkip) return
         onCancel?.()
     }
 
-    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target
+    const handleFormChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const {name, value, type} = e.target
 
         // Clear error message when user updates form
         setFormError(null)
@@ -180,7 +181,8 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
     }
 
     return (
-        <Modal showModal={showModal} setShowModal={handleClose} className="relative !bg-muted w-[52rem] overflow-visible">
+        <Modal showModal={showModal} setShowModal={handleClose}
+               className="relative !bg-muted w-[52rem] !z-[100] !overflow-visible">
             {/* Character mascot */}
             <div className="absolute -top-6/7 md:-left-1/8 md:!-top-13 pointer-events-none w-1/2">
                 <AnimatedCharacter
@@ -210,14 +212,16 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
                         </div>
                     </div>
                     {allowSkip && (
-                        <button onClick={handleSkip} className="text-sm text-muted-foreground hover:opacity-50 underline">
+                        <button onClick={handleSkip}
+                                className="text-sm text-muted-foreground hover:opacity-50 underline">
                             Skip
                         </button>
                     )}
                 </div>
 
                 {/* Main content area */}
-                <div className="bg-white dark:bg-n-8 p-4 overflow-y-auto h-[18rem] rounded gap-4 justify-center items-center">
+                <div
+                    className="bg-white dark:bg-n-8 shadow p-4 overflow-y-auto h-[18rem] rounded gap-4 justify-center items-center">
                     {/* Text content */}
                     <div className="space-y-4">
                         <Heading size="xl">{currentStep.title}</Heading>
@@ -231,7 +235,8 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
                         {currentStep.form && (
                             <div className="mt-4 space-y-3">
                                 {formError && (
-                                    <div className="p-2 mb-2 text-sm font-medium text-red-800 bg-red-100 rounded-md dark:bg-red-900 dark:text-red-200">
+                                    <div
+                                        className="p-2 mb-2 text-sm font-medium text-red-800 bg-red-100 rounded-md dark:bg-red-900 dark:text-red-200">
                                         {formError}
                                     </div>
                                 )}
@@ -253,7 +258,8 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
                                             />
                                         ) : field.type === 'textarea' ? (
                                             <Field>
-                                                <Textarea placeholder={field.placeholder} name={field.name} onChange={handleFormChange} />
+                                                <Textarea placeholder={field.placeholder} name={field.name}
+                                                          onChange={handleFormChange}/>
                                             </Field>
                                         ) : field.type === 'checkbox' ? (
                                             <CheckboxField>
@@ -300,12 +306,20 @@ export default function NUEModal({ config }: CharacterTextBoxProps) {
                             ) : (
                                 <>
                                     {currentStepIndex > 0 && (
-                                        <Button onClick={handlePrevious} disabled={isLoading}>
+                                        <Button outline onClick={handlePrevious} disabled={isLoading}>
                                             Previous
                                         </Button>
                                     )}
                                     <Button onClick={handleNext} color="indigo" disabled={isLoading}>
-                                        {isLoading ? 'Loading' : currentStepIndex < steps.length - 1 ? 'Next' : 'Complete'}
+                                        <Activity mode={isVisible(isLoading)}>
+                                            Loading
+                                        </Activity>
+                                        <Activity mode={isVisible(!isLoading && currentStepIndex < steps.length - 1)}>
+                                            Next
+                                        </Activity>
+                                        <Activity mode={isVisible(!isLoading && currentStepIndex === steps.length - 1)}>
+                                            Quit yapping, let me in!
+                                        </Activity>
                                     </Button>
                                 </>
                             )}
@@ -329,6 +343,7 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                 content: [
                     'Welcome to Packbase!',
                     "I'm here to help you get started with your new Packbase account.",
+                    'As this related to critical information, you cannot skip this.',
                     "{img src:'noai_created'}{/img}",
                 ],
                 expression: Expressions.DEFAULT,
@@ -393,12 +408,6 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                             ],
                             required: false,
                         },
-                        {
-                            name: 'domain-agreement',
-                            label: 'I solemly swear that I will follow the law, and that I will only use this subdomain for myself and myself alone.',
-                            type: 'checkbox',
-                            required: true,
-                        },
                     ],
                 },
             },
@@ -417,8 +426,9 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                 title: 'readme-or-get-banned-uwu.txt.md',
                 content: [
                     'We are currently in private alpha, so you will not be able to use all the features of Packbase yet, and we are still working on some of the core features.',
-                    "Please, be kind to one another - **we won't hesitate to ban you for life with no appeals**. We appreciate you taking the time to join and help us make something truly great, but we ask you to be respectful of our time as well. ***Remember***: We're far from a company - we're just a bunch of passionate people who want to make a great community.",
-                    "We want to know how you'd like to use Packbase and what features are missing! After I finish yapping, join /p/support and howl in #ideas to tell us what you think!",
+                    "Please, be kind to one another - **we won't hesitate to ban you for life with no appeals**. We appreciate you taking the time to join and help us make something truly great, but we ask you to be respectful of our time as well.",
+                    "***Remember***: We're far from a company - we're just a bunch of passionate people who want to make a great community. No one working on (or using) Packbase deserves to be harassed.",
+                    "***Double Remember: IT'S A PRIVATE ALPHA. THINGS FUCKING BREAK. YOU WOULDN'T GO TO A CONSTRUCTION SITE AND COMPLAIN YOU CAN'T TAKE A SHIT. ALSO; OUR EMAILS AREN'T FOR BUG REPORTS. THIS REMINDER IS TARGETED. YOU KNOW WHO YOU ARE.***"
                 ],
                 expression: Expressions.UNIMPRESSED,
                 onComplete: async formData => {
@@ -428,20 +438,20 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                             display_name: formData.display_name,
                             ...(formData.bio
                                 ? {
-                                      about: {
-                                          bio: formData.bio,
-                                      },
-                                  }
+                                    about: {
+                                        bio: formData.bio,
+                                    },
+                                }
                                 : {}),
                         })
-                        .then(({ data, error }) => {
+                        .then(({data, error}) => {
                             console.log('User data:', data)
                             if (!data || error) {
                                 toast.error(
                                     "Couldn't save: " +
-                                        (error.value
-                                            ? `${error.status}: ${error.value.summary || error.value.error}`
-                                            : 'Something went wrong')
+                                    (error.value
+                                        ? `${error.status}: ${error.value.summary || error.value.error}`
+                                        : 'Something went wrong')
                                 )
                             }
                         })
@@ -464,7 +474,8 @@ export function createDebugNUEFlow(): CharacterTextBoxConfig {
                 expression: Expressions.AMAZED,
                 customComponent: (
                     <Alert variant="info">
-                        <AlertDescription>This is a custom component example that can be included after the content!</AlertDescription>
+                        <AlertDescription>This is a custom component example that can be included after the
+                            content!</AlertDescription>
                     </Alert>
                 ),
                 onComplete: async () => {

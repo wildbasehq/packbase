@@ -1,8 +1,8 @@
-import { Button, ErrorBoundary, InlineLoading } from '@carbon/react'
-import { useEffect, useState } from 'react'
-import { ErrorEmptyState } from '@carbon/ibm-products'
-import { Link, useLocation } from 'wouter'
-import { listQueryPages } from '@/lib/queryPages'
+import {Button, ErrorBoundary, InlineLoading} from '@carbon/react'
+import {useEffect, useState} from 'react'
+import {ErrorEmptyState} from '@carbon/ibm-products'
+import {Link, useLocation} from 'wouter'
+import {listQueryPages} from '@/lib/queryPages'
 
 function QueryPageList() {
     const [isLoading, setIsLoading] = useState(true)
@@ -11,6 +11,7 @@ function QueryPageList() {
 
     useEffect(() => {
         void load()
+
         async function load() {
             setIsLoading(true)
             try {
@@ -33,17 +34,17 @@ function QueryPageList() {
             </div>
 
             {isLoading ? (
-                <InlineLoading description="Loading" />
+                <InlineLoading description="Loading"/>
             ) : pages.length ? (
                 <div className="grid gap-3">
                     {pages.map(p => (
                         <Link key={p.id} href={`/query/${p.slug}`}>
                             <a
                                 className="block !no-underline"
-                                style={{ border: '1px solid var(--cds-border-subtle-01)', borderRadius: 6, padding: 12 }}
+                                style={{border: '1px solid var(--cds-border-subtle-01)', borderRadius: 6, padding: 12}}
                             >
                                 <div className="!font-semibold">{p.title}</div>
-                                {!!p.description && <div className="!text-text-secondary">{p.description}</div>}
+                                {!!p.description && <div className="!text-secondary">{p.description}</div>}
                             </a>
                         </Link>
                     ))}
@@ -75,7 +76,7 @@ export default function RouteIndex() {
                 />
             }
         >
-            <QueryPageList />
+            <QueryPageList/>
         </ErrorBoundary>
     )
 }

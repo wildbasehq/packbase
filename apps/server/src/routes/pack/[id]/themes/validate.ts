@@ -1,22 +1,24 @@
-import { YapockType } from '@/index';
-import { HTTPError } from '@/lib/HTTPError';
-import validateThemeContent from '@/lib/themes/validateThemeContent';
-import { t } from 'elysia';
-import { pack } from '@/lib/packs/permissions';
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import validateThemeContent from '@/lib/themes/validateThemeContent'
+import {t} from 'elysia'
+import PackMan from '@/lib/packs/PackMan'
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ set, body, user, params }) => {
+        async ({set, body, user, params}) => {
             if (!user) {
-                set.status = 401;
+                set.status = 401
                 throw HTTPError.unauthorized({
                     summary: 'You must be logged in to validate pack theme content.',
-                });
+                })
             }
 
             // Verify pack exists and user is owner
-            await pack.requiresOwnership({ set, user, id: params.id });
+            if (!(await PackMan.hasPermission(user.sub, params.id, PackMan.PERMISSIONS.ManagePack))) return HTTPError.forbidden({
+                summary: 'Missing permission'
+            })
 
             try {
                 const result = validateThemeContent(
@@ -25,18 +27,18 @@ export default (app: YapockType) =>
                         css: body.css,
                     },
                     true,
-                );
+                )
 
                 return {
                     valid: true,
                     sanitized: result,
-                };
+                }
             } catch (error: any) {
-                set.status = 400;
+                set.status = 400
                 throw HTTPError.badRequest({
                     summary: 'Theme content validation failed.',
                     detail: error.message,
-                });
+                })
             }
         },
         {

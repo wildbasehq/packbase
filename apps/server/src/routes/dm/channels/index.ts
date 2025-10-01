@@ -1,9 +1,9 @@
-import { t } from 'elysia';
-import { YapockType } from '@/index';
+import {t} from 'elysia';
+import {YapockType} from '@/index';
 import prisma from '@/db/prisma';
-import { HTTPError } from '@/lib/HTTPError';
+import {HTTPError} from '@/lib/HTTPError';
 import mapChannel from '@/utils/channels/mapChannel';
-import { CommonErrorResponses, DM_ERROR_CODES } from '@/utils/dm/errors';
+import {CommonErrorResponses, DM_ERROR_CODES} from '@/utils/dm/errors';
 
 // Channel response schemas
 const RecipientResponse = t.Object({
@@ -38,7 +38,7 @@ export default (app: YapockType) =>
         // GET /dm/channels - list all DM channels for current user
         .get(
             '',
-            async ({ set, user }) => {
+            async ({set, user}) => {
                 if (!user?.sub) {
                     set.status = 401;
                     throw HTTPError.unauthorized({
@@ -48,8 +48,8 @@ export default (app: YapockType) =>
                 }
 
                 const links = await prisma.dm_participants.findMany({
-                    where: { user_id: user.sub },
-                    select: { channel_id: true },
+                    where: {user_id: user.sub},
+                    select: {channel_id: true},
                 });
 
                 const result: any[] = [];
@@ -74,7 +74,7 @@ export default (app: YapockType) =>
         // POST /dm/channels - create or return an existing 1:1 channel
         .post(
             '',
-            async ({ set, user, body }) => {
+            async ({set, user, body}) => {
                 if (!user?.sub) {
                     set.status = 401;
                     throw HTTPError.unauthorized({
@@ -83,7 +83,7 @@ export default (app: YapockType) =>
                     });
                 }
 
-                const { userId } = body as { userId?: string };
+                const {userId} = body as { userId?: string };
                 if (!userId) {
                     set.status = 400;
                     throw HTTPError.badRequest({
@@ -98,8 +98,8 @@ export default (app: YapockType) =>
                     const selfExisting = await prisma.dm_channels.findFirst({
                         where: {
                             dm_participants: {
-                                some: { user_id: user.sub },
-                                every: { user_id: user.sub }, // ensures only self is a participant
+                                some: {user_id: user.sub},
+                                every: {user_id: user.sub}, // ensures only self is a participant
                             },
                         },
                     });
@@ -107,43 +107,45 @@ export default (app: YapockType) =>
                     if (selfExisting) {
                         channelId = selfExisting.id;
                     } else {
-                        const created = await prisma.dm_channels.create({ data: {} });
+                        const created = await prisma.dm_channels.create({data: {}});
                         channelId = created.id;
-                        await prisma.dm_participants.create({ data: { channel_id: channelId, user_id: user.sub } });
+                        await prisma.dm_participants.create({data: {channel_id: channelId, user_id: user.sub}});
                     }
                 } else {
                     // Find existing channel shared by both users
-                    const myLinks = await prisma.dm_participants.findMany({ where: { user_id: user.sub }, select: { channel_id: true } });
+                    const myLinks = await prisma.dm_participants.findMany({
+                        where: {user_id: user.sub},
+                        select: {channel_id: true}
+                    });
                     const myChannelIds = myLinks.map((l) => l.channel_id);
 
                     const existing = await prisma.dm_participants.findFirst({
-                        where: { user_id: userId, channel_id: { in: myChannelIds } },
-                        select: { channel_id: true },
+                        where: {user_id: userId, channel_id: {in: myChannelIds}},
+                        select: {channel_id: true},
                     });
 
                     if (existing?.channel_id) {
                         channelId = existing.channel_id;
                     } else {
-                        const created = await prisma.dm_channels.create({ data: {} });
+                        const created = await prisma.dm_channels.create({data: {}});
                         channelId = created.id;
                         await prisma.dm_participants.createMany({
                             data: [
-                                { channel_id: channelId, user_id: user.sub },
-                                { channel_id: channelId, user_id: userId },
+                                {channel_id: channelId, user_id: user.sub},
+                                {channel_id: channelId, user_id: userId},
                             ],
                         });
                     }
                 }
 
-                const payload = await mapChannel(channelId, user.sub);
-                return payload;
+                return await mapChannel(channelId, user.sub);
             },
             {
                 detail: {
                     description: 'Create or return an existing DM channel with userId',
                     tags: ['DM'],
                 },
-                body: t.Object({ userId: t.String() }),
+                body: t.Object({userId: t.String()}),
                 response: {
                     200: ChannelResponse,
                     400: CommonErrorResponses[400],

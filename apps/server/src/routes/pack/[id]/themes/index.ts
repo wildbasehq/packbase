@@ -1,45 +1,44 @@
-import { YapockType } from '@/index';
-import { HTTPError } from '@/lib/HTTPError';
-import validateThemeContent from '@/lib/themes/validateThemeContent';
-import { PackTheme, PackThemesList, CreatePackTheme } from '@/models/pack-themes.model';
-import { t } from 'elysia';
-import prisma from '@/db/prisma';
-import { pack } from '@/lib/packs/permissions';
-import { getPack } from '../index';
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import validateThemeContent from '@/lib/themes/validateThemeContent'
+import {CreatePackTheme, PackTheme, PackThemesList} from '@/models/pack-themes.model'
+import {t} from 'elysia'
+import prisma from '@/db/prisma'
+import PackMan from '@/lib/packs/PackMan'
 
 export default (app: YapockType) =>
     app
         // Get all themes for a specific pack (owner only)
         .get(
             '',
-            async ({ set, user, params }) => {
+            async ({set, user, params}) => {
                 if (!user) {
-                    set.status = 401;
+                    set.status = 401
                     throw HTTPError.unauthorized({
                         summary: 'You must be logged in to access pack themes.',
-                    });
+                    })
                 }
 
                 // Verify pack exists and user is owner
-                await pack.requiresOwnership({ set, user, id: params.id });
+                if (!(await PackMan.hasPermission(user.sub, params.id, PackMan.PERMISSIONS.ManagePack))) return HTTPError.forbidden({
+                    summary: 'Missing permission'
+                })
 
                 try {
-                    const data = await prisma.pack_themes.findMany({
+                    return await prisma.pack_themes.findMany({
                         where: {
                             pack_id: params.id,
                         },
                         orderBy: {
                             created_at: 'desc',
                         },
-                    });
-
-                    return data;
+                    })
                 } catch (error: any) {
-                    set.status = 500;
+                    set.status = 500
                     throw HTTPError.serverError({
                         summary: 'Failed to fetch pack themes.',
                         detail: error.message,
-                    });
+                    })
                 }
             },
             {
@@ -62,24 +61,26 @@ export default (app: YapockType) =>
         // Create a new theme for a pack (owner only)
         .post(
             '',
-            async ({ set, body, user, params }) => {
+            async ({set, body, user, params}) => {
                 if (!user) {
-                    set.status = 401;
+                    set.status = 401
                     throw HTTPError.unauthorized({
                         summary: 'You must be logged in to create a pack theme.',
-                    });
+                    })
                 }
 
                 // Verify pack exists and user is owner
-                await pack.requiresOwnership({ set, user, id: params.id });
+                if (!(await PackMan.hasPermission(user.sub, params.id, PackMan.PERMISSIONS.ManagePack))) return HTTPError.forbidden({
+                    summary: 'Missing permission'
+                })
 
                 // Validate and sanitize HTML and CSS
-                const { html: sanitizedHTML, css: sanitizedCSS } = validateThemeContent({
+                const {html: sanitizedHTML, css: sanitizedCSS} = validateThemeContent({
                     html: body.html,
                     css: body.css,
-                });
+                })
 
-                let data;
+                let data
                 try {
                     data = await prisma.pack_themes.create({
                         data: {
@@ -89,13 +90,13 @@ export default (app: YapockType) =>
                             css: sanitizedCSS,
                             is_active: body.is_active || false,
                         },
-                    });
+                    })
                 } catch (error: any) {
-                    set.status = 500;
+                    set.status = 500
                     throw HTTPError.serverError({
                         summary: 'Failed to create pack theme.',
                         detail: error.message,
-                    });
+                    })
                 }
 
                 // If this theme is set as active, deactivate all other themes for this pack
@@ -104,19 +105,19 @@ export default (app: YapockType) =>
                         await prisma.pack_themes.updateMany({
                             where: {
                                 pack_id: params.id,
-                                id: { not: data.id },
+                                id: {not: data.id},
                             },
                             data: {
                                 is_active: false,
                             },
-                        });
+                        })
                     } catch (error) {
                         // If there's an error deactivating other themes, we'll just continue
-                        console.error('Failed to deactivate other pack themes:', error);
+                        console.error('Failed to deactivate other pack themes:', error)
                     }
                 }
 
-                return data;
+                return data
             },
             {
                 params: t.Object({

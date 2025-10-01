@@ -99,34 +99,34 @@ describe('WorkerStore', () => {
         })
 
         test('should maintain separate caches for different jobs', async () => {
-            const job1Id = 'cache-job-1'
-            const job2Id = 'cache-job-2'
-            const data1 = {job: 1}
-            const data2 = {job: 2}
+            const jobOneID = 'cache-job-1'
+            const jobTwoID = 'cache-job-2'
+            const dataOne = {job: 1}
+            const dataTwo = {job: 2}
 
             // Store data for both jobs
             await Promise.all([
                 new Promise<void>(resolve => {
-                    WorkerStore.getState().enqueue(job1Id, async (cache) => {
-                        cache.replace(data1)
+                    WorkerStore.getState().enqueue(jobOneID, async (cache) => {
+                        cache.replace(dataOne)
                         resolve()
                     })
                     WorkerStore.getState().process()
                 }),
                 new Promise<void>(resolve => {
-                    WorkerStore.getState().enqueue(job2Id, async (cache) => {
-                        cache.replace(data2)
+                    WorkerStore.getState().enqueue(jobTwoID, async (cache) => {
+                        cache.replace(dataTwo)
                         resolve()
                     })
                     WorkerStore.getState().process()
                 })
             ])
 
-            const cache1 = WorkerStore.getState().getCachedValue(job1Id)
-            const cache2 = WorkerStore.getState().getCachedValue(job2Id)
+            const cacheOne = WorkerStore.getState().getCachedValue(jobOneID)
+            const cacheTwo = WorkerStore.getState().getCachedValue(jobTwoID)
 
-            expect(cache1).toEqual(data1)
-            expect(cache2).toEqual(data2)
+            expect(cacheOne).toEqual(dataOne)
+            expect(cacheTwo).toEqual(dataTwo)
         })
     })
 

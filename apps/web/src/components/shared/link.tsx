@@ -3,9 +3,9 @@
  */
 
 import * as Headless from '@headlessui/react'
-import { ComponentPropsWithoutRef, ForwardedRef, forwardRef } from 'react'
-import clsx from 'clsx'
-import { Link as RouterLink } from 'wouter'
+import {ComponentPropsWithoutRef, ForwardedRef, forwardRef} from 'react'
+import {Link as RouterLink} from 'wouter'
+import {cn} from "@/lib";
 
 const Link = forwardRef(function Link(
     props: Omit<ComponentPropsWithoutRef<'a'>, 'href'> & {
@@ -15,7 +15,7 @@ const Link = forwardRef(function Link(
     },
     ref: ForwardedRef<HTMLAnchorElement>
 ) {
-    const shallowProps = { ...props }
+    const shallowProps = {...props}
     const href = shallowProps.href || shallowProps.to
     delete shallowProps.href
     delete shallowProps.to
@@ -29,7 +29,7 @@ const Link = forwardRef(function Link(
                 <a
                     {...shallowProps}
                     href={href}
-                    className={clsx(props.className, 'text-indigo-500')}
+                    className={props.className}
                     ref={ref}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -39,7 +39,7 @@ const Link = forwardRef(function Link(
                 <RouterLink
                     {...shallowProps}
                     to={shallowProps.nref || `~${href}`}
-                    className={clsx('text-indigo-500', props.className)}
+                    className={cn('text-indigo-500', props.className)}
                     ref={ref}
                 />
             )}

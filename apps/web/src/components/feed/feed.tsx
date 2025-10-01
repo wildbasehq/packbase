@@ -3,131 +3,82 @@
  */
 
 // src/components/feed/feed.tsx
-import { useEffect, useRef } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useSearchParams } from 'wouter'
-import { useSession } from '@clerk/clerk-react'
-import { useResourceStore, useUIStore } from '@/lib/state'
-import { setToken } from '@/lib'
-import { FeedProps } from './types/feed'
-import { fetchFeedPage, fetchSearchPage, FeedPageResult } from './fetchers'
-import FeedList from './feed-list'
-import FeedLoading from './feed-loading'
-import FeedMaintenance from './feed-maintenance'
-import FeedError from './feed-error'
-import useWindowSize from '@/lib/hooks/use-window-size.ts'
-import { FloatingCompose } from './index'
-import { useLocalStorage } from 'usehooks-ts'
+import {useEffect} from 'react'
+import {useSession} from '@clerk/clerk-react'
+import {useResourceStore, useUIStore} from '@/lib/state'
+import {FeedProps} from './types/feed'
+import {FeedError, FeedList, FeedLoading, FeedMaintenance, FloatingCompose} from '.'
+import {useLocalStorage} from 'usehooks-ts'
+import {useFeedPagination} from './hooks/use-feed-pagination'
+import {useFeedQuery} from './hooks/use-feed-query'
+import {useFeedTitle} from './hooks/use-feed-title'
+import {useFeedHandlers} from './hooks/use-feed-handlers'
 
 export default function Feed({
-    packID = '00000000-0000-0000-0000-000000000000',
-    channelID,
-    feedQueryOverride,
-    titleOverride,
-    dontShowCompose,
-}: FeedProps) {
-    const { maintenance } = useUIStore()
-    const { currentResource } = useResourceStore()
-    const { session, isSignedIn } = useSession()
-    const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
-    const queryClient = useQueryClient()
-    const prevPackIDRef = useRef(packID)
-    const prevChannelIDRef = useRef(channelID)
+                                 packID = '00000000-0000-0000-0000-000000000000',
+                                 channelID,
+                                 feedQueryOverride,
+                                 titleOverride,
+                                 dontShowCompose,
+                             }: FeedProps) {
+    const {maintenance} = useUIStore()
+    const {currentResource} = useResourceStore()
+    const {isSignedIn} = useSession()
+    const [, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
 
-    const { isMobile } = useWindowSize()
+    const {page, setPage} = useFeedPagination({packID, channelID})
 
-    // Read page from URL
-    const [searchParams, setSearchParams] = useSearchParams()
-    const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
-    const setPage = (newPage: number) => setSearchParams({ page: newPage.toString() })
-
-    // Determine if this is a search or feed query
-    const isSearch = !!channelID || !!feedQueryOverride
-    const queryKey = isSearch ? ['search', channelID, feedQueryOverride, page] : ['feed', packID, page]
-
-    // Single query for the current page
-    const { data, isLoading, error } = useQuery<FeedPageResult>({
-        queryKey,
-        queryFn: async () => {
-            if (isSearch) {
-                return fetchSearchPage({
-                    channelID: channelID!,
-                    q: feedQueryOverride,
-                    page,
-                })
-            } else {
-                return fetchFeedPage({
-                    packID,
-                    page,
-                })
-            }
-        },
-        enabled: isSignedIn,
-        placeholderData: previousData => previousData,
-        staleTime: 5 * 60 * 1000, // 5 minutes
+    const {posts, hasMore, isLoading, error, isSearch, queryKey} = useFeedQuery({
+        packID,
+        channelID,
+        feedQueryOverride,
+        page,
+        isSignedIn,
     })
 
-    const posts = data?.posts || []
-    const hasMore = data?.hasMore || false
+    useFeedTitle({
+        page,
+        titleOverride,
+        currentResourceDisplayName: currentResource?.display_name,
+        currentResourceId: currentResource?.id,
+    })
+
+    const {handleDeletePost, handleLoadMore, handleComposeRefresh} = useFeedHandlers({
+        queryKey,
+        isSearch,
+        channelID,
+        feedQueryOverride,
+        packID,
+        setPage,
+    })
 
     useEffect(() => {
-        document.title = `${titleOverride || currentResource?.display_name || (currentResource?.id?.startsWith('0000') ? 'Home' : 'Packbase')} • P${page}`
-    }, [page, titleOverride, currentResource])
-
-    // Reset to page 1 when packID or channelID changes
-    useEffect(() => {
-        if (packID !== prevPackIDRef.current || channelID !== prevChannelIDRef.current) {
-            prevPackIDRef.current = packID
-            prevChannelIDRef.current = channelID
-            setPage(1)
-        }
-    }, [packID, channelID, setPage])
-
-    useEffect(() => {
-        if (dontShowCompose) {
+        const shouldCollapseSidebar = dontShowCompose === true
+        if (shouldCollapseSidebar) {
             setUserSidebarCollapsed(false)
         }
-    }, [dontShowCompose])
-
-    // Handle post deletion
-    const handleDeletePost = (_postId: string) => {
-        // Invalidate current page query to refresh
-        queryClient.invalidateQueries({ queryKey })
-    }
-
-    // Handle load more for pagination
-    const handleLoadMore = async (requestedPage: number): Promise<void> => {
-        // Navigate to the requested page
-        setPage(requestedPage)
-    }
-
-    // Handle compose refresh - invalidate base query keys
-    const handleComposeRefresh = async (): Promise<void> => {
-        const baseKey = isSearch ? ['search', channelID, feedQueryOverride] : ['feed', packID]
-        await queryClient.invalidateQueries({ queryKey: baseKey, exact: false })
-    }
+    }, [dontShowCompose, setUserSidebarCollapsed])
 
     if (maintenance) {
-        return <FeedMaintenance message={maintenance} />
+        return <FeedMaintenance message={maintenance}/>
     }
 
     if (error) {
-        return <FeedError error={error as Error} />
+        return <FeedError error={error as Error}/>
     }
 
-    let content
-    if (isLoading && page === 1) {
-        content = <FeedLoading isMasonry={false} message="Loading howls..." />
-    } else {
-        content = <FeedList posts={posts} hasMore={hasMore} onLoadMore={handleLoadMore} onPostDelete={handleDeletePost} />
-    }
+    const isFirstPageLoading = isLoading && page === 1
+    const shouldShowCompose = dontShowCompose !== true
 
     return (
         <div className="relative pb-20 max-w-3xl space-y-4 mx-auto">
-            {!dontShowCompose && <FloatingCompose onShouldFeedRefresh={handleComposeRefresh} />}
+            {shouldShowCompose && <FloatingCompose onShouldFeedRefresh={handleComposeRefresh}/>}
 
-            {/* Main content area */}
-            {content}
+            {isFirstPageLoading ? (
+                <FeedLoading isMasonry={false} message="Loading howls..."/>
+            ) : (
+                <FeedList posts={posts} hasMore={hasMore} onLoadMore={handleLoadMore} onPostDelete={handleDeletePost}/>
+            )}
         </div>
     )
 }

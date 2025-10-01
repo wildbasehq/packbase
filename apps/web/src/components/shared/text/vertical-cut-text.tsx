@@ -1,12 +1,12 @@
 'use client'
 
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { AnimationOptions, motion } from 'motion/react'
+import {forwardRef, ReactNode, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react'
+import {AnimationOptions, motion} from 'motion/react'
 
-import { cn } from '@/lib/utils'
+import {cn} from '@/lib/utils'
 
 interface TextProps {
-    children: React.ReactNode
+    children: ReactNode
     reverse?: boolean
     transition?: AnimationOptions
     splitBy?: 'words' | 'characters' | 'lines' | string
@@ -63,8 +63,8 @@ const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
         // handy function to split text into characters with support for unicode and emojis
         const splitIntoCharacters = (text: string): string[] => {
             if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
-                const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' })
-                return Array.from(segmenter.segment(text), ({ segment }) => segment)
+                const segmenter = new Intl.Segmenter('en', {granularity: 'grapheme'})
+                return Array.from(segmenter.segment(text), ({segment}) => segment)
             }
             // Fallback for browsers that don't support Intl.Segmenter
             return Array.from(text)
@@ -88,9 +88,9 @@ const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
                 const total =
                     splitBy === 'characters'
                         ? elements.reduce(
-                              (acc, word) => acc + (typeof word === 'string' ? 1 : word.characters.length + (word.needsSpace ? 1 : 0)),
-                              0
-                          )
+                            (acc, word) => acc + (typeof word === 'string' ? 1 : word.characters.length + (word.needsSpace ? 1 : 0)),
+                            0
+                        )
                         : elements.length
                 if (staggerFrom === 'first') return index * staggerDuration
                 if (staggerFrom === 'last') return (total - 1 - index) * staggerDuration
@@ -126,7 +126,7 @@ const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
         }, [autoStart])
 
         const variants = {
-            hidden: { y: reverse ? '-100%' : '100%' },
+            hidden: {y: reverse ? '-100%' : '100%'},
             visible: (i: number) => ({
                 y: 0,
                 transition: {
@@ -146,18 +146,20 @@ const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
                 <span className="sr-only">{text}</span>
 
                 {(splitBy === 'characters'
-                    ? (elements as WordObject[])
-                    : (elements as string[]).map((el, i) => ({
-                          characters: [el],
-                          needsSpace: i !== elements.length - 1,
-                      }))
+                        ? (elements as WordObject[])
+                        : (elements as string[]).map((el, i) => ({
+                            characters: [el],
+                            needsSpace: i !== elements.length - 1,
+                        }))
                 ).map((wordObj, wordIndex, array) => {
                     const previousCharsCount = array.slice(0, wordIndex).reduce((sum, word) => sum + word.characters.length, 0)
 
                     return (
-                        <span key={wordIndex} aria-hidden="true" className={cn('inline-flex overflow-hidden', wordLevelClassName)}>
+                        <span key={wordIndex} aria-hidden="true"
+                              className={cn('inline-flex overflow-hidden', wordLevelClassName)}>
                             {wordObj.characters.map((char, charIndex) => (
-                                <span className={cn(elementLevelClassName, 'whitespace-normal relative')} key={charIndex}>
+                                <span className={cn(elementLevelClassName, 'whitespace-normal relative')}
+                                      key={charIndex}>
                                     <motion.span
                                         custom={previousCharsCount + charIndex}
                                         initial="hidden"

@@ -2,40 +2,51 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { ExpandingArrow, LoadingCircle } from '@/components/icons'
-import { Heading, Text } from '@/components/shared/text'
+import {ExpandingArrow, LoadingCircle} from '@/components/icons'
+import {Heading, Text} from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 import useComponentVisible from '@/lib/hooks/use-component-visible'
-import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
-import useSound from 'use-sound'
-import './resource-switcher.component.css'
-import { Dropdown, DropdownHeader, DropdownMenu } from '@/components/shared/dropdown'
-import { MenuButton, MenuItem } from '@headlessui/react'
+import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
+import {Dropdown, DropdownHeader, DropdownMenu} from '@/components/shared/dropdown'
+import {MenuButton, MenuItem} from '@headlessui/react'
 import LogoutIcon from '@/components/icons/logout'
-import { vg } from '@/lib/api'
-import { toast } from 'sonner'
-import { useModal } from '@/components/modal/provider'
-import { Button } from '@/components/shared/button'
-import { ClipboardIcon, Cog6ToothIcon, UserGroupIcon } from '@heroicons/react/20/solid'
-import { Avatar } from '@/components/shared/avatar'
+import {vg} from '@/lib/api'
+import {toast} from 'sonner'
+import {useModal} from '@/components/modal/provider'
+import {Button} from '@/components/shared/button'
+import {ClipboardIcon, Cog6ToothIcon, UserGroupIcon} from '@heroicons/react/20/solid'
+import {Avatar} from '@/components/shared/avatar'
 import ResourceSettingsGeneral from './pages/general'
 import ResourceSettingsMembers from '@/components/layout/resource-switcher/pages/members.tsx'
-import { VerifiedBadge } from '@/components/layout/resource-switcher/pack-badge.tsx'
+import {VerifiedBadge} from '@/components/layout/resource-switcher/pack-badge.tsx'
 import PagedModal from '@/components/shared/paged-modal'
 import ResourceSettingsTheme from '@/components/layout/resource-switcher/pages/theme.tsx'
-import { SwatchIcon } from '@heroicons/react/16/solid'
-import { useContentFrame } from '@/src/components'
-import ServerConfigRender, { decideCategoryDescription } from '@/components/shared/input/server-config-render.tsx'
+import {SwatchIcon} from '@heroicons/react/16/solid'
+import {useContentFrame} from '@/src/components'
+import ServerConfigRender, {decideCategoryDescription} from '@/components/shared/input/server-config-render.tsx'
+import {Activity} from "react";
+import {isVisible} from "@/lib";
 
 export default function ResourceSwitcher() {
-    const { currentResource } = useResourceStore()
+    const {currentResource} = useResourceStore()
 
-    const { loading, connecting } = useUIStore()
-    const { ref } = useComponentVisible()
+    const {loading, connecting} = useUIStore()
+    const {ref} = useComponentVisible()
 
     return (
         <>
-            {!connecting ? (
+            <Activity mode={isVisible(connecting)}>
+                <div className="flex cursor-pointer select-none flex-row items-center justify-between">
+                    <span className="z-10 flex w-full items-center justify-between">
+                        <div className="flex h-10 items-center space-x-2">
+                            <LoadingCircle/>
+                            <Text className="font-bold">Connecting</Text>
+                        </div>
+                    </span>
+                </div>
+            </Activity>
+
+            <Activity mode={isVisible(!connecting)}>
                 <div
                     ref={ref}
                     className={`group flex select-none flex-row items-center justify-between ${loading ? 'cursor-no-drop!' : ''}`}
@@ -57,37 +68,32 @@ export default function ResourceSwitcher() {
                         >
                             <span className="z-10 flex w-full items-center justify-between">
                                 <div className="flex h-10 items-center space-x-2">
-                                    {(currentResource.verified || currentResource.standalone || currentResource.slug === 'support') && (
-                                        <VerifiedBadge tooltipText="This is an official pack which represents the creator or organisation behind it." />
-                                    )}
+                                    <Activity
+                                        mode={isVisible((currentResource.verified || currentResource.standalone || currentResource.slug === 'support'))}>
+                                        <VerifiedBadge
+                                            tooltipText="This is an official pack which represents the creator or organisation behind it."/>
+                                    </Activity>
+
                                     <Text className="font-bold">{currentResource.display_name}</Text>
                                 </div>
-                                <ExpandingArrow className="right-0 -mt-1 h-6 w-6 rotate-90 text-muted-foreground transition-all dark:text-white" />
+                                <ExpandingArrow
+                                    className="right-0 -mt-1 h-6 w-6 rotate-90 text-muted-foreground transition-all dark:text-white"/>
                             </span>
                         </MenuButton>
                         <DropdownMenu className="z-50 -mt-16 rounded-tl-none rounded-tr-none p-0!">
-                            <MenuItem>{({ close }) => <ResourceSwitcherMenu close={close} />}</MenuItem>
+                            <MenuItem>{({close}) => <ResourceSwitcherMenu close={close}/>}</MenuItem>
                         </DropdownMenu>
                     </Dropdown>
                 </div>
-            ) : (
-                <div className="flex cursor-pointer select-none flex-row items-center justify-between">
-                    <span className="z-10 flex w-full items-center justify-between">
-                        <div className="flex h-10 items-center space-x-2">
-                            <LoadingCircle />
-                            <Text className="font-bold">Connecting</Text>
-                        </div>
-                    </span>
-                </div>
-            )}
+            </Activity>
         </>
     )
 }
 
-function ResourceSwitcherMenu({ close }: { close: () => void }) {
-    const { currentResource: pack } = useResourceStore()
-    const { user } = useUserAccountStore()
-    const { show } = useModal()
+function ResourceSwitcherMenu({close}: { close: () => void }) {
+    const {currentResource: pack} = useResourceStore()
+    const {user} = useUserAccountStore()
+    const {show} = useModal()
 
     return (
         <DropdownHeader className="flex w-96 flex-col p-0!">
@@ -98,11 +104,11 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
                         onClick={() => {
                             if (user.id === pack.owner_id) {
                                 close()
-                                show(<ResourceSettingsModal />)
+                                show(<ResourceSettingsModal/>)
                             }
                         }}
                     >
-                        <UserAvatar user={pack} size="lg" />
+                        <UserAvatar user={pack} size="lg"/>
                         <div className="ml-3 grow">
                             <Heading>{pack.display_name || pack.slug}</Heading>
                             <Text alt>{pack.slug}</Text>
@@ -110,8 +116,8 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
                         {user.id === pack.owner_id && (
                             <div>
                                 {/* mt-1 to offset button */}
-                                <Button variant="ghost" size="icon" className="mt-1 h-5 w-5 cursor-pointer">
-                                    <Cog6ToothIcon className="h-5 w-5" />
+                                <Button plain className="mt-1 h-5 w-5 cursor-pointer">
+                                    <Cog6ToothIcon className="h-5 w-5"/>
                                 </Button>
                             </div>
                         )}
@@ -123,7 +129,7 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
                 <div
                     className="group inline-flex w-full cursor-pointer items-center justify-start gap-4 rounded px-4 py-3 ring-destructive/25 transition-all hover:bg-destructive/75 hover:ring-2"
                     onClick={() => {
-                        vg.pack({ id: pack.id })
+                        vg.pack({id: pack.id})
                             .join.delete()
                             .then(() => {
                                 window.location.reload()
@@ -133,7 +139,7 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
                             })
                     }}
                 >
-                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white!" />{' '}
+                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white!"/>{' '}
                     <Text alt className="group-hover:text-white!">
                         Leave pack
                     </Text>
@@ -144,8 +150,8 @@ function ResourceSwitcherMenu({ close }: { close: () => void }) {
 }
 
 function ResourceSettingsModal() {
-    const { currentResource } = useResourceStore()
-    const { data } = useContentFrame('get', `pack/${currentResource.id}/settings`)
+    const {currentResource} = useResourceStore()
+    const {data} = useContentFrame('get', `pack/${currentResource.id}/settings`)
     // Get unique categories that are ONLY strings.
     const packSettingsCategories =
         data?.reduce(
@@ -179,21 +185,22 @@ function ResourceSettingsModal() {
 
     return (
         <PagedModal footer={ResourceProfileFooter} className="h-[50vh] min-w-(--container-6xl) max-w-6xl">
-            <PagedModal.Page id="general" title="General Information" description="Change pack information" icon={ClipboardIcon}>
+            <PagedModal.Page id="general" title="General Information" description="Change pack information"
+                             icon={ClipboardIcon}>
                 <PagedModal.Body>
-                    <ResourceSettingsGeneral />
+                    <ResourceSettingsGeneral/>
                 </PagedModal.Body>
             </PagedModal.Page>
 
             <PagedModal.Page id="members" title="Members" description="Manage pack members" icon={UserGroupIcon}>
                 <PagedModal.Body>
-                    <ResourceSettingsMembers />
+                    <ResourceSettingsMembers/>
                 </PagedModal.Body>
             </PagedModal.Page>
 
             <PagedModal.Page id="theme" title="Theme" icon={SwatchIcon}>
                 <PagedModal.Body>
-                    <ResourceSettingsTheme />
+                    <ResourceSettingsTheme/>
                 </PagedModal.Body>
             </PagedModal.Page>
 
@@ -205,7 +212,7 @@ function ResourceSettingsModal() {
                     icon={Cog6ToothIcon}
                 >
                     <PagedModal.Body>
-                        <ServerConfigRender config={packSettingsCategories[category]} />
+                        <ServerConfigRender config={packSettingsCategories[category]}/>
                     </PagedModal.Body>
                 </PagedModal.Page>
             ))}

@@ -3,26 +3,24 @@
  */
 
 // src/components/feed/thread-post.tsx
-import { useState } from 'react'
-import { ChatBubbleLeftIcon, ChevronRightIcon, HeartIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { CheckIcon, FaceSmileIcon, XMarkIcon } from '@heroicons/react/16/solid'
-import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
-import { toast } from 'sonner'
-import { vg } from '@/lib/api'
+import {FormEvent, useState} from 'react'
+import {ChatBubbleLeftIcon, ChevronRightIcon, TrashIcon} from '@heroicons/react/24/outline'
+import {UserGroupIcon} from '@heroicons/react/16/solid'
+import {toast} from 'sonner'
+import {vg} from '@/lib/api'
 import UserAvatar from '@/components/shared/user/avatar'
 import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
-import MediaGallery from './media-gallery'
-import { UserProfileBasic } from '@/lib/defs/user'
-import { formatRelativeTime } from '@/lib/utils/date'
-import { Text } from '@/components/shared/text.tsx'
-import { AvatarButton, FeedPostData, LoadingCircle } from '@/src/components'
-import { Button } from '@/components/shared/experimental-button-rework'
-import { UserGroupIcon } from '@heroicons/react/16/solid'
-import { BentoGenericUnlockableBadge, BentoStaffBadge } from '@/lib/utils/pak.tsx'
+import {MediaGallery} from '.'
+import {UserProfileBasic} from '@/lib/defs/user'
+import {formatRelativeTime} from '@/lib/utils/date'
+import {Text} from '@/components/shared/text.tsx'
+import {AvatarButton, FeedPostData, LoadingCircle} from '@/src/components'
+import {Button} from '@/components/shared'
+import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak.tsx'
 import Card from '@/components/shared/card.tsx'
 import UserInfoCol from '@/components/shared/user/info-col.tsx'
-import { ServerReactionStack } from '../ui/reaction-stack'
+import {ServerReactionStack} from '../ui/reaction-stack'
 
 interface ThreadPostProps {
     post: FeedPostData
@@ -33,7 +31,14 @@ interface ThreadPostProps {
     depth?: number
 }
 
-export default function ThreadPost({ post, signedInUser, onDelete, onComment, isRoot = true, depth = 0 }: ThreadPostProps) {
+export default function ThreadPost({
+                                       post,
+                                       signedInUser,
+                                       onDelete,
+                                       onComment,
+                                       isRoot = true,
+                                       depth = 0
+                                   }: ThreadPostProps) {
     const [showReplyForm, setShowReplyForm] = useState(false)
     const [replyText, setReplyText] = useState('')
     const [isSubmittingReply, setIsSubmittingReply] = useState(false)
@@ -45,14 +50,14 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
     // Thread line styling
     const threadLineClass = depth > 0 ? 'before:absolute before:left-16 before:top-0 before:bottom-0 before:w-px before:bg-border' : ''
 
-    const handleSubmitReply = async (e: React.FormEvent) => {
+    const handleSubmitReply = async (e: FormEvent) => {
         e.preventDefault()
         if (!replyText.trim() || isSubmittingReply || !signedInUser) return
 
         setIsSubmittingReply(true)
 
         try {
-            const { data, error } = await vg.howl({ id: post.id }).comment.post({
+            const {data, error} = await vg.howl({id: post.id}).comment.post({
                 body: replyText.trim(),
             })
 
@@ -84,12 +89,12 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
     }
 
     return (
-        <Card className={`relative !border-0 !max-w-full ${!isRoot ? '!pl-12' : ''} ${threadLineClass}`}>
-            <div className={`relative ${!isRoot ? 'pt-3' : ''}`}>
+        <Card className={`relative !border-0 !max-w-full ${(isRoot ? '' : '!pl-12')} ${threadLineClass}`}>
+            <div className={`relative ${(isRoot ? '' : 'pt-3')}`}>
                 <div className="flex gap-3">
                     {/* Avatar */}
                     <div className="flex-shrink-0 flex flex-col">
-                        <UserAvatar user={post.user} size={depth > 0 ? 'md' : 'lg'} className="rounded-full" />
+                        <UserAvatar user={post.user} size={depth > 0 ? 'md' : 'lg'} className="rounded-full"/>
                         {post.pack && post.pack?.slug !== 'universe' && (
                             <Link
                                 href={`/p/${post.pack.slug}`}
@@ -110,7 +115,8 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                     <div className="flex-1 min-w-0 -mt-1">
                         <div className="flex items-center justify-between mb-1">
                             <UserInfoCol user={post.user} className="flex items-baseline gap-2">
-                                <Link href={`/@${post.user?.username}/`} className="font-semibold hover:underline text-default">
+                                <Link href={`/@${post.user?.username}/`}
+                                      className="font-semibold hover:underline text-default">
                                     {post.user?.display_name || post.user?.username}
                                 </Link>
                                 {post.user?.type && (
@@ -136,14 +142,16 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                     ·
                                 </Text>
                                 <Link href={`/p/universe/all/${post.id}`}>
-                                    <time className="text-sm text-muted-foreground">{formatRelativeTime(post.created_at)}</time>
+                                    <time
+                                        className="text-sm text-muted-foreground">{formatRelativeTime(post.created_at)}</time>
                                 </Link>
                             </UserInfoCol>
 
                             {/* Delete button for author */}
                             {isAuthor && (
-                                <button onClick={onDelete} className="p-1 text-muted-foreground hover:text-red-500 transition-colors">
-                                    <TrashIcon className="w-4 h-4" />
+                                <button onClick={onDelete}
+                                        className="p-1 text-muted-foreground hover:text-red-500 transition-colors">
+                                    <TrashIcon className="w-4 h-4"/>
                                 </button>
                             )}
                         </div>
@@ -151,7 +159,8 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                         {post.pack && post.pack?.slug !== 'universe' && (
                             <Link href={`/p/${post.pack.slug}`}>
                                 <Text size="xs" alt className="mb-1 items-center flex">
-                                    <UserGroupIcon className="h-3 w-3 mr-1 inline-flex" /> howl'd in {post.pack.display_name}
+                                    <UserGroupIcon className="h-3 w-3 mr-1 inline-flex"/> howl'd
+                                    in {post.pack.display_name}
                                 </Text>
                             </Link>
                         )}
@@ -163,19 +172,20 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                         {/* Media */}
                         {post.assets && post.assets.length > 0 && (
                             <div className="mt-3 max-w-lg">
-                                <MediaGallery assets={post.assets} />
+                                <MediaGallery assets={post.assets}/>
                             </div>
                         )}
 
                         {isRoot && signedInUser && (
                             <div className="flex items-center gap-4 mt-3">
-                                <ServerReactionStack entityId={post.id} allowAdd={true} max={10} initialReactions={post.reactions} />
+                                <ServerReactionStack entityId={post.id} allowAdd={true} max={10}
+                                                     initialReactions={post.reactions}/>
 
                                 <button
                                     onClick={() => setShowReplyForm(!showReplyForm)}
                                     className="flex items-center gap-1 text-muted-foreground hover:text-indigo-500 transition-colors"
                                 >
-                                    <ChatBubbleLeftIcon className="w-5 h-5" />
+                                    <ChatBubbleLeftIcon className="w-5 h-5"/>
                                     <span className="text-sm">{post.comments?.length || 0}</span>
                                 </button>
                             </div>
@@ -193,8 +203,9 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                         className="flex-1 px-3 py-2 text-sm border border-neutral-200 dark:border-neutral-800 rounded-lg bg-white dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         disabled={isSubmittingReply}
                                     />
-                                    <Button type="submit" disabled={!replyText.trim() || isSubmittingReply} color="indigo">
-                                        {isSubmittingReply ? <LoadingCircle /> : 'Reply'}
+                                    <Button type="submit" disabled={!replyText.trim() || isSubmittingReply}
+                                            color="indigo">
+                                        {isSubmittingReply ? <LoadingCircle/> : 'Reply'}
                                     </Button>
                                 </div>
                             </form>
@@ -212,8 +223,7 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                                 signedInUser={signedInUser}
                                 onDelete={() => {
                                     // Handle nested comment deletion
-                                    const updatedComments = post.comments?.filter(c => c.id !== comment.id) || []
-                                    post.comments = updatedComments
+                                    post.comments = post.comments?.filter(c => c.id !== comment.id) || []
                                 }}
                                 onComment={onComment}
                                 isRoot={false}
@@ -224,8 +234,9 @@ export default function ThreadPost({ post, signedInUser, onDelete, onComment, is
                         {/* Show more comments indicator */}
                         {depth >= maxDepth - 1 && post.comments.length > 0 && (
                             <div className="ml-12 mt-3">
-                                <button className="flex items-center gap-1 text-sm text-indigo-500 hover:text-indigo-600">
-                                    <ChevronRightIcon className="w-4 h-4" />
+                                <button
+                                    className="flex items-center gap-1 text-sm text-indigo-500 hover:text-indigo-600">
+                                    <ChevronRightIcon className="w-4 h-4"/>
                                     Continue thread
                                 </button>
                             </div>

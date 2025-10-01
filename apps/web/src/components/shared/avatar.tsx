@@ -3,10 +3,10 @@
  */
 
 import * as Headless from '@headlessui/react'
-import clsx from 'clsx'
-import React, { forwardRef } from 'react'
-import { TouchTarget } from './button'
+import React, {forwardRef} from 'react'
+import {TouchTarget} from './button'
 import Link from './link'
+import {cn} from "@/lib";
 
 type AvatarProps = {
     src?: string | null
@@ -17,13 +17,13 @@ type AvatarProps = {
 }
 
 export function Avatar({
-    src = null,
-    square = false,
-    initials,
-    alt = '',
-    className,
-    ...props
-}: AvatarProps & React.ComponentPropsWithoutRef<'span'>) {
+                           src = null,
+                           square = false,
+                           initials,
+                           alt = '',
+                           className,
+                           ...props
+                       }: AvatarProps & React.ComponentPropsWithoutRef<'span'>) {
     // Random gradient from initial
     if (!src && initials) {
         const charCode = initials.charCodeAt(0)
@@ -38,7 +38,7 @@ export function Avatar({
         <span
             data-slot="avatar"
             {...props}
-            className={clsx(
+            className={cn(
                 className,
                 // Basic layout
                 'inline-grid shrink-0 align-middle [--avatar-radius:20%] [--ring-opacity:20%] *:col-start-1 *:row-start-1',
@@ -54,12 +54,13 @@ export function Avatar({
                     aria-hidden={alt ? undefined : 'true'}
                 >
                     {alt && <title>{alt}</title>}
-                    <text x="50%" y="50%" alignmentBaseline="middle" dominantBaseline="middle" textAnchor="middle" dy=".125em">
+                    <text x="50%" y="50%" alignmentBaseline="middle" dominantBaseline="middle" textAnchor="middle"
+                          dy=".125em">
                         {initials}
                     </text>
                 </svg>
             )}
-            {src && <img className="size-full aspect-square" src={src} alt={alt} />}
+            {src && <img className="size-full aspect-square" src={src} alt={alt}/>}
         </span>
     )
 }
@@ -75,7 +76,7 @@ export const AvatarButton = forwardRef(function AvatarButton(
     }: AvatarProps & (Omit<Headless.ButtonProps, 'as' | 'className'> | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'>),
     ref: React.ForwardedRef<HTMLElement>
 ) {
-    let classes = clsx(
+    let classes = cn(
         className,
         square ? 'rounded-[20%]' : 'rounded-full',
         'relative inline-grid focus:outline-hidden data-focus:outline-2 data-focus:outline-offset-2 data-focus:outline-blue-500',
@@ -85,14 +86,14 @@ export const AvatarButton = forwardRef(function AvatarButton(
     return 'href' in props ? (
         <Link {...props} className={classes} ref={ref as React.ForwardedRef<HTMLAnchorElement>}>
             <TouchTarget>
-                <Avatar src={src} square={square} initials={initials} alt={alt} />
+                <Avatar src={src} square={square} initials={initials} alt={alt}/>
             </TouchTarget>
         </Link>
     ) : (
         // @ts-ignore - bruh
         <Headless.Button {...props} className={classes} ref={ref}>
             <TouchTarget>
-                <Avatar src={src} square={square} initials={initials} alt={alt} />
+                <Avatar src={src} square={square} initials={initials} alt={alt}/>
             </TouchTarget>
         </Headless.Button>
     )

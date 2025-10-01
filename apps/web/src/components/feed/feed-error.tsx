@@ -1,13 +1,13 @@
 // src/components/feed/FeedError.tsx
-import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
-import { Heading, Text } from '@/components/shared/text'
-import { Button } from '@/components/shared/experimental-button-rework'
-import { FeedErrorProps } from './types/feed'
+import {ExclamationCircleIcon} from '@heroicons/react/24/outline'
+import {Heading, Text} from '@/components/shared/text'
+import {Button} from '@/components/shared'
+import {FeedErrorProps} from './types/feed'
 
 /**
  * Displays an error message when the feed fails to load
  */
-export default function FeedError({ error }: FeedErrorProps) {
+export default function FeedError({error}: FeedErrorProps) {
     const handleRefresh = () => {
         window.location.reload()
     }
@@ -15,8 +15,9 @@ export default function FeedError({ error }: FeedErrorProps) {
     return (
         <div className="flex flex-col items-center justify-center py-10">
             <div className="mx-auto max-w-lg text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20">
-                    <ExclamationCircleIcon className="h-8 w-8 text-red-500 dark:text-red-400" />
+                <div
+                    className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20">
+                    <ExclamationCircleIcon className="h-8 w-8 text-red-500 dark:text-red-400"/>
                 </div>
 
                 <Heading size="lg" className="mb-2 text-neutral-800 dark:text-neutral-200">

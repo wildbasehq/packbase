@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import React, {useEffect, useRef, useState} from 'react'
+import {motion} from 'motion/react'
 import GridLayout from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
-import { cn } from '@/lib/utils'
-import { Heading, Text } from '@/components/shared/text'
+import {cn} from '@/lib/utils'
+import {Heading, Text} from '@/components/shared/text'
 
 // Define types for our bento items
 export interface BentoItem {
@@ -25,7 +25,7 @@ interface BentoGridProps {
     className?: string
 }
 
-export const BentoGrid: React.FC<BentoGridProps> = ({ items, onLayoutChange, onRemoveItem, className }) => {
+export const BentoGrid: React.FC<BentoGridProps> = ({items, onLayoutChange, onRemoveItem, className}) => {
     // Convert items to layout format required by GridLayout
     const layout = items.map(item => ({
         i: item.id,
@@ -38,7 +38,6 @@ export const BentoGrid: React.FC<BentoGridProps> = ({ items, onLayoutChange, onR
     // State to track if an item is being dragged or resized
     const [isDragging, setIsDragging] = useState(false)
     const [isResizing, setIsResizing] = useState(false)
-    const [activeItemId, setActiveItemId] = useState<string | null>(null)
 
     // State to track container width for responsive behavior
     const [containerWidth, setContainerWidth] = useState(1200)
@@ -73,10 +72,11 @@ export const BentoGrid: React.FC<BentoGridProps> = ({ items, onLayoutChange, onR
 
     // Add effect to ensure placeholder styling is applied with Tailwind classes
     useEffect(() => {
+        let timer;
         // This effect runs when dragging or resizing starts/stops
         if (isDragging || isResizing) {
             // Small delay to ensure the placeholder is in the DOM
-            const timer = setTimeout(() => {
+            timer = setTimeout(() => {
                 // Find all placeholder elements and ensure they have our custom styling
                 const placeholders = document.querySelectorAll('.react-grid-item.react-grid-placeholder')
                 placeholders.forEach(placeholder => {
@@ -106,8 +106,8 @@ export const BentoGrid: React.FC<BentoGridProps> = ({ items, onLayoutChange, onR
                 })
             }, 0)
 
-            return () => clearTimeout(timer)
         }
+        return () => timer && clearTimeout(timer)
     }, [isDragging, isResizing])
 
     return (
@@ -160,8 +160,8 @@ export const BentoGrid: React.FC<BentoGridProps> = ({ items, onLayoutChange, onR
                                     'shadow-sm hover:shadow-md transition-shadow',
                                     item.color
                                 )}
-                                whileHover={{ scale: isDragging ? 1 : 1.02 }}
-                                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                                whileHover={{scale: isDragging ? 1 : 1.02}}
+                                transition={{type: 'spring', stiffness: 400, damping: 17}}
                             >
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="bento-item-drag-handle flex-1 h-8 cursor-move flex items-center">
@@ -172,8 +172,8 @@ export const BentoGrid: React.FC<BentoGridProps> = ({ items, onLayoutChange, onR
                                     {onRemoveItem && (
                                         <motion.button
                                             className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 hover:text-red-500"
-                                            whileHover={{ scale: 1.1 }}
-                                            whileTap={{ scale: 0.9 }}
+                                            whileHover={{scale: 1.1}}
+                                            whileTap={{scale: 0.9}}
                                             onClick={e => {
                                                 e.stopPropagation()
                                                 onRemoveItem(item.id)
@@ -218,7 +218,7 @@ export const BentoItemContent: React.FC<{
     description?: string
     icon?: React.ReactNode
     className?: string
-}> = ({ title, description, icon, className }) => {
+}> = ({title, description, icon, className}) => {
     return (
         <div className={cn('flex flex-col h-full', className)}>
             {icon && <div className="mb-2">{icon}</div>}

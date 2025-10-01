@@ -1,6 +1,7 @@
 // src/components/feed/types.ts
-import { UserProfileBasic } from '@/lib/defs/user'
-import { Reaction } from '@/components/ui/reaction-stack'
+import {UserProfileBasic} from '@/lib/defs/user'
+import {Reaction} from '@/components/ui/reaction-stack'
+import {Dispatch, SetStateAction} from "react";
 
 export interface Asset {
     type: 'image' | 'video'
@@ -39,6 +40,6 @@ export interface FeedPostData {
 
 export interface FeedPostProps {
     post: FeedPostData
-    postState?: [FeedPostData[], React.Dispatch<React.SetStateAction<FeedPostData[]>>]
+    postState?: [FeedPostData[], Dispatch<SetStateAction<FeedPostData[]>>]
     onDelete?: () => void
 }

@@ -1,8 +1,8 @@
 import useWindowSize from '@/lib/hooks/use-window-size'
-import clsx from 'clsx'
-import {AnimatePresence, motion} from 'framer-motion'
-import {useCallback, useEffect, useRef} from 'react'
+import {AnimatePresence, motion} from 'motion/react'
+import {ReactNode, useCallback, useEffect, useRef} from 'react'
 import Leaflet from './leaflet'
+import {cn} from "@/lib";
 
 export default function Modal({
                                   children,
@@ -10,7 +10,7 @@ export default function Modal({
                                   setShowModal,
                                   className,
                               }: {
-    children: React.ReactNode
+    children: ReactNode
     showModal: boolean
     setShowModal: any
     maxWidth?: boolean
@@ -54,13 +54,14 @@ export default function Modal({
                                     }
                                 }}
                             >
-                                <div className={clsx(className, `max-h-full overflow-auto bg-card shadow-xl md:rounded-2xl md:border`)}>
+                                <div
+                                    className={cn(className, `max-h-full overflow-auto bg-card shadow-xl md:rounded-2xl md:border`)}>
                                     {children}
                                 </div>
                             </motion.div>
                             <motion.div
                                 key="desktop-backdrop"
-                                className="fixed inset-0 z-40 bg-gray-100/10 backdrop-blur-sm"
+                                className="fixed inset-0 z-[45] bg-gray-100/10 backdrop-blur-sm"
                                 initial={{opacity: 0}}
                                 animate={{opacity: 1}}
                                 exit={{opacity: 0}}

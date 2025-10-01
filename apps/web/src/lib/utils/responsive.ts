@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 
 // Breakpoint values from the spacing.css file
 const Breakpoints = {
@@ -51,18 +51,24 @@ export function useActiveBreakpoint(): Breakpoint {
         const checkBreakpoint = () => {
             const width = window.innerWidth
 
-            if (width >= Breakpoints['2xl']) {
-                setActiveBreakpoint('2xl')
-            } else if (width >= Breakpoints.xl) {
-                setActiveBreakpoint('xl')
-            } else if (width >= Breakpoints.lg) {
-                setActiveBreakpoint('lg')
-            } else if (width >= Breakpoints.md) {
-                setActiveBreakpoint('md')
-            } else if (width >= Breakpoints.sm) {
-                setActiveBreakpoint('sm')
-            } else {
-                setActiveBreakpoint('xs')
+            switch (true) {
+                case width >= Breakpoints['2xl']:
+                    setActiveBreakpoint('2xl')
+                    break
+                case width >= Breakpoints.xl:
+                    setActiveBreakpoint('xl')
+                    break
+                case width >= Breakpoints.lg:
+                    setActiveBreakpoint('lg')
+                    break
+                case width >= Breakpoints.md:
+                    setActiveBreakpoint('md')
+                    break
+                case width >= Breakpoints.sm:
+                    setActiveBreakpoint('sm')
+                    break
+                default:
+                    setActiveBreakpoint('xs')
             }
         }
 
@@ -137,4 +143,4 @@ export function useResponsiveValue<T>(values: Partial<Record<Breakpoint, T>> & {
 }
 
 // Export breakpoints for use in other files
-export { Breakpoints }
+export {Breakpoints}

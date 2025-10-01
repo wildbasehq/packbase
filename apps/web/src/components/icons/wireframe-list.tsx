@@ -1,7 +1,7 @@
 import {JSX} from 'react'
 
 export default function WireframeList({...props}: {
-    [key: string]: any;
+    [_: string]: any;
 }): JSX.Element {
     return (
         <svg viewBox="0 0 512 512" fill="none" {...props}>
@@ -29,7 +29,8 @@ export default function WireframeList({...props}: {
                                     <stop offset="0" stopColor="#60a5fa"/>
                                     <stop offset="1" stopColor="#34d399"/>
                                 </linearGradient>
-                                <pattern id="c" width="34" height="24" x="15" y="172" data-loading="false" patternUnits="userSpaceOnUse">
+                                <pattern id="c" width="34" height="24" x="15" y="172" data-loading="false"
+                                         patternUnits="userSpaceOnUse">
                                     <path fill="url(#b)" d="M0 0h34v24H0z"/>
                                 </pattern>
                             </defs>

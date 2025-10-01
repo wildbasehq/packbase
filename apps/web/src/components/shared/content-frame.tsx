@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react'
-import { useSession } from '@clerk/clerk-react'
-import { setToken } from '@/lib'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import React, {ReactNode} from 'react'
+import {useSession} from '@clerk/clerk-react'
+import {setToken} from '@/lib'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 
 const API_URL = import.meta.env.VITE_YAPOCK_URL
 
@@ -62,34 +62,38 @@ export const useContentFrame = (
         enabled?: boolean
     }
 ) => {
-    const { session, isLoaded, isSignedIn } = useSession()
+    const {session, isLoaded, isSignedIn} = useSession()
 
-    const queryKey = options?.id || (method && path ? [method, path, requestData] : null)
+    const hasMethodAndPath = method && path
+    const queryKey = options?.id || (hasMethodAndPath ? [method, path, requestData] : null)
+    const enabled = isLoaded && hasMethodAndPath && options?.enabled
+    const refetchInterval = (options?.refetchInterval || 0) * 1000
 
     const query = useQuery({
         queryKey: queryKey ? [queryKey] : undefined,
         queryFn: async () => {
-            // if (!session || !method || !path) return null
             const token = isSignedIn ? await session.getToken() : null
             if (token) setToken(token)
             return createApiCall(method, path, requestData, token)
         },
-        enabled: isLoaded && !!method && !!path && options?.enabled !== false,
-        refetchInterval: options?.refetchInterval ? options.refetchInterval * 1000 : undefined,
+        enabled,
+        refetchInterval,
     })
+
+    const error = query.error
+        ? {
+            message: (query.error as any)?.message || 'Request failed',
+            status: (query.error as any)?.status,
+            url: path,
+            code: (query.error as any)?.code,
+            timestamp: Date.now(),
+        } as ContentFrameError
+        : null
 
     return {
         data: query.data,
         raw: query,
-        error: query.error
-            ? ({
-                  message: (query.error as any)?.message || 'Request failed',
-                  status: (query.error as any)?.status,
-                  url: path,
-                  code: (query.error as any)?.code,
-                  timestamp: Date.now(),
-              } as ContentFrameError)
-            : null,
+        error,
         isLoading: query.isLoading,
         refetch: query.refetch,
     }
@@ -103,7 +107,7 @@ export const useContentFrameMutation = (
         onError?: (error: ContentFrameError) => void
     }
 ) => {
-    const { session, isSignedIn } = useSession()
+    const {session, isSignedIn} = useSession()
     const queryClient = useQueryClient()
 
     return useMutation({
@@ -114,7 +118,9 @@ export const useContentFrameMutation = (
             return createApiCall(method, path, requestData, token)
         },
         onSuccess: data => {
-            queryClient.invalidateQueries()
+            queryClient.invalidateQueries().catch(error => {
+                console.error(error)
+            })
             options?.onSuccess?.(data)
         },
         onError: error => {
@@ -131,21 +137,21 @@ export const useContentFrameMutation = (
 }
 
 export const ContentFrame: React.FC<ContentFrameProps> = ({
-    children,
-    get,
-    post,
-    put,
-    delete: deleteMethod,
-    patch,
-    data: requestData,
-    onError,
-    id,
-    refetchInterval,
-}) => {
+                                                              children,
+                                                              get,
+                                                              post,
+                                                              put,
+                                                              delete: deleteMethod,
+                                                              patch,
+                                                              data: requestData,
+                                                              onError,
+                                                              id,
+                                                              refetchInterval,
+                                                          }) => {
     const method = get ? 'get' : post ? 'post' : put ? 'put' : deleteMethod ? 'delete' : patch ? 'patch' : null
     const path = get || post || put || deleteMethod || patch
 
-    const { error } = useContentFrame(method || undefined, path || undefined, requestData, {
+    const {error} = useContentFrame(method || undefined, path || undefined, requestData, {
         id,
         refetchInterval,
     })

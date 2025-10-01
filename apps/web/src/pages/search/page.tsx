@@ -2,20 +2,115 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { AlertCircle, Clock, Filter, Loader2, RefreshCw, Search as SearchIcon, X } from 'lucide-react'
-import { useSearch, useUserAccountStore, vg } from '@/lib'
-import { useDebounce } from 'use-debounce'
-import { SearchApiResponse, RawSearchApiResponse, SearchResult } from './types'
-import { PackCard, PostCard, ProfileCard } from '@/components/search'
-import { Heading, Text } from '@/components/shared/text.tsx'
-import { Alert, AlertDescription, AlertTitle, AppTabs, ExpandableTabs } from '@/src/components'
-import { MagnifyingGlassCircleIcon, RectangleStackIcon, UserGroupIcon, UsersIcon } from '@heroicons/react/20/solid'
-import { SignedIn } from '@clerk/clerk-react'
-import { SearchBox } from '@/components/shared/search-box.tsx'
-import { Button } from '@/components/shared/experimental-button-rework.tsx'
+import {Activity, useEffect, useState} from 'react'
+import {motion} from 'motion/react'
+import {AlertCircle, Clock, Filter, Loader2, RefreshCw, Search as SearchIcon, X} from 'lucide-react'
+import {useSearch, useUserAccountStore, vg} from '@/lib'
+import {useDebounce} from 'use-debounce'
+import {RawSearchApiResponse, SearchApiResponse, SearchResult} from './types'
+import {PackCard, PostCard, ProfileCard} from '@/components/search'
+import {Heading, Text} from '@/components/shared/text.tsx'
+import {Alert, AlertDescription, AlertTitle, ExpandableTabs} from '@/src/components'
+import {MagnifyingGlassCircleIcon, RectangleStackIcon, UserGroupIcon, UsersIcon} from '@heroicons/react/20/solid'
+import {SearchBox} from '@/components/shared/search-box.tsx'
+import {Button} from '@/components/shared'
 import useWindowSize from '@/lib/hooks/use-window-size.ts'
+
+// Helper function to normalize search data based on response format
+const normalizeSearchData = (
+    data: RawSearchApiResponse | undefined,
+    activeCategory: string
+): { profiles: SearchResult[]; packs: SearchResult[]; posts: SearchResult[] } => {
+    const emptyResult = {profiles: [], packs: [], posts: []}
+
+    if (!data?.data) {
+        return emptyResult
+    }
+
+    // Single table case - data is an array of results
+    const isSingleTableResponse = activeCategory !== 'Everything' && Array.isArray(data.data)
+    if (isSingleTableResponse) {
+        const tableKey = activeCategory.toLowerCase() as 'profiles' | 'packs' | 'posts'
+        return {...emptyResult, [tableKey]: data.data}
+    }
+
+    // Multiple tables case - data is an object with table arrays
+    const isMultiTableResponse = typeof data.data === 'object' && !Array.isArray(data.data)
+    if (isMultiTableResponse) {
+        const tableData = data.data as {
+            profiles?: SearchResult[]
+            packs?: SearchResult[]
+            posts?: SearchResult[]
+        }
+        return {
+            profiles: tableData.profiles || [],
+            packs: tableData.packs || [],
+            posts: tableData.posts || [],
+        }
+    }
+
+    return emptyResult
+}
+
+// Helper function to determine result type based on category and result properties
+const determineResultType = (result: SearchResult, activeCategory: string): 'profile' | 'pack' | 'post' => {
+    // Category-specific tabs have explicit types
+    const categoryTypeMap: Record<string, 'profile' | 'pack' | 'post'> = {
+        Profiles: 'profile',
+        Packs: 'pack',
+        Posts: 'post',
+    }
+
+    if (categoryTypeMap[activeCategory]) {
+        return categoryTypeMap[activeCategory]
+    }
+
+    // For 'Everything' category, infer type from result properties
+    const hasMarkdownContent = result.content_type === 'markdown' && result.body
+    const hasUserAndBody = result.user && result.body
+    const hasBodyWithoutUser = result.body && !result.user
+
+    if (hasMarkdownContent || hasUserAndBody) return 'post'
+    if (hasBodyWithoutUser) return 'profile'
+
+    return 'pack' // Default fallback
+}
+
+// Helper function to check if results are empty
+const hasNoResults = (data: SearchApiResponse['data']): boolean => {
+    const hasProfiles = data?.profiles && data.profiles.length > 0
+    const hasPacks = data?.packs && data.packs.length > 0
+    const hasPosts = data?.posts && data.posts.length > 0
+
+    return !hasProfiles && !hasPacks && !hasPosts
+}
+
+// Helper function to get loading message
+const getLoadingMessage = (query: string): string => {
+    return query?.startsWith('[') ? 'Hold on while whskrd starts...' : 'Hold on...'
+}
+
+// Helper function to get result count display text
+const getResultCountText = (
+    filteredCount: number,
+    totalCount: number,
+    isLoading: boolean,
+    query: string,
+    activeCategory: string
+): string => {
+    if (filteredCount > 0) {
+        const count = totalCount || filteredCount
+        const resultWord = count === 1 ? 'result' : 'results'
+        const categoryText = activeCategory === 'Everything' ? '' : ` in ${activeCategory}`
+        return `Found ${count} ${resultWord}${categoryText}`
+    }
+
+    if (!isLoading) {
+        return `No results found for "${query}"`
+    }
+
+    return getLoadingMessage(query)
+}
 
 // Array of greeting messages to randomly display
 const greetings = [
@@ -48,11 +143,11 @@ const greetings = [
 ]
 
 export default function Search() {
-    const { query, setQuery } = useSearch()
-    const { user } = useUserAccountStore()
+    const {query, setQuery} = useSearch()
+    const {user} = useUserAccountStore()
 
     const [results, setResults] = useState<SearchApiResponse>({
-        data: { profiles: [], packs: [], posts: [] },
+        data: {profiles: [], packs: [], posts: []},
         count: 0,
         query: '',
     })
@@ -62,7 +157,7 @@ export default function Search() {
     const [error, setError] = useState<string | null>(null)
     const [greeting, setGreeting] = useState<string>('')
     const [activeCategory, setActiveCategory] = useState('Everything')
-    const { isMobile } = useWindowSize()
+    const {isMobile} = useWindowSize()
 
     // Debounce the search query with 3 seconds delay
     const [debouncedQuery] = useDebounce<string>(query, 500)
@@ -83,13 +178,18 @@ export default function Search() {
 
     // Fetch search results when debounced query changes
     useEffect(() => {
+        const reportFetchError = (err: any) => {
+            console.error('Error fetching search results:', err)
+            setError('An error occurred while fetching search results. Check console for more info.')
+        }
+
         const fetchResults = async () => {
             document.title = 'Packbase • Searching...'
             setIsTyping(false)
 
             if (!debouncedQuery || debouncedQuery.trim() === '') {
                 setResults({
-                    data: { profiles: [], packs: [], posts: [] },
+                    data: {profiles: [], packs: [], posts: []},
                     count: 0,
                     query: '',
                 })
@@ -112,30 +212,12 @@ export default function Search() {
                     },
                 })
                 if (searchResults.error) {
-                    throw new Error(searchResults.error)
+                    reportFetchError(searchResults.error)
                 }
 
                 document.title = `Packbase • ${activeCategory}`
                 // Handle the case where there's only one allowed table and data is an array
-                let normalizedData = { profiles: [], packs: [], posts: [] }
-
-                if (activeCategory !== 'Everything' && Array.isArray(searchResults.data?.data)) {
-                    // Single table case - data is an array of results
-                    const tableKey = activeCategory.toLowerCase() as 'profiles' | 'packs' | 'posts'
-                    normalizedData[tableKey] = searchResults.data.data
-                } else if (
-                    searchResults.data?.data &&
-                    typeof searchResults.data.data === 'object' &&
-                    !Array.isArray(searchResults.data.data)
-                ) {
-                    // Multiple tables case - data is an object with table arrays
-                    const data = searchResults.data.data as { profiles?: SearchResult[]; packs?: SearchResult[]; posts?: SearchResult[] }
-                    normalizedData = {
-                        profiles: data.profiles || [],
-                        packs: data.packs || [],
-                        posts: data.posts || [],
-                    }
-                }
+                const normalizedData = normalizeSearchData(searchResults.data, activeCategory)
 
                 setResults({
                     data: normalizedData,
@@ -143,12 +225,7 @@ export default function Search() {
                     query: debouncedQuery,
                 })
             } catch (err) {
-                console.error('Error fetching search results:', err)
-                if (err.message?.includes('NOT_FOUND')) {
-                    setError("VE28004:Korat: This instance of Voyage doesn't allow searching.")
-                } else {
-                    setError("An error occurred while fetching search results. We can't tell you more at this time.")
-                }
+                reportFetchError(err)
             } finally {
                 setIsLoading(false)
             }
@@ -159,16 +236,20 @@ export default function Search() {
 
     // Filter results based on active category
     useEffect(() => {
-        if (activeCategory === 'Everything') {
-            // Combine all result types
-            const allResults = [...(results.data?.profiles || []), ...(results.data?.packs || []), ...(results.data?.posts || [])]
-            setFilteredResults(allResults)
-        } else if (activeCategory === 'Profiles') {
-            setFilteredResults(results.data?.profiles || [])
-        } else if (activeCategory === 'Packs') {
-            setFilteredResults(results.data?.packs || [])
-        } else if (activeCategory === 'Posts') {
-            setFilteredResults(results.data?.posts || [])
+        switch (activeCategory) {
+            case 'Everything': // Combine all result types
+                const allResults = [...(results.data?.profiles || []), ...(results.data?.packs || []), ...(results.data?.posts || [])]
+                setFilteredResults(allResults)
+                break
+            case 'Profiles':
+                setFilteredResults(results.data?.profiles || [])
+                break
+            case 'Packs':
+                setFilteredResults(results.data?.packs || [])
+                break
+            case 'Posts':
+                setFilteredResults(results.data?.posts || [])
+                break
         }
     }, [results, activeCategory])
 
@@ -183,54 +264,46 @@ export default function Search() {
             <div className="sticky top-0 z-10 backdrop-blur-sm border-b pb-4">
                 <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
                     <h1 className="text-2xl font-medium mb-4">{greeting}</h1>
-                    {!isMobile && <SearchBox />}
+                    <Activity mode={isMobile ? 'hidden' : 'visible'}>
+                        <SearchBox/>
+                    </Activity>
 
                     {/* Active filters/info display */}
-                    {query && (
+                    <Activity mode={query ? 'visible' : 'hidden'}>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between mt-4">
                                 <div className="text-sm text-muted-foreground">
-                                    {filteredResults.length > 0 ? (
-                                        <span>
-                                            Found {results.count || filteredResults.length}{' '}
-                                            {(results.count || filteredResults.length) === 1 ? 'result' : 'results'}
-                                            {activeCategory !== 'Everything' ? ` in ${activeCategory}` : ''}
-                                        </span>
-                                    ) : !isLoading ? (
-                                        <span>No results found for "{query}"</span>
-                                    ) : !query?.startsWith('[') ? (
-                                        'Hold on...'
-                                    ) : (
-                                        'Hold on while whskrd starts...'
-                                    )}
+                                    {getResultCountText(filteredResults.length, results.count, isLoading, query, activeCategory)}
                                 </div>
 
                                 {/* Clear search button */}
-                                {query && (
+                                <Activity mode={query ? 'visible' : 'hidden'}>
                                     <button
                                         onClick={handleClearSearch}
                                         className="inline-flex items-center gap-1 px-2 py-1 text-xs text-foreground/70 hover:text-foreground rounded hover:bg-accent/50 transition-colors"
                                     >
-                                        <X className="h-3 w-3" />
+                                        <X className="h-3 w-3"/>
                                         <span>Clear</span>
                                     </button>
-                                )}
+                                </Activity>
                             </div>
 
                             {/* Using whskrd warning */}
-                            {query?.startsWith('[') && (
+                            <Activity mode={query?.startsWith('[') ? 'visible' : 'hidden'}>
                                 <Alert variant="warning">
                                     <AlertTitle>whskrd is experimental</AlertTitle>
                                     <AlertDescription>
                                         <Text>
-                                            whskrd is an in-house scripting language which enables powerful and flexible search queries,
-                                            soon to be powering feeds. It's currently in an experimental phase and may not work as expected.
+                                            whskrd is an in-house scripting language which enables powerful and flexible
+                                            search queries,
+                                            soon to be powering feeds. It's currently in an experimental phase and may
+                                            not work as expected.
                                         </Text>
                                     </AlertDescription>
                                 </Alert>
-                            )}
+                            </Activity>
                         </div>
-                    )}
+                    </Activity>
                 </div>
             </div>
 
@@ -267,19 +340,21 @@ export default function Search() {
             {/* Results area */}
             <div className="flex-grow p-4 overflow-auto">
                 <div className="max-w-6xl mx-auto">
-                    {isLoading || isTyping ? (
+                    <Activity mode={isLoading || isTyping ? 'visible' : 'hidden'}>
                         <div className="flex flex-col items-center justify-center py-16">
                             <div className="relative">
-                                <Loader2 className="h-10 w-10 text-primary animate-spin" />
-                                <div className="absolute inset-0 h-10 w-10 animate-ping rounded-full border border-primary/20" />
+                                <Loader2 className="h-10 w-10 text-primary animate-spin"/>
+                                <div
+                                    className="absolute inset-0 h-10 w-10 animate-ping rounded-full border border-primary/20"/>
                             </div>
                             <p className="mt-4 text-muted-foreground">
                                 {isTyping ? 'Waiting for you to finish typing...' : 'Searching the universe...'}
                             </p>
                         </div>
-                    ) : error ? (
+                    </Activity>
+                    <Activity mode={error ? 'visible' : 'hidden'}>
                         <div className="bg-destructive/10 rounded-lg p-4 flex items-start my-4">
-                            <AlertCircle className="h-5 w-5 text-destructive mt-0.5 mr-3 flex-shrink-0" />
+                            <AlertCircle className="h-5 w-5 text-destructive mt-0.5 mr-3 flex-shrink-0"/>
                             <div>
                                 <h3 className="font-medium text-destructive">Error</h3>
                                 <p className="text-destructive/90 text-sm">{error}</p>
@@ -287,27 +362,27 @@ export default function Search() {
                                     onClick={() => setQuery(query)}
                                     className="mt-2 inline-flex items-center text-xs text-destructive/80 hover:text-destructive font-medium"
                                 >
-                                    <RefreshCw className="h-3 w-3 mr-1" /> Try again
+                                    <RefreshCw className="h-3 w-3 mr-1"/> Try again
                                 </button>
                             </div>
                         </div>
-                    ) : !query ? (
+                    </Activity>
+                    <Activity mode={query ? 'hidden' : 'visible'}>
                         <div className="py-16 flex flex-col items-center text-center">
                             <div className="bg-accent/50 p-6 rounded-full mb-4">
-                                <SearchIcon className="h-8 w-8 text-muted-foreground" />
+                                <SearchIcon className="h-8 w-8 text-muted-foreground"/>
                             </div>
                             <h2 className="text-xl font-medium mb-2">Search for anything</h2>
                             <p className="text-muted-foreground max-w-md">
-                                Get typin', we'll handle the rest. Packs, users, howls, whatever Packbase has info on, we got you~
+                                Get typin', we'll handle the rest. Packs, users, howls, whatever Packbase has info on,
+                                we got you~
                             </p>
                         </div>
-                    ) : filteredResults.length === 0 &&
-                      (!results.data?.profiles || results.data?.profiles.length === 0) &&
-                      (!results.data?.packs || results.data?.packs.length === 0) &&
-                      (!results.data?.posts || results.data?.posts.length === 0) ? (
+                    </Activity>
+                    <Activity mode={filteredResults.length === 0 && hasNoResults(results.data) ? 'visible' : 'hidden'}>
                         <div className="py-16 flex flex-col items-center text-center">
                             <div className="bg-accent/50 p-6 rounded-full mb-4">
-                                <SearchIcon className="h-8 w-8 text-muted-foreground" />
+                                <SearchIcon className="h-8 w-8 text-muted-foreground"/>
                             </div>
                             <Heading size="xl" className="mb-2">
                                 This ain't on Packbase
@@ -315,76 +390,57 @@ export default function Search() {
                             <Text alt className="max-w-md">
                                 Woah, we couldn't find anything for "{query}". Try searching for something else?
                             </Text>
-                            {activeCategory !== 'Everything' && (
+                            <Activity mode={activeCategory === 'Everything' ? 'hidden' : 'visible'}>
                                 <Button outline onClick={() => setActiveCategory('Everything')}>
-                                    <Filter data-slot="icon" className="inline-flex h-4 w-4" />
+                                    <Filter data-slot="icon" className="inline-flex h-4 w-4"/>
                                     <span>Clear filters</span>
                                 </Button>
-                            )}
+                            </Activity>
                         </div>
-                    ) : (
+                    </Activity>
+                    <Activity mode={filteredResults.length > 0 ? 'visible' : 'hidden'}>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             {filteredResults?.map((result, index) => {
-                                // Determine the result type based on available properties or explicit type
-                                let resultType
-
-                                // First check if we're in a specific category tab
-                                if (activeCategory === 'Profiles') {
-                                    resultType = 'profile'
-                                } else if (activeCategory === 'Packs') {
-                                    resultType = 'pack'
-                                } else if (activeCategory === 'Posts') {
-                                    resultType = 'post'
-                                } else {
-                                    // For 'All' category, try to determine type from the result properties
-                                    if (result.content_type === 'markdown' && result.body) {
-                                        resultType = 'post'
-                                        // @ts-ignore
-                                    } else if (result.username && !result.body) {
-                                        resultType = 'profile'
-                                    } else if (result.user && result.body) {
-                                        resultType = 'post'
-                                    } else {
-                                        // Default to pack if we can't determine the type
-                                        resultType = 'pack'
-                                    }
-                                }
+                                const resultType = determineResultType(result, activeCategory)
 
                                 // Render the appropriate component based on result type
                                 switch (resultType) {
                                     case 'profile':
                                         // @ts-ignore
-                                        return <ProfileCard key={result.id} profile={result} />
+                                        return <ProfileCard key={result.id} profile={result}/>
                                     case 'pack':
-                                        return <PackCard key={result.id} pack={result} />
+                                        return <PackCard key={result.id} pack={result}/>
                                     case 'post':
-                                        return <PostCard key={result.id} post={result} />
+                                        return <PostCard key={result.id} post={result}/>
                                     default:
                                         // Fallback to generic card if type can't be determined
+                                        // noinspection MagicNumberJS
                                         return (
                                             <motion.div
                                                 key={result.id}
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ duration: 0.2, delay: index * 0.03 }}
+                                                initial={{opacity: 0, y: 10}}
+                                                animate={{opacity: 1, y: 0}}
+                                                transition={{duration: 0.2, delay: index * 0.03}}
                                                 className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-all duration-200 hover:border-border/80 group"
                                             >
                                                 <div className="block h-full">
                                                     <div className="p-5">
                                                         <div className="flex items-start justify-between mb-3">
-                                                            {result.category && (
-                                                                <span className="text-xs px-2.5 py-1 rounded-full tracking-wide font-medium ml-2 flex-shrink-0 bg-accent text-accent-foreground">
+                                                            <Activity mode={result.category ? 'visible' : 'hidden'}>
+                                                                <span
+                                                                    className="text-xs px-2.5 py-1 rounded-full tracking-wide font-medium ml-2 flex-shrink-0 bg-accent text-accent-foreground">
                                                                     {result.category}
                                                                 </span>
-                                                            )}
+                                                            </Activity>
                                                         </div>
                                                         <p className="text-muted-foreground mb-3 line-clamp-2">{result.description}</p>
-                                                        {result.timestamp && (
-                                                            <div className="flex items-center text-xs text-muted-foreground">
-                                                                <Clock className="h-3 w-3 mr-1" />
+                                                        <Activity mode={result.timestamp ? 'visible' : 'hidden'}>
+                                                            <div
+                                                                className="flex items-center text-xs text-muted-foreground">
+                                                                <Clock className="h-3 w-3 mr-1"/>
                                                                 <span>{result.timestamp}</span>
                                                             </div>
-                                                        )}
+                                                        </Activity>
                                                     </div>
                                                 </div>
                                             </motion.div>
@@ -392,7 +448,7 @@ export default function Search() {
                                 }
                             })}
                         </div>
-                    )}
+                    </Activity>
                 </div>
             </div>
         </div>

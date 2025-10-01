@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { API_URL } from '@/lib/api'
+import {useEffect, useState} from 'react'
+import {API_URL} from '@/lib/api'
 
 // Theme model based on the API documentation
 export interface Theme {
@@ -113,7 +113,7 @@ export const ThemeAPI = {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${globalThis.TOKEN || ''}`,
                 },
-                body: JSON.stringify({ html, css }),
+                body: JSON.stringify({html, css}),
             })
             if (!response.ok) {
                 throw new Error('Failed to validate theme')
@@ -155,7 +155,7 @@ export function useThemes() {
     const addTheme = async (theme: Theme) => {
         const newTheme = await ThemeAPI.create(theme)
         if (newTheme) {
-            fetchThemes()
+            await fetchThemes()
             return newTheme
         }
         return null
@@ -165,7 +165,7 @@ export function useThemes() {
     const updateTheme = async (id: string, theme: Partial<Theme>) => {
         const updatedTheme = await ThemeAPI.update(id, theme)
         if (updatedTheme) {
-            fetchThemes()
+            await fetchThemes()
             return updatedTheme
         }
         return null
@@ -175,7 +175,7 @@ export function useThemes() {
     const deleteTheme = async (id: string) => {
         const success = await ThemeAPI.delete(id)
         if (success) {
-            fetchThemes()
+            await fetchThemes()
         }
         return success
     }

@@ -2,18 +2,18 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { Description, Label, Radio, RadioGroup } from '@headlessui/react'
-import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
-import { CheckIcon } from '@heroicons/react/24/solid'
-import { useEffect, useState } from 'react'
+import {Description, Label, Radio, RadioGroup} from '@headlessui/react'
+import {QuestionMarkCircleIcon} from '@heroicons/react/20/solid'
+import {CheckIcon} from '@heroicons/react/24/solid'
+import {useEffect, useState} from 'react'
 
 type Option = { id: string; name: string; desc?: string; warn?: string; disabled?: boolean }
 export default function SelectPills({
-    label,
-    id,
-    options,
-    onChange,
-}: {
+                                        label,
+                                        id,
+                                        options,
+                                        onChange,
+                                    }: {
     label?: string
     id?: string
     options: Option[]
@@ -38,27 +38,29 @@ export default function SelectPills({
                                 disabled={option.disabled}
                                 key={option.name}
                                 value={option}
-                                className={({ focus, checked }) =>
+                                className={({focus, checked}) =>
                                     `${focus ? 'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-neutral-300' : ''}
                                 ${checked ? 'bg-n-1/70 dark:bg-n-6' : 'hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50'}
                                 ${option.disabled ? 'cursor-not-allowed opacity-75 hover:ring-0' : 'cursor-default'}
                                 ring-default flex select-none flex-col justify-center rounded border px-4 py-4 !no-underline transition-all`
                                 }
                             >
-                                {({ checked }) => (
+                                {({checked}) => (
                                     <>
                                         <div className="flex w-full items-center justify-between">
                                             <div className="flex items-center">
                                                 <div className="text-sm">
-                                                    <Label as="p" className={`font-medium  ${checked ? 'text-default' : 'text-alt'}`}>
+                                                    <Label as="p"
+                                                           className={`font-medium  ${checked ? 'text-default' : 'text-muted-foreground'}`}>
                                                         {option.name}
                                                     </Label>
                                                     {(option.desc || option.warn) && (
-                                                        <Description as="span" className="text-alt inline">
+                                                        <Description as="span" className="text-muted-foreground inline">
                                                             <span>{option.desc}</span>{' '}
                                                             {option.warn && (
                                                                 <p className="mt-1 flex items-center text-sm">
-                                                                    <QuestionMarkCircleIcon className="text-alt mr-1 h-4 w-6" />
+                                                                    <QuestionMarkCircleIcon
+                                                                        className="text-muted-foreground mr-1 h-4 w-6"/>
                                                                     <span>{option.warn}</span>
                                                                 </p>
                                                             )}
@@ -68,7 +70,7 @@ export default function SelectPills({
                                             </div>
                                             {checked && (
                                                 <div className="text-default shrink-0">
-                                                    <CheckIcon className="h-6 w-6" />
+                                                    <CheckIcon className="h-6 w-6"/>
                                                 </div>
                                             )}
                                         </div>

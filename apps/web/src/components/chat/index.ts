@@ -1,5 +1,4 @@
 export * from './types'
-export * from './ChatContainer'
 export * from './MessageInput'
 export * from './MessageList'
 export * from './MessageItem'

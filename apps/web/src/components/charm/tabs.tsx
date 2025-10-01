@@ -1,10 +1,7 @@
-import { ComponentClass, Fragment, FunctionComponent, useEffect, useMemo, useRef, useState } from 'react'
-import { Menu, Transition } from '@headlessui/react'
-import { useFloating, shift, FloatingPortal } from '@floating-ui/react'
-
-function classNames(...classes: (string | boolean)[]) {
-    return classes.filter(Boolean).join(' ')
-}
+import {ElementType, Fragment, useEffect, useMemo, useRef, useState} from 'react'
+import {Menu, Transition} from '@headlessui/react'
+import {FloatingPortal, shift, useFloating} from '@floating-ui/react'
+import {cn} from "@/lib";
 
 /**
  * CharmingTabs component
@@ -16,27 +13,27 @@ function classNames(...classes: (string | boolean)[]) {
  * @param {function} props.onChange Called when the active tab changes
  */
 export default function CharmingTabs({
-    items,
-    tabComponent: TabComponent = 'a',
-    selectedIndex = 0,
-    onChange,
-}: {
-    items: { label: string; [key: string]: any }[]
-    tabComponent?: string | React.ElementType
+                                         items,
+                                         tabComponent: TabComponent = 'a',
+                                         selectedIndex = 0,
+                                         onChange,
+                                     }: {
+    items: { label: string; [_: string]: any }[]
+    tabComponent?: string | ElementType
     selectedIndex: number
     onChange: (index: number) => void
 }) {
     const [mousePosition, setMousePosition] = useState<{
         x: number | null
         y: number | null
-    }>({ x: null, y: null })
+    }>({x: null, y: null})
     const [activeElement, setActiveElement] = useState<HTMLDivElement | null>(null)
     const ref = useRef<HTMLDivElement>(null)
 
     // Mobile menu panel positioning
-    const { refs, floatingStyles } = useFloating({
+    const {refs, floatingStyles} = useFloating({
         placement: 'bottom',
-        middleware: [shift({ padding: 8 })],
+        middleware: [shift({padding: 8})],
     })
 
     // Track relative mouse position
@@ -65,7 +62,7 @@ export default function CharmingTabs({
 
     return (
         <Menu as="div" className="relative">
-            {({ open }) => (
+            {({open}) => (
                 <>
                     <div
                         ref={ref}
@@ -104,7 +101,7 @@ export default function CharmingTabs({
                                         as={TabComponent}
                                         isActive={idx === selectedIndex}
                                         setActiveElement={setActiveElement}
-                                        onClick={item.target !== '_blank' ? () => onChange(idx) : undefined}
+                                        onClick={item.target === '_blank' ? undefined : () => onChange(idx)}
                                         {...item}
                                     />
                                 ))}
@@ -130,11 +127,12 @@ export default function CharmingTabs({
                                     ref={refs.setReference}
                                     className="group peer relative flex rounded bg-white/90 dark:bg-n-8/90 p-2 outline-hidden transition-colors active:bg-white/80 dark:active:bg-n-7/80 md:hidden"
                                 >
-                                    <MenuIcon isOpen={open} />
+                                    <MenuIcon isOpen={open}/>
                                 </Menu.Button>
 
                                 {/* Focus/hover background */}
-                                <div className="absolute inset-0 -z-1 block bg-[#af91ff] dark:bg-[#af91ff]/70 opacity-20 transition-opacity duration-100 group-hover:opacity-70 peer-focus:opacity-100 md:hidden"></div>
+                                <div
+                                    className="absolute inset-0 -z-1 block bg-[#af91ff] dark:bg-[#af91ff]/70 opacity-20 transition-opacity duration-100 group-hover:opacity-70 peer-focus:opacity-100 md:hidden"></div>
                             </>
                         </div>
                     </div>
@@ -142,7 +140,8 @@ export default function CharmingTabs({
                     {/* Mobile items (< md) */}
                     {open && (
                         <FloatingPortal>
-                            <Menu.Items className="group focus:outline-hidden md:hidden" ref={refs.setFloating} style={floatingStyles}>
+                            <Menu.Items className="group focus:outline-hidden md:hidden" ref={refs.setFloating}
+                                        style={floatingStyles}>
                                 <Transition
                                     as={Fragment}
                                     appear={true}
@@ -153,8 +152,10 @@ export default function CharmingTabs({
                                     leaveFrom="transform scale-100 opacity-100"
                                     leaveTo="transform scale-95 opacity-0"
                                 >
-                                    <div className="mt-3 origin-top-right rounded-[0.75rem] bg-[#60a5fa88] dark:bg-n-7/70 p-[2px]">
-                                        <div className="rounded-[calc(0.75rem-2px)] bg-white/[0.95] dark:bg-n-8/[0.95] py-1 pr-4 shadow-md">
+                                    <div
+                                        className="mt-3 origin-top-right rounded-[0.75rem] bg-[#60a5fa88] dark:bg-n-7/70 p-[2px]">
+                                        <div
+                                            className="rounded-[calc(0.75rem-2px)] bg-white/[0.95] dark:bg-n-8/[0.95] py-1 pr-4 shadow-md">
                                             {items.map((item, idx) => (
                                                 <MobileTab
                                                     key={idx}
@@ -179,18 +180,19 @@ export default function CharmingTabs({
     )
 }
 
+// noinspection ParameterNamingConventionJS
 function DesktopTab({
-    as: Component,
-    label,
-    isActive,
-    setActiveElement,
-    ...rest
-}: {
-    as: string | React.ElementType
+                        as: Component,
+                        label,
+                        isActive,
+                        setActiveElement,
+                        ...rest
+                    }: {
+    as: string | ElementType
     label: string
     isActive: boolean
     setActiveElement: (element: HTMLDivElement | null) => void
-    [key: string]: any
+    [_: string]: any
 }) {
     const ref = useRef(null)
 
@@ -203,7 +205,7 @@ function DesktopTab({
     return (
         <Component
             ref={ref}
-            className={classNames(
+            className={cn(
                 'group flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded px-4 py-2.5 text-sm font-medium outline-hidden transition-colors duration-200 lg:px-6',
                 isActive
                     ? 'text-indigo-900 focus:text-indigo-950 dark:text-indigo-300 dark:focus:text-indigo-200'
@@ -212,7 +214,7 @@ function DesktopTab({
             {...rest}
         >
             <div
-                className={classNames(
+                className={cn(
                     'block h-1 w-1 rounded transition-transform duration-200',
                     isActive
                         ? 'scale-100 bg-indigo-600 group-focus:bg-indigo-800 dark:bg-indigo-400 dark:group-focus:bg-indigo-300'
@@ -224,11 +226,11 @@ function DesktopTab({
     )
 }
 
-function MobileTab({ as, label, isActive, ...rest }: { as: any; label: string; isActive: boolean; [key: string]: any }) {
+function MobileTab({as, label, isActive, ...rest}: { as: any; label: string; isActive: boolean; [_: string]: any }) {
     return (
         <Menu.Item
             as={as}
-            className={classNames(
+            className={cn(
                 'group/item flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded px-4 py-2.5 text-sm font-medium outline-hidden transition-colors duration-200 lg:px-6',
                 isActive
                     ? 'text-indigo-900 focus:text-indigo-950 dark:text-indigo-300 dark:focus:text-indigo-200'
@@ -236,17 +238,17 @@ function MobileTab({ as, label, isActive, ...rest }: { as: any; label: string; i
             )}
             {...rest}
         >
-            {({ active }) => (
+            {({focus}) => (
                 <>
                     <div
-                        className={classNames(
+                        className={cn(
                             'block h-1 w-1 rounded transition-transform duration-200',
                             isActive
                                 ? 'group/item-focus:bg-indigo-800 scale-100 bg-indigo-600 dark:bg-indigo-400 dark:group/item-focus:bg-indigo-300'
-                                : classNames(
-                                      'group/item-focus:scale-100 bg-gray-600 dark:bg-gray-400 dark:group/item-focus:bg-gray-300',
-                                      active ? 'scale-100' : 'scale-0'
-                                  )
+                                : cn(
+                                    'group/item-focus:scale-100 bg-gray-600 dark:bg-gray-400 dark:group/item-focus:bg-gray-300',
+                                    focus ? 'scale-100' : 'scale-0'
+                                )
                         )}
                     ></div>
                     {label}
@@ -257,7 +259,7 @@ function MobileTab({ as, label, isActive, ...rest }: { as: any; label: string; i
 }
 
 // Menu icon that animates between hamburger and X
-function MenuIcon({ isOpen = false }) {
+function MenuIcon({isOpen = false}) {
     return (
         <div className="flex h-6 w-6 flex-col justify-between px-[0.2rem] py-[0.35rem]">
             {[...Array(3)].map((_, outerIdx) => (
@@ -265,16 +267,16 @@ function MenuIcon({ isOpen = false }) {
                     {[...Array(outerIdx === 1 ? 2 : 1)].map((_, innerIdx) => (
                         <div
                             key={innerIdx}
-                            className={classNames(
+                            className={cn(
                                 'h-0.5 w-full rounded bg-slate-500 dark:bg-n-3 transition-all duration-150 group-hover:bg-slate-600 dark:group-hover:bg-n-1',
                                 innerIdx === 1 && 'absolute top-0',
                                 isOpen &&
-                                    classNames(
-                                        innerIdx === 1 && 'rotate-45',
-                                        outerIdx === 1 && innerIdx === 0 && '-rotate-45',
-                                        outerIdx === 0 && 'translate-y-full scale-75 opacity-0',
-                                        outerIdx === 2 && '-translate-y-full scale-75 opacity-0'
-                                    )
+                                cn(
+                                    innerIdx === 1 && 'rotate-45',
+                                    outerIdx === 1 && innerIdx === 0 && '-rotate-45',
+                                    outerIdx === 0 && 'translate-y-full scale-75 opacity-0',
+                                    outerIdx === 2 && '-translate-y-full scale-75 opacity-0'
+                                )
                             )}
                         ></div>
                     ))}

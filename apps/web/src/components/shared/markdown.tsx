@@ -2,13 +2,13 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { Heading, Text } from '@/components/shared/text'
+import {Heading, Text} from '@/components/shared/text'
 import ReactMarkdown from 'react-markdown'
 import rehypeSanitize from 'rehype-sanitize'
-import { Pre } from '@/components/shared/code.tsx'
-import { createElement, Children, isValidElement } from 'react'
+import {Pre} from '@/components/shared/code.tsx'
+import {Children, createElement, FC, isValidElement, ReactElement} from 'react'
 import CreatedByHumans from '@/src/images/svg/noai/created.svg'
-import { clsx } from 'clsx'
+import {cn} from "@/lib";
 
 // Safe sanitization schema for Markdown
 const sanitizeSchema = {
@@ -61,19 +61,19 @@ const isValidUrl = (url: string): boolean => {
 }
 
 // Dot SVG component
-const DotIcon = ({ className }: { className?: string }) => (
+const DotIcon = ({className}: { className?: string }) => (
     <svg width="6" height="6" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-        <circle cx="3" cy="3" r="3" fill="currentColor" />
+        <circle cx="3" cy="3" r="3" fill="currentColor"/>
     </svg>
 )
 
 // Custom UL component that uses dot SVG and replaces li with Text
-const CustomUL = ({ children, className, ...props }: any) => {
+const CustomUL = ({children, className, ...props}: any) => {
     const processedChildren = Children.map(children, child => {
         if (isValidElement(child) && child.type === 'li') {
             return (
                 <div className="flex items-start gap-2 my-1" key={child.key}>
-                    <DotIcon className="mt-1.5 text-stone-500 flex-shrink-0" />
+                    <DotIcon className="mt-1.5 text-stone-500 flex-shrink-0"/>
                     {/* @ts-ignore */}
                     <Text className="flex-1">{child.props.children}</Text>
                 </div>
@@ -83,7 +83,7 @@ const CustomUL = ({ children, className, ...props }: any) => {
     })
 
     return (
-        <div className={clsx('space-y-2', className)} {...props}>
+        <div className={cn('space-y-2', className)} {...props}>
             {processedChildren}
         </div>
     )
@@ -107,7 +107,7 @@ const CustomUL = ({ children, className, ...props }: any) => {
 class HowlertagHandler {
     constructor(
         public tag: string,
-        public component: React.FC<any>
+        public component: FC<any>
     ) {
         this.tag = tag
         this.component = component
@@ -122,7 +122,7 @@ class HowlertagHandler {
         const regex = new RegExp(`{${this.tag}(.*?)}(.*?){/${this.tag}}`, 's')
         const match = text.match(regex)
 
-        if (!match) return { content: '', props: {} }
+        if (!match) return {content: '', props: {}}
 
         const propsString = match[1].trim()
         const content = match[2]
@@ -148,11 +148,11 @@ class HowlertagHandler {
         }
     }
 
-    render(text: string): React.ReactElement | null {
+    render(text: string): ReactElement | null {
         if (!this.matches(text)) return null
 
-        const { content, props } = this.parse(text)
-        return createElement(this.component, { ...props }, content)
+        const {content, props} = this.parse(text)
+        return createElement(this.component, {...props}, content)
     }
 
     private normalizePropsString(propsString: string): string {
@@ -180,10 +180,13 @@ class HowlertagHandler {
                 const [, key, , value] = pair.match(/(\w+):\s*(['"]?)([^,}]*)\2/) || []
                 if (key && value !== undefined) {
                     // Try to parse as number or boolean
-                    if (value === 'true') props[key] = true
-                    else if (value === 'false') props[key] = false
-                    else if (!isNaN(Number(value)) && value !== '') props[key] = Number(value)
-                    else props[key] = value
+                    const parseValue = (value: string) => {
+                        if (value === 'true') return true
+                        if (value === 'false') return false
+                        if (!isNaN(Number(value)) && value !== '') return Number(value)
+                        return value
+                    }
+                    props[key] = parseValue(value)
                 }
             })
         }
@@ -206,8 +209,8 @@ class HowlertagConverter {
         this.handlers.push(handler)
     }
 
-    convert(text: string): (React.ReactElement | string)[] {
-        const results: (React.ReactElement | string)[] = []
+    convert(text: string): (ReactElement | string)[] {
+        const results: (ReactElement | string)[] = []
         let remainingText = text
         let processed = false
 
@@ -245,7 +248,7 @@ class HowlertagConverter {
     }
 }
 
-const ForwardIMG = ({ src, className }: { src: string; className?: string }) => {
+const ForwardIMG = ({src, className}: { src: string; className?: string }) => {
     const quicktags: { tag: string; src: string }[] = [
         {
             tag: 'noai_created',
@@ -261,21 +264,26 @@ const ForwardIMG = ({ src, className }: { src: string; className?: string }) => 
         return src
     }
 
-    return <img src={srcToQuicktag(src || 'error.png')} className={className} alt="" loading="lazy" />
+    return <img src={srcToQuicktag(src || 'error.png')} className={className} alt="" loading="lazy"/>
 }
 
 const GenericHTMLImageHandler = new HowlertagHandler('img', ForwardIMG)
 const Howlertag = new HowlertagConverter()
 Howlertag.addHandler(GenericHTMLImageHandler)
 
-export default function Markdown({ children, componentClassName }: { children: string; componentClassName?: string; [x: string]: any }) {
+export default function Markdown({children, componentClassName}: {
+    children: string;
+    componentClassName?: string;
+    [_: string]: any
+}) {
     // Check for numbers followed by a period, and if so, replace with \.
     if (children?.replace) children = children?.replace(/(\d+)\./g, '$1\\.')
 
     const convertedContent = Howlertag.convert(children)
 
     return (
-        <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full break-words message-content">
+        <div
+            className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full break-words message-content">
             {convertedContent.map((item, index) => {
                 if (typeof item === 'string') {
                     return (
@@ -284,21 +292,25 @@ export default function Markdown({ children, componentClassName }: { children: s
                             rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
                             components={{
                                 h1(props) {
-                                    return <Heading as="h1" size="3xl" className={clsx(props.className, componentClassName)} {...props} />
+                                    return <Heading as="h1" size="3xl"
+                                                    className={cn(props.className, componentClassName)} {...props} />
                                 },
                                 h2(props) {
-                                    return <Heading as="h2" size="2xl" className={clsx(props.className, componentClassName)} {...props} />
+                                    return <Heading as="h2" size="2xl"
+                                                    className={cn(props.className, componentClassName)} {...props} />
                                 },
                                 h3(props) {
-                                    return <Heading as="h3" size="xl" className={clsx(props.className, componentClassName)} {...props} />
+                                    return <Heading as="h3" size="xl"
+                                                    className={cn(props.className, componentClassName)} {...props} />
                                 },
                                 p(props) {
-                                    return <Text className={clsx('!select-auto', props.className, componentClassName)} {...props} />
+                                    return <Text
+                                        className={cn('!select-auto', props.className, componentClassName)} {...props} />
                                 },
                                 ul(props) {
                                     return (
                                         <CustomUL
-                                            className={clsx('text-sm text-default', props.className, componentClassName)}
+                                            className={cn('text-sm text-default', props.className, componentClassName)}
                                             {...props}
                                         />
                                     )
@@ -306,7 +318,7 @@ export default function Markdown({ children, componentClassName }: { children: s
                                 ol(props) {
                                     return (
                                         <ol
-                                            className={clsx(
+                                            className={cn(
                                                 'text-sm text-default select-none list-decimal pl-4 space-y-1',
                                                 props.className,
                                                 componentClassName

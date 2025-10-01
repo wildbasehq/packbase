@@ -5,7 +5,7 @@
 import debug from 'debug'
 import prisma from '@/db/prisma'
 
-const log = debug('migrate:0_universe_seed')
+const log = debug('vg:migrate:0_universe_seed')
 
 const universePack = {
     id: '00000000-0000-0000-0000-000000000000',

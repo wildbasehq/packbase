@@ -2,9 +2,9 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { Button } from '@/components/shared/experimental-button-rework'
-import { Heading } from '@/components/shared/heading'
-import { Text } from '@/components/shared/text'
+import {Button} from '@/components/shared'
+import {Heading} from '@/components/shared/heading'
+import {Text} from '@/components/shared/text'
 import React from 'react'
 
 export default function ResourceDeletePage() {
@@ -13,11 +13,13 @@ export default function ResourceDeletePage() {
             <div>
                 <Heading>Pack Deletion</Heading>
                 <Text alt>
-                    Pack deletion is not possible through self-service yet. Please start a chat with us and we will help you with the
+                    Pack deletion is not possible through self-service yet. Please start a chat with us and we will help
+                    you with the
                     deletion process.
                 </Text>
                 <Text alt>
-                    Someone from Wildbase - or Rheo - will guide you through the process of deleting your pack. This is a manual process
+                    Someone from Wildbase - or Rheo - will guide you through the process of deleting your pack. This is
+                    a manual process
                     that requires some time and effort from our team. Be sure to alert your community before doing this.
                 </Text>
                 <Button color="red" className="mt-2">

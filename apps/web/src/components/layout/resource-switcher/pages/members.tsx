@@ -1,20 +1,20 @@
-import { Heading, Text } from '@/components/shared/text.tsx'
-import { useEffect, useState } from 'react'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shared/table.tsx'
-import { vg } from '@/lib/api'
-import { UserInfo } from '@/components/shared/user/info-col.tsx'
-import { useResourceStore } from '@/lib/index'
+import {Heading, Text} from '@/components/shared/text.tsx'
+import {useEffect, useState} from 'react'
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/shared/table.tsx'
+import {vg} from '@/lib/api'
+import {UserInfo} from '@/components/shared/user/info-col.tsx'
+import {useResourceStore} from '@/lib'
 
 export default function ResourceSettingsMembers() {
     const {
-        currentResource: { id },
+        currentResource: {id},
     } = useResourceStore()
     const [members, setMembers] = useState([])
 
     useEffect(() => {
-        vg.pack({ id })
+        vg.pack({id})
             .members.get()
-            .then(({ data }) => {
+            .then(({data}) => {
                 setMembers(data)
             })
     }, [])
@@ -37,7 +37,7 @@ export default function ResourceSettingsMembers() {
                     {members.map(member => (
                         <TableRow key={member.id}>
                             <TableCell>
-                                <UserInfo user={member} />
+                                <UserInfo user={member}/>
                             </TableCell>
                             <TableCell>
                                 {Intl.DateTimeFormat(navigator.language, {

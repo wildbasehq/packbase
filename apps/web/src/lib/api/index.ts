@@ -9,8 +9,8 @@
 import VoyageSDK from 'voyagesdk-ts'
 
 import './cron/check-update.ts'
-import { WorkerStore } from '@/lib/workers'
-import { formatRelativeTime } from '../utils/date.ts'
+import {WorkerStore} from '@/lib/workers'
+import {formatRelativeTime} from '../utils/date.ts'
 
 /**
  * The name of the project. All Wildbase projects should have a name
@@ -27,13 +27,13 @@ export const ProjectSafeName = 'Packbase'
 
 export const API_URL = import.meta.env.VITE_YAPOCK_URL
 
-export let { vg } = new VoyageSDK(API_URL, {
+export let {vg} = new VoyageSDK(API_URL, {
     supabase: {
         client: {},
     },
 })
 
-const { enqueue } = WorkerStore.getState()
+const {enqueue} = WorkerStore.getState()
 
 export const setToken = (token?: string) => {
     // skip if token is the same
@@ -54,8 +54,8 @@ export const setToken = (token?: string) => {
     window.voyageSDK = newClient
 
     // Emit authentication event for plugins
-    if (window.packbase) {
-        window.packbase.emit('user:auth:changed', { authenticated: !!token })
+    if (window.Packbase) {
+        window.Packbase.emit('user:auth:changed', {authenticated: !!token})
     }
     // })
 }

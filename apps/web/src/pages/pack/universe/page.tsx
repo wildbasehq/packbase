@@ -3,10 +3,9 @@
  */
 
 import PackFeedController from '@/pages/pack/components.tsx'
-import { Protect } from '@clerk/clerk-react'
-import { Heading, Text } from '@/components/shared/text.tsx'
+import {Protect} from '@clerk/clerk-react'
 
-export default function UniversePack({ useEverythingQuery }: { useEverythingQuery?: boolean }) {
+export default function UniversePack({useEverythingQuery}: { useEverythingQuery?: boolean }) {
     return (
         <>
             <Protect>

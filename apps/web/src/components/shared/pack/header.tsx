@@ -1,11 +1,11 @@
 import Markdown from '@/components/shared/markdown'
-import { Heading, Text } from '@/components/shared/text'
-import { Button } from '@/components/shared/experimental-button-rework'
-import { vg } from '@/lib/api'
-import { toast } from 'sonner'
-import { MinusIcon, PlusIcon } from '@heroicons/react/16/solid'
+import {Heading, Text} from '@/components/shared/text'
+import {Button} from '@/components/shared'
+import {vg} from '@/lib/api'
+import {toast} from 'sonner'
+import {MinusIcon, PlusIcon} from '@heroicons/react/16/solid'
 
-export default function PackHeader({ ...props }: any) {
+export default function PackHeader({...props}: any) {
     const pack = props.pack
 
     return (
@@ -26,7 +26,8 @@ export default function PackHeader({ ...props }: any) {
                             alt=""
                         />
                     </div>
-                    <div className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
+                    <div
+                        className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                         <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
                             <Heading>{pack.display_name || pack.slug}</Heading>
                             {/* Small @username */}
@@ -37,7 +38,7 @@ export default function PackHeader({ ...props }: any) {
                     </div>
                     {pack.is_owner && (
                         <div>
-                            <PackMembershipButton pack={pack} />
+                            <PackMembershipButton pack={pack}/>
                         </div>
                     )}
                 </div>
@@ -54,22 +55,22 @@ export default function PackHeader({ ...props }: any) {
     )
 }
 
-function PackMembershipButton({ pack }: { pack: any }) {
+function PackMembershipButton({pack}: { pack: any }) {
     const packJoin = () => {
-        vg.pack({ id: pack.id })
+        vg.pack({id: pack.id})
             .join.post()
-            .then(({ error }) => {
-                if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
-                window.location.reload()
+            .then(({error}) => {
+                if (error) toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+                else window.location.reload()
             })
             .catch(e => {
                 console.error(e)
-                return toast.error('Failed to join')
+                toast.error('Failed to join')
             })
     }
 
     const packLeave = () => {
-        vg.pack({ id: pack.id })
+        vg.pack({id: pack.id})
             .join.delete()
             .then(() => {
                 window.location.reload()
@@ -82,14 +83,14 @@ function PackMembershipButton({ pack }: { pack: any }) {
     if (!pack.membership) {
         return (
             <Button outline onClick={packJoin}>
-                <PlusIcon data-slot="icon" /> Join
+                <PlusIcon data-slot="icon"/> Join
             </Button>
         )
     }
 
     return (
         <Button outline onClick={packLeave} disabled={(pack.membership?.permissions & 1) === 1}>
-            <MinusIcon data-slot="icon" /> Leave
+            <MinusIcon data-slot="icon"/> Leave
         </Button>
     )
 }

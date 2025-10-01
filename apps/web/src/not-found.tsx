@@ -15,7 +15,7 @@ export default function NotFound() {
                 <Heading className="items-center">
                     Wherever you are, you{'\''}re not supposed to be here.
                 </Heading>
-                <p className="mt-1 text-sm leading-6 text-alt unicorn:text-on-surface-variant">
+                <p className="mt-1 text-sm leading-6 text-muted-foreground unicorn:text-on-surface-variant">
                     This resource doesn{'\''}t exist, or you don{'\''}t have permission to view it.
                 </p>
             </div>

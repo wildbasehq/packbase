@@ -1,6 +1,7 @@
 # PagedModal Component
 
-A reusable modal component with sidebar navigation and content pages. This component allows for custom headers, sidebar items, and footers.
+A reusable modal component with sidebar navigation and content pages. This component allows for custom headers, sidebar
+items, and footers.
 
 ## Features
 
@@ -81,7 +82,7 @@ const MyComponent = () => {
       </div>
       <div className="ml-2">
         <Text className="text-sm font-medium">John Doe</Text>
-        <Text className="text-xs text-alt">@johndoe</Text>
+        <Text className="text-xs" alt>@johndoe</Text>
       </div>
     </div>
   );
@@ -105,12 +106,12 @@ The main container component.
 
 #### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `children` | `ReactNode` | The content of the modal, typically PagedModal.Page components |
-| `className` | `string` | Optional additional CSS classes |
-| `header` | `ReactNode` | Optional custom header for the sidebar |
-| `footer` | `ReactNode` | Optional custom footer for the sidebar |
+| Prop        | Type        | Description                                                    |
+|-------------|-------------|----------------------------------------------------------------|
+| `children`  | `ReactNode` | The content of the modal, typically PagedModal.Page components |
+| `className` | `string`    | Optional additional CSS classes                                |
+| `header`    | `ReactNode` | Optional custom header for the sidebar                         |
+| `footer`    | `ReactNode` | Optional custom footer for the sidebar                         |
 
 ### PagedModal.Page
 
@@ -118,14 +119,14 @@ The component for defining individual pages.
 
 #### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `children` | `ReactNode` | The content of the page |
-| `id` | `string` | Optional unique identifier for the page (defaults to lowercase title with spaces replaced by hyphens) |
-| `title` | `string` | The title of the page, displayed in the sidebar |
-| `description` | `string \| ReactNode` | Optional description displayed under the title in the sidebar |
-| `icon` | `React.ElementType` | Optional icon component to display next to the title |
-| `badge` | `string` | Optional badge text to display next to the title |
+| Prop          | Type                  | Description                                                                                           |
+|---------------|-----------------------|-------------------------------------------------------------------------------------------------------|
+| `children`    | `ReactNode`           | The content of the page                                                                               |
+| `id`          | `string`              | Optional unique identifier for the page (defaults to lowercase title with spaces replaced by hyphens) |
+| `title`       | `string`              | The title of the page, displayed in the sidebar                                                       |
+| `description` | `string \| ReactNode` | Optional description displayed under the title in the sidebar                                         |
+| `icon`        | `React.ElementType`   | Optional icon component to display next to the title                                                  |
+| `badge`       | `string`              | Optional badge text to display next to the title                                                      |
 
 ## Examples
 

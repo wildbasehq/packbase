@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
-import { vg } from '@/lib/api'
-import { Theme } from '@/lib/api/theme'
-import { PackThemeAPI } from '@/lib/api/pack-theme'
+import {useEffect, useState} from 'react'
+import {vg} from '@/lib/api'
+import {Theme} from '@/lib/api/theme'
+import {PackThemeAPI} from '@/lib/api/pack-theme'
 
 // Component to render custom theme HTML and CSS for users or packs
 interface CustomThemeProps {
@@ -9,17 +9,18 @@ interface CustomThemeProps {
     packId?: string
 }
 
-export function CustomTheme({ userId, packId }: CustomThemeProps) {
+export function CustomTheme({userId, packId}: CustomThemeProps) {
     const [theme, setTheme] = useState<Theme | null>(null)
 
     useEffect(() => {
         if (userId && !packId) {
             // Fetch user theme
-            vg.user({ username: userId })
+            vg.user({username: userId})
                 .theme.get()
-                .then(({ data }) => {
-                    if (!data || data.message) return setTheme(null)
-                    setTheme(data)
+                .then(({data}) => {
+                    if (data && !data.message) {
+                        setTheme(data)
+                    } else setTheme(null)
                 })
                 .catch(e => {
                     console.error('Error fetching user theme:', e)
@@ -29,8 +30,9 @@ export function CustomTheme({ userId, packId }: CustomThemeProps) {
             // Fetch pack theme
             PackThemeAPI.getActive(packId)
                 .then(data => {
-                    if (!data) return setTheme(null)
-                    setTheme(data)
+                    if (data) {
+                        setTheme(data)
+                    } else setTheme(null)
                 })
                 .catch(e => {
                     console.error('Error fetching pack theme:', e)
@@ -49,7 +51,7 @@ export function CustomTheme({ userId, packId }: CustomThemeProps) {
 
     return (
         <div className="custom-theme-container">
-            <div dangerouslySetInnerHTML={{ __html: combinedTheme }} />
+            <div dangerouslySetInnerHTML={{__html: combinedTheme}}/>
         </div>
     )
 }

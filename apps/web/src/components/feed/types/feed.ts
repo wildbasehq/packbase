@@ -2,16 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { FeedPostData } from './post'
-
-export type FeedViewType = 1 | 2 // Legacy - may be removed
-
-export interface FeedViewOption {
-    id: FeedViewType
-    name: string
-    icon: React.FC<React.SVGProps<SVGSVGElement>>
-    unavailable?: boolean
-}
+import {FeedPostData} from './post'
+import {ReactNode} from "react";
 
 export interface FeedProps {
     packID?: string
@@ -19,26 +11,6 @@ export interface FeedProps {
     feedQueryOverride?: string
     titleOverride?: string
     dontShowCompose?: boolean
-}
-
-export interface FeedState {
-    posts: FeedPostData[]
-    isLoading: boolean
-    hasMore: boolean
-    currentPage: number
-    error: Error | null
-}
-
-export interface FeedHeaderProps {
-    onViewChange: () => void
-    postsCount: number
-    hasMore: boolean
-}
-
-export interface FeedViewControlsProps {
-    onClose: () => void
-    currentView: FeedViewType
-    onViewChange: (view: FeedViewType) => void
 }
 
 export interface FeedListProps {
@@ -50,7 +22,7 @@ export interface FeedListProps {
 }
 
 export interface FeedLoadingProps {
-    message?: string | React.ReactNode
+    message?: string | ReactNode
     isMasonry?: boolean
 }
 

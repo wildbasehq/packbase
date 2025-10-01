@@ -2,12 +2,12 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { useState } from 'react'
+import {useState} from 'react'
 import UserInfoCol from '@/components/shared/user/info-col'
-import { Text } from '@/components/shared/text'
+import {Text} from '@/components/shared/text'
 
 export default function IDArtistShowcase() {
-    const [notice, setNotice] = useState<any>({
+    const [notice] = useState<any>({
         if_youre_seeing_this_its_because_we_dont_have_a_showcase_yet: true,
         user: {
             id: '52c9daa9-f99c-4384-b61a-2ccacd6b3db8',
@@ -35,12 +35,12 @@ export default function IDArtistShowcase() {
             <div className="absolute left-4 top-16 rounded border-2 bg-card p-2">
                 <Text alt className="mb-2">
                     &copy; {notice.user.username}
-                    <br />
+                    <br/>
                     All rights reserved
                 </Text>
-                <UserInfoCol user={notice.user} />
+                <UserInfoCol user={notice.user}/>
             </div>
-            <img className="inset-0 h-full w-full object-cover" src={notice.image} alt="" />
+            <img className="inset-0 h-full w-full object-cover" src={notice.image} alt=""/>
         </div>
     )
 }

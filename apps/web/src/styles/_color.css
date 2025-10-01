@@ -1,77 +1,52 @@
 /* Colours */
 .bg-sidebar {
-//   @apply bg-white dark:bg-n-7;
-  @apply bg-gradient-to-b from-white to-neutral-50 dark:from-n-7 dark:to-n-7/80;
-}
-
-.bg-sidebar\/90 {
-  @apply bg-gradient-to-b from-white/90 to-n-1/90 dark:from-n-7/90 dark:to-[#1b1b1c]/90;
-}
-
-.bg-body-acrylic {
-  @apply bg-n-1/95 dark:bg-n-7/95;
+    @apply bg-gradient-to-b from-white to-neutral-50 dark:from-n-7 dark:to-n-7/80;
 }
 
 .text-default {
-  @apply text-neutral-700 dark:text-white;
+    @apply text-neutral-700 dark:text-white;
 }
 
 .border-default {
-  @apply border-n-2 dark:border-n-6/50;
-}
-
-.divide-default {
-  @apply divide-neutral-300 dark:divide-neutral-800;
+    @apply border-n-2 dark:border-n-6/50;
 }
 
 .ring-default {
-  @apply ring-n-2/80 dark:ring-n-6/80;
+    @apply ring-n-2/80 dark:ring-n-6/80;
 }
 
 .ring-shadow {
-  @apply ring-n-2/50 dark:ring-n-6/80;
+    @apply ring-n-2/50 dark:ring-n-6/80;
 }
 
 .bg-default {
-  @apply bg-white dark:bg-neutral-800;
+    @apply bg-white dark:bg-neutral-800;
 }
 
 .bg-default-alt {
-  @apply bg-neutral-50 dark:bg-[#303030];
+    @apply bg-neutral-50 dark:bg-[#303030];
 }
 
 .border-default-alt {
-  @apply border-n-2 dark:border-n-6/50;
-}
-
-.divide-default {
-  @apply divide-neutral-300 dark:divide-neutral-800;
-}
-
-.dark\:border-gradient-red-dark {
-  background: linear-gradient(#3d1d1d, #3d1d1d) padding-box, linear-gradient(to top, #f43f5e, #fb7185, #ef4444) border-box
+    @apply border-n-2 dark:border-n-6/50;
 }
 
 .text-secondary {
-  color: var(--color-primary-lime);
+    color: var(--color-primary-lime);
 }
 
 .text-alt {
-  @apply text-n-4;
+    @apply text-n-4;
 }
 
 .fill-alt {
-  @apply fill-n-4/80;
+    @apply fill-n-4/80;
 }
 
 .text-tertiary {
-  color: rgb(var(--destructive));
-}
-
-.border-divider {
-  border-color: var(--color-divider);
+    color: rgb(var(--destructive));
 }
 
 .border-dark {
-  border-color: var(--color-border-dark);
+    border-color: var(--color-border-dark);
 }

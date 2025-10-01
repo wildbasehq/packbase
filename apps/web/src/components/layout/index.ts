@@ -4,7 +4,6 @@
 
 // Re-export all layout components
 export * from './body'
-export * from './ConnectionStatus'
 export * from './container'
 export * from './grid-body'
 export * from './navbar'

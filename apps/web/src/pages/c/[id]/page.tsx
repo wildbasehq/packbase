@@ -1,41 +1,43 @@
-import { useParams } from 'wouter'
-import { useContentFrame, useContentFrameMutation } from '@/components/shared/content-frame.tsx'
-import ContentFrame from '@/components/shared/content-frame.tsx'
-import { Avatar } from '@/components/shared/avatar.tsx'
-import { useSession } from '@clerk/clerk-react'
-import { useUserAccountStore } from '@/lib'
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
-import { toast } from 'sonner'
-import { MessageGroup } from '@/components/chat/MessageGroup'
-import { ChatBox } from '@/components/shared/chat-box.tsx'
-import { Heading, Text } from '@/components/shared/text.tsx'
-import { HomeModernIcon } from '@heroicons/react/24/solid'
-import { useNormalizedMessages } from '@/components/chat/useNormalizedMessages'
-import { useEditingState, useScrollState, useLoadingState } from '@/components/chat/useChatContext'
-import { usePerformanceMonitor } from '@/components/chat/usePerformanceMonitor'
-import { useQueryClient } from '@tanstack/react-query'
+import {useParams} from 'wouter'
+import ContentFrame, {useContentFrame, useContentFrameMutation} from '@/components/shared/content-frame.tsx'
+import {Avatar} from '@/components/shared/avatar.tsx'
+import {useSession} from '@clerk/clerk-react'
+import {useUserAccountStore} from '@/lib'
+import React, {useCallback, useEffect, useMemo, useRef} from 'react'
+import {toast} from 'sonner'
+import {MessageGroup} from '@/components/chat/MessageGroup'
+import {ChatBox} from '@/components/shared/chat-box.tsx'
+import {Heading, Text} from '@/components/shared/text.tsx'
+import {HomeModernIcon} from '@heroicons/react/24/solid'
+import {useNormalizedMessages} from '@/components/chat/useNormalizedMessages'
+import {useEditingState, useLoadingState, useScrollState} from '@/components/chat/useChatContext'
+import {usePerformanceMonitor} from '@/components/chat/usePerformanceMonitor'
+import {useQueryClient} from '@tanstack/react-query'
 
 export default function ChatThreadPage() {
-    const { id } = useParams<{ id: string }>()
+    const {id} = useParams<{ id: string }>()
     if (!id) return null
 
     return (
         <div className="flex flex-col h-full w-full overflow-hidden">
             <ContentFrame get={`dm.channels.${id}`} id={`channel-${id}`}>
-                <ChannelHeader channelId={id} />
+                <ChannelHeader channelId={id}/>
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <ContentFrame get={`dm.channels.${id}.messages`} refetchInterval={5} id={`messages-${id}`}>
-                        <MessagesList channelId={id} />
+                        <MessagesList channelId={id}/>
                     </ContentFrame>
-                    <MessageComposer channelId={id} />
+                    <MessageComposer channelId={id}/>
                 </div>
             </ContentFrame>
         </div>
     )
 }
 
-function ChannelHeader({ channelId }: { channelId: string }) {
-    const { data: channel, isLoading } = useContentFrame('get', `dm.channels.${channelId}`, undefined, { id: `channel-${channelId}` })
+function ChannelHeader({channelId}: { channelId: string }) {
+    const {
+        data: channel,
+        isLoading
+    } = useContentFrame('get', `dm.channels.${channelId}`, undefined, {id: `channel-${channelId}`})
     const rec = channel?.recipients?.[0]
     const name = rec?.display_name || rec?.username || 'Direct Message'
     const avatarSrc = rec?.images_avatar || null
@@ -44,10 +46,10 @@ function ChannelHeader({ channelId }: { channelId: string }) {
     return (
         <div className="border-b p-3 flex-shrink-0">
             {isLoading ? (
-                <div className="h-5 w-40 bg-muted animate-pulse rounded" />
+                <div className="h-5 w-40 bg-muted animate-pulse rounded"/>
             ) : channel ? (
                 <div className="flex items-center gap-3">
-                    <Avatar src={avatarSrc} alt={name} initials={avatarSrc ? undefined : initials} className="size-6" />
+                    <Avatar src={avatarSrc} alt={name} initials={avatarSrc ? undefined : initials} className="size-6"/>
                     <div className="text-sm text-muted-foreground">{name}</div>
                 </div>
             ) : null}
@@ -55,29 +57,29 @@ function ChannelHeader({ channelId }: { channelId: string }) {
     )
 }
 
-function MessagesList({ channelId }: { channelId: string }) {
+function MessagesList({channelId}: { channelId: string }) {
     usePerformanceMonitor('MessagesList')
 
-    const { data: messages, isLoading } = useContentFrame('get', `dm.channels.${channelId}.messages`, undefined, {
+    const {data: messages, isLoading} = useContentFrame('get', `dm.channels.${channelId}.messages`, undefined, {
         id: `messages-${channelId}`,
         refetchInterval: 5,
     })
-    const { data: channel } = useContentFrame('get', `dm.channels.${channelId}`, undefined, { id: `channel-${channelId}` })
+    const {data: channel} = useContentFrame('get', `dm.channels.${channelId}`, undefined, {id: `channel-${channelId}`})
     const messageArray = useMemo(() => (Array.isArray(messages) ? messages : []), [messages])
     const normalizedMessages = useNormalizedMessages(messageArray)
-    const { user: me } = useUserAccountStore()
-    const { session } = useSession()
+    const {user: me} = useUserAccountStore()
+    const {session} = useSession()
 
-    const { editingMessageId, editContent, setEditingMessage, setEditContent, cancelEdit } = useEditingState()
-    const { isUserScrolled, setUserScrolled } = useScrollState()
-    const { loadingOlder, hasMoreMessages, setLoadingOlder, setHasMoreMessages } = useLoadingState()
+    const {editingMessageId, editContent, setEditingMessage, setEditContent, cancelEdit} = useEditingState()
+    const {isUserScrolled, setUserScrolled} = useScrollState()
+    const {loadingOlder, hasMoreMessages, setLoadingOlder, setHasMoreMessages} = useLoadingState()
     const queryClient = useQueryClient()
 
     const scrollContainerRef = useRef<HTMLDivElement>(null)
     const scrollBottomRef = useRef<HTMLDivElement>(null)
 
     const scrollToBottom = useCallback((behavior: 'smooth' | 'auto' = 'smooth') => {
-        scrollBottomRef.current?.scrollIntoView({ behavior })
+        scrollBottomRef.current?.scrollIntoView({behavior})
     }, [])
 
     const checkIfScrolledToBottom = useCallback(() => {
@@ -124,13 +126,13 @@ function MessagesList({ channelId }: { channelId: string }) {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                        ...(token ? {Authorization: `Bearer ${token}`} : {}),
                     },
-                    body: JSON.stringify({ content: editContent.trim() }),
+                    body: JSON.stringify({content: editContent.trim()}),
                 })
 
                 if (res.ok) {
-                    await queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
+                    await queryClient.invalidateQueries({queryKey: [`messages-${channelId}`]})
                 } else {
                     toast.error('Failed to save changes')
                 }
@@ -149,12 +151,12 @@ function MessagesList({ channelId }: { channelId: string }) {
                 const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${messageId}`, {
                     method: 'DELETE',
                     headers: {
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                        ...(token ? {Authorization: `Bearer ${token}`} : {}),
                     },
                 })
 
                 if (res.ok) {
-                    queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
+                    await queryClient.invalidateQueries({queryKey: [`messages-${channelId}`]})
                 } else {
                     toast.error('Failed to delete message')
                 }
@@ -180,7 +182,7 @@ function MessagesList({ channelId }: { channelId: string }) {
                     headers: {
                         'Content-Type': 'application/json',
                         Accept: 'application/json',
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                        ...(token ? {Authorization: `Bearer ${token}`} : {}),
                     },
                 }
             )
@@ -190,7 +192,7 @@ function MessagesList({ channelId }: { channelId: string }) {
                 if (olderMessages.length === 0) {
                     setHasMoreMessages(false)
                 } else {
-                    queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
+                    await queryClient.invalidateQueries({queryKey: [`messages-${channelId}`]})
                 }
             } else {
                 toast.error('Failed to load older messages')
@@ -230,16 +232,18 @@ function MessagesList({ channelId }: { channelId: string }) {
     if (isLoading) {
         return (
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
-                <div className="h-4 w-1/3 bg-muted animate-pulse rounded" />
-                <div className="h-4 w-2/5 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-1/2 bg-muted animate-pulse rounded"/>
+                <div className="h-4 w-1/3 bg-muted animate-pulse rounded"/>
+                <div className="h-4 w-2/5 bg-muted animate-pulse rounded"/>
             </div>
         )
     }
 
     if (!messageArray.length) {
         return (
-            <div className="flex-1 overflow-y-auto p-4 text-sm text-muted-foreground flex items-center justify-center">No messages yet</div>
+            <div
+                className="flex-1 overflow-y-auto p-4 text-sm text-muted-foreground flex items-center justify-center">No
+                messages yet</div>
         )
     }
 
@@ -264,11 +268,12 @@ function MessagesList({ channelId }: { channelId: string }) {
                 {recipient?.id === me?.id && (
                     <div className="flex flex-col mt-30 gap-2">
                         <Heading>
-                            <HomeModernIcon className="inline-flex -mt-1 mr-1 h-5 w-5" />
+                            <HomeModernIcon className="inline-flex -mt-1 mr-1 h-5 w-5"/>
                             Welcome to your basecamp
                         </Heading>
                         <Text>
-                            No one but you here, forever and always. Use this space however you want; saved messages, random photos,
+                            No one but you here, forever and always. Use this space however you want; saved messages,
+                            random photos,
                             whatever!
                         </Text>
                     </div>
@@ -286,8 +291,9 @@ function MessagesList({ channelId }: { channelId: string }) {
                     if (g.type === 'day') {
                         return (
                             <div key={`day-${idx}`} className="relative flex items-center justify-center my-2">
-                                <div className="absolute inset-x-0 h-px bg-border" />
-                                <span className="relative z-10 bg-background px-2 text-xs text-muted-foreground">{g.label}</span>
+                                <div className="absolute inset-x-0 h-px bg-border"/>
+                                <span
+                                    className="relative z-10 bg-background px-2 text-xs text-muted-foreground">{g.label}</span>
                             </div>
                         )
                     }
@@ -310,19 +316,19 @@ function MessagesList({ channelId }: { channelId: string }) {
                     )
                 })}
 
-                <div ref={scrollBottomRef} />
+                <div ref={scrollBottomRef}/>
             </div>
         </div>
     )
 }
 
-function MessageComposer({ channelId }: { channelId: string }) {
-    const { user: me } = useUserAccountStore()
+function MessageComposer({channelId}: { channelId: string }) {
+    const {user: me} = useUserAccountStore()
     const queryClient = useQueryClient()
 
     const sendMessage = useContentFrameMutation('post', `dm/channels/${channelId}/messages`, {
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
+            queryClient.invalidateQueries({queryKey: [`messages-${channelId}`]})
         },
         onError: () => {
             toast.error('Failed to send message')
@@ -331,12 +337,12 @@ function MessageComposer({ channelId }: { channelId: string }) {
 
     const onSend = async (content: string) => {
         if (sendMessage.isPending || !me) return
-        sendMessage.mutate({ content })
+        sendMessage.mutate({content})
     }
 
     return (
         <div className="p-3 border-t">
-            <ChatBox placeholder="Message..." onSend={onSend} disabled={sendMessage.isPending} />
+            <ChatBox placeholder="Message..." onSend={onSend} disabled={sendMessage.isPending}/>
         </div>
     )
 }

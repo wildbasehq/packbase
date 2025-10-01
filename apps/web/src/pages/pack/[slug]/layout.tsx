@@ -3,24 +3,24 @@
  */
 
 import Body from '@/components/layout/body'
-import { LoadingDots } from '@/components/icons'
-import { Heading } from '@/components/shared/text'
-import { vg } from '@/lib/api'
-import { useResourceStore, useUIStore } from '@/lib/state'
-import { FaceFrownIcon } from '@heroicons/react/24/solid'
-import { OrbitIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useParams } from 'wouter'
-import { PackChannels, SafeFrame } from '@/src/components'
-import { SidebarPortal } from '@/lib/context/sidebar-context.tsx'
-import { CustomTheme } from '@/components/shared/theme/custom-theme'
+import {LoadingDots} from '@/components/icons'
+import {Heading} from '@/components/shared/text'
+import {vg} from '@/lib/api'
+import {useResourceStore, useUIStore} from '@/lib/state'
+import {FaceFrownIcon} from '@heroicons/react/24/solid'
+import {OrbitIcon} from 'lucide-react'
+import {ReactNode, useEffect, useState} from 'react'
+import {useParams} from 'wouter'
+import {PackChannels} from '@/src/components'
+import {SidebarPortal} from '@/lib/context/sidebar-context.tsx'
+import {CustomTheme} from '@/components/shared/theme/custom-theme'
 
-export default function PackLayout({ children }: { children: React.ReactNode }) {
-    const { resourceDefault, loading, setLoading, setNavigation } = useUIStore()
-    const { resources, currentResource, setCurrentResource, setResources } = useResourceStore()
+export default function PackLayout({children}: { children: ReactNode }) {
+    const {resourceDefault, loading, setLoading, setNavigation} = useUIStore()
+    const {resources, currentResource, setCurrentResource, setResources} = useResourceStore()
     const [error, setError] = useState<any>(null)
 
-    const { slug } = useParams<{ slug: string }>()
+    const {slug} = useParams<{ slug: string }>()
 
     useEffect(() => {
         const tempResources = resources.slice()
@@ -38,13 +38,13 @@ export default function PackLayout({ children }: { children: React.ReactNode }) 
         if (slug) {
             setLoading(true)
             setError(null)
-            vg.pack({ id: slug })
-                .get({ query: { scope: 'pages' } })
+            vg.pack({id: slug})
+                .get({query: {scope: 'pages'}})
                 .then(res => {
                     setLoading(false)
 
                     if (res.status === 404) {
-                        setError({ cause: 404, message: 'Not Found' })
+                        setError({cause: 404, message: 'Not Found'})
                         setNavigation([
                             {
                                 name: 'Back to the Universe',
@@ -114,8 +114,8 @@ export default function PackLayout({ children }: { children: React.ReactNode }) 
                                 />
                                 Entering {slug}...
                             </Heading>
-                            <p className="text-alt mt-1 items-center align-middle text-sm leading-6">
-                                <LoadingDots className="-mt-1 mr-1 inline-block" />
+                            <p className="text-muted-foreground mt-1 items-center align-middle text-sm leading-6">
+                                <LoadingDots className="-mt-1 mr-1 inline-block"/>
                                 Locating {slug} in the Cosmos, hang tight!
                             </p>
                         </>
@@ -124,31 +124,32 @@ export default function PackLayout({ children }: { children: React.ReactNode }) 
                     {error && (
                         <>
                             <Heading className="items-center">
-                                <FaceFrownIcon className="text-default mr-1 inline-block h-6 w-6" />
+                                <FaceFrownIcon className="text-default mr-1 inline-block h-6 w-6"/>
                                 {error.cause === 404 ? `The Cosmos can't find ${slug}` : `Packbase can\'t continue`}
                                 {error.cause === 404 && slug === 'universe' && `. Someone setup Packbase wrong :/`}
                             </Heading>
-                            <p className="text-alt mt-1 text-sm leading-6">
+                            <p className="text-muted-foreground mt-1 text-sm leading-6">
                                 {error.cause === 404 ? (
                                     <span>
                                         This pack may no longer exist as it isn't in our database.
-                                        <br />
-                                        <br />
+                                        <br/>
+                                        <br/>
                                         {slug === 'universe' ? (
                                             <>
-                                                Someone internally screwed something up, it ain't your fault! If the universe pack is
-                                                missing, chances are *a lot* of other post data is missing as well. Or someone accidentally
+                                                Someone internally screwed something up, it ain't your fault! If the
+                                                universe pack is
+                                                missing, chances are *a lot* of other post data is missing as well. Or
+                                                someone accidentally
                                                 changed the universe slug, either way, you'll have to wait. Sorry!
-                                                <br />
-                                                <br />
-                                                If you're a developer and this is your first time running Packbase, you'll need to create a
-                                                new pack with the <code>universe</code> slug. You can do this with the site public, as the
-                                                user needs the <code>GLOBAL_ADMIN</code> permission to create a pack with that slug, but
-                                                users will see this screen...
+                                                <br/>
+                                                <br/>
+                                                If this is your first time running Packbase, this should have been
+                                                automatically created. Check your database connection!
                                             </>
                                         ) : (
                                             <>
-                                                If you came here from your pack list, please reload to update it &mdash; they might've
+                                                If you came here from your pack list, please reload to update
+                                                it &mdash; they might've
                                                 changed their @name.
                                             </>
                                         )}
@@ -164,13 +165,13 @@ export default function PackLayout({ children }: { children: React.ReactNode }) 
         )
 
     return (
-        <SafeFrame className="w-full h-full">
+        <div>
             <SidebarPortal>
-                <PackChannels />
+                <PackChannels/>
             </SidebarPortal>
 
-            {currentResource && <CustomTheme packId={currentResource.id} />}
+            {currentResource && <CustomTheme packId={currentResource.id}/>}
             {children}
-        </SafeFrame>
+        </div>
     )
 }

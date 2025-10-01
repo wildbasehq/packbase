@@ -3,11 +3,17 @@
  */
 
 // src/components/feed/ImageOverlay.tsx
-import { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { ArrowLeftIcon, ArrowRightIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { useUIStore } from '@/lib/state'
-import { Asset } from './types/post'
+import {DragEvent, MouseEvent, TouchEvent, useEffect, useRef, useState} from 'react'
+import {createPortal} from 'react-dom'
+import {
+    ArrowLeftIcon,
+    ArrowRightIcon,
+    MagnifyingGlassMinusIcon,
+    MagnifyingGlassPlusIcon,
+    XMarkIcon
+} from '@heroicons/react/24/outline'
+import {useUIStore} from '@/lib/state'
+import {Asset} from './types/post'
 
 interface ImageOverlayProps {
     assets: Asset[]
@@ -15,13 +21,13 @@ interface ImageOverlayProps {
     onClose: () => void
 }
 
-export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOverlayProps) {
+export default function ImageOverlay({assets, initialIndex, onClose}: ImageOverlayProps) {
     const bucketRoot = useUIStore(state => state.bucketRoot)
     const [currentIndex, setCurrentIndex] = useState(initialIndex)
     const [scale, setScale] = useState(1)
-    const [position, setPosition] = useState({ x: 0, y: 0 })
+    const [position, setPosition] = useState({x: 0, y: 0})
     const [isDragging, setIsDragging] = useState(false)
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+    const [dragStart, setDragStart] = useState({x: 0, y: 0})
     const [touchDistance, setTouchDistance] = useState<number | null>(null)
 
     const containerRef = useRef<HTMLDivElement>(null)
@@ -82,7 +88,7 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
     // Reset zoom and position when changing images
     const resetView = () => {
         setScale(1)
-        setPosition({ x: 0, y: 0 })
+        setPosition({x: 0, y: 0})
     }
 
     // Zoom functions
@@ -96,7 +102,7 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
 
             // If zooming out to default, reset position too
             if (newScale === 1) {
-                setPosition({ x: 0, y: 0 })
+                setPosition({x: 0, y: 0})
             }
 
             return newScale
@@ -104,14 +110,14 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
     }
 
     // Mouse event handlers for dragging
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const handleMouseDown = (e: MouseEvent) => {
         if (scale > 1) {
             setIsDragging(true)
-            setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y })
+            setDragStart({x: e.clientX - position.x, y: e.clientY - position.y})
         }
     }
 
-    const handleMouseMove = (e: React.MouseEvent) => {
+    const handleMouseMove = (e: MouseEvent) => {
         if (isDragging && scale > 1) {
             setPosition({
                 x: e.clientX - dragStart.x,
@@ -125,7 +131,7 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
     }
 
     // Touch event handlers for pinch zoom and dragging
-    const handleTouchStart = (e: React.TouchEvent) => {
+    const handleTouchStart = (e: TouchEvent) => {
         if (e.touches.length === 2) {
             // Calculate initial distance between two fingers for pinch zoom
             const dx = e.touches[0].clientX - e.touches[1].clientX
@@ -142,7 +148,7 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
         }
     }
 
-    const handleTouchMove = (e: React.TouchEvent) => {
+    const handleTouchMove = (e: TouchEvent) => {
         if (e.touches.length === 2 && touchDistance !== null) {
             // Pinch zoom
             const dx = e.touches[0].clientX - e.touches[1].clientX
@@ -170,7 +176,7 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
     }
 
     // Double-click to zoom in/out
-    const handleDoubleClick = (e: React.MouseEvent) => {
+    const handleDoubleClick = (e: MouseEvent) => {
         if (scale === 1) {
             setScale(2)
             // Zoom to cursor position
@@ -178,7 +184,7 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
             if (rect) {
                 const x = e.clientX - rect.left - rect.width / 2
                 const y = e.clientY - rect.top - rect.height / 2
-                setPosition({ x: -x, y: -y })
+                setPosition({x: -x, y: -y})
             }
         } else {
             resetView()
@@ -186,13 +192,13 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
     }
 
     // Prevent accidental selection during dragging
-    const handleDragStart = (e: React.DragEvent) => {
+    const handleDragStart = (e: DragEvent) => {
         e.preventDefault()
         return false
     }
 
     // Click overlay background to close
-    const handleBackgroundClick = (e: React.MouseEvent) => {
+    const handleBackgroundClick = (e: MouseEvent) => {
         if (e.target === e.currentTarget) {
             onClose()
         }
@@ -209,17 +215,17 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
                     className="p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700"
                     disabled={scale <= 0.5}
                 >
-                    <MagnifyingGlassPlusIcon className="h-5 w-5" />
+                    <MagnifyingGlassPlusIcon className="h-5 w-5"/>
                 </button>
                 <button
                     onClick={handleZoomOut}
                     className="p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700"
                     disabled={scale >= 3}
                 >
-                    <MagnifyingGlassMinusIcon className="h-5 w-5" />
+                    <MagnifyingGlassMinusIcon className="h-5 w-5"/>
                 </button>
                 <button onClick={onClose} className="p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700">
-                    <XMarkIcon className="h-5 w-5" />
+                    <XMarkIcon className="h-5 w-5"/>
                 </button>
             </div>
 
@@ -232,7 +238,7 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
                     }}
                     className="absolute left-4 p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700"
                 >
-                    <ArrowLeftIcon className="h-5 w-5" />
+                    <ArrowLeftIcon className="h-5 w-5"/>
                 </button>
             )}
 
@@ -244,7 +250,7 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
                     }}
                     className="absolute right-4 p-2 rounded-full bg-neutral-800 text-white hover:bg-neutral-700"
                 >
-                    <ArrowRightIcon className="h-5 w-5" />
+                    <ArrowRightIcon className="h-5 w-5"/>
                 </button>
             )}
 
@@ -269,12 +275,13 @@ export default function ImageOverlay({ assets, initialIndex, onClose }: ImageOve
                         transformOrigin: 'center',
                     }}
                 >
-                    <img src={assetUrl} alt="" className="max-h-screen max-w-screen" draggable={false} />
+                    <img src={assetUrl} alt="" className="max-h-screen max-w-screen" draggable={false}/>
                 </div>
             </div>
 
             {/* Image counter */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-neutral-800 bg-opacity-75 px-3 py-1 rounded-full text-white text-sm">
+            <div
+                className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-neutral-800 bg-opacity-75 px-3 py-1 rounded-full text-white text-sm">
                 {currentIndex + 1} / {imageAssets.length}
             </div>
         </div>,

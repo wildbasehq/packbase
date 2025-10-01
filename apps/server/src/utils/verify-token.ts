@@ -1,7 +1,7 @@
 import clerkClient from '@/db/auth';
 import prisma from '@/db/prisma';
-import trinketManager, { toParentId } from './trinket-manager';
-import { NotificationManager } from './NotificationManager';
+import trinketManager, {toParentId} from './trinket-manager';
+import {NotificationManager} from './NotificationManager';
 import Debug from 'debug';
 
 const log = {
@@ -45,7 +45,6 @@ export default async function verifyToken(req: any) {
 
     // If no user ID, proceed without queue logic
     if (!userId) {
-        log.info('No user ID found, proceeding without queue logic');
         return await verifyTokenProcess(req);
     }
 
@@ -165,8 +164,6 @@ async function verifyTokenProcess(req: any) {
             } else if (user.sub) {
                 log.info(`Found existing profile ${user.sub} for user ${user.userId}`);
             }
-        } else {
-            log.info('User is not signed in');
         }
     } catch (e) {
         log.error('Error in verifyTokenProcess:', e);

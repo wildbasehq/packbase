@@ -1,6 +1,6 @@
 import React from 'react'
-import { ContentBlock } from '@/types/terms'
-import { Heading, Text } from '@/components/shared/text'
+import {ContentBlock} from '@/types/terms'
+import {Heading, Text} from '@/components/shared/text'
 
 interface ContentRendererProps {
     block: ContentBlock
@@ -8,7 +8,7 @@ interface ContentRendererProps {
     retentionOrder?: string[]
 }
 
-const ContentRenderer: React.FC<ContentRendererProps> = ({ block, dataCollection = [], retentionOrder = [] }) => {
+const ContentRenderer: React.FC<ContentRendererProps> = ({block, dataCollection = [], retentionOrder = []}) => {
     const renderContent = () => {
         switch (block.type) {
             case 'heading':
@@ -47,34 +47,36 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ block, dataCollection
                         <div className="overflow-x-auto rounded border">
                             <table className="min-w-full">
                                 <thead className="bg-card">
-                                    <tr>
-                                        {block.tableData.headers.map((header, index) => (
-                                            <th key={index} className="p-4 text-left">
-                                                <Text>{header}</Text>
-                                            </th>
-                                        ))}
-                                    </tr>
+                                <tr>
+                                    {block.tableData.headers.map((header, index) => (
+                                        <th key={index} className="p-4 text-left">
+                                            <Text>{header}</Text>
+                                        </th>
+                                    ))}
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    {sortedData.map((row, index) => (
-                                        <tr key={index} className="odd:bg-white/50 even:bg-white dark:odd:bg-transparent dark:even:bg-n-7">
-                                            <td className="p-4">
-                                                <Text>{row.type}</Text>
-                                            </td>
-                                            <td className="p-4">
-                                                <Text>{row.purpose}</Text>
-                                            </td>
-                                            <td className="p-4">
-                                                <Text>{row.retention}</Text>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                {sortedData.map((row, index) => (
+                                    <tr key={index}
+                                        className="odd:bg-white/50 even:bg-white dark:odd:bg-transparent dark:even:bg-n-7">
+                                        <td className="p-4">
+                                            <Text>{row.type}</Text>
+                                        </td>
+                                        <td className="p-4">
+                                            <Text>{row.purpose}</Text>
+                                        </td>
+                                        <td className="p-4">
+                                            <Text>{row.retention}</Text>
+                                        </td>
+                                    </tr>
+                                ))}
                                 </tbody>
                             </table>
                         </div>
                     )
+                } else {
+                    return <span>failed.</span>
                 }
-                break
 
             case 'card':
                 const cardStyles = {
@@ -94,7 +96,8 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ block, dataCollection
                 return (
                     <div className={cardStyles[block.style || 'default']}>
                         {block.title && (
-                            <Heading size="xl" className={`mb-4 font-medium ${block.style === 'dark' ? 'text-white!' : ''}`}>
+                            <Heading size="xl"
+                                     className={`mb-4 font-medium ${block.style === 'dark' ? 'text-white!' : ''}`}>
                                 {block.title}
                             </Heading>
                         )}
@@ -118,7 +121,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ block, dataCollection
                 )
 
             default:
-                return null
+                return <span>failed.</span>
         }
     }
 

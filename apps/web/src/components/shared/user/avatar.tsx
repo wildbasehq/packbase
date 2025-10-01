@@ -3,22 +3,22 @@
  */
 
 import BoringAvatar from 'boring-avatars'
-import { clsx } from 'clsx'
-import Link from '@/components/shared/link.tsx'
+import {cn, isVisible} from "@/lib";
+import {Activity} from "react";
 
 export default function UserAvatar({
-    user,
-    size = 'lg',
-    icon,
-    showOnlineStatus = false,
-    ...props
-}: {
+                                       user,
+                                       size = 'lg',
+                                       icon,
+                                       showOnlineStatus = false,
+                                       ...props
+                                   }: {
     user?: any // object - @todo: type this
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | number
     icon?: string
     showOnlineStatus?: boolean
     isOnline?: boolean
-    [x: string]: any
+    [_: string]: any
 }) {
     const sizes = {
         xs: 16,
@@ -38,47 +38,48 @@ export default function UserAvatar({
     }
 
     const isOnline = user?.online
+    const hasIcon = ((user?.images?.avatar || user?.images_avatar)) || icon
 
-    if ((!user || (!user.images?.avatar && !user.images_avatar)) && !icon) {
-        return (
-            <div
-                className={clsx(props.className, `relative items-center justify-center overflow-hidden rounded-md bg-n-5 text-white`)}
-                style={props.style}
-                title={`${user?.username || user?.display_name || props.display_name}'s avatar`}
-            >
-                <BoringAvatar
-                    variant="beam"
-                    square
-                    size={typeof size === 'number' ? size : sizes[size]}
-                    name={user?.username || props.name || 'packbase'}
-                    {...props}
-                />
-                {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size} />}
-            </div>
-        )
-    } else {
-        return (
-            // <Link href={`/@${user?.username}`}>
-            <div className="relative" style={props.style}>
-                <img
-                    width={1024}
-                    height={1024}
-                    src={user?.images?.avatar || user?.images_avatar || icon}
-                    alt={`${user?.username || props.display_name}'s avatar`}
-                    {...props}
-                    className={clsx(props.className, `inline-flex items-center justify-center overflow-hidden rounded-md text-white`)}
-                />
-                {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size} />}
-            </div>
-            // </Link>
-        )
-    }
+    return (
+        <>
+            <Activity mode={isVisible(!hasIcon)}>
+                <div
+                    className={cn(props.className, `relative items-center justify-center overflow-hidden rounded-md bg-n-5 text-white`)}
+                    style={props.style}
+                    title={`${user?.username || user?.display_name || props.display_name}'s avatar`}
+                >
+                    <BoringAvatar
+                        variant="beam"
+                        square
+                        size={typeof size === 'number' ? size : sizes[size]}
+                        name={user?.username || props.name || 'packbase'}
+                        {...props}
+                    />
+                    {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size}/>}
+                </div>
+            </Activity>
+            
+            <Activity mode={isVisible(hasIcon)}>
+                <div className="relative" style={props.style}>
+                    <img
+                        width={1024}
+                        height={1024}
+                        src={user?.images?.avatar || user?.images_avatar || icon}
+                        alt={`${user?.username || props.display_name}'s avatar`}
+                        {...props}
+                        className={cn(props.className, `inline-flex items-center justify-center overflow-hidden rounded-md text-white`)}
+                    />
+                    {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size}/>}
+                </div>
+            </Activity>
+        </>
+    )
 }
 
-function OnlineStatus({ isOnline, size }: { isOnline: boolean; size: string | number }) {
+function OnlineStatus({isOnline, size}: { isOnline: boolean; size: string | number }) {
     return (
         <div
-            className={clsx(
+            className={cn(
                 'absolute -bottom-0.5 -right-0.5 rounded-full border-2 border-white dark:border-zinc-900',
                 isOnline ? 'bg-green-500' : 'bg-gray-400',
                 {

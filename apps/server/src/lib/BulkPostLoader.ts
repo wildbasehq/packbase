@@ -5,7 +5,8 @@ import getClerkAvatar from '@/utils/get-clerk-avatar';
  * BulkPostLoader - Efficiently loads multiple posts with a single query
  */
 export class BulkPostLoader {
-    constructor() {}
+    constructor() {
+    }
 
     /**
      * Load multiple posts with a single query, including user data and reactions
@@ -21,7 +22,7 @@ export class BulkPostLoader {
             // First, fetch the posts with minimal related data
             const posts = await prisma.posts.findMany({
                 where: {
-                    id: { in: postIds },
+                    id: {in: postIds},
                 },
                 select: {
                     id: true,
@@ -144,14 +145,12 @@ export class BulkPostLoader {
             Object.keys(reactionsByPost).forEach((postId) => {
                 const post = postsMap[postId];
                 if (post) {
-                    const postReactions = Object.entries(reactionsByPost[postId]).map(([key, data]) => ({
+                    post.reactions = Object.entries(reactionsByPost[postId]).map(([key, data]) => ({
                         key,
                         emoji: data.emoji,
                         count: data.users.length,
                         reactedByMe: currentUserId ? data.users.includes(currentUserId) : false,
                     }));
-
-                    post.reactions = postReactions;
                 }
             });
 
@@ -233,7 +232,7 @@ export class BulkPostLoader {
         try {
             const data = await prisma.profiles.findMany({
                 where: {
-                    id: { in: userIds },
+                    id: {in: userIds},
                 },
             });
 
@@ -285,7 +284,7 @@ export class BulkPostLoader {
         try {
             const data = await prisma.posts_reactions.findMany({
                 where: {
-                    post_id: { in: postIds },
+                    post_id: {in: postIds},
                 },
                 select: {
                     post_id: true,
@@ -310,7 +309,7 @@ export class BulkPostLoader {
         try {
             const data = await prisma.posts.findMany({
                 where: {
-                    parent: { in: postIds },
+                    parent: {in: postIds},
                 },
                 select: {
                     id: true,
@@ -337,7 +336,7 @@ export class BulkPostLoader {
         try {
             const data = await prisma.packs.findMany({
                 where: {
-                    id: { in: packIds },
+                    id: {in: packIds},
                 },
             });
 
@@ -357,7 +356,7 @@ export class BulkPostLoader {
         try {
             const data = await prisma.packs_pages.findMany({
                 where: {
-                    id: { in: channelds },
+                    id: {in: channelds},
                 },
                 select: {
                     id: true,

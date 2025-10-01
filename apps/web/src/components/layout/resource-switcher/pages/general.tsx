@@ -1,16 +1,15 @@
-import { Heading, Text } from '@/components/shared/text.tsx'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/alert.tsx'
-import { UserCircleIcon } from '@heroicons/react/24/solid'
+import {Heading, Text} from '@/components/shared/text.tsx'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert.tsx'
+import {UserCircleIcon} from '@heroicons/react/24/solid'
 import UserAvatar from '@/components/shared/user/avatar.tsx'
-import { Button } from '@/components/shared/experimental-button-rework'
-import { Input, Textarea, Field, Label } from '@/components/shared'
-import { vg } from '@/lib/api'
-import { toast } from 'sonner'
-import { createRef, useEffect, useState } from 'react'
-import { useResourceStore } from '@/lib'
+import {Button, Field, Input, Label, Textarea} from '@/components/shared'
+import {vg} from '@/lib/api'
+import {toast} from 'sonner'
+import {Activity, createRef, FormEvent, useEffect, useState} from 'react'
+import {isVisible, useResourceStore} from '@/lib'
 
 export default function ResourceSettingsGeneral() {
-    const { currentResource, setCurrentResource, resources, setResources } = useResourceStore()
+    const {currentResource, setCurrentResource, resources, setResources} = useResourceStore()
     // For pack avatar upload
     const [profilePicUpload, setProfilePicUpload] = useState<File | undefined>()
     const [profilePicPreview, setProfilePicPreview] = useState<string | undefined>()
@@ -55,11 +54,12 @@ export default function ResourceSettingsGeneral() {
 
     useEffect(() => {
         for (let ref in fields) {
-            if (fields[ref].ref?.current) {
-                if (fields[ref].api) {
-                    fields[ref].ref.current.value = getObjectFromStringPath(currentResource, fields[ref].api) || ''
+            const fieldData = fields[ref]
+            if (fieldData.ref?.current) {
+                if ('api' in fieldData && fieldData.api) {
+                    fieldData.ref.current.value = getObjectFromStringPath(currentResource, fieldData.api) || ''
                 } else {
-                    fields[ref].ref.current.value = currentResource[ref] || ''
+                    fieldData.ref.current.value = currentResource[ref] || ''
                 }
             }
         }
@@ -77,71 +77,84 @@ export default function ResourceSettingsGeneral() {
             .join(' ')
     }
 
-    const aggregateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const aggregateSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setSubmitting(true)
-        let packUpdate: any = {}
-        if (profilePicPreview) {
-            packUpdate.images = { avatar: profilePicPreview }
+
+        // Helper function to build nested object structure
+        const buildNestedObject = (path: string[], value: any) => {
+            return path.reduceRight((acc, key) => ({[key]: acc}), value)
         }
 
-        if (headerPicPreview) {
-            packUpdate.images = { ...packUpdate.images, header: headerPicPreview }
-        }
-
-        for (let field in fields) {
-            if (fields[field].api) {
-                // 'about.bio' -> { about: { bio: value } }
-                const path = fields[field].api.split('.')
-                let obj = packUpdate
-                for (let i = 0; i < path.length - 1; i++) {
-                    obj[path[i]] = {}
-                    obj = obj[path[i]]
+        // Prepare the update object
+        const packUpdate = {
+            ...(profilePicPreview && {images: {avatar: profilePicPreview}}),
+            ...(headerPicPreview && {
+                images: {
+                    ...((profilePicPreview && {avatar: profilePicPreview}) || {}),
+                    header: headerPicPreview
                 }
-                obj[path[path.length - 1]] = fields[field].ref?.current.value
-            } else {
-                packUpdate[field] = fields[field].ref?.current.value
-            }
-        }
+            }),
+            ...Object.entries(fields).reduce((acc, [field, fieldData]) => {
+                const value = fieldData.ref?.current.value
+                if (!value) return acc
 
-        // Remove undefined, null, empty strings
-        for (let key in packUpdate) {
-            if (!packUpdate[key] || packUpdate[key] === '') {
-                delete packUpdate[key]
-            }
-        }
-
-        vg.pack({ id: currentResource.id })
-            .post(packUpdate)
-            .then(({ error }) => {
-                if (error) {
-                    toast.error(
-                        `Whoops! ${error.status}: ${
-                            (error.status as unknown as number) === 403
-                                ? 'You are not authorized to perform this action.'
-                                : error.value.summary
-                        }${error.value.property ? ` (/${error.value.on}${error.value.property})` : ''}`
-                    )
-                } else {
-                    toast.success('Settings saved!')
-                    // Set resources to reflect changes
-                    if (packUpdate.images) {
-                        packUpdate.images.avatar = packUpdate.images.avatar || currentResource.images.avatar
-                        packUpdate.images.header = packUpdate.images.header || currentResource.images.header
+                if ('api' in fieldData && fieldData.api) {
+                    const path = fieldData.api.split('.')
+                    return {
+                        ...acc,
+                        ...buildNestedObject(path, value)
                     }
-                    const newResources = resources.map(r => (r.id === currentResource.id ? { ...r, ...packUpdate } : r))
-                    setResources(newResources)
-                    setCurrentResource(newResources.find(r => r.id === currentResource.id))
                 }
-            })
-            .catch(e => {
-                toast.error(e.status)
-            })
-            .finally(() => {
-                setSubmitting(false)
-            })
-    }
 
+                return {
+                    ...acc,
+                    [field]: value
+                }
+            }, {})
+        }
+
+        // Clean empty values
+        const cleanedUpdate = Object.entries(packUpdate).reduce((acc, [key, value]) => {
+            if (value && value !== '') {
+                acc[key] = value
+            }
+            return acc
+        }, {} as Record<string, any>)
+
+        vg.pack({id: currentResource.id})
+            .post(cleanedUpdate)
+            .then(({error}) => {
+                if (error) {
+                    const errorMessage = (error.status as unknown as number) === 403
+                        ? 'You are not authorized to perform this action.'
+                        : error.value.summary
+                    const propertyInfo = error.value.property
+                        ? ` (/${error.value.on}${error.value.property})`
+                        : ''
+                    toast.error(`Whoops! ${error.status}: ${errorMessage}${propertyInfo}`)
+                    return
+                }
+
+                toast.success('Settings saved!')
+
+                // Update resources with new data
+                if (cleanedUpdate.images) {
+                    cleanedUpdate.images = {
+                        avatar: cleanedUpdate.images.avatar || currentResource.images.avatar,
+                        header: cleanedUpdate.images.header || currentResource.images.header
+                    }
+                }
+
+                const newResources = resources.map(r =>
+                    r.id === currentResource.id ? {...r, ...cleanedUpdate} : r
+                )
+                setResources(newResources)
+                setCurrentResource(newResources.find(r => r.id === currentResource.id))
+            })
+            .catch(e => toast.error(e.status))
+            .finally(() => setSubmitting(false))
+    }
     return (
         <form onSubmit={aggregateSubmit}>
             <div className="flex flex-1 flex-col gap-4 pb-12">
@@ -153,8 +166,10 @@ export default function ResourceSettingsGeneral() {
                 <Alert variant="destructive">
                     <AlertTitle>Trinkets will be required soon!</AlertTitle>
                     <AlertDescription>
-                        Trinkets (T) are a new feature that will be required to perform certain actions in the future. You can earn trinkets
-                        from your community interacting with your pack, which is already counting! You can never buy or exchange Trinkets
+                        Trinkets (T) are a new feature that will be required to perform certain actions in the future.
+                        You can earn trinkets
+                        from your community interacting with your pack, which is already counting! You can never buy or
+                        exchange Trinkets
                         with real money.
                     </AlertDescription>
                 </Alert>
@@ -162,7 +177,8 @@ export default function ResourceSettingsGeneral() {
                 {/* form */}
                 <div className="flex flex-col gap-4">
                     <div className="col-span-full">
-                        <label htmlFor="avatar" className="text-default block select-none text-sm font-medium leading-6">
+                        <label htmlFor="avatar"
+                               className="text-default block select-none text-sm font-medium leading-6">
                             Photo
                         </label>
                         <Input
@@ -174,11 +190,12 @@ export default function ResourceSettingsGeneral() {
                             onChange={e => setProfilePicUpload(e.target.files?.[0] || undefined)}
                         />
                         <div className="mt-2 flex items-center gap-x-3">
-                            {!profilePicPreview ? (
-                                <UserCircleIcon className="text-alt h-12 w-12" aria-hidden="true" />
-                            ) : (
-                                <UserAvatar icon={profilePicPreview} size="lg" />
-                            )}
+                            <Activity mode={isVisible(!!profilePicPreview)}>
+                                <UserAvatar icon={profilePicPreview} size="lg"/>
+                            </Activity>
+                            <Activity mode={isVisible(!profilePicPreview)}>
+                                <UserCircleIcon className="text-muted-foreground h-12 w-12" aria-hidden="true"/>
+                            </Activity>
                             <Button outline onClick={() => document.getElementById('avatar')?.click()}>
                                 <div>Upload</div>
                             </Button>
@@ -188,7 +205,8 @@ export default function ResourceSettingsGeneral() {
                     <div className="grid grid-cols-2">
                         {/* Header image */}
                         <div>
-                            <label htmlFor="header" className="text-default block select-none text-sm font-medium leading-6">
+                            <label htmlFor="header"
+                                   className="text-default block select-none text-sm font-medium leading-6">
                                 Header
                             </label>
                             <input
@@ -208,7 +226,7 @@ export default function ResourceSettingsGeneral() {
 
                         <div className="aspect-3/1 rounded-lg bg-n-2/25">
                             {headerPicPreview ? (
-                                <img src={headerPicPreview} alt="Header preview" className="rounded-lg object-cover" />
+                                <img src={headerPicPreview} alt="Header preview" className="rounded-lg object-cover"/>
                             ) : (
                                 <div className="text-default flex h-full items-center justify-center">
                                     <Text alt>Upload a header image</Text>

@@ -1,10 +1,10 @@
-import { t } from 'elysia';
-import { YapockType } from '@/index';
+import {t} from 'elysia';
+import {YapockType} from '@/index';
 import prisma from '@/db/prisma';
-import { HTTPError } from '@/lib/HTTPError';
-import { CommonErrorResponses, DM_ERROR_CODES } from '@/utils/dm/errors';
-import { CreateMessageBody, MESSAGE_TYPES, validateMessageType } from '@/utils/dm/validation';
-import { DMRateLimiter } from '@/utils/dm/rate-limiter';
+import {HTTPError} from '@/lib/HTTPError';
+import {CommonErrorResponses, DM_ERROR_CODES} from '@/utils/dm/errors';
+import {CreateMessageBody, MESSAGE_TYPES, validateMessageType} from '@/utils/dm/validation';
+import {DMRateLimiter} from '@/utils/dm/rate-limiter';
 
 // Message response schema
 const MessageResponse = t.Object({
@@ -24,7 +24,7 @@ export default (app: YapockType) =>
         // GET /dm/channels/:id/messages
         .get(
             '',
-            async ({ set, user, params, query }) => {
+            async ({set, user, params, query}) => {
                 if (!user?.sub) {
                     set.status = 401;
                     throw HTTPError.unauthorized({
@@ -33,9 +33,14 @@ export default (app: YapockType) =>
                     });
                 }
 
-                const { id } = params as { id: string };
+                const {id} = params as { id: string };
                 // Ensure the user participates in the channel
-                const isParticipant = await prisma.dm_participants.findFirst({ where: { channel_id: id, user_id: user.sub } });
+                const isParticipant = await prisma.dm_participants.findFirst({
+                    where: {
+                        channel_id: id,
+                        user_id: user.sub
+                    }
+                });
                 if (!isParticipant) {
                     set.status = 403;
                     throw HTTPError.forbidden({
@@ -44,33 +49,33 @@ export default (app: YapockType) =>
                     });
                 }
 
-                const { limit: limitQ, before, after } = query as any;
+                const {limit: limitQ, before, after} = query as any;
                 const limit = Math.max(1, Math.min(Number(limitQ) || 50, 100));
 
                 let beforeDate: Date | undefined;
                 let afterDate: Date | undefined;
 
                 if (before) {
-                    const msg = await prisma.dm_messages.findUnique({ where: { id: String(before) } });
+                    const msg = await prisma.dm_messages.findUnique({where: {id: String(before)}});
                     if (msg) beforeDate = msg.created_at;
                 }
                 if (after) {
-                    const msg = await prisma.dm_messages.findUnique({ where: { id: String(after) } });
+                    const msg = await prisma.dm_messages.findUnique({where: {id: String(after)}});
                     if (msg) afterDate = msg.created_at;
                 }
 
                 const messages = await prisma.dm_messages.findMany({
                     where: {
                         channel_id: id,
-                        ...(beforeDate ? { created_at: { lt: beforeDate } } : {}),
-                        ...(afterDate ? { created_at: { gt: afterDate } } : {}),
+                        ...(beforeDate ? {created_at: {lt: beforeDate}} : {}),
+                        ...(afterDate ? {created_at: {gt: afterDate}} : {}),
                     },
-                    orderBy: { created_at: 'desc' },
+                    orderBy: {created_at: 'desc'},
                     take: limit,
                 });
 
                 // Map to response payloads (hide content if deleted)
-                const mapped = messages.map((m) => ({
+                return messages.map((m) => ({
                     id: m.id,
                     channel_id: m.channel_id,
                     author_id: m.author_id,
@@ -81,11 +86,9 @@ export default (app: YapockType) =>
                     deleted_at: m.deleted_at?.toISOString() || null,
                     reply_to: m.reply_to,
                 }));
-
-                return mapped;
             },
             {
-                detail: { description: 'List messages in a DM channel', tags: ['DM'] },
+                detail: {description: 'List messages in a DM channel', tags: ['DM']},
                 response: {
                     200: t.Array(MessageResponse),
                     401: CommonErrorResponses[401],
@@ -96,7 +99,7 @@ export default (app: YapockType) =>
         // POST /dm/channels/:id/messages
         .post(
             '',
-            async ({ set, user, params, body }) => {
+            async ({set, user, params, body}) => {
                 if (!user?.sub) {
                     set.status = 401;
                     throw HTTPError.unauthorized({
@@ -105,7 +108,7 @@ export default (app: YapockType) =>
                     });
                 }
 
-                const { id } = params as { id: string };
+                const {id} = params as { id: string };
 
                 // Check rate limits before processing
                 const rateLimiter = DMRateLimiter.getInstance();
@@ -124,7 +127,7 @@ export default (app: YapockType) =>
                     });
                 }
 
-                const { content, message_type, reply_to } = body as {
+                const {content, message_type, reply_to} = body as {
                     content?: string;
                     message_type?: string;
                     reply_to?: string;
@@ -175,7 +178,12 @@ export default (app: YapockType) =>
                     }
                 }
 
-                const isParticipant = await prisma.dm_participants.findFirst({ where: { channel_id: id, user_id: user.sub } });
+                const isParticipant = await prisma.dm_participants.findFirst({
+                    where: {
+                        channel_id: id,
+                        user_id: user.sub
+                    }
+                });
                 if (!isParticipant) {
                     set.status = 403;
                     throw HTTPError.forbidden({
@@ -194,7 +202,7 @@ export default (app: YapockType) =>
                     },
                 });
 
-                await prisma.dm_channels.update({ where: { id }, data: { last_message_id: message.id } });
+                await prisma.dm_channels.update({where: {id}, data: {last_message_id: message.id}});
 
                 // Record the message for rate limiting after successful creation
                 rateLimiter.recordMessage(user.sub, id);
@@ -212,7 +220,7 @@ export default (app: YapockType) =>
                 };
             },
             {
-                detail: { description: 'Send a message to a DM channel', tags: ['DM'] },
+                detail: {description: 'Send a message to a DM channel', tags: ['DM']},
                 body: CreateMessageBody,
                 response: {
                     200: MessageResponse,

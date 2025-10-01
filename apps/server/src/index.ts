@@ -205,16 +205,14 @@ const Yapock = new Elysia({})
      *               memory?: number,
      *             }
      */
-    .get('/health', async ({response}) => {
-        const health = {
+    .get('/health', async () => {
+        return {
             status: 'OK',
             message: 'Server is healthy',
             connections: process.env.CLUSTER_WORKERS ? process.env.CLUSTER_WORKERS : 1,
             cpu: process.cpuUsage().system / 1000000000,
             memory: process.memoryUsage().heapUsed / 1000000,
         };
-
-        return health;
     })
     .listen(process.env.PORT || 8000, async () => {
         const startupMs = performance.now();

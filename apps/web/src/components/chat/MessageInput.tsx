@@ -1,7 +1,7 @@
-import React, { useState, forwardRef, useImperativeHandle, useRef } from 'react'
-import { cn } from '@/lib/utils/cn'
-import { ChatEvents } from './types'
-import { Button } from '@/components/shared/experimental-button-rework'
+import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react'
+import {cn} from '@/lib/utils/cn'
+import {ChatEvents} from './types'
+import {Button} from '@/components/shared'
 
 interface MessageInputProps extends ChatEvents {
     placeholder?: string
@@ -10,7 +10,7 @@ interface MessageInputProps extends ChatEvents {
 }
 
 export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>(
-    ({ onChatSend, placeholder = 'Message…', disabled, className }, ref) => {
+    ({onChatSend, placeholder = 'Message…', disabled, className}, ref) => {
         const [value, setValue] = useState('')
         const inputRef = useRef<HTMLInputElement>(null)
 

@@ -1,7 +1,14 @@
 import prisma from '@/db/prisma';
-import trinketManager, { toParentId } from '@/utils/trinket-manager';
-import { HTTPError } from '@/lib/HTTPError';
+import trinketManager, {toParentId} from '@/utils/trinket-manager';
+import {HTTPError} from '@/lib/HTTPError';
 import Items from '@/lib/store/items.json';
+import debug from "debug";
+
+const log = {
+    info: debug('vg:trinket'),
+    error: debug('vg:trinket:error'),
+    warn: debug('vg:trinket:warn'),
+}
 
 export type StoreItemId = keyof typeof Items;
 
@@ -38,42 +45,42 @@ export default class StoreManager {
     async listWithOwnership(userId: string): Promise<(StoreItem & { ownedAmount: number })[]> {
         const items = this.listItems();
         const rows = await prisma.inventory.findMany({
-            where: { user_id: userId, item_id: { in: items.map((i) => i.id) } },
-            select: { item_id: true, amount: true },
+            where: {user_id: userId, item_id: {in: items.map((i) => i.id)}},
+            select: {item_id: true, amount: true},
         });
         const ownedMap = new Map(rows.map((r) => [r.item_id, r.amount] as const));
-        return items.map((i) => ({ ...i, ownedAmount: ownedMap.get(i.id) ?? 0 }));
+        return items.map((i) => ({...i, ownedAmount: ownedMap.get(i.id) ?? 0}));
     }
 
     async purchase(userId: string, itemId: string, quantity: number = 1): Promise<PurchaseResult> {
         const item = this.getItem(itemId);
         if (!item) {
-            throw HTTPError.notFound({ summary: 'ITEM_NOT_FOUND' });
+            throw HTTPError.notFound({summary: 'ITEM_NOT_FOUND'});
         }
         if (!Number.isInteger(quantity) || quantity <= 0) {
-            throw HTTPError.badRequest({ summary: 'INVALID_QUANTITY' });
+            throw HTTPError.badRequest({summary: 'INVALID_QUANTITY'});
         }
         if (item.stackable === false && quantity !== 1) {
-            throw HTTPError.badRequest({ summary: 'NOT_STACKABLE' });
+            throw HTTPError.badRequest({summary: 'NOT_STACKABLE'});
         }
         if (item.stackable && item.maxQuantity && quantity > item.maxQuantity) {
-            throw HTTPError.badRequest({ summary: 'QUANTITY_EXCEEDS_MAX' });
+            throw HTTPError.badRequest({summary: 'QUANTITY_EXCEEDS_MAX'});
         }
 
         // Validate ownership for one-time purchases before charging
         const existing = await prisma.inventory.findUnique({
-            where: { item_id_user_id: { item_id: item.id, user_id: userId } },
-            select: { amount: true },
+            where: {item_id_user_id: {item_id: item.id, user_id: userId}},
+            select: {amount: true},
         });
 
         if (!item.stackable && existing) {
-            throw HTTPError.conflict({ summary: 'ALREADY_OWNED' });
+            throw HTTPError.conflict({summary: 'ALREADY_OWNED'});
         }
 
         // Calculate cost and charge trinkets first
         const totalCost = item.price * quantity;
         if (!Number.isInteger(totalCost) || totalCost < 0) {
-            throw HTTPError.serverError({ summary: 'INVALID_PRICE' });
+            throw HTTPError.serverError({summary: 'INVALID_PRICE'});
         }
 
         const parentId = toParentId('user', userId);
@@ -85,15 +92,15 @@ export default class StoreManager {
             newTrinketBalance = await trinketManager.decrement(parentId, totalCost);
         } catch (e: any) {
             if (e?.message === 'insufficient trinkets') {
-                throw HTTPError.forbidden({ summary: 'INSUFFICIENT_TRINKETS' });
+                throw HTTPError.forbidden({summary: 'INSUFFICIENT_TRINKETS'});
             }
             console.error(e);
-            throw HTTPError.serverError({ summary: 'FAILED_TO_CHARGE' });
+            throw HTTPError.serverError({summary: 'FAILED_TO_CHARGE'});
         }
 
         try {
             const updated = await prisma.inventory.upsert({
-                where: { item_id_user_id: { item_id: item.id, user_id: userId } },
+                where: {item_id_user_id: {item_id: item.id, user_id: userId}},
                 update: {
                     amount: item.stackable ? (existing?.amount ?? 0) + quantity : 1,
                     type: item.type,
@@ -104,26 +111,26 @@ export default class StoreManager {
                     amount: item.stackable ? quantity : 1,
                     type: item.type,
                 },
-                select: { item_id: true, amount: true, type: true },
+                select: {item_id: true, amount: true, type: true},
             });
 
             // Set is_set to true if the item is a badge, only to this item. Sets all other badges to false.
             if (item.type === 'badge') {
                 await prisma.inventory.updateMany({
-                    where: { user_id: userId, type: 'badge' },
-                    data: { is_set: false },
+                    where: {user_id: userId, type: 'badge'},
+                    data: {is_set: false},
                 });
                 await prisma.inventory.update({
-                    where: { item_id_user_id: { item_id: item.id, user_id: userId } },
-                    data: { is_set: true },
+                    where: {item_id_user_id: {item_id: item.id, user_id: userId}},
+                    data: {is_set: true},
                 });
             }
 
             // Enforce maxQuantity on total amount if defined
             if (item.stackable && item.maxQuantity && updated.amount > item.maxQuantity) {
                 await prisma.inventory.update({
-                    where: { item_id_user_id: { item_id: item.id, user_id: userId } },
-                    data: { amount: item.maxQuantity },
+                    where: {item_id_user_id: {item_id: item.id, user_id: userId}},
+                    data: {amount: item.maxQuantity},
                 });
                 updated.amount = item.maxQuantity;
             }
@@ -134,7 +141,7 @@ export default class StoreManager {
                     action: 'INVENTORY_PURCHASE_OK',
                     model_type: 'inventory',
                     model_id: item.id,
-                    model_object: { amount: updated.amount, quantity },
+                    model_object: {amount: updated.amount, quantity},
                 },
             });
 
@@ -148,8 +155,10 @@ export default class StoreManager {
             // Best-effort refund
             try {
                 await trinketManager.increment(parentId, totalCost);
-            } catch (_) {}
-            throw HTTPError.serverError({ summary: 'FAILED_TO_DELIVER' });
+            } catch (_) {
+                log.error('Failed to refund trinkets after purchase failure');
+            }
+            throw HTTPError.serverError({summary: 'FAILED_TO_DELIVER'});
         }
     }
 }

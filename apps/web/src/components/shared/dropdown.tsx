@@ -1,33 +1,35 @@
 import * as Headless from '@headlessui/react'
-import clsx from 'clsx'
 import type React from 'react'
-import { Button } from './button'
+import {Button} from './button'
 import Link from './link'
+import {cn} from "@/lib";
 
 export function Dropdown(props: Headless.MenuProps) {
     return <Headless.Menu {...props} />
 }
 
 export function DropdownButton<T extends React.ElementType = typeof Button>({
-    // @ts-ignore
-    as = Button,
-    ...props
-}: { className?: string } & Omit<Headless.MenuButtonProps<T>, 'className'>) {
+                                                                                // @ts-ignore
+                                                                                as = Button,
+                                                                                ...props
+                                                                            }: {
+    className?: string
+} & Omit<Headless.MenuButtonProps<T>, 'className'>) {
     // @ts-ignore
     return <Headless.MenuButton as={as} {...props} />
 }
 
 export function DropdownMenu({
-    anchor = 'bottom',
-    className,
-    ...props
-}: { className?: string } & Omit<Headless.MenuItemsProps, 'className'>) {
+                                 anchor = 'bottom',
+                                 className,
+                                 ...props
+                             }: { className?: string } & Omit<Headless.MenuItemsProps, 'className'>) {
     return (
         <Headless.Transition leave="duration-100 ease-in" leaveTo="opacity-0">
             <Headless.MenuItems
                 {...props}
                 anchor={anchor}
-                className={clsx(
+                className={cn(
                     className,
                     // Anchor positioning
                     '[--anchor-gap:--spacing(2)] [--anchor-padding:--spacing(1)] data-[anchor~=end]:[--anchor-offset:6px] data-[anchor~=start]:[--anchor-offset:-6px] sm:data-[anchor~=end]:[--anchor-offset:4px] sm:data-[anchor~=start]:[--anchor-offset:-4px]',
@@ -50,12 +52,12 @@ export function DropdownMenu({
 }
 
 export function DropdownItem({
-    className,
-    ...props
-}: {
+                                 className,
+                                 ...props
+                             }: {
     className?: string
 } & (Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'> | Omit<React.ComponentPropsWithoutRef<'button'>, 'className'>)) {
-    let classes = clsx(
+    let classes = cn(
         className,
         // Base styles
         'group cursor-default rounded-lg px-3.5 py-2.5 focus:outline-hidden sm:px-3 sm:py-1.5',
@@ -79,20 +81,22 @@ export function DropdownItem({
     return (
         <Headless.MenuItem>
             {/* @ts-ignore - bruh */}
-            {'href' in props ? <Link {...props} className={classes} /> : <button {...props} className={classes} />}
+            {'href' in props ? <Link {...props} className={classes}/> : <button {...props} className={classes}/>}
         </Headless.MenuItem>
     )
 }
 
-export function DropdownHeader({ className, ...props }: Readonly<React.ComponentPropsWithoutRef<'div'>>) {
-    return <div {...props} className={clsx(className, 'col-span-5 px-3.5 pb-1 pt-2.5 sm:px-3')} />
+export function DropdownHeader({className, ...props}: Readonly<React.ComponentPropsWithoutRef<'div'>>) {
+    return <div {...props} className={cn(className, 'col-span-5 px-3.5 pb-1 pt-2.5 sm:px-3')}/>
 }
 
-export function DropdownSection({ className, ...props }: { className?: string } & Omit<Headless.MenuSectionProps, 'className'>) {
+export function DropdownSection({className, ...props}: {
+    className?: string
+} & Omit<Headless.MenuSectionProps, 'className'>) {
     return (
         <Headless.MenuSection
             {...props}
-            className={clsx(
+            className={cn(
                 className,
                 // Define grid at the section level instead of the item level if subgrid is supported
                 'col-span-full supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_1fr_1.5rem_0.5rem_auto]'
@@ -101,11 +105,13 @@ export function DropdownSection({ className, ...props }: { className?: string } 
     )
 }
 
-export function DropdownHeading({ className, ...props }: { className?: string } & Omit<Headless.MenuHeadingProps, 'className'>) {
+export function DropdownHeading({className, ...props}: {
+    className?: string
+} & Omit<Headless.MenuHeadingProps, 'className'>) {
     return (
         <Headless.MenuHeading
             {...props}
-            className={clsx(
+            className={cn(
                 className,
                 'col-span-full grid grid-cols-[1fr_auto] gap-x-12 px-3.5 pb-1 pt-2 text-sm/5 font-medium text-zinc-500 dark:text-zinc-400 sm:px-3 sm:text-xs/5'
             )}
@@ -113,11 +119,13 @@ export function DropdownHeading({ className, ...props }: { className?: string } 
     )
 }
 
-export function DropdownDivider({ className, ...props }: { className?: string } & Omit<Headless.MenuSeparatorProps, 'className'>) {
+export function DropdownDivider({className, ...props}: {
+    className?: string
+} & Omit<Headless.MenuSeparatorProps, 'className'>) {
     return (
         <Headless.MenuSeparator
             {...props}
-            className={clsx(
+            className={cn(
                 className,
                 'forced-colors:bg-[CanvasText] col-span-full mx-3.5 my-1 h-px border-0 bg-zinc-950/5 dark:bg-white/10 sm:mx-3'
             )}
@@ -125,16 +133,19 @@ export function DropdownDivider({ className, ...props }: { className?: string } 
     )
 }
 
-export function DropdownLabel({ className, ...props }: { className?: string } & Omit<Headless.LabelProps, 'className'>) {
-    return <Headless.Label {...props} data-slot="label" className={clsx(className, 'col-start-2 row-start-1')} {...props} />
+export function DropdownLabel({className, ...props}: { className?: string } & Omit<Headless.LabelProps, 'className'>) {
+    return <Headless.Label {...props} data-slot="label"
+                           className={cn(className, 'col-start-2 row-start-1')} {...props} />
 }
 
-export function DropdownDescription({ className, ...props }: { className?: string } & Omit<Headless.DescriptionProps, 'className'>) {
+export function DropdownDescription({className, ...props}: {
+    className?: string
+} & Omit<Headless.DescriptionProps, 'className'>) {
     return (
         <Headless.Description
             data-slot="description"
             {...props}
-            className={clsx(
+            className={cn(
                 className,
                 'forced-colors:group-data-focus:text-[HighlightText] col-span-2 col-start-2 row-start-2 text-sm/5 text-default group-hover:!text-white sm:text-xs/5'
             )}
@@ -143,16 +154,20 @@ export function DropdownDescription({ className, ...props }: { className?: strin
 }
 
 export function DropdownShortcut({
-    keys,
-    className,
-    ...props
-}: { keys: string | string[]; className?: string } & Omit<Headless.DescriptionProps<'kbd'>, 'className'>) {
+                                     keys,
+                                     className,
+                                     ...props
+                                 }: {
+    keys: string | string[];
+    className?: string
+} & Omit<Headless.DescriptionProps<'kbd'>, 'className'>) {
     return (
-        <Headless.Description as="kbd" {...props} className={clsx(className, 'col-start-5 row-start-1 flex justify-self-end')}>
+        <Headless.Description as="kbd" {...props}
+                              className={cn(className, 'col-start-5 row-start-1 flex justify-self-end')}>
             {(Array.isArray(keys) ? keys : keys.split('')).map((char, index) => (
                 <kbd
                     key={char}
-                    className={clsx([
+                    className={cn([
                         'forced-colors:group-data-focus:text-[HighlightText] min-w-[2ch] text-center font-sans capitalize text-zinc-400 group-data-focus:text-white',
                         // Make sure key names that are longer than one character (like "Tab") have extra space
                         index > 0 && char.length > 1 && 'pl-1',

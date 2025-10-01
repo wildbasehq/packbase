@@ -1,10 +1,9 @@
 import React from 'react'
 import {Input} from '@/components/shared/input/text'
-import {Button} from '@/components/shared/experimental-button-rework'
+import {Button} from '@/components/shared'
 import {Heading, Text} from '@/components/shared/text'
 import Link from '@/components/shared/link'
 import {EnvelopeIcon} from '@heroicons/react/24/solid'
-import {motion} from 'framer-motion'
 import {vg} from '@/lib/api'
 import WolfoxDrawing from '@/src/images/png/wolfox-drawing.png'
 
@@ -17,8 +16,14 @@ const AnonUserSettings: React.FC = () => {
             username: formData.get('username')?.toString() || '',
         }
 
-        if (!post.invite_code) return alert('Please enter an invite code')
-        if (!post.username) return alert('Please enter a username')
+        if (!post.invite_code) {
+            alert('Please enter an invite code')
+            return
+        }
+        if (!post.username) {
+            alert('Please enter a username')
+            return
+        }
 
         vg.user.me
             .post({
@@ -50,7 +55,8 @@ const AnonUserSettings: React.FC = () => {
                     </Heading>
                     <div className="space-y-4">
                         <Text alt size="sm">
-                            If yes, yippee! We're glad you're here. Please enter a valid invite code to get started.{' '}
+                            If yes, yippee! We're glad you're here. Please enter a valid invite code to get
+                            started.{' '}
                             <span className="text-tertiary">
                                 If you've traded anything for an invite, whether it be an art trade, or even money, you've been scammed.
                                 Report that code instead and work on getting whatever you gave back.
@@ -68,7 +74,8 @@ const AnonUserSettings: React.FC = () => {
                                 <label htmlFor="username" className="block mb-1 text-sm font-medium">
                                     Username
                                 </label>
-                                <Input name="username" id="username" placeholder="Desired username" className="w-full" required />
+                                <Input name="username" id="username" placeholder="Desired username" className="w-full"
+                                       required/>
                             </div>
 
                             <div>
@@ -85,7 +92,7 @@ const AnonUserSettings: React.FC = () => {
                             </div>
 
                             <div className="flex items-center space-x-2">
-                                <EnvelopeIcon className="w-5 h-5 text-indigo-500" />
+                                <EnvelopeIcon className="w-5 h-5 text-indigo-500"/>
                                 <Text alt size="sm">
                                     Enter the invite code you received
                                 </Text>
@@ -99,7 +106,7 @@ const AnonUserSettings: React.FC = () => {
                 </div>
 
                 <div className="items-center justify-center hidden lg:flex">
-                    <img src={WolfoxDrawing} alt="Packbase Mascot" className="w-4/5 max-w-xs" />
+                    <img src={WolfoxDrawing} alt="Packbase Mascot" className="w-4/5 max-w-xs"/>
                 </div>
             </div>
         </div>

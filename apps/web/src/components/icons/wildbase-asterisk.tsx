@@ -1,4 +1,6 @@
-export default function WildbaseAsteriskIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
+import {ComponentPropsWithoutRef} from "react";
+
+export default function WildbaseAsteriskIcon(props: ComponentPropsWithoutRef<'svg'>) {
     return (
         <svg viewBox="0 0 123 123" aria-hidden="true" fill="currentColor" {...props}>
             <g>

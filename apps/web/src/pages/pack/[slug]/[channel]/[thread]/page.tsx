@@ -2,22 +2,26 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { useParams } from 'wouter'
-import { useEffect, useState } from 'react'
-import { Text } from '@/components/shared/text.tsx'
-import { Avatar } from '@/components/shared/avatar.tsx'
-import { Divider } from '@/components/shared/divider.tsx'
-import { ChatBox } from '@/components/shared/chat-box.tsx'
-import { Hash, MessageSquare, Reply } from 'lucide-react'
-import { formatRelativeTime } from '@/lib/utils/date.ts'
-import { useUIStore, vg } from '@/lib'
-import { FeedPostData, LogoSpinner } from '@/src/components'
-import { toast } from 'sonner'
+import {useParams} from 'wouter'
+import {useEffect, useState} from 'react'
+import {Text} from '@/components/shared/text.tsx'
+import {Avatar} from '@/components/shared/avatar.tsx'
+import {Divider} from '@/components/shared/divider.tsx'
+import {ChatBox} from '@/components/shared/chat-box.tsx'
+import {Hash, MessageSquare, Reply} from 'lucide-react'
+import {formatRelativeTime} from '@/lib/utils/date.ts'
+import {useUIStore, vg} from '@/lib'
+import {FeedPostData, LogoSpinner} from '@/src/components'
+import {toast} from 'sonner'
 import Markdown from '@/components/shared/markdown.tsx'
-import { SignedIn } from '@clerk/clerk-react'
-import { ServerReactionStack } from '@/components/ui/reaction-stack'
+import {SignedIn} from '@clerk/clerk-react'
+import {ServerReactionStack} from '@/components/ui/reaction-stack'
 
-function ThreadMessage({ message, isOriginalPost = false }: { message: FeedPostData; isOriginalPost?: boolean; currentUserId?: string }) {
+function ThreadMessage({message, isOriginalPost = false}: {
+    message: FeedPostData;
+    isOriginalPost?: boolean;
+    currentUserId?: string
+}) {
     const bucketRoot = useUIStore(state => state.bucketRoot)
 
     return (
@@ -46,7 +50,8 @@ function ThreadMessage({ message, isOriginalPost = false }: { message: FeedPostD
                     </div>
 
                     {/* Reactions */}
-                    <ServerReactionStack entityId={message.id} allowAdd={true} max={10} initialReactions={message.reactions} />
+                    <ServerReactionStack entityId={message.id} allowAdd={true} max={10}
+                                         initialReactions={message.reactions}/>
                 </div>
 
                 {/* Message actions */}
@@ -78,7 +83,7 @@ function ThreadMessage({ message, isOriginalPost = false }: { message: FeedPostD
 }
 
 export default function PackChannelThread() {
-    const { id, channel, slug } = useParams<{ id: string; channel: string; slug: string }>()
+    const {id, channel} = useParams<{ id: string; channel: string; slug: string }>()
     const [newMessage, setNewMessage] = useState('')
     const [currentUserId] = useState('user-1') // In a real app, this would come from authentication
 
@@ -88,7 +93,7 @@ export default function PackChannelThread() {
         if (!content.trim()) return
 
         console.log('Sending message:', content)
-        const { data, error } = await vg.howl({ id }).comment.post({
+        const {error} = await vg.howl({id}).comment.post({
             body: content.trim(),
         })
 
@@ -97,17 +102,6 @@ export default function PackChannelThread() {
             toast.error('Failed to send message')
             return
         } else {
-            // Emit message sent event for plugins
-            if (window.packbase && data) {
-                window.packbase.emit('message:sent', {
-                    messageId: data.id,
-                    threadId: id,
-                    channelId: channel,
-                    content: content.trim(),
-                    timestamp: new Date().toISOString(),
-                })
-            }
-
             setNewMessage('')
             await getHowl()
         }
@@ -115,22 +109,11 @@ export default function PackChannelThread() {
 
     const getHowl = async () => {
         console.log('Fetching thread:', id)
-        const howl = await vg.howl({ id }).get()
+        const howl = await vg.howl({id}).get()
 
         console.log('Fetched thread:', howl)
         if (howl.data) {
             setThreadContent(howl.data)
-
-            // Emit thread opened event for plugins
-            if (window.packbase) {
-                window.packbase.emit('howl:opened', {
-                    threadId: id,
-                    channelId: channel,
-                    packSlug: slug,
-                    title: howl.data.title || 'Untitled Howl',
-                    postCount: (howl.data.comments?.length || 0) + 1,
-                })
-            }
         } else {
             setThreadContent(null)
         }
@@ -146,7 +129,7 @@ export default function PackChannelThread() {
             <div className="flex h-full flex-col">
                 <div className="border-b px-6 py-4">
                     <div className="flex items-center space-x-2">
-                        <Hash className="h-5 w-5 text-muted-foreground" />
+                        <Hash className="h-5 w-5 text-muted-foreground"/>
                         <Text weight="semibold" className="text-lg">
                             {channel}
                         </Text>
@@ -154,7 +137,7 @@ export default function PackChannelThread() {
                 </div>
 
                 <div className="flex flex-1 h-full w-full justify-center items-center">
-                    <LogoSpinner delay={0} />
+                    <LogoSpinner delay={0}/>
                 </div>
             </div>
         )
@@ -165,13 +148,13 @@ export default function PackChannelThread() {
             <div className="border-b px-6 py-4">
                 <div className="flex items-center space-x-3">
                     <div className="flex items-center space-x-2">
-                        <Hash className="h-5 w-5 text-muted-foreground" />
+                        <Hash className="h-5 w-5 text-muted-foreground"/>
                         <Text weight="semibold" className="text-lg">
                             {channel}
                         </Text>
                     </div>
                     <div className="flex items-center space-x-1">
-                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                        <MessageSquare className="h-4 w-4 text-muted-foreground"/>
                         <Text size="sm" alt>
                             Thread
                         </Text>
@@ -187,11 +170,11 @@ export default function PackChannelThread() {
                 <div className="px-6 py-4">
                     {/* Original Post */}
                     <div className="mb-4">
-                        <ThreadMessage message={threadContent} isOriginalPost={true} currentUserId={currentUserId} />
-                        <Divider className="my-4" />
+                        <ThreadMessage message={threadContent} isOriginalPost={true} currentUserId={currentUserId}/>
+                        <Divider className="my-4"/>
 
                         <div className="flex items-center space-x-2 mb-4">
-                            <Reply className="h-4 w-4 text-muted-foreground" />
+                            <Reply className="h-4 w-4 text-muted-foreground"/>
                             <Text size="sm" weight="semibold" className="text-muted-foreground">
                                 {threadContent.comments?.length} replies
                             </Text>
@@ -201,7 +184,7 @@ export default function PackChannelThread() {
                     {/* Replies */}
                     <div className="space-y-4">
                         {threadContent.comments?.map(reply => (
-                            <ThreadMessage key={reply.id} message={reply} currentUserId={currentUserId} />
+                            <ThreadMessage key={reply.id} message={reply} currentUserId={currentUserId}/>
                         ))}
                     </div>
                 </div>
@@ -210,7 +193,8 @@ export default function PackChannelThread() {
             {/* Chat Input */}
             <SignedIn>
                 <div className="border-t p-4">
-                    <ChatBox placeholder={`Reply to howl...`} onSend={handleSendMessage} value={newMessage} onChange={setNewMessage} />
+                    <ChatBox placeholder={`Reply to howl...`} onSend={handleSendMessage} value={newMessage}
+                             onChange={setNewMessage}/>
                 </div>
             </SignedIn>
         </div>

@@ -2,30 +2,32 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import {isVisible} from "@/lib";
+import {Activity, StrictMode} from 'react'
+import {createRoot} from 'react-dom/client'
+import App from './App.tsx'
+import {ClerkProvider} from '@clerk/clerk-react'
+import {dark} from '@clerk/themes'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+
 declare global {
     interface String {
         toTitleCase(): string
+
         fromSnakeCase(): string
     }
 }
 
 String.prototype.toTitleCase = function () {
     return this.fromSnakeCase().replace(/\w\S*/g, function (txt) {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+        return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
     })
 }
 
 String.prototype.fromSnakeCase = function () {
     return this.replaceAll('_', ' ')
 }
-
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import { ClerkProvider } from '@clerk/clerk-react'
-import { dark } from '@clerk/themes'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_live_Y2xlcmsucGFja2Jhc2UuYXBwJA'
 
@@ -49,17 +51,20 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        {/*<div*/}
-        {/*    className="h-12 w-screen"*/}
-        {/*    style={{*/}
-        {/*        position: 'fixed',*/}
-        {/*        zIndex: '99999',*/}
-        {/*        opacity: 0.2,*/}
-        {/*        pointerEvents: 'none',*/}
-        {/*        backgroundImage: 'url("/img/devel.symbolic.svg")',*/}
-        {/*        backgroundRepeat: 'repeat-x',*/}
-        {/*    }}*/}
-        {/*/>*/}
+        <Activity mode={isVisible(!import.meta.env.PROD)}>
+            <div
+                className="h-12 w-screen"
+                style={{
+                    position: 'fixed',
+                    zIndex: '99999',
+                    opacity: 0.2,
+                    pointerEvents: 'none',
+                    backgroundImage: 'url("/img/devel.symbolic.svg")',
+                    backgroundRepeat: 'repeat-x',
+                }}
+            />
+        </Activity>
+
         <ClerkProvider
             publishableKey={PUBLISHABLE_KEY}
             afterSignOutUrl="/"
@@ -87,7 +92,7 @@ createRoot(document.getElementById('root')!).render(
                 },
             }}
             appearance={{
-                baseTheme: window.matchMedia('(prefers-color-scheme: dark)').matches ? dark : null,
+                theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? dark : null,
                 elements: {
                     cardBox: {
                         boxShadow: 'none',
@@ -99,8 +104,8 @@ createRoot(document.getElementById('root')!).render(
             }}
         >
             <QueryClientProvider client={queryClient}>
-                <App />
-                <ReactQueryDevtools initialIsOpen={false} />
+                <App/>
+                <ReactQueryDevtools initialIsOpen={false}/>
             </QueryClientProvider>
         </ClerkProvider>
     </StrictMode>

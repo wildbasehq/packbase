@@ -1,7 +1,7 @@
-import React, { ReactNode, useEffect } from 'react'
-import { PagedModalProvider, usePagedModal } from './context'
+import React, {Activity, ReactNode, useEffect} from 'react'
+import {PagedModalProvider, usePagedModal} from './context'
 import clsx from 'clsx'
-import { Text } from '@/components/shared/text'
+import {Text} from '@/components/shared/text'
 
 export interface PageProps {
     id?: string
@@ -20,12 +20,12 @@ export interface PagedModalProps {
 }
 
 // The Page component that represents each tab/page in the modal
-const Page: React.FC<PageProps> = ({ id: providedId, title, description, icon: Icon, badge, children }) => {
-    const { registerPage, activePage } = usePagedModal()
+const Page: React.FC<PageProps> = ({id: providedId, title, description, icon: Icon, badge, children}) => {
+    const {registerPage, activePage} = usePagedModal()
     const id = providedId || title.toLowerCase().replace(/\s+/g, '-')
 
     useEffect(() => {
-        registerPage(id, { title, description, icon: Icon, badge })
+        registerPage(id, {title, description, icon: Icon, badge})
     }, [id, title, description, Icon, badge])
 
     if (activePage !== id) return null
@@ -33,12 +33,17 @@ const Page: React.FC<PageProps> = ({ id: providedId, title, description, icon: I
     return <>{children}</>
 }
 
-const PageBody: React.FC<{ children: ReactNode }> = ({ children }) => {
+const PageBody: React.FC<{ children: ReactNode }> = ({children}) => {
     return <div className="h-full overflow-y-auto p-6">{children}</div>
 }
 
 // The main PagedModal component
-const PagedModal: React.FC<PagedModalProps> & { Page: typeof Page; Body: typeof PageBody } = ({ children, className, header, footer }) => {
+const PagedModal: React.FC<PagedModalProps> & { Page: typeof Page; Body: typeof PageBody } = ({
+                                                                                                  children,
+                                                                                                  className,
+                                                                                                  header,
+                                                                                                  footer
+                                                                                              }) => {
     return (
         <PagedModalProvider>
             <PagedModalContent className={className} header={header} footer={footer}>
@@ -49,8 +54,8 @@ const PagedModal: React.FC<PagedModalProps> & { Page: typeof Page; Body: typeof 
 }
 
 // The internal content component that uses the context
-const PagedModalContent: React.FC<PagedModalProps> = ({ children, className, header, footer }) => {
-    const { activePage, setActivePage, pages } = usePagedModal()
+const PagedModalContent: React.FC<PagedModalProps> = ({children, className, header, footer}) => {
+    const {activePage, setActivePage, pages} = usePagedModal()
 
     return (
         <div
@@ -69,7 +74,6 @@ const PagedModalContent: React.FC<PagedModalProps> = ({ children, className, hea
                     <nav className="flex-1 p-4 overflow-y-auto">
                         <ul className="space-y-2">
                             {Object.values(pages).map(page => {
-                                const PageIcon = page.icon
                                 return (
                                     <li
                                         key={page.id}
@@ -79,9 +83,10 @@ const PagedModalContent: React.FC<PagedModalProps> = ({ children, className, hea
                                             'ring-default/25 ring-default group w-full items-center justify-start gap-4 rounded px-4 py-3 transition-all hover:ring-2'
                                         )}
                                     >
-                                        <div onClick={() => setActivePage(page.id)} className="flex flex-row items-center">
-                                            {PageIcon && (
-                                                <PageIcon
+                                        <div onClick={() => setActivePage(page.id)}
+                                             className="flex flex-row items-center">
+                                            {page.icon && (
+                                                <page.icon
                                                     className={`h-5 w-5 mr-3 ${
                                                         activePage === page.id ? 'text-indigo-500' : 'text-gray-400 dark:text-gray-500'
                                                     }`}
@@ -101,15 +106,17 @@ const PagedModalContent: React.FC<PagedModalProps> = ({ children, className, hea
                                         </div>
 
                                         {/* Description if provided */}
-                                        {page.description && typeof page.description !== 'string' && (
+                                        <Activity
+                                            mode={page.description && typeof page.description !== 'string' ? 'visible' : 'hidden'}>
                                             <div className="mt-1 mb-3 ml-8">{page.description}</div>
-                                        )}
+                                        </Activity>
 
-                                        {page.description && typeof page.description === 'string' && page.description.length > 0 && (
-                                            <Text size="xs" className="mt-1 ml-8 text-alt">
+                                        <Activity
+                                            mode={page.description && typeof page.description === 'string' && page.description.length > 0 ? 'visible' : 'hidden'}>
+                                            <Text size="xs" className="mt-1 ml-8" alt>
                                                 {page.description}
                                             </Text>
-                                        )}
+                                        </Activity>
                                     </li>
                                 )
                             })}

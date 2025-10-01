@@ -2,9 +2,9 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { useRive } from '@rive-app/react-canvas'
-import { useEffect, useState } from 'react'
-import { useTimeout } from 'usehooks-ts'
+import {useRive} from '@rive-app/react-canvas'
+import {Dispatch, SetStateAction, useEffect, useState} from 'react'
+import {useTimeout} from 'usehooks-ts'
 
 /**
  * Character expression constants
@@ -38,7 +38,7 @@ export interface AnimatedCharacterProps {
     /**
      * Whether the character is currently talking
      */
-    talkingState?: [boolean, React.Dispatch<React.SetStateAction<boolean>>]
+    talkingState?: [boolean, Dispatch<SetStateAction<boolean>>]
     /**
      * How long the character should talk before stopping (in ms)
      */
@@ -58,16 +58,16 @@ export interface AnimatedCharacterProps {
 }
 
 export function AnimatedCharacter({
-    src = '/img/rive/mascat-placeholder-please-replace.riv',
-    stateMachine = 'State Machine 1',
-    expression = Expressions.AMAZED,
-    talkingState = useState(false),
-    talkingDuration = 2000,
-    className = '',
-    onTalkingComplete,
-    autoplay = true,
-}: AnimatedCharacterProps) {
-    const { rive, RiveComponent } = useRive({
+                                      src = '/img/rive/mascat-placeholder-please-replace.riv',
+                                      stateMachine = 'State Machine 1',
+                                      expression = Expressions.AMAZED,
+                                      talkingState = useState(false),
+                                      talkingDuration = 2000,
+                                      className = '',
+                                      onTalkingComplete,
+                                      autoplay = true,
+                                  }: AnimatedCharacterProps) {
+    const {rive, RiveComponent} = useRive({
         src,
         stateMachines: stateMachine,
         autoplay,
@@ -111,5 +111,5 @@ export function AnimatedCharacter({
         })
     }
 
-    return <RiveComponent className={className} />
+    return <RiveComponent className={className}/>
 }

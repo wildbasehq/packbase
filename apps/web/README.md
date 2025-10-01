@@ -40,14 +40,14 @@ Example:
 
 ```typescript
 // Import components
-import { Button } from '@/components/shared/button';
+import {Button} from '@/components/shared/button';
 
 // Import from lib
-import { useUserAccountStore } from '@/lib/state';
-import { cn } from '@/lib/utils';
+import {useUserAccountStore} from '@/lib/state';
+import {cn} from '@/lib/utils';
 
 // Import from pages
-import { HomePage } from '@/pages/home';
+import {HomePage} from '@/pages/home';
 ```
 
 ## State Management
@@ -62,19 +62,20 @@ The project uses Zustand for state management. State stores are organized by dom
 Import state stores from the state index file:
 
 ```typescript
-import { useUIStore, useUserAccountStore, useResourceStore } from '@/lib/state';
+import {useUIStore, useUserAccountStore, useResourceStore} from '@/lib/state';
 ```
 
 ## Worker System
 
-The project includes a worker system for background processing. Worker functionality is in the `/src/lib/workers` directory.
+The project includes a worker system for background processing. Worker functionality is in the `/src/lib/workers`
+directory.
 
 Import worker functionality from the workers index file:
 
 ```typescript
-import { WorkerStore, shutdownWorker } from '@/lib/workers';
+import {WorkerStore, shutdownWorker} from '@/lib/workers';
 ```
 
 ## Building and Running
 
-See the [Development Guidelines](/.junie/guidelines.md) for information on building and running the project.
+See the [Development Guidelines](.junie/guidelines.md) for information on building and running the project.

@@ -2,22 +2,21 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, { FormEvent, useEffect, useState } from 'react'
-import { LoadingCircle } from '@/components/icons'
-import { Heading, Text } from '@/components/shared/text'
-import { Button } from '@/components/shared/experimental-button-rework'
-import { vg } from '@/lib/api'
-import { useResourceStore, useUserAccountStore } from '@/lib'
-import { toast } from 'sonner'
-import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
+import React, {FormEvent, useEffect, useState} from 'react'
+import {LoadingCircle} from '@/components/icons'
+import {Heading, Text} from '@/components/shared/text'
+import {Button, Textarea} from '@/components/shared'
+import {vg} from '@/lib/api'
+import {useResourceStore} from '@/lib'
+import {toast} from 'sonner'
+import {MagnifyingGlassIcon} from '@heroicons/react/24/solid'
 import PackCard from '@/components/shared/pack/card'
-import { useModal } from '@/components/modal/provider.tsx'
-import { Input } from '@/components/shared/input.tsx'
-import { Description, Field, Label } from '@/components/shared/fieldset.tsx'
+import {useModal} from '@/components/modal/provider.tsx'
+import {Input} from '@/components/shared/input.tsx'
+import {Description, Field, Label} from '@/components/shared/fieldset.tsx'
 import Rive from '@rive-app/react-canvas'
-import { UserGroupIcon } from '@heroicons/react/20/solid'
-import { Separator } from '@radix-ui/react-dropdown-menu'
-import { Select, Textarea } from '@/components/shared'
+import {UserGroupIcon} from '@heroicons/react/20/solid'
+import {Separator} from '@radix-ui/react-dropdown-menu'
 import Markdown from '@/components/shared/markdown.tsx'
 
 // Types
@@ -64,8 +63,8 @@ const PRIVACY_OPTIONS: PrivacyOption[] = [
 /**
  * CreatePackModal - Component for creating a new pack
  */
-function CreatePackModal({ close }: { close: () => void }) {
-    const [selected, setSelected] = useState<PrivacyOption>(PRIVACY_OPTIONS[0])
+function CreatePackModal({close}: { close: () => void }) {
+    const [selected] = useState<PrivacyOption>(PRIVACY_OPTIONS[0])
     const [submitting, setSubmitting] = useState(false)
     const [formData, setFormData] = useState({
         display_name: '',
@@ -76,7 +75,7 @@ function CreatePackModal({ close }: { close: () => void }) {
     document.title = `Create Pack • ${formData.display_name || 'Pack Name'}`
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target
+        const {name, value} = e.target
         setFormData(prev => ({
             ...prev,
             [name]: name === 'slug' ? value.toLowerCase() : value,
@@ -89,7 +88,7 @@ function CreatePackModal({ close }: { close: () => void }) {
         setSubmitting(true)
 
         try {
-            const { data, error } = await vg.pack.create.post({
+            const {data, error} = await vg.pack.create.post({
                 display_name: formData.display_name,
                 slug: formData.slug,
                 description: formData.description,
@@ -122,14 +121,14 @@ function CreatePackModal({ close }: { close: () => void }) {
                 <div className="flex-1 grow p-6 space-y-6">
                     <div className="flex items-center space-x-3">
                         <div className="inline-flex shrink-0 items-center justify-center rounded-xl bg-muted/50 p-3">
-                            <UserGroupIcon className="size-5" aria-hidden={true} />
+                            <UserGroupIcon className="size-5" aria-hidden={true}/>
                         </div>
                         <div className="space-y-0.5">
                             <Heading>{formData?.display_name || 'Pack Name'}</Heading>
                             <Text alt>{formData?.slug ? `@${formData.slug}` : 'Pack information will show here'}</Text>
                         </div>
                     </div>
-                    <Separator className="my-4" />
+                    <Separator className="my-4"/>
                     <div>
                         <Heading size="sm">Description</Heading>
                         <Markdown componentClassName="!leading-6 mt-1 !text-muted-foreground">
@@ -184,7 +183,8 @@ function CreatePackModal({ close }: { close: () => void }) {
                     <Description className="!text-xs">
                         Used to quickly get to your pack via URL, and optionally show as a flair on profiles.
                     </Description>
-                    <Input type="text" name="slug" placeholder="rawr" value={formData.slug} onChange={handleInputChange} className="mt-1" />
+                    <Input type="text" name="slug" placeholder="rawr" value={formData.slug} onChange={handleInputChange}
+                           className="mt-1"/>
                 </Field>
 
                 <Field>
@@ -206,7 +206,8 @@ function CreatePackModal({ close }: { close: () => void }) {
                     <div className="flex items-center space-x-3 mb-2">
                         <Text className="inline-flex size-6 items-center justify-center rounded-lg bg-muted/50">4</Text>
                         <Heading className="!text-sm font-medium flex-1">
-                            By clicking "Create", you agree that you have the right to use and act on the information you provide, and that
+                            By clicking "Create", you agree that you have the right to use and act on the information
+                            you provide, and that
                             it does not violate any third-party rights.
                         </Heading>
                     </div>
@@ -228,7 +229,7 @@ function SearchablePackList() {
     useEffect(() => {
         const fetchPacks = async () => {
             try {
-                const { data } = await vg.packs.get()
+                const {data} = await vg.packs.get()
                 setPacks(data?.packs.filter(pack => pack.slug !== 'universe') || [])
                 setPacksHidden(data?.hidden || 0)
             } catch (error) {
@@ -261,7 +262,7 @@ function SearchablePackList() {
 
                 <div className="relative w-full sm:w-64">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                        <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" aria-hidden="true"/>
                     </div>
                     <Input
                         type="text"
@@ -275,12 +276,12 @@ function SearchablePackList() {
 
             {isLoading ? (
                 <div className="flex justify-center py-12">
-                    <LoadingCircle className="h-5 w-5" />
+                    <LoadingCircle className="h-5 w-5"/>
                 </div>
             ) : filteredPacks.length > 0 ? (
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {filteredPacks.map(pack => (
-                        <PackCard key={pack.id} pack={pack} />
+                        <PackCard key={pack.id} pack={pack}/>
                     ))}
                 </div>
             ) : (
@@ -298,9 +299,8 @@ function SearchablePackList() {
  * PackAdd - Main component for the pack creation page
  */
 export default function PackAdd() {
-    const { setCurrentResource } = useResourceStore()
-    const user = useUserAccountStore(state => state.user)
-    const { show, hide } = useModal()
+    const {setCurrentResource} = useResourceStore()
+    const {show, hide} = useModal()
 
     document.title = 'Packbase • Discover Packs'
 
@@ -314,7 +314,7 @@ export default function PackAdd() {
     }, [setCurrentResource])
 
     const handleCreatePack = () => {
-        show(<CreatePackModal close={hide} />)
+        show(<CreatePackModal close={hide}/>)
     }
 
     // if (!user || user.anonUser) {
@@ -337,7 +337,8 @@ export default function PackAdd() {
                 <div className="max-w-md">
                     <Heading>Find yo' pack</Heading>
                     <Text alt className="mt-2">
-                        Join packs that match your vibe or start your own lil community to find your people. Packs are public, open, weird,
+                        Join packs that match your vibe or start your own lil community to find your people. Packs are
+                        public, open, weird,
                         and (hopefully) fun~
                     </Text>
                     <div className="mt-6">
@@ -347,11 +348,11 @@ export default function PackAdd() {
                     </div>
                 </div>
                 <div className="w-full max-w-lg">
-                    <Rive src="/img/rive/pack-bench.riv" stateMachines="Animation" className="w-full h-[18rem]" />
+                    <Rive src="/img/rive/pack-bench.riv" stateMachines="Animation" className="w-full h-[18rem]"/>
                 </div>
             </div>
 
-            <SearchablePackList />
+            <SearchablePackList/>
         </div>
     )
 }

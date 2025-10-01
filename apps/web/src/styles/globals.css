@@ -4,7 +4,6 @@
 /*
  ---break---
  */
-@plugin "tailwindcss-animate";
 
 @import 'tailwindcss';
 @import 'tailwind-rounded-out';
@@ -16,6 +15,8 @@
 @import './tailwind/typography.css';
 @import './tailwind/spacing.css';
 @import './tailwind/animations.css';
+
+@plugin "tailwindcss-animate";
 /*
  ---break---
  */
@@ -37,6 +38,10 @@
         @apply border-transparent bg-(--btn-border) dark:bg-(--btn-bg) before:absolute before:inset-0 before:-z-10 before:rounded-[calc(var(--radius-lg)-1px)] before:bg-(--btn-bg) before:shadow-sm dark:before:hidden dark:border-white/5 after:absolute after:inset-0 after:-z-10 after:rounded-[calc(var(--radius-lg)-1px)] after:shadow-[shadow:inset_0_1px_--theme(--color-white/15%)] data-active:after:bg-(--btn-hover-overlay) data-hover:after:bg-(--btn-hover-overlay) dark:after:-inset-px dark:after:rounded-lg;
     }
 
+    a {
+        @apply text-foreground;
+    }
+
     *,
     ::after,
     ::before,
@@ -51,10 +56,6 @@
 
     .bg-card {
         @apply bg-white dark:bg-n-7;
-    }
-
-    .bg-card\/75 {
-        @apply bg-white/75 dark:bg-n-7/75;
     }
 
     .bg-card-solid {
@@ -76,20 +77,6 @@
     hyphens: auto;
     max-width: 100%;
     overflow: visible;
-}
-
-@layer utilities {
-    .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
-
-    .scrollbar-show::-webkit-scrollbar {
-        display: block;
-    }
 }
 
 /*
@@ -218,6 +205,7 @@
     * {
         @apply border-border outline-ring/50;
     }
+
     body {
         @apply bg-background text-foreground;
     }

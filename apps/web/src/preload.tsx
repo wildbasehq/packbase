@@ -3,15 +3,15 @@
  */
 
 import Body from '@/components/layout/body'
-import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib'
-import { useEffect, useState } from 'react'
-import { SignedIn, SignedOut, useSession } from '@clerk/clerk-react'
-import { LogoSpinner } from '@/src/components'
-import { useContentFrame } from '@/components/shared/content-frame'
-import NUEModal, { createNUEFlow } from '@/components/seen-once/nue-modal'
-import { toast } from 'sonner'
+import {isVisible, useResourceStore, useUIStore, useUserAccountStore} from '@/lib'
+import {Activity, ReactNode, useEffect, useState} from 'react'
+import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
+import {LogoSpinner} from '@/src/components'
+import {useContentFrame} from '@/components/shared/content-frame'
+import NUEModal, {createNUEFlow} from '@/components/seen-once/nue-modal'
+import {toast} from 'sonner'
 
-export default function Preload({ children }: { children: React.ReactNode }) {
+export default function Preload({children}: { children: ReactNode }) {
     return (
         <>
             <SignedIn>
@@ -30,25 +30,25 @@ export default function Preload({ children }: { children: React.ReactNode }) {
     )
 }
 
-function PreloadChild({ children }: { children: React.ReactNode }) {
+function PreloadChild({children}: { children: ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`auth`)
     const [error, setError] = useState<any | null>(null)
     const [showNUE, setShowNUE] = useState(false)
 
-    const { setUser } = useUserAccountStore()
-    const { setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities } = useUIStore()
-    const { setResources } = useResourceStore()
-    const { session, isSignedIn, isLoaded } = useSession()
+    const {setUser} = useUserAccountStore()
+    const {setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities} = useUIStore()
+    const {setResources} = useResourceStore()
+    const {session, isSignedIn, isLoaded} = useSession()
 
-    const { data: userMeData, isLoading: userMeLoading } = useContentFrame('get', 'user.me', undefined, {
+    const {data: userMeData, isLoading: userMeLoading} = useContentFrame('get', 'user.me', undefined, {
         id: 'user.me',
         enabled: isSignedIn,
     })
-    const { data: userPacksData, isLoading: userPacksLoading } = useContentFrame('get', 'user.me.packs', undefined, {
+    const {data: userPacksData, isLoading: userPacksLoading} = useContentFrame('get', 'user.me.packs', undefined, {
         id: 'user.me.packs',
         enabled: isSignedIn,
     })
-    const { data: server } = useContentFrame('get', 'server.describeServer', undefined, {
+    const {data: server} = useContentFrame('get', 'server.describeServer', undefined, {
         id: 'server.describeServer',
     })
 
@@ -66,10 +66,11 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
         setServerCapabilities(server.capabilities || [])
 
         if (server.maintenance) {
-            return setError({
+            setError({
                 cause: 'Server is under maintenance',
                 message: server.maintenance || `Packbase is currently under maintenance. Please check back later.`,
             })
+            return
         }
 
         if (isSignedIn) {
@@ -92,28 +93,30 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
     }
 
     const proceed = () => {
-        if (error) return
-        if (serviceLoading === 'proceeding') return
+        if (error || serviceLoading === 'proceeding') return
+
         setStatus('proceeding')
         setLoading(false)
         setConnecting(false)
 
-        if (
-            userMeData &&
-            (!userMeData?.display_name ||
-                !userMeData?.display_name?.trim().length ||
-                !userMeData?.about?.bio ||
-                !userMeData?.about?.bio?.trim().length)
-        ) {
+        const shouldShowNUE = userMeData && isProfileIncomplete(userMeData)
+        if (shouldShowNUE) {
             setShowNUE(true)
         }
     }
 
+    // Helper function to check if profile is incomplete
+    const isProfileIncomplete = (userData: any) => {
+        const hasValidDisplayName = userData?.display_name?.trim().length > 0
+        const hasValidBio = userData?.about?.bio?.trim().length > 0
+
+        return !hasValidDisplayName || !hasValidBio
+    }
     return (
         <>
             {serviceLoading === 'proceeding' ? (
                 <>
-                    {showNUE && (
+                    <Activity mode={isVisible(showNUE)}>
                         <NUEModal
                             config={{
                                 ...createNUEFlow(),
@@ -126,21 +129,27 @@ function PreloadChild({ children }: { children: React.ReactNode }) {
                                 },
                             }}
                         />
-                    )}
+                    </Activity>
 
                     {children}
                 </>
             ) : (
                 <Body bodyClassName="h-full" className="!h-full items-center justify-center">
-                    <LogoSpinner />
+                    <LogoSpinner/>
                     <span className="text-sm mt-1">
-                        {serviceLoading.startsWith('auth')
-                            ? `Checking data...`
-                            : serviceLoading.startsWith('auth:@me')
-                              ? `Getting profile...`
-                              : serviceLoading.startsWith('cron')
-                                ? 'Welcome!'
-                                : 'Get set...'}
+                        <Activity
+                            mode={isVisible(serviceLoading.startsWith('auth'))}>
+                            Checking data...
+                        </Activity>
+                        <Activity
+                            mode={isVisible(serviceLoading.startsWith('auth:@me'))}>
+                            Getting profile...
+                        </Activity>
+                        <Activity mode={isVisible(serviceLoading.startsWith('cron'))}>Welcome!</Activity>
+                        <Activity
+                            mode={isVisible(!serviceLoading.startsWith('auth') && !serviceLoading.startsWith('cron'))}>
+                            Get set...
+                        </Activity>
                     </span>
                 </Body>
             )}

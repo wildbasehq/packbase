@@ -3,33 +3,33 @@
  */
 
 // src/components/feed/floating-compose-button.tsx
-import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
+import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
 import UserAvatar from '@/components/shared/user/avatar'
-import { Heading, Text } from '@/components/shared/text.tsx'
-import { Editor } from '@/src/components'
-import { useParams } from 'wouter'
-import { FormEvent, useEffect, useRef, useState } from 'react'
-import { Invisible } from '../icons/plump/Invisible'
-import { ChevronRightIcon, ArrowDownIcon } from '@heroicons/react/20/solid'
+import {Heading, Text} from '@/components/shared/text.tsx'
+import {Editor} from '@/src/components'
+import {useParams} from 'wouter'
+import {ReactNode, useEffect, useRef, useState} from 'react'
+import {Invisible} from '../icons/plump/Invisible'
+import {ArrowDownIcon, ChevronRightIcon} from '@heroicons/react/20/solid'
 import Tooltip from '../shared/tooltip'
-import { HashtagIcon } from '@heroicons/react/16/solid'
-import { cn, vg } from '@/src/lib'
-import { Camera } from '../icons/plump/Camera'
-import ImageUploadStack, { type Image } from './image-placeholder-stack'
-import { motion } from 'framer-motion'
-import { CatSunglasses } from '../icons/plump/CatSunglasses'
-import { toast } from 'sonner'
+import {HashtagIcon} from '@heroicons/react/16/solid'
+import {cn, vg} from '@/src/lib'
+import {Camera} from '../icons/plump/Camera'
+import ImageUploadStack, {type Image} from './image-placeholder-stack'
+import {motion} from 'motion/react'
+import {CatSunglasses} from '@/components/icons/plump'
+import {toast} from 'sonner'
 import ProgressBar from '../shared/progress-bar'
-import { AlignLeft } from '../icons/plump/AlignLeft'
-import { useLocalStorage } from 'usehooks-ts'
-import { UserActionsContainer } from '../layout/user-sidebar'
+import {AlignLeft} from '../icons/plump/AlignLeft'
+import {useLocalStorage} from 'usehooks-ts'
+import {UserActionsContainer} from '../layout/user-sidebar'
 
-export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedRefresh?: () => Promise<void> }) {
-    const { user } = useUserAccountStore()
-    const { navigation } = useUIStore()
-    const { currentResource } = useResourceStore()
+export default function FloatingCompose({onShouldFeedRefresh}: { onShouldFeedRefresh?: () => Promise<void> }) {
+    const {user} = useUserAccountStore()
+    const {navigation} = useUIStore()
+    const {currentResource} = useResourceStore()
 
-    let { channel } = useParams<{
+    let {channel} = useParams<{
         channel: string
     }>()
 
@@ -99,7 +99,7 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
                 }
                 const reader = new FileReader()
                 reader.onloadend = () => {
-                    newImages.push({ id: `${file.name}-${crypto.randomUUID()}`, src: reader.result as string })
+                    newImages.push({id: `${file.name}-${crypto.randomUUID()}`, src: reader.result as string})
 
                     if (i === files.length - 1) {
                         setImages([...images, ...newImages])
@@ -145,11 +145,11 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
         setVisible(false)
         vg.howl.create
             .post(post)
-            .then(({ error }) => {
+            .then(({error}) => {
                 if (error) {
                     setUploading(false)
                     setVisible(true)
-                    return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+                    toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'A network error happened...')
                 } else {
                     onShouldFeedRefresh?.().then(() => {
                         setUploading(false)
@@ -179,7 +179,7 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
                 ref={floatingComposeRef}
                 className={cn(
                     'w-full flex bg-card flex-col border mx-auto',
-                    visible ? 'rounded-b-xl shadow-sm' : 'rounded-b-none border-b-0'
+                    visible ? 'rounded-b-3xl shadow-sm' : 'rounded-b-none border-b-0'
                 )}
                 initial={false}
                 animate={visible ? 'open' : 'closed'}
@@ -189,7 +189,7 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
                         opacity: 1,
                         y: -1,
                     },
-                    closed: { height: 0, opacity: 1, y: -8 },
+                    closed: {height: 0, opacity: 1, y: -8},
                 }}
                 onAnimationStart={() => {
                     if (!visible) {
@@ -203,28 +203,28 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
                     }
                 }}
                 transition={{
-                    type: visible ? 'spring' : 'ease',
+                    type: visible ? 'spring' : 'tween',
                     stiffness: 500,
                     damping: 30,
                     duration: 0.25,
                     ease: [0.16, 1, 0.3, 1],
                 }}
-                {...(visible ? { 'aria-hidden': false } : { 'aria-hidden': true })}
+                {...(visible ? {'aria-hidden': false} : {'aria-hidden': true})}
             >
                 {/* Top small bar */}
                 <div className="min-h-12 border-b flex items-center justify-between px-4">
                     <Tooltip content="Hide" side="bottom">
                         <div className="bg-muted rounded-full w-7 h-7 p-1.5" onClick={() => setVisible(false)}>
-                            <Invisible className="fill-muted-foreground w-full h-full" />
+                            <Invisible className="fill-muted-foreground w-full h-full"/>
                         </div>
                     </Tooltip>
                     <div className="flex items-center gap-2">
                         {channel && (
                             <div className="flex items-center gap-1">
-                                <UserAvatar user={currentResource} size={26} className="!rounded-full" />
-                                <ChevronRightIcon className="w-5 h-5 text-muted-foreground" />
+                                <UserAvatar user={currentResource} size={26} className="!rounded-full"/>
+                                <ChevronRightIcon className="w-5 h-5 text-muted-foreground"/>
                                 <Heading size="sm" className="flex justify-center items-center">
-                                    <HashtagIcon className="w-4 h-4 inline-flex fill-muted-foreground" />
+                                    <HashtagIcon className="w-4 h-4 inline-flex fill-muted-foreground"/>
                                     {channelName}
                                 </Heading>
                             </div>
@@ -233,8 +233,9 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
                         {!channel && <Heading size="sm">{currentResource.display_name}</Heading>}
                     </div>
                     <div className="flex items-center justify-center gap-2">
-                        {userSidebarCollapsed && <UserActionsContainer />}
-                        <AlignLeft className="w-7 h-7 fill-indigo-600" onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)} />
+                        {userSidebarCollapsed && <UserActionsContainer/>}
+                        <AlignLeft className="w-7 h-7 fill-indigo-600"
+                                   onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)}/>
                     </div>
                 </div>
 
@@ -249,7 +250,7 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
 
                 {images.length > 0 && (
                     <div className="px-4 pb-2">
-                        <ImageUploadStack images={images} setImages={setImages} />
+                        <ImageUploadStack images={images} setImages={setImages}/>
                     </div>
                 )}
 
@@ -257,7 +258,8 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
                 <div className="h-12 flex items-center justify-between px-2">
                     {/* Button group */}
                     <div className="flex items-center gap-1">
-                        <ComposeButton className="rounded-l-[0.85rem] rounded-r-sm" onClick={() => fileInputRef.current?.click()}>
+                        <ComposeButton className="rounded-l-[0.85rem] rounded-r-sm"
+                                       onClick={() => fileInputRef.current?.click()}>
                             <input
                                 aria-hidden
                                 className="hidden"
@@ -267,20 +269,20 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
                                 accept="image/*"
                                 onChange={e => addAttachment(e.target.files)}
                             />
-                            <Camera className="w-5 h-5 fill-primary-light p-0.5" />
+                            <Camera className="w-5 h-5 fill-primary-light p-0.5"/>
                         </ComposeButton>
 
                         <ComposeButton className="rounded-r-[0.85rem] rounded-l-sm">
-                            <CatSunglasses className="h-5 fill-primary-light" />
+                            <CatSunglasses className="h-5 fill-primary-light"/>
                         </ComposeButton>
                     </div>
                     <ComposeButton
-                        className="p-1"
+                        className="p-1 rounded-full"
                         onClick={() => {
                             submitHowl()
                         }}
                     >
-                        <ArrowDownIcon className="w-5 h-5 fill-muted-foreground" />
+                        <ArrowDownIcon className="w-5 h-5 fill-muted-foreground"/>
                     </ComposeButton>
                 </div>
             </motion.div>
@@ -289,10 +291,10 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
                 <div
                     ref={hiddenComposeRef}
                     className={cn(
-                        'relative w-full h-6 bg-card overflow-hidden flex-col border border-t-0 -mt-px rounded-b mx-auto shadow-sm items-center animate-slide-down-fade justify-center transition-all',
+                        'relative w-full h-6 bg-card overflow-hidden flex-col border border-t-0 -mt-px rounded-b-3xl mx-auto shadow-sm items-center animate-slide-down-fade justify-center transition-all',
                         uploading ? 'h-8 cursor-not-allowed' : 'h-6 group-hover:h-8'
                     )}
-                    style={{ display: 'none' }}
+                    style={{display: 'none'}}
                     onClick={() => {
                         if (!uploading) setVisible(true)
                     }}
@@ -313,18 +315,22 @@ export default function FloatingCompose({ onShouldFeedRefresh }: { onShouldFeedR
                             </Text>
                         </>
                     )}
-                    {uploading && <ProgressBar indeterminate={true} className="absolute bottom-0 rounded-none" />}
+                    {uploading && <ProgressBar indeterminate mask className="absolute bottom-0 rounded-none"/>}
                 </div>
             )}
         </div>
     )
 }
 
-function ComposeButton({ onClick, children, className }: { onClick?: () => void; children: React.ReactNode; className?: string }) {
+function ComposeButton({onClick, children, className}: {
+    onClick?: () => void;
+    children: ReactNode;
+    className?: string
+}) {
     return (
         <button
             className={cn(
-                'border rounded-full py-1.5 px-4 ring-[0.05rem] flex justify-center items-center ring-default bg-card transition-all hover:bg-muted active:ring-2 active:bg-neutral-200 dark:active:bg-neutral-700',
+                'border py-1.5 px-4 ring-[0.05rem] flex justify-center items-center ring-default bg-card transition-all hover:bg-muted active:ring-2 active:bg-neutral-200 dark:active:bg-neutral-700',
                 className
             )}
             onClick={onClick}

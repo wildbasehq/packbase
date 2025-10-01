@@ -2,21 +2,21 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { Heading } from '@/components/shared/text'
+import {Heading} from '@/components/shared/text'
 import Markdown from '@/components/shared/markdown'
 import UserAvatar from '@/components/shared/user/avatar'
-import { vg } from '@/lib/api'
-import { toast } from 'sonner'
-import { Button } from '@/components/shared/experimental-button-rework'
-import { useUserAccountStore } from '@/lib/state'
-import { useState } from 'react'
-import { ChatBubbleLeftEllipsisIcon } from '@heroicons/react/16/solid'
+import {vg} from '@/lib/api'
+import {toast} from 'sonner'
+import {Button} from '@/components/shared'
+import {useUserAccountStore} from '@/lib/state'
+import {useState} from 'react'
+import {ChatBubbleLeftEllipsisIcon} from '@heroicons/react/16/solid'
 
 // @TODO: Unify user and pack headers.
-export default function ProfileHeader({ ...props }: any) {
+export default function ProfileHeader({...props}: any) {
     const profile = props.user
 
-    const { user } = useUserAccountStore()
+    const {user} = useUserAccountStore()
 
     return (
         <div className="relative" id="profile-header">
@@ -44,11 +44,14 @@ export default function ProfileHeader({ ...props }: any) {
                         className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
                         id="profile-content-info-container"
                     >
-                        <div className="mt-6 min-w-0 flex-1 sm:hidden md:block" id="profile-content-info-desktop-container">
-                            <Heading id="profile-content-info-desktop-display-name">{profile.display_name || profile.username}</Heading>
+                        <div className="mt-6 min-w-0 flex-1 sm:hidden md:block"
+                             id="profile-content-info-desktop-container">
+                            <Heading
+                                id="profile-content-info-desktop-display-name">{profile.display_name || profile.username}</Heading>
                             {/* Small @username */}
                             <div className="flex items-center" id="profile-content-info-desktop-username-container">
-                                <p className="text-alt-2 truncate text-sm font-medium" id="profile-content-info-desktop-username">
+                                <p className="text-muted-foreground truncate text-sm font-medium"
+                                   id="profile-content-info-desktop-username">
                                     @{profile.username}
                                 </p>
                             </div>
@@ -56,20 +59,23 @@ export default function ProfileHeader({ ...props }: any) {
                     </div>
                     {user && (
                         <>
-                            <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0" id="profile-content-follow-button-container">
-                                <UserFollowButton user={profile} />
+                            <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0"
+                                 id="profile-content-follow-button-container">
+                                <UserFollowButton user={profile}/>
                             </div>
 
                             <div className="mt-6 flex items-center sm:mt-0 sm:flex-shrink-0">
                                 <Button outline href={`/c/sw:${profile.id}`}>
-                                    <ChatBubbleLeftEllipsisIcon data-slot="icon" /> DM
+                                    <ChatBubbleLeftEllipsisIcon data-slot="icon"/> DM
                                 </Button>
                             </div>
                         </>
                     )}
                 </div>
-                <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden" id="profile-content-info-mobile-container">
-                    <Heading id="profile-content-info-mobile-display-name">{profile.display_name || profile.username}</Heading>
+                <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden"
+                     id="profile-content-info-mobile-container">
+                    <Heading
+                        id="profile-content-info-mobile-display-name">{profile.display_name || profile.username}</Heading>
                 </div>
                 <div className="text-default block min-w-0 flex-1" id="profile-content-info-bio-container">
                     <div className="mt-6 whitespace-pre-line text-sm" id="profile-content-info-bio">
@@ -81,33 +87,34 @@ export default function ProfileHeader({ ...props }: any) {
     )
 }
 
-function UserFollowButton({ user }: { user: any }) {
+function UserFollowButton({user}: { user: any }) {
     const [following, setFollowing] = useState(user.following)
     const [submitting, setSubmitting] = useState(false)
     const follow = () => {
         setSubmitting(true)
-        vg.user({ username: user.username })
+        vg.user({username: user.username})
             .follow.post()
-            .then(({ error }) => {
+            .then(({error}) => {
                 setSubmitting(false)
-                if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
-                setFollowing(true)
+                if (error) toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+                else setFollowing(true)
             })
     }
 
     const unfollow = () => {
         setSubmitting(true)
-        vg.user({ username: user.username })
+        vg.user({username: user.username})
             .follow.delete()
-            .then(({ error }) => {
+            .then(({error}) => {
                 setSubmitting(false)
-                if (error) return toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
-                setFollowing(false)
+                if (error) toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong')
+                else setFollowing(false)
             })
     }
 
     return (
-        <Button onClick={following ? unfollow : follow} color={(following ? 'red' : 'indigo') as 'red' | 'indigo'} disabled={submitting}>
+        <Button onClick={following ? unfollow : follow} color={(following ? 'red' : 'indigo') as 'red' | 'indigo'}
+                disabled={submitting}>
             {following ? 'Unfollow' : 'Follow'}
         </Button>
     )

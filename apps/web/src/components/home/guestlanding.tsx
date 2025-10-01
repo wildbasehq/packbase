@@ -2,11 +2,11 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { Heading, Text } from '@/components/shared/text'
-import { Button } from '@/components/shared/experimental-button-rework'
-import { Container } from '@/components/layout/container'
+import {Heading, Text} from '@/components/shared/text'
+import {Button} from '@/components/shared'
+import {Container} from '@/components/layout/container'
 import VerticalCutReveal from '../shared/text/vertical-cut-text'
-import { AnimatePresence, motion } from 'framer-motion'
+import {AnimatePresence, motion} from 'motion/react'
 import Tooltip from '../shared/tooltip'
 import {
     ArrowUpRightIcon,
@@ -17,11 +17,12 @@ import {
     ShieldCheckIcon,
     SparklesIcon,
 } from '@heroicons/react/20/solid'
-import { ReactNode, useMemo, useState } from 'react'
-import { QuestionMarkCircleIcon } from '@heroicons/react/16/solid'
+import {ReactNode, useMemo, useState} from 'react'
+import {QuestionMarkCircleIcon} from '@heroicons/react/16/solid'
 import Link from '../shared/link'
-import { Logo, Badge } from '@/src/components'
-import LandingBackground from '@/src/images/png/landing-bg.jpg'
+import {Badge, Logo} from '@/src/components'
+import LandingBackground from '@/src/images/png/prjkorat-heading-proposed.png'
+import NoAIBadge from '@/src/images/svg/noai/created.svg'
 
 // Animation configuration
 const animConfig = {
@@ -47,7 +48,7 @@ const animConfig = {
 }
 
 const links = [
-    { name: 'Join Waitlist', href: '/id/create', primary: true },
+    {name: 'Join Waitlist', href: '/id/create', primary: true},
     {
         name: 'Discord Community',
         href: 'https://discord.gg/StuuK55gYA',
@@ -116,7 +117,7 @@ const posts = [
             'Saw the new Lilo and Stitch trailer~ It looks good, but they gave Pleakly a hologram disguise, taking away his cute frilly outfits~ :c',
     },
     {
-        user: { name: 'swaggypaws', avatar: 'https://robohash.org/swaggypaws' },
+        user: {name: 'swaggypaws', avatar: 'https://robohash.org/swaggypaws'},
         content: 'Just finished these custom paw print shoes! Taking orders for similar designs',
         image: 'https://profiles.cdn.packbase.app/3e133370-0ec2-4825-b546-77de3804c8b1/2682ee79-eddf-4b0c-b07f-649776018e41/0.png',
     },
@@ -129,11 +130,11 @@ interface AnimatedCardProps {
     children: ReactNode
 }
 
-const AnimatedCard = ({ className, initialY, delayTime, children }: AnimatedCardProps) => (
+const AnimatedCard = ({className, initialY, delayTime, children}: AnimatedCardProps) => (
     <motion.div
         className={className}
-        initial={{ scale: animConfig.scale.initial, opacity: 0, y: initialY }}
-        animate={{ scale: animConfig.scale.final, opacity: 1, y: 0 }}
+        initial={{scale: animConfig.scale.initial, opacity: 0, y: initialY}}
+        animate={{scale: animConfig.scale.final, opacity: 1, y: 0}}
         transition={{
             type: 'spring',
             stiffness: animConfig.spring.stiffness,
@@ -153,28 +154,28 @@ function BottomRowCards() {
                 initialY={animConfig.offset.bottom}
                 delayTime={animConfig.delay.bottomRowBase + animConfig.delay.far}
             >
-                <FakePost user={posts[4].user} content={posts[4].content} image={posts[4].image} />
+                <FakePost user={posts[4].user} content={posts[4].content} image={posts[4].image}/>
             </AnimatedCard>
             <AnimatedCard
                 className="absolute w-1/3 h-40 transform ring-default ring-2 rounded z-10 left-[30%] md:h-56 lg:h-72 bg-card rotate-1 overflow-hidden"
                 initialY={animConfig.offset.bottom}
                 delayTime={animConfig.delay.bottomRowBase + animConfig.delay.adjacent}
             >
-                <FakePost user={posts[5].user} content={posts[5].content} image={posts[5].image} />
+                <FakePost user={posts[5].user} content={posts[5].content} image={posts[5].image}/>
             </AnimatedCard>
             <AnimatedCard
                 className="absolute mt-6 z-[5] w-1/3 h-40 transform ring-default ring-2 rounded left-[50%] md:h-56 lg:h-72 bg-card rotate-4 overflow-hidden"
                 initialY={animConfig.offset.bottom}
                 delayTime={animConfig.delay.bottomRowBase}
             >
-                <FakePost user={posts[6].user} content={posts[6].content} image={posts[6].image} />
+                <FakePost user={posts[6].user} content={posts[6].content} image={posts[6].image}/>
             </AnimatedCard>
             <AnimatedCard
                 className="absolute mt-12 w-[24rem] h-40 transform ring-default ring-2 rounded -right-8 md:h-56 lg:h-72 bg-card -rotate-2 overflow-hidden"
                 initialY={animConfig.offset.bottom}
                 delayTime={animConfig.delay.bottomRowBase + animConfig.delay.adjacent}
             >
-                <FakePost user={posts[7].user} content={posts[7].content} image={posts[7].image} />
+                <FakePost user={posts[7].user} content={posts[7].content} image={posts[7].image}/>
             </AnimatedCard>
         </div>
     )
@@ -187,17 +188,18 @@ function Hero() {
             <img
                 src={LandingBackground}
                 alt="N-BG"
-                className="absolute top-0 -z-10 w-full h-full object-cover object-bottom"
-                style={{ objectPosition: '0 50%' }}
+                className="absolute top-0 -z-10 w-full h-full object-cover object-bottom blur-xs"
+                style={{objectPosition: '0 50%'}}
             />
             {/* Top row of skewed cards */}
             {/*<TopRowCards />*/}
 
             {/* Main hero content */}
             <Container className="relative z-10 text-center top-1/6 pb-82">
-                <Heading className="!text-2xl flex justify-center items-center [&>*]:!text-white tracking-tight font-new-spirit-bold overflow-visible sm:!text-5xl">
+                <Heading
+                    className="!text-2xl flex justify-center items-center [&>*]:!text-white tracking-tight font-new-spirit-bold overflow-visible sm:!text-5xl">
                     <div>
-                        <Logo fullSize className="h-5 w-5 mr-2 sm:!h-10 sm:!w-10 sm:mr-4 -mt-1.5" />
+                        <Logo fullSize className="h-5 w-5 mr-2 sm:!h-10 sm:!w-10 sm:mr-4 -mt-1.5"/>
                     </div>
                     <VerticalCutReveal
                         reverse
@@ -205,7 +207,7 @@ function Hero() {
                         staggerDuration={0.025}
                         staggerFrom="first"
                         containerClassName="justify-center"
-                        wordLevelClassName="text-shadow-lg text-shadow-[rgb(65_185_249)] sm:px-1"
+                        wordLevelClassName="sm:px-1"
                         transition={{
                             type: 'spring',
                             stiffness: 200,
@@ -216,9 +218,11 @@ function Hero() {
                     </VerticalCutReveal>
                 </Heading>
 
-                <div className="mt-8 p-6 max-w-2xl mx-auto bg-sidebar rounded transform skew-x-4 ring-1 ring-default shadow">
+                <div
+                    className="mt-8 p-6 max-w-2xl mx-auto bg-sidebar rounded transform skew-x-4 ring-1 ring-default shadow">
                     <Text className="text-lg sm:text-xl font-medium transform -skew-x-4">
-                        Join the Pack-based social platform where <HighlightedText>communities come first</HighlightedText>. No ads, no
+                        Join the Pack-based social platform where <HighlightedText>communities come
+                        first</HighlightedText>. No ads, no
                         algorithms, just authentic conversations in your own space.
                     </Text>
                 </div>
@@ -227,12 +231,14 @@ function Hero() {
                     {links.map((link, index) =>
                         link.tooltip ? (
                             <Tooltip key={index} content={link.tooltip} delayDuration={0} side="top">
-                                <Button href={link.href} color={(link.primary ? 'indigo' : 'zinc') as 'indigo' | 'zinc'}>
-                                    {link.name} <ArrowUpRightIcon className="inline-flex w-4 h-4 text-white" />
+                                <Button href={link.href}
+                                        color={(link.primary ? 'indigo' : 'zinc') as 'indigo' | 'zinc'}>
+                                    {link.name} <ArrowUpRightIcon className="inline-flex w-4 h-4 text-white"/>
                                 </Button>
                             </Tooltip>
                         ) : (
-                            <Button key={index} href={link.href} color={(link.primary ? 'indigo' : 'zinc') as 'indigo' | 'zinc'}>
+                            <Button key={index} href={link.href}
+                                    color={(link.primary ? 'indigo' : 'zinc') as 'indigo' | 'zinc'}>
                                 {link.name}
                             </Button>
                         )
@@ -241,16 +247,16 @@ function Hero() {
             </Container>
 
             {/* Image of website. Centered in the middle of the screen */}
-            <BottomRowCards />
+            <BottomRowCards/>
         </div>
     )
 }
 
 function FakePost({
-    user,
-    content,
-    image,
-}: {
+                      user,
+                      content,
+                      image,
+                  }: {
     user: {
         name: string
         avatar: string
@@ -263,7 +269,7 @@ function FakePost({
             <div className="flex items-center justify-between p-3">
                 <div className="flex items-center space-x-2">
                     <div className="w-10 h-10 overflow-hidden rounded">
-                        <img src={user.avatar} alt={user.name} className="object-cover w-full h-full" />
+                        <img src={user.avatar} alt={user.name} className="object-cover w-full h-full"/>
                     </div>
                     <div>
                         <p className="font-medium">{user.name}</p>
@@ -279,7 +285,8 @@ function FakePost({
 
             {image && (
                 <div className="flex items-center justify-center flex-1 px-4 pb-4">
-                    <img src={image} alt={content || user.name} className="object-cover w-full rounded-lg max-h-36 ring-2 ring-default" />
+                    <img src={image} alt={content || user.name}
+                         className="object-cover w-full rounded-lg max-h-36 ring-2 ring-default"/>
                 </div>
             )}
         </div>
@@ -287,46 +294,34 @@ function FakePost({
 }
 
 // Reusable highlighted text component with randomized clip path
-function HighlightedText({ children, width = '100%' }: { children: ReactNode; width?: string }) {
-    // Generate random wavy SVG path for highlight
+function HighlightedText({children, width = '100%'}: { children: ReactNode; width?: string }) {
+    // Generate random wavy SVG path for highlight using a more efficient approach
     const svgPath = useMemo(() => {
-        const segments = 10
-        let path = ''
+        const segments = 10;
+        const points = {
+            top: Array.from({length: segments + 1}, () => Math.floor(Math.random() * 16) + 2),
+            bottom: Array.from({length: segments + 1}, () => Math.floor(Math.random() * 15) + 80)
+        };
 
-        // Starting point
-        path += `M 0,${Math.floor(Math.random() * 16) + 2} `
+        // Build path using array methods instead of loops
+        const topEdge = points.top
+            .map((y, i) => `L ${(i * 100) / segments},${y}`)
+            .join(' ');
 
-        // Top edge - random wavy line
-        for (let i = 1; i <= segments; i++) {
-            const x = (i * 100) / segments
-            const y = Math.floor(Math.random() * 16) + 2
-            path += `L ${x},${y} `
-        }
+        const bottomEdge = points.bottom
+            .reverse()
+            .map((y, i) => `L ${((segments - i) * 100) / segments},${y}`)
+            .join(' ');
 
-        // Right edge
-        path += `L 100,${Math.floor(Math.random() * 15) + 80} `
-
-        // Bottom edge - random wavy line
-        for (let i = segments - 1; i >= 0; i--) {
-            const x = (i * 100) / segments
-            const y = Math.floor(Math.random() * 15) + 80
-            path += `L ${x},${y} `
-        }
-
-        // Close the path
-        path += 'Z'
-
-        return path
-    }, [])
+        return `M 0,${points.top[0]} ${topEdge} L 100,${points.bottom[0]} ${bottomEdge} Z`;
+    }, []);
 
     return (
         <span className="relative z-10 font-instrument-serif-italic text-default">
             {' '}
             <span
                 className="absolute inset-0 -z-[1]"
-                style={{
-                    width,
-                }}
+                style={{width}}
             >
                 <svg
                     width="100%"
@@ -354,11 +349,15 @@ function HighlightedText({ children, width = '100%' }: { children: ReactNode; wi
             </span>
             {children}
         </span>
-    )
+    );
 }
 
 // Replace the existing BlurFadeIn component with this new version
-function BlurFadeIn({ children, isVisible, staggerDelay = 0.05 }: { children: ReactNode; isVisible: boolean; staggerDelay?: number }) {
+function BlurFadeIn({children, isVisible, staggerDelay = 0.05}: {
+    children: ReactNode;
+    isVisible: boolean;
+    staggerDelay?: number
+}) {
     // Extract text content from React elements
     const extractText = (node: ReactNode): string => {
         if (typeof node === 'string') return node
@@ -377,9 +376,9 @@ function BlurFadeIn({ children, isVisible, staggerDelay = 0.05 }: { children: Re
                     {words.map((word, index) => (
                         <motion.span
                             key={index}
-                            initial={{ filter: 'blur(2px)', opacity: 0 }}
-                            animate={{ filter: 'blur(0px)', opacity: 1 }}
-                            exit={{ filter: 'blur(2px)', opacity: 0 }}
+                            initial={{filter: 'blur(2px)', opacity: 0}}
+                            animate={{filter: 'blur(0px)', opacity: 1}}
+                            exit={{filter: 'blur(2px)', opacity: 0}}
                             transition={{
                                 duration: 0.4,
                                 ease: 'easeOut',
@@ -453,7 +452,8 @@ function FeaturePromiseGrid() {
                     How <HighlightedText>social</HighlightedText> should be built
                 </Heading>
                 <Text className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Classic forums, reimagined for today's communities without the data mining. You <i>don't</i> have to sacrifice your data
+                    Classic forums, reimagined for today's communities without the data mining. You <i>don't</i> have to
+                    sacrifice your data
                     and sanity to communicate, you know that right?
                 </Text>
             </div>
@@ -472,7 +472,8 @@ function FeaturePromiseGrid() {
                             <div className="flex items-start w-full gap-4">
                                 <div className="flex-shrink-0">
                                     <div className="p-2 bg-indigo-100 rounded-lg dark:bg-indigo-900/30">
-                                        {IconComponent && <IconComponent className="w-6 h-6 text-indigo-500/80 dark:text-indigo-400" />}
+                                        {IconComponent && <IconComponent
+                                            className="w-6 h-6 text-indigo-500/80 dark:text-indigo-400"/>}
                                     </div>
                                 </div>
                                 <div className="flex-1">
@@ -489,7 +490,7 @@ function FeaturePromiseGrid() {
                                                 className="flex items-center text-sm text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300"
                                             >
                                                 <span>{isAccordionOpen ? 'Show less' : 'Learn more'}</span>
-                                                <QuestionMarkCircleIcon className="w-4 h-4 ml-1" />
+                                                <QuestionMarkCircleIcon className="w-4 h-4 ml-1"/>
                                             </button>
                                         )}
                                     </div>
@@ -499,10 +500,10 @@ function FeaturePromiseGrid() {
 
                             {hasAccordion && isAccordionOpen && (
                                 <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
+                                    initial={{height: 0, opacity: 0}}
+                                    animate={{height: 'auto', opacity: 1}}
+                                    exit={{height: 0, opacity: 0}}
+                                    transition={{duration: 0.3}}
                                     className="w-full pt-3 pl-12 mt-2 border-t border-n-2/80 dark:border-n-6/80"
                                 >
                                     <Text alt size="sm">
@@ -559,7 +560,8 @@ function PackShowcase() {
                     Discover Your <HighlightedText>Pack</HighlightedText>
                 </Heading>
                 <Text className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Every community has its own space, customization, and culture. Find where you belong, or create your own.
+                    Every community has its own space, customization, and culture. Find where you belong, or create your
+                    own.
                 </Text>
             </div>
 
@@ -567,15 +569,17 @@ function PackShowcase() {
                 {packs.map((pack, index) => (
                     <motion.div
                         key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
+                        initial={{opacity: 0, y: 20}}
+                        animate={{opacity: 1, y: 0}}
+                        transition={{delay: index * 0.1}}
                         className="group relative overflow-hidden rounded bg-white dark:bg-zinc-800 ring-1 ring-default hover:ring-2 hover:ring-indigo-500/50 transition-all cursor-pointer"
                     >
-                        <div className={`absolute inset-0 ${pack.color} opacity-10 group-hover:opacity-20 transition-opacity`} />
+                        <div
+                            className={`absolute inset-0 ${pack.color} opacity-10 group-hover:opacity-20 transition-opacity`}/>
                         <div className="relative p-6">
                             <div className="flex items-center gap-3 mb-3">
-                                <div className={`w-12 h-12 rounded-xl ${pack.color} flex items-center justify-center text-xl`}>
+                                <div
+                                    className={`w-12 h-12 rounded-xl ${pack.color} flex items-center justify-center text-xl`}>
                                     {pack.avatar}
                                 </div>
                                 <div>
@@ -627,16 +631,18 @@ function MigrationSection() {
                     Bring Your <HighlightedText>Community</HighlightedText> With You
                 </Heading>
                 <Text className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                    Switching platforms shouldn't mean starting over. We'll handle the heavy lifting and migrate your entire community's
+                    Switching platforms shouldn't mean starting over. We'll handle the heavy lifting and migrate your
+                    entire community's
                     history, preserving years of conversations, connections, and content.
                 </Text>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                 {platforms.map(platform => (
-                    <div className="relative overflow-hidden rounded p-8 cursor-pointer transition-all ring-1 ring-default hover:ring-2 hover:ring-indigo-500/50 shadow-md bg-white dark:bg-zinc-800">
+                    <div
+                        className="relative overflow-hidden rounded p-8 cursor-pointer transition-all ring-1 ring-default hover:ring-2 hover:ring-indigo-500/50 shadow-md bg-white dark:bg-zinc-800">
                         {/* Gradient overlay */}
-                        <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-5`} />
+                        <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-5`}/>
 
                         <div className="relative">
                             <div className="flex items-start gap-4 mb-4">
@@ -656,14 +662,16 @@ function MigrationSection() {
                             <div className="space-y-2 mt-6">
                                 {platform.features.map((feature, idx) => (
                                     <div key={idx} className="flex gap-2">
-                                        <div className="w-5 h-5 rounded-full bg-green-500/20 dark:bg-green-400/20 flex items-center justify-center">
+                                        <div
+                                            className="w-5 h-5 rounded-full bg-green-500/20 dark:bg-green-400/20 flex items-center justify-center">
                                             <svg
                                                 className="w-3 h-3 text-green-600 dark:text-green-400"
                                                 fill="none"
                                                 viewBox="0 0 24 24"
                                                 stroke="currentColor"
                                             >
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                      d="M5 13l4 4L19 7"/>
                                             </svg>
                                         </div>
                                         <Text size="sm">{feature}</Text>
@@ -676,10 +684,12 @@ function MigrationSection() {
             </div>
 
             {/* Migration process */}
-            <div className="mt-16 p-8 rounded bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 ring-1 ring-default">
+            <div
+                className="mt-16 p-8 rounded bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 ring-1 ring-default">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="text-center">
-                        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                        <div
+                            className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
                             <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">1</span>
                         </div>
                         <Heading size="lg" className="mb-2">
@@ -690,7 +700,8 @@ function MigrationSection() {
                         </Text>
                     </div>
                     <div className="text-center">
-                        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                        <div
+                            className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
                             <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">2</span>
                         </div>
                         <Heading size="lg" className="mb-2">
@@ -701,7 +712,8 @@ function MigrationSection() {
                         </Text>
                     </div>
                     <div className="text-center">
-                        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                        <div
+                            className="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
                             <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">3</span>
                         </div>
                         <Heading size="lg" className="mb-2">
@@ -746,21 +758,24 @@ export default function GuestLanding() {
     }
     return (
         <div className="h-full overflow-x-hidden overflow-y-auto scrollbar-hide bg-zinc-100 dark:bg-zinc-950">
-            <div className="relative z-30 bg-white mb-80 rounded ring-2 ring-default dark:bg-zinc-900 shadow-xl">
-                <Hero />
-                <FeaturePromiseGrid />
-                <PackShowcase />
-                <MigrationSection />
+            <div
+                className="relative z-30 bg-white overflow-hidden mb-80 rounded-b ring-2 ring-default dark:bg-zinc-900 shadow-xl">
+                <Hero/>
+                <FeaturePromiseGrid/>
+                <PackShowcase/>
+                <MigrationSection/>
             </div>
 
             {/* Minimal footer */}
-            <div className="absolute bottom-0 z-10 left-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80 h-80">
+            <div className="absolute bottom-0 left-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80 h-80">
                 <div className="flex items-end justify-end w-full h-80 border-x border-n-2/80 dark:border-n-6/80">
                     {/* Horizontal dotted border at the top of items */}
-                    <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80" style={{ top: '2rem' }}></div>
+                    <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80"
+                         style={{top: '2rem'}}></div>
 
                     {/* Items with grid border style */}
                     <div className="flex justify-end w-full border-t border-n-2/80 dark:border-n-6/80">
+                        <img src={NoAIBadge} className="mr-8 pointer-events-none" alt="No AI Reliance"/>
                         <div className="relative grid grid-cols-2 gap-12 px-4 py-2 mb-8 mr-8 ring-1 ring-default">
                             {Object.entries(links).map(([category, items]) => (
                                 <div key={category}>
@@ -770,7 +785,7 @@ export default function GuestLanding() {
                                             <li key={item.name}>
                                                 <Link
                                                     href={item.href}
-                                                    className="text-sm transition-colors text-alt hover:!text-primary-cosmos hover:underline"
+                                                    className="text-sm transition-colors text-muted-foreground hover:!text-primary-cosmos hover:underline"
                                                 >
                                                     {item.name}
                                                 </Link>
@@ -783,16 +798,17 @@ export default function GuestLanding() {
                     </div>
 
                     {/* Horizontal dotted border at the bottom of items */}
-                    <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80" style={{ bottom: '1.85rem' }}></div>
+                    <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80"
+                         style={{bottom: '1.85rem'}}></div>
 
                     {/* Floating brand text on bottom-left - should not interact with other elements! */}
-                    <h1 className="fixed flex flex-col opacity-50 select-none bottom-4 left-8 font-bold">
-                        <span className="tracking-tighter text-8xl">
+                    <h1 className="fixed flex flex-col opacity-50 select-none bottom-1 left-7 font-bold">
+                        <span className="tracking-tighter text-8xl -mb-3">
                             <span className="font-extrabold text-primary-lime">✱</span>
                             <span className="font-wildbase-bold">base</span>
                         </span>
                         <span className="text-xs tracking-tight ml-22 text-default-alt font-wildbase-medium">
-                            &copy; 2025 ✱base. Not a company! Landing hero (c) Aniplex
+                            &copy; 2025 ✱base
                         </span>
                     </h1>
                 </div>

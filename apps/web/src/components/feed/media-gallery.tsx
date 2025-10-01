@@ -3,17 +3,17 @@
  */
 
 // src/components/feed/MediaGallery.tsx
-import { useState } from 'react'
-import { useUIStore } from '@/lib/state'
-import { Asset } from './types/post'
-import ImageOverlay from './image-overlay'
+import {useState} from 'react'
+import {useUIStore} from '@/lib/state'
+import {Asset} from './types/post'
+import {ImageOverlay} from '.'
 
 interface MediaGalleryProps {
     assets: Asset[]
     truncate?: boolean
 }
 
-export default function MediaGallery({ assets, truncate = true }: MediaGalleryProps) {
+export default function MediaGallery({assets, truncate = true}: MediaGalleryProps) {
     const bucketRoot = useUIStore(state => state.bucketRoot)
     const [overlayOpen, setOverlayOpen] = useState(false)
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -65,13 +65,15 @@ export default function MediaGallery({ assets, truncate = true }: MediaGalleryPr
                                         loading="lazy"
                                     />
                                     {isLastWithMore && (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+                                        <div
+                                            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
                                             <span className="text-lg font-medium text-white">+{remainingCount}</span>
                                         </div>
                                     )}
                                 </>
                             ) : (
-                                <video src={assetUrl} className="h-full w-full object-cover" controls onClick={e => e.stopPropagation()} />
+                                <video src={assetUrl} className="h-full w-full object-cover" controls
+                                       onClick={e => e.stopPropagation()}/>
                             )}
                         </div>
                     )
@@ -79,7 +81,8 @@ export default function MediaGallery({ assets, truncate = true }: MediaGalleryPr
             </div>
 
             {/* Image overlay for zooming and panning */}
-            {overlayOpen && <ImageOverlay assets={assets} initialIndex={currentImageIndex} onClose={() => setOverlayOpen(false)} />}
+            {overlayOpen &&
+                <ImageOverlay assets={assets} initialIndex={currentImageIndex} onClose={() => setOverlayOpen(false)}/>}
         </>
     )
 }

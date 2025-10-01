@@ -1,41 +1,42 @@
-import { useEffect, useState } from 'react'
-import { API_URL } from '@/lib/api'
-import { Theme } from '@/lib/api/theme.ts'
+import {useEffect, useState} from 'react'
+import {API_URL} from '@/lib/api'
+import {Theme} from '@/lib/api/theme.ts'
 
 // Pack theme API service
 export const PackThemeAPI = {
     // Get active theme for a pack
     async getActive(packId: string): Promise<Theme | null> {
-        try {
-            const response = await fetch(`${API_URL}/pack/${packId}/theme`, {
-                headers: {
-                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
-                },
-            })
-            if (!response.ok) {
-                if (response.status === 404) {
-                    return null // No active theme
-                }
-                throw new Error('Failed to fetch pack theme')
+        const response = await fetch(`${API_URL}/pack/${packId}/theme`, {
+            headers: {
+                Authorization: `Bearer ${globalThis.TOKEN || ''}`,
+            },
+        })
+        if (!response.ok) {
+            if (response.status === 404) {
+                return null // No active theme
             }
+            throw new Error('Failed to fetch pack theme')
+        }
+
+        try {
             return await response.json()
         } catch (error) {
-            console.error('Error fetching pack theme:', error)
             return null
         }
     },
 
     // Get all themes for a pack (owner only)
     async getAll(packId: string): Promise<Theme[]> {
+        const response = await fetch(`${API_URL}/pack/${packId}/themes`, {
+            headers: {
+                Authorization: `Bearer ${globalThis.TOKEN || ''}`,
+            },
+        })
+        if (!response.ok) {
+            throw new Error('Failed to fetch pack themes')
+        }
+
         try {
-            const response = await fetch(`${API_URL}/pack/${packId}/themes`, {
-                headers: {
-                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
-                },
-            })
-            if (!response.ok) {
-                throw new Error('Failed to fetch pack themes')
-            }
             return await response.json()
         } catch (error) {
             console.error('Error fetching pack themes:', error)
@@ -45,18 +46,19 @@ export const PackThemeAPI = {
 
     // Create a new pack theme (owner only)
     async create(packId: string, theme: Omit<Theme, 'id' | 'pack_id' | 'created_at' | 'updated_at'>): Promise<Theme | null> {
+        const response = await fetch(`${API_URL}/pack/${packId}/themes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${globalThis.TOKEN || ''}`,
+            },
+            body: JSON.stringify({...theme, pack_id: packId}),
+        })
+        if (!response.ok) {
+            throw new Error('Failed to create pack theme')
+        }
+
         try {
-            const response = await fetch(`${API_URL}/pack/${packId}/themes`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
-                },
-                body: JSON.stringify({ ...theme, pack_id: packId }),
-            })
-            if (!response.ok) {
-                throw new Error('Failed to create pack theme')
-            }
             return await response.json()
         } catch (error) {
             console.error('Error creating pack theme:', error)
@@ -70,18 +72,19 @@ export const PackThemeAPI = {
         themeId: string,
         theme: Partial<Omit<Theme, 'id' | 'pack_id' | 'created_at' | 'updated_at'>>
     ): Promise<Theme | null> {
+        const response = await fetch(`${API_URL}/pack/${packId}/themes/${themeId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${globalThis.TOKEN || ''}`,
+            },
+            body: JSON.stringify(theme),
+        })
+        if (!response.ok) {
+            throw new Error('Failed to update pack theme')
+        }
+
         try {
-            const response = await fetch(`${API_URL}/pack/${packId}/themes/${themeId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
-                },
-                body: JSON.stringify(theme),
-            })
-            if (!response.ok) {
-                throw new Error('Failed to update pack theme')
-            }
             return await response.json()
         } catch (error) {
             console.error('Error updating pack theme:', error)
@@ -91,21 +94,16 @@ export const PackThemeAPI = {
 
     // Delete a pack theme (owner only)
     async delete(packId: string, themeId: string): Promise<boolean> {
-        try {
-            const response = await fetch(`${API_URL}/pack/${packId}/themes/${themeId}`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
-                },
-            })
-            if (!response.ok) {
-                throw new Error('Failed to delete pack theme')
-            }
-            return true
-        } catch (error) {
-            console.error('Error deleting pack theme:', error)
-            return false
+        const response = await fetch(`${API_URL}/pack/${packId}/themes/${themeId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${globalThis.TOKEN || ''}`,
+            },
+        })
+        if (!response.ok) {
+            throw new Error('Failed to delete pack theme')
         }
+        return true
     },
 
     // Validate pack theme content (owner only)
@@ -114,23 +112,25 @@ export const PackThemeAPI = {
         html: string,
         css: string
     ): Promise<{ valid: boolean; sanitized: { html: string; css: string } } | null> {
+        const response = await fetch(`${API_URL}/pack/${packId}/themes/validate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${globalThis.TOKEN || ''}`,
+            },
+            body: JSON.stringify({html, css}),
+        })
+        if (!response.ok) {
+            throw new Error('Failed to validate pack theme')
+        }
+
         try {
-            const response = await fetch(`${API_URL}/pack/${packId}/themes/validate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${globalThis.TOKEN || ''}`,
-                },
-                body: JSON.stringify({ html, css }),
-            })
-            if (!response.ok) {
-                throw new Error('Failed to validate pack theme')
-            }
             return await response.json()
         } catch (error) {
             console.error('Error validating pack theme:', error)
             return null
         }
+
     },
 }
 
@@ -167,7 +167,7 @@ export function usePackThemes(packId: string) {
     const addTheme = async (theme: Omit<Theme, 'id' | 'pack_id' | 'created_at' | 'updated_at'>) => {
         const newTheme = await PackThemeAPI.create(packId, theme)
         if (newTheme) {
-            fetchThemes()
+            await fetchThemes()
             return newTheme
         }
         return null
@@ -177,7 +177,7 @@ export function usePackThemes(packId: string) {
     const updateTheme = async (themeId: string, theme: Partial<Omit<Theme, 'id' | 'pack_id' | 'created_at' | 'updated_at'>>) => {
         const updatedTheme = await PackThemeAPI.update(packId, themeId, theme)
         if (updatedTheme) {
-            fetchThemes()
+            await fetchThemes()
             return updatedTheme
         }
         return null
@@ -187,7 +187,7 @@ export function usePackThemes(packId: string) {
     const deleteTheme = async (themeId: string) => {
         const success = await PackThemeAPI.delete(packId, themeId)
         if (success) {
-            fetchThemes()
+            await fetchThemes()
         }
         return success
     }

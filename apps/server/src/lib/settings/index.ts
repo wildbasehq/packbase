@@ -1,13 +1,13 @@
 // ./apps/server/src/lib/settings/index.ts
 
-import { promises as fs } from 'fs';
-import { join } from 'path';
-import type { SettingSchema, SettingDefinition, ValidationResult, SettingValue, SettingsOptions } from './types';
-import { ConditionEvaluator } from './conditions';
-import { SettingValidator } from './validators';
-import { CacheManager } from './cache-manager';
-import { AuditLogger } from './audit-logger';
-import { PrismaDatabaseAdapter } from './database-adapter';
+import {promises as fs} from 'fs';
+import {join} from 'path';
+import type {SettingDefinition, SettingSchema, SettingsOptions, SettingValue, ValidationResult} from './types';
+import {ConditionEvaluator} from './conditions';
+import {SettingValidator} from './validators';
+import {CacheManager} from './cache-manager';
+import {AuditLogger} from './audit-logger';
+import {PrismaDatabaseAdapter} from './database-adapter';
 
 /**
  * Settings management system that handles configuration for different data models
@@ -68,7 +68,7 @@ export class Settings {
         // Handle schema inheritance
         if (this.options.allowSchemaInheritance && schema.extends) {
             const parentSchema = await this.loadSchema(schema.extends);
-            schema.settings = { ...parentSchema.settings, ...schema.settings };
+            schema.settings = {...parentSchema.settings, ...schema.settings};
         }
 
         // Validate and cache
@@ -108,7 +108,7 @@ export class Settings {
      * @throws Error if setting doesn't exist or access is denied
      */
     async getSetting<T extends Record<string, any>>(modelObject: T, settingKey: string): Promise<any> {
-        const { definition } = await this.getSettingDefinition(modelObject, settingKey);
+        const {definition} = await this.getSettingDefinition(modelObject, settingKey);
 
         this.assertAccess(modelObject, definition, settingKey);
 
@@ -132,7 +132,7 @@ export class Settings {
      * @throws Error for validation failures or permission issues
      */
     async updateSetting<T extends Record<string, any>>(modelObject: T, settingKey: string, value: any, internal = false): Promise<boolean> {
-        const { schema, definition } = await this.getSettingDefinition(modelObject, settingKey);
+        const {schema, definition} = await this.getSettingDefinition(modelObject, settingKey);
 
         // Permission checks
         this.assertAccess(modelObject, definition, settingKey);
@@ -184,7 +184,7 @@ export class Settings {
             await this.updateSetting(modelObject, key, value, internal);
         }
 
-        return { success: true, errors: [] };
+        return {success: true, errors: []};
     }
 
     /**
@@ -286,7 +286,7 @@ export class Settings {
             throw new Error(`Setting "${settingKey}" not found for model "${schema.model}"`);
         }
 
-        return { schema, definition };
+        return {schema, definition};
     }
 
     private checkAccess<T extends Record<string, any>>(modelObject: T, definition: SettingDefinition): boolean {
@@ -405,12 +405,11 @@ export class Settings {
         }
 
         if (errors.length > 0) {
-            return { success: false, errors };
+            return {success: false, errors};
         }
 
         // Validate all values
-        const validation = SettingValidator.validateSettings(updates, definitions);
-        return validation;
+        return SettingValidator.validateSettings(updates, definitions);
     }
 
     private validateSchema(schema: SettingSchema): void {
@@ -448,6 +447,6 @@ export class Settings {
         if (!id) {
             throw new Error('Unable to determine unique identifier for database operations');
         }
-        return { id };
+        return {id};
     }
 }

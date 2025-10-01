@@ -3,15 +3,16 @@
  */
 
 import * as React from 'react'
+import {ComponentPropsWithoutRef, ComponentRef, forwardRef} from 'react'
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
 
-import { cn } from '@/lib/utils'
-import { CheckIcon } from '@heroicons/react/20/solid'
+import {cn} from '@/lib/utils'
+import {CheckIcon} from '@heroicons/react/20/solid'
 
-const Checkbox = React.forwardRef<
-    React.ElementRef<typeof CheckboxPrimitive.Root>,
-    React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
->(({ className, ...props }, ref) => (
+const Checkbox = forwardRef<
+    ComponentRef<typeof CheckboxPrimitive.Root>,
+    ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
+>(({className, ...props}, ref) => (
     <CheckboxPrimitive.Root
         ref={ref}
         className={cn(
@@ -21,10 +22,10 @@ const Checkbox = React.forwardRef<
         {...props}
     >
         <CheckboxPrimitive.Indicator className={cn('flex items-center justify-center text-current')}>
-            <CheckIcon className="h-4 w-4 text-white" />
+            <CheckIcon className="h-4 w-4 text-white"/>
         </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
 ))
 Checkbox.displayName = CheckboxPrimitive.Root.displayName
 
-export { Checkbox }
+export {Checkbox}

@@ -45,10 +45,10 @@ export default function ReportAbuse() {
                         <h3 className="font-display text-2xl font-bold">
                             Report Bug or Abuse
                         </h3>
-                        <p className="mt-2 text-sm text-alt">
+                        <p className="mt-2 text-sm text-muted-foreground">
                             Found a bug or abuse? Let us know so we can fix it!
                         </p>
-                        <p className="mt-2 text-sm text-alt">
+                        <p className="mt-2 text-sm text-muted-foreground">
                             When reporting a user, please go to their profile before doing this.
                         </p>
                     </div>
@@ -63,7 +63,7 @@ export default function ReportAbuse() {
 
                     <div>
                         <input type="checkbox" id="screenshot" className="rounded-xs bg-default"/>
-                        <label htmlFor="screenshot" className="ml-2 text-sm leading-5 text-alt">
+                        <label htmlFor="screenshot" className="ml-2 text-sm leading-5 text-muted-foreground">
                             Include a screenshot
                         </label>
                     </div>
@@ -77,7 +77,7 @@ export default function ReportAbuse() {
 
 function SubmitButton({pending}: { pending: boolean; }) {
     return (
-        <Button variant="primary" type="submit" disabled={pending}>
+        <Button color="indigo" type="submit" disabled={pending}>
             {pending ? <LoadingDots/> : <p>Report Abuse</p>}
         </Button>
     )

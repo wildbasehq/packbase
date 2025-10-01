@@ -2,25 +2,24 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { lazy, Suspense, useState } from 'react'
-import { usePackThemes } from '@/lib/api/pack-theme.ts'
-import { Button } from '@/components/shared/experimental-button-rework.tsx'
-import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { CheckCircleIcon } from '@heroicons/react/24/solid'
-import { Heading, Text } from '@/components/shared/text.tsx'
-import Body from '@/components/layout/body.tsx'
-import { useParams } from 'wouter'
-import { useResourceStore } from '@/lib/state'
-import { Theme } from '@/lib/api/theme.ts'
+import {lazy, Suspense, useState} from 'react'
+import {usePackThemes} from '@/lib/api/pack-theme.ts'
+import {Button} from '@/components/shared'
+import {PencilIcon, PlusIcon, TrashIcon} from '@heroicons/react/24/outline'
+import {CheckCircleIcon} from '@heroicons/react/24/solid'
+import {Heading, Text} from '@/components/shared/text.tsx'
+import {useParams} from 'wouter'
+import {useResourceStore} from '@/lib/state'
+import {Theme} from '@/lib/api/theme.ts'
 
 const ThemeEditor = lazy(() => import('@/components/layout/resource-switcher/pages/theme-editor.tsx'))
 
 export default function ResourceSettingsTheme() {
-    const { slug } = useParams<{ slug: string }>()
-    const { currentResource } = useResourceStore()
+    const {slug} = useParams<{ slug: string }>()
+    const {currentResource} = useResourceStore()
     const packId = currentResource?.id || slug
 
-    const { themes, loading, error, addTheme, updateTheme, deleteTheme } = usePackThemes(packId)
+    const {themes, loading, error, addTheme, updateTheme, deleteTheme} = usePackThemes(packId)
     const [isEditorOpen, setIsEditorOpen] = useState(false)
     const [currentTheme, setCurrentTheme] = useState<Theme | null>(null)
 
@@ -62,7 +61,7 @@ export default function ResourceSettingsTheme() {
     // Handle setting a theme as active
     const handleSetActive = async (theme: Theme) => {
         if (theme.id) {
-            await updateTheme(theme.id, { ...theme, is_active: true })
+            await updateTheme(theme.id, {...theme, is_active: true})
         }
     }
 
@@ -74,7 +73,7 @@ export default function ResourceSettingsTheme() {
                     <Text alt>Manage this pack's look and feel</Text>
                 </div>
                 <Button onClick={handleCreateTheme}>
-                    <PlusIcon className="h-5 w-5 mr-2" />
+                    <PlusIcon className="h-5 w-5 mr-2"/>
                     Create New Theme
                 </Button>
             </div>
@@ -95,7 +94,8 @@ export default function ResourceSettingsTheme() {
                                 No themes found. Create your first pack theme to get started.
                             </Heading>
                             <Text alt size="sm">
-                                Pack themes allow you to customize the appearance of your pack for all members and visitors.
+                                Pack themes allow you to customize the appearance of your pack for all members and
+                                visitors.
                             </Text>
                         </div>
                     )
@@ -120,20 +120,21 @@ export default function ResourceSettingsTheme() {
                                             className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700"
                                             title="Edit theme"
                                         >
-                                            <PencilIcon className="h-4 w-4" />
+                                            <PencilIcon className="h-4 w-4"/>
                                         </button>
                                         <button
                                             onClick={() => handleDeleteTheme(theme.id!)}
                                             className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700"
                                             title="Delete theme"
                                         >
-                                            <TrashIcon className="h-4 w-4" />
+                                            <TrashIcon className="h-4 w-4"/>
                                         </button>
                                     </div>
                                 </div>
 
                                 <div className="text-xs text-muted-foreground mb-3">
-                                    {theme.created_at && <p>Created: {new Date(theme.created_at).toLocaleDateString()}</p>}
+                                    {theme.created_at &&
+                                        <p>Created: {new Date(theme.created_at).toLocaleDateString()}</p>}
                                     {theme.updated_at && theme.updated_at !== theme.created_at && (
                                         <p>Updated: {new Date(theme.updated_at).toLocaleDateString()}</p>
                                     )}
@@ -141,11 +142,12 @@ export default function ResourceSettingsTheme() {
 
                                 {theme.is_active ? (
                                     <div className="flex items-center text-sm text-indigo-600 dark:text-indigo-400">
-                                        <CheckCircleIcon className="h-4 w-4 mr-1" />
+                                        <CheckCircleIcon className="h-4 w-4 mr-1"/>
                                         Active
                                     </div>
                                 ) : (
-                                    <Button outline={true} onClick={() => handleSetActive(theme)} className="text-xs mt-2">
+                                    <Button outline={true} onClick={() => handleSetActive(theme)}
+                                            className="text-xs mt-2">
                                         Set as active
                                     </Button>
                                 )}
@@ -164,8 +166,10 @@ export default function ResourceSettingsTheme() {
                         </Heading>
                         <Text alt>⚠️ This is horribly jank. Sorry! We're rewriting it soon :(</Text>
                         <div className="pt-8 h-[calc(100vh-12rem)]">
-                            <Suspense fallback={<div className="flex items-center justify-center h-full">Loading editor...</div>}>
-                                <ThemeEditor theme={currentTheme} onSave={handleSaveTheme} onCancel={() => setIsEditorOpen(false)} />
+                            <Suspense fallback={<div className="flex items-center justify-center h-full">Loading
+                                editor...</div>}>
+                                <ThemeEditor theme={currentTheme} onSave={handleSaveTheme}
+                                             onCancel={() => setIsEditorOpen(false)}/>
                             </Suspense>
                         </div>
                     </div>

@@ -50,7 +50,8 @@ model packs_memberships {
   tenant_id   String   @db.Uuid
   user_id     String   @db.Uuid
   packs       packs    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "public_packs_memberships_tenant_id_fkey")
-  permissions String?
+  // Bitwise permissions
+  permissions Int?    @default(0)
 
   @@index([tenant_id], type: Hash)
   @@index([user_id], type: Hash)

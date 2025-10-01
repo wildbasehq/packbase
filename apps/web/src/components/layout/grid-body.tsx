@@ -1,5 +1,7 @@
-export default function GridBody({ children, className }: {
-    children: React.ReactNode
+import {ReactNode} from "react";
+
+export default function GridBody({children, className}: {
+    children: ReactNode
     className?: string
 }) {
     return (

@@ -1,20 +1,22 @@
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import FolderCollectionIcon from '@/components/icons/folder-collection.tsx'
-import { Heading, Text } from '@/components/shared/text.tsx'
-import { BentoGrid } from '@/components/bento/bento-grid'
-import { sampleBentoItems } from '@/components/bento/sample-items'
+import {Heading, Text} from '@/components/shared/text.tsx'
+import {BentoGrid} from '@/components/bento/bento-grid'
+import {sampleBentoItems} from '@/components/bento/sample-items'
 
 function EmptyState() {
     return (
-        <div className="absolute flex justify-center items-center h-[calc(100vh-14rem)] top-14 lg:pl-18 w-full overflow-hidden grow">
+        <div
+            className="absolute flex justify-center items-center h-[calc(100vh-14rem)] top-14 lg:pl-18 w-full overflow-hidden grow">
             <div className="h-full flex items-center justify-center">
                 <div className="w-full max-w-2xl">
                     <div className="flex flex-col items-center justify-center">
                         <div className="flex flex-col items-center justify-center max-w-xs text-center mb-4">
-                            <FolderCollectionIcon className="h-24 mb-6" />
+                            <FolderCollectionIcon className="h-24 mb-6"/>
                             <Heading className="mb-2">You have no stuff yet</Heading>
                             <Text alt>
-                                Your "stuff" is collections of content you've saved across Packbase or copy-and-pasted into here, and will
+                                Your "stuff" is collections of content you've saved across Packbase or copy-and-pasted
+                                into here, and will
                                 always have quick access to.
                             </Text>
                         </div>
@@ -54,7 +56,8 @@ function BentoContent() {
             title: 'New Item',
             content: (
                 <div className="flex flex-col h-full">
-                    <Text>Items are automatically arranged. You can resize this item using the bottom-right corner.</Text>
+                    <Text>Items are automatically arranged. You can resize this item using the bottom-right
+                        corner.</Text>
                 </div>
             ),
             x: 0, // Position will be determined by the grid's compactType
@@ -74,7 +77,7 @@ function BentoContent() {
     return (
         <div className="absolute h-[calc(100vh-14rem)] w-full top-14 lg:pl-18 overflow-auto">
             <div className="p-4">
-                <BentoGrid items={items} onLayoutChange={handleLayoutChange} onRemoveItem={handleRemoveItem} />
+                <BentoGrid items={items} onLayoutChange={handleLayoutChange} onRemoveItem={handleRemoveItem}/>
             </div>
         </div>
     )
@@ -82,11 +85,7 @@ function BentoContent() {
 
 export default function YourStuffPage() {
     // State to track if the user has content
-    const [hasContent, setHasContent] = useState(false)
+    const [hasContent] = useState(false)
 
-    const handleGetStarted = () => {
-        setHasContent(true)
-    }
-
-    return hasContent ? <BentoContent /> : <EmptyState />
+    return hasContent ? <BentoContent/> : <EmptyState/>
 }

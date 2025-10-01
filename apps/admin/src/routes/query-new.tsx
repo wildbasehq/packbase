@@ -1,13 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Column, FlexGrid, InlineLoading, Layer, Row, Stack, TextInput, InlineNotification } from '@carbon/react'
-import { OptionsTile } from '@carbon/ibm-products'
+import React, {useEffect, useMemo, useState} from 'react'
+import {Button, Column, FlexGrid, InlineLoading, InlineNotification, Layer, Row, Stack, TextInput} from '@carbon/react'
+import {OptionsTile} from '@carbon/ibm-products'
 import SqlEditor from '@/components/SqlEditor'
 import TableLayoutEditor from '@/components/TableLayoutEditor'
-import CarbonDataTable, { Column as DataCol } from '@/components/CarbonDataTable'
+import CarbonDataTable, {Column as DataCol} from '@/components/CarbonDataTable'
 import adminSql from '@/lib/adminSql'
-import { QueryColumn, UpsertQueryPageInput, upsertQueryPage, QueryPage } from '@/lib/queryPages'
-import { useLocation } from 'wouter'
-import { evaluateCustomContent } from '@/lib/customContent'
+import {QueryColumn, QueryPage, upsertQueryPage, UpsertQueryPageInput} from '@/lib/queryPages'
+import {useLocation} from 'wouter'
+import {evaluateCustomContent} from '@/lib/customContent'
+import {similarity} from "wominjeka/src/utils/similarity";
 
 type PreviewRow = Record<string, any>
 
@@ -20,8 +21,8 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
     const [sql, setSql] = useState(page?.sql || "SELECT 1 as id, 'example' as name")
     const [mapping, setMapping] = useState<QueryColumn[]>(
         page?.mapping || [
-            { key: 'id', header: 'ID' },
-            { key: 'name', header: 'Name' },
+            {key: 'id', header: 'ID'},
+            {key: 'name', header: 'Name'},
         ]
     )
     const [previewRows, setPreviewRows] = useState<PreviewRow[]>([])
@@ -35,7 +36,9 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
     const [, navigate] = useLocation()
 
     useEffect(() => {
-        const newDeleteSql = `DELETE FROM ${page?.slug || 'posts'} WHERE ${deleteKey} = ANY($1::uuid[])`
+        const newDeleteSql = `DELETE
+                              FROM ${page?.slug || 'posts'}
+                              WHERE ${deleteKey} = ANY ($1::uuid[])`
         setDeleteSql(prev => {
             if (!prev) return newDeleteSql
             // Are these 2 similar (by ~95% similarity)? If so, do the update
@@ -57,9 +60,9 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
     async function runPreview() {
         setIsRunning(true)
         try {
-            const res = await adminSql({ query: sql })
+            const res = await adminSql({query: sql})
             if (res.ok && res.type === 'query') {
-                const rows = (res.rows as any[]).map((r, idx) => ({ id: String(idx + 1), ...r }))
+                const rows = (res.rows as any[]).map((r, idx) => ({id: String(idx + 1), ...r}))
                 setPreviewRows(rows)
                 const keys = rows.length ? Object.keys(rows[0]).filter(k => k !== 'id') : []
                 setAvailableKeys(keys)
@@ -72,14 +75,19 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
     }
 
     const tableColumns: ReadonlyArray<DataCol<PreviewRow>> = useMemo(() => {
-        return mapping.map(m => ({ header: m.header, key: m.key as any }))
+        return mapping.map(m => ({header: m.header, key: m.key as any}))
     }, [mapping])
 
-    const [customPreview, setCustomPreview] = useState<{ element?: React.ReactNode; html?: string; error?: string } | null>(null)
+    const [customPreview, setCustomPreview] = useState<{
+        element?: React.ReactNode;
+        html?: string;
+        error?: string
+    } | null>(null)
     const [isRenderingPreview, setIsRenderingPreview] = useState(false)
 
     useEffect(() => {
         let cancelled = false
+
         async function run() {
             if (!customJs?.trim() || !previewRows.length) {
                 setCustomPreview(null)
@@ -93,6 +101,7 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
                 setIsRenderingPreview(false)
             }
         }
+
         void run()
         return () => {
             cancelled = true
@@ -114,7 +123,7 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
                 sql,
                 mapping,
                 custom_js: customJs,
-                ...(deleteKey && deleteSql ? { delete_key: deleteKey, delete_sql: deleteSql } : {}),
+                ...(deleteKey && deleteSql ? {delete_key: deleteKey, delete_sql: deleteSql} : {}),
             }
             const saved = await upsertQueryPage(input)
             navigate(`~/query/${saved.slug}`)
@@ -175,7 +184,7 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
                                 }
                                 title="Batch Delete (optional)"
                             >
-                                <div style={{ fontWeight: 600, marginBottom: 8 }}>Batch Delete (optional)</div>
+                                <div style={{fontWeight: 600, marginBottom: 8}}>Batch Delete (optional)</div>
                                 <div className="grid lg:grid-cols-3 gap-4">
                                     <TextInput
                                         id="deleteKey"
@@ -205,13 +214,18 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
                                 }
                                 title="Custom Content (optional)"
                             >
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                                    <div style={{ fontWeight: 600 }}>Custom JavaScript (default export)</div>
-                                    <div style={{ color: 'var(--cds-text-secondary)' }}>Receives: rows (SQL result)</div>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginBottom: 8
+                                }}>
+                                    <div style={{fontWeight: 600}}>Custom JavaScript (default export)</div>
+                                    <div style={{color: 'var(--cds-text-secondary)'}}>Receives: rows (SQL result)</div>
                                 </div>
-                                <SqlEditor value={customJs} onChange={setCustomJs} language="javascript" height={260} />
+                                <SqlEditor value={customJs} onChange={setCustomJs} language="javascript" height={260}/>
                                 <div className="!mt-4">
-                                    <div style={{ fontWeight: 600, marginBottom: 8 }}>Custom Content Preview</div>
+                                    <div style={{fontWeight: 600, marginBottom: 8}}>Custom Content Preview</div>
                                     {!previewRows.length && (
                                         <InlineNotification
                                             title="Run SQL preview to render custom content"
@@ -223,7 +237,7 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
                                     {!!previewRows.length && customJs?.trim() && (
                                         <Layer>
                                             {isRenderingPreview ? (
-                                                <InlineLoading description="Rendering" />
+                                                <InlineLoading description="Rendering"/>
                                             ) : customPreview?.error ? (
                                                 <InlineNotification
                                                     title="Custom content error"
@@ -234,7 +248,7 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
                                             ) : customPreview?.element ? (
                                                 <div>{customPreview.element as any}</div>
                                             ) : customPreview?.html ? (
-                                                <div dangerouslySetInnerHTML={{ __html: customPreview.html }} />
+                                                <div dangerouslySetInnerHTML={{__html: customPreview.html}}/>
                                             ) : (
                                                 <InlineNotification
                                                     title="Nothing to render"
@@ -249,21 +263,27 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
                             </OptionsTile>
 
                             <div>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                                    <div style={{ fontWeight: 600 }}>SQL Editor</div>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginBottom: 8
+                                }}>
+                                    <div style={{fontWeight: 600}}>SQL Editor</div>
                                     <Button kind="secondary" size="sm" onClick={runPreview} disabled={isRunning}>
-                                        {isRunning ? <InlineLoading description="Running" /> : 'Run preview'}
+                                        {isRunning ? <InlineLoading description="Running"/> : 'Run preview'}
                                     </Button>
                                 </div>
-                                <SqlEditor value={sql} onChange={setSql} language="sql" />
+                                <SqlEditor value={sql} onChange={setSql} language="sql"/>
                             </div>
 
                             <div>
-                                <TableLayoutEditor columns={mapping} onChange={setMapping} availableKeys={availableKeys} />
+                                <TableLayoutEditor columns={mapping} onChange={setMapping}
+                                                   availableKeys={availableKeys}/>
                             </div>
 
                             <div>
-                                <div style={{ fontWeight: 600, marginBottom: 8 }}>Table Preview</div>
+                                <div style={{fontWeight: 600, marginBottom: 8}}>Table Preview</div>
                                 <CarbonDataTable
                                     title="Preview"
                                     rows={previewRows as any}
@@ -272,9 +292,9 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
                                 />
                             </div>
 
-                            <div style={{ display: 'flex', gap: 12 }}>
+                            <div style={{display: 'flex', gap: 12}}>
                                 <Button kind="primary" onClick={onSave} disabled={isSaving}>
-                                    {isSaving ? <InlineLoading description="Saving" /> : 'Save'}
+                                    {isSaving ? <InlineLoading description="Saving"/> : 'Save'}
                                 </Button>
                             </div>
                         </Stack>
@@ -286,43 +306,5 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
 }
 
 export default function RouteQueryNew() {
-    return <QueryEditor />
-}
-
-/**
- * Similarity between 2 strings
- */
-function similarity(s1: string, s2: string) {
-    let longer = s1
-    let shorter = s2
-    if (s1.length < s2.length) {
-        longer = s2
-        shorter = s1
-    }
-    const longerLength = longer.length
-    if (longerLength == 0) {
-        return 1.0
-    }
-    return (longerLength - editDistance(longer, shorter)) / longerLength
-}
-
-function editDistance(s1: string, s2: string) {
-    s1 = s1.toLowerCase()
-    s2 = s2.toLowerCase()
-
-    const costs: number[] = []
-    for (let i = 0; i <= s1.length; i++) {
-        let lastValue: number = i
-        for (let j = 0; j <= s2.length; j++) {
-            if (i == 0) costs[j] = j
-            else if (j > 0) {
-                let newValue: number = costs[j - 1] || 0
-                if (s1.charAt(i - 1) != s2.charAt(j - 1)) newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1
-                costs[j - 1] = lastValue
-                lastValue = newValue
-            }
-        }
-        if (i > 0) costs[s2.length] = lastValue
-    }
-    return costs[s2.length] || 0
+    return <QueryEditor/>
 }

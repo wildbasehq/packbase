@@ -1,7 +1,7 @@
-import clsx from 'clsx'
 import type React from 'react'
 import {createContext, useContext, useState} from 'react'
 import Link from '@/components/shared/link'
+import {cn} from "@/lib";
 
 const TableContext = createContext<{ bleed: boolean; dense: boolean; grid: boolean; striped: boolean }>({
     bleed: false,
@@ -18,12 +18,17 @@ export function Table({
                           className,
                           children,
                           ...props
-                      }: { bleed?: boolean; dense?: boolean; grid?: boolean; striped?: boolean } & React.ComponentPropsWithoutRef<'div'>) {
+                      }: {
+    bleed?: boolean;
+    dense?: boolean;
+    grid?: boolean;
+    striped?: boolean
+} & React.ComponentPropsWithoutRef<'div'>) {
     return (
         <TableContext.Provider value={{bleed, dense, grid, striped} as React.ContextType<typeof TableContext>}>
             <div className="flow-root">
-                <div {...props} className={clsx(className, '-mx-(--gutter) overflow-x-auto whitespace-nowrap')}>
-                    <div className={clsx('inline-block min-w-full align-middle', !bleed && 'sm:px-(--gutter)')}>
+                <div {...props} className={cn(className, '-mx-(--gutter) overflow-x-auto whitespace-nowrap')}>
+                    <div className={cn('inline-block min-w-full align-middle', !bleed && 'sm:px-(--gutter)')}>
                         <table className="min-w-full text-left text-sm/6">{children}</table>
                     </div>
                 </div>
@@ -33,7 +38,7 @@ export function Table({
 }
 
 export function TableHead({className, ...props}: React.ComponentPropsWithoutRef<'thead'>) {
-    return <thead {...props} className={clsx(className, 'text-muted-foreground')}/>
+    return <thead {...props} className={cn(className, 'text-muted-foreground')}/>
 }
 
 export function TableBody(props: React.ComponentPropsWithoutRef<'tbody'>) {
@@ -59,7 +64,7 @@ export function TableRow({
         <TableRowContext.Provider value={{href, target, title} as React.ContextType<typeof TableRowContext>}>
             <tr
                 {...props}
-                className={clsx(
+                className={cn(
                     className,
                     href &&
                     'has-[[data-row-link][data-focus]]:outline-2 has-[[data-row-link][data-focus]]:-outline-offset-2 has-[[data-row-link][data-focus]]:outline-blue-500 dark:focus-within:bg-white/[2.5%]',
@@ -78,7 +83,7 @@ export function TableHeader({className, ...props}: React.ComponentPropsWithoutRe
     return (
         <th
             {...props}
-            className={clsx(
+            className={cn(
                 className,
                 'border-b border-b-muted px-4 py-2 font-medium first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2))',
                 grid && 'border-l border-l-muted first:border-l-0',
@@ -97,7 +102,7 @@ export function TableCell({className, children, ...props}: React.ComponentPropsW
         <td
             ref={href ? setCellRef : undefined}
             {...props}
-            className={clsx(
+            className={cn(
                 className,
                 'relative px-4 first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2))',
                 !striped && 'border-b',

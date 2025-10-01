@@ -2,25 +2,34 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { vg } from '@/lib/api'
+import {useCallback, useEffect, useMemo, useState} from 'react'
+import {vg} from '@/lib/api'
 import Categories from './categories.json'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/alert'
-import { Button, Divider, Heading, SidebarDivider, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection } from '@/components/shared'
-import { SidebarPortal } from '@/lib/context/sidebar-context'
-import { Text } from '@/components/shared/text'
-import { BentoGenericUnlockableBadge } from '@/src/lib/utils/pak'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
+import {
+    Button,
+    Divider,
+    Heading,
+    SidebarDivider,
+    SidebarHeading,
+    SidebarItem,
+    SidebarLabel,
+    SidebarSection
+} from '@/components/shared'
+import {SidebarPortal} from '@/lib/context/sidebar-context'
+import {Text} from '@/components/shared/text'
+import {BentoGenericUnlockableBadge} from '@/src/lib/utils/pak'
 import StoreItemModal from './[item]/page'
 import {
-    ArrowTrendingUpIcon,
-    ShoppingBagIcon,
-    QuestionMarkCircleIcon,
     ArrowPathIcon,
     ArrowTrendingDownIcon,
+    ArrowTrendingUpIcon,
+    QuestionMarkCircleIcon,
+    ShoppingBagIcon,
 } from '@heroicons/react/20/solid'
-import { useResourceStore } from '@/src/lib'
+import {useResourceStore} from '@/src/lib'
 import Popover from '@/components/shared/popover'
-import { toast } from 'sonner'
+import {toast} from 'sonner'
 
 type StoreItem = {
     id: string
@@ -40,7 +49,7 @@ export default function StorePage() {
     const [error, setError] = useState<string | null>(null)
     const [activeTab, setActiveTab] = useState<number>(0)
     const [trinketCount, setTrinketCount] = useState<number>(0)
-    const { setCurrentResource } = useResourceStore()
+    const {setCurrentResource} = useResourceStore()
 
     const categoryKeys = useMemo(() => Object.keys(Categories), [])
     const activeCategory = categoryKeys[activeTab]
@@ -57,7 +66,7 @@ export default function StorePage() {
         setLoading(true)
         vg.store
             .get()
-            .then(({ data }) => {
+            .then(({data}) => {
                 setItems(data.items || [])
                 setTrinketCount(data.trinketCount || 0)
                 setError(null)
@@ -74,7 +83,9 @@ export default function StorePage() {
     }, [items, activeCategory])
 
     const canBuyItem = useCallback((item: OwnedItem) => {
-        return (item.maxQuantity > 1 && !!item.ownedAmount) || item.maxQuantity === 1 || (!item.maxQuantity && !item.ownedAmount)
+        if (item.maxQuantity === 1) return true
+        if (!item.maxQuantity) return !item.ownedAmount
+        return item.ownedAmount > 0
     }, [])
 
     return (
@@ -86,21 +97,21 @@ export default function StorePage() {
                             onClick={() => setActiveTab(categoryKeys.indexOf(category))}
                             current={activeTab === categoryKeys.indexOf(category)}
                         >
-                            <ShoppingBagIcon />
+                            <ShoppingBagIcon/>
                             <div className="flex flex-col min-w-0">
                                 <SidebarLabel>{category.toTitleCase()}</SidebarLabel>
                             </div>
                         </SidebarItem>
                     ))}
                 </SidebarSection>
-                <SidebarDivider />
+                <SidebarDivider/>
                 <SidebarSection>
                     <SidebarHeading>History</SidebarHeading>
                     {history.map(h => (
                         <SidebarItem key={h.id} disabled>
-                            {h.action === 'TRINKET_PURCHASE_OK' && <ArrowTrendingUpIcon />}
-                            {h.action === 'TRINKET_BALANCE_CHANGED_OK' && <ArrowTrendingDownIcon />}
-                            {h.action === 'TRINKET_BALANCE_TRANSFER_OK' && <ArrowPathIcon />}
+                            {h.action === 'TRINKET_PURCHASE_OK' && <ArrowTrendingUpIcon/>}
+                            {h.action === 'TRINKET_BALANCE_CHANGED_OK' && <ArrowTrendingDownIcon/>}
+                            {h.action === 'TRINKET_BALANCE_TRANSFER_OK' && <ArrowPathIcon/>}
                             <div className="flex flex-col min-w-0">
                                 <SidebarLabel>{h.action.toTitleCase()}</SidebarLabel>
                                 <SidebarLabel>
@@ -115,29 +126,31 @@ export default function StorePage() {
             {/* "What's a trinket?" */}
             <div className="rounded border bg-card p-4">
                 <Heading level={2}>
-                    <QuestionMarkCircleIcon className="w-5 -mt-0.5 h-5 inline-flex mr-1" data-slot="icon" />
+                    <QuestionMarkCircleIcon className="w-5 -mt-0.5 h-5 inline-flex mr-1" data-slot="icon"/>
                     WTF is a trinket..?
                 </Heading>
                 <Text>
-                    Trinkets (T) is a value-less currency that you can use to buy exclusive items from the store. You can earn trinkets from
+                    Trinkets (T) is a value-less currency that you can use to buy exclusive items from the store. You
+                    can earn trinkets from
                     inviting other users! You can never buy or exchange Trinkets with real money.
                 </Text>
-                <Divider soft className="my-4" />
+                <Divider soft className="my-4"/>
                 <Text className="text-red-500 font-bold underline">
-                    These badges are only available during the invite-only alpha. You will no longer be able to get these badges after the
+                    These badges are only available during the invite-only alpha. You will no longer be able to get
+                    these badges after the
                     alpha!!!
                 </Text>
             </div>
 
             {/* Optional header announcement */}
-            <Announcement />
+            <Announcement/>
 
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-semibold">Store</h1>
                 <div className="text-sm">{trinketCount} Trinkets to spend</div>
             </div>
 
-            {loading && <div className="text-alt">Loading items…</div>}
+            {loading && <div className="text-muted-foreground">Loading items…</div>}
             {error && (
                 <Alert variant="destructive">
                     <AlertTitle>Failed to load store</AlertTitle>
@@ -150,7 +163,7 @@ export default function StorePage() {
                     {filteredItems.map(item => (
                         <div key={item.id} className="rounded border bg-card p-4 flex flex-col gap-2">
                             <Text alt>{item.type.toTitleCase()}</Text>
-                            {item.type === 'badge' && <BentoGenericUnlockableBadge type={item.id} className="w-18" />}
+                            {item.type === 'badge' && <BentoGenericUnlockableBadge type={item.id} className="w-18"/>}
                             <div className="flex items-center justify-between">
                                 <Text bold size="lg">
                                     {item.title}
@@ -173,7 +186,10 @@ export default function StorePage() {
                                                     onPurchaseSuccess={() => {
                                                         toast.success('Purchased successfully!')
                                                         setItems(prev =>
-                                                            prev.map(i => (i.id === item.id ? { ...i, ownedAmount: i.ownedAmount + 1 } : i))
+                                                            prev.map(i => (i.id === item.id ? {
+                                                                ...i,
+                                                                ownedAmount: i.ownedAmount + 1
+                                                            } : i))
                                                         )
                                                         setTrinketCount(trinketCount - item.price)
                                                     }}
@@ -190,12 +206,12 @@ export default function StorePage() {
                                         className="w-full"
                                         color="indigo"
                                         onClick={() => {
-                                            vg.user.me.badge.post({ badge: item.id }).then(({ error }) => {
-                                                if (error)
-                                                    return toast.error(
+                                            vg.user.me.badge.post({badge: item.id}).then(({error}) => {
+                                                if (error) {
+                                                    toast.error(
                                                         error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'
                                                     )
-                                                toast.success('Set as active')
+                                                } else toast.success('Set as active')
                                             })
                                         }}
                                     >

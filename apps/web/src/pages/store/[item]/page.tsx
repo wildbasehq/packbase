@@ -2,11 +2,11 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { useState } from 'react'
-import { vg } from '@/lib/api'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/alert'
-import { Button } from '@/components/shared'
-import { Text, Heading } from '@/components/shared/text'
+import {useState} from 'react'
+import {vg} from '@/lib/api'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
+import {Button} from '@/components/shared'
+import {Text} from '@/components/shared/text'
 
 type StoreItem = {
     id: string
@@ -19,10 +19,10 @@ type StoreItem = {
 }
 
 export default function StoreItemModal({
-    item,
-    trinkets,
-    onPurchaseSuccess,
-}: {
+                                           item,
+                                           trinkets,
+                                           onPurchaseSuccess,
+                                       }: {
     item: StoreItem
     trinkets: number
     onPurchaseSuccess: () => void
@@ -49,19 +49,17 @@ export default function StoreItemModal({
         setLoading(true)
         setError(null)
         setSuccess(null)
-        try {
-            const res = await vg.store({ item: item.id }).post({ quantity: finalQuantity })
-            if (res.error) {
-                throw new Error(res.error.summary || 'Purchase failed')
-            }
-            setOwned(res.inventory?.amount || owned + finalQuantity)
-            setSuccess('Purchased successfully!')
-            onPurchaseSuccess()
-        } catch (e: any) {
-            setError(e.message || 'Purchase failed')
-        } finally {
-            setLoading(false)
+
+        const res = await vg.store({item: item.id}).post({quantity: finalQuantity})
+        if (res.error) {
+            throw new Error(res.error.summary || 'Purchase failed')
         }
+        
+        setOwned(res.inventory?.amount || owned + finalQuantity)
+        setSuccess('Purchased successfully!')
+        onPurchaseSuccess()
+
+        setLoading(false)
     }
 
     return (
@@ -79,7 +77,7 @@ export default function StoreItemModal({
 
             {canSetQuantity && (
                 <div className="flex items-center gap-2">
-                    <label className="text-sm text-alt">Quantity</label>
+                    <label className="text-sm text-muted-foreground">Quantity</label>
                     <input
                         type="number"
                         min={1}
@@ -88,7 +86,7 @@ export default function StoreItemModal({
                         onChange={e => setQuantity(Math.max(1, Math.min(item.maxQuantity || Infinity, parseInt(e.target.value || '1'))))}
                         className="px-2 py-1 rounded border bg-card w-24"
                     />
-                    {item.maxQuantity && <div className="text-xs text-alt">Max {item.maxQuantity}</div>}
+                    {item.maxQuantity && <div className="text-xs text-muted-foreground">Max {item.maxQuantity}</div>}
                 </div>
             )}
 
@@ -100,7 +98,8 @@ export default function StoreItemModal({
                         </Text>
                         <Text alt size="xs" className="italic">
                             {/* Calc based on invites giving 5 trinkets each */}
-                            You're T${item.price - trinkets} short. That's about {Math.ceil((item.price - trinkets) / 5)} invite(s).
+                            You're T${item.price - trinkets} short. That's
+                            about {Math.ceil((item.price - trinkets) / 5)} invite(s).
                         </Text>
                     </div>
                 )}
@@ -108,7 +107,8 @@ export default function StoreItemModal({
                 {trinkets >= item.price && (
                     <>
                         <Text alt size="xs" className="italic">
-                            You'll have {trinkets - item.price} trinkets afterwards. It will be automatically set as your active badge.
+                            You'll have {trinkets - item.price} trinkets afterwards. It will be automatically set as
+                            your active badge.
                         </Text>
                         <Button color="indigo" onClick={onPurchase} disabled={loading}>
                             {loading ? 'Purchasing…' : 'Buy'}

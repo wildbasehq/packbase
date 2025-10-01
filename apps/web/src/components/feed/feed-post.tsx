@@ -3,20 +3,20 @@
  */
 
 // src/components/feed/feed-post.tsx
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { vg } from '@/lib/api'
-import { useUserAccountStore } from '@/lib/state'
-import { FeedPostData, FeedPostProps } from './types/post'
-import ThreadPost from './thread-post'
+import {useState} from 'react'
+import {toast} from 'sonner'
+import {vg} from '@/lib/api'
+import {useUserAccountStore} from '@/lib/state'
+import type {FeedPostData, FeedPostProps} from '.'
+import {ThreadPost} from '.'
 
-export default function FeedPost({ post, onDelete, postState }: FeedPostProps) {
+export default function FeedPost({post, onDelete, postState}: FeedPostProps) {
     const [postContent, setPostContent] = useState<FeedPostData>(post)
-    const { user: signedInUser } = useUserAccountStore()
+    const {user: signedInUser} = useUserAccountStore()
 
     const handleDelete = async () => {
         try {
-            const { error } = await vg.howl({ id: postContent.id }).delete()
+            const {error} = await vg.howl({id: postContent.id}).delete()
 
             if (error) {
                 const errorMessage = error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'
@@ -33,7 +33,7 @@ export default function FeedPost({ post, onDelete, postState }: FeedPostProps) {
     }
 
     const handleComment = (comment: FeedPostData) => {
-        const newPostContent = { ...postContent }
+        const newPostContent = {...postContent}
         if (!newPostContent.comments) newPostContent.comments = []
         newPostContent.comments.push(comment)
         setPostContent(newPostContent)

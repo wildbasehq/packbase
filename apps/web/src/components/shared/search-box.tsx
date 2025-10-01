@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { Input } from './input/text'
-import { cn, useSearch } from '@/lib'
-import { useEffect, useRef, useState } from 'react'
+import {FormEvent, useEffect, useRef, useState} from 'react'
+import {Input} from './input/text'
+import {cn, useSearch} from '@/lib'
 
 interface SearchBoxProps {
     className?: string
@@ -13,8 +13,8 @@ interface SearchBoxProps {
     inAppTab?: boolean
 }
 
-export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = true, inAppTab }: SearchBoxProps) {
-    const { query, setQuery } = useSearch()
+export function SearchBox({placeholder = 'Search...', onSearch, autoFocus = true, inAppTab}: SearchBoxProps) {
+    const {query, setQuery} = useSearch()
     const inputRef = React.useRef<HTMLInputElement>(null)
 
     // Inside your component before the return statement, add:
@@ -48,17 +48,18 @@ export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = tru
   after:opacity-0
 `
 
-    React.useEffect(() => {
+    useEffect(() => {
+        let timer
         if (autoFocus && inputRef.current) {
             // Small delay to ensure animation has started
-            const timer = setTimeout(() => {
+            timer = setTimeout(() => {
                 inputRef.current?.focus()
             }, 100)
-            return () => clearTimeout(timer)
         }
+        return () => timer && clearTimeout(timer)
     }, [autoFocus])
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
         if (onSearch) {
             onSearch(query)
@@ -79,7 +80,8 @@ export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = tru
                     : ''
             )}
         >
-            {!inAppTab && <div className="absolute inset-0 w-full h-full z-[1] rounded transition-opacity duration-300" />}
+            {!inAppTab &&
+                <div className="absolute inset-0 w-full h-full z-[1] rounded transition-opacity duration-300"/>}
             <Input
                 combined
                 ref={inputRef}
@@ -88,7 +90,7 @@ export function SearchBox({ placeholder = 'Search...', onSearch, autoFocus = tru
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 className="w-full focus-within:!ring-0 !bg-transparent z-[2] !max-w-full"
-                inputClassName={cn('w-full', !inAppTab ? 'pl-8 w-full' : '')}
+                inputClassName={cn('w-full', inAppTab ? '' : 'pl-8 w-full')}
             />
         </form>
     )

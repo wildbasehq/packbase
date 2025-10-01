@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react'
-import { Button } from '@/components/shared/experimental-button-rework'
+import React, {useEffect, useRef} from 'react'
+import {Button} from '@/components/shared'
 
 interface MessageEditorProps {
     content: string
@@ -9,7 +9,7 @@ interface MessageEditorProps {
     className?: string
 }
 
-export function MessageEditor({ content, onContentChange, onSave, onCancel, className }: MessageEditorProps) {
+export function MessageEditor({content, onContentChange, onSave, onCancel, className}: MessageEditorProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 
     useEffect(() => {

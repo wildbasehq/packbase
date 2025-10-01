@@ -1,14 +1,9 @@
-import React, { ReactNode, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Editor, Extension, Range } from '@tiptap/core'
+import React, {ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
+import {Editor, Extension, Range} from '@tiptap/core'
 import Suggestion from '@tiptap/suggestion'
-import { ReactRenderer } from '@tiptap/react'
-import { useCompletion } from '@ai-sdk/react'
+import {ReactRenderer} from '@tiptap/react'
 import tippy from 'tippy.js'
-import { Code, Heading1, Heading2, Heading3, Text, TextQuote } from 'lucide-react'
-import { toast } from 'sonner'
-import { getPrevText } from '@/components/novel/lib/editor'
-import { NovelContext } from '../provider'
-import { LoadingCircle } from '@/components/icons'
+import {Code, Heading1, Heading2, Heading3, Text, TextQuote} from 'lucide-react'
 
 interface CommandItemProps {
     title: string
@@ -27,8 +22,8 @@ const Command = Extension.create({
         return {
             suggestion: {
                 char: '/',
-                command: ({ editor, range, props }: { editor: Editor; range: Range; props: any }) => {
-                    props.command({ editor, range })
+                command: ({editor, range, props}: { editor: Editor; range: Range; props: any }) => {
+                    props.command({editor, range})
                 },
             },
         }
@@ -43,7 +38,7 @@ const Command = Extension.create({
     },
 })
 
-const getSuggestionItems = ({ query }: { query: string }) => {
+const getSuggestionItems = ({query}: { query: string }) => {
     return [
         // {
         //     title: 'Continue writing',
@@ -64,8 +59,8 @@ const getSuggestionItems = ({ query }: { query: string }) => {
             title: 'Text',
             description: 'Just start typing with plain text.',
             searchTerms: ['p', 'paragraph'],
-            icon: <Text size={18} />,
-            command: ({ editor, range }: CommandProps) => {
+            icon: <Text size={18}/>,
+            command: ({editor, range}: CommandProps) => {
                 editor.chain().focus().deleteRange(range).toggleNode('paragraph', 'paragraph').run()
             },
         },
@@ -82,27 +77,27 @@ const getSuggestionItems = ({ query }: { query: string }) => {
             title: 'Heading 1',
             description: 'Big section heading.',
             searchTerms: ['title', 'big', 'large'],
-            icon: <Heading1 size={18} />,
-            command: ({ editor, range }: CommandProps) => {
-                editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run()
+            icon: <Heading1 size={18}/>,
+            command: ({editor, range}: CommandProps) => {
+                editor.chain().focus().deleteRange(range).setNode('heading', {level: 1}).run()
             },
         },
         {
             title: 'Heading 2',
             description: 'Medium section heading.',
             searchTerms: ['subtitle', 'medium'],
-            icon: <Heading2 size={18} />,
-            command: ({ editor, range }: CommandProps) => {
-                editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run()
+            icon: <Heading2 size={18}/>,
+            command: ({editor, range}: CommandProps) => {
+                editor.chain().focus().deleteRange(range).setNode('heading', {level: 2}).run()
             },
         },
         {
             title: 'Heading 3',
             description: 'Small section heading.',
             searchTerms: ['subtitle', 'small'],
-            icon: <Heading3 size={18} />,
-            command: ({ editor, range }: CommandProps) => {
-                editor.chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run()
+            icon: <Heading3 size={18}/>,
+            command: ({editor, range}: CommandProps) => {
+                editor.chain().focus().deleteRange(range).setNode('heading', {level: 3}).run()
             },
         },
         // {
@@ -127,16 +122,19 @@ const getSuggestionItems = ({ query }: { query: string }) => {
             title: 'Quote',
             description: 'Capture a quote.',
             searchTerms: ['blockquote'],
-            icon: <TextQuote size={18} />,
-            command: ({ editor, range }: CommandProps) =>
+            icon: <TextQuote size={18}/>,
+            command: ({editor, range}: CommandProps) =>
                 editor.chain().focus().deleteRange(range).toggleNode('paragraph', 'paragraph').toggleBlockquote().run(),
         },
         {
             title: 'Code',
             description: 'Capture a code snippet.',
             searchTerms: ['codeblock'],
-            icon: <Code size={18} />,
-            command: ({ editor, range }: CommandProps) => editor.chain().focus().deleteRange(range).toggleCodeBlock().run(),
+            icon: <Code size={18}/>,
+            command: ({
+                          editor,
+                          range
+                      }: CommandProps) => editor.chain().focus().deleteRange(range).toggleCodeBlock().run(),
         },
         // {
         //     title: 'Image',
@@ -186,51 +184,21 @@ export const updateScrollView = (container: HTMLElement, item: HTMLElement) => {
     }
 }
 
-const CommandList = ({ items, command, editor, range }: { items: CommandItemProps[]; command: any; editor: any; range: any }) => {
+const CommandList = ({items, command, editor}: {
+    items: CommandItemProps[];
+    command: any;
+    editor: any;
+}) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
-
-    const { completionApi } = useContext(NovelContext)
-
-    const { complete, isLoading } = useCompletion({
-        id: 'novel',
-        api: completionApi,
-        onResponse: response => {
-            if (response.status === 429) {
-                toast.error('You have reached your request limit for the day.')
-                return
-            }
-            editor.chain().focus().deleteRange(range).run()
-        },
-        onFinish: (_prompt, completion) => {
-            // highlight the generated text
-            editor.commands.setTextSelection({
-                from: range.from,
-                to: range.from + completion.length,
-            })
-        },
-        onError: e => {
-            toast.error(e.message)
-        },
-    })
 
     const selectItem = useCallback(
         (index: number) => {
             const item = items[index]
             if (item) {
-                if (item.title === 'Continue writing') {
-                    if (isLoading) return
-                    complete(
-                        getPrevText(editor, {
-                            chars: 5000,
-                            offset: 1,
-                        })
-                    )
-                } else {
-                    command(item)
-                }
+                command(item)
             }
         },
-        [complete, isLoading, command, editor, items]
+        [command, editor, items]
     )
 
     useEffect(() => {
@@ -252,6 +220,7 @@ const CommandList = ({ items, command, editor, range }: { items: CommandItemProp
                 }
                 return false
             }
+            return false
         }
         document.addEventListener('keydown', onKeyDown)
         return () => {
@@ -289,11 +258,11 @@ const CommandList = ({ items, command, editor, range }: { items: CommandItemProp
                         onClick={() => selectItem(index)}
                     >
                         <div className="flex h-10 w-10 items-center justify-center rounded border">
-                            {item.title === 'Continue writing' && isLoading ? <LoadingCircle /> : item.icon}
+                            {item.icon}
                         </div>
                         <div>
                             <p className="font-medium">{item.title}</p>
-                            <p className="text-alt text-xs">{item.description}</p>
+                            <p className="text-muted-foreground text-xs">{item.description}</p>
                         </div>
                     </button>
                 )
@@ -328,9 +297,9 @@ const renderItems = () => {
             component?.updateProps(props)
 
             popup &&
-                popup[0].setProps({
-                    getReferenceClientRect: props.clientRect,
-                })
+            popup[0].setProps({
+                getReferenceClientRect: props.clientRect,
+            })
         },
         onKeyDown: (props: { event: KeyboardEvent }) => {
             if (props.event.key === 'Escape') {

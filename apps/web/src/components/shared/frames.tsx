@@ -1,7 +1,7 @@
-import Frame, { useFrame } from 'react-frame-component'
-import { useLayoutEffect } from 'react'
+import Frame, {useFrame} from 'react-frame-component'
+import {ReactNode, useLayoutEffect} from 'react'
 
-export function SafeFrame({ children, ...props }: { children: React.ReactNode; [x: string]: any }) {
+export function SafeFrame({children, ...props}: { children: ReactNode; [_: string]: any }) {
     return (
         <Frame {...props}>
             <InnerCSS>{children}</InnerCSS>
@@ -9,28 +9,19 @@ export function SafeFrame({ children, ...props }: { children: React.ReactNode; [
     )
 }
 
-function InnerCSS({ children }: { children: React.ReactNode }) {
-    const { document: doc } = useFrame()
+function InnerCSS({children}: { children: ReactNode }) {
+    const {document: doc} = useFrame()
 
     useLayoutEffect(() => {
-        // this covers development case as well as part of production
-        document.head.querySelectorAll('style').forEach(style => {
-            const frameStyles = style.cloneNode(true)
-            doc?.head.append(frameStyles)
+        const selectors = ['style', 'link[as="style"]', 'link[rel="stylesheet"]']
+        selectors.forEach(selector => {
+            document.head.querySelectorAll(selector).forEach(element => {
+                doc?.head.append(element.cloneNode(true))
+            })
         })
 
-        // inject the production minified styles into the iframe
-        // if (import.meta && import.meta.env.NODE_ENV === 'production') {
-        document.head.querySelectorAll('link[as="style"]').forEach(ele => {
-            doc?.head.append(ele.cloneNode(true))
-        })
-        document.head.querySelectorAll('link[rel="stylesheet"]').forEach(ele => {
-            doc?.head.append(ele.cloneNode(true))
-        })
-        // }
-
-        // dark mode support
-        if (document.documentElement.classList.contains('dark')) {
+        const isDarkMode = document.documentElement.classList.contains('dark')
+        if (isDarkMode) {
             doc?.documentElement.classList.add('dark')
         } else if (doc?.documentElement.classList.contains('dark')) {
             doc?.documentElement.classList.remove('dark')

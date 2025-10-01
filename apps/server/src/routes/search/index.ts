@@ -2,16 +2,15 @@
  * Search API routes
  */
 
-import { t } from 'elysia';
-import { YapockType } from '@/index';
-import { ErrorTypebox } from '@/utils/errors';
-import { HTTPError } from '@/lib/HTTPError';
-import { search, SearchApiError, SearchResult } from '@/lib/search';
-import { getUser } from '@/routes/user/[username]';
-import { getPack } from '@/routes/pack/[id]';
-import { getPost } from '@/lib/api/post';
-import { BulkPostLoader } from '@/lib/BulkPostLoader';
-import posthog, { distinctId } from '@/utils/posthog';
+import {t} from 'elysia';
+import {YapockType} from '@/index';
+import {ErrorTypebox} from '@/utils/errors';
+import {HTTPError} from '@/lib/HTTPError';
+import {search, SearchApiError} from '@/lib/search';
+import {getUser} from '@/routes/user/[username]';
+import {getPack} from '@/routes/pack/[id]';
+import {BulkPostLoader} from '@/lib/BulkPostLoader';
+import posthog, {distinctId} from '@/utils/posthog';
 
 const log = require('debug')('vg:search');
 // Define the search response schema
@@ -38,7 +37,7 @@ const SearchErrorSchema = t.Object({
 const SearchAPI = (app: YapockType) =>
     app.get(
         '',
-        async ({ query, set, user }) => {
+        async ({query, set, user}) => {
             const timeStart = new Date().getTime();
             try {
                 // Validate query parameter
@@ -56,7 +55,19 @@ const SearchAPI = (app: YapockType) =>
 
                 // Parse limit and offset
                 const limit = query.limit ? parseInt(query.limit, 10) : 30;
-                const offset = query.offset ? parseInt(query.offset, 10) : query.page && query.page !== '1' ? parseInt(query.page, 10) * limit : 0;
+                const calculateOffset = () => {
+                    if (query.offset) {
+                        return parseInt(query.offset, 10);
+                    }
+
+                    if (query.page && query.page !== '1') {
+                        return parseInt(query.page, 10) * limit;
+                    }
+
+                    return 0;
+                };
+
+                const offset = calculateOffset();
 
                 // Parse allowed tables
                 let allowedTables = ['profiles', 'packs', 'posts'];

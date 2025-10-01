@@ -1,28 +1,22 @@
 'use client'
 
 import * as React from 'react'
-import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { cn } from '@/lib/utils'
-import { LucideIcon } from 'lucide-react'
-import { useLocation } from 'wouter'
-import { SearchBox } from '@/components/shared/search-box.tsx'
-import { useSearch } from '@/lib'
+import {Activity, useEffect, useRef, useState} from 'react'
+import {AnimatePresence, motion} from 'motion/react'
+import {cn, isVisible} from '@/lib/utils'
+import {LucideIcon} from 'lucide-react'
+import {useLocation} from 'wouter'
+import {SearchBox} from '@/components/shared/search-box.tsx'
+import {useSearch} from '@/lib'
 
-interface Tab {
+interface TabInterface {
     title?: string
     icon?: LucideIcon
     type?: string
     href?: string | string[]
 }
 
-interface Separator {
-    type: 'separator'
-    title?: never
-    icon?: never
-}
-
-type TabItem = Tab
+type TabItem = TabInterface
 
 interface ExpandableTabsProps {
     tabs: TabItem[]
@@ -48,12 +42,18 @@ const buttonVariants = {
 }
 
 const spanVariants = {
-    initial: { width: 0, opacity: 0 },
-    animate: { width: 'auto', opacity: 1 },
-    exit: { width: 0, opacity: 0 },
+    initial: {width: 0, opacity: 0},
+    animate: {width: 'auto', opacity: 1},
+    exit: {width: 0, opacity: 0},
 }
 
-const transition = {
+const transition: {
+    type: 'spring'
+    stiffness: number
+    damping: number
+    mass: number
+    bounce: number
+} = {
     type: 'spring',
     stiffness: 300,
     damping: 25,
@@ -61,10 +61,16 @@ const transition = {
     bounce: 0,
 }
 
-export function ExpandableTabs({ tabs, className, activeColor = 'text-default', onChange, activeTab }: ExpandableTabsProps) {
+export function ExpandableTabs({
+                                   tabs,
+                                   className,
+                                   activeColor = 'text-default',
+                                   onChange,
+                                   activeTab
+                               }: ExpandableTabsProps) {
     const [selected, setSelected] = React.useState<number | null>(null)
-    const [location, setLocation] = useLocation()
-    const { query } = useSearch()
+    const [, setLocation] = useLocation()
+    const {query} = useSearch()
 
     // Inside your component before the return statement, add:
     const prevQueryStartsWithBracket = useRef(false)
@@ -134,23 +140,21 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
         }
     })
 
-    const Separator = () => <div className="mx-1 h-[24px] w-[1.2px] bg-border" aria-hidden="true" />
-
     return (
         <div className={cn('relative flex items-center gap-2 rounded-2xl border bg-background p-1', className)}>
             {tabs.map((tab, index) => {
                 if (tab.type === 'separator') {
-                    return <Separator key={`separator-${index}`} />
+                    return <div key={`separator-${index}`} className="mx-1 h-[24px] w-[1.2px] bg-border"
+                                aria-hidden="true"/>
                 }
 
-                const Icon = tab.icon
                 return (
                     <motion.button
                         key={tab.title || `tab-${index}`}
                         variants={buttonVariants}
                         initial={false}
                         animate="animate"
-                        custom={{ isSelected: selected === index, isSearch: tab.type === 'search' }}
+                        custom={{isSelected: selected === index, isSearch: tab.type === 'search'}}
                         onClick={() => handleSelect(index)}
                         transition={transition}
                         className={cn(
@@ -158,30 +162,30 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
                             selected === index ? cn('bg-muted', activeColor) : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                             tab.type === 'search' && gradientBorderAnimationClass,
                             selected === index && query?.startsWith('[')
-                                ? `after:opacity-100
-                            ${gradientDirection === 'forward' ? 'after:bg-[position:100%_100%]' : 'after:bg-[position:0_0]'}
-                            `
+                                ? `after:opacity-100 ${gradientDirection === 'forward' ? 'after:bg-[position:100%_100%]' : 'after:bg-[position:0_0]'}`
                                 : ''
                         )}
                         layout
                     >
-                        {tab.type === 'search' && (
+                        <Activity mode={isVisible(tab.type === 'search')}>
                             <div
                                 className={`bg-muted absolute inset-0 z-[1] rounded transition-opacity opacity-0 duration-300 ${selected === index ? 'opacity-100' : ''}`}
                             />
-                        )}
+                        </Activity>
+
                         {/* floating card if query starts with bracket with text */}
-                        {query?.startsWith('[') && selected === index && tab.type === 'search' && (
+                        <Activity
+                            mode={isVisible(query?.startsWith('[') && selected === index && tab.type === 'search')}>
                             <div className="absolute z-[1] rounded-2xl right-0">
                                 <p className="text-sm text-muted-foreground px-4 py-2">whskrd</p>
                             </div>
-                        )}
+                        </Activity>
                         {/* The content of your button with proper z-index */}
                         <div className="relative z-[2]">
-                            <Icon className="w-5 h-5 flex-shrink-0" />
+                            <tab.icon className="w-5 h-5 flex-shrink-0"/>
                         </div>
                         <AnimatePresence initial={false}>
-                            {selected === index && tab.type !== 'search' && (
+                            <Activity mode={isVisible(selected === index && tab.type !== 'search')}>
                                 <motion.span
                                     variants={spanVariants}
                                     initial="initial"
@@ -193,14 +197,14 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
                                 >
                                     {tab.title}
                                 </motion.span>
-                            )}
+                            </Activity>
 
-                            {selected === index && tab.type === 'search' && (
+                            <Activity mode={isVisible(selected === index && tab.type === 'search')}>
                                 <motion.div
                                     variants={{
-                                        initial: { width: 0, opacity: 0 },
-                                        animate: { width: '100%', opacity: 1 },
-                                        exit: { width: 0, opacity: 0 },
+                                        initial: {width: 0, opacity: 0},
+                                        animate: {width: '100%', opacity: 1},
+                                        exit: {width: 0, opacity: 0},
                                     }}
                                     initial="initial"
                                     animate="animate"
@@ -209,9 +213,9 @@ export function ExpandableTabs({ tabs, className, activeColor = 'text-default', 
                                     className="overflow-hidden whitespace-nowrap relative z-[2]"
                                     layout
                                 >
-                                    <SearchBox inAppTab />
+                                    <SearchBox inAppTab/>
                                 </motion.div>
-                            )}
+                            </Activity>
                         </AnimatePresence>
                     </motion.button>
                 )

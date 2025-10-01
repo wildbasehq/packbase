@@ -1,4 +1,4 @@
-import { vg } from '@/lib/api'
+import {vg} from '@/lib/api'
 
 // Notification type definition based on API documentation
 export interface Notification {
@@ -40,7 +40,7 @@ export async function fetchNotifications(
  * @returns Promise with success status
  */
 export async function markNotificationAsRead(id: string): Promise<{ success: boolean; count: number }> {
-    return (await vg.inbox.read.post({ id })).data as { success: boolean; count: number }
+    return (await vg.inbox.read.post({id})).data as { success: boolean; count: number }
 }
 
 /**
@@ -49,7 +49,7 @@ export async function markNotificationAsRead(id: string): Promise<{ success: boo
  * @returns Promise with success status
  */
 export async function markNotificationsAsRead(ids: string[]): Promise<{ success: boolean; count: number }> {
-    return (await vg.inbox.read.post({ ids })).data as { success: boolean; count: number }
+    return (await vg.inbox.read.post({ids})).data as { success: boolean; count: number }
 }
 
 /**
@@ -57,14 +57,5 @@ export async function markNotificationsAsRead(ids: string[]): Promise<{ success:
  * @returns Promise with success status
  */
 export async function markAllNotificationsAsRead(): Promise<{ success: boolean; count: number }> {
-    return (await vg.inbox.read.post({ all: true })).data as { success: boolean; count: number }
-}
-
-/**
- * Get a specific notification by ID
- * @param id - ID of the notification to retrieve
- * @returns Promise with notification
- */
-export async function getNotification(id: string): Promise<Notification> {
-    return (await vg.inbox.get({ id })).data as Notification
+    return (await vg.inbox.read.post({all: true})).data as { success: boolean; count: number }
 }

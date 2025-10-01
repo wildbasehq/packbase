@@ -1,10 +1,10 @@
 /**
  * Renders JSON Schema configs from server as user-configurable options
  */
-import { Description, Field, Input, InputGroup, Label, Select } from '..'
-import { Heading, Text } from '@/components/shared/text.tsx'
+import {Description, Field, Input, Label, Select} from '..'
+import {Heading, Text} from '@/components/shared/text.tsx'
 import React from 'react'
-import { cn } from '@/lib'
+import {cn} from '@/lib'
 
 interface ConfigItem {
     key: string
@@ -25,7 +25,7 @@ export function decideCategoryDescription(category: string) {
     if (category === 'server_configuration') return "Change this Pack's internal server configs"
 }
 
-export default function ServerConfigRender({ config }: { config: ConfigItem[] }) {
+export default function ServerConfigRender({config}: { config: ConfigItem[] }) {
     const decideElement = (setting: ConfigItem) => {
         if (setting.definition.type === 'string' && setting.definition.values)
             return (
@@ -35,7 +35,8 @@ export default function ServerConfigRender({ config }: { config: ConfigItem[] })
                     ))}
                 </Select>
             )
-        if (setting.definition.type === 'string') return <Input id={setting.key} name={setting.key} />
+        if (setting.definition.type === 'string') return <Input id={setting.key} name={setting.key}/>
+        return <Text>Cannot render {setting.key}</Text>
     }
 
     return (
@@ -47,17 +48,18 @@ export default function ServerConfigRender({ config }: { config: ConfigItem[] })
             {config
                 .toSorted((a, b) => Number(a.modifiable) - Number(b.modifiable))
                 .map((setting, idx) =>
-                    !setting.modifiable ? (
+                    setting.modifiable ? (
+                        <Field key={setting.key} className={cn('mt-4', !config[idx]?.modifiable && 'border-t pt-2')}>
+                            <Label>{setting.key.toTitleCase()}</Label>
+                            {setting.definition.description &&
+                                <Description>{setting.definition.description}</Description>}
+                            {decideElement(setting)}
+                        </Field>
+                    ) : (
                         <Text alt>
                             <b>{setting.key.toTitleCase()}</b> (Read-only
                             {setting.definition.description ? `, ${setting.definition.description}` : ''}): {setting.value}
                         </Text>
-                    ) : (
-                        <Field key={setting.key} className={cn('mt-4', !config[idx]?.modifiable && 'border-t pt-2')}>
-                            <Label>{setting.key.toTitleCase()}</Label>
-                            {setting.definition.description && <Description>{setting.definition.description}</Description>}
-                            {decideElement(setting)}
-                        </Field>
                     )
                 )}
         </form>

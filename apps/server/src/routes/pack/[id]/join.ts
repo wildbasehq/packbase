@@ -1,58 +1,58 @@
-import { t } from 'elysia';
-import { getPack, getPackMembership, PackMembershipCache } from './index';
-import { YapockType } from '@/index';
-import { pack } from '@/lib/packs/permissions';
-import { ErrorTypebox } from '@/utils/errors';
-import { FeedController } from '@/lib/FeedController';
-import { HTTPError } from '@/lib/HTTPError';
-import prisma from '@/db/prisma';
-import requiresToken from '@/utils/identity/requires-token';
+import {t} from 'elysia'
+import {getPack, getPackMembership, PackMembershipCache} from './index'
+import {YapockType} from '@/index'
+import {ErrorTypebox} from '@/utils/errors'
+import {FeedController} from '@/lib/FeedController'
+import {HTTPError} from '@/lib/HTTPError'
+import prisma from '@/db/prisma'
+import requiresToken from '@/utils/identity/requires-token'
+import PackMan from '@/lib/packs/PackMan'
 
 export default (app: YapockType) =>
     app
         .post(
             '',
-            async ({ params: { id }, set, user }) => {
-                await requiresToken({ set, user });
+            async ({params: {id}, set, user}) => {
+                await requiresToken({set, user})
 
-                const packExists = await getPack(id, 'id');
+                const packExists = await getPack(id, 'id')
                 if (!packExists) {
-                    set.status = 404;
-                    return;
+                    set.status = 404
+                    return
                 }
 
-                const isMember = await getPackMembership(id, user.sub);
+                const isMember = await getPackMembership(id, user.sub)
                 if (!isMember) {
-                    let data;
+                    let data
                     try {
                         data = await prisma.packs_memberships.create({
                             data: {
                                 tenant_id: id,
                                 user_id: user.sub,
                             },
-                        });
+                        })
                     } catch (insertError) {
-                        set.status = 400;
+                        set.status = 400
                         throw HTTPError.badRequest({
                             summary: insertError.message || 'unknown',
-                        });
+                        })
                     }
 
                     if (!data) {
-                        set.status = 400;
+                        set.status = 400
                         throw HTTPError.badRequest({
                             summary: 'Failed to create membership',
-                        });
+                        })
                     }
 
-                    FeedController.packCache.delete(user.sub);
-                    set.status = 200;
-                    return data;
+                    FeedController.packCache.delete(user.sub)
+                    set.status = 200
+                    return data
                 } else {
-                    set.status = 409;
+                    set.status = 409
                     throw HTTPError.conflict({
                         summary: 'you are already a member',
-                    });
+                    })
                 }
             },
             {
@@ -73,52 +73,44 @@ export default (app: YapockType) =>
         )
         .delete(
             '',
-            async ({ params: { id }, set, user }) => {
-                await requiresToken({ set, user });
+            async ({params: {id}, set, user}) => {
+                await requiresToken({set, user})
 
-                const packExists = await getPack(id, 'id');
+                const packExists = await getPack(id, 'id')
                 if (!packExists) {
-                    set.status = 404;
-                    return;
+                    set.status = 404
+                    return
                 }
 
-                const isMember = await getPackMembership(id, user.sub);
-                if (isMember) {
-                    if (await pack.hasPermission(isMember.permissions || 0, pack.PERMISSIONS.Owner)) {
-                        set.status = 400;
-                        throw HTTPError.badRequest({
-                            summary: 'you cannot leave a pack you own',
-                        });
-                    }
-
+                if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.Owner))) {
                     try {
                         await prisma.packs_memberships.deleteMany({
                             where: {
                                 tenant_id: id,
                                 user_id: user.sub,
                             },
-                        });
+                        })
                     } catch (deleteError) {
-                        set.status = 400;
+                        set.status = 400
                         throw HTTPError.badRequest({
                             summary: deleteError.message,
-                        });
+                        })
                     }
 
                     PackMembershipCache.forEach((v, k) => {
                         if (v.tenant_id === id && v.user_id === user.sub) {
-                            PackMembershipCache.delete(k);
+                            PackMembershipCache.delete(k)
                         }
-                    });
+                    })
 
-                    FeedController.packCache.delete(user.sub);
+                    FeedController.packCache.delete(user.sub)
 
-                    set.status = 204;
+                    set.status = 204
                 } else {
-                    set.status = 409;
+                    set.status = 409
                     throw HTTPError.conflict({
                         summary: 'you are not a member of the pack',
-                    });
+                    })
                 }
             },
             {

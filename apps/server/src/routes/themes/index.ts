@@ -1,8 +1,8 @@
-import { YapockType } from '@/index';
-import { HTTPError } from '@/lib/HTTPError';
+import {YapockType} from '@/index';
+import {HTTPError} from '@/lib/HTTPError';
 import validateThemeContent from '@/lib/themes/validateThemeContent';
-import { Theme, ThemesList } from '@/models/themes.model';
-import { t } from 'elysia';
+import {Theme, ThemesList} from '@/models/themes.model';
+import {t} from 'elysia';
 import prisma from '@/db/prisma';
 
 export default (app: YapockType) =>
@@ -10,7 +10,7 @@ export default (app: YapockType) =>
         // Get all themes for the current user
         .get(
             '',
-            async ({ set, user }) => {
+            async ({set, user}) => {
                 if (!user) {
                     set.status = 401;
                     throw HTTPError.unauthorized({
@@ -19,13 +19,11 @@ export default (app: YapockType) =>
                 }
 
                 try {
-                    const data = await prisma.user_themes.findMany({
+                    return await prisma.user_themes.findMany({
                         where: {
                             user_id: user.sub,
                         },
                     });
-
-                    return data;
                 } catch (error: any) {
                     set.status = 500;
                     throw HTTPError.serverError({
@@ -49,7 +47,7 @@ export default (app: YapockType) =>
         // Create a new theme
         .post(
             '',
-            async ({ set, body, user }) => {
+            async ({set, body, user}) => {
                 if (!user) {
                     set.status = 401;
                     throw HTTPError.unauthorized({
@@ -58,7 +56,7 @@ export default (app: YapockType) =>
                 }
 
                 // Validate and sanitize HTML and CSS
-                const { html: sanitizedHTML, css: sanitizedCSS } = validateThemeContent({
+                const {html: sanitizedHTML, css: sanitizedCSS} = validateThemeContent({
                     html: body.html,
                     css: body.css,
                 });
@@ -88,7 +86,7 @@ export default (app: YapockType) =>
                         await prisma.user_themes.updateMany({
                             where: {
                                 user_id: user.sub,
-                                id: { not: data.id },
+                                id: {not: data.id},
                             },
                             data: {
                                 is_active: false,

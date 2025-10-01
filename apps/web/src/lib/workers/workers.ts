@@ -4,7 +4,7 @@ import {create} from 'zustand'
  * Cache manager for storing and retrieving job results
  */
 class CacheManager {
-    private jobId: string
+    private readonly jobId: string
     private store: WorkerState
 
     constructor(jobId: string, store: WorkerState) {
@@ -54,9 +54,9 @@ type JobPriority = 'low' | 'medium' | 'high' | 'critical'
 
 /**
  * Represents a job in the queue
- * @interface Job
+ * @interface JobInterface
  */
-interface Job {
+interface JobInterface {
     /** Unique identifier for the job */
     id: string
     /** The async function to be executed */
@@ -110,7 +110,7 @@ interface WorkerState {
     readonly DEFAULT_MAX_ATTEMPTS: number
 
     /** Map of all jobs indexed by their IDs */
-    jobs: Map<string, Job>
+    jobs: Map<string, JobInterface>
     /** Separate queues for each priority level */
     queues: Record<JobPriority, string[]>
     /** Cache manager for storing job results */
@@ -151,13 +151,13 @@ interface WorkerState {
      * Returns all currently running jobs
      * @returns Array of running Job objects
      */
-    getRunningJobs: () => Job[]
+    getRunningJobs: () => JobInterface[]
 
     /**
      * Returns all queued jobs
      * @returns Array of queued Job objects
      */
-    getQueuedJobs: () => Job[]
+    getQueuedJobs: () => JobInterface[]
 
     /**
      * Gets the current status of a job
@@ -218,7 +218,7 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
         const timeoutMs = options.timeoutMs || state.DEFAULT_TIMEOUT_MS
         const maxAttempts = options.maxAttempts || state.DEFAULT_MAX_ATTEMPTS
 
-        const job: Job = {
+        const job: JobInterface = {
             id,
             fn,
             status: 'queued',

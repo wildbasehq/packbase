@@ -1,6 +1,11 @@
-import { cn } from '@/lib/utils'
+import {cn} from '@/lib/utils'
+import {ReactNode} from "react";
 
-export default function Card({ children, className, ...props }: { children: React.ReactNode; className?: string; [key: string]: any }) {
+export default function Card({children, className, ...props}: {
+    children: ReactNode;
+    className?: string;
+    [_: string]: any
+}) {
     return (
         <div
             className={cn(

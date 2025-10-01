@@ -1,16 +1,5 @@
 @use '../_color.css';
-@use 'snapper-engine/main';
-
-@layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
-}
+@use './deluxe-shimmer';
 
 // TODO: Bloody move these into their own stuff
 // Devel uses different header backgrounds

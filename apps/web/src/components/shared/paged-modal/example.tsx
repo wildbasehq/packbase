@@ -1,8 +1,8 @@
 import React from 'react'
 import PagedModal from './index'
-import { Text } from '@/components/shared/text'
-import { Heading } from '@/components/shared/heading'
-import { BellIcon, CogIcon, HomeIcon, UserIcon } from '@heroicons/react/24/outline'
+import {Text} from '@/components/shared/text'
+import {Heading} from '@/components/shared/heading'
+import {BellIcon, CogIcon, HomeIcon, UserIcon} from '@heroicons/react/24/outline'
 
 /**
  * Example usage of the PagedModal component
@@ -13,29 +13,23 @@ import { BellIcon, CogIcon, HomeIcon, UserIcon } from '@heroicons/react/24/outli
  * - Multiple pages with icons, titles, and descriptions
  */
 const PagedModalExample: React.FC = () => {
-    // Custom header component
-    const CustomHeader = (
-        <div>
-            <Heading className="text-lg font-medium">My Application</Heading>
-            <Text className="text-sm text-gray-500 dark:text-gray-400">Configure your settings</Text>
-        </div>
-    )
-
-    // Custom footer component
-    const CustomFooter = (
-        <div className="flex items-center">
-            <div className="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center text-white">
-                <UserIcon className="h-5 w-5" />
-            </div>
-            <div className="ml-2">
-                <Text className="text-sm font-medium">John Doe</Text>
-                <Text className="text-xs text-alt">@johndoe</Text>
-            </div>
-        </div>
-    )
-
     return (
-        <PagedModal header={CustomHeader} footer={CustomFooter}>
+        <PagedModal header={
+            <div>
+                <Heading className="text-lg font-medium">My Application</Heading>
+                <Text className="text-sm text-gray-500 dark:text-gray-400">Configure your settings</Text>
+            </div>
+        } footer={
+            <div className="flex items-center">
+                <div className="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center text-white">
+                    <UserIcon className="h-5 w-5"/>
+                </div>
+                <div className="ml-2">
+                    <Text className="text-sm font-medium">John Doe</Text>
+                    <Text className="text-xs" alt>@johndoe</Text>
+                </div>
+            </div>
+        }>
             <PagedModal.Page title="Home" icon={HomeIcon} description="Dashboard and overview">
                 <div className="p-6">
                     <Heading>Home Page</Heading>
@@ -52,11 +46,11 @@ const PagedModalExample: React.FC = () => {
                         <Text className="font-medium">Application Settings</Text>
                         <div className="mt-2 space-y-2">
                             <div className="flex items-center">
-                                <input type="checkbox" id="notifications" className="mr-2" />
+                                <input type="checkbox" id="notifications" className="mr-2"/>
                                 <label htmlFor="notifications">Enable notifications</label>
                             </div>
                             <div className="flex items-center">
-                                <input type="checkbox" id="darkMode" className="mr-2" />
+                                <input type="checkbox" id="darkMode" className="mr-2"/>
                                 <label htmlFor="darkMode">Dark mode</label>
                             </div>
                         </div>
@@ -90,7 +84,8 @@ const PagedModalExample: React.FC = () => {
                 </div>
             </PagedModal.Page>
 
-            <PagedModal.Page title="Notifications" icon={BellIcon} description="Manage your notification preferences" badge="New">
+            <PagedModal.Page title="Notifications" icon={BellIcon} description="Manage your notification preferences"
+                             badge="New">
                 <div className="p-6">
                     <Heading>Notifications Page</Heading>
                     <Text className="mt-2">This is the notifications page content.</Text>

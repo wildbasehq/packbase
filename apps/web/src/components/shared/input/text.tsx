@@ -2,8 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
+import React, {forwardRef} from 'react'
+import {cn} from '@/lib/utils'
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     description?: string
@@ -16,16 +16,30 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ inputClassName, className, type, id, description, suffix, button, autoComplete, label, combined, ...props }, ref) => {
+    ({
+         inputClassName,
+         className,
+         type,
+         id,
+         description,
+         suffix,
+         button,
+         autoComplete,
+         label,
+         combined,
+         ...props
+     }, ref) => {
         let InputElement = 'input'
-        if (type === 'textarea') InputElement = 'textarea'
+        if (type === 'textarea') { // noinspection ReuseOfLocalVariableJS
+            InputElement = 'textarea'
+        }
 
         return (
             <>
                 {label && !combined && (
                     <label htmlFor={id} className="text-default mb-1 block select-none text-sm font-medium leading-6">
                         {label}
-                        {description && <p className="text-alt mt-1 text-xs leading-5">{description}</p>}
+                        {description && <p className="text-muted-foreground mt-1 text-xs leading-5">{description}</p>}
                     </label>
                 )}
 
@@ -40,7 +54,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         )}
                     >
                         {suffix && (
-                            <span className="-mr-2.5 flex select-none items-center pl-3 text-muted-foreground sm:text-sm">{suffix}</span>
+                            <span
+                                className="-mr-2.5 flex select-none items-center pl-3 text-muted-foreground sm:text-sm">{suffix}</span>
                         )}
                         <InputElement
                             // @ts-ignore
@@ -64,4 +79,4 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 )
 Input.displayName = 'Input'
 
-export { Input }
+export {Input}

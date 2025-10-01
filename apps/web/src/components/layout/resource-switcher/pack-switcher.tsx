@@ -2,24 +2,23 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { Logo } from '@/components/shared/logo'
+import {Logo} from '@/components/shared/logo'
 import Tooltip from '@/components/shared/tooltip'
-import { Button } from '@/components/shared/button'
+import {Button} from '@/components/shared/button'
 import UserAvatar from '@/components/shared/user/avatar'
-import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
-import { cn } from '@/lib/utils'
-import { BuildingStorefrontIcon } from '@heroicons/react/20/solid'
-import { PlusIcon } from '@heroicons/react/24/solid'
-import './pack-switcher.component.css'
+import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
+import {cn} from '@/lib/utils'
+import {BuildingStorefrontIcon} from '@heroicons/react/20/solid'
+import {PlusIcon} from '@heroicons/react/24/solid'
 import Link from '@/components/shared/link.tsx'
-import { useLocation } from 'wouter'
-import { Protect } from '@clerk/clerk-react'
-import { AnimatePresence, motion } from 'framer-motion'
+import {useLocation} from 'wouter'
+import {Protect} from '@clerk/clerk-react'
+import {AnimatePresence, motion} from 'motion/react'
 
 export default function PackSwitcher() {
-    const { currentResource, setCurrentResource, resources } = useResourceStore()
-    const { resourceDefault, loading, setLoading } = useUIStore()
-    const { user } = useUserAccountStore()
+    const {currentResource, setCurrentResource, resources} = useResourceStore()
+    const {resourceDefault, loading, setLoading} = useUIStore()
+    const {user} = useUserAccountStore()
     const [, navigate] = useLocation()
 
     const switchResource = (resource: any) => {
@@ -45,7 +44,7 @@ export default function PackSwitcher() {
                     )}
                     onClick={() => switchResource(resourceDefault)}
                 >
-                    <Logo noColorTheme className="!w-9.5 !h-9.5" />
+                    <Logo noColorTheme className="!w-9.5 !h-9.5"/>
                 </div>
             </Tooltip>
 
@@ -57,7 +56,7 @@ export default function PackSwitcher() {
                     )}
                     onClick={() => navigate('~/store')}
                 >
-                    <BuildingStorefrontIcon className="w-5 h-5  " />
+                    <BuildingStorefrontIcon className="w-5 h-5  "/>
                 </div>
             </Tooltip>
 
@@ -86,10 +85,10 @@ export default function PackSwitcher() {
                             {currentResource.id === item.id && (
                                 <motion.div
                                     key={`pack-bg-${item.id}`}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
+                                    initial={{opacity: 0}}
+                                    animate={{opacity: 1}}
+                                    exit={{opacity: 0}}
+                                    transition={{duration: 0.3}}
                                     className="absolute inset-0 ring-white/10 -z-1 rounded-l-xl bg-white dark:bg-n-8 h-12 rounded-out-r w-[calc(3.75rem)] pack-icon-bg"
                                 />
                             )}
@@ -104,14 +103,14 @@ export default function PackSwitcher() {
                         href="/p/new"
                         className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === 'new' && 'force-pill')}
                     >
-                        <Button variant="ghost" size="icon" className="h-8 w-8 p-1">
-                            <PlusIcon />
+                        <Button plain className="h-8 w-8 p-1">
+                            <PlusIcon/>
                         </Button>
                     </Link>
                 </Tooltip>
             </Protect>
 
-            <div className="grow" />
+            <div className="grow"/>
         </div>
     )
 }

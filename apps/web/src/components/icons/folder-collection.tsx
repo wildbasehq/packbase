@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import {cn} from '@/lib/utils'
 import React from 'react'
 
 export interface IconProps extends React.SVGAttributes<SVGElement> {
@@ -7,7 +7,7 @@ export interface IconProps extends React.SVGAttributes<SVGElement> {
     dark?: boolean
 }
 
-export default function FolderCollectionIcon({ className, size = 113, dark = false, ...props }: IconProps) {
+export default function FolderCollectionIcon({className, size = 113, dark = false, ...props}: IconProps) {
     dark = dark || document.documentElement.classList.contains('dark')
     const fillColour = dark ? '#FFF' : 'rgb(30 30 32)'
     const fillBackgroundColour = dark ? '#000' : '#FFFFFF'
@@ -72,14 +72,15 @@ export default function FolderCollectionIcon({ className, size = 113, dark = fal
                     filterUnits="userSpaceOnUse"
                     colorInterpolationFilters="sRGB"
                 >
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-                    <feOffset dy="4" />
-                    <feGaussianBlur stdDeviation="0.5" />
-                    <feComposite in2="hardAlpha" operator="out" />
-                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" />
-                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_10_32" />
-                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_10_32" result="shape" />
+                    <feFlood floodOpacity="0" result="BackgroundImageFix"/>
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                                   result="hardAlpha"/>
+                    <feOffset dy="4"/>
+                    <feGaussianBlur stdDeviation="0.5"/>
+                    <feComposite in2="hardAlpha" operator="out"/>
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0"/>
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_10_32"/>
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_10_32" result="shape"/>
                 </filter>
             </defs>
         </svg>
