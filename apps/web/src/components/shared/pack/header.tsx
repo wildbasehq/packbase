@@ -35,7 +35,7 @@ export default function PackHeader({ ...props }: any) {
                             </div>
                         </div>
                     </div>
-                    {pack.is_owner && (
+                    {!pack.is_owner && (
                         <div>
                             <PackMembershipButton pack={pack} />
                         </div>
