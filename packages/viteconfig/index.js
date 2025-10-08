@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import * as path from 'node:path'
 
-export default function viteConfig(sourceDir: string) {
+export default function viteConfig(sourceDir) {
     return defineConfig({
         server: {
             port: parseInt(process.env.PORT || '5173'),
