@@ -4,6 +4,7 @@ import {Heading} from "@/src/components";
 import {isVisible, vg} from "@/lib";
 import {Text} from "@/components/shared/text.tsx";
 
+
 export default function UserStoragePage() {
     const [userStorageOverbleed, setUserStorageOverbleed] = useState(0)
     const [userStorageUsed, setUserStorageUsed] = useState(0)
@@ -42,7 +43,7 @@ export default function UserStoragePage() {
                 setUserStorageOverbleed(0)
             }
 
-            setIsInfinite(result.data.tier === 'void')
+            // setIsInfinite(result.data.tier === 'void')
         })
     }, [])
 
@@ -147,9 +148,7 @@ export default function UserStoragePage() {
                     About {fileCount} files, using
                     up {useHumanReadable(userStorageUsed)} of {maxHumanReadable} Core.
                 </Text>
-            </Activity>
 
-            <Activity mode={isVisible(isInfinite)}>
                 <div className="flex flex-col space-y-4">
                     <Heading className="text-tertiary">
                         Use however much you want
