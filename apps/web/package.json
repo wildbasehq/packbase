@@ -1,6 +1,6 @@
 {
   "name": "packbase",
-  "version": "1000.472.0",
+  "version": "2000.001.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -61,6 +61,7 @@
     "motion": "^12.5.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-dropzone": "^14.3.8",
     "react-fast-marquee": "^1.6.5",
     "react-frame-component": "^5.2.7",
     "react-grid-layout": "^1.5.1",

@@ -27,6 +27,7 @@ const GuestLanding = lazy(() => import('@/components/home/guestlanding.tsx'))
 // Store
 const StoreLayout = lazy(() => import('@/pages/store/layout.tsx'))
 const StorePage = lazy(() => import('@/pages/store/page.tsx'))
+const FilesPage = lazy(() => import('@/pages/files/page.tsx'))
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -86,6 +87,13 @@ export default function Routes() {
                             </Suspense>
                         </Route>
                     </StoreLayout>
+                </Suspense>
+            </Route>
+
+            {/* Files (matches /files and any subpath) */}
+            <Route path={/^\/files(\/.*)?$/}>
+                <Suspense fallback={<LoadingFallback/>}>
+                    <FilesPage/>
                 </Suspense>
             </Route>
 
