@@ -25,11 +25,11 @@ export default function AppDropdownMenu() {
                     Recent accounts will show here...
                 </DropdownHeading>
             </DropdownSection>
-            <DropdownDivider/>
+            {/* <DropdownDivider/>
             <DropdownItem href="/teams/create">
                 <PlusIcon/>
                 <DropdownLabel>New team&hellip;</DropdownLabel>
-            </DropdownItem>
+            </DropdownItem> */}
         </DropdownMenu>
     )
 }
