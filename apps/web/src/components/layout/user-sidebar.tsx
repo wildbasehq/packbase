@@ -172,9 +172,6 @@ function FriendsListContainer() {
                     </Text>
                 </div>
             )}
-            <div className="flex items-center justify-between mx-3">
-                <Text size="sm">Friends</Text>
-            </div>
 
             {/* Avatar with display name */}
             <div className="flex flex-col space-y-2">
@@ -219,7 +216,7 @@ function PackMembersContainer() {
                         {members?.length} total
                     </Text>
                 </div>
-                
+
             </Activity>
 
             <Activity mode={isVisible(!members?.length)}>

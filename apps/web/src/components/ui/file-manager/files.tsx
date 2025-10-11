@@ -1,6 +1,5 @@
-import {MouseEvent, useEffect, useMemo, useRef, useState} from 'react'
+import {Activity, MouseEvent, useEffect, useMemo, useRef, useState} from 'react'
 import {useLocation} from 'wouter'
-import {Activity} from 'react'
 import {isVisible} from '@/lib'
 import {useFileManager} from './context'
 import type {FileNode, FileSystemNode} from './types'
@@ -49,7 +48,7 @@ export function FileManagerFiles() {
         e.preventDefault()
         const isMeta = e.metaKey || e.ctrlKey
         const isShift = e.shiftKey
-        setSelectedIds(prev => {
+        setSelectedIds((prev: Set<string>) => {
             const next = new Set(prev)
             if (isMeta) {
                 if (next.has(id)) {
@@ -120,7 +119,7 @@ export function FileManagerFiles() {
     return (
         <div
             ref={containerRef}
-            className="flex-1 relative overflow-auto bg-background"
+            className="flex-1 relative overflow-auto"
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseLeave={onMouseUp}

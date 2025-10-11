@@ -7,7 +7,7 @@ import {useEffect} from 'react'
 import {useSession} from '@clerk/clerk-react'
 import {useResourceStore, useUIStore} from '@/lib/state'
 import {FeedProps} from './types/feed'
-import {FeedError, FeedList, FeedLoading, FeedMaintenance, FloatingCompose} from '.'
+import {FeedError, FeedList, FeedLoading, FeedMaintenance} from '.'
 import {useLocalStorage} from 'usehooks-ts'
 import {useFeedPagination} from './hooks/use-feed-pagination'
 import {useFeedQuery} from './hooks/use-feed-query'
@@ -72,7 +72,7 @@ export default function Feed({
 
     return (
         <div className="relative pb-20 max-w-3xl space-y-4 mx-auto">
-            {shouldShowCompose && <FloatingCompose onShouldFeedRefresh={handleComposeRefresh}/>}
+            {/*{shouldShowCompose && <FloatingCompose onShouldFeedRefresh={handleComposeRefresh}/>}*/}
 
             {isFirstPageLoading ? (
                 <FeedLoading isMasonry={false} message="Loading howls..."/>

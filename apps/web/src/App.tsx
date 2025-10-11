@@ -107,7 +107,8 @@ Thanks for being a crucial part of the internet.
 
                                     <ClerkLoaded>
                                         <Preload>
-                                            <div id="NGRoot" className="h-full overflow-y-auto overflow-x-hidden">
+                                            <div id="NGRoot"
+                                                 className="h-full overflow-y-auto overflow-x-hidden">
                                                 <WaitlistCheck/>
                                                 <SignedOut>
                                                     <div

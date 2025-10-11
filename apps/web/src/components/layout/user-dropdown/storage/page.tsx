@@ -43,7 +43,7 @@ export default function UserStoragePage() {
                 setUserStorageOverbleed(0)
             }
 
-            // setIsInfinite(result.data.tier === 'void')
+            setIsInfinite(result.data.tier === 'void')
         })
     }, [])
 

@@ -3,21 +3,23 @@
  */
 
 import * as Headless from '@headlessui/react'
-import React, {useState} from 'react'
+import React, {Activity, useEffect, useState} from 'react'
 import {useResourceStore} from '@/lib/state'
 import {NavbarItem} from '@/components/layout'
-import PackSwitcher from '@/components/layout/resource-switcher/pack-switcher.tsx'
+import PackSwitcher from '@/components/layout/resource/pack-switcher.tsx'
 import UserSidebar, {UserActionsContainer} from '@/components/layout/user-sidebar.tsx'
 import cx from 'classnames'
 import {useSidebar} from '@/lib/context/sidebar-context'
-import ResourceSwitcher from '@/components/layout/resource-switcher'
+import ResourceSettings from '@/components/layout/resource'
 import {
     Dropdown,
     DropdownButton,
     DropdownItem,
     DropdownMenu,
+    FloatingCompose,
     Sidebar,
     SidebarBody,
+    SidebarDivider,
     SidebarFooter,
     SidebarHeading,
     SidebarItem,
@@ -30,10 +32,14 @@ import {FaceSmileIcon} from '@heroicons/react/16/solid'
 import {SiDiscord} from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 import {useSession} from '@clerk/clerk-react'
-import {cn} from '@/lib'
+import {cn, isVisible} from '@/lib'
 import useWindowSize from '@/lib/hooks/use-window-size.ts'
 import ResizablePanel from '@/components/shared/resizable'
 import {News} from '../ui/sidebar-news'
+import {useLocation} from "wouter";
+import {motion} from "motion/react"
+import YourStuffPage from "@/pages/stuff/page.tsx";
+import {navigate} from "wouter/use-browser-location";
 
 function OpenMenuIcon() {
     return (
@@ -80,45 +86,24 @@ function MobileSidebar({open, close, children}: React.PropsWithChildren<{ open: 
 
 export function SidebarLayout({children}: React.PropsWithChildren) {
     let [showSidebar, setShowSidebar] = useState(false)
-    // const [showVGSNotice, setShowVGSNotice] = useState(true)
     const {isSignedIn} = useSession()
     const {sidebarContent} = useSidebar()
     const {isMobile} = useWindowSize()
-    const [sidebarWidth, setSidebarWidth] = useState<number>(320)
-    // const [location] = useLocation()
-    // const isStuffPage = location === '/stuff'
+    const [location] = useLocation()
+    const isStuffPage = location.startsWith('/stuff')
+
+    // Keeps track of the last non-stuff page we were on, so we can navigate back to it
+    // @TODO Store this elsewhere so it doesn't cause a re-render?
+    const [lastNonStuffPage, setLastNonStuffPage] = useState<any>(null)
+
+    useEffect(() => {
+        if (!isStuffPage) {
+            setLastNonStuffPage(location)
+        }
+    }, [location])
 
     return (
         <div className="w-full isolate min-h-svh max-lg:flex-col bg-muted dark:bg-n-8">
-            {/*{showVGSNotice && (*/}
-            {/*    <div className="top-0 z-50 mx-2 my-2">*/}
-            {/*        <div className="bg-amber-50 border-2 ring-2 ring-amber-500/10 border-amber-500 p-4 rounded-md shadow-sm dark:bg-amber-900/20 dark:border-amber-600">*/}
-            {/*            <div className="flex items-center">*/}
-            {/*                <div className="flex-shrink-0">*/}
-            {/*                    <ShieldExclamationIcon className="h-5 w-5 text-amber-500 dark:text-amber-400" aria-hidden="true" />*/}
-            {/*                </div>*/}
-            {/*                <div className="ml-3 flex-1">*/}
-            {/*                    <Markdown componentClassName="text-sm !text-amber-700 dark:!text-amber-200">*/}
-            {/*                        **Notice (UPDATED #2):** We're still working out an issue with our storage provider in regards to some*/}
-            {/*                        images - This only affects a small number of content hosted on Packbase. Content hosted yourself is not*/}
-            {/*                        affected.*/}
-            {/*                    </Markdown>*/}
-            {/*                </div>*/}
-            {/*                <div>*/}
-            {/*                    <button*/}
-            {/*                        type="button"*/}
-            {/*                        className="inline-flex rounded p-1.5 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500"*/}
-            {/*                        onClick={() => setShowVGSNotice(false)}*/}
-            {/*                    >*/}
-            {/*                        <span className="sr-only">Dismiss</span>*/}
-            {/*                        <XIcon className="h-5 w-5" aria-hidden="true" />*/}
-            {/*                    </button>*/}
-            {/*                </div>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*)}*/}
-
             <div className="relative flex">
                 {/* Sidebar on mobile */}
                 <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
@@ -138,61 +123,56 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                             <UserActionsContainer/>
                         </div>
                     </header>
-                    {/*<div className="hidden lg:block">{navbar}</div>*/}
-                    {/*{isStuffPage && <YourStuffPage />}*/}
+                    {isStuffPage && <YourStuffPage/>}
                     <main className="lg:min-w-0 flex">
                         {isSignedIn && (
-                            <div className={cn('w-fit max-lg:hidden flex h-full' /**,showVGSNotice && 'top-20'**/)}>
+                            <div className={cn('w-fit max-lg:hidden flex h-full')}>
                                 <PackSwitcher/>
                             </div>
                         )}
-                        {/*<motion.main*/}
-                        {/*    // key={isStuffPage ? 'settings' : 'default'}*/}
-                        {/*    className={`pb-2 lg:min-w-0 lg:pr-2 ${user ? 'lg:pl-96' : 'lg:pl-2'} ${isStuffPage ? '!z-10' : 'z-0'}`}*/}
-                        {/*    initial={false}*/}
-                        {/*    animate="animate"*/}
-                        {/*    transition={{*/}
-                        {/*        type: 'spring',*/}
-                        {/*        stiffness: 600,*/}
-                        {/*        damping: 40,*/}
-                        {/*        mass: 1,*/}
-                        {/*        bounce: 0,*/}
-                        {/*    }}*/}
-                        {/*    custom={{ isStuffPage }}*/}
-                        {/*    variants={{*/}
-                        {/*        initial: {*/}
-                        {/*            y: 0,*/}
-                        {/*            filter: 'blur(0px)',*/}
-                        {/*            opacity: 1,*/}
-                        {/*        },*/}
-                        {/*        animate: ({ isStuffPage }) => ({*/}
-                        {/*            y: isStuffPage ? '80%' : 0,*/}
-                        {/*            filter: isStuffPage ? 'blur(2px)' : 'blur(0px)',*/}
-                        {/*            // opacity: isSettingsPage ? 0.5 : 1,*/}
-                        {/*        }),*/}
-                        {/*    }}*/}
-                        {/*>*/}
-
-                        <div
-                            className="relative h-screen flex overflow-hidden grow lg:rounded-br-none lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-n-8 dark:lg:ring-white/10">
+                        <motion.main
+                            // key={isStuffPage ? 'settings' : 'default'}
+                            className={`relative h-screen flex overflow-hidden grow lg:bg-white dark:lg:bg-n-8 ${isStuffPage ? '!z-10 cursor-pointer ring-1 ring-default rounded-2xl' : 'z-0'}`}
+                            onClick={() => {
+                                if (isStuffPage) navigate(lastNonStuffPage ?? '/')
+                            }}
+                            initial={false}
+                            animate="animate"
+                            transition={{
+                                type: 'spring',
+                                stiffness: 600,
+                                damping: 40,
+                                mass: 1,
+                                bounce: 0,
+                            }}
+                            custom={{isStuffPage}}
+                            variants={{
+                                initial: {
+                                    y: 0,
+                                    filter: 'blur(0px)',
+                                    opacity: 1,
+                                },
+                                animate: ({isStuffPage}) => ({
+                                    y: isStuffPage ? '80%' : 0,
+                                    filter: isStuffPage ? 'blur(2px)' : 'blur(0px)',
+                                    // opacity: isSettingsPage ? 0.5 : 1,
+                                }),
+                            }}
+                        >
                             {isSignedIn && !isMobile && (
                                 // Sidebar content for desktop
-                                <ResizablePanel
-                                    className="relative top-0 border-r h-full flex z-30"
-                                    width={sidebarWidth}
-                                    onResize={setSidebarWidth}
-                                    minWidth={240}
-                                    maxWidth={560}
-                                >
-                                    <SidebarContentContainer
-                                        width={sidebarWidth}>{sidebarContent}</SidebarContentContainer>
-                                </ResizablePanel>
+                                <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                             )}
 
                             {/* Content */}
-                            <div className={cx('mx-auto w-full overflow-hidden h-full z-30')}>{children}</div>
-                        </div>
-                        {/*</motion.main>*/}
+                            <div className={cx('relative mx-auto w-full overflow-hidden h-full z-30')}>
+                                <div className="max-w-3xl mx-auto absolute left-0 right-0 top-0">
+                                    <FloatingCompose onShouldFeedRefresh={async () => {
+                                    }}/>
+                                </div>
+                                {children}
+                            </div>
+                        </motion.main>
                     </main>
                 </div>
                 {isSignedIn && <UserSidebar/>}
@@ -201,71 +181,75 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     )
 }
 
-function SidebarContentContainer({children, width}: { children: React.ReactNode; width?: number }) {
+function SidebarContentContainer({children}: { children: React.ReactNode }) {
     const {currentResource} = useResourceStore()
     const [articlesUnread, setArticlesUnread] = useState(false)
-    return (
-        <div className="flex flex-col" style={{width: width ?? 320}}>
-            {!currentResource.standalone && (
-                <nav aria-label="Sections" className="flex flex-col min-h-14" style={{width: width ?? 320}}>
-                    <div className="relative flex h-full items-center px-5 py-2 overflow-hidden">
-                        <div className="w-full">
-                            <ResourceSwitcher/>
-                        </div>
-                    </div>
-                </nav>
-            )}
-            <Sidebar className="w-full">
-                <SidebarBody>
-                    {!children &&
-                        // Skeleton
-                        Array(10)
-                            .fill(null)
-                            .map((_, i) => (
-                                <div key={i} className="flex items-center py-3 px-2">
-                                    <SidebarLabel className="flex items-center space-x-2">
-                                        <div className="w-8 h-8 rounded-full bg-white dark:bg-n-7"/>
-                                        <div className="w-24 h-4 rounded-full bg-white dark:bg-n-7"/>
-                                    </SidebarLabel>
-                                </div>
-                            ))}
-                    {children}
-                    <SidebarSpacer/>
-                    <SidebarSection>
-                        <Dropdown>
-                            <DropdownButton as={SidebarItem}>
-                                <QuestionMarkCircleIcon/>
-                                <SidebarLabel>Help</SidebarLabel>
-                            </DropdownButton>
-                            <DropdownMenu anchor="top">
-                                <DropdownItem href="https://work.wildbase.xyz/maniphest/query/all/" target="_blank">
-                                    <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                    <SidebarLabel>Feedback</SidebarLabel>
-                                </DropdownItem>
-                                <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
-                                    <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                    <SidebarLabel>Discord</SidebarLabel>
-                                </DropdownItem>
-                                <DropdownItem href="https://wildbase.xyz/" target="_blank">
-                                    <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                    <SidebarLabel>Wildbase</SidebarLabel>
-                                </DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
-                        <SidebarItem href="https://blog.packbase.app" target="_blank">
-                            <SparklesIcon/>
-                            <SidebarLabel external>Blog</SidebarLabel>
-                        </SidebarItem>
-                    </SidebarSection>
-                </SidebarBody>
+    const [sidebarWidth, setSidebarWidth] = useState<number>(320)
 
-                <SidebarFooter className={articlesUnread ? 'bg-gradient-to-b from-transparent to-muted/50' : ''}>
-                    <SidebarHeading>(c) ✱base - Private alpha, things break!</SidebarHeading>
-                    <div className="bottom-0 w-full">
-                        <News toggleUnread={setArticlesUnread}/>
-                    </div>
-                </SidebarFooter>
-            </Sidebar>
-        </div>
+    return (
+        <Activity mode={isVisible(!!children)}>
+            <ResizablePanel
+                className="relative top-0 border-r h-full flex z-30"
+                width={sidebarWidth}
+                onResize={setSidebarWidth}
+                minWidth={240}
+                maxWidth={560}
+            >
+                <div className="flex flex-col" style={{width: sidebarWidth ?? 320}}>
+                    {!currentResource.standalone && (
+                        <nav aria-label="Sections" className="flex flex-col min-h-14"
+                             style={{width: sidebarWidth ?? 320}}>
+                            <div className="relative flex h-full items-center px-5 py-2 overflow-hidden">
+                                <div className="w-full">
+                                    <ResourceSettings/>
+                                </div>
+                            </div>
+                        </nav>
+                    )}
+                    <Sidebar className="w-full">
+                        <SidebarBody>
+                            {children}
+                            <SidebarSpacer/>
+                            <SidebarDivider/>
+                            <SidebarSection>
+                                <Dropdown>
+                                    <DropdownButton as={SidebarItem}>
+                                        <QuestionMarkCircleIcon/>
+                                        <SidebarLabel>Help</SidebarLabel>
+                                    </DropdownButton>
+                                    <DropdownMenu anchor="top">
+                                        <DropdownItem href="https://work.wildbase.xyz/maniphest/query/all/"
+                                                      target="_blank">
+                                            <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                            <SidebarLabel>Feedback</SidebarLabel>
+                                        </DropdownItem>
+                                        <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
+                                            <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                            <SidebarLabel>Discord</SidebarLabel>
+                                        </DropdownItem>
+                                        <DropdownItem href="https://wildbase.xyz/" target="_blank">
+                                            <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                            <SidebarLabel>Wildbase</SidebarLabel>
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>
+                                <SidebarItem href="https://blog.packbase.app" target="_blank">
+                                    <SparklesIcon/>
+                                    <SidebarLabel external>Blog</SidebarLabel>
+                                </SidebarItem>
+                            </SidebarSection>
+                        </SidebarBody>
+
+                        <SidebarFooter
+                            className={articlesUnread ? 'bg-gradient-to-b from-transparent to-muted/50' : ''}>
+                            <SidebarHeading>(c) ✱base - Private alpha, things break!</SidebarHeading>
+                            <div className="bottom-0 w-full">
+                                <News toggleUnread={setArticlesUnread}/>
+                            </div>
+                        </SidebarFooter>
+                    </Sidebar>
+                </div>
+            </ResizablePanel>
+        </Activity>
     )
 }

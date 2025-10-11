@@ -10,6 +10,7 @@ import {ClerkProvider} from '@clerk/clerk-react'
 import {dark} from '@clerk/themes'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+import {ConfidentialOverlay} from "@/components/shared/confidential-overlay.tsx";
 
 declare global {
     interface String {
@@ -51,20 +52,6 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <Activity mode={isVisible(!import.meta.env.PROD)}>
-            <div
-                className="h-12 w-screen"
-                style={{
-                    position: 'fixed',
-                    zIndex: '99999',
-                    opacity: 0.2,
-                    pointerEvents: 'none',
-                    backgroundImage: 'url("/img/devel.symbolic.svg")',
-                    backgroundRepeat: 'repeat-x',
-                }}
-            />
-        </Activity>
-
         <ClerkProvider
             publishableKey={PUBLISHABLE_KEY}
             afterSignOutUrl="/"
@@ -103,6 +90,10 @@ createRoot(document.getElementById('root')!).render(
                 },
             }}
         >
+            <Activity mode={isVisible(!import.meta.env.PROD)}>
+                <ConfidentialOverlay/>
+            </Activity>
+
             <QueryClientProvider client={queryClient}>
                 <App/>
                 <ReactQueryDevtools initialIsOpen={false}/>

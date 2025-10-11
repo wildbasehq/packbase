@@ -17,17 +17,17 @@ import {Button} from '@/components/shared/button'
 import {ClipboardIcon, Cog6ToothIcon, UserGroupIcon} from '@heroicons/react/20/solid'
 import {Avatar} from '@/components/shared/avatar'
 import ResourceSettingsGeneral from './pages/general'
-import ResourceSettingsMembers from '@/components/layout/resource-switcher/pages/members.tsx'
-import {VerifiedBadge} from '@/components/layout/resource-switcher/pack-badge.tsx'
+import ResourceSettingsMembers from '@/components/layout/resource/pages/members.tsx'
+import {VerifiedBadge} from '@/components/layout/resource/pack-badge.tsx'
 import PagedModal from '@/components/shared/paged-modal'
-import ResourceSettingsTheme from '@/components/layout/resource-switcher/pages/theme.tsx'
+import ResourceSettingsTheme from '@/components/layout/resource/pages/theme.tsx'
 import {SwatchIcon} from '@heroicons/react/16/solid'
 import {useContentFrame} from '@/src/components'
 import ServerConfigRender, {decideCategoryDescription} from '@/components/shared/input/server-config-render.tsx'
 import {Activity} from "react";
 import {isVisible} from "@/lib";
 
-export default function ResourceSwitcher() {
+export default function ResourceSettings() {
     const {currentResource} = useResourceStore()
 
     const {loading, connecting} = useUIStore()

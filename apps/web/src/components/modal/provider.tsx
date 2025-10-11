@@ -28,7 +28,7 @@ export function ModalProvider({children}: { children: ReactNode }) {
         <ModalContext.Provider value={{show, hide}}>
             {children}
             {modalContent && (
-                <Dialog open={showModal} onClose={setShowModal} className="z-[100] overflow-hidden">
+                <Dialog open={showModal} onClose={setShowModal} className="z-[100]">
                     {modalContent}
                 </Dialog>
             )}

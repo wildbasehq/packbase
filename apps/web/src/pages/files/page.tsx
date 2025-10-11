@@ -39,7 +39,7 @@ async function sampleList(path: string): Promise<FileSystemNode[]> {
 export default function FilesPage() {
     return (
         <div className="flex h-full select-none">
-            <FileManager.Root baseHref="/files" content={sampleList} tree={sampleTree}>
+            <FileManager.Root content={sampleList} tree={sampleTree}>
                 <FileManager.Sidebar/>
                 <FileManager.Files/>
             </FileManager.Root>

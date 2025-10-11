@@ -21,7 +21,7 @@ export default (app: YapockType) =>
             try {
                 const storage = createStorage('packbase-public-profiles');
                 console.log('Fetching storage information for user:', user.sub);
-                const result = await storage.listFiles('3e133370-0ec2-4825-b546-77de3804c8b1');
+                const result = await storage.listFiles(user.sub);
 
                 if (!result.success || !result.files) {
                     set.status = 500;

@@ -15,14 +15,14 @@ function normalizePath(pathname: string, baseHref: string) {
 }
 
 export function FileManagerRoot({
-    content,
-    tree,
-    onUpload,
-    onChange,
-    onOpenFile,
-    baseHref = '/files',
-    children,
-}: FileManagerRootProps) {
+                                    content,
+                                    tree,
+                                    onUpload,
+                                    onChange,
+                                    onOpenFile,
+                                    baseHref = '/stuff',
+                                    children,
+                                }: FileManagerRootProps) {
     const [location] = useLocation()
     const [currentPath, setCurrentPath] = useState<string>('/')
     const [items, setItems] = useState<FileSystemNode[]>([])
