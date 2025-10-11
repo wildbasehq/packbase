@@ -10,8 +10,6 @@ datasource db {
   schemas   = ["auth", "public"]
 }
 
-
-
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model notice {
   id         BigInt   @id @default(autoincrement())
@@ -23,6 +21,13 @@ model notice {
   @@schema("public")
 }
 
+model storage {
+  user_id        String  @id
+  tier           String  @default("free")
+  quota_override BigInt?
+
+  @@schema("public")
+}
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model packs {
@@ -51,7 +56,7 @@ model packs_memberships {
   user_id     String   @db.Uuid
   packs       packs    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "public_packs_memberships_tenant_id_fkey")
   // Bitwise permissions
-  permissions Int?    @default(0)
+  permissions Int?     @default(0)
 
   @@index([tenant_id], type: Hash)
   @@index([user_id], type: Hash)
@@ -236,13 +241,13 @@ model notifications {
 }
 
 model inventory {
-  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id  String
-  item_id  String
-  amount   Int      @default(1)
-  type     String   @default("item")
+  id      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id String
+  item_id String
+  amount  Int     @default(1)
+  type    String  @default("item")
   // For "badges"
-  is_set   Boolean  @default(false)
+  is_set  Boolean @default(false)
 
   @@unique([item_id, user_id])
   @@schema("public")
@@ -376,13 +381,13 @@ model admin_query_pages {
 }
 
 model admin_audit_log {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id     String   @db.Uuid
-  action      String
-  model_type  String
-  model_id    String
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String   @db.Uuid
+  action       String
+  model_type   String
+  model_id     String
   model_object Json
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
 
   @@schema("public")
 }

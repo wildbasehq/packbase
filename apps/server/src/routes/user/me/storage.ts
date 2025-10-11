@@ -34,10 +34,20 @@ export default (app: YapockType) =>
                 // Calculate total bytes used
                 const totalBytes = result.files.reduce((sum, file) => sum + file.size, 0);
 
+                const tierRow = await prisma.storage.findFirst({
+                    where: {
+                        user_id: user.sub,
+                    },
+                    select: {
+                        user_id: true,
+                        tier: true,
+                    },
+                })
+
                 const data = {
                     totalBytes,
                     fileCount: result.files.length,
-                    tier: 'void' // everyone has void storage during private alpha
+                    tier: tierRow?.tier || 'free',
                 };
 
                 // Store in cache
