@@ -46,7 +46,7 @@ export interface FileManagerContextValue {
     loading: boolean
     setLoading: (v: boolean) => void
     selectedIds: Set<string>
-    setSelectedIds: (next: Set<string>) => void
+    setSelectedIds: (next: Set<string> | ((prev: Set<string>) => Set<string>)) => void
     onUpload?: (files: File[], path: string) => Promise<void> | void
     onChange?: (selected: FileSystemNode[]) => void
     onOpenFile?: (file: FileNode) => void

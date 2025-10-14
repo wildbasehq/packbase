@@ -212,7 +212,8 @@ function ResourceSettingsModal() {
                     icon={Cog6ToothIcon}
                 >
                     <PagedModal.Body>
-                        <ServerConfigRender config={packSettingsCategories[category]}/>
+                        <ServerConfigRender config={packSettingsCategories[category]}
+                                            updateEndpoint={`pack/${currentResource.id}/settings`}/>
                     </PagedModal.Body>
                 </PagedModal.Page>
             ))}
