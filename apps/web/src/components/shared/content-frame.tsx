@@ -1,9 +1,7 @@
 import React, {ReactNode} from 'react'
 import {useSession} from '@clerk/clerk-react'
-import {setToken} from '@/lib'
+import {API_URL, setToken} from '@/lib'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-
-const API_URL = import.meta.env.VITE_YAPOCK_URL
 
 interface ContentFrameProps {
     children: ReactNode

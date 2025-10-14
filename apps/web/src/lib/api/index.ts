@@ -25,7 +25,16 @@ import {formatRelativeTime} from '../utils/date.ts'
 export const ProjectName = `Project Korat Honeybear`
 export const ProjectSafeName = 'Packbase'
 
-export const API_URL = import.meta.env.VITE_YAPOCK_URL
+export const API_URL = localStorage.getItem('api_url') || import.meta.env.VITE_YAPOCK_URL
+
+// if url has query param 'api_override' then set localStorage and reload with no query param
+if (window.location.search.includes('api_override=')) {
+    const overrideUrl = window.location.search.split('api_override=')[1]
+    if (overrideUrl) {
+        localStorage.setItem('api_url', overrideUrl)
+        window.location.href = window.location.href.split('?')[0]
+    }
+}
 
 export let {vg} = new VoyageSDK(API_URL, {
     supabase: {

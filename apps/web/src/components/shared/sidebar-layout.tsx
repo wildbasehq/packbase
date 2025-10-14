@@ -31,7 +31,7 @@ import {QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
 import {ChevronDownIcon, FaceSmileIcon} from '@heroicons/react/16/solid'
 import {SiDiscord} from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
-import {useSession} from '@clerk/clerk-react'
+import {SignedIn, useSession} from '@clerk/clerk-react'
 import {isVisible, WorkerSpinner} from '@/lib'
 import useWindowSize from '@/lib/hooks/use-window-size.ts'
 import ResizablePanel from '@/components/shared/resizable'
@@ -111,32 +111,34 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
 
     return (
         <div className="relative isolate flex min-h-svh w-full flex-col bg-muted dark:bg-n-8">
-            <Activity mode={isVisible(!seenPackTour)}>
-                {/* Floating callout for Packs feature */}
-                <div className="pointer-events-none fixed inset-0 z-50 flex items-start justify-start">
-                    <div className="relative mt-16 ml-6 max-w-sm pointer-events-auto">
-                        {/* Pointer triangle */}
-                        <div
-                            className="absolute -top-2 left-8 h-0 w-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white dark:border-b-zinc-900"/>
+            <SignedIn>
+                <Activity mode={isVisible(!seenPackTour)}>
+                    {/* Floating callout for Packs feature */}
+                    <div className="pointer-events-none fixed inset-0 z-50 flex items-start justify-start">
+                        <div className="relative mt-16 ml-6 max-w-sm pointer-events-auto">
+                            {/* Pointer triangle */}
+                            <div
+                                className="absolute -top-2 left-8 h-0 w-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white dark:border-b-zinc-900"/>
 
-                        {/* Card */}
-                        <div
-                            className="rounded-lg border bg-card p-4 shadow-xl">
-                            <Heading>Packs live up here!</Heading>
-                            <Text>
-                                All your packs, pack creation, settings, and other pack-specific actions have moved into
-                                the header.
-                            </Text>
-                            <div className="mt-3 flex gap-2">
-                                <Button onClick={() => setSeenPackTour(true)}>
-                                    Got it
-                                </Button>
+                            {/* Card */}
+                            <div
+                                className="rounded-lg border bg-card p-4 shadow-xl">
+                                <Heading>Packs live up here!</Heading>
+                                <Text>
+                                    All your packs, pack creation, settings, and other pack-specific actions have moved
+                                    into
+                                    the header.
+                                </Text>
+                                <div className="mt-3 flex gap-2">
+                                    <Button onClick={() => setSeenPackTour(true)}>
+                                        Got it
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </Activity>
-
+                </Activity>
+            </SignedIn>
             {/* Content */}
             <div
                 className="min-w-0 bg-sidebar px-4 border-b border-default">
