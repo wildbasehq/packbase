@@ -132,7 +132,7 @@ export function ConfidentialOverlay() {
                             fontSize="12"
                             fontFamily="sans-serif"
                         >
-                            &copy; ✱base {new Date().getFullYear()} INTERNAL USE ONLY
+                            &copy; ✱base {new Date().getFullYear()} DON'T STEAL OUR WORK
                         </text>
                     </pattern>
                 </defs>

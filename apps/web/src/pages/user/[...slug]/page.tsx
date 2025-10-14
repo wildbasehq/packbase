@@ -32,7 +32,7 @@ export default function UserProfile() {
                 if (!data || data.message) {
                     setError('failed')
                 } else setUser(data)
-                
+
                 setLoading(false)
             })
             .catch(e => {
@@ -59,7 +59,7 @@ export default function UserProfile() {
                     <CustomTheme userId={user.id}/>
 
                     <div className="p-8" id="profile-feed">
-                        <Feed packID={user.id} dontShowCompose/>
+                        <Feed packID={user.id}/>
                     </div>
                 </>
             )}

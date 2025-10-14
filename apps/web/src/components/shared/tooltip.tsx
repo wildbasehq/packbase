@@ -6,8 +6,8 @@ import {motion} from 'motion/react'
 export default function Tooltip({
                                     children,
                                     content,
-                                    delayDuration,
-                                    side,
+                                    delayDuration = 0,
+                                    side = 'top',
                                 }: {
     children: ReactNode
     content: ReactNode | string
@@ -18,10 +18,10 @@ export default function Tooltip({
         return <>{children}</>
     }
 
-    const animateDirection = side === 'top' || side === 'bottom' ? 'y' : 'x'
+    const animateDirection = (side === 'top' || side === 'bottom') ? 'y' : 'x'
 
     return (
-        <TooltipPrimitive.Provider delayDuration={typeof delayDuration === undefined ? 100 : delayDuration}>
+        <TooltipPrimitive.Provider delayDuration={delayDuration}>
             <TooltipPrimitive.Root>
                 <TooltipPrimitive.Trigger className="inline-flex" asChild>
                     {children}
@@ -29,7 +29,7 @@ export default function Tooltip({
                 <TooltipPrimitive.Portal>
                     <TooltipPrimitive.Content asChild side={side || 'top'}>
                         <motion.div
-                            className="rounded bg-n-8 max-w-76 px-3 py-2 text-sm select-none text-white [&>*]:!text-white shadow-md dark:bg-n-7 relative"
+                            className="rounded bg-primary-midnight max-w-76 px-4 py-2 z-[100] text-sm select-none text-white [&>*]:!text-white shadow-md relative"
                             initial={{opacity: 0, [animateDirection]: -5, rotateX: -20}}
                             animate={{opacity: 1, [animateDirection]: 0, rotateX: 0}}
                             exit={{opacity: 0, [animateDirection]: -5, rotateX: -20}}

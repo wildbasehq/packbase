@@ -36,6 +36,7 @@ export interface FeedPostData {
         rheoAgrees: boolean
         rationale: string
     }
+    tags?: string[]
 }
 
 export interface FeedPostProps {

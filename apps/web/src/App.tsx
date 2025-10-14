@@ -6,24 +6,12 @@ import React, {lazy, useEffect} from 'react'
 import {SidebarLayout} from '@/components/shared/sidebar-layout.tsx'
 import {Providers} from './provider.tsx'
 import {SidebarProvider} from '@/lib/context/sidebar-context'
-import {
-    AppTabs,
-    Dropdown,
-    DropdownButton,
-    Logo,
-    LogoSpinner,
-    Navbar,
-    NavbarDivider,
-    NavbarItem,
-    NavbarLabel
-} from '@/src/components'
+import {AppTabs, LogoSpinner} from '@/src/components'
 import Body from '@/components/layout/body.tsx'
-import {ClerkLoaded, ClerkLoading, SignedOut} from '@clerk/clerk-react'
+import {ClerkLoaded, ClerkLoading} from '@clerk/clerk-react'
 import Preload from '@/src/preload.tsx'
 import {ProjectName, ProjectSafeName} from '@/lib'
 import BrowserCheck from '@/components/modal/browser-check.tsx'
-import {ChevronDownIcon} from "@heroicons/react/16/solid";
-import AppDropdownMenu from "@/components/layout/AppDropdownMenu.tsx";
 import Routes from "@/src/Routes.tsx";
 
 // Lazy load components
@@ -110,27 +98,6 @@ Thanks for being a crucial part of the internet.
                                             <div id="NGRoot"
                                                  className="h-full overflow-y-auto overflow-x-hidden">
                                                 <WaitlistCheck/>
-                                                <SignedOut>
-                                                    <div
-                                                        className="fixed w-full top-0 z-50 bg-sidebar px-4 border-b border-default">
-                                                        <Navbar>
-                                                            <Dropdown>
-                                                                <DropdownButton as={NavbarItem}
-                                                                                className="max-lg:hidden">
-                                                                    <div
-                                                                        className="rounded-sm w-6 h-6 border overflow-hidden bg-primary-cosmos flex justify-center items-center">
-                                                                        <Logo noStyle fullSize
-                                                                              className="w-4 h-4 invert"/>
-                                                                    </div>
-                                                                    <NavbarLabel>Packbase</NavbarLabel>
-                                                                    <ChevronDownIcon/>
-                                                                </DropdownButton>
-                                                                <AppDropdownMenu/>
-                                                            </Dropdown>
-                                                            <NavbarDivider/>
-                                                        </Navbar>
-                                                    </div>
-                                                </SignedOut>
 
                                                 <Routes/>
                                             </div>

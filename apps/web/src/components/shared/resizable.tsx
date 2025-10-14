@@ -2,7 +2,7 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, {useCallback, useEffect, useRef} from 'react'
 import cx from 'classnames'
 
 type ResizablePanelProps = {
@@ -20,14 +20,14 @@ type ResizablePanelProps = {
  * to resize horizontally between minWidth and maxWidth. State is controlled by the parent.
  */
 export function ResizablePanel({
-    children,
-    width,
-    onResize,
-    minWidth = 240,
-    maxWidth = 560,
-    className,
-    handleClassName,
-}: ResizablePanelProps) {
+                                   children,
+                                   width,
+                                   onResize,
+                                   minWidth = 240,
+                                   maxWidth = 560,
+                                   className,
+                                   handleClassName,
+                               }: ResizablePanelProps) {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const draggingRef = useRef(false)
 
@@ -70,7 +70,7 @@ export function ResizablePanel({
     }, [onMouseMove, stopDragging])
 
     return (
-        <div ref={containerRef} className={cx('relative h-full', className)} style={{ width }}>
+        <div ref={containerRef} className={cx('relative', className)} style={{width}}>
             {children}
             <div
                 onMouseDown={startDragging}

@@ -5,7 +5,6 @@
 import useWindowSize from '@/src/lib/hooks/use-window-size'
 import {
     Activity,
-    memo,
     MouseEvent as ReactMouseEvent,
     TouchEvent as ReactTouchEvent,
     useCallback,
@@ -14,7 +13,6 @@ import {
     useState
 } from 'react'
 import {Heading, Text} from '@/components/shared/text.tsx'
-import UserDropdown from '@/components/layout/user-dropdown'
 import Link from '@/components/shared/link.tsx'
 import {isVisible, useResourceStore} from '@/lib'
 import {Desktop, Tab, TabsLayout, useContentFrame} from '@/src/components'
@@ -22,8 +20,7 @@ import {useInterval, useLocalStorage} from 'usehooks-ts'
 import UserAvatar from '@/components/shared/user/avatar.tsx'
 import {InboxContent, UserMultipleAccounts} from '@/components/icons/plump'
 import InboxPage from '@/pages/inbox/page'
-
-const DropdownComponent = memo(UserDropdown, () => true)
+import {PlusIcon} from "@heroicons/react/16/solid";
 
 export default function UserSidebar() {
     const {
@@ -93,7 +90,7 @@ export default function UserSidebar() {
     return (
         <div
             ref={containerRef}
-            className={`h-screen relative transition-all bg-muted dark:bg-n-8 md:flex ${
+            className={`h-fill relative transition-all bg-muted dark:bg-n-8 md:flex ${
                 collapsed ? 'translate-x-full p-0 hidden' : 'p-1 z-10'
             } ${isResizing ? 'select-none cursor-col-resize !transition-none' : ''}`}
             style={{
@@ -140,9 +137,9 @@ export default function UserSidebar() {
 export function UserActionsContainer() {
     return (
         <>
-            {/* User avatar */}
+            {/* + New */}
             <div className="flex mr-2 items-center animate-scale-in">
-                <DropdownComponent/>
+                <PlusIcon className="h-5 w-5 text-muted-foreground dark:text-muted-foreground"/>
             </div>
         </>
     )

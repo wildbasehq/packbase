@@ -14,12 +14,14 @@ export interface DatabaseAdapter {
 }
 
 export class PrismaDatabaseAdapter implements DatabaseAdapter {
-    constructor(private prisma: any) {}
+    constructor(private prisma: any) {
+    }
 
     async updateSetting(table: string, column: string, value: any, whereCondition: Record<string, any>): Promise<void> {
+        console.log('updating', table, column, value, whereCondition);
         await this.prisma[table].update({
             where: whereCondition,
-            data: { [column]: value },
+            data: {[column]: value},
         });
     }
 
@@ -27,7 +29,7 @@ export class PrismaDatabaseAdapter implements DatabaseAdapter {
         console.log(table, column, whereCondition);
         const result = await this.prisma[table].findUnique({
             where: whereCondition,
-            select: { [column]: true },
+            select: {[column]: true},
         });
         if (column.endsWith('_at')) return result?.[column].toString();
         return result?.[column];

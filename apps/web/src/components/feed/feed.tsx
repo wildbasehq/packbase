@@ -8,23 +8,21 @@ import {useSession} from '@clerk/clerk-react'
 import {useResourceStore, useUIStore} from '@/lib/state'
 import {FeedProps} from './types/feed'
 import {FeedError, FeedList, FeedLoading, FeedMaintenance} from '.'
-import {useLocalStorage} from 'usehooks-ts'
 import {useFeedPagination} from './hooks/use-feed-pagination'
 import {useFeedQuery} from './hooks/use-feed-query'
 import {useFeedTitle} from './hooks/use-feed-title'
 import {useFeedHandlers} from './hooks/use-feed-handlers'
+import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
 
 export default function Feed({
                                  packID = '00000000-0000-0000-0000-000000000000',
                                  channelID,
                                  feedQueryOverride,
                                  titleOverride,
-                                 dontShowCompose,
                              }: FeedProps) {
     const {maintenance} = useUIStore()
     const {currentResource} = useResourceStore()
     const {isSignedIn} = useSession()
-    const [, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
 
     const {page, setPage} = useFeedPagination({packID, channelID})
 
@@ -53,11 +51,15 @@ export default function Feed({
     })
 
     useEffect(() => {
-        const shouldCollapseSidebar = dontShowCompose === true
-        if (shouldCollapseSidebar) {
-            setUserSidebarCollapsed(false)
+        const listener = PackbaseInstance.on('feed-reload', () => {
+            log.debug('Feed', 'Received feed-reload event')
+            handleComposeRefresh()
+        })
+
+        return () => {
+            listener()
         }
-    }, [dontShowCompose, setUserSidebarCollapsed])
+    }, [])
 
     if (maintenance) {
         return <FeedMaintenance message={maintenance}/>
@@ -68,11 +70,9 @@ export default function Feed({
     }
 
     const isFirstPageLoading = isLoading && page === 1
-    const shouldShowCompose = dontShowCompose !== true
 
     return (
         <div className="relative pb-20 max-w-3xl space-y-4 mx-auto">
-            {/*{shouldShowCompose && <FloatingCompose onShouldFeedRefresh={handleComposeRefresh}/>}*/}
 
             {isFirstPageLoading ? (
                 <FeedLoading isMasonry={false} message="Loading howls..."/>

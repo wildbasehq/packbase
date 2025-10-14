@@ -9,7 +9,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
     description?: string
     label?: string
     combined?: boolean
-    suffix?: string
+    prefix?: string
     button?: React.ReactNode
     rows?: number
     inputClassName?: string
@@ -22,7 +22,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
          type,
          id,
          description,
-         suffix,
+         prefix,
          button,
          autoComplete,
          label,
@@ -53,9 +53,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             'bg-default flex w-full focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600! sm:max-w-md'
                         )}
                     >
-                        {suffix && (
+                        {prefix && (
                             <span
-                                className="-mr-2.5 flex select-none items-center pl-3 text-muted-foreground sm:text-sm">{suffix}</span>
+                                className="-mr-2.5 flex select-none items-center whitespace-pre-wrap pl-3 text-muted-foreground sm:text-sm">{prefix}</span>
                         )}
                         <InputElement
                             // @ts-ignore

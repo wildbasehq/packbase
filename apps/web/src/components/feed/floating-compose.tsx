@@ -6,7 +6,7 @@
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
 import UserAvatar from '@/components/shared/user/avatar'
 import {Heading, Text} from '@/components/shared/text.tsx'
-import {Editor} from '@/src/components'
+import {Editor, Field, Label, Listbox, ListboxLabel, ListboxOption, Textarea} from '@/src/components'
 import {useParams} from 'wouter'
 import {Activity, ReactNode, useEffect, useRef, useState} from 'react'
 import {ArrowDownIcon, ChevronRightIcon} from '@heroicons/react/20/solid'
@@ -17,18 +17,14 @@ import ImageUploadStack, {type Image} from './image-placeholder-stack'
 import {motion} from 'motion/react'
 import {toast} from 'sonner'
 import ProgressBar from '../shared/progress-bar'
-import {AlignLeft} from '../icons/plump/AlignLeft'
-import {useLocalStorage} from 'usehooks-ts'
-import {UserActionsContainer} from '../layout/user-sidebar'
 import Tooltip from "@/components/shared/tooltip.tsx";
-import {Folder} from "lucide-react";
-import Link from "@/components/shared/link.tsx";
 import {useModal} from '@/components/modal/provider'
 import {Button} from '@/components/shared/button'
 import {ChatBubbleExclamation} from "@/components/icons/plump/chat-bubble-exclamation.tsx";
-import {Input} from "@/components/shared/input/text.tsx";
+import {HardDisk} from "@/components/icons/plump";
+import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
 
-export default function FloatingCompose({onShouldFeedRefresh}: { onShouldFeedRefresh?: () => Promise<void> }) {
+export default function FloatingCompose() {
     const {user} = useUserAccountStore()
     const {navigation} = useUIStore()
     const {currentResource} = useResourceStore()
@@ -40,12 +36,12 @@ export default function FloatingCompose({onShouldFeedRefresh}: { onShouldFeedRef
 
     const [channelName, setChannelName] = useState<string | null>(null)
     const [body, setBody] = useState<string>('')
-    const [visible, setVisible] = useState(true)
+    const [visible, setVisible] = useState(false)
     const [images, setImages] = useState<Image[]>([])
     const [uploading, setUploading] = useState<boolean>(false)
     const [uploadingTooLong, setUploadingTooLong] = useState<string | null>(null)
-    const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
     const [selectedTags, setSelectedTags] = useState<string>('')
+    const [selectedContentLabel, setSelectedContentLabel] = useState<string>('rating_safe')
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const floatingComposeRef = useRef<HTMLDivElement>(null)
@@ -123,9 +119,11 @@ export default function FloatingCompose({onShouldFeedRefresh}: { onShouldFeedRef
             body: string
             content_type: string
             assets?: any[]
+            tags?: string[]
         } = {
             body: body || null,
             content_type: 'markdown',
+            tags: [selectedContentLabel, ...selectedTags.split(',').map(t => t.trim()).filter(Boolean)],
         }
 
         // @ts-ignore
@@ -157,13 +155,14 @@ export default function FloatingCompose({onShouldFeedRefresh}: { onShouldFeedRef
                     setVisible(true)
                     toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'A network error happened...')
                 } else {
-                    onShouldFeedRefresh?.().then(() => {
-                        setUploading(false)
-                        setVisible(true)
-                        setBody('')
-                        setImages([])
-                        editorRef.current?.destroy()
-                    })
+                    PackbaseInstance.emit('feed-reload', {})
+                    setUploading(false)
+                    setVisible(true)
+                    setBody('')
+                    setImages([])
+                    setSelectedContentLabel('rating_safe')
+                    setSelectedTags('')
+                    editorRef.current?.destroy()
                 }
             })
             .catch(error => {
@@ -192,7 +191,7 @@ export default function FloatingCompose({onShouldFeedRefresh}: { onShouldFeedRef
                     'w-full flex bg-card flex-col border mx-auto',
                     visible ? 'rounded-b-3xl shadow-sm' : 'rounded-b-none border-b-0'
                 )}
-                initial={false}
+                initial={true}
                 animate={visible ? 'open' : 'closed'}
                 variants={{
                     open: {
@@ -224,10 +223,13 @@ export default function FloatingCompose({onShouldFeedRefresh}: { onShouldFeedRef
             >
                 {/* Top small bar */}
                 <div className="min-h-12 border-b flex items-center justify-between px-4">
-                    <Tooltip content="Hide" side="bottom">
-                        <Link className="bg-muted rounded-full w-7 h-7 p-1.5" href="/stuff">
-                            <Folder className="fill-muted-foreground w-full h-full"/>
-                        </Link>
+                    <Tooltip content="Manage storage" side="bottom">
+                        <div className="bg-muted rounded-full w-7 h-7 p-1.5 text-indigo-500" onClick={(e) => {
+                            e.stopPropagation()
+                            toast.error('"Your Stuff" is disabled by the instance owner.')
+                        }}>
+                            <HardDisk className="fill-muted-foreground w-full h-full"/>
+                        </div>
                     </Tooltip>
                     <div className="flex items-center gap-2">
                         <Activity mode={isVisible(!!channel)}>
@@ -246,9 +248,7 @@ export default function FloatingCompose({onShouldFeedRefresh}: { onShouldFeedRef
                         </Activity>
                     </div>
                     <div className="flex items-center justify-center gap-2">
-                        {userSidebarCollapsed && <UserActionsContainer/>}
-                        <AlignLeft className="w-7 h-7 fill-indigo-600"
-                                   onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)}/>
+
                     </div>
                 </div>
 
@@ -292,8 +292,10 @@ export default function FloatingCompose({onShouldFeedRefresh}: { onShouldFeedRef
                                 modal?.show(
                                     <PostSettingsModal
                                         selectedTags={selectedTags}
-                                        onClose={(tags) => {
+                                        selectedContentLabel={selectedContentLabel}
+                                        onClose={({tags, contentLabel}) => {
                                             setSelectedTags(tags)
+                                            setSelectedContentLabel(contentLabel)
                                             modal.hide()
                                         }}
                                     />
@@ -345,72 +347,18 @@ export default function FloatingCompose({onShouldFeedRefresh}: { onShouldFeedRef
 
 function PostSettingsModal({
                                selectedTags,
+                               selectedContentLabel,
                                onClose,
                            }: {
     selectedTags: string
-    onClose: (tags: string) => void
+    selectedContentLabel: string
+    onClose: (options: {
+        tags: string
+        contentLabel: string
+    }) => void
 }) {
     const [selectedTagsState, setSelectedTagsState] = useState<string>(selectedTags)
-    const [tagInput, setTagInput] = useState('')
-    const [poofAnimations, setPoofAnimations] = useState<Record<string, { x: number, y: number }>>({})
-    const [usePlainEditor, setUsePlainEditor] = useState<boolean>(false)
-    const inputRef = useRef<HTMLInputElement>(null)
-    const tagRefs = useRef<Record<string, HTMLDivElement | null>>({})
-
-    const addTag = (tag: string) => {
-        const tagsArray = selectedTagsState ? selectedTagsState.split(', ').filter(Boolean) : []
-        if (!tagsArray.includes(tag)) {
-            const newTags = [...tagsArray, tag].join(',')
-            setSelectedTagsState(newTags)
-        }
-        setTagInput('')
-    }
-
-    const removeTag = (tag: string) => {
-        // Get the position of the tag element
-        const tagElement = tagRefs.current[tag]
-        if (tagElement && tagElement.parentElement) {
-            const tagRect = tagElement.getBoundingClientRect()
-            const containerRect = tagElement.parentElement.getBoundingClientRect()
-
-            // Calculate position relative to container
-            const x = tagRect.left - containerRect.left
-            const y = tagRect.top - containerRect.top
-
-            setPoofAnimations(prev => ({
-                ...prev,
-                [tag]: {x, y}
-            }))
-        }
-
-        // Remove the tag immediately
-        const tagsArray = selectedTagsState.split(', ').filter(Boolean)
-        const newTags = tagsArray.filter(t => t !== tag).join(',')
-        setSelectedTagsState(newTags)
-
-        // Remove poof animation after ~1 second
-        setTimeout(() => {
-            setPoofAnimations(prev => {
-                const newState = {...prev}
-                delete newState[tag]
-                return newState
-            })
-        }, 1000)
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (['Enter', ',', 'Tab'].includes(e.key) && tagInput.trim()) {
-            e.preventDefault()
-            if (tagInput.trim()) {
-                addTag(tagInput.trim())
-            }
-        } else if (e.key === 'Backspace' && !tagInput && selectedTagsState) {
-            const tagsArray = selectedTagsState.split(',').filter(Boolean)
-            if (tagsArray.length > 0) {
-                removeTag(tagsArray[tagsArray.length - 1])
-            }
-        }
-    }
+    const [selectedContentLabelState, setSelectedContentLabelState] = useState<string>(selectedContentLabel)
 
     return (
         <div className="p-6 max-w-lg w-full">
@@ -422,88 +370,306 @@ function PostSettingsModal({
 
             <div className="space-y-4">
                 <div>
-                    <Text size="sm" className="mb-2 font-medium">
+                    <Text size="sm" className="mb-2">
                         Tags
                     </Text>
                     <Text size="xs" alt className="mb-2">
                         These tags help others find or filter your howl. Press enter to add a tag, or press backspace to
                         remove the last tag.
                     </Text>
-                    <div className="relative">
-                        <Activity mode={isVisible(usePlainEditor)}>
-                            <Input type="text"
-                                   value={selectedTagsState}
-                                   onChange={e => setSelectedTagsState(e.target.value)}
-                                // onKeyDown={handleKeyDown}
-                                   placeholder={!selectedTagsState ? 'Add tags...' : ''}
-                                   className="w-full"
-                            />
-                        </Activity>
 
-                        <Activity mode={isVisible(!usePlainEditor)}>
-                            <div
-                                className="flex flex-wrap gap-2 p-2 border rounded-xl bg-background min-h-[2.5rem] items-center relative">
-                                {selectedTagsState.split(',').filter(Boolean).map(tag => (
-                                    <div
-                                        key={tag}
-                                        // @ts-ignore
-                                        ref={el => tagRefs.current[tag] = el}
-                                        className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-md text-sm"
-                                    >
-                                        <span>{tag}</span>
-                                        <button
-                                            onClick={() => removeTag(tag)}
-                                            className="hover:text-primary/70"
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                ))}
-
-                                {/* Render poof animations on top */}
-                                {Object.entries(poofAnimations).map(([tag, pos]) => (
-                                    <div
-                                        key={`poof-${tag}`}
-                                        className="poof absolute"
-                                        style={{
-                                            left: `${pos.x}px`,
-                                            top: `${pos.y + 14}px`,
-                                            width: '32px',
-                                            height: '18px'
-                                        }}
-                                    />
-                                ))}
-
-                                <input
-                                    ref={inputRef}
-                                    type="text"
-                                    value={tagInput}
-                                    onChange={e => {
-                                        setTagInput(e.target.value)
-                                    }}
-                                    onKeyDown={handleKeyDown}
-                                    placeholder={!selectedTagsState ? 'Add tags...' : ''}
-                                    className="flex-1 outline-none bg-transparent min-w-[100px] text-sm"
-                                />
-                            </div>
-                        </Activity>
-
-                        <Button plain className="h-6 !px-2 !py-1 rounded-sm !text-xs !text-muted-foreground"
-                                onClick={() => setUsePlainEditor(!usePlainEditor)}>
-                            Plain Editor &rarr;
-                        </Button>
-                    </div>
+                    <TagsInput
+                        forcedTag={selectedContentLabelState}
+                        value={selectedTagsState}
+                        onChange={setSelectedTagsState}
+                    />
                 </div>
+
+                <ContentLabelInput
+                    value={selectedContentLabelState}
+                    onChange={setSelectedContentLabelState}
+                />
 
                 <div className="flex justify-end gap-2 pt-4">
                     <Button onClick={() => {
-                        onClose(selectedTagsState)
+                        onClose({
+                            tags: selectedTagsState,
+                            contentLabel: selectedContentLabelState
+                        })
                     }}>
                         Done
                     </Button>
                 </div>
             </div>
         </div>
+    )
+}
+
+function TagsInput({
+                       forcedTag,
+                       value,
+                       onChange
+                   }: {
+    forcedTag: string
+    value: string
+    onChange: (v: string) => void
+}) {
+    const [usePlainEditor, setUsePlainEditor] = useState<boolean>(false)
+    const [tagInput, setTagInput] = useState('')
+    const [poofAnimations, setPoofAnimations] = useState<Record<string, { x: number, y: number }>>({})
+    const inputRef = useRef<HTMLInputElement>(null)
+    const tagRefs = useRef<Record<string, HTMLDivElement | null>>({})
+    const tagInputUndo = useRef<string[]>([])
+    const tagInputRedo = useRef<string[]>([])
+
+    // Shared sanitization: lowercase, allowed chars only, ensure ", " after commas,
+    // convert spaces to underscores except immediately after commas.
+    const sanitizeListText = (val: string) => {
+        let s = (val || '').toLowerCase()
+        s = s.replace(/[^a-z0-9_, ]+/g, '')
+        s = s.replace(/,\s*/g, ', ')
+        s = s.replace(/ /g, '_').replace(/,_/g, ', ')
+        s = s.replace(/_+/g, '_')
+        s = s.replace(/(?:,\s)+/g, ', ')
+        return s
+    }
+
+    // Single tag sanitization: same rules, but commas are separators; strip them from a single tag.
+    const sanitizeSingleTag = (val: string) => {
+        return sanitizeListText(val).replace(/,/g, '')
+    }
+
+    // Backspace handler: if deleting the space after a comma, remove the comma too.
+    const handleBackspaceCommaSpace = (
+        e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
+        currentValue: string,
+        setter: (v: string) => void
+    ) => {
+        if (e.key !== 'Backspace') return
+        const target = e.currentTarget
+        const pos = target.selectionStart ?? 0
+        if (pos <= 0) return
+
+        const before = currentValue.slice(0, pos)
+        if (before.endsWith(' ') && before.length >= 2 && before[before.length - 2] === ',') {
+            e.preventDefault()
+            const newValue = before.slice(0, -2) + currentValue.slice(pos)
+            const sanitized = sanitizeListText(newValue)
+            setter(sanitized)
+            requestAnimationFrame(() => {
+                try {
+                    const newCaret = (before.length - 2)
+                    target.setSelectionRange(newCaret, newCaret)
+                } catch (e) {
+                    console.error('Failed to set selection range after backspace', e)
+                }
+            })
+        }
+    }
+
+    const addTag = (tag: string) => {
+        const cleaned = sanitizeSingleTag(tag).trim()
+        if (!cleaned) {
+            setTagInput('')
+            return
+        }
+        const tagsArray = value ? value.split(', ').filter(Boolean) : []
+        if (!tagsArray.includes(cleaned)) {
+            const newTags = [...tagsArray, cleaned].join(', ')
+            onChange(newTags)
+        }
+        if (tagInput) {
+            tagInputUndo.current.push(tagInput)
+            tagInputRedo.current = []
+        }
+        setTagInput('')
+    }
+
+    const removeTag = (tag: string) => {
+        const tagElement = tagRefs.current[tag]
+        if (tagElement && tagElement.parentElement) {
+            const tagRect = tagElement.getBoundingClientRect()
+            const containerRect = tagElement.parentElement.getBoundingClientRect()
+            const x = tagRect.left - containerRect.left
+            const y = tagRect.top - containerRect.top
+            setPoofAnimations(prev => ({
+                ...prev,
+                [tag]: {x, y}
+            }))
+        }
+
+        const tagsArray = (value || '').split(', ').filter(Boolean)
+        const newTags = tagsArray.filter(t => t !== tag).join(', ')
+        onChange(newTags)
+
+        setTimeout(() => {
+            setPoofAnimations(prev => {
+                const newState = {...prev}
+                delete newState[tag]
+                return newState
+            })
+        }, 1000)
+    }
+
+    const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+            e.preventDefault()
+            if (e.shiftKey) {
+                const redoVal = tagInputRedo.current.pop()
+                if (redoVal !== undefined) {
+                    tagInputUndo.current.push(tagInput)
+                    setTagInput(redoVal)
+                }
+            } else {
+                const undoVal = tagInputUndo.current.pop()
+                if (undoVal !== undefined) {
+                    tagInputRedo.current.push(tagInput)
+                    setTagInput(undoVal)
+                }
+            }
+            return
+        }
+
+        if (['Enter', ',', 'Tab'].includes(e.key) && tagInput.trim()) {
+            e.preventDefault()
+            addTag(tagInput.trim())
+            return
+        }
+        if (e.key === 'Backspace' && !tagInput && value) {
+            const tagsArray = value.split(', ').filter(Boolean)
+            if (tagsArray.length > 0) {
+                removeTag(tagsArray[tagsArray.length - 1])
+            }
+            return
+        }
+        handleBackspaceCommaSpace(e, tagInput, setTagInput)
+    }
+
+    return (
+        <div className="relative">
+            <Activity mode={isVisible(usePlainEditor)}>
+                <Textarea
+                    rows={6}
+                    value={value}
+                    onChange={e => {
+                        const sanitized = sanitizeListText(e.target.value)
+                        onChange(sanitized)
+                    }}
+                    onKeyDown={e => handleBackspaceCommaSpace(e, value, onChange)}
+                    placeholder={value ? '' : 'Add tags...'}
+                    className="w-full"
+                />
+            </Activity>
+
+            <Activity mode={isVisible(!usePlainEditor)}>
+                <div
+                    className="flex flex-wrap gap-2 p-2 border rounded-xl bg-background min-h-[2.5rem] items-center relative">
+                    <Tooltip content="System tags are forced and cannot be removed." delayDuration={0}>
+                        <div
+                            className="flex items-center gap-1 bg-destructive/10 text-destructive px-2 py-1 rounded-md text-sm"
+                        >
+                            <HardDisk className="w-4 h-4 mr-1"/>
+                            <span>{forcedTag || 'rating_safe'}</span>
+                        </div>
+                    </Tooltip>
+
+                    {(value || '').split(', ').filter(Boolean).map(tag => (
+                        <div
+                            key={tag}
+                            // @ts-ignore
+                            ref={el => tagRefs.current[tag] = el}
+                            className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-md text-sm"
+                        >
+                            <span>{tag}</span>
+                            <button
+                                onClick={() => removeTag(tag)}
+                                className="hover:text-primary/70"
+                            >
+                                ×
+                            </button>
+                        </div>
+                    ))}
+
+                    {Object.entries(poofAnimations).map(([tag, pos]) => (
+                        <div
+                            key={`poof-${tag}`}
+                            className="poof absolute"
+                            style={{
+                                left: `${pos.x}px`,
+                                top: `${pos.y + 14}px`,
+                                width: '32px',
+                                height: '18px'
+                            }}
+                        />
+                    ))}
+
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={tagInput}
+                        onChange={e => {
+                            const sanitized = sanitizeSingleTag(e.target.value)
+                            setTagInput(prev => {
+                                if (prev !== sanitized) {
+                                    tagInputUndo.current.push(prev)
+                                    tagInputRedo.current = []
+                                }
+                                return sanitized
+                            })
+                        }}
+                        onKeyDown={handleTagInputKeyDown}
+                        placeholder={value ? '' : 'Add tags...'}
+                        className="flex-1 outline-none bg-transparent min-w-[100px] text-sm"
+                    />
+                </div>
+            </Activity>
+
+            <Button plain className="h-6 !px-2 !py-1 rounded-sm !text-xs !text-muted-foreground"
+                    onClick={() => setUsePlainEditor(!usePlainEditor)}>
+                Switch to {usePlainEditor ? 'Rich Editor' : 'Plain Editor'} &rarr;
+            </Button>
+        </div>
+    )
+}
+
+function ContentLabelInput({
+                               value,
+                               onChange
+                           }: {
+    value: string
+    onChange: (v: string) => void
+}) {
+    const options = [
+        {
+            label: 'R18 - NSFW',
+            value: 'rating_explicit'
+        },
+        {
+            label: 'R18 - Suggestive',
+            value: 'rating_suggestive'
+        },
+        {
+            label: 'MA16 - Mature',
+            value: 'rating_mature'
+        },
+        {
+            label: 'G, PG, M - SFW',
+            value: 'rating_safe'
+        }
+    ]
+    return (
+        <Field>
+            <Label>Content Label</Label>
+            <Listbox name="Rating"
+                     defaultValue={options.find(option => option.value === (value.length ? value : 'rating_safe'))?.value || options[options.length - 1]}
+                     onChange={onChange}>
+                {options.map(option => (
+                    <ListboxOption value={option.value}>
+                        <ListboxLabel>{option.label}</ListboxLabel>
+                    </ListboxOption>
+                ))}
+            </Listbox>
+        </Field>
     )
 }
 

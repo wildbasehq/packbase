@@ -3,43 +3,59 @@
  */
 
 import * as Headless from '@headlessui/react'
-import React, {Activity, useEffect, useState} from 'react'
+import React, {Activity, useState} from 'react'
 import {useResourceStore} from '@/lib/state'
-import {NavbarItem} from '@/components/layout'
-import PackSwitcher from '@/components/layout/resource/pack-switcher.tsx'
+import {Navbar, NavbarDivider, NavbarItem, NavbarLabel, NavbarSection, NavbarSpacer} from '@/components/layout'
 import UserSidebar, {UserActionsContainer} from '@/components/layout/user-sidebar.tsx'
-import cx from 'classnames'
 import {useSidebar} from '@/lib/context/sidebar-context'
 import ResourceSettings from '@/components/layout/resource'
 import {
+    Badge,
+    Button,
     Dropdown,
     DropdownButton,
     DropdownItem,
     DropdownMenu,
     FloatingCompose,
+    Heading,
+    Logo,
     Sidebar,
     SidebarBody,
     SidebarDivider,
     SidebarFooter,
     SidebarHeading,
-    SidebarItem,
     SidebarLabel,
-    SidebarSection,
     SidebarSpacer,
 } from '@/src/components'
 import {QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
-import {FaceSmileIcon} from '@heroicons/react/16/solid'
+import {ChevronDownIcon, FaceSmileIcon} from '@heroicons/react/16/solid'
 import {SiDiscord} from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 import {useSession} from '@clerk/clerk-react'
-import {cn, isVisible} from '@/lib'
+import {isVisible, WorkerSpinner} from '@/lib'
 import useWindowSize from '@/lib/hooks/use-window-size.ts'
 import ResizablePanel from '@/components/shared/resizable'
 import {News} from '../ui/sidebar-news'
 import {useLocation} from "wouter";
-import {motion} from "motion/react"
-import YourStuffPage from "@/pages/stuff/page.tsx";
-import {navigate} from "wouter/use-browser-location";
+import AppDropdownMenu from "@/components/layout/AppDropdownMenu.tsx";
+import TextTicker from "@/components/shared/text-ticker.tsx";
+import {useLocalStorage} from "usehooks-ts";
+import {Text} from "@/components/shared/text.tsx";
+import UserDropdown from "@/components/layout/user-dropdown";
+import {AlignLeft} from "@/components/icons/plump/AlignLeft.tsx";
+
+const NavbarItems = [
+    {
+        label: 'Home',
+        currentHref: '/p/universe',
+        href: '/'
+    },
+    {
+        label: 'Badges',
+        limitedEvent: true,
+        href: '/store'
+    }
+]
 
 function OpenMenuIcon() {
     return (
@@ -90,93 +106,143 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     const {sidebarContent} = useSidebar()
     const {isMobile} = useWindowSize()
     const [location] = useLocation()
-    const isStuffPage = location.startsWith('/stuff')
-
-    // Keeps track of the last non-stuff page we were on, so we can navigate back to it
-    // @TODO Store this elsewhere so it doesn't cause a re-render?
-    const [lastNonStuffPage, setLastNonStuffPage] = useState<any>(null)
-
-    useEffect(() => {
-        if (!isStuffPage) {
-            setLastNonStuffPage(location)
-        }
-    }, [location])
+    const [seenPackTour, setSeenPackTour] = useLocalStorage('seen-pack-tour', false)
+    const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
 
     return (
-        <div className="w-full isolate min-h-svh max-lg:flex-col bg-muted dark:bg-n-8">
-            <div className="relative flex">
+        <div className="relative isolate flex min-h-svh w-full flex-col bg-muted dark:bg-n-8">
+            <Activity mode={isVisible(!seenPackTour)}>
+                {/* Floating callout for Packs feature */}
+                <div className="pointer-events-none fixed inset-0 z-50 flex items-start justify-start">
+                    <div className="relative mt-16 ml-6 max-w-sm pointer-events-auto">
+                        {/* Pointer triangle */}
+                        <div
+                            className="absolute -top-2 left-8 h-0 w-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white dark:border-b-zinc-900"/>
+
+                        {/* Card */}
+                        <div
+                            className="rounded-lg border bg-card p-4 shadow-xl">
+                            <Heading>Packs live up here!</Heading>
+                            <Text>
+                                All your packs, pack creation, settings, and other pack-specific actions have moved into
+                                the header.
+                            </Text>
+                            <div className="mt-3 flex gap-2">
+                                <Button onClick={() => setSeenPackTour(true)}>
+                                    Got it
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Activity>
+
+            {/* Content */}
+            <div
+                className="min-w-0 bg-sidebar px-4 border-b border-default">
+                <Navbar>
+                    <Dropdown>
+                        <DropdownButton as={NavbarItem}
+                                        className="max-lg:hidden flex w-2xs h-8 [&>*]:w-full">
+                            <div
+                                data-slot="avatar"
+                                className="rounded-sm w-6 h-6 border overflow-hidden bg-primary-cosmos flex justify-center items-center">
+                                <Logo noStyle fullSize
+                                      className="w-4 h-4 invert"/>
+                            </div>
+                            <div className="flex flex-col -space-y-1 relative">
+                                <NavbarLabel>Packbase</NavbarLabel>
+                                <NavbarLabel className="text-muted-foreground text-xs">
+                                    <TextTicker
+                                        texts={['CommInt ticker 1', 'CommInt ticker two', 'long interaction that should cut off']}
+                                        interval={5000}/>
+                                </NavbarLabel>
+                            </div>
+                            <ChevronDownIcon/>
+                        </DropdownButton>
+                        <AppDropdownMenu/>
+                    </Dropdown>
+                    <NavbarDivider/>
+                    <NavbarSection className="max-lg:hidden">
+                        {NavbarItems.map((item) => (
+                            <NavbarItem href={item.href} current={location.startsWith(item.currentHref || item.href)}
+                                        key={item.href}>
+                                {item.label}
+                                {item.limitedEvent && <Badge className="!py-0" color="indigo">Limited</Badge>}
+                            </NavbarItem>
+                        ))}
+                    </NavbarSection>
+                    <NavbarSpacer/>
+
+                    <WorkerSpinner/>
+
+                    <NavbarSection>
+                        <Dropdown>
+                            <DropdownButton as={NavbarItem}>
+                                <QuestionMarkCircleIcon/>
+                                <SidebarLabel>Help</SidebarLabel>
+                            </DropdownButton>
+                            <DropdownMenu anchor="top">
+                                <DropdownItem href="https://work.wildbase.xyz/maniphest/query/all/"
+                                              target="_blank">
+                                    <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                    <SidebarLabel>Feedback</SidebarLabel>
+                                </DropdownItem>
+                                <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
+                                    <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                    <SidebarLabel>Discord</SidebarLabel>
+                                </DropdownItem>
+                                <DropdownItem href="https://wildbase.xyz/" target="_blank">
+                                    <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                    <SidebarLabel>Wildbase</SidebarLabel>
+                                </DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+                        <NavbarItem href="https://blog.packbase.app" target="_blank">
+                            <SparklesIcon/>
+                            <NavbarLabel>Blog</NavbarLabel>
+                        </NavbarItem>
+                    </NavbarSection>
+
+                    <AlignLeft className="w-7 h-7 fill-indigo-600"
+                               onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)}/>
+                    <UserDropdown/>
+                </Navbar>
+            </div>
+
+            {/* Navbar on mobile */}
+            <header className="flex items-center px-4 gap-4 lg:hidden z-10">
+                <div className="py-2.5">
+                    <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
+                        <OpenMenuIcon/>
+                    </NavbarItem>
+                </div>
+                <div className="flex gap-4 w-full">
+                    <UserActionsContainer/>
+                </div>
+            </header>
+
+            {/* Content */}
+            <main className="flex flex-1 pb-2 lg:px-2">
                 {/* Sidebar on mobile */}
                 <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
                     <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                 </MobileSidebar>
 
-                {/* Content */}
-                <div className="flex flex-col flex-1 relative">
-                    {/* Navbar on mobile */}
-                    <header className="flex items-center px-4 gap-4 lg:hidden z-10">
-                        <div className="py-2.5">
-                            <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
-                                <OpenMenuIcon/>
-                            </NavbarItem>
-                        </div>
-                        <div className="flex gap-4 w-full">
-                            <UserActionsContainer/>
-                        </div>
-                    </header>
-                    {isStuffPage && <YourStuffPage/>}
-                    <main className="lg:min-w-0 flex">
-                        {isSignedIn && (
-                            <div className={cn('w-fit max-lg:hidden flex h-full')}>
-                                <PackSwitcher/>
-                            </div>
-                        )}
-                        <motion.main
-                            // key={isStuffPage ? 'settings' : 'default'}
-                            className={`relative h-screen flex overflow-hidden grow lg:bg-white dark:lg:bg-n-8 ${isStuffPage ? '!z-10 cursor-pointer ring-1 ring-default rounded-2xl' : 'z-0'}`}
-                            onClick={() => {
-                                if (isStuffPage) navigate(lastNonStuffPage ?? '/')
-                            }}
-                            initial={false}
-                            animate="animate"
-                            transition={{
-                                type: 'spring',
-                                stiffness: 600,
-                                damping: 40,
-                                mass: 1,
-                                bounce: 0,
-                            }}
-                            custom={{isStuffPage}}
-                            variants={{
-                                initial: {
-                                    y: 0,
-                                    filter: 'blur(0px)',
-                                    opacity: 1,
-                                },
-                                animate: ({isStuffPage}) => ({
-                                    y: isStuffPage ? '80%' : 0,
-                                    filter: isStuffPage ? 'blur(2px)' : 'blur(0px)',
-                                    // opacity: isSettingsPage ? 0.5 : 1,
-                                }),
-                            }}
-                        >
-                            {isSignedIn && !isMobile && (
-                                // Sidebar content for desktop
-                                <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
-                            )}
+                {isSignedIn && !isMobile && (
+                    // Sidebar content for desktop
+                    <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
+                )}
 
-                            {/* Content */}
-                            <div className={cx('relative mx-auto w-full overflow-hidden h-full z-30')}>
-                                <div className="max-w-3xl mx-auto absolute left-0 right-0 top-0">
-                                    <FloatingCompose onShouldFeedRefresh={async () => {
-                                    }}/>
-                                </div>
-                                {children}
-                            </div>
-                        </motion.main>
-                    </main>
+                <div
+                    className="relative overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
+                    <div className="max-w-3xl mx-auto absolute left-0 right-0 top-0">
+                        <FloatingCompose/>
+                    </div>
+                    <div className="mx-auto h-full max-w-6xl">{children}</div>
                 </div>
                 {isSignedIn && <UserSidebar/>}
-            </div>
+            </main>
         </div>
     )
 }
@@ -189,7 +255,7 @@ function SidebarContentContainer({children}: { children: React.ReactNode }) {
     return (
         <Activity mode={isVisible(!!children)}>
             <ResizablePanel
-                className="relative top-0 border-r h-full flex z-30"
+                className="h-fill inset-y-0 max-lg:hidden flex z-30"
                 width={sidebarWidth}
                 onResize={setSidebarWidth}
                 minWidth={240}
@@ -211,33 +277,6 @@ function SidebarContentContainer({children}: { children: React.ReactNode }) {
                             {children}
                             <SidebarSpacer/>
                             <SidebarDivider/>
-                            <SidebarSection>
-                                <Dropdown>
-                                    <DropdownButton as={SidebarItem}>
-                                        <QuestionMarkCircleIcon/>
-                                        <SidebarLabel>Help</SidebarLabel>
-                                    </DropdownButton>
-                                    <DropdownMenu anchor="top">
-                                        <DropdownItem href="https://work.wildbase.xyz/maniphest/query/all/"
-                                                      target="_blank">
-                                            <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                            <SidebarLabel>Feedback</SidebarLabel>
-                                        </DropdownItem>
-                                        <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
-                                            <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                            <SidebarLabel>Discord</SidebarLabel>
-                                        </DropdownItem>
-                                        <DropdownItem href="https://wildbase.xyz/" target="_blank">
-                                            <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                            <SidebarLabel>Wildbase</SidebarLabel>
-                                        </DropdownItem>
-                                    </DropdownMenu>
-                                </Dropdown>
-                                <SidebarItem href="https://blog.packbase.app" target="_blank">
-                                    <SparklesIcon/>
-                                    <SidebarLabel external>Blog</SidebarLabel>
-                                </SidebarItem>
-                            </SidebarSection>
                         </SidebarBody>
 
                         <SidebarFooter

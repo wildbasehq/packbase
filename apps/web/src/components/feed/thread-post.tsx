@@ -15,7 +15,7 @@ import {MediaGallery} from '.'
 import {UserProfileBasic} from '@/lib/defs/user'
 import {formatRelativeTime} from '@/lib/utils/date'
 import {Text} from '@/components/shared/text.tsx'
-import {AvatarButton, FeedPostData, LoadingCircle} from '@/src/components'
+import {AvatarButton, Badge, FeedPostData, LoadingCircle} from '@/src/components'
 import {Button} from '@/components/shared'
 import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak.tsx'
 import Card from '@/components/shared/card.tsx'
@@ -167,6 +167,18 @@ export default function ThreadPost({
                         {/* Post body */}
                         <div className="whitespace-normal break-words">
                             <Markdown>{post.body}</Markdown>
+                        </div>
+
+                        {/* tag debug */}
+                        <div className="mt-3 flex flex-wrap gap-1">
+                            <Text className="!text-[0.75rem]" alt>
+                                (debug) Tags:
+                            </Text>
+                            {post.tags?.map((tag) => (
+                                <Badge>
+                                    {tag}
+                                </Badge>
+                            ))}
                         </div>
 
                         {/* Media */}
