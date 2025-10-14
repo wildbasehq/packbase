@@ -1,12 +1,14 @@
 import {Settings} from "@/lib/settings";
 import {t} from "elysia";
 import {YapockType} from '@/index';
+import requiresToken from "@/utils/identity/requires-token";
 
 
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({user}) => {
+        async ({set, user}) => {
+            requiresToken({set, user});
             const settings = new Settings();
             const userObj = await prisma.profiles.findUnique({
                 where: {

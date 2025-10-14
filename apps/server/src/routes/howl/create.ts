@@ -73,7 +73,7 @@ export default (app: YapockType) =>
              * underscore and brackets). If brackets are used, they must be closed and only appear once.
              */
             let sanitisedTags: string[] = []
-            const tagHasRating = tags?.some((tag) => ['rating_safe', 'rating_mature', 'rating_suggestive', 'rating_nsfw'].indexOf(tag) > -1);
+            const tagHasRating = tags?.some((tag) => ['rating_safe', 'rating_mature', 'rating_suggestive', 'rating_mature'].indexOf(tag) > -1);
             if (tags && tagHasRating) {
                 try {
                     sanitisedTags = sanitizeTags(tags);
@@ -83,7 +83,7 @@ export default (app: YapockType) =>
                 }
 
                 // Check if only one rating tag is present
-                const tagOnlyHasOneRating = sanitisedTags.filter((tag) => ['rating_safe', 'rating_mature', 'rating_suggestive', 'rating_nsfw'].indexOf(tag) > -1).length === 1;
+                const tagOnlyHasOneRating = sanitisedTags.filter((tag) => ['rating_safe', 'rating_mature', 'rating_suggestive', 'rating_explicit'].indexOf(tag) > -1).length === 1;
 
                 if (!tagOnlyHasOneRating) {
                     set.status = 400;

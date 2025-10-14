@@ -29,7 +29,7 @@ export default async function verifyToken(req: any) {
     try {
         const shadowReq = req.clone();
         const authReq = await clerkClient.authenticateRequest(shadowReq, {
-            authorizedParties: ['https://packbase.app', 'http://localhost:5173', 'http://localhost:8000', 'http://localhost:5933'],
+            authorizedParties: ['https://packbase.app', 'http://localhost:5173', 'http://localhost:8000', 'http://localhost:5933', 'https://proto.packbase.app'],
         });
 
         if (authReq.isSignedIn) {
@@ -92,7 +92,7 @@ async function verifyTokenProcess(req: any) {
     try {
         const shadowReq = req.clone();
         const authReq = await clerkClient.authenticateRequest(shadowReq, {
-            authorizedParties: ['https://packbase.app', 'http://localhost:5173', 'http://localhost:8000', 'http://localhost:5933'],
+            authorizedParties: ['https://packbase.app', 'http://localhost:5173', 'http://localhost:8000', 'http://localhost:5933', 'https://proto.packbase.app'],
         });
 
         if (authReq.isSignedIn) {
