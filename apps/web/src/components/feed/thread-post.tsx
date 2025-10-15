@@ -177,7 +177,7 @@ export default function ThreadPost({
                                 className="flex justify-between items-center mt-2 text-xs rounded-md border border-amber-400/50 bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 px-3 py-2 text-sm">
                                 <div>
                                     <ExclamationTriangleIcon className="w-4 h-4 mr-1 inline-flex"/>
-                                    Heads up: This post contains content that may not be suitable for you.
+                                    Heads up: This post contains adult content that may not be suitable for you.
                                 </div>
                                 <Button color="amber" className="!py-1 !text-xs"
                                         onClick={() => setShowUnsavouryNotice(false)}>
