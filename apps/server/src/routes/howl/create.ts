@@ -73,7 +73,7 @@ export default (app: YapockType) =>
              * underscore and brackets). If brackets are used, they must be closed and only appear once.
              */
             let sanitisedTags: string[] = []
-            const tagHasRating = tags?.some((tag) => ['rating_safe', 'rating_mature', 'rating_suggestive', 'rating_mature'].indexOf(tag) > -1);
+            const tagHasRating = tags?.some((tag) => ['rating_safe', 'rating_mature', 'rating_suggestive', 'rating_explicit'].indexOf(tag) > -1);
             if (tags && tagHasRating) {
                 try {
                     sanitisedTags = sanitizeTags(tags);

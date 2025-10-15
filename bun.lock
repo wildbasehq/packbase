@@ -92,7 +92,7 @@
     },
     "apps/web": {
       "name": "packbase",
-      "version": "1000.472.0",
+      "version": "2000.1.0",
       "dependencies": {
         "@clerk/clerk-react": "^5.31.4",
         "@clerk/themes": "^2.2.46",
@@ -138,6 +138,7 @@
         "elysia": "^1.2.10",
         "eslint": "^8.31.0",
         "frimousse": "^0.3.0",
+        "fuse.js": "^7.1.0",
         "lucide-react": "^0.544.0",
         "monaco-editor": "^0.52.2",
         "monaco-html-linter": "^1.0.4",
@@ -1493,6 +1494,8 @@
     "fsevents": ["fsevents@2.3.3", "", { "os": "darwin" }, "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="],
 
     "function-bind": ["function-bind@1.1.2", "", {}, "sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA=="],
+
+    "fuse.js": ["fuse.js@7.1.0", "", {}, "sha512-trLf4SzuuUxfusZADLINj+dE8clK1frKdmqiJNb1Es75fmI5oY6X2mxLVUciLLjxqw/xr72Dhy+lER6dGd02FQ=="],
 
     "gensync": ["gensync@1.0.0-beta.2", "", {}, "sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg=="],
 

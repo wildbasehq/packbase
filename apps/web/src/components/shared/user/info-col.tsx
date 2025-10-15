@@ -35,51 +35,7 @@ export default function UserInfoCol({
                     sideOffset={5}
                     collisionPadding={{left: 32}}
                 >
-                    {user.images?.header && (
-                        <div className="pointer-events-none absolute right-0 top-0 h-full w-full">
-                            {/*<div className="absolute w-full h-full bg-card/90 rounded"/>*/}
-                            <img
-                                src={user.images?.header}
-                                width={1080}
-                                height={1080}
-                                className="h-full w-full rounded object-cover object-center opacity-10"
-                                alt="Cover image"
-                            />
-                        </div>
-                    )}
-
-                    <div className="z-50 flex flex-col gap-[7px]">
-                        <UserAvatar size="3xl" user={user}/>
-                        <div className="flex flex-col gap-4">
-                            <div>
-                                <div className="text-md">
-                                    {user.display_name || user.username}
-                                    {user.type && (
-                                        <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5"
-                                                         width={20} height={20}/>
-                                    )}
-                                    {user.badge && (
-                                        <BentoGenericUnlockableBadge
-                                            type={user.badge}
-                                            className="ml-1 inline-flex h-5 w-5"
-                                            width={20}
-                                            height={20}
-                                        />
-                                    )}
-                                </div>
-                                <div className="text-muted-foreground text-sm">@{user.username}</div>
-                            </div>
-                            <Markdown className="text-sm">{user.about?.bio}</Markdown>
-                            {user.mutuals && (
-                                <div className="flex gap-4">
-                                    <div className="flex gap-1">
-                                        <div className="text-sm font-medium">{user.mutuals}</div>
-                                        <div className="text-sm">Mutuals</div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                    <UserHoverCard user={user}/>
 
                     <HoverCard.Arrow className="fill-white"/>
                 </HoverCard.Content>
@@ -116,5 +72,57 @@ export function UserInfo({
                 </span>
             </div>
         </div>
+    )
+}
+
+export function UserHoverCard({user}: { user: any }) {
+    return (
+        <>
+            {user.images?.header && (
+                <div className="pointer-events-none absolute right-0 top-0 h-full w-full">
+                    {/*<div className="absolute w-full h-full bg-card/90 rounded"/>*/}
+                    <img
+                        src={user.images?.header}
+                        width={1080}
+                        height={1080}
+                        className="h-full w-full rounded object-cover object-center opacity-10"
+                        alt="Cover image"
+                    />
+                </div>
+            )}
+
+            <div className="z-50 flex flex-col gap-[7px]">
+                <UserAvatar size="3xl" user={user}/>
+                <div className="flex flex-col gap-4">
+                    <div>
+                        <div className="text-md">
+                            {user.display_name || user.username}
+                            {user.type && (
+                                <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5"
+                                                 width={20} height={20}/>
+                            )}
+                            {user.badge && (
+                                <BentoGenericUnlockableBadge
+                                    type={user.badge}
+                                    className="ml-1 inline-flex h-5 w-5"
+                                    width={20}
+                                    height={20}
+                                />
+                            )}
+                        </div>
+                        <div className="text-muted-foreground text-sm">@{user.username}</div>
+                    </div>
+                    <Markdown className="text-sm">{user.about?.bio}</Markdown>
+                    {user.mutuals && (
+                        <div className="flex gap-4">
+                            <div className="flex gap-1">
+                                <div className="text-sm font-medium">{user.mutuals}</div>
+                                <div className="text-sm">Mutuals</div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </>
     )
 }

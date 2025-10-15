@@ -13,6 +13,7 @@ import Preload from '@/src/preload.tsx'
 import {ProjectName, ProjectSafeName} from '@/lib'
 import BrowserCheck from '@/components/modal/browser-check.tsx'
 import Routes from "@/src/Routes.tsx";
+import CommandPalette from "@/components/modal/command-palette.tsx";
 
 // Lazy load components
 const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
@@ -74,6 +75,7 @@ Thanks for being a crucial part of the internet.
         <Providers>
             {/* Browser check */}
             <BrowserCheck/>
+            <CommandPalette/>
 
             <SidebarProvider>
                 <div className="absolute bottom-0 left-0 z-40 w-full sm:hidden">
