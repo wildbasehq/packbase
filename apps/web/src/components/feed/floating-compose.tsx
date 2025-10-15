@@ -9,7 +9,7 @@ import {Heading, Text} from '@/components/shared/text.tsx'
 import {Editor, Field, Label, Listbox, ListboxLabel, ListboxOption, Textarea} from '@/src/components'
 import {useParams} from 'wouter'
 import {Activity, ReactNode, useEffect, useRef, useState} from 'react'
-import {ArrowDownIcon, ChevronRightIcon} from '@heroicons/react/20/solid'
+import {ArrowDownIcon, ChevronRightIcon, QuestionMarkCircleIcon} from '@heroicons/react/20/solid'
 import {HashtagIcon} from '@heroicons/react/16/solid'
 import {cn, isVisible, vg} from '@/src/lib'
 import {Camera} from '../icons/plump/Camera'
@@ -417,10 +417,96 @@ function TagsInput({
     const [usePlainEditor, setUsePlainEditor] = useState<boolean>(false)
     const [tagInput, setTagInput] = useState('')
     const [poofAnimations, setPoofAnimations] = useState<Record<string, { x: number, y: number }>>({})
+    const [tagValidation, setTagValidation] = useState<Record<string, boolean>>({})
+    const [tagSuggestions, setTagSuggestions] = useState<Record<string, string>>({})
     const inputRef = useRef<HTMLInputElement>(null)
     const tagRefs = useRef<Record<string, HTMLDivElement | null>>({})
     const tagInputUndo = useRef<string[]>([])
     const tagInputRedo = useRef<string[]>([])
+
+    const getLevenshteinDistance = (a: string, b: string): number => {
+        const matrix: number[][] = []
+
+        for (let i = 0; i <= b.length; i++) {
+            matrix[i] = [i]
+        }
+
+        for (let j = 0; j <= a.length; j++) {
+            matrix[0][j] = j
+        }
+
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1]
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    )
+                }
+            }
+        }
+
+        return matrix[b.length][a.length]
+    }
+
+    const findClosestTag = async (invalidTag: string): Promise<string | null> => {
+        try {
+            const response = await vg.tags.get()
+            const allTags = Array.isArray(response.data) ? response.data : []
+
+            if (allTags.length === 0) return null
+
+            let closestTag = allTags[0]
+            let minDistance = getLevenshteinDistance(invalidTag, closestTag)
+
+            for (const tag of allTags) {
+                const distance = getLevenshteinDistance(invalidTag, tag)
+                if (distance < minDistance) {
+                    minDistance = distance
+                    closestTag = tag
+                }
+            }
+
+            // Only suggest if the distance is reasonable (not too different)
+            return minDistance <= Math.max(3, invalidTag.length / 2) ? closestTag : null
+        } catch (error) {
+            console.error('Error finding closest tag:', error)
+            return null
+        }
+    }
+
+    useEffect(() => {
+        const validateTags = async () => {
+            const tags = (value || '').split(', ').filter(Boolean)
+            const validationResults: Record<string, boolean> = {}
+            const suggestions: Record<string, string> = {}
+
+            for (const tag of tags) {
+                const isValid = await getTagValid(tag)
+                validationResults[tag] = isValid
+
+                if (!isValid) {
+                    const suggestion = await findClosestTag(tag)
+                    if (suggestion) {
+                        suggestions[tag] = suggestion
+                    }
+                }
+            }
+
+            setTagValidation(validationResults)
+            setTagSuggestions(suggestions)
+        }
+
+        if (value) {
+            validateTags()
+        } else {
+            setTagValidation({})
+            setTagSuggestions({})
+        }
+    }, [value])
 
     // Shared sanitization: lowercase, allowed chars only, ensure ", " after commas,
     // convert spaces to underscores except immediately after commas.
@@ -545,6 +631,98 @@ function TagsInput({
         handleBackspaceCommaSpace(e, tagInput, setTagInput)
     }
 
+    const getTagValid = async (tag: string): Promise<boolean> => {
+        // Use IndexedDB for cache, get from API if missing
+        const DB_NAME = 'Packbase'
+        const STORE_NAME = 'tags'
+
+        // Open or create IndexedDB
+        const openDB = (): Promise<IDBDatabase> => {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME)
+
+                request.onerror = () => reject(request.error)
+                request.onsuccess = () => resolve(request.result)
+
+                request.onupgradeneeded = (event) => {
+                    const db = (event.target as IDBOpenDBRequest).result
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        const objectStore = db.createObjectStore(STORE_NAME, {keyPath: 'tag'})
+                        objectStore.createIndex('timestamp', 'timestamp', {unique: false})
+                    }
+                }
+            })
+        }
+
+        // Get cached value from IndexedDB
+        const getCached = async (db: IDBDatabase, tag: string): Promise<{
+            valid: boolean,
+            timestamp: number
+        } | null> => {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly')
+                const store = transaction.objectStore(STORE_NAME)
+                const request = store.get(tag)
+
+                request.onerror = () => reject(request.error)
+                request.onsuccess = () => resolve(request.result || null)
+            })
+        }
+
+        // Set value in IndexedDB
+        const setCached = async (db: IDBDatabase, tag: string, valid: boolean): Promise<void> => {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite')
+                const store = transaction.objectStore(STORE_NAME)
+                const request = store.put({tag, valid, timestamp: Date.now()})
+
+                request.onerror = () => reject(request.error)
+                request.onsuccess = () => resolve()
+            })
+        }
+
+        try {
+            const db = await openDB()
+
+            // Check cache first
+            const cached = await getCached(db, tag)
+
+            // Use cached value if it exists and is less than 24 hours old
+            const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours
+            if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+                db.close()
+                return cached.valid
+            }
+
+            // Fetch all tags from API if not in cache or expired
+            const response = await vg.tags.get()
+            const allTags = Array.isArray(response.data) ? response.data : []
+            const isValid = allTags.includes(tag)
+
+            // Store in cache
+            await setCached(db, tag, isValid)
+            db.close()
+
+            return isValid
+        } catch (error) {
+            console.error('Error validating tag:', error)
+            // Fallback to API only if IndexedDB fails
+            try {
+                const response = await vg.tags.get()
+                const allTags = Array.isArray(response.data) ? response.data : []
+                return allTags.includes(tag)
+            } catch (apiError) {
+                console.error('API validation failed:', apiError)
+                return false
+            }
+        }
+    }
+
+    // Forces a tag check
+    useEffect(() => {
+        getTagValid('dummy')
+    }, [])
+
     return (
         <div className="relative">
             <Activity mode={isVisible(usePlainEditor)}>
@@ -573,22 +751,61 @@ function TagsInput({
                         </div>
                     </Tooltip>
 
-                    {(value || '').split(', ').filter(Boolean).map(tag => (
-                        <div
-                            key={tag}
-                            // @ts-ignore
-                            ref={el => tagRefs.current[tag] = el}
-                            className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-md text-sm"
-                        >
-                            <span>{tag}</span>
-                            <button
-                                onClick={() => removeTag(tag)}
-                                className="hover:text-primary/70"
+                    {(value || '').split(', ').filter(Boolean).map(tag => {
+                        const isValid = tagValidation[tag]
+                        const suggestion = tagSuggestions[tag]
+
+                        const tagElement = (
+                            <div
+                                key={tag}
+                                // @ts-ignore
+                                ref={el => tagRefs.current[tag] = el}
+                                className={cn(
+                                    "flex items-center gap-1 px-2 py-1 rounded-md text-sm",
+                                    isValid ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                )}
                             >
-                                ×
-                            </button>
-                        </div>
-                    ))}
+                                <Activity mode={isVisible(!isValid)}>
+                                    <QuestionMarkCircleIcon className="w-4 h-4 mr-1"/>
+                                </Activity>
+                                <span>{tag}</span>
+                                <button
+                                    onClick={() => removeTag(tag)}
+                                    className={cn(
+                                        isValid ? "hover:text-primary/70" : "hover:text-amber-600/70 dark:hover:text-amber-400/70"
+                                    )}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        )
+
+                        if (!isValid) {
+                            const tooltipContent = suggestion ? (
+                                <div className="flex flex-col gap-1">
+                                    <span>System doesn't know what {tag} is. It'll be queued for moderation.</span>
+                                    <button
+                                        onClick={() => {
+                                            const tagsArray = (value || '').split(', ').filter(Boolean)
+                                            const newTags = tagsArray.map(t => t === tag ? suggestion : t).join(', ')
+                                            onChange(newTags)
+                                        }}
+                                        className="cursor-pointer text-left !text-muted-foreground"
+                                    >
+                                        Did you mean {suggestion}?
+                                    </button>
+                                </div>
+                            ) : `System doesn't know what ${tag} is. It'll be queued for moderation.`
+
+                            return (
+                                <Tooltip key={tag} content={tooltipContent} delayDuration={0}>
+                                    {tagElement}
+                                </Tooltip>
+                            )
+                        }
+
+                        return tagElement
+                    })}
 
                     {Object.entries(poofAnimations).map(([tag, pos]) => (
                         <div

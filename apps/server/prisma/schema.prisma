@@ -121,6 +121,14 @@ model posts_reactions {
   @@schema("public")
 }
 
+model posts_statistics {
+  type String   @default("unknown")
+  tags String[] @default([])
+
+  @@id([type], map: "posts_statistics_pkey")
+  @@schema("public")
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model profiles {
