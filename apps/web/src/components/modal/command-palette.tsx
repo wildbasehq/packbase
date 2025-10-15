@@ -23,6 +23,7 @@ import PackHeader from "@/components/shared/pack/header";
 import {UserHoverCard} from "@/src/components";
 import UserInfoCol from "@/components/shared/user/info-col.tsx";
 import Markdown from "@/components/shared/markdown.tsx";
+import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -126,6 +127,14 @@ export default function CommandPalette() {
         }
 
         fetchResults()
+
+        const cancelInstance = PackbaseInstance.on('search-open', () => {
+            setOpen(true)
+        })
+
+        return () => {
+            cancelInstance()
+        }
     }, [debouncedRawQuery, query])
 
     // Create Fuse instances for client-side fuzzy search
@@ -208,7 +217,7 @@ export default function CommandPalette() {
             <div className="fixed inset-0 z-10 w-screen overflow-y-auto p-4 sm:p-6 md:p-20">
                 <DialogPanel
                     transition
-                    className="mx-auto max-w-4xl transform overflow-hidden rounded-xl bg-white ring-1 shadow-2xl ring-black/5 transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+                    className="mx-auto max-w-4xl transform overflow-hidden rounded-xl bg-white ring-1 shadow-2xl ring-black/5 transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-snapper data-leave:duration-200 data-leave:ease-in"
                 >
                     <Combobox
                         onChange={(item: any) => {
@@ -284,9 +293,11 @@ export default function CommandPalette() {
                                                                             />
                                                                         )}
                                                                         <div className="ml-3 flex-auto truncate">
-                                                                            <div className="truncate">{profile.display_name}</div>
+                                                                            <div
+                                                                                className="truncate">{profile.display_name}</div>
                                                                             {profile.description && (
-                                                                                <div className="text-xs text-gray-500 group-data-focus:text-gray-200 truncate">
+                                                                                <div
+                                                                                    className="text-xs text-gray-500 group-data-focus:text-gray-200 truncate">
                                                                                     {profile.description}
                                                                                 </div>
                                                                             )}
@@ -320,9 +331,11 @@ export default function CommandPalette() {
                                                                             />
                                                                         )}
                                                                         <div className="ml-3 flex-auto truncate">
-                                                                            <div className="truncate">{pack.display_name}</div>
+                                                                            <div
+                                                                                className="truncate">{pack.display_name}</div>
                                                                             {pack.description && (
-                                                                                <div className="text-xs text-gray-500 group-data-focus:text-gray-200 truncate">
+                                                                                <div
+                                                                                    className="text-xs text-gray-500 group-data-focus:text-gray-200 truncate">
                                                                                     {pack.description}
                                                                                 </div>
                                                                             )}
@@ -349,7 +362,8 @@ export default function CommandPalette() {
                                                                         />
                                                                         <div className="ml-3 flex-auto truncate">
                                                                             {post.user && (
-                                                                                <div className="text-xs text-gray-500 group-data-focus:text-gray-200">
+                                                                                <div
+                                                                                    className="text-xs text-gray-500 group-data-focus:text-gray-200">
                                                                                     {post.user.display_name}
                                                                                 </div>
                                                                             )}
@@ -368,41 +382,51 @@ export default function CommandPalette() {
 
                                             {rawQuery === '?' && (
                                                 <div className="px-6 py-14 text-center text-sm sm:px-14">
-                                                    <LifebuoyIcon className="mx-auto size-6 text-gray-400" aria-hidden="true"/>
-                                                    <p className="mt-4 font-semibold text-gray-900">Help with searching</p>
+                                                    <LifebuoyIcon className="mx-auto size-6 text-gray-400"
+                                                                  aria-hidden="true"/>
+                                                    <p className="mt-4 font-semibold text-gray-900">Help with
+                                                        searching</p>
                                                     <p className="mt-2 text-gray-500">
-                                                        Use this tool to quickly search for profiles, packs, and posts across Packbase.
-                                                        Type <kbd className="px-1 py-0.5 text-xs border rounded">@</kbd> to search profiles only,
-                                                        or <kbd className="px-1 py-0.5 text-xs border rounded">#</kbd> to search packs only.
+                                                        Use this tool to quickly search for profiles, packs, and posts
+                                                        across Packbase.
+                                                        Type <kbd
+                                                        className="px-1 py-0.5 text-xs border rounded">@</kbd> to search
+                                                        profiles only,
+                                                        or <kbd
+                                                        className="px-1 py-0.5 text-xs border rounded">#</kbd> to search
+                                                        packs only.
                                                     </p>
                                                 </div>
                                             )}
 
                                             {!isLoading && query !== '' && rawQuery !== '?' && !hasResults && (
                                                 <div className="px-6 py-14 text-center text-sm sm:px-14">
-                                                    <ExclamationTriangleIcon className="mx-auto size-6 text-gray-400" aria-hidden="true"/>
+                                                    <ExclamationTriangleIcon className="mx-auto size-6 text-gray-400"
+                                                                             aria-hidden="true"/>
                                                     <p className="mt-4 font-semibold text-gray-900">No results found</p>
-                                                    <p className="mt-2 text-gray-500">We couldn't find anything with that term. Please try again.</p>
+                                                    <p className="mt-2 text-gray-500">We couldn't find anything with
+                                                        that term. Please try again.</p>
                                                 </div>
                                             )}
                                         </div>
 
                                         {/* Preview */}
                                         {activeOption && (
-                                            <div className="hidden h-96 w-1/2 flex-none flex-col divide-y divide-gray-100 overflow-y-auto sm:flex">
+                                            <div
+                                                className="hidden h-96 w-1/2 flex-none flex-col divide-y divide-gray-100 overflow-y-auto sm:flex">
                                                 {getItemType(activeOption) === 'profile' && (
                                                     <div className="p-6">
-                                                        <UserHoverCard user={activeOption} />
+                                                        <UserHoverCard user={activeOption}/>
                                                     </div>
                                                 )}
                                                 {getItemType(activeOption) === 'pack' && (
                                                     <div className="p-6">
-                                                        <PackHeader pack={activeOption} />
+                                                        <PackHeader pack={activeOption}/>
                                                     </div>
                                                 )}
                                                 {getItemType(activeOption) === 'post' && (
                                                     <div className="p-6">
-                                                        <UserInfoCol user={activeOption.user} />
+                                                        <UserInfoCol user={activeOption.user}/>
                                                         <div className="mt-4">
                                                             <Markdown>{activeOption.body}</Markdown>
                                                         </div>
@@ -413,7 +437,8 @@ export default function CommandPalette() {
                                     </ComboboxOptions>
                                 )}
 
-                                <div className="flex flex-wrap items-center bg-gray-50 px-4 py-2.5 text-xs text-gray-700">
+                                <div
+                                    className="flex flex-wrap items-center bg-gray-50 px-4 py-2.5 text-xs text-gray-700">
                                     Type{' '}
                                     <kbd
                                         className={classNames(

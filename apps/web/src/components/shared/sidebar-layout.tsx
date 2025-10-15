@@ -27,7 +27,7 @@ import {
     SidebarLabel,
     SidebarSpacer,
 } from '@/src/components'
-import {QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
+import {MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
 import {ChevronDownIcon, FaceSmileIcon} from '@heroicons/react/16/solid'
 import {SiDiscord} from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
@@ -43,6 +43,7 @@ import {useLocalStorage} from "usehooks-ts";
 import {Text} from "@/components/shared/text.tsx";
 import UserDropdown from "@/components/layout/user-dropdown";
 import {AlignLeft} from "@/components/icons/plump/AlignLeft.tsx";
+import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
 
 const NavbarItems = [
     {
@@ -179,6 +180,9 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     <WorkerSpinner/>
 
                     <NavbarSection>
+                        <NavbarItem onClick={() => PackbaseInstance.emit('search-open', {})} aria-label="Open search">
+                            <MagnifyingGlassIcon/>
+                        </NavbarItem>
                         <Dropdown>
                             <DropdownButton as={NavbarItem}>
                                 <QuestionMarkCircleIcon/>
