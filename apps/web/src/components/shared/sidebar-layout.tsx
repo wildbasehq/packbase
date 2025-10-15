@@ -110,7 +110,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
 
     return (
-        <div className="relative isolate flex min-h-svh w-full flex-col bg-muted dark:bg-n-8">
+        <div className="relative isolate flex min-h-svh h-screen w-full flex-col bg-muted">
             <SignedIn>
                 <Activity mode={isVisible(!seenPackTour)}>
                     {/* Floating callout for Packs feature */}
@@ -141,7 +141,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
             </SignedIn>
             {/* Content */}
             <div
-                className="min-w-0 bg-sidebar px-4 border-b border-default">
+                className="min-w-0 bg-sidebar px-4">
                 <Navbar>
                     <Dropdown>
                         <DropdownButton as={NavbarItem}
@@ -225,7 +225,8 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
             </header>
 
             {/* Content */}
-            <main className="flex flex-1 pb-2 lg:px-2">
+            <div
+                className="relative flex overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
                 {/* Sidebar on mobile */}
                 <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
                     <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
@@ -235,16 +236,13 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     // Sidebar content for desktop
                     <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                 )}
-
-                <div
-                    className="relative overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-                    <div className="max-w-3xl mx-auto absolute left-0 right-0 top-0">
-                        <FloatingCompose/>
-                    </div>
-                    <div className="mx-auto h-full max-w-6xl">{children}</div>
+                <div className="max-w-3xl mx-auto absolute left-0 right-0 top-0">
+                    <FloatingCompose/>
                 </div>
+                <div className="mx-auto h-full max-w-6xl">{children}</div>
                 {isSignedIn && <UserSidebar/>}
-            </main>
+            </div>
+            {/*</main>*/}
         </div>
     )
 }

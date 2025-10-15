@@ -1,6 +1,6 @@
 /* Colours */
 .bg-sidebar {
-    @apply bg-gradient-to-b from-white to-neutral-50 dark:from-n-7 dark:to-n-7/80;
+    @apply bg-gradient-to-b from-white to-muted dark:from-n-7 dark:to-muted;
 }
 
 .text-default {

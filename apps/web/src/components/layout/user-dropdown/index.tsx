@@ -38,7 +38,7 @@ export default function UserDropdown() {
             <UserButton>
                 <UserButton.MenuItems>
                     <UserButton.Action label="Your Profile" labelIcon={<UserIcon/>}
-                                       onClick={() => setLocation(`/@me`)}/>
+                                       onClick={() => setLocation(`~/@me`)}/>
                 </UserButton.MenuItems>
                 <UserButton.UserProfilePage label="Profile" url="/profile" labelIcon={<UserIcon/>}>
                     <ProfileSettings/>
