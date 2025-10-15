@@ -239,7 +239,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                 <div className="max-w-3xl mx-auto absolute left-0 right-0 top-0">
                     <FloatingCompose/>
                 </div>
-                <div className="mx-auto h-full max-w-6xl">{children}</div>
+                <div className="mx-auto h-full w-full max-w-6xl">{children}</div>
                 {isSignedIn && <UserSidebar/>}
             </div>
             {/*</main>*/}
