@@ -12,6 +12,7 @@ import {Button} from '@/components/shared/button'
 import {Field, SidebarItem} from "@/src/components";
 import {useModal} from "@/components/modal/provider.tsx";
 import {TagsInput} from "@/components/feed/floating-compose.tsx";
+import {useParams} from "wouter";
 
 export type Folder = {
     id: string
@@ -182,11 +183,21 @@ function FolderForm({
     )
 }
 
-export default function UserFolders() {
+export default function UserFolders({user: folderUser}: { user: { id: string } }) {
     const {show, hide} = useModal()
     const {user} = useUserAccountStore()
+    const {slug} = useParams<{ slug: string }>()
 
-    const {data, isLoading, refetch} = useContentFrame('get', 'folders', undefined, {id: 'folders', enabled: true})
+    console.log(slug)
+
+    const {
+        data,
+        isLoading,
+        refetch
+    } = useContentFrame('get', `folders?user=${folderUser.id}`, undefined, {
+        id: `folders.${folderUser.id}`,
+        enabled: true
+    })
     const createMutation = useContentFrameMutation('post', 'folders', {onSuccess: () => refetch()})
 
     const folders: Folder[] = data?.folders || []
@@ -202,12 +213,14 @@ export default function UserFolders() {
 
     return (
         <div className="space-y-3">
-            <div className="flex items-center justify-between">
-                <Heading size="sm">Folders</Heading>
-                <Button plain onClick={() => show(<FolderForm onCancel={() => hide()} onSave={onCreate}/>)}>
-                    <PlusIcon className="h-4 w-4 mr-1"/> New
-                </Button>
-            </div>
+            <Activity mode={isVisible(folderUser.id === user?.id)}>
+                <div className="flex items-center justify-between">
+                    <Heading size="sm">Folders</Heading>
+                    <Button plain onClick={() => show(<FolderForm onCancel={() => hide()} onSave={onCreate}/>)}>
+                        <PlusIcon className="h-4 w-4 mr-1"/> New
+                    </Button>
+                </div>
+            </Activity>
 
             {isLoading && <Text size="xs" alt>Loading folders…</Text>}
 

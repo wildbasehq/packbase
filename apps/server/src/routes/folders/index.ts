@@ -42,9 +42,9 @@ export default (app: YapockType) =>
         // List folders for current user
         .get(
             '',
-            async ({set, user}) => {
+            async ({query, set, user}) => {
                 requiresToken({set, user});
-                const folders = await readUserFolders(user.sub);
+                const folders = await readUserFolders(query.user);
                 return {folders};
             },
             {
@@ -52,6 +52,9 @@ export default (app: YapockType) =>
                     description: 'List folders for the current user',
                     tags: ['Folders'],
                 },
+                query: t.Object({
+                    user: t.String()
+                }),
                 response: {
                     200: t.Object({folders: t.Array(FolderSchema)}),
                 },
