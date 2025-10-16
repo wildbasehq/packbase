@@ -12,6 +12,7 @@ import ResourceSettings from '@/components/layout/resource'
 import {
     Badge,
     Button,
+    Desktop,
     Dropdown,
     DropdownButton,
     DropdownItem,
@@ -111,142 +112,152 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
 
     return (
-        <div className="relative isolate flex min-h-svh h-screen w-full flex-col bg-muted">
-            <SignedIn>
-                <Activity mode={isVisible(!seenPackTour)}>
-                    {/* Floating callout for Packs feature */}
-                    <div className="pointer-events-none fixed inset-0 z-50 flex items-start justify-start">
-                        <div className="relative mt-16 ml-6 max-w-sm pointer-events-auto">
-                            {/* Pointer triangle */}
-                            <div
-                                className="absolute -top-2 left-8 h-0 w-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white dark:border-b-zinc-900"/>
+        <div className="flex min-h-svh h-screen w-full relative bg-muted">
+            <div className="relative isolate flex min-h-svh h-screen w-full flex-col bg-muted">
+                <SignedIn>
+                    <Activity mode={isVisible(!seenPackTour)}>
+                        {/* Floating callout for Packs feature */}
+                        <div className="pointer-events-none fixed inset-0 z-50 flex items-start justify-start">
+                            <div className="relative mt-16 ml-6 max-w-sm pointer-events-auto">
+                                {/* Pointer triangle */}
+                                <div
+                                    className="absolute -top-2 left-8 h-0 w-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white dark:border-b-zinc-900"/>
 
-                            {/* Card */}
-                            <div
-                                className="rounded-lg border bg-card p-4 shadow-xl">
-                                <Heading>Packs live up here!</Heading>
-                                <Text>
-                                    All your packs, pack creation, settings, and other pack-specific actions have moved
-                                    into
-                                    the header.
-                                </Text>
-                                <div className="mt-3 flex gap-2">
-                                    <Button onClick={() => setSeenPackTour(true)}>
-                                        Got it
-                                    </Button>
+                                {/* Card */}
+                                <div
+                                    className="rounded-lg border bg-card p-4 shadow-xl">
+                                    <Heading>Packs live up here!</Heading>
+                                    <Text>
+                                        All your packs, pack creation, settings, and other pack-specific actions have
+                                        moved
+                                        into
+                                        the header.
+                                    </Text>
+                                    <div className="mt-3 flex gap-2">
+                                        <Button onClick={() => setSeenPackTour(true)}>
+                                            Got it
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </Activity>
-            </SignedIn>
-            {/* Content */}
-            <div
-                className="min-w-0 bg-sidebar px-4">
-                <Navbar>
-                    <Dropdown>
-                        <DropdownButton as={NavbarItem}
-                                        className="max-lg:hidden flex w-2xs h-8 [&>*]:w-full">
-                            <div
-                                data-slot="avatar"
-                                className="rounded-sm w-6 h-6 border overflow-hidden bg-primary-cosmos flex justify-center items-center">
-                                <Logo noStyle fullSize
-                                      className="w-4 h-4 invert"/>
-                            </div>
-                            <div className="flex flex-col -space-y-1 relative">
-                                <NavbarLabel>Packbase</NavbarLabel>
-                                <NavbarLabel className="text-muted-foreground text-xs">
-                                    <TextTicker
-                                        texts={['CommInt ticker 1', 'CommInt ticker two', 'long interaction that should cut off']}
-                                        interval={5000}/>
-                                </NavbarLabel>
-                            </div>
-                            <ChevronDownIcon/>
-                        </DropdownButton>
-                        <AppDropdownMenu/>
-                    </Dropdown>
-                    <NavbarDivider/>
-                    <NavbarSection className="max-lg:hidden">
-                        {NavbarItems.map((item) => (
-                            <NavbarItem href={item.href} current={location.startsWith(item.currentHref || item.href)}
-                                        key={item.href}>
-                                {item.label}
-                                {item.limitedEvent && <Badge className="!py-0" color="indigo">Limited</Badge>}
-                            </NavbarItem>
-                        ))}
-                    </NavbarSection>
-                    <NavbarSpacer/>
-
-                    <WorkerSpinner/>
-
-                    <NavbarSection>
-                        <NavbarItem onClick={() => PackbaseInstance.emit('search-open', {})} aria-label="Open search">
-                            <MagnifyingGlassIcon/>
-                        </NavbarItem>
+                    </Activity>
+                </SignedIn>
+                {/* Content */}
+                <div
+                    className="min-w-0 bg-sidebar px-4">
+                    <Navbar>
                         <Dropdown>
-                            <DropdownButton as={NavbarItem}>
-                                <QuestionMarkCircleIcon/>
-                                <SidebarLabel>Help</SidebarLabel>
+                            <DropdownButton as={NavbarItem}
+                                            className="max-lg:hidden flex w-2xs h-8 [&>*]:w-full">
+                                <div
+                                    data-slot="avatar"
+                                    className="rounded-sm w-6 h-6 border overflow-hidden bg-primary-cosmos flex justify-center items-center">
+                                    <Logo noStyle fullSize
+                                          className="w-4 h-4 invert"/>
+                                </div>
+                                <div className="flex flex-col -space-y-1 relative">
+                                    <NavbarLabel>Packbase</NavbarLabel>
+                                    <NavbarLabel className="text-muted-foreground text-xs">
+                                        <TextTicker
+                                            texts={['CommInt ticker 1', 'CommInt ticker two', 'long interaction that should cut off']}
+                                            interval={5000}/>
+                                    </NavbarLabel>
+                                </div>
+                                <ChevronDownIcon/>
                             </DropdownButton>
-                            <DropdownMenu anchor="top">
-                                <DropdownItem href="https://work.wildbase.xyz/maniphest/query/all/"
-                                              target="_blank">
-                                    <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                    <SidebarLabel>Feedback</SidebarLabel>
-                                </DropdownItem>
-                                <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
-                                    <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                    <SidebarLabel>Discord</SidebarLabel>
-                                </DropdownItem>
-                                <DropdownItem href="https://wildbase.xyz/" target="_blank">
-                                    <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                    <SidebarLabel>Wildbase</SidebarLabel>
-                                </DropdownItem>
-                            </DropdownMenu>
+                            <AppDropdownMenu/>
                         </Dropdown>
-                        <NavbarItem href="https://blog.packbase.app" target="_blank">
-                            <SparklesIcon/>
-                            <NavbarLabel>Blog</NavbarLabel>
+                        <NavbarDivider/>
+                        <NavbarSection className="max-lg:hidden">
+                            {NavbarItems.map((item) => (
+                                <NavbarItem href={item.href}
+                                            current={location.startsWith(item.currentHref || item.href)}
+                                            key={item.href}>
+                                    {item.label}
+                                    {item.limitedEvent && <Badge className="!py-0" color="indigo">Limited</Badge>}
+                                </NavbarItem>
+                            ))}
+                        </NavbarSection>
+                        <NavbarSpacer/>
+
+                        <WorkerSpinner/>
+
+                        <NavbarSection>
+                            <NavbarItem onClick={() => PackbaseInstance.emit('search-open', {})}
+                                        aria-label="Open search">
+                                <MagnifyingGlassIcon/>
+                            </NavbarItem>
+                            <Dropdown>
+                                <DropdownButton as={NavbarItem}>
+                                    <QuestionMarkCircleIcon/>
+                                    <SidebarLabel>Help</SidebarLabel>
+                                </DropdownButton>
+                                <DropdownMenu anchor="top">
+                                    <DropdownItem href="https://work.wildbase.xyz/maniphest/query/all/"
+                                                  target="_blank">
+                                        <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                        <SidebarLabel>Feedback</SidebarLabel>
+                                    </DropdownItem>
+                                    <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
+                                        <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                        <SidebarLabel>Discord</SidebarLabel>
+                                    </DropdownItem>
+                                    <DropdownItem href="https://wildbase.xyz/" target="_blank">
+                                        <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                        <SidebarLabel>Wildbase</SidebarLabel>
+                                    </DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
+                            <NavbarItem href="https://blog.packbase.app" target="_blank">
+                                <SparklesIcon/>
+                                <NavbarLabel>Blog</NavbarLabel>
+                            </NavbarItem>
+                        </NavbarSection>
+
+                        <AlignLeft className="w-7 h-7 fill-indigo-600"
+                                   onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)}/>
+                        <UserDropdown/>
+                    </Navbar>
+                </div>
+
+                {/* Navbar on mobile */}
+                <header className="flex items-center px-4 gap-4 lg:hidden z-10">
+                    <div className="py-2.5">
+                        <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
+                            <OpenMenuIcon/>
                         </NavbarItem>
-                    </NavbarSection>
+                    </div>
+                    <div className="flex gap-4 w-full">
+                        <UserActionsContainer/>
+                    </div>
+                </header>
 
-                    <AlignLeft className="w-7 h-7 fill-indigo-600"
-                               onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)}/>
-                    <UserDropdown/>
-                </Navbar>
+                {/* Content */}
+                <div
+                    className="relative flex overflow-hidden grow m-1 lg:rounded-lg lg:bg-white lg:ring-1 ring-default lg:shadow-xs  dark:lg:bg-zinc-900">
+                    {/* Sidebar on mobile */}
+                    <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
+                        <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
+                    </MobileSidebar>
+
+                    {isSignedIn && !isMobile && (
+                        // Sidebar content for desktop
+                        <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
+                    )}
+                    <div className="max-w-3xl mx-auto absolute left-0 right-0 top-0">
+                        <FloatingCompose/>
+                    </div>
+                    <div className="mx-auto h-full w-full max-w-6xl">{children}</div>
+                </div>
+                {/*</main>*/}
             </div>
 
-            {/* Navbar on mobile */}
-            <header className="flex items-center px-4 gap-4 lg:hidden z-10">
-                <div className="py-2.5">
-                    <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
-                        <OpenMenuIcon/>
-                    </NavbarItem>
-                </div>
-                <div className="flex gap-4 w-full">
-                    <UserActionsContainer/>
-                </div>
-            </header>
-
-            {/* Content */}
-            <div
-                className="relative flex overflow-hidden grow lg:rounded-lg lg:bg-white lg:ring-1 lg:shadow-xs lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10">
-                {/* Sidebar on mobile */}
-                <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
-                    <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
-                </MobileSidebar>
-
-                {isSignedIn && !isMobile && (
-                    // Sidebar content for desktop
-                    <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
-                )}
-                <div className="max-w-3xl mx-auto absolute left-0 right-0 top-0">
-                    <FloatingCompose/>
-                </div>
-                <div className="mx-auto h-full w-full max-w-6xl">{children}</div>
-                {isSignedIn && <UserSidebar/>}
-            </div>
-            {/*</main>*/}
+            <SignedIn>
+                <Desktop>
+                    <UserSidebar/>
+                </Desktop>
+            </SignedIn>
         </div>
     )
 }

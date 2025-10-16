@@ -1,4 +1,4 @@
-import React, { Children, isValidElement, useCallback, useId, useMemo, useState } from 'react'
+import React, {Children, isValidElement, useCallback, useId, useMemo, useState} from 'react'
 import clsx from 'clsx'
 
 type IconComponent = React.ComponentType<{ className?: string }>
@@ -30,16 +30,16 @@ function getTabsFromChildren(children: React.ReactNode) {
 }
 
 export function TabsLayout({
-    children,
-    className,
-    headerClassName,
-    contentClassName,
-    defaultIndex = 0,
-    selectedIndex,
-    onChange,
-    prefix,
-    suffix,
-}: TabsLayoutProps) {
+                               children,
+                               className,
+                               headerClassName,
+                               contentClassName,
+                               defaultIndex = 0,
+                               selectedIndex,
+                               onChange,
+                               prefix,
+                               suffix,
+                           }: TabsLayoutProps) {
     const tabs = useMemo(() => getTabsFromChildren(children), [children])
     const isControlled = typeof selectedIndex === 'number'
     const [uncontrolledIndex, setUncontrolledIndex] = useState(defaultIndex)
@@ -76,7 +76,8 @@ export function TabsLayout({
         <div className={clsx('flex flex-col', className)}>
             <div className={clsx('inline-flex items-center gap-1 text-sm/6 -mb-px', headerClassName)}>
                 {prefix ? <div>{prefix}</div> : null}
-                <div role="tablist" aria-orientation="horizontal" className="inline-flex items-center gap-1" onKeyDown={onKeyDown}>
+                <div role="tablist" aria-orientation="horizontal" className="inline-flex items-center gap-1"
+                     onKeyDown={onKeyDown}>
                     {tabs.map((tab, index) => {
                         const selected = index === activeIndex
                         const Icon = tab.props.icon
@@ -91,10 +92,10 @@ export function TabsLayout({
                                 tabIndex={selected ? 0 : -1}
                                 onClick={() => setActiveIndex(index)}
                                 className={clsx(
-                                    'group relative inline-flex items-center border-t border-x gap-2 rounded-t-2xl px-3 py-2 font-medium transition',
+                                    'group relative inline-flex items-center border-t-[0.1rem] border-x-[0.1rem] gap-2 rounded-t-2xl px-4 py-3 font-medium transition',
                                     selected
-                                        ? `bg-white !z-20 dark:bg-n-8 border-default ${index === 0 ? 'rounded-out-br-xl' : 'rounded-out-b-xl'}`
-                                        : 'text-muted-foreground bg-neutral-100/80 dark:bg-n-9 hover:bg-neutral-50 dark:hover:bg-neutral-800 border-default-alt'
+                                        ? `bg-white !z-20 dark:bg-n-8 ${index === 0 ? 'rounded-out-br-xl' : 'rounded-out-b-xl'}`
+                                        : 'text-muted-foreground bg-neutral-100/80 dark:bg-n-9 hover:bg-neutral-50 dark:hover:bg-neutral-800'
                                 )}
                             >
                                 {Icon ? (

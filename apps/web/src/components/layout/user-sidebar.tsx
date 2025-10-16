@@ -3,7 +3,7 @@
  */
 
 import useWindowSize from '@/src/lib/hooks/use-window-size'
-import {
+import React, {
     Activity,
     MouseEvent as ReactMouseEvent,
     TouchEvent as ReactTouchEvent,
@@ -90,7 +90,7 @@ export default function UserSidebar() {
     return (
         <div
             ref={containerRef}
-            className={`h-fill relative transition-all bg-muted dark:bg-n-8 md:flex ${
+            className={`h-fill relative transition-all md:flex ${
                 collapsed ? 'translate-x-full p-0 hidden' : 'p-1 z-10'
             } ${isResizing ? 'select-none cursor-col-resize !transition-none' : ''}`}
             style={{
@@ -102,12 +102,13 @@ export default function UserSidebar() {
         >
             {collapsed ? null : (
                 <>
+                    <div className="absolute bg-sidebar w-full -z-[1] h-12 left-0 top-0"/>
                     <div className="flex flex-col w-full">
                         <TabsLayout
                             defaultIndex={0}
                             suffix={<UserActionsContainer/>}
                             className="h-full"
-                            contentClassName="h-[calc(100vh-3.75rem)] relative pt-8 z-10 bg-white border dark:bg-n-8 rounded-tr rounded-b-xl flex flex-col overflow-y-auto px-4 pb-8 h-full"
+                            contentClassName="relative pt-8 z-10 bg-white border-[0.1rem] shadow-xs dark:bg-n-8 rounded-tr rounded-b-xl flex flex-col overflow-y-auto px-4 pb-8 h-full"
                             headerClassName="rounded-tr rounded-out-lt-3xl"
                         >
                             <Tab title="People" icon={UserMultipleAccounts}>

@@ -42,14 +42,6 @@
         @apply text-foreground;
     }
 
-    *,
-    ::after,
-    ::before,
-    ::backdrop,
-    ::file-selector-button {
-        @apply border-n-2 dark:border-n-6/50;
-    }
-
     body {
         @apply bg-background text-foreground;
     }
@@ -203,7 +195,7 @@
 
 @layer base {
     * {
-        @apply border-border outline-ring/50;
+        @apply border-zinc-950/15 dark:border-white/10;
     }
 
     body {

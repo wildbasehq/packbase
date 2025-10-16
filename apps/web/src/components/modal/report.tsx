@@ -58,7 +58,7 @@ export default function ReportAbuse() {
                     </div>
 
                     <div>
-                        <Input label="What's up?" id="reason" className="bg-default-alt"/>
+                        <Input label="What's up?" id="reason" className="bg-muted"/>
                     </div>
 
                     <div>

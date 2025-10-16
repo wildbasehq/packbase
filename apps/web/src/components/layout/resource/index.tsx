@@ -139,7 +139,7 @@ function ResourceSwitcherMenu({close}: { close: () => void }) {
                             })
                     }}
                 >
-                    <LogoutIcon className="fill-alt h-4 w-4 group-hover:fill-white!"/>{' '}
+                    <LogoutIcon className="fill-muted-foreground h-4 w-4 group-hover:fill-white!"/>{' '}
                     <Text alt className="group-hover:text-white!">
                         Leave pack
                     </Text>
