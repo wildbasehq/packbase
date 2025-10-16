@@ -30,6 +30,7 @@ function FolderForm({
                         onSave,
                         onCancel,
                     }: { initial?: Partial<Folder>, onSave: (input: Partial<Folder>) => void, onCancel: () => void }) {
+    const {user} = useUserAccountStore()
     const [name, setName] = useState(initial?.name || '')
     const [description, setDescription] = useState(initial?.description || '')
     const [emoji, setEmoji] = useState(initial?.emoji || '📁')
@@ -99,7 +100,7 @@ function FolderForm({
             <Activity mode={isVisible(mode === 'dynamic')}>
                 <div className="space-y-2">
                     <Text size="sm" className="font-medium">Search Query</Text>
-                    <TagsInput value={query.replace('[tag', '').replace(']', '').trim()}
+                    <TagsInput value={query.replace('[tag', '').replace(`] ${user.id}`, '').trim()}
                                onChange={setQuery}/>
                     <Text size="xs" alt>
                         Search query is used to populate the folder. Howls must have all tags in the query.
@@ -183,6 +184,7 @@ function FolderForm({
 
 export default function UserFolders() {
     const {show, hide} = useModal()
+    const {user} = useUserAccountStore()
 
     const {data, isLoading, refetch} = useContentFrame('get', 'folders', undefined, {id: 'folders', enabled: true})
     const createMutation = useContentFrameMutation('post', 'folders', {onSuccess: () => refetch()})
@@ -191,7 +193,7 @@ export default function UserFolders() {
 
     const onCreate = async (input: Partial<Folder>) => {
         if (input.mode === 'dynamic' && input.query && !input.query.startsWith('[')) {
-            input.query = `[tag ${input.query}]`
+            input.query = `[tag ${input.query}] ${user.id}`
         }
 
         await createMutation.mutateAsync(input)
@@ -232,7 +234,7 @@ function Folder({folder, refetch}: {
 
     const onUpdate = async (input: Partial<Folder>) => {
         if (input.mode === 'dynamic' && input.query && !input.query.startsWith('[')) {
-            input.query = `[tag ${input.query}]`
+            input.query = `[tag ${input.query}] ${user.id}`
         }
 
         await updateMutation.mutateAsync(input)

@@ -19,12 +19,13 @@ const log = require('debug')('vg:search');
  * @param tags Array of tags to search for
  * @returns Array of posts matching the tags
  */
-async function searchTags(tags: string[]): Promise<any[]> {
+async function searchTags(tags: string[], user_id?: string): Promise<any[]> {
     return prisma.posts.findMany({
         where: {
             tags: {
                 hasEvery: tags,
             },
+            ...(user_id ? {user_id} : {})
         },
         orderBy: {
             created_at: 'desc',
@@ -90,12 +91,14 @@ const SearchAPI = (app: YapockType) =>
 
                 // Check if query is a tag search
                 if (query.q.startsWith('[tag ')) {
-                    const tagMatch = query.q.match(/^\[tag (.+)]$/);
+                    const queryTag = query.q.split('] ')[0] + ']';
+                    const queryUser = query.q.split('] ')[1];
+                    const tagMatch = queryTag.match(/^\[tag (.+)]$/);
                     if (tagMatch) {
                         const tagsString = tagMatch[1];
                         const tags = tagsString.split(',').map(tag => tag.trim());
 
-                        const posts = await searchTags(tags);
+                        const posts = await searchTags(tags, queryUser);
                         const postLoader = new BulkPostLoader();
                         const postIds = posts.map(post => post.id);
                         const postsMap = await postLoader.loadPosts(postIds, user?.sub);
@@ -243,6 +246,7 @@ const SearchAPI = (app: YapockType) =>
                 offset: t.Optional(t.String()),
                 includeMetadata: t.Optional(t.String()),
                 allowedTables: t.Optional(t.Array(t.String())),
+                tagUser: t.Optional(t.String()),
             }),
             detail: {
                 description: 'Search API using custom query syntax',
