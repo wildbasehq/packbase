@@ -22,7 +22,6 @@ import {
     Logo,
     Sidebar,
     SidebarBody,
-    SidebarDivider,
     SidebarFooter,
     SidebarHeading,
     SidebarLabel,
@@ -248,7 +247,11 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     <div className="max-w-3xl mx-auto absolute left-0 right-0 top-0">
                         <FloatingCompose/>
                     </div>
-                    <div className="mx-auto h-full w-full max-w-6xl">{children}</div>
+                    <div className="mx-auto h-full w-full overflow-y-auto max-w-6xl">
+                        <div className="pt-6">
+                            {children}
+                        </div>
+                    </div>
                 </div>
                 {/*</main>*/}
             </div>
@@ -276,7 +279,7 @@ function SidebarContentContainer({children}: { children: React.ReactNode }) {
                 minWidth={240}
                 maxWidth={560}
             >
-                <div className="flex flex-col" style={{width: sidebarWidth ?? 320}}>
+                <div className="pt-4 flex flex-col" style={{width: sidebarWidth ?? 320}}>
                     {!currentResource.standalone && (
                         <nav aria-label="Sections" className="flex flex-col min-h-14"
                              style={{width: sidebarWidth ?? 320}}>
@@ -287,11 +290,11 @@ function SidebarContentContainer({children}: { children: React.ReactNode }) {
                             </div>
                         </nav>
                     )}
+
                     <Sidebar className="w-full">
                         <SidebarBody>
                             {children}
                             <SidebarSpacer/>
-                            <SidebarDivider/>
                         </SidebarBody>
 
                         <SidebarFooter

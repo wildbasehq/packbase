@@ -405,14 +405,14 @@ function PostSettingsModal({
     )
 }
 
-function TagsInput({
-                       forcedTag,
-                       value,
-                       onChange
-                   }: {
-    forcedTag: string
+export function TagsInput({
+                              forcedTag,
+                              value,
+                              onChange
+                          }: {
     value: string
     onChange: (v: string) => void
+    forcedTag?: string
 }) {
     const [usePlainEditor, setUsePlainEditor] = useState<boolean>(false)
     const [tagInput, setTagInput] = useState('')
@@ -742,24 +742,26 @@ function TagsInput({
             <Activity mode={isVisible(!usePlainEditor)}>
                 <div
                     className="flex flex-wrap gap-2 p-2 border rounded-xl bg-background min-h-[2.5rem] items-center relative">
-                    <Tooltip content={(
-                        <div className="flex flex-col gap-1">
-                            <span>System tags are required to ensure content safety and moderation.</span>
-                            <button
-                                className="cursor-pointer text-xs text-left !text-muted-foreground"
+                    <Activity mode={isVisible(!!forcedTag)}>
+                        <Tooltip content={(
+                            <div className="flex flex-col gap-1">
+                                <span>System tags are required to ensure content safety and moderation.</span>
+                                <button
+                                    className="cursor-pointer text-xs text-left !text-muted-foreground"
+                                >
+                                    System tags directly affect your howl's visibility. Learn More &rarr;
+                                </button>
+                            </div>
+                        )}
+                                 delayDuration={0}>
+                            <div
+                                className="flex items-center gap-1 bg-destructive/10 text-destructive px-2 py-1 rounded-md text-sm"
                             >
-                                System tags directly affect your howl's visibility. Learn More &rarr;
-                            </button>
-                        </div>
-                    )}
-                             delayDuration={0}>
-                        <div
-                            className="flex items-center gap-1 bg-destructive/10 text-destructive px-2 py-1 rounded-md text-sm"
-                        >
-                            <HardDisk className="w-4 h-4 mr-1"/>
-                            <span>{forcedTag || 'rating_safe'}</span>
-                        </div>
-                    </Tooltip>
+                                <HardDisk className="w-4 h-4 mr-1"/>
+                                <span>{forcedTag || 'rating_safe'}</span>
+                            </div>
+                        </Tooltip>
+                    </Activity>
 
                     {(value || '').split(', ').filter(Boolean).map(tag => {
                         const isValid = tagValidation[tag]

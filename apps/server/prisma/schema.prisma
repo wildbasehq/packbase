@@ -205,6 +205,23 @@ model user_themes {
   @@schema("public")
 }
 
+/// Folders owned by users (replaces profiles.settings JSON folders)
+model folders {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime  @default(now()) @db.Timestamptz(6)
+  user_id     String    @db.Uuid
+  name        String
+  description String?
+  emoji       String?
+  mode        String    // 'dynamic' | 'manual'
+  query       String?
+  howl_ids    String[]  @default([])
+
+  @@index([user_id], type: Hash)
+  @@schema("public")
+}
+
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model pack_themes {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid

@@ -7,6 +7,8 @@ import UniversePackLayout from "@/pages/pack/universe/layout.tsx";
 import PackChannelThread from "@/pages/pack/[slug]/[channel]/[thread]/page.tsx";
 import ChatLayout from "@/pages/c/layout.tsx";
 import NotSelected from "@/pages/c/not-selected.tsx";
+import UserLayout from "@/pages/user/[...slug]/layout.tsx";
+import UserFolderPage from "@/pages/user/[...slug]/folders/[id]/page.tsx";
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
@@ -173,11 +175,20 @@ export default function Routes() {
                 </Switch>
             </Route>
 
+            {/* jank */}
             <Route path={/^\/(%40|@)(?<slug>[^\/]+)\/?$/}>
-                <Suspense fallback={<LoadingFallback/>}>
-                    <UserProfile/>
-                </Suspense>
+                <UserLayout>
+                    <Suspense fallback={<LoadingFallback/>}>
+                        <UserProfile/>
+                    </Suspense>
+                </UserLayout>
             </Route>
+            <Route path={/^\/(%40|@)(?<slug>[^\/]+)(\/folders\/(?<id>[^\/]+))?\/?$/}>
+                <UserLayout>
+                    <UserFolderPage/>
+                </UserLayout>
+            </Route>
+
 
             <Route path="/stuff" nest>
                 <div></div>

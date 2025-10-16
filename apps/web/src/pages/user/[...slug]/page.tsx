@@ -12,7 +12,6 @@ import {useParams} from 'wouter'
 import {Feed} from '@/components/feed'
 import {CustomTheme} from '@/components/shared/theme/custom-theme'
 import {useUserAccountStore} from '@/lib'
-import {SafeFrame} from '@/components/shared'
 
 export default function UserProfile() {
     const [user, setUser] = useState<any>(null)
@@ -43,7 +42,7 @@ export default function UserProfile() {
     if (error) return <NotFound/>
 
     return (
-        <SafeFrame className="w-full h-full">
+        <>
             {loading && (
                 <Body>
                     <div className="mx-auto">
@@ -63,6 +62,6 @@ export default function UserProfile() {
                     </div>
                 </>
             )}
-        </SafeFrame>
+        </>
     )
 }

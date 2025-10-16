@@ -41,7 +41,7 @@ export function Dialog({
                         className={cn(
                             className,
                             sizes[size],
-                            'row-start-2 w-full min-w-0 rounded-3xl bg-white ring-1 shadow-lg ring-zinc-950/10 sm:mb-auto dark:bg-zinc-900 dark:ring-white/10 forced-colors:outline',
+                            'row-start-2 w-full overflow-hidden min-w-0 rounded-3xl bg-white ring-1 shadow-lg ring-zinc-950/10 sm:mb-auto dark:bg-zinc-900 dark:ring-white/10 forced-colors:outline',
                             'transition duration-100 will-change-transform data-closed:translate-y-12 data-closed:opacity-0 data-enter:ease-out data-leave:ease-in sm:data-closed:translate-y-0 sm:data-closed:data-enter:scale-95'
                         )}
                     >
