@@ -3,7 +3,7 @@
  */
 
 import React, {useCallback, useEffect, useRef} from 'react'
-import cx from 'classnames'
+import {cn} from "@/lib";
 
 type ResizablePanelProps = {
     children: React.ReactNode
@@ -70,11 +70,11 @@ export function ResizablePanel({
     }, [onMouseMove, stopDragging])
 
     return (
-        <div ref={containerRef} className={cx('relative', className)} style={{width}}>
+        <div ref={containerRef} className={cn('relative', className)} style={{width}}>
             {children}
             <div
                 onMouseDown={startDragging}
-                className={cx(
+                className={cn(
                     'absolute right-0 top-0 h-full w-1.5 cursor-col-resize bg-transparent transition-[background-color] hover:bg-n-2/25',
                     handleClassName
                 )}

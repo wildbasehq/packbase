@@ -58,7 +58,7 @@ Big tech doesn't work for you. They don't know what a creative site is, they don
 
 On the Internet, you have the power to make whatever the hell you want. Make a site with just basic <a>links</a>, a bio about yourself, whatever it may be; it's art. It's **your** art.
 
-"But a site can't be art" some say. "It's just a website."
+"But a site can't be art," some say. "It's just a website."
 
 If you spend hours making a page that embodies you, that's art.
 
