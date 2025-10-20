@@ -1,8 +1,13 @@
-import { defineNitroConfig } from "nitropack/config"
+import {defineNitroConfig} from "nitropack/config"
 
-// https://nitro.build/config
 export default defineNitroConfig({
-  compatibilityDate: "latest",
-  srcDir: "server",
-  imports: false
-});
+    compatibilityDate: "2024-09-19",
+    preset: "cloudflare_module",
+    srcDir: "server",
+    imports: false,
+    cloudflare: {
+        deployConfig: true,
+        nodeCompat: true
+    }
+})
+

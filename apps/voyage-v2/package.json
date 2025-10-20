@@ -4,7 +4,8 @@
   "scripts": {
     "build": "nitro build",
     "dev": "nitro dev",
-    "preview": "node .output/server/index.mjs"
+    "preview": "node .output/server/index.mjs",
+    "wrangler": "bun run build && bunx wrangler dev"
   },
   "devDependencies": {
     "h3": "^1.15.4",
