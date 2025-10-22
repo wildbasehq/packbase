@@ -18,6 +18,8 @@ const log = {
  */
 const queue = new Set<string>();
 
+const authorizedParties = ['https://packbase.app', 'http://localhost:5173', 'http://localhost:8000', 'http://localhost:5933', 'http://localhost:5174', 'https://proto.packbase.app'];
+
 /**
  * Verifies a token and returns a user object
  * Waits for the queue to be empty before returning the user object
@@ -29,7 +31,7 @@ export default async function verifyToken(req: any) {
     try {
         const shadowReq = req.clone();
         const authReq = await clerkClient.authenticateRequest(shadowReq, {
-            authorizedParties: ['https://packbase.app', 'http://localhost:5173', 'http://localhost:8000', 'http://localhost:5933', 'https://proto.packbase.app'],
+            authorizedParties
         });
 
         if (authReq.isSignedIn) {
@@ -92,7 +94,7 @@ async function verifyTokenProcess(req: any) {
     try {
         const shadowReq = req.clone();
         const authReq = await clerkClient.authenticateRequest(shadowReq, {
-            authorizedParties: ['https://packbase.app', 'http://localhost:5173', 'http://localhost:8000', 'http://localhost:5933', 'https://proto.packbase.app'],
+            authorizedParties
         });
 
         if (authReq.isSignedIn) {
