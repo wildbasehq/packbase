@@ -11,6 +11,7 @@ import Tooltip from '../shared/tooltip'
 import {
     ArrowUpRightIcon,
     BoltIcon,
+    CheckIcon,
     CubeTransparentIcon,
     GlobeAltIcon,
     HeartIcon,
@@ -604,7 +605,7 @@ function MigrationSection() {
             icon: '🦊',
             description: 'Seamlessly import your gallery and submissions',
             features: ['Gallery & submissions', 'Journals & stories', 'Shadow comments (displays as "From FA: {user}")'],
-            color: 'from-orange-500 to-amber-500',
+            color: 'bg-gradient-to-b from-orange-500/5 to-amber-500/5',
         },
         {
             id: 'phpbb',
@@ -617,7 +618,7 @@ function MigrationSection() {
                 'Forum structure',
                 'Attachments & media',
             ],
-            color: 'from-blue-500 to-indigo-500',
+            color: 'bg-gradient-to-b from-blue-500/5 to-indigo-500/5',
         },
     ]
 
@@ -640,14 +641,11 @@ function MigrationSection() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                 {platforms.map(platform => (
                     <div
-                        className="relative overflow-hidden rounded p-8 cursor-pointer transition-all ring-1 ring-default hover:ring-2 hover:ring-indigo-500/50 shadow-md bg-white dark:bg-zinc-800">
-                        {/* Gradient overlay */}
-                        <div className={`absolute inset-0 bg-gradient-to-br ${platform.color} opacity-5`}/>
-
+                        className={`relative overflow-hidden rounded p-8 transition-all ring-1 ring-default ${platform.color}`}>
                         <div className="relative">
                             <div className="flex items-start gap-4 mb-4">
                                 <div
-                                    className={`w-14 h-14 rounded-xl bg-gradient-to-br ${platform.color} flex items-center justify-center text-2xl shadow-lg`}
+                                    className={`w-12 h-12 flex items-center justify-center text-2xl`}
                                 >
                                     {platform.icon}
                                 </div>
@@ -661,18 +659,10 @@ function MigrationSection() {
 
                             <div className="space-y-2 mt-6">
                                 {platform.features.map((feature, idx) => (
-                                    <div key={idx} className="flex gap-2">
+                                    <div key={idx} className="flex items-center gap-2">
                                         <div
-                                            className="w-5 h-5 rounded-full bg-green-500/20 dark:bg-green-400/20 flex items-center justify-center">
-                                            <svg
-                                                className="w-3 h-3 text-green-600 dark:text-green-400"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                      d="M5 13l4 4L19 7"/>
-                                            </svg>
+                                            className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                                            <CheckIcon className="w-3 h-3 text-green-500"/>
                                         </div>
                                         <Text size="sm">{feature}</Text>
                                     </div>
@@ -756,10 +746,11 @@ export default function GuestLanding() {
             },
         ],
     }
+
     return (
-        <div className="h-full overflow-x-hidden overflow-y-auto scrollbar-hide bg-zinc-100 dark:bg-zinc-950">
+        <div className="h-full overflow-x-hidden overflow-y-auto scrollbar-hide">
             <div
-                className="relative z-30 bg-white overflow-hidden mb-80 rounded-b ring-2 ring-default dark:bg-zinc-900 shadow-xl">
+                className="relative bg-white overflow-hidden z-10 rounded-b ring-2 ring-default dark:bg-zinc-900 shadow-xl">
                 <Hero/>
                 <FeaturePromiseGrid/>
                 <PackShowcase/>
@@ -767,7 +758,7 @@ export default function GuestLanding() {
             </div>
 
             {/* Minimal footer */}
-            <div className="absolute bottom-0 left-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80 h-80">
+            <div className="relative bottom-0 left-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80">
                 <div className="flex items-end justify-end w-full h-80 border-x border-n-2/80 dark:border-n-6/80">
                     {/* Horizontal dotted border at the top of items */}
                     <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80"

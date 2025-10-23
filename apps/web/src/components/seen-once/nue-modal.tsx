@@ -343,7 +343,7 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                 content: [
                     'Welcome to Packbase!',
                     "I'm here to help you get started with your new Packbase account.",
-                    'As this related to critical information, you cannot skip this.',
+                    'As we still need some critical information, you cannot skip this.',
                     "{img src:'noai_created'}{/img}",
                 ],
                 expression: Expressions.DEFAULT,

@@ -404,7 +404,7 @@ export const termsConfig: TermsConfig = {
                                 'All adult or sexually explicit artwork MUST be tagged with their respective "Content Label", and must tag anything within the content, based on "what you see". Some tags may be allowed under "What you know", but cannot be used to evade Packbase\'s terms.',
                                 'No minors or youthful-looking characters; all depictions must be clearly 18+.',
                                 'Cross-posting adult content to Standard accounts is prohibited.',
-                                'You must complete age verification and enable Afterdark to publish or view adult content.',
+                                'Depending on your region, you may need to complete age verification to enable Afterdark to publish or view adult content.',
                             ],
                         },
                         {

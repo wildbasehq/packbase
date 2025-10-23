@@ -38,7 +38,7 @@ __/\\_| |__   __ _ ___  ___
 `,
             'color: #ff6b35;'
         )
-
+        
         console.log('')
         console.log("Welcome. Don't run random scripts people send to you. That'd be fucking stupid as shit.")
         console.log('')
