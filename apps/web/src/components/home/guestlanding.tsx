@@ -189,7 +189,7 @@ function Hero() {
                 src={LandingBackground}
                 alt="N-BG"
                 className="absolute top-0 -z-10 w-full h-full object-cover object-bottom blur-xs"
-                style={{objectPosition: '0 50%'}}
+                style={{objectPosition: '0 15%'}}
             />
             {/* Top row of skewed cards */}
             {/*<TopRowCards />*/}
