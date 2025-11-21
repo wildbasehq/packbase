@@ -7,9 +7,16 @@ import {SidebarPortal} from '@/lib/context/sidebar-context.tsx'
 import {Newspaper} from '@/components/icons/plump/Newspaper'
 import {ChatBubbleSmileyIcon} from '@/components/icons/plump'
 import {ChatSidebarContent} from '@/pages/c/layout'
-import {ReactNode} from "react";
+import {ReactNode, useEffect} from "react";
+import {useResourceStore} from "@/lib";
 
 export default function UniversePackLayout({children}: { children: ReactNode }) {
+    const {setCurrentResource, resourceDefault} = useResourceStore()
+
+    useEffect(() => {
+        setCurrentResource(resourceDefault)
+    }, [setCurrentResource])
+
     return (
         <>
             <SidebarPortal>

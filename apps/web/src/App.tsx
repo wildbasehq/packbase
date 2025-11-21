@@ -2,18 +2,18 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {lazy, useEffect} from 'react'
-import {SidebarLayout} from '@/components/shared/sidebar-layout.tsx'
-import {Providers} from './provider.tsx'
-import {SidebarProvider} from '@/lib/context/sidebar-context'
-import {AppTabs, LogoSpinner} from '@/src/components'
+import React, { lazy, useEffect } from 'react'
+import { SidebarLayout } from '@/components/shared/sidebar-layout.tsx'
+import { Providers } from './provider.tsx'
+import { SidebarProvider } from '@/lib/context/sidebar-context'
+import { AppTabs, LogoSpinner } from '@/src/components'
 import Body from '@/components/layout/body.tsx'
-import {ClerkLoaded, ClerkLoading} from '@clerk/clerk-react'
+import { ClerkLoaded, ClerkLoading } from '@clerk/clerk-react'
 import Preload from '@/src/preload.tsx'
-import {ProjectName, ProjectSafeName} from '@/lib'
+import { ProjectName, ProjectSafeName } from '@/lib'
 import BrowserCheck from '@/components/modal/browser-check.tsx'
-import Routes from "@/src/Routes.tsx";
-import CommandPalette from "@/components/modal/command-palette.tsx";
+import Routes from '@/src/Routes.tsx'
+import CommandPalette from '@/components/modal/command-palette.tsx'
 
 // Lazy load components
 const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
@@ -28,17 +28,17 @@ function App() {
         }
 
         console.log(
-            `%c      _                    
-__/\\_| |__   __ _ ___  ___ 
+            `%c      _
+__/\\_| |__   __ _ ___  ___
 \\    / '_ \\ / _\` / __|/ _ \\
 /_  _\\ |_) | (_| \\__ \\  __/
   \\/ |_.__/ \\__,_|___/\\___|
-  
+
   (c) Wildbase 2025
 `,
             'color: #ff6b35;'
         )
-        
+
         console.log('')
         console.log("Welcome. Don't run random scripts people send to you. That'd be fucking stupid as shit.")
         console.log('')
@@ -51,36 +51,17 @@ __/\\_| |__   __ _ ___  ___
         console.log('')
 
         console.log('%c`base()`', 'color: #9b59b6; font-style: italic;')
-        ;(window as any).base = () =>
-            console.log(`Dear user,
-
-Big tech doesn't work for you. They don't know what a creative site is, they don't even know what being creative truly means. Every little byte of code to them is money - nothing more.
-
-On the Internet, you have the power to make whatever the hell you want. Make a site with just basic <a>links</a>, a bio about yourself, whatever it may be; it's art. It's **your** art.
-
-"But a site can't be art," some say. "It's just a website."
-
-If you spend hours making a page that embodies you, that's art.
-
-What i'm trying to say is, do what you want, make what you want.
-At the end of the day,
-only you know what's good
-for you.
-
-Thanks for being a crucial part of the internet.
-        `)
     }, [])
 
     return (
         <Providers>
             {/* Browser check */}
-            <BrowserCheck/>
-            <CommandPalette/>
+            <BrowserCheck />
+            <CommandPalette />
 
             <SidebarProvider>
                 <div className="absolute bottom-0 left-0 z-40 w-full sm:hidden">
-                    <AppTabs
-                        className="border-0 !rounded-none !rounded-t-md ring-1 ring-default items-center justify-center"/>
+                    <AppTabs className="border-0 !rounded-none !rounded-t-md ring-1 ring-default items-center justify-center" />
                 </div>
 
                 <SidebarLayout>
@@ -90,18 +71,17 @@ Thanks for being a crucial part of the internet.
                                 <div className="w-full h-full">
                                     <ClerkLoading>
                                         <Body bodyClassName="h-full" className="!h-full items-center justify-center">
-                                            <LogoSpinner/>
+                                            <LogoSpinner />
                                             <span className="text-sm mt-1">Checking Wild ID</span>
                                         </Body>
                                     </ClerkLoading>
 
                                     <ClerkLoaded>
                                         <Preload>
-                                            <div id="NGRoot"
-                                                 className="h-full overflow-y-auto overflow-x-hidden">
-                                                <WaitlistCheck/>
+                                            <div id="NGRoot" className="h-full overflow-y-auto overflow-x-hidden">
+                                                <WaitlistCheck />
 
-                                                <Routes/>
+                                                <Routes />
                                             </div>
                                         </Preload>
                                     </ClerkLoaded>

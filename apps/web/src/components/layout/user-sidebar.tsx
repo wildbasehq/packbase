@@ -20,7 +20,6 @@ import {useInterval, useLocalStorage} from 'usehooks-ts'
 import UserAvatar from '@/components/shared/user/avatar.tsx'
 import {InboxContent, UserMultipleAccounts} from '@/components/icons/plump'
 import InboxPage from '@/pages/inbox/page'
-import {PlusIcon} from "@heroicons/react/16/solid";
 
 export default function UserSidebar() {
     const {
@@ -48,7 +47,7 @@ export default function UserSidebar() {
         const {right} = containerRef.current.getBoundingClientRect()
 
         const onMove = (x: number) => {
-            // Dragging the LEFT edge: width is the distance from cursor to the container's right edge
+            // Dragging the LEFT edge: width is the distance from the cursor to the container's right edge
             const rawWidth = Math.max(0, right - x)
 
             const clamped = Math.min(maxExpandedPx, Math.max(minExpandedPx, rawWidth))
@@ -140,7 +139,7 @@ export function UserActionsContainer() {
         <>
             {/* + New */}
             <div className="flex mr-2 items-center animate-scale-in">
-                <PlusIcon className="h-5 w-5 text-muted-foreground dark:text-muted-foreground"/>
+                {/*<PlusIcon className="h-5 w-5 text-muted-foreground dark:text-muted-foreground"/>*/}
             </div>
         </>
     )

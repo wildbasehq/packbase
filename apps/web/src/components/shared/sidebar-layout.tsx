@@ -6,7 +6,7 @@ import * as Headless from '@headlessui/react'
 import React, {Activity, useState} from 'react'
 import {useResourceStore} from '@/lib/state'
 import {Navbar, NavbarDivider, NavbarItem, NavbarLabel, NavbarSection, NavbarSpacer} from '@/components/layout'
-import UserSidebar, {UserActionsContainer} from '@/components/layout/user-sidebar.tsx'
+import UserSidebar from '@/components/layout/user-sidebar.tsx'
 import {useSidebar} from '@/lib/context/sidebar-context'
 import ResourceSettings from '@/components/layout/resource'
 import {
@@ -20,6 +20,7 @@ import {
     FloatingCompose,
     Heading,
     Logo,
+    Mobile,
     Sidebar,
     SidebarBody,
     SidebarFooter,
@@ -27,23 +28,30 @@ import {
     SidebarLabel,
     SidebarSpacer,
 } from '@/src/components'
-import {MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
-import {ChevronDownIcon, FaceSmileIcon} from '@heroicons/react/16/solid'
+import {
+    ExclamationTriangleIcon,
+    MagnifyingGlassIcon,
+    QuestionMarkCircleIcon,
+    SparklesIcon
+} from '@heroicons/react/20/solid'
+import {FaceSmileIcon} from '@heroicons/react/16/solid'
 import {SiDiscord} from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 import {SignedIn, useSession} from '@clerk/clerk-react'
-import {isVisible, WorkerSpinner} from '@/lib'
+import {cn, isVisible, WorkerSpinner} from '@/lib'
 import useWindowSize from '@/lib/hooks/use-window-size.ts'
 import ResizablePanel from '@/components/shared/resizable'
 import {News} from '../ui/sidebar-news'
 import {useLocation} from "wouter";
-import AppDropdownMenu from "@/components/layout/AppDropdownMenu.tsx";
 import TextTicker from "@/components/shared/text-ticker.tsx";
 import {useLocalStorage} from "usehooks-ts";
 import {Text} from "@/components/shared/text.tsx";
 import UserDropdown from "@/components/layout/user-dropdown";
 import {AlignLeft} from "@/components/icons/plump/AlignLeft.tsx";
 import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
+import {motion} from "motion/react"
+import Link from "@/components/shared/link.tsx";
+import Tooltip from "@/components/shared/tooltip.tsx";
 
 const NavbarItems = [
     {
@@ -54,7 +62,8 @@ const NavbarItems = [
     {
         label: 'Badges',
         limitedEvent: true,
-        href: '/store'
+        href: '/store',
+        onlySignedIn: true
     }
 ]
 
@@ -109,6 +118,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     const [location] = useLocation()
     const [seenPackTour, setSeenPackTour] = useLocalStorage('seen-pack-tour', false)
     const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
+    const [isWHOpen, setIsWHOpen] = useState(false)
 
     return (
         <div className="flex min-h-svh h-screen w-full relative bg-muted">
@@ -142,99 +152,158 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                         </div>
                     </Activity>
                 </SignedIn>
+
                 {/* Content */}
                 <div
                     className="min-w-0 bg-sidebar px-4">
                     <Navbar>
-                        <Dropdown>
-                            <DropdownButton as={NavbarItem}
-                                            className="max-lg:hidden flex w-2xs h-8 [&>*]:w-full">
-                                <div
-                                    data-slot="avatar"
-                                    className="rounded-sm w-6 h-6 border overflow-hidden bg-primary-cosmos flex justify-center items-center">
-                                    <Logo noStyle fullSize
-                                          className="w-4 h-4 invert"/>
-                                </div>
-                                <div className="flex flex-col -space-y-1 relative">
-                                    <NavbarLabel>Packbase</NavbarLabel>
-                                    <NavbarLabel className="text-muted-foreground text-xs">
-                                        <TextTicker
-                                            texts={['CommInt ticker 1', 'CommInt ticker two', 'long interaction that should cut off']}
-                                            interval={5000}/>
-                                    </NavbarLabel>
-                                </div>
-                                <ChevronDownIcon/>
-                            </DropdownButton>
-                            <AppDropdownMenu/>
-                        </Dropdown>
-                        <NavbarDivider/>
-                        <NavbarSection className="max-lg:hidden">
-                            {NavbarItems.map((item) => (
-                                <NavbarItem href={item.href}
-                                            current={location.startsWith(item.currentHref || item.href)}
-                                            key={item.href}>
-                                    {item.label}
-                                    {item.limitedEvent && <Badge className="!py-0" color="indigo">Limited</Badge>}
+                        <Mobile>
+                            <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
+                                <OpenMenuIcon/>
+                            </NavbarItem>
+                        </Mobile>
+
+                        <NavbarItem
+                            className="flex w-2xs h-8 [&>*]:w-full"
+                            onClick={() => setIsWHOpen(!isWHOpen)}
+                        >
+                            <div
+                                data-slot="avatar"
+                                className="rounded-sm w-6 h-6 border overflow-hidden bg-primary-cosmos flex justify-center items-center">
+                                <Logo noStyle fullSize
+                                      className="w-4 h-4 invert"/>
+                            </div>
+                            <div className="flex flex-col -space-y-1 relative">
+                                <NavbarLabel>Packbase</NavbarLabel>
+                                <NavbarLabel className="text-muted-foreground text-xs">
+                                    <TextTicker
+                                        texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...', 'Click in for more...']}
+                                        interval={2000}/>
+                                </NavbarLabel>
+                            </div>
+                            <Tooltip
+                                content={
+                                    <>
+                                        <Heading className="!text-sm">System fault precautions are in effect.</Heading>
+                                        <Text className="!text-xs">
+                                            Our content moderation system is currently having some issues.
+                                            We've temporarily enabled stricter (but sensitive) filtering which
+                                            may block valid content. We're extremely sorry. /rek.
+                                        </Text>
+                                    </>
+                                }>
+                                <ExclamationTriangleIcon
+                                    data-hardcoded-reasoning="Rheo manages feature flags - can't change due to Rheo being down."
+                                    className="!fill-orange-500"/>
+                            </Tooltip>
+                            {/*<ChevronDownIcon/>*/}
+                        </NavbarItem>
+
+                        <Desktop>
+                            <NavbarDivider/>
+
+                            <NavbarSection>
+                                {NavbarItems
+                                    .filter(item => !item.onlySignedIn || (item.onlySignedIn && isSignedIn))
+                                    .map((item) => (
+                                        <NavbarItem href={item.href}
+                                                    current={location.startsWith(item.currentHref || item.href)}
+                                                    key={item.href}>
+                                            {item.label}
+                                            {item.limitedEvent &&
+                                                <Badge className="!py-0" color="indigo">Limited</Badge>}
+                                        </NavbarItem>
+                                    ))}
+                            </NavbarSection>
+
+                            <NavbarSpacer/>
+
+                            <WorkerSpinner/>
+
+                            <NavbarSection>
+                                <SignedIn>
+                                    <NavbarItem onClick={() => PackbaseInstance.emit('search-open', {})}
+                                                aria-label="Open search">
+                                        <MagnifyingGlassIcon/>
+                                    </NavbarItem>
+                                </SignedIn>
+
+                                <Dropdown>
+                                    <DropdownButton as={NavbarItem}>
+                                        <QuestionMarkCircleIcon/>
+                                        <SidebarLabel>Help</SidebarLabel>
+                                    </DropdownButton>
+                                    <DropdownMenu anchor="top">
+                                        <DropdownItem href="https://work.wildbase.xyz/maniphest/query/all/"
+                                                      target="_blank">
+                                            <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                            <SidebarLabel>Feedback</SidebarLabel>
+                                        </DropdownItem>
+                                        <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
+                                            <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                            <SidebarLabel>Discord</SidebarLabel>
+                                        </DropdownItem>
+                                        <DropdownItem href="https://wildbase.xyz/" target="_blank">
+                                            <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                            <SidebarLabel>Wildbase</SidebarLabel>
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>
+                                <NavbarItem href="https://blog.packbase.app" target="_blank">
+                                    <SparklesIcon/>
+                                    <NavbarLabel>Blog</NavbarLabel>
                                 </NavbarItem>
-                            ))}
-                        </NavbarSection>
-                        <NavbarSpacer/>
+                            </NavbarSection>
+                        </Desktop>
 
-                        <WorkerSpinner/>
-
-                        <NavbarSection>
-                            <NavbarItem onClick={() => PackbaseInstance.emit('search-open', {})}
-                                        aria-label="Open search">
-                                <MagnifyingGlassIcon/>
-                            </NavbarItem>
-                            <Dropdown>
-                                <DropdownButton as={NavbarItem}>
-                                    <QuestionMarkCircleIcon/>
-                                    <SidebarLabel>Help</SidebarLabel>
-                                </DropdownButton>
-                                <DropdownMenu anchor="top">
-                                    <DropdownItem href="https://work.wildbase.xyz/maniphest/query/all/"
-                                                  target="_blank">
-                                        <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                        <SidebarLabel>Feedback</SidebarLabel>
-                                    </DropdownItem>
-                                    <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
-                                        <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                        <SidebarLabel>Discord</SidebarLabel>
-                                    </DropdownItem>
-                                    <DropdownItem href="https://wildbase.xyz/" target="_blank">
-                                        <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
-                                        <SidebarLabel>Wildbase</SidebarLabel>
-                                    </DropdownItem>
-                                </DropdownMenu>
-                            </Dropdown>
-                            <NavbarItem href="https://blog.packbase.app" target="_blank">
-                                <SparklesIcon/>
-                                <NavbarLabel>Blog</NavbarLabel>
-                            </NavbarItem>
-                        </NavbarSection>
-
-                        <AlignLeft className="w-7 h-7 fill-indigo-600"
-                                   onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)}/>
-                        <UserDropdown/>
+                        <SignedIn>
+                            <AlignLeft className="w-7 h-7 fill-indigo-600"
+                                       onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)}/>
+                            <UserDropdown/>
+                        </SignedIn>
                     </Navbar>
                 </div>
 
-                {/* Navbar on mobile */}
-                <header className="flex items-center px-4 gap-4 lg:hidden z-10">
-                    <div className="py-2.5">
-                        <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
-                            <OpenMenuIcon/>
-                        </NavbarItem>
+                {/* Dropdown content, moves below content down */}
+                <Activity mode={isVisible(isWHOpen)}>
+                    <div className="absolute top-12 px-4 py-2.5">
+                        <WhatsHappeningDropdown/>
                     </div>
-                    <div className="flex gap-4 w-full">
-                        <UserActionsContainer/>
-                    </div>
-                </header>
+                </Activity>
+
+                {/* Bottom gradient transparent to bg-card */}
+                <div
+                    className="absolute z-50 bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-muted/50"/>
 
                 {/* Content */}
-                <div
-                    className="relative flex overflow-hidden grow m-1 lg:rounded-lg lg:bg-white lg:ring-1 ring-default lg:shadow-xs  dark:lg:bg-zinc-900">
+                <motion.div
+                    initial={true}
+                    animate={isWHOpen ? 'open' : 'closed'}
+                    variants={{
+                        open: {
+                            y: '12rem',
+                            opacity: 0.85,
+                            filter: 'blur(2px)',
+                            scale: 1
+                        },
+                        closed: {
+                            y: 0,
+                            scale: 1
+                        },
+                        interactEntry: {
+                            y: '11.5rem'
+                        }
+                    }}
+                    transition={{
+                        type: 'spring',
+                        stiffness: 1000,
+                        damping: 50,
+                        mass: 1
+                    }}
+                    whileHover={isWHOpen ? 'interactEntry' : undefined}
+                    onClick={() => isWHOpen && setIsWHOpen(false)}
+                    className={cn(isWHOpen && '[&>*]:!pointer-events-none', 'relative flex overflow-hidden grow m-1 lg:rounded-lg lg:bg-white lg:ring-1 ring-default lg:shadow-xs dark:lg:bg-zinc-900')}
+                >
                     {/* Sidebar on mobile */}
                     <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
                         <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
@@ -252,7 +321,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                             {children}
                         </div>
                     </div>
-                </div>
+                </motion.div>
                 {/*</main>*/}
             </div>
 
@@ -261,6 +330,42 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     <UserSidebar/>
                 </Desktop>
             </SignedIn>
+        </div>
+    )
+}
+
+function WhatsHappeningDropdown() {
+    const items = [
+        // col 1
+        [
+            {name: 'Packbase', href: '/'},
+        ],
+        // col 2
+        [
+            {name: 'Packbase', href: '/'},
+        ],
+        // col 3
+        [
+            {name: 'Packbase', href: '/'},
+        ],
+    ]
+
+    return (
+        <div className="grid grid-cols-3 gap-6">
+            {items.map((column, colIdx) => (
+                <ul key={colIdx} className="space-y-2">
+                    {column.map((item, itemIdx) => (
+                        <li key={`${colIdx}-${itemIdx}-${item.name}`}>
+                            <Link
+                                href={item.href}
+                                className="text-xl font-bold text-foreground hover:underline"
+                            >
+                                {item.name}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            ))}
         </div>
     )
 }

@@ -6,7 +6,7 @@
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
 import UserAvatar from '@/components/shared/user/avatar'
 import {Heading, Text} from '@/components/shared/text.tsx'
-import {Editor, Field, Label, Listbox, ListboxLabel, ListboxOption, Textarea} from '@/src/components'
+import {Badge, Editor, Field, Label, Listbox, ListboxLabel, ListboxOption, Textarea} from '@/src/components'
 import {useParams} from 'wouter'
 import {Activity, ReactNode, useEffect, useRef, useState} from 'react'
 import {ArrowDownIcon, ChevronRightIcon, QuestionMarkCircleIcon} from '@heroicons/react/20/solid'
@@ -223,14 +223,15 @@ export default function FloatingCompose() {
             >
                 {/* Top small bar */}
                 <div className="min-h-12 border-b flex items-center justify-between px-4">
-                    <Tooltip content="Manage storage" side="bottom">
-                        <div className="bg-muted rounded-full w-7 h-7 p-1.5 text-indigo-500" onClick={(e) => {
-                            e.stopPropagation()
-                            toast.error('"Your Stuff" is disabled by the instance owner.')
-                        }}>
-                            <HardDisk className="fill-muted-foreground w-full h-full"/>
-                        </div>
-                    </Tooltip>
+                    {/*<Tooltip content="Manage storage" side="bottom">*/}
+                    {/*    <div className="bg-muted rounded-full w-7 h-7 p-1.5 text-indigo-500" onClick={(e) => {*/}
+                    {/*        e.stopPropagation()*/}
+                    {/*        toast.error('"Your Stuff" is disabled by the instance owner.')*/}
+                    {/*    }}>*/}
+                    {/*        <HardDisk className="fill-muted-foreground w-full h-full"/>*/}
+                    {/*    </div>*/}
+                    {/*</Tooltip>*/}
+                    <div className="flex items-center justify-center gap-2" />
                     <div className="flex items-center gap-2">
                         <Activity mode={isVisible(!!channel)}>
                             <div className="flex items-center gap-1">
@@ -247,9 +248,28 @@ export default function FloatingCompose() {
                             <Heading size="sm">{currentResource.display_name}</Heading>
                         </Activity>
                     </div>
-                    <div className="flex items-center justify-center gap-2">
-
-                    </div>
+                    <Tooltip content={
+                        <div className="flex flex-col gap-1">
+                            <span className="gap-2">
+                                Jump into Deep Compose
+                            </span>
+                            <span className="text-xs">
+                                Create or Draft multiple Howls and Stories quickly on a dedicated page.
+                            </span>
+                            <div>
+                                <Badge color="red">
+                                    Experimental - may be unstable
+                                </Badge>
+                            </div>
+                        </div>
+                    } side="bottom">
+                        <div className="bg-muted rounded-full w-7 h-7 p-1.5 text-indigo-500" onClick={(e) => {
+                            e.stopPropagation()
+                            toast.error('"Your Stuff" is disabled by the instance owner.')
+                        }}>
+                            <HardDisk className="fill-muted-foreground w-full h-full"/>
+                        </div>
+                    </Tooltip>
                 </div>
 
                 <div className="flex-grow p-4">

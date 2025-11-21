@@ -190,7 +190,7 @@ function Hero() {
                 src={LandingBackground}
                 alt="N-BG"
                 className="absolute top-0 -z-10 w-full h-full object-cover object-bottom blur-xs"
-                style={{objectPosition: '0 50%'}}
+                style={{objectPosition: '0 15%'}}
             />
             {/* Top row of skewed cards */}
             {/*<TopRowCards />*/}
@@ -758,16 +758,26 @@ export default function GuestLanding() {
             </div>
 
             {/* Minimal footer */}
-            <div className="relative bottom-0 left-0 w-full px-8 border-y border-n-2/80 dark:border-n-6/80">
-                <div className="flex items-end justify-end w-full h-80 border-x border-n-2/80 dark:border-n-6/80">
+            <div
+                className="relative bottom-0 left-0 w-full px-4 sm:px-6 md:px-8 border-y border-n-2/80 dark:border-n-6/80">
+                <div
+                    className="flex w-full items-end justify-end h-auto md:h-80 border-x border-n-2/80 dark:border-n-6/80 py-4 sm:py-6">
                     {/* Horizontal dotted border at the top of items */}
-                    <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80"
-                         style={{top: '2rem'}}></div>
+                    <div
+                        className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80 hidden md:block"
+                        style={{top: '2rem'}}
+                    ></div>
 
                     {/* Items with grid border style */}
-                    <div className="flex justify-end w-full border-t border-n-2/80 dark:border-n-6/80">
-                        <img src={NoAIBadge} className="mr-8 pointer-events-none" alt="No AI Reliance"/>
-                        <div className="relative grid grid-cols-2 gap-12 px-4 py-2 mb-8 mr-8 ring-1 ring-default">
+                    <div
+                        className="flex w-full flex-col md:flex-row md:justify-end border-t border-n-2/80 dark:border-n-6/80 gap-4 sm:gap-6">
+                        <img
+                            src={NoAIBadge}
+                            className="hidden sm:block h-8 sm:h-10 md:h-auto md:mr-8 pointer-events-none"
+                            alt="No AI Reliance"
+                        />
+                        <div
+                            className="relative w-full md:w-auto grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 px-4 py-4 sm:py-2 mb-6 sm:mb-8 md:mr-8 ring-1 ring-default">
                             {Object.entries(links).map(([category, items]) => (
                                 <div key={category}>
                                     <Heading className="mb-3 !font-bold !uppercase">{category}</Heading>
@@ -789,18 +799,21 @@ export default function GuestLanding() {
                     </div>
 
                     {/* Horizontal dotted border at the bottom of items */}
-                    <div className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80"
-                         style={{bottom: '1.85rem'}}></div>
+                    <div
+                        className="absolute left-0 right-0 border-t border-n-2/80 dark:border-n-6/80 hidden md:block"
+                        style={{bottom: '1.85rem'}}
+                    ></div>
 
                     {/* Floating brand text on bottom-left - should not interact with other elements! */}
-                    <h1 className="fixed flex flex-col opacity-50 select-none bottom-1 left-7 font-bold">
-                        <span className="tracking-tighter text-8xl -mb-3">
-                            <span className="font-extrabold text-primary-lime">✱</span>
-                            <span className="font-wildbase-bold">base</span>
-                        </span>
-                        <span className="text-xs tracking-tight ml-22 text-default-alt font-wildbase-medium">
-                            &copy; 2025 ✱base
-                        </span>
+                    <h1 className="hidden md:fixed md:flex flex-col opacity-50 select-none bottom-1 left-7 font-bold">
+            <span className="tracking-tighter text-6xl md:text-8xl -mb-3">
+                <span className="font-extrabold text-primary-lime">✱</span> 
+                <span className="font-wildbase-bold">base</span>
+            </span>
+                        <span
+                            className="text-[10px] md:text-xs tracking-tight ml-22 text-default-alt font-wildbase-medium">
+                &copy; 2025 ✱base
+            </span>
                     </h1>
                 </div>
             </div>

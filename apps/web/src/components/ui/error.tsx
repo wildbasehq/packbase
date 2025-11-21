@@ -37,25 +37,25 @@ class ErrorBoundaryImpl extends React.Component<ErrorBoundaryProps, ErrorBoundar
     };
 
     static getDerivedStateFromError(error: unknown): Partial<ErrorBoundaryState> {
-        return { hasError: true, error };
+        return {hasError: true, error};
     }
 
     componentDidCatch(error: unknown, errorInfo: ErrorInfo) {
         // Allow consumers to handle/log errors
-        this.props.onError?.(error, { componentStack: errorInfo.componentStack });
+        this.props.onError?.(error, {componentStack: errorInfo.componentStack});
         // Basic console output for visibility during development
         // eslint-disable-next-line no-console
         console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
 
     reset = () => {
-        this.setState({ hasError: false, error: null });
+        this.setState({hasError: false, error: null});
         this.props.onReset?.();
     };
 
     render() {
         if (this.state.hasError) {
-            const { fallback } = this.props;
+            const {fallback} = this.props;
 
             if (typeof fallback === 'function') {
                 return fallback(this.state.error, this.reset);
@@ -71,25 +71,27 @@ class ErrorBoundaryImpl extends React.Component<ErrorBoundaryProps, ErrorBoundar
                     <div className="flex flex-col">
                         <div className="flex items-center gap-4">
                             <AlertTitle>
-                                <SadComputerIcon className="h-12 w-fit" />
+                                <SadComputerIcon className="h-12 w-fit"/>
                             </AlertTitle>
                             <div className="flex flex-col">
                                 <Heading>
                                     Failure: {this.state.error instanceof Error ? this.state.error.message : 'Something went wrong'}
                                 </Heading>
                                 <Text>
-                                    A critical component crashed and can't recover. {navigator.appName === 'Packbase' ? "You'll need to restart this software entirely." : "Reload this page to try again."}
-                                    <br />
-                                    This shouldn't happen. <Link href="https://discord.gg/StuuK55gYA" target="_blank" className="text-primary">Report it <ArrowUpRightIcon className="h-4 w-4 inline-flex" /></Link>,
+                                    A critical component crashed and can't
+                                    recover. {navigator.appName === 'Packbase' ? "You'll need to restart this software entirely." : "Reload this page to try again."}
+                                    <br/>
+                                    This shouldn't happen. <Link href="https://discord.gg/StuuK55gYA" target="_blank"
+                                                                 className="text-primary">Report it <ArrowUpRightIcon
+                                    className="h-4 w-4 inline-flex"/></Link>,
                                     otherwise it will never be fixed.
-                                    <br />
-                                    Don't rely on other people to report - <b>not everyone does.</b>
                                 </Text>
                                 <div className="space-x-2 mt-4">
                                     <Button href="https://work.wildbase.xyz">
-                                        Report <ArrowUpRightIcon className="h-4 w-4 inline-flex" />
+                                        Report <ArrowUpRightIcon className="h-4 w-4 inline-flex"/>
                                     </Button>
-                                    <Tooltip content="Doing this puts Packbase in an extremely unstable state. Only do this if there's specific content you need to recover.">
+                                    <Tooltip
+                                        content="Doing this puts Packbase in an extremely unstable state. Only do this if there's specific content you need to recover.">
                                         <Button plain onClick={this.reset}>
                                             Soft Reset
                                         </Button>
@@ -97,8 +99,10 @@ class ErrorBoundaryImpl extends React.Component<ErrorBoundaryProps, ErrorBoundar
                                 </div>
                             </div>
                         </div>
-                        <CodeGroup title="Context" code={this.state.error instanceof Error ? this.state.error.message : 'No error message available'}>
-                            <Code title="String">{this.state.error instanceof Error ? this.state.error.stack : 'No stack trace available'}</Code>
+                        <CodeGroup title="Context"
+                                   code={this.state.error instanceof Error ? this.state.error.message : 'No error message available'}>
+                            <Code
+                                title="String">{this.state.error instanceof Error ? this.state.error.stack : 'No stack trace available'}</Code>
                         </CodeGroup>
                     </div>
                 </Alert>

@@ -16,7 +16,6 @@ import {
     UserCircleIcon,
     UserGroupIcon
 } from "@heroicons/react/20/solid";
-import Fuse from "fuse.js";
 import {vg} from "@/lib";
 import type {RawSearchApiResponse, SearchResult} from "@/pages/search/types";
 import PackHeader from "@/components/shared/pack/header";
@@ -137,31 +136,6 @@ export default function CommandPalette() {
         }
     }, [debouncedRawQuery, query])
 
-    // Create Fuse instances for client-side fuzzy search
-    const profilesFuse = useMemo(() => {
-        return new Fuse(apiResults.profiles, {
-            keys: ['display_name', 'description', 'about.bio'],
-            threshold: 0.3,
-            ignoreLocation: true,
-        })
-    }, [apiResults.profiles])
-
-    const packsFuse = useMemo(() => {
-        return new Fuse(apiResults.packs, {
-            keys: ['display_name', 'description'],
-            threshold: 0.3,
-            ignoreLocation: true,
-        })
-    }, [apiResults.packs])
-
-    const postsFuse = useMemo(() => {
-        return new Fuse(apiResults.posts, {
-            keys: ['body', 'user.display_name'],
-            threshold: 0.3,
-            ignoreLocation: true,
-        })
-    }, [apiResults.posts])
-
     // Memoized filtered results using fuzzy search on API data
     const filteredProfiles = useMemo(() => {
         if (debouncedRawQuery.startsWith('#')) return []
@@ -217,7 +191,7 @@ export default function CommandPalette() {
             <div className="fixed inset-0 z-10 w-screen overflow-y-auto p-4 sm:p-6 md:p-20">
                 <DialogPanel
                     transition
-                    className="mx-auto max-w-4xl transform overflow-hidden rounded-xl bg-white ring-1 shadow-2xl ring-black/5 transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-snapper data-leave:duration-200 data-leave:ease-in"
+                    className="mx-auto max-w-4xl transform overflow-hidden rounded-xl bg-card ring-1 shadow-2xl ring-default transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-snapper data-leave:duration-200 data-leave:ease-in"
                 >
                     <Combobox
                         onChange={(item: any) => {
@@ -236,13 +210,19 @@ export default function CommandPalette() {
                                 <div className="grid grid-cols-1">
                                     <ComboboxInput
                                         autoFocus
-                                        className="col-start-1 row-start-1 h-12 w-full pr-4 pl-11 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm"
+                                        className="col-start-1 row-start-1 h-12 w-full pr-4 pl-11 text-base text-foreground outline-hidden placeholder:text-muted-foreground sm:text-sm"
                                         placeholder="Search..."
                                         onChange={(event) => setRawQuery(event.target.value)}
+                                        onKeyDown={(event) => {
+                                            // There's an actual solution to this, but this needs to release now.
+                                            if (event.key === 'Escape') {
+                                                setRawQuery('')
+                                            }
+                                        }}
                                         value={rawQuery}
                                     />
                                     <MagnifyingGlassIcon
-                                        className="pointer-events-none col-start-1 row-start-1 ml-4 size-5 self-center text-gray-400"
+                                        className="pointer-events-none col-start-1 row-start-1 ml-4 size-5 self-center text-muted-foreground"
                                         aria-hidden="true"
                                     />
                                 </div>
@@ -261,9 +241,9 @@ export default function CommandPalette() {
                                             {isLoading && (
                                                 <div className="px-6 py-14 text-center text-sm">
                                                     <MagnifyingGlassIcon
-                                                        className="mx-auto size-6 text-gray-400 animate-pulse"
+                                                        className="mx-auto size-6 text-muted-foreground animate-pulse"
                                                         aria-hidden="true"/>
-                                                    <p className="mt-4 text-gray-500">Searching...</p>
+                                                    <p className="mt-4 text-muted-foreground">Searching...</p>
                                                 </div>
                                             )}
 
@@ -271,7 +251,7 @@ export default function CommandPalette() {
                                                 <div className="-mx-2 text-sm text-gray-700 space-y-4">
                                                     {filteredProfiles.length > 0 && (
                                                         <div>
-                                                            <h2 className="mb-2 text-xs font-semibold text-gray-900">Profiles</h2>
+                                                            <h2 className="mb-2 text-xs font-semibold text-foreground">Profiles</h2>
                                                             <div>
                                                                 {filteredProfiles.map((profile) => (
                                                                     <ComboboxOption
@@ -288,7 +268,7 @@ export default function CommandPalette() {
                                                                             />
                                                                         ) : (
                                                                             <UserCircleIcon
-                                                                                className="size-6 flex-none text-gray-400 group-data-focus:text-white"
+                                                                                className="size-6 flex-none text-muted-foreground group-data-focus:text-white"
                                                                                 aria-hidden="true"
                                                                             />
                                                                         )}
@@ -297,7 +277,7 @@ export default function CommandPalette() {
                                                                                 className="truncate">{profile.display_name}</div>
                                                                             {profile.description && (
                                                                                 <div
-                                                                                    className="text-xs text-gray-500 group-data-focus:text-gray-200 truncate">
+                                                                                    className="text-xs text-muted-foreground group-data-focus:text-gray-200 truncate">
                                                                                     {profile.description}
                                                                                 </div>
                                                                             )}
@@ -309,7 +289,7 @@ export default function CommandPalette() {
                                                     )}
                                                     {filteredPacks.length > 0 && (
                                                         <div>
-                                                            <h2 className="mb-2 text-xs font-semibold text-gray-900">Packs</h2>
+                                                            <h2 className="mb-2 text-xs font-semibold text-foreground">Packs</h2>
                                                             <div>
                                                                 {filteredPacks.map((pack) => (
                                                                     <ComboboxOption
@@ -326,7 +306,7 @@ export default function CommandPalette() {
                                                                             />
                                                                         ) : (
                                                                             <UserGroupIcon
-                                                                                className="size-6 flex-none text-gray-400 group-data-focus:text-white"
+                                                                                className="size-6 flex-none text-muted-foreground group-data-focus:text-white"
                                                                                 aria-hidden="true"
                                                                             />
                                                                         )}
@@ -335,7 +315,7 @@ export default function CommandPalette() {
                                                                                 className="truncate">{pack.display_name}</div>
                                                                             {pack.description && (
                                                                                 <div
-                                                                                    className="text-xs text-gray-500 group-data-focus:text-gray-200 truncate">
+                                                                                    className="text-xs text-muted-foreground group-data-focus:text-gray-200 truncate">
                                                                                     {pack.description}
                                                                                 </div>
                                                                             )}
@@ -347,7 +327,7 @@ export default function CommandPalette() {
                                                     )}
                                                     {filteredPosts.length > 0 && (
                                                         <div>
-                                                            <h2 className="mb-2 text-xs font-semibold text-gray-900">Posts</h2>
+                                                            <h2 className="mb-2 text-xs font-semibold text-foreground">Posts</h2>
                                                             <div>
                                                                 {filteredPosts.map((post) => (
                                                                     <ComboboxOption
@@ -357,13 +337,13 @@ export default function CommandPalette() {
                                                                         className="group flex cursor-default items-center rounded-md p-2 select-none data-focus:bg-indigo-600 data-focus:text-white"
                                                                     >
                                                                         <RectangleStackIcon
-                                                                            className="size-6 flex-none text-gray-400 group-data-focus:text-white"
+                                                                            className="size-6 flex-none text-muted-foreground group-data-focus:text-white"
                                                                             aria-hidden="true"
                                                                         />
                                                                         <div className="ml-3 flex-auto truncate">
                                                                             {post.user && (
                                                                                 <div
-                                                                                    className="text-xs text-gray-500 group-data-focus:text-gray-200">
+                                                                                    className="text-xs text-muted-foreground group-data-focus:text-gray-200">
                                                                                     {post.user.display_name}
                                                                                 </div>
                                                                             )}
@@ -382,11 +362,11 @@ export default function CommandPalette() {
 
                                             {rawQuery === '?' && (
                                                 <div className="px-6 py-14 text-center text-sm sm:px-14">
-                                                    <LifebuoyIcon className="mx-auto size-6 text-gray-400"
+                                                    <LifebuoyIcon className="mx-auto size-6 text-muted-foreground"
                                                                   aria-hidden="true"/>
-                                                    <p className="mt-4 font-semibold text-gray-900">Help with
+                                                    <p className="mt-4 font-semibold text-foreground">Help with
                                                         searching</p>
-                                                    <p className="mt-2 text-gray-500">
+                                                    <p className="mt-2 text-muted-foreground">
                                                         Use this tool to quickly search for profiles, packs, and posts
                                                         across Packbase.
                                                         Type <kbd
@@ -401,10 +381,10 @@ export default function CommandPalette() {
 
                                             {!isLoading && query !== '' && rawQuery !== '?' && !hasResults && (
                                                 <div className="px-6 py-14 text-center text-sm sm:px-14">
-                                                    <ExclamationTriangleIcon className="mx-auto size-6 text-gray-400"
+                                                    <ExclamationTriangleIcon className="mx-auto size-6 text-muted-foreground"
                                                                              aria-hidden="true"/>
-                                                    <p className="mt-4 font-semibold text-gray-900">No results found</p>
-                                                    <p className="mt-2 text-gray-500">We couldn't find anything with
+                                                    <p className="mt-4 font-semibold text-foreground">No results found</p>
+                                                    <p className="mt-2 text-muted-foreground">We couldn't find anything with
                                                         that term. Please try again.</p>
                                                 </div>
                                             )}
@@ -438,12 +418,12 @@ export default function CommandPalette() {
                                 )}
 
                                 <div
-                                    className="flex flex-wrap items-center bg-gray-50 px-4 py-2.5 text-xs text-gray-700">
+                                    className="flex flex-wrap items-center bg-muted px-4 py-2.5 text-xs text-foreground">
                                     Type{' '}
                                     <kbd
                                         className={classNames(
                                             'mx-1 flex size-5 items-center justify-center rounded-sm border bg-white font-semibold sm:mx-2',
-                                            rawQuery.startsWith('@') ? 'border-indigo-600 text-indigo-600' : 'border-gray-400 text-gray-900',
+                                            rawQuery.startsWith('@') ? 'border-indigo-600 text-indigo-600' : 'border-gray-400 text-foreground',
                                         )}
                                     >
                                         @
@@ -453,7 +433,7 @@ export default function CommandPalette() {
                                     <kbd
                                         className={classNames(
                                             'mx-1 flex size-5 items-center justify-center rounded-sm border bg-white font-semibold sm:mx-2',
-                                            rawQuery.startsWith('#') ? 'border-indigo-600 text-indigo-600' : 'border-gray-400 text-gray-900',
+                                            rawQuery.startsWith('#') ? 'border-indigo-600 text-indigo-600' : 'border-gray-400 text-foreground',
                                         )}
                                     >
                                         #
@@ -462,7 +442,7 @@ export default function CommandPalette() {
                                     <kbd
                                         className={classNames(
                                             'mx-1 flex size-5 items-center justify-center rounded-sm border bg-white font-semibold sm:mx-2',
-                                            rawQuery === '?' ? 'border-indigo-600 text-indigo-600' : 'border-gray-400 text-gray-900',
+                                            rawQuery === '?' ? 'border-indigo-600 text-indigo-600' : 'border-gray-400 text-foreground',
                                         )}
                                     >
                                         ?

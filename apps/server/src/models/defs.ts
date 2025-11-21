@@ -199,7 +199,7 @@ export const HowlBody = t.Object({
     body: t.Nullable(
         t.String({
             minLength: 1,
-            maxLength: 1000,
+            maxLength: 4096,
         }),
     ),
     assets: t.Optional(
@@ -223,7 +223,7 @@ export const HowlComment = t.Object({
     user: UserProfile,
     created_at: t.String(),
     body: t.String({
-        maxLength: 1000,
+        maxLength: 4096,
     }),
 });
 
@@ -235,7 +235,7 @@ export const HowlResponse = t.Object({
     created_at: t.String(),
     body: t.Optional(
         t.String({
-            maxLength: 1000,
+            maxLength: 4096,
         }),
     ),
     assets: t.Optional(

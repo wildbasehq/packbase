@@ -1,13 +1,13 @@
 'use client'
 
 import * as React from 'react'
-import { cn } from '@/lib/utils'
-import { Card } from '@/components/ui/card'
+import {useEffect, useState} from 'react'
+import {cn} from '@/lib/utils'
+import {Card} from '@/components/ui/card'
 import useWindowSize from '@/lib/hooks/use-window-size'
 import Link from '../shared/link'
-import { useLocalStorage } from 'usehooks-ts'
-import { vg } from '@/src/lib/api'
-import { useEffect, useState } from 'react'
+import {useLocalStorage} from 'usehooks-ts'
+import {vg} from '@/src/lib/api'
 
 export interface NewsArticle {
     href: string
@@ -20,23 +20,26 @@ const OFFSET_FACTOR = 4
 const SCALE_FACTOR = 0.03
 const OPACITY_FACTOR = 0.1
 
-export function News({ articles: initialArticles, toggleUnread }: { articles?: NewsArticle[]; toggleUnread?: (unread: boolean) => void }) {
+export function News({articles: initialArticles, toggleUnread}: {
+    articles?: NewsArticle[];
+    toggleUnread?: (unread: boolean) => void
+}) {
     const [seenNewsIDs, setSeenNewsIDs] = useLocalStorage('seenNewsIDs', [])
     const [articles, setArticles] = useState<NewsArticle[]>(initialArticles ?? [])
 
     async function getNews() {
-        const { data } = await vg.news.get({ query: { onlyRecent: true } })
+        const {data} = await vg.news.get({query: {onlyRecent: false}})
         return data ?? []
     }
 
-    const cards = articles?.filter(({ href }) => !seenNewsIDs.includes(href)) ?? []
+    const cards = articles?.filter(({href}) => !seenNewsIDs.includes(href)) ?? []
     const cardCount = cards.length
 
     useEffect(() => {
         if (articles.length > 0) return
         getNews().then(data => {
             setArticles(data)
-            const unread = data.filter(({ href }) => !seenNewsIDs.includes(href))
+            const unread = data.filter(({href}) => !seenNewsIDs.includes(href))
             toggleUnread?.(unread.length > 0)
         })
     }, [])
@@ -48,16 +51,16 @@ export function News({ articles: initialArticles, toggleUnread }: { articles?: N
     return cards.length ? (
         <div className="group overflow-hidden px-3 pb-3 pt-8" data-active={cardCount !== 0}>
             <div className="relative size-full">
-                {cards.toReversed().map(({ href, title, summary, image }, idx) => (
+                {cards.toReversed().map(({href, title, summary, image}, idx) => (
                     <div
                         key={href}
                         className={cn(
                             'absolute left-0 top-0 size-full scale-[var(--scale)] transition-[opacity,transform] duration-200',
                             cardCount - idx > 3
                                 ? [
-                                      'opacity-0 sm:group-hover:translate-y-[var(--y)] sm:group-hover:opacity-[var(--opacity)]',
-                                      'sm:group-has-[*[data-dragging=true]]:translate-y-[var(--y)] sm:group-has-[*[data-dragging=true]]:opacity-[var(--opacity)]',
-                                  ]
+                                    'opacity-0 sm:group-hover:translate-y-[var(--y)] sm:group-hover:opacity-[var(--opacity)]',
+                                    'sm:group-has-[*[data-dragging=true]]:translate-y-[var(--y)] sm:group-has-[*[data-dragging=true]]:opacity-[var(--opacity)]',
+                                ]
                                 : 'translate-y-[var(--y)] opacity-[var(--opacity)]'
                         )}
                         style={
@@ -81,7 +84,7 @@ export function News({ articles: initialArticles, toggleUnread }: { articles?: N
                     </div>
                 ))}
                 <div className="pointer-events-none invisible" aria-hidden>
-                    <NewsCard title="Title" description="Description" />
+                    <NewsCard title="Title" description="Description"/>
                 </div>
             </div>
         </div>
@@ -89,14 +92,14 @@ export function News({ articles: initialArticles, toggleUnread }: { articles?: N
 }
 
 function NewsCard({
-    title,
-    description,
-    image,
-    onDismiss,
-    hideContent,
-    href,
-    active,
-}: {
+                      title,
+                      description,
+                      image,
+                      onDismiss,
+                      hideContent,
+                      href,
+                      active,
+                  }: {
     title: string
     description: string
     image?: string
@@ -105,7 +108,7 @@ function NewsCard({
     href?: string
     active?: boolean
 }) {
-    const { isMobile } = useWindowSize()
+    const {isMobile} = useWindowSize()
 
     const ref = React.useRef<HTMLDivElement>(null)
     const drag = React.useRef<{
@@ -124,7 +127,7 @@ function NewsCard({
 
     const onDragMove = (e: PointerEvent) => {
         if (!ref.current) return
-        const { clientX } = e
+        const {clientX} = e
         const dx = clientX - drag.current.start
         drag.current.delta = dx
         drag.current.maxDelta = Math.max(drag.current.maxDelta, Math.abs(dx))
@@ -139,8 +142,8 @@ function NewsCard({
 
         // Dismiss card
         animation.current = ref.current.animate(
-            { opacity: 0, transform: `translateX(${translateX}px)` },
-            { duration: 150, easing: 'ease-in-out', fill: 'forwards' }
+            {opacity: 0, transform: `translateX(${translateX}px)`},
+            {duration: 150, easing: 'ease-in-out', fill: 'forwards'}
         )
         animation.current.onfinish = () => onDismiss?.()
     }
@@ -157,10 +160,10 @@ function NewsCard({
         }
 
         // Animate back to original position
-        animation.current = ref.current.animate({ transform: 'translateX(0)' }, { duration: 150, easing: 'ease-in-out' })
+        animation.current = ref.current.animate({transform: 'translateX(0)'}, {duration: 150, easing: 'ease-in-out'})
         animation.current.onfinish = () => ref.current?.style.setProperty('--dx', '0')
 
-        drag.current = { start: 0, delta: 0, startTime: 0, maxDelta: 0 }
+        drag.current = {start: 0, delta: 0, startTime: 0, maxDelta: 0}
     }
 
     const onDragEnd = () => stopDragging(false)

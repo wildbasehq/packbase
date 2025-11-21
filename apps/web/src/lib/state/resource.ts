@@ -1,10 +1,11 @@
-import { create } from 'zustand'
+import {create} from 'zustand'
 
 /**
  * Resource store
  */
 interface ResourceStore {
     currentResource: any
+    resourceDefault: any
     resources: any[]
     setCurrentResource: (currentResource: any) => void
     setResources: (resources: any[]) => void
@@ -20,6 +21,7 @@ const resourceDefault = {
 export const useResourceStore = create<ResourceStore>(set => ({
     currentResource: resourceDefault,
     resources: [],
+    resourceDefault,
     setCurrentResource: currentResource =>
         set(state => ({
             ...state,
