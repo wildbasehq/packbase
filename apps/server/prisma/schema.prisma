@@ -103,6 +103,7 @@ model posts {
   packs           packs             @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
   packs_pages     packs_pages?      @relation(fields: [channel_id], references: [id], onDelete: SetNull)
   posts_reactions posts_reactions[]
+  tags            String[]
   classification  Json?
 
   @@index([parent], type: Hash)
@@ -124,6 +125,14 @@ model posts_reactions {
   @@index([actor_id], type: Hash)
   @@index([post_id], type: Hash)
   @@map("posts.reactions")
+  @@schema("public")
+}
+
+model posts_statistics {
+  type String   @default("unknown")
+  tags String[] @default([])
+
+  @@id([type], map: "posts_statistics_pkey")
   @@schema("public")
 }
 
@@ -200,6 +209,23 @@ model user_themes {
 
   @@index([user_id], type: Hash)
   @@map("user.themes")
+  @@schema("public")
+}
+
+/// Folders owned by users (replaces profiles.settings JSON folders)
+model folders {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime  @default(now()) @db.Timestamptz(6)
+  user_id     String    @db.Uuid
+  name        String
+  description String?
+  emoji       String?
+  mode        String    // 'dynamic' | 'manual'
+  query       String?
+  howl_ids    String[]  @default([])
+
+  @@index([user_id], type: Hash)
   @@schema("public")
 }
 

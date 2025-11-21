@@ -22,16 +22,16 @@ export interface ContentBlock {
     content?:
         | string
         | (
-              | {
-                    type: string
-                    content: string
-                }
-              | {
-                    type: string
-                    listType: string
-                    items: string[]
-                }
-          )[]
+        | {
+        type: string
+        content: string
+    }
+        | {
+        type: string
+        listType: string
+        items: string[]
+    }
+        )[]
     items?: string[]
     listType?: 'ordered' | 'unordered'
     level?: number
@@ -86,7 +86,7 @@ const RetentionOrders = {
 export const termsConfig: TermsConfig = {
     header: {
         title: 'Packbase Usage Policy and Data Handling',
-        lastUpdated: 'May 30, 2025',
+        lastUpdated: 'October 16, 2025',
     },
     retentionOrder: Object.values(RetentionOrders),
     dataCollection: [
@@ -100,16 +100,20 @@ export const termsConfig: TermsConfig = {
             purpose: 'Account verification for 18+ feature-sets',
             retention: RetentionOrders.UNTIL_WID_DEL,
         },
-        { type: 'Username', purpose: 'Display name and identification', retention: RetentionOrders.UNTIL_PROFILE_DEL },
-        { type: 'Slug', purpose: 'User space domain for personalized URL', retention: RetentionOrders.UNTIL_PROFILE_DEL },
+        {type: 'Username', purpose: 'Display name and identification', retention: RetentionOrders.UNTIL_PROFILE_DEL},
+        {type: 'Slug', purpose: 'User space domain for personalized URL', retention: RetentionOrders.UNTIL_PROFILE_DEL},
         {
             type: 'Custom Domain',
             purpose: 'User space domain for personalized URL',
             retention: RetentionOrders.UNTIL_PROFILE_DEL,
         },
-        { type: 'Login timestamps', purpose: 'Security monitoring and fraud prevention', retention: RetentionOrders.DAYS_90 },
-        { type: 'IP address', purpose: 'Fraud prevention and security', retention: RetentionOrders.DAYS_30 },
-        { type: 'Role information', purpose: 'Access control and permissions', retention: RetentionOrders.UNTIL_WID_DEL },
+        {
+            type: 'Login timestamps',
+            purpose: 'Security monitoring and fraud prevention',
+            retention: RetentionOrders.DAYS_90
+        },
+        {type: 'IP address', purpose: 'Fraud prevention and security', retention: RetentionOrders.DAYS_30},
+        {type: 'Role information', purpose: 'Access control and permissions', retention: RetentionOrders.UNTIL_WID_DEL},
         {
             type: 'Account type',
             purpose: 'Service provisioning and access control',
@@ -120,7 +124,7 @@ export const termsConfig: TermsConfig = {
             purpose: 'Account security',
             retention: RetentionOrders.UNTIL_WID_DEL,
         },
-        { type: 'Session tokens', purpose: 'User authentication', retention: RetentionOrders.UNTIL_SESSION_EXPIRATION },
+        {type: 'Session tokens', purpose: 'User authentication', retention: RetentionOrders.UNTIL_SESSION_EXPIRATION},
         {
             type: 'Refresh tokens',
             purpose: 'Maintaining authenticated sessions',
@@ -131,12 +135,16 @@ export const termsConfig: TermsConfig = {
             purpose: 'Third-party authentication',
             retention: RetentionOrders.UNTIL_WID_DEL,
         },
-        { type: 'Display name', purpose: 'User profile customization', retention: RetentionOrders.UNTIL_PROFILE_DEL },
-        { type: 'Bio', purpose: 'User profile information', retention: RetentionOrders.UNTIL_PROFILE_DEL },
-        { type: 'Profile picture', purpose: 'User profile customization', retention: RetentionOrders.UNTIL_PROFILE_DEL },
-        { type: 'Header image', purpose: 'User profile customization', retention: RetentionOrders.UNTIL_PROFILE_DEL },
-        { type: 'Profile HTML code', purpose: 'User profile customization', retention: RetentionOrders.UNTIL_PROFILE_DEL },
-        { type: 'Profile CSS code', purpose: 'User profile customization', retention: RetentionOrders.UNTIL_PROFILE_DEL },
+        {type: 'Display name', purpose: 'User profile customization', retention: RetentionOrders.UNTIL_PROFILE_DEL},
+        {type: 'Bio', purpose: 'User profile information', retention: RetentionOrders.UNTIL_PROFILE_DEL},
+        {type: 'Profile picture', purpose: 'User profile customization', retention: RetentionOrders.UNTIL_PROFILE_DEL},
+        {type: 'Header image', purpose: 'User profile customization', retention: RetentionOrders.UNTIL_PROFILE_DEL},
+        {
+            type: 'Profile HTML code',
+            purpose: 'User profile customization',
+            retention: RetentionOrders.UNTIL_PROFILE_DEL
+        },
+        {type: 'Profile CSS code', purpose: 'User profile customization', retention: RetentionOrders.UNTIL_PROFILE_DEL},
         {
             type: 'Space HTML code',
             purpose: 'User profile customization',
@@ -152,7 +160,7 @@ export const termsConfig: TermsConfig = {
             purpose: 'User profile customization',
             retention: RetentionOrders.UNTIL_PROFILE_OR_SPACE_DEL,
         },
-        { type: 'Flair', purpose: 'User profile information', retention: RetentionOrders.UNTIL_PROFILE_DEL },
+        {type: 'Flair', purpose: 'User profile information', retention: RetentionOrders.UNTIL_PROFILE_DEL},
         {
             type: 'Custom profile pages',
             purpose: 'User profile customization',
@@ -168,7 +176,11 @@ export const termsConfig: TermsConfig = {
             purpose: 'User profile customization',
             retention: RetentionOrders.UNTIL_PROFILE_OR_PAGE_DEL,
         },
-        { type: 'Profile settings', purpose: 'User experience customization', retention: RetentionOrders.UNTIL_PROFILE_DEL },
+        {
+            type: 'Profile settings',
+            purpose: 'User experience customization',
+            retention: RetentionOrders.UNTIL_PROFILE_DEL
+        },
         {
             type: 'Profile privacy settings',
             purpose: 'Content visibility control',
@@ -179,14 +191,14 @@ export const termsConfig: TermsConfig = {
             purpose: 'Profile customization options',
             retention: RetentionOrders.UNTIL_PROFILE_DEL,
         },
-        { type: 'Post content', purpose: 'User-generated content', retention: RetentionOrders.UNTIL_PROFILE_DEL },
+        {type: 'Post content', purpose: 'User-generated content', retention: RetentionOrders.UNTIL_PROFILE_DEL},
         {
             type: 'Post assets (images, etc.)',
             purpose: 'User-generated content',
             retention: RetentionOrders.UNTIL_PROFILE_DEL,
         },
-        { type: 'Comments', purpose: 'User interaction', retention: RetentionOrders.UNTIL_PROFILE_DEL },
-        { type: 'Reactions', purpose: 'User interaction', retention: RetentionOrders.UNTIL_PROFILE_DEL },
+        {type: 'Comments', purpose: 'User interaction', retention: RetentionOrders.UNTIL_PROFILE_DEL},
+        {type: 'Reactions', purpose: 'User interaction', retention: RetentionOrders.UNTIL_PROFILE_DEL},
         {
             type: 'Followers',
             purpose: 'User interaction and social networking',
@@ -197,12 +209,24 @@ export const termsConfig: TermsConfig = {
             purpose: 'User interaction and social networking',
             retention: RetentionOrders.UNTIL_PROFILE_DEL,
         },
-        { type: 'Messages', purpose: 'User communication', retention: RetentionOrders.UNTIL_PROFILE_DEL },
-        { type: 'Pack name', purpose: 'User interaction regarding groups', retention: RetentionOrders.UNTIL_PACK_DEL },
-        { type: 'Pack description', purpose: 'User interaction regarding groups', retention: RetentionOrders.UNTIL_PACK_DEL },
-        { type: 'Pack category', purpose: 'User interaction regarding groups', retention: RetentionOrders.UNTIL_PACK_DEL },
-        { type: 'Pack tags', purpose: 'User interaction regarding groups', retention: RetentionOrders.UNTIL_PACK_DEL },
-        { type: 'Pack visibility', purpose: 'User interaction regarding groups', retention: RetentionOrders.UNTIL_PACK_DEL },
+        {type: 'Messages', purpose: 'User communication', retention: RetentionOrders.UNTIL_PROFILE_DEL},
+        {type: 'Pack name', purpose: 'User interaction regarding groups', retention: RetentionOrders.UNTIL_PACK_DEL},
+        {
+            type: 'Pack description',
+            purpose: 'User interaction regarding groups',
+            retention: RetentionOrders.UNTIL_PACK_DEL
+        },
+        {
+            type: 'Pack category',
+            purpose: 'User interaction regarding groups',
+            retention: RetentionOrders.UNTIL_PACK_DEL
+        },
+        {type: 'Pack tags', purpose: 'User interaction regarding groups', retention: RetentionOrders.UNTIL_PACK_DEL},
+        {
+            type: 'Pack visibility',
+            purpose: 'User interaction regarding groups',
+            retention: RetentionOrders.UNTIL_PACK_DEL
+        },
         {
             type: 'Pack creation date',
             purpose: 'User interaction regarding groups',
@@ -238,8 +262,8 @@ export const termsConfig: TermsConfig = {
             purpose: 'Security monitoring and user experience optimization',
             retention: RetentionOrders.DAYS_90,
         },
-        { type: 'Error logs', purpose: 'Debugging and troubleshooting', retention: RetentionOrders.DAYS_30 },
-        { type: 'Activity logs', purpose: 'Fraud prevention and security', retention: RetentionOrders.DAYS_90 },
+        {type: 'Error logs', purpose: 'Debugging and troubleshooting', retention: RetentionOrders.DAYS_30},
+        {type: 'Activity logs', purpose: 'Fraud prevention and security', retention: RetentionOrders.DAYS_90},
         {
             type: 'User presence data',
             purpose: 'Online status and activity tracking',
@@ -260,16 +284,20 @@ export const termsConfig: TermsConfig = {
             purpose: 'Transaction processing (handled securely by Stripe; card details are not stored on our servers)',
             retention: RetentionOrders.UNTIL_PROFILE_DEL_OR_LAW,
         },
-        { type: 'Subscription details', purpose: 'Service management', retention: RetentionOrders.UNTIL_PROFILE_DEL },
-        { type: 'Support tickets', purpose: 'Customer support', retention: RetentionOrders.UNTIL_RESOLVED_OR_WID_DEL },
-        { type: 'Invite codes', purpose: 'User invitation', retention: RetentionOrders.UNTIL_USED_OR_EXPIRED },
+        {type: 'Subscription details', purpose: 'Service management', retention: RetentionOrders.UNTIL_PROFILE_DEL},
+        {type: 'Support tickets', purpose: 'Customer support', retention: RetentionOrders.UNTIL_RESOLVED_OR_WID_DEL},
+        {type: 'Invite codes', purpose: 'User invitation', retention: RetentionOrders.UNTIL_USED_OR_EXPIRED},
         {
             type: 'Collectibles/Badges',
             purpose: 'User achievements and customization',
             retention: RetentionOrders.UNTIL_PROFILE_DEL,
         },
-        { type: 'User themes', purpose: 'User interface customization', retention: RetentionOrders.UNTIL_PROFILE_DEL },
-        { type: 'Search history', purpose: 'User experience customization', retention: RetentionOrders.NEVER_BROWSER_ONLY },
+        {type: 'User themes', purpose: 'User interface customization', retention: RetentionOrders.UNTIL_PROFILE_DEL},
+        {
+            type: 'Search history',
+            purpose: 'User experience customization',
+            retention: RetentionOrders.NEVER_BROWSER_ONLY
+        },
         {
             type: 'Analytics data',
             purpose: 'Service improvement and user experience optimization',
@@ -337,7 +365,7 @@ export const termsConfig: TermsConfig = {
                     content: [
                         {
                             type: 'text',
-                            content: 'Standard accounts must maintain PG-13 appropriate content. The following are prohibited:',
+                            content: 'All accounts must maintain PG-13 appropriate content (unless explicitly stated in "Afterdark" section). The following are prohibited:',
                         },
                         {
                             type: 'list',
@@ -345,21 +373,43 @@ export const termsConfig: TermsConfig = {
                             items: [
                                 'Adult or sexually explicit content outside of an Afterdark Account',
                                 'Extreme violence or gore',
-                                'Hate speech or discriminatory content',
-                                'Harassment or bullying',
+                                'Harassment or bullying, as defined by the eSafety Commissioner Australia.',
                                 'Condoning, advocating, or displaying the use of illegal substances or activities',
-                                'Personal information without consent',
-                                'Spam or unauthorized advertising',
                                 'Impersonation of others',
                                 'Content promoting self-harm',
-                                'Manipulation of platform metrics',
+                                'AI-generated images or videos of any kind are prohibited',
                                 'Real-life sexually explicit content',
-                                'Any suggestive content depicting underage characters or people, whether fictional or not.',
-                                'Non-consensual content',
+                                'Any suggestive or explicit content depicting minors or youthful-looking characters; all depictions must be clearly 18+.',
                                 'Hate speech, harassment, or discriminatory content',
-                                'Illegal activities',
-                                'Exploitation or trafficking',
+                                'Incest, bestiality, sexual violence, non-consensual content, or exploitation/trafficking themes.',
+                                'Doxxing, revenge content, or privately obtained material.',
                             ],
+                        },
+                    ],
+                },
+                {
+                    type: 'card',
+                    style: 'warning',
+                    title: 'Afterdark (18+) Account Guidelines',
+                    content: [
+                        {
+                            type: 'text',
+                            content: 'Afterdark accounts gain permission to use R18 content labels, and may post adult artwork content under strict rules:',
+                        },
+                        {
+                            type: 'list',
+                            listType: 'unordered',
+                            items: [
+                                'Only illustrated, animated, CGI, or otherwise non-photographic adult artwork is allowed (no IRL/real-person imagery, including image manipulation to a real-person, deepfakes or AI of real people).',
+                                'All adult or sexually explicit artwork MUST be tagged with their respective "Content Label", and must tag anything within the content, based on "what you see". Some tags may be allowed under "What you know", but cannot be used to evade Packbase\'s terms.',
+                                'No minors or youthful-looking characters; all depictions must be clearly 18+.',
+                                'Cross-posting adult content to Standard accounts is prohibited.',
+                                'Depending on your region, you may need to complete age verification to enable Afterdark to publish or view adult content.',
+                            ],
+                        },
+                        {
+                            type: 'text',
+                            content: 'Failure to comply may lead to content removal, account restrictions, or termination.',
                         },
                     ],
                 },
@@ -381,25 +431,7 @@ export const termsConfig: TermsConfig = {
                             ],
                         },
                     ],
-                },
-                {
-                    type: 'card',
-                    style: 'info',
-                    title: 'Content Visibility and Discovery',
-                    content: [
-                        {
-                            type: 'list',
-                            listType: 'unordered',
-                            items: [
-                                'Afterdark content is hidden from standard searches',
-                                'Only other Afterdark accounts can view Afterdark content',
-                                'Content warnings cannot be disabled',
-                                'Cross-posting between account types is prohibited',
-                                'Geographic restrictions may apply based on local laws',
-                            ],
-                        },
-                    ],
-                },
+                }
             ],
         },
         {

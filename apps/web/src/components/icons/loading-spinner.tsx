@@ -3,13 +3,13 @@
  */
 
 import styles from './loading-spinner.module.css'
-import cx from 'classnames'
 import {CSSProperties} from "react";
+import {cn} from "@/lib";
 
 export default function LoadingSpinner({className, speed = 0.5}: { className?: string; speed?: number }) {
     return (
         <div
-            className={cx('dark:invert', styles.spinner, className)}
+            className={cn('dark:invert', styles.spinner, className)}
             style={
                 {
                     '--spinner-duration': `${speed}s`,

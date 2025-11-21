@@ -49,7 +49,7 @@ export function PackChannels() {
                         href={item.href}
                         name={item.name}
                         ticker={item.ticker}
-                        isVoice={item.name.toLowerCase().includes('voice') || item.name.toLowerCase().includes('call')}
+                        isVoice={item.name?.toLowerCase().includes('voice') || item.name?.toLowerCase().includes('call')}
                     />
                 ))}
             </SidebarSection>

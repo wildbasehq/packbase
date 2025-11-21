@@ -1,11 +1,10 @@
-import { YapockType } from '@/index';
-import { t } from 'elysia';
-import { ErrorTypebox } from '@/utils/errors';
-import { HTTPError } from '@/lib/HTTPError';
+import {YapockType} from '@/index';
+import {t} from 'elysia';
+import {ErrorTypebox} from '@/utils/errors';
+import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
-import { NotificationManager } from '@/utils/NotificationManager';
-import clerkClient from '@/db/auth';
-import { getUserClerkByID } from '@/utils/clerk';
+import {NotificationManager} from '@/utils/NotificationManager';
+import {getUserClerkByID} from '@/utils/clerk';
 import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
@@ -81,7 +80,7 @@ export default (app: YapockType) =>
             body: t.Object({
                 body: t.String({
                     minLength: 1,
-                    maxLength: 1024,
+                    maxLength: 4096,
                 }),
             }),
             response: {

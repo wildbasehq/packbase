@@ -1,6 +1,6 @@
 /* Colours */
 .bg-sidebar {
-    @apply bg-gradient-to-b from-white to-neutral-50 dark:from-n-7 dark:to-n-7/80;
+    @apply bg-gradient-to-b from-white to-muted dark:from-n-7 dark:to-muted;
 }
 
 .text-default {
@@ -8,39 +8,15 @@
 }
 
 .border-default {
-    @apply border-n-2 dark:border-n-6/50;
+    @apply border-zinc-950/10 dark:border-white/10;
 }
 
 .ring-default {
-    @apply ring-n-2/80 dark:ring-n-6/80;
-}
-
-.ring-shadow {
-    @apply ring-n-2/50 dark:ring-n-6/80;
+    @apply ring-zinc-950/10 dark:ring-white/10;
 }
 
 .bg-default {
     @apply bg-white dark:bg-neutral-800;
-}
-
-.bg-default-alt {
-    @apply bg-neutral-50 dark:bg-[#303030];
-}
-
-.border-default-alt {
-    @apply border-n-2 dark:border-n-6/50;
-}
-
-.text-secondary {
-    color: var(--color-primary-lime);
-}
-
-.text-alt {
-    @apply text-n-4;
-}
-
-.fill-alt {
-    @apply fill-n-4/80;
 }
 
 .text-tertiary {

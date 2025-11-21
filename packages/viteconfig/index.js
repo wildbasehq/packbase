@@ -7,7 +7,7 @@ export default function viteConfig(sourceDir) {
     return defineConfig({
         server: {
             port: parseInt(process.env.PORT || '5173'),
-            strictPort: true
+            strictPort: false
         },
         resolve: {
             alias: {
@@ -20,6 +20,7 @@ export default function viteConfig(sourceDir) {
                 '@/public': path.resolve(sourceDir, './public'),
                 '@/datasets': path.resolve(sourceDir, './datasets'),
                 '@/types': path.resolve(sourceDir, './src/types'),
+                '@/routes': path.resolve(sourceDir, './src/routes')
             },
         },
         define: {

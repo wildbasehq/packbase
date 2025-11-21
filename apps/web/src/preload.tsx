@@ -99,7 +99,7 @@ function PreloadChild({children}: { children: ReactNode }) {
         setLoading(false)
         setConnecting(false)
 
-        const shouldShowNUE = userMeData && isProfileIncomplete(userMeData)
+        const shouldShowNUE = isSignedIn && (!userMeData || isProfileIncomplete(userMeData))
         if (shouldShowNUE) {
             setShowNUE(true)
         }
@@ -131,7 +131,9 @@ function PreloadChild({children}: { children: ReactNode }) {
                         />
                     </Activity>
 
-                    {children}
+                    <Activity mode={isVisible(!showNUE)}>
+                        {children}
+                    </Activity>
                 </>
             ) : (
                 <Body bodyClassName="h-full" className="!h-full items-center justify-center">

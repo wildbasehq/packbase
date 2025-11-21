@@ -1,7 +1,7 @@
-import { YapockType } from '@/index';
-import { t } from 'elysia';
-import { HTTPError } from '@/lib/HTTPError';
-import { XMLParser } from 'fast-xml-parser';
+import {YapockType} from '@/index';
+import {t} from 'elysia';
+import {HTTPError} from '@/lib/HTTPError';
+import {XMLParser} from 'fast-xml-parser';
 
 type NewsItem = {
     href: string;
@@ -97,11 +97,11 @@ async function fetchFeed(): Promise<NewsItem[]> {
         },
     });
     if (!res.ok) {
-        throw HTTPError.serverError({ summary: `Failed to fetch feed (${res.status})` });
+        throw HTTPError.serverError({summary: `Failed to fetch feed (${res.status})`});
     }
     const xml = await res.text();
 
-    const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '' });
+    const parser = new XMLParser({ignoreAttributes: false, attributeNamePrefix: ''});
     const data = parser.parse(xml);
 
     // sometimes entry is a single object, not an array
@@ -134,13 +134,13 @@ async function fetchFeed(): Promise<NewsItem[]> {
             const image =
                 imageURL && imageURL.startsWith('https://prox.packbase.app/')
                     ? 'data:image/png;base64,' +
-                      (await fetch(imageURL)
-                          .then((res) => res.arrayBuffer())
-                          .then((buffer) => Buffer.from(buffer).toString('base64')))
+                    (await fetch(imageURL)
+                        .then((res) => res.arrayBuffer())
+                        .then((buffer) => Buffer.from(buffer).toString('base64')))
                     : '';
             const createdAt = (it.updated?.['#text'] || it.updated || it.published?.['#text'] || it.published || '').toString();
 
-            return { href, title, summary, image, created_at: createdAt };
+            return {href, title, summary, image, created_at: createdAt};
         }),
     );
 }
@@ -148,18 +148,18 @@ async function fetchFeed(): Promise<NewsItem[]> {
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({ set, query: { onlyRecent = false } }) => {
+        async ({set, query: {onlyRecent = false}}) => {
             try {
                 const items = await fetchFeed();
 
                 // If onlyRecent is true, return only the most recent 4 items by 30 days
-                if (onlyRecent) {
+                if (onlyRecent === 'true') {
                     return items.filter((item) => new Date(item.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).slice(0, 4);
                 }
                 return items;
             } catch (e: any) {
                 set.status = 500;
-                throw HTTPError.serverError({ summary: 'Error fetching news', cause: e });
+                throw HTTPError.serverError({summary: 'Error fetching news', cause: e});
             }
         },
         {

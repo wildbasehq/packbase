@@ -3,7 +3,7 @@
  */
 
 // src/components/feed/thread-post.tsx
-import {FormEvent, useState} from 'react'
+import {Activity, FormEvent, useState} from 'react'
 import {ChatBubbleLeftIcon, ChevronRightIcon, TrashIcon} from '@heroicons/react/24/outline'
 import {UserGroupIcon} from '@heroicons/react/16/solid'
 import {toast} from 'sonner'
@@ -15,12 +15,14 @@ import {MediaGallery} from '.'
 import {UserProfileBasic} from '@/lib/defs/user'
 import {formatRelativeTime} from '@/lib/utils/date'
 import {Text} from '@/components/shared/text.tsx'
-import {AvatarButton, FeedPostData, LoadingCircle} from '@/src/components'
+import {AvatarButton, Badge, FeedPostData, LoadingCircle} from '@/src/components'
 import {Button} from '@/components/shared'
 import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak.tsx'
 import Card from '@/components/shared/card.tsx'
 import UserInfoCol from '@/components/shared/user/info-col.tsx'
 import {ServerReactionStack} from '../ui/reaction-stack'
+import {isVisible} from "@/lib";
+import {ExclamationTriangleIcon} from "@heroicons/react/20/solid";
 
 interface ThreadPostProps {
     post: FeedPostData
@@ -49,6 +51,10 @@ export default function ThreadPost({
 
     // Thread line styling
     const threadLineClass = depth > 0 ? 'before:absolute before:left-16 before:top-0 before:bottom-0 before:w-px before:bg-border' : ''
+
+    const [showUnsavouryNotice, setShowUnsavouryNotice] = useState<boolean>(post.tags?.some(
+        (tag) => tag === 'rating_explicit' || tag === 'rating_suggestive' || tag === 'rating_mature'
+    ))
 
     const handleSubmitReply = async (e: FormEvent) => {
         e.preventDefault()
@@ -164,17 +170,47 @@ export default function ThreadPost({
                                 </Text>
                             </Link>
                         )}
-                        {/* Post body */}
-                        <div className="whitespace-normal break-words">
-                            <Markdown>{post.body}</Markdown>
-                        </div>
 
-                        {/* Media */}
-                        {post.assets && post.assets.length > 0 && (
-                            <div className="mt-3 max-w-lg">
-                                <MediaGallery assets={post.assets}/>
+                        {/* Unsavoury content notice */}
+                        <Activity mode={isVisible(showUnsavouryNotice)}>
+                            <div
+                                className="flex justify-between items-center mt-2 text-xs rounded-md border border-amber-400/50 bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 px-3 py-2 text-sm">
+                                <div>
+                                    <ExclamationTriangleIcon className="w-4 h-4 mr-1 inline-flex"/>
+                                    Heads up: This post contains adult content that may not be suitable for you.
+                                </div>
+                                <Button color="amber" className="!py-1 !text-xs"
+                                        onClick={() => setShowUnsavouryNotice(false)}>
+                                    Show me anyway
+                                </Button>
                             </div>
-                        )}
+                        </Activity>
+
+                        <Activity mode={isVisible(!showUnsavouryNotice)}>
+                            {/* Post body */}
+                            <div className="whitespace-normal break-words">
+                                <Markdown>{post.body}</Markdown>
+                            </div>
+
+                            {/* tag debug */}
+                            <div className="mt-3 flex flex-wrap gap-1">
+                                <Text className="!text-[0.75rem]" alt>
+                                    (debug) Tags:
+                                </Text>
+                                {post.tags?.map((tag) => (
+                                    <Badge>
+                                        {tag}
+                                    </Badge>
+                                ))}
+                            </div>
+
+                            {/* Media */}
+                            {post.assets && post.assets.length > 0 && (
+                                <div className="mt-3 max-w-lg">
+                                    <MediaGallery assets={post.assets}/>
+                                </div>
+                            )}
+                        </Activity>
 
                         {isRoot && signedInUser && (
                             <div className="flex items-center gap-4 mt-3">

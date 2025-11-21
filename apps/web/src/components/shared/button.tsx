@@ -180,7 +180,7 @@ export const Button = forwardRef(function Button(
     let classes = clsx(
         className,
         styles.base,
-        outline ? styles.outline : plain ? styles.plain : clsx(styles.solid, styles.colors[color ?? 'dark/zinc'])
+        outline ? styles.outline : plain ? styles.plain : clsx(styles.solid, styles.colors[color ?? 'indigo'])
     )
 
     return 'href' in props ? (

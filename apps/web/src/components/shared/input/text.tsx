@@ -9,7 +9,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
     description?: string
     label?: string
     combined?: boolean
-    suffix?: string
+    prefix?: string
     button?: React.ReactNode
     rows?: number
     inputClassName?: string
@@ -22,7 +22,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
          type,
          id,
          description,
-         suffix,
+         prefix,
          button,
          autoComplete,
          label,
@@ -48,14 +48,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         className={cn(
                             combined
                                 ? '!rounded-0 !border-0 shadow-none'
-                                : 'rounded-md shadow-xs ring-1 ring-inset ring-neutral-300 dark:ring-white/10',
+                                : 'rounded-xl shadow-xs ring-1 ring-inset ring-neutral-300 dark:ring-white/10',
                             className,
                             'bg-default flex w-full focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600! sm:max-w-md'
                         )}
                     >
-                        {suffix && (
+                        {prefix && (
                             <span
-                                className="-mr-2.5 flex select-none items-center pl-3 text-muted-foreground sm:text-sm">{suffix}</span>
+                                className="-mr-2.5 flex select-none items-center whitespace-pre-wrap pl-3 text-muted-foreground sm:text-sm">{prefix}</span>
                         )}
                         <InputElement
                             // @ts-ignore
@@ -66,7 +66,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             autoComplete={autoComplete || 'off'}
                             className={cn(
                                 inputClassName,
-                                'text-default rounded block flex-1 border-0 bg-transparent px-3 py-2 placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6 focus:outline-none'
+                                'text-default rounded-xl block flex-1 border-0 bg-transparent px-3 py-2 placeholder:text-neutral-400 focus:ring-0 sm:text-sm sm:leading-6 focus:outline-none'
                             )}
                             {...props}
                         />

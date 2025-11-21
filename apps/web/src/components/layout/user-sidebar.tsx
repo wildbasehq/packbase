@@ -3,9 +3,8 @@
  */
 
 import useWindowSize from '@/src/lib/hooks/use-window-size'
-import {
+import React, {
     Activity,
-    memo,
     MouseEvent as ReactMouseEvent,
     TouchEvent as ReactTouchEvent,
     useCallback,
@@ -14,7 +13,6 @@ import {
     useState
 } from 'react'
 import {Heading, Text} from '@/components/shared/text.tsx'
-import UserDropdown from '@/components/layout/user-dropdown'
 import Link from '@/components/shared/link.tsx'
 import {isVisible, useResourceStore} from '@/lib'
 import {Desktop, Tab, TabsLayout, useContentFrame} from '@/src/components'
@@ -22,8 +20,6 @@ import {useInterval, useLocalStorage} from 'usehooks-ts'
 import UserAvatar from '@/components/shared/user/avatar.tsx'
 import {InboxContent, UserMultipleAccounts} from '@/components/icons/plump'
 import InboxPage from '@/pages/inbox/page'
-
-const DropdownComponent = memo(UserDropdown, () => true)
 
 export default function UserSidebar() {
     const {
@@ -51,7 +47,7 @@ export default function UserSidebar() {
         const {right} = containerRef.current.getBoundingClientRect()
 
         const onMove = (x: number) => {
-            // Dragging the LEFT edge: width is the distance from cursor to the container's right edge
+            // Dragging the LEFT edge: width is the distance from the cursor to the container's right edge
             const rawWidth = Math.max(0, right - x)
 
             const clamped = Math.min(maxExpandedPx, Math.max(minExpandedPx, rawWidth))
@@ -93,7 +89,7 @@ export default function UserSidebar() {
     return (
         <div
             ref={containerRef}
-            className={`h-screen relative transition-all bg-muted dark:bg-n-8 md:flex ${
+            className={`h-fill relative transition-all md:flex ${
                 collapsed ? 'translate-x-full p-0 hidden' : 'p-1 z-10'
             } ${isResizing ? 'select-none cursor-col-resize !transition-none' : ''}`}
             style={{
@@ -105,12 +101,13 @@ export default function UserSidebar() {
         >
             {collapsed ? null : (
                 <>
+                    <div className="absolute bg-sidebar w-full -z-[1] h-12 left-0 top-0"/>
                     <div className="flex flex-col w-full">
                         <TabsLayout
                             defaultIndex={0}
                             suffix={<UserActionsContainer/>}
                             className="h-full"
-                            contentClassName="h-[calc(100vh-3.75rem)] relative pt-8 z-10 bg-white border dark:bg-n-8 rounded-tr rounded-b-xl flex flex-col overflow-y-auto px-4 pb-8 h-full"
+                            contentClassName="relative pt-8 z-10 bg-white border-[0.1rem] shadow-xs dark:bg-n-8 rounded-tr rounded-b-xl flex flex-col overflow-y-auto px-4 pb-8 h-full"
                             headerClassName="rounded-tr rounded-out-lt-3xl"
                         >
                             <Tab title="People" icon={UserMultipleAccounts}>
@@ -140,9 +137,9 @@ export default function UserSidebar() {
 export function UserActionsContainer() {
     return (
         <>
-            {/* User avatar */}
+            {/* + New */}
             <div className="flex mr-2 items-center animate-scale-in">
-                <DropdownComponent/>
+                {/*<PlusIcon className="h-5 w-5 text-muted-foreground dark:text-muted-foreground"/>*/}
             </div>
         </>
     )
@@ -172,9 +169,6 @@ function FriendsListContainer() {
                     </Text>
                 </div>
             )}
-            <div className="flex items-center justify-between mx-3">
-                <Text size="sm">Friends</Text>
-            </div>
 
             {/* Avatar with display name */}
             <div className="flex flex-col space-y-2">
@@ -219,7 +213,7 @@ function PackMembersContainer() {
                         {members?.length} total
                     </Text>
                 </div>
-                
+
             </Activity>
 
             <Activity mode={isVisible(!members?.length)}>

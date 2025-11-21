@@ -1,5 +1,5 @@
 import prisma from '@/db/prisma';
-import { SafetyTrainingData } from '@/lib/rheo/dataset/safety-classification';
+import {faker} from '@faker-js/faker';
 
 async function main() {
     const [, , userId, limitArg] = process.argv;
@@ -9,29 +9,40 @@ async function main() {
         process.exit(1);
     }
 
-    const limit = limitArg ? Number.parseInt(limitArg, 10) : SafetyTrainingData.length;
+    const limit = limitArg ? Number.parseInt(limitArg, 10) : 100;
     if (Number.isNaN(limit) || limit <= 0) {
-        console.error('LIMIT must be a positive integer if provided');
+        console.error('LIMIT must be a positive integer if provided, got ' + limitArg);
         process.exit(1);
     }
 
-    const texts = SafetyTrainingData.slice(0, Math.min(limit, SafetyTrainingData.length));
+    const texts = Array.from({length: limit}, () => {
+        const title = faker.lorem.sentence({min: 3, max: 8});
+        const paragraphs = faker.lorem.paragraphs({min: 2, max: 6}, '\n\n');
+        const listItems = Array.from({
+            length: faker.number.int({
+                min: 2,
+                max: 5
+            })
+        }, () => `- ${faker.lorem.sentence()}`).join('\n');
+        const codeBlock = '```ts\n' + faker.lorem.sentences({min: 1, max: 3}) + '\n```';
+        return `# ${title}\n\n${paragraphs}\n\n${listItems}\n\n${codeBlock}`;
+    });
 
     if (texts.length === 0) {
-        console.error('No training data available to insert');
+        console.error('No data to insert');
         process.exit(1);
     }
 
     console.log(`Creating ${texts.length} posts for user ${userId} ...`);
 
     try {
-        const data = texts.map((item) => ({
+        const data = texts.map((body) => ({
             content_type: 'markdown',
-            body: item.text,
+            body,
             user_id: userId,
         }));
 
-        const result = await prisma.posts.createMany({ data });
+        const result = await prisma.posts.createMany({data});
         console.log(`Inserted ${result.count} posts.`);
     } catch (error) {
         console.error('Failed to populate posts:', error);

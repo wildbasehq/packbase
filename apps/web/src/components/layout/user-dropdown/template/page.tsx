@@ -9,7 +9,7 @@ import {PencilIcon, PlusIcon, TrashIcon} from '@heroicons/react/24/outline'
 import {CheckCircleIcon} from '@heroicons/react/24/solid'
 import {Heading, Text} from '@/components/shared/text.tsx'
 
-const ThemeEditor = lazy(() => import('@/components/layout/resource-switcher/pages/theme-editor.tsx'))
+const ThemeEditor = lazy(() => import('@/components/layout/resource/pages/theme-editor.tsx'))
 
 export default function TemplateSettings() {
     const {themes, loading, error, addTheme, updateTheme, deleteTheme} = useThemes()

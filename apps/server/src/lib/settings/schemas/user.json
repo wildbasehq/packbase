@@ -2,121 +2,18 @@
   "model": "user",
   "version": "1.0.0",
   "settings": {
-    "theme": {
+    "post_privacy": {
       "type": "string",
-      "values": ["light", "dark", "auto"],
-      "default": "auto",
-      "userModifiable": true,
-      "description": "User interface theme preference",
-      "category": "appearance",
-      "db": "profiles.theme"
-    },
-    "emailNotifications": {
-      "type": "boolean",
-      "default": true,
-      "userModifiable": true,
-      "condition": {
-        "field": "emailVerified",
-        "operator": "equals",
-        "value": true
-      },
-      "description": "Enable email notifications",
-      "category": "notifications",
-      "db": "profiles.email_notifications"
-    },
-    "pushNotifications": {
-      "type": "boolean",
-      "default": false,
-      "userModifiable": true,
-      "description": "Enable push notifications",
-      "category": "notifications",
-      "db": "profiles.push_notifications"
-    },
-    "language": {
-      "type": "string",
-      "values": ["en", "es", "fr", "de", "ja", "zh"],
-      "default": "en",
-      "userModifiable": true,
-      "description": "User interface language",
-      "category": "localization",
-      "db": "profiles.language"
-    },
-    "timezone": {
-      "type": "string",
-      "default": "UTC",
-      "userModifiable": true,
-      "description": "User timezone for date/time display",
-      "category": "localization",
-      "db": "profiles.timezone"
-    },
-    "accountStatus": {
-      "type": "string",
-      "values": ["active", "suspended", "deleted", "pending"],
-      "default": "pending",
-      "userModifiable": false,
-      "description": "Current account status",
-      "category": "account",
-      "db": "profiles.type"
-    },
-    "twoFactorEnabled": {
-      "type": "boolean",
-      "default": false,
-      "userModifiable": true,
-      "description": "Enable two-factor authentication",
-      "category": "security",
-      "db": "profiles.two_factor_enabled"
-    },
-    "apiAccessEnabled": {
-      "type": "boolean",
-      "default": false,
-      "userModifiable": true,
-      "condition": {
-        "and": [
-          {
-            "field": "accountStatus",
-            "operator": "equals",
-            "value": "active"
-          },
-          {
-            "field": "emailVerified",
-            "operator": "equals",
-            "value": true
-          }
-        ]
-      },
-      "description": "Enable API access for this user",
-      "category": "api",
-      "db": "profiles.api_access_enabled"
-    },
-    "maxApiCallsPerHour": {
-      "type": "number",
-      "default": 1000,
-      "userModifiable": false,
-      "condition": {
-        "field": "apiAccessEnabled",
-        "operator": "equals",
-        "value": true
-      },
-      "description": "Maximum API calls per hour",
-      "category": "api",
-      "db": "profiles.max_api_calls_per_hour"
-    },
-    "profileVisibility": {
-      "type": "string",
-      "values": ["public", "private", "friends"],
-      "default": "public",
+      "values": [
+        "everyone",
+        "followers",
+        "friends"
+      ],
+      "default": "everyone",
       "userModifiable": true,
       "description": "Profile visibility setting",
       "category": "privacy",
       "db": "profiles.post_privacy"
-    },
-    "dataRetentionDays": {
-      "type": "number",
-      "default": 365,
-      "userModifiable": false,
-      "description": "Number of days to retain user data",
-      "category": "privacy",
-      "db": "profiles.data_retention_days"
     }
   }
 }

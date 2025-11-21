@@ -13,6 +13,26 @@ import {BulkPostLoader} from '@/lib/BulkPostLoader';
 import posthog, {distinctId} from '@/utils/posthog';
 
 const log = require('debug')('vg:search');
+
+/**
+ * Search posts by tags
+ * @param tags Array of tags to search for
+ * @returns Array of posts matching the tags
+ */
+async function searchTags(tags: string[], user_id?: string): Promise<any[]> {
+    return prisma.posts.findMany({
+        where: {
+            tags: {
+                hasEvery: tags,
+            },
+            ...(user_id ? {user_id} : {})
+        },
+        orderBy: {
+            created_at: 'desc',
+        },
+    });
+}
+
 // Define the search response schema
 const SearchResultSchema = t.Object({
     id: t.String(),
@@ -68,6 +88,45 @@ const SearchAPI = (app: YapockType) =>
                 };
 
                 const offset = calculateOffset();
+
+                // Check if query is a tag search
+                if (query.q.startsWith('[tag ')) {
+                    const queryTag = query.q.split('] ')[0] + ']';
+                    const queryUser = query.q.split('] ')[1];
+                    const tagMatch = queryTag.match(/^\[tag (.+)]$/);
+                    if (tagMatch) {
+                        const tagsString = tagMatch[1];
+                        const tags = tagsString.split(',').map(tag => tag.trim());
+
+                        const posts = await searchTags(tags, queryUser);
+                        const postLoader = new BulkPostLoader();
+                        const postIds = posts.map(post => post.id);
+                        const postsMap = await postLoader.loadPosts(postIds, user?.sub);
+                        const trueResults = postIds.map((id) => postsMap[id]).filter((post) => post !== undefined);
+
+                        const requestTime = new Date().getTime() - timeStart;
+                        posthog.capture({
+                            distinctId,
+                            event: 'Viewed Feed',
+                            properties: {
+                                fetch_time: requestTime,
+                                query,
+                            },
+                        });
+
+                        log(`[${requestTime}ms] ${query.q}`);
+
+                        return {
+                            data: {
+                                posts: trueResults
+                            },
+                            count: trueResults.length,
+                            query: query.q,
+                            pages: Math.ceil(trueResults.length / limit),
+                            has_more: trueResults.length > limit,
+                        };
+                    }
+                }
 
                 // Parse allowed tables
                 let allowedTables = ['profiles', 'packs', 'posts'];
@@ -187,6 +246,7 @@ const SearchAPI = (app: YapockType) =>
                 offset: t.Optional(t.String()),
                 includeMetadata: t.Optional(t.String()),
                 allowedTables: t.Optional(t.Array(t.String())),
+                tagUser: t.Optional(t.String()),
             }),
             detail: {
                 description: 'Search API using custom query syntax',

@@ -8,7 +8,7 @@ JSON.stringify = (obj) =>
         }
         return value;
     });
-
+import prisma from '@/db/prisma';
 import {Elysia} from 'elysia';
 import {cors} from '@elysiajs/cors';
 import Debug from 'debug';
@@ -18,31 +18,26 @@ import {autoload} from 'elysia-autoload';
 import deleteNulls from '@/utils/delete-nulls';
 import fs from 'node:fs/promises';
 import posthog, {distinctId} from '@/utils/posthog';
-// Trigger clerk connection
-import './db/auth';
 import './lib/rheo';
 import {HTTPError} from '@/lib/HTTPError';
 import clerkClient from './db/auth';
-import prisma from '@/db/prisma';
 
 const isCluster = process.argv.includes('--cluster');
 const isBuildingSDK = process.argv.includes('--build-sdk');
 const isTestingStartupTime = process.argv.includes('--close-on-success');
 
-const log = !isTestingStartupTime
-    ? {
-        info: Debug('vg:init'),
-        request: Debug('vg:request'),
-        error: Debug('vg:init:error'),
-    }
-    : {
-        info: () => {
-        },
-        request: () => {
-        },
-        error: () => {
-        },
-    };
+const log = isTestingStartupTime ? {
+    info: () => {
+    },
+    request: () => {
+    },
+    error: () => {
+    },
+} : {
+    info: Debug('vg:init'),
+    request: Debug('vg:request'),
+    error: Debug('vg:init:error'),
+};
 
 log.info(`Server${isCluster ? ' (cluster)' : ''} \x1b[38;5;244mSTART\x1b[0m: Awake!!`);
 
@@ -172,6 +167,7 @@ const Yapock = new Elysia({})
     // Load routes
     .use(
         await autoload({
+            dir: `${__dirname}/routes`,
             ...(isBuildingSDK
                 ? {
                     types: {
@@ -214,60 +210,56 @@ const Yapock = new Elysia({})
             memory: process.memoryUsage().heapUsed / 1000000,
         };
     })
-    .listen(process.env.PORT || 8000, async () => {
-        const startupMs = performance.now();
 
-        if (isBuildingSDK) {
-            log.info(`Server \x1b[32mOK\x1b[0m: Heading back to the SDK build process`);
-            process.exit(0);
-        } else if (isTestingStartupTime) {
-            console.log(startupMs);
-            process.exit(0);
-        }
+Yapock.listen(process.env.PORT || 8000, async () => {
+    const startupMs = performance.now();
 
-        posthog.capture({
-            distinctId,
-            event: 'Server Start',
-            properties: {
-                startup: startupMs,
-                maintenance: process.env.MAINTENANCE,
-            },
-        });
+    if (isBuildingSDK) {
+        log.info(`Server \x1b[32mOK\x1b[0m: Heading back to the SDK build process`);
+        process.exit(0);
+    } else if (isTestingStartupTime) {
+        console.log(startupMs);
+        process.exit(0);
+    }
 
-        if (process.env.WEBHOOK_URL) {
-            // Call webhook with message
-            fetch(process.env.WEBHOOK_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'startup',
-                    startup: performance.now(),
-                    maintenance: process.env.MAINTENANCE,
-                }),
-            })
-                .then(() => {
-                    log.info('Webhook called');
-                })
-                .catch((e) => {
-                    log.error('Webhook failed', e);
-                });
-        }
+    posthog.capture({
+        distinctId,
+        event: 'Server Start',
+        properties: {
+            startup: startupMs,
+            maintenance: process.env.MAINTENANCE,
+        },
     });
 
-setTimeout(async () => {
-    const initialMs = performance.now();
-    const logStartup = () => {
-        const startupMs = Math.round(performance.now() - initialMs);
-        if (startupMs > 150) {
-            log.info(
-                `Server \x1b[31mSLOW\x1b[0m: Startup took ${startupMs}ms (true ${performance.now()}) (${Math.round(startupMs / 1000)}s${Math.round(startupMs / 1000) > 60 ? `, ${Math.round(startupMs / 1000 / 60)}m` : ''}), Listening on ${process.env.PORT || 8000}\nThis took too long! It will add up the more server instances you have.`,
-            );
-        } else {
-            log.info(`Server \x1b[32mOK\x1b[0m: Startup took ${startupMs}ms (true ${Math.round(performance.now())}), Listening on ${process.env.PORT || 8000}`);
-        }
-    };
+    if (process.env.WEBHOOK_URL) {
+        // Call webhook with message
+        fetch(process.env.WEBHOOK_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'startup',
+                startup: performance.now(),
+                maintenance: process.env.MAINTENANCE,
+            }),
+        })
+            .then(() => {
+                log.info('Webhook called');
+            })
+            .catch((e) => {
+                log.error('Webhook failed', e);
+            });
+    }
+
+    if (startupMs > 150) {
+        log.info(
+            `Server \x1b[31mSLOW\x1b[0m: Startup took ${startupMs}ms (true ${performance.now()}) (${Math.round(startupMs / 1000)}s${Math.round(startupMs / 1000) > 60 ? `, ${Math.round(startupMs / 1000 / 60)}m` : ''}), Listening on ${process.env.PORT || 8000}\nThis took too long! It will add up the more server instances you have.`,
+        );
+    } else {
+        log.info(`Server \x1b[32mOK\x1b[0m: Startup took ${startupMs}ms (true ${Math.round(performance.now())}), Listening on ${process.env.PORT || 8000}`);
+    }
+
     // Run all files in order inside the migrate folder
     try {
         const modules = await fs.readdir(`${__dirname}/migrate`);
@@ -275,18 +267,18 @@ setTimeout(async () => {
             const index = modules.indexOf(module);
             if (module.endsWith('.ts')) {
                 log.info(`Running migration ${module}`);
-                const {default: func} = await import(`./migrate/${module}`);
+                const {default: func} = await import(`${__dirname}/migrate/${module}`);
                 await func();
 
                 if (index === modules.length - 1) {
-                    logStartup();
+                    log.info('Finished running migrations');
                 }
             }
         }
     } catch (e) {
         log.error('Error running migrations', e);
     }
-}, 100);
+});
 
 // process.on('unhandledRejection', (reason, promise) => {
 //     log.error('Unhandled Rejection at:', promise, 'reason:', reason)

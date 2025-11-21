@@ -2,7 +2,7 @@ import {useParams} from 'wouter'
 import ContentFrame, {useContentFrame, useContentFrameMutation} from '@/components/shared/content-frame.tsx'
 import {Avatar} from '@/components/shared/avatar.tsx'
 import {useSession} from '@clerk/clerk-react'
-import {useUserAccountStore} from '@/lib'
+import {API_URL, useUserAccountStore} from '@/lib'
 import React, {useCallback, useEffect, useMemo, useRef} from 'react'
 import {toast} from 'sonner'
 import {MessageGroup} from '@/components/chat/MessageGroup'
@@ -122,7 +122,7 @@ function MessagesList({channelId}: { channelId: string }) {
 
             try {
                 const token = await session?.getToken()
-                const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${messageId}`, {
+                const res = await fetch(`${API_URL}/dm/messages/${messageId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ function MessagesList({channelId}: { channelId: string }) {
         async (messageId: string) => {
             try {
                 const token = await session?.getToken()
-                const res = await fetch(`${import.meta.env.VITE_YAPOCK_URL}/dm/messages/${messageId}`, {
+                const res = await fetch(`${API_URL}/dm/messages/${messageId}`, {
                     method: 'DELETE',
                     headers: {
                         ...(token ? {Authorization: `Bearer ${token}`} : {}),
@@ -177,7 +177,7 @@ function MessagesList({channelId}: { channelId: string }) {
             const oldestMessage = messageArray[messageArray.length - 1]
 
             const res = await fetch(
-                `${import.meta.env.VITE_YAPOCK_URL}/dm/channels/${channelId}/messages?before=${oldestMessage.id}&limit=50`,
+                `${API_URL}/dm/channels/${channelId}/messages?before=${oldestMessage.id}&limit=50`,
                 {
                     headers: {
                         'Content-Type': 'application/json',

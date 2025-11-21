@@ -12,7 +12,7 @@ import {useParams} from 'wouter'
 import {useResourceStore} from '@/lib/state'
 import {Theme} from '@/lib/api/theme.ts'
 
-const ThemeEditor = lazy(() => import('@/components/layout/resource-switcher/pages/theme-editor.tsx'))
+const ThemeEditor = lazy(() => import('@/components/layout/resource/pages/theme-editor.tsx'))
 
 export default function ResourceSettingsTheme() {
     const {slug} = useParams<{ slug: string }>()

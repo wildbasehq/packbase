@@ -15,4 +15,4 @@ export * from './app-tabs'
 // Re-export resource-switcher components if they exist
 // This assumes there's an index.ts file in the resource-switcher directory
 // If not, individual components should be exported here
-export * from './resource-switcher'
+export * from './resource'

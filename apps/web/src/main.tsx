@@ -6,10 +6,13 @@ import {isVisible} from "@/lib";
 import {Activity, StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import App from './App.tsx'
+import MaintenancePage from './_maintenance.tsx'
 import {ClerkProvider} from '@clerk/clerk-react'
 import {dark} from '@clerk/themes'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+import {ConfidentialOverlay} from "@/components/shared/confidential-overlay.tsx";
+import ErrorBoundary from "@/components/ui/error.tsx";
 
 declare global {
     interface String {
@@ -51,62 +54,54 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <Activity mode={isVisible(!import.meta.env.PROD)}>
-            <div
-                className="h-12 w-screen"
-                style={{
-                    position: 'fixed',
-                    zIndex: '99999',
-                    opacity: 0.2,
-                    pointerEvents: 'none',
-                    backgroundImage: 'url("/img/devel.symbolic.svg")',
-                    backgroundRepeat: 'repeat-x',
+        <ErrorBoundary>
+            <ClerkProvider
+                publishableKey={PUBLISHABLE_KEY}
+                afterSignOutUrl="/"
+                experimental={{
+                    persistClient: true,
                 }}
-            />
-        </Activity>
-
-        <ClerkProvider
-            publishableKey={PUBLISHABLE_KEY}
-            afterSignOutUrl="/"
-            experimental={{
-                persistClient: true,
-            }}
-            localization={{
-                userProfile: {
-                    start: {
-                        headerTitle__account: 'Account Info',
-                        profileSection: {
-                            title: 'Avatar',
-                            primaryButton: 'Update avatar',
+                localization={{
+                    userProfile: {
+                        start: {
+                            headerTitle__account: 'Account Info',
+                            profileSection: {
+                                title: 'Avatar',
+                                primaryButton: 'Update avatar',
+                            },
+                        },
+                        navbar: {
+                            account: 'Account',
+                        },
+                        profilePage: {
+                            title: 'Update Avatar',
+                        },
+                        billingPage: {
+                            title: 'Billing (Managed by Stripe / Clerk)',
                         },
                     },
-                    navbar: {
-                        account: 'Account',
+                }}
+                appearance={{
+                    theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? dark : null,
+                    elements: {
+                        cardBox: {
+                            boxShadow: 'none',
+                        },
+                        logoBox: {
+                            display: 'none',
+                        },
                     },
-                    profilePage: {
-                        title: 'Update Avatar',
-                    },
-                    billingPage: {
-                        title: 'Billing (Managed by Stripe / Clerk)',
-                    },
-                },
-            }}
-            appearance={{
-                theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? dark : null,
-                elements: {
-                    cardBox: {
-                        boxShadow: 'none',
-                    },
-                    logoBox: {
-                        display: 'none',
-                    },
-                },
-            }}
-        >
-            <QueryClientProvider client={queryClient}>
-                <App/>
-                <ReactQueryDevtools initialIsOpen={false}/>
-            </QueryClientProvider>
-        </ClerkProvider>
+                }}
+            >
+                <Activity mode={isVisible(!import.meta.env.PROD)}>
+                    <ConfidentialOverlay/>
+                </Activity>
+
+                <QueryClientProvider client={queryClient}>
+                    {import.meta.env.MAINTENANCE ? <MaintenancePage/> : <App/>}
+                    <ReactQueryDevtools initialIsOpen={false}/>
+                </QueryClientProvider>
+            </ClerkProvider>
+        </ErrorBoundary>
     </StrictMode>
 )

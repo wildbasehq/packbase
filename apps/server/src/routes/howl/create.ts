@@ -1,19 +1,20 @@
-import { t } from 'elysia';
+import {t} from 'elysia';
 import uploadFile from '@/utils/upload-file';
-import { YapockType } from '@/index';
-import { HowlBody } from '@/models/defs';
-import { FeedController } from '@/lib/FeedController';
-import { HTTPError } from '@/lib/HTTPError';
+import {YapockType} from '@/index';
+import {HowlBody} from '@/models/defs';
+import {FeedController} from '@/lib/FeedController';
+import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import createStorage from '@/lib/storage';
 import Baozi from '@/lib/events';
 import requiresToken from '@/utils/identity/requires-token';
+import sanitizeTags from '@/utils/sanitize-tags';
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ body: { tenant_id, channel_id, assets, body, content_type }, set, user }) => {
-            await requiresToken({ set, user });
+        async ({body: {tenant_id, channel_id, assets, body, content_type, tags}, set, user}) => {
+            await requiresToken({set, user});
 
             if (tenant_id === 'universe') tenant_id = '00000000-0000-0000-0000-000000000000';
 
@@ -33,7 +34,7 @@ export default (app: YapockType) =>
             }
 
             if (tenant_id !== '00000000-0000-0000-0000-000000000000') {
-                const tenant = await prisma.packs.findUnique({ where: { id: tenant_id } });
+                const tenant = await prisma.packs.findUnique({where: {id: tenant_id}});
 
                 if (!tenant) {
                     set.status = 404;
@@ -46,8 +47,8 @@ export default (app: YapockType) =>
             // If channel_id is provided, verify it exists and belongs to the specified tenant
             if (channel_id) {
                 const page = await prisma.packs_pages.findUnique({
-                    where: { id: channel_id },
-                    select: { tenant_id: true },
+                    where: {id: channel_id},
+                    select: {tenant_id: true},
                 });
 
                 if (!page) {
@@ -65,19 +66,51 @@ export default (app: YapockType) =>
                 }
             }
 
+            /**
+             * Tags
+             * body.tags = String[],
+             * trimmed, lowecase, all tags must only be alphanumeric, no spaces, no special characters (except
+             * underscore and brackets). If brackets are used, they must be closed and only appear once.
+             */
+            let sanitisedTags: string[] = []
+            const tagHasRating = tags?.some((tag) => ['rating_safe', 'rating_mature', 'rating_suggestive', 'rating_explicit'].indexOf(tag) > -1);
+            if (tags && tagHasRating) {
+                try {
+                    sanitisedTags = sanitizeTags(tags);
+                } catch (error) {
+                    set.status = 400;
+                    throw error;
+                }
+
+                // Check if only one rating tag is present
+                const tagOnlyHasOneRating = sanitisedTags.filter((tag) => ['rating_safe', 'rating_mature', 'rating_suggestive', 'rating_explicit'].indexOf(tag) > -1).length === 1;
+
+                if (!tagOnlyHasOneRating) {
+                    set.status = 400;
+                    throw HTTPError.badRequest({
+                        summary: 'Rating tag is conflicting.',
+                    });
+                }
+            } else {
+                throw HTTPError.badRequest({
+                    summary: 'Missing required tags',
+                });
+            }
+
             const dbCreate = await Baozi.trigger('HOWL_CREATE', {
                 tenant_id,
                 channel_id,
                 content_type,
                 body,
                 user_id: user.sub,
+                tags: sanitisedTags,
             });
 
             console.log('dbCreate', dbCreate);
 
             let data;
             try {
-                data = await prisma.posts.create({ data: dbCreate });
+                data = await prisma.posts.create({data: dbCreate});
             } catch (error) {
                 set.status = 400;
                 throw HTTPError.fromError(error);
@@ -97,7 +130,7 @@ export default (app: YapockType) =>
                     const upload = await uploadFile('packbase-public-profiles', `${user.sub}/${data.id}/${i}.{ext}`, asset.data);
                     if (upload.error) {
                         // delete post
-                        await prisma.posts.delete({ where: { id: data.id } });
+                        await prisma.posts.delete({where: {id: data.id}});
 
                         // also delete uploaded assets
                         const storage = createStorage('packbase-public-profiles');
@@ -123,7 +156,7 @@ export default (app: YapockType) =>
                 }
 
                 await prisma.posts.update({
-                    where: { id: data.id },
+                    where: {id: data.id},
                     data: {
                         assets: uploadedAssets,
                     },
@@ -133,7 +166,7 @@ export default (app: YapockType) =>
             FeedController.homeFeedCache.forEach((value, key) => {
                 if (key.includes(user.sub)) {
                     // Soft update
-                    const { data: post } = value;
+                    const {data: post} = value;
                     post.unshift(data);
                     value.data = post;
                     FeedController.homeFeedCache.set(key, value);

@@ -1,4 +1,4 @@
-import { t } from 'elysia';
+import {t} from 'elysia';
 import emojiRegex from 'emoji-regex';
 
 export const UserProfile = t.Object(
@@ -199,7 +199,7 @@ export const HowlBody = t.Object({
     body: t.Nullable(
         t.String({
             minLength: 1,
-            maxLength: 1000,
+            maxLength: 4096,
         }),
     ),
     assets: t.Optional(
@@ -209,13 +209,21 @@ export const HowlBody = t.Object({
             }),
         ),
     ),
+    tags: t.Optional(
+        t.Array(
+            t.String({
+                minLength: 1,
+                maxLength: 50,
+            }),
+        ),
+    ),
 });
 
 export const HowlComment = t.Object({
     user: UserProfile,
     created_at: t.String(),
     body: t.String({
-        maxLength: 1000,
+        maxLength: 4096,
     }),
 });
 
@@ -227,7 +235,7 @@ export const HowlResponse = t.Object({
     created_at: t.String(),
     body: t.Optional(
         t.String({
-            maxLength: 1000,
+            maxLength: 4096,
         }),
     ),
     assets: t.Optional(
@@ -238,6 +246,14 @@ export const HowlResponse = t.Object({
                     name: t.Optional(t.String()),
                     url: t.String(),
                 }),
+            }),
+        ),
+    ),
+    tags: t.Optional(
+        t.Array(
+            t.String({
+                minLength: 1,
+                maxLength: 50,
             }),
         ),
     ),
@@ -352,7 +368,7 @@ export const NotificationReadBody = t.Object({
 });
 
 export const NotificationFetchQuery = t.Object({
-    limit: t.Optional(t.Number({ default: 20 })),
+    limit: t.Optional(t.Number({default: 20})),
     cursor: t.Optional(t.String()),
-    unread_only: t.Optional(t.Boolean({ default: false })),
+    unread_only: t.Optional(t.Boolean({default: false})),
 });

@@ -34,6 +34,7 @@ export class BulkPostLoader {
                     body: true,
                     assets: true,
                     parent: true,
+                    tags: true
                 },
             });
 

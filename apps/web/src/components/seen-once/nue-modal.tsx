@@ -343,7 +343,7 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                 content: [
                     'Welcome to Packbase!',
                     "I'm here to help you get started with your new Packbase account.",
-                    'As this related to critical information, you cannot skip this.',
+                    'As we still need some critical information, you cannot skip this.',
                     "{img src:'noai_created'}{/img}",
                 ],
                 expression: Expressions.DEFAULT,
@@ -423,12 +423,14 @@ export function createNUEFlow(): CharacterTextBoxConfig {
             },
             {
                 id: 'private-alpha-notice',
-                title: 'readme-or-get-banned-uwu.txt.md',
+                title: 'readme-or-get-banned-uwu.txt.docx.md',
                 content: [
-                    'We are currently in private alpha, so you will not be able to use all the features of Packbase yet, and we are still working on some of the core features.',
+                    'We are currently in alpha, so you will not be able to use all the features of Packbase yet, and we are still working on some of the core stuff.',
                     "Please, be kind to one another - **we won't hesitate to ban you for life with no appeals**. We appreciate you taking the time to join and help us make something truly great, but we ask you to be respectful of our time as well.",
+                    "Your access here is considered a privilege. Breaking any rules may result in immediate account termination.",
                     "***Remember***: We're far from a company - we're just a bunch of passionate people who want to make a great community. No one working on (or using) Packbase deserves to be harassed.",
-                    "***Double Remember: IT'S A PRIVATE ALPHA. THINGS FUCKING BREAK. YOU WOULDN'T GO TO A CONSTRUCTION SITE AND COMPLAIN YOU CAN'T TAKE A SHIT. ALSO; OUR EMAILS AREN'T FOR BUG REPORTS. THIS REMINDER IS TARGETED. YOU KNOW WHO YOU ARE.***"
+                    "***Double Remember: IT'S AN ALPHA. THINGS BREAK. YOU WOULDN'T GO TO A CONSTRUCTION SITE AND COMPLAIN YOU CAN'T TAKE A SHIT. ALSO; OUR EMAILS AREN'T FOR BUG REPORTS. DO NOT POST ABOUT PACKBASE ON HYPER-CRITICAL FORUMS BECAUSE SOMETHING \"FUNCTIONS LIKE SHIT\". THIS REMINDER IS TARGETED. YOU KNOW WHO YOU ARE.***",
+                    "__**BY CLICKING \"Quit yapping, let me in!\", YOU AGREE TO EVERY SINGLE STATEMENT MADE ABOVE.**__"
                 ],
                 expression: Expressions.UNIMPRESSED,
                 onComplete: async formData => {
