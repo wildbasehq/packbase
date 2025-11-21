@@ -98,7 +98,7 @@ createRoot(document.getElementById('root')!).render(
                 </Activity>
 
                 <QueryClientProvider client={queryClient}>
-                    {import.meta.env.MAINTENANCE ? <MaintenancePage/> : <App/>}
+                    {import.meta.env.VITE_MAINTENANCE ? <MaintenancePage/> : <App/>}
                     <ReactQueryDevtools initialIsOpen={false}/>
                 </QueryClientProvider>
             </ClerkProvider>
