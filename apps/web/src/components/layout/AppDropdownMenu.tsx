@@ -39,6 +39,11 @@ export default function AppDropdownMenu() {
                     packs are disabled by the instance owner.
                 </DropdownHeading>
             </DropdownSection>
+            {/* <DropdownDivider/>
+            <DropdownItem href="/teams/create">
+                <PlusIcon/>
+                <DropdownLabel>New team&hellip;</DropdownLabel>
+            </DropdownItem> */}
         </DropdownMenu>
     )
 }

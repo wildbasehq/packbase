@@ -41,7 +41,7 @@ export default (app: YapockType) =>
                     select: { id: true },
                 });
 
-                if (invites && invites.length >= 25) {
+                if (invites && invites.length >= 100) {
                     set.status = 403;
                     throw HTTPError.forbidden({ summary: 'Too many invited people' });
                 }
