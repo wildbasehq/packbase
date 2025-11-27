@@ -21,7 +21,7 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential openssl pkg-config python-is-python3
 
 # Install node modules
-COPY bun.lockb package.json ./
+COPY package.json ./
 RUN bun install --ci
 
 # Generate Prisma Client
