@@ -16,6 +16,8 @@ export default (app: YapockType) =>
                 },
             });
 
+            delete userObj.type
+            
             return (
                 await settings.getSettingValues({
                     model: 'user',
