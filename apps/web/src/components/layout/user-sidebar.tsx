@@ -176,7 +176,7 @@ function FriendsListContainer() {
                     <Link
                         href={`/@${friend.username}`}
                         key={friend.id}
-                        className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
+                        className="flex !text-foreground items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
                     >
                         <div className="flex items-center gap-2">
                             <UserAvatar user={friend} size={32} showOnlineStatus={true}/>
@@ -229,7 +229,7 @@ function PackMembersContainer() {
                     <Link
                         href={`/@${member.username}`}
                         key={member.id}
-                        className="flex items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
+                        className="flex !text-foreground items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
                     >
                         <div className="flex items-center gap-2">
                             <UserAvatar user={member} size={32} showOnlineStatus={false}/>
