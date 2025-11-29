@@ -2,24 +2,27 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {Logo} from '@/components/shared/logo'
 import Tooltip from '@/components/shared/tooltip'
-import {Button} from '@/components/shared/button'
-import UserAvatar from '@/components/shared/user/avatar'
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
-import {cn} from '@/lib/utils'
-import {BuildingStorefrontIcon} from '@heroicons/react/20/solid'
-import {PlusIcon} from '@heroicons/react/24/solid'
-import Link from '@/components/shared/link.tsx'
+import {ExclamationTriangleIcon, GlobeAsiaAustraliaIcon} from '@heroicons/react/20/solid'
 import {useLocation} from 'wouter'
-import {Protect} from '@clerk/clerk-react'
-import {AnimatePresence, motion} from 'motion/react'
+import {Activity, useCallback, useEffect, useRef, useState} from "react"
+import {Heading, NavbarItem, NavbarLabel} from "@/src/components";
+import {Text} from "@/components/shared/text.tsx";
+import {SignedOut} from "@clerk/clerk-react";
+import {Login} from "@/components/icons/plump/Login.tsx";
+import {cn, isVisible} from "@/lib";
 
-export default function PackSwitcher() {
+export default function PackSwitcher({onChange}: {
+    onChange: (resource: any) => void
+}) {
     const {currentResource, setCurrentResource, resources} = useResourceStore()
     const {resourceDefault, loading, setLoading} = useUIStore()
     const {user} = useUserAccountStore()
     const [, navigate] = useLocation()
+    const scrollRef = useRef<HTMLDivElement | null>(null)
+    const [hasLeftOverflow, setHasLeftOverflow] = useState(false)
+    const [hasRightOverflow, setHasRightOverflow] = useState(false)
 
     const switchResource = (resource: any) => {
         if (loading || currentResource.id === resource.id) {
@@ -30,87 +33,155 @@ export default function PackSwitcher() {
         setCurrentResource(resource)
         setLoading(true)
         navigate(`/p/${resource.slug}`)
+        onChange(resource)
     }
 
+    const updateOverflowShadows = useCallback(() => {
+        const el = scrollRef.current
+        if (!el) return
+
+        const {scrollLeft, scrollWidth, clientWidth} = el
+        const maxScrollLeft = scrollWidth - clientWidth
+
+        // Small epsilon to avoid flicker due to fractional scroll values
+        const epsilon = 1
+
+        setHasLeftOverflow(scrollLeft > epsilon)
+        setHasRightOverflow(scrollLeft < maxScrollLeft - epsilon)
+    }, [])
+
+    const handleHorizontalWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+        // If the user scrolls vertically with the wheel, move horizontally instead.
+        if (event.deltaY !== 0) {
+            event.preventDefault()
+            const el = event.currentTarget
+            el.scrollLeft += event.deltaY
+            // After adjusting scrollLeft manually, update shadows
+            window.requestAnimationFrame(updateOverflowShadows)
+        }
+    }
+
+    const handleScroll = () => {
+        updateOverflowShadows()
+    }
+
+    useEffect(() => {
+        // Initialize on mount (and when layout changes)
+        updateOverflowShadows()
+        const handleResize = () => updateOverflowShadows()
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [updateOverflowShadows])
+
     return (
-        <div className="w-18 relative flex h-full flex-col items-center py-2 bg-n-9">
-            <Tooltip content="Your Nest" side="right" delayDuration={0}>
-                <div
-                    className={cn(
-                        'hover:show-pill flex h-12 w-12 justify-center cursor-pointer items-center [&>div]:bg-n-1',
-                        currentResource.id === resourceDefault.id
-                            ? 'force-pill [&>div>*]:invert [&>div]:bg-primary'
-                            : 'dark:[&>div>*]:invert dark:[&>div]:bg-n-7'
-                    )}
-                    onClick={() => switchResource(resourceDefault)}
+        <div
+            ref={scrollRef}
+            className="w-full overflow-x-auto py-4 overflow-y-hidden"
+            onWheel={handleHorizontalWheel}
+            onScroll={handleScroll}
+        >
+            <div className="inline-grid w-max grid-rows-3 grid-flow-col gap-2 auto-cols-max">
+                <NavbarItem
+                    className="flex w-2xs mx-4 [&>*]:w-full"
+                    href="/p/new"
+                    onClick={() => close()}
                 >
-                    <Logo noColorTheme className="!w-9.5 !h-9.5"/>
-                </div>
-            </Tooltip>
+                    <GlobeAsiaAustraliaIcon className="w-6 h-6"/>
+                    <NavbarLabel className="text-muted-foreground group-hover:text-foreground">Explore / Create
+                        Packs&hellip;</NavbarLabel>
+                </NavbarItem>
 
-            <Tooltip content="(LIMITED - FOR INVITE ALPHA) Trinket Exchange" side="right" delayDuration={0}>
-                <div
-                    className={cn(
-                        'hover:show-pill flex justify-center mt-1 h-9.5 w-9.5 rounded-xl items-center',
-                        currentResource.id === 'store' ? 'force-pill bg-primary [&>svg>*]:text-white' : 'bg-n-1 dark:bg-n-7'
-                    )}
-                    onClick={() => navigate('~/store')}
-                >
-                    <BuildingStorefrontIcon className="w-5 h-5  "/>
-                </div>
-            </Tooltip>
-
-            <div className="h-[1px] w-1/2 bg-n-3 dark:bg-n-7 mt-2 mb-1"></div>
-
-            {resources.map(item => (
-                <Tooltip key={item.id} content={item.display_name} side="right" delayDuration={0}>
-                    <div className="relative">
-                        <div
-                            className={cn(
-                                'hover:show-pill off-by-six flex h-12 w-12 justify-center items-center before:!left-[-0.65rem]',
-                                currentResource.id === item.id && 'force-pill'
-                            )}
-                            onClick={() => switchResource(item)}
-                        >
-                            <UserAvatar
-                                name={item.display_name}
-                                size={38}
-                                icon={item.images?.avatar}
-                                className="inline-flex cursor-pointer overflow-hidden !rounded-xl"
-                            />
-                        </div>
-
-                        {/* Pack icon background */}
-                        <AnimatePresence>
-                            {currentResource.id === item.id && (
-                                <motion.div
-                                    key={`pack-bg-${item.id}`}
-                                    initial={{opacity: 0}}
-                                    animate={{opacity: 1}}
-                                    exit={{opacity: 0}}
-                                    transition={{duration: 0.3}}
-                                    className="absolute inset-0 ring-white/10 -z-1 rounded-l-xl bg-white dark:bg-n-8 h-12 rounded-out-r w-[calc(3.75rem)] pack-icon-bg"
-                                />
-                            )}
-                        </AnimatePresence>
-                    </div>
-                </Tooltip>
-            ))}
-
-            <Protect>
-                <Tooltip content="Create/Join Pack" side="right" delayDuration={0}>
-                    <Link
-                        href="/p/new"
-                        className={cn('hover:show-pill flex h-8 w-8 items-center', currentResource.id === 'new' && 'force-pill')}
+                <SignedOut>
+                    <NavbarItem
+                        className="flex w-2xs mx-4 [&>*]:w-full"
+                        href="/id/login"
+                        onClick={() => close()}
                     >
-                        <Button plain className="h-8 w-8 p-1">
-                            <PlusIcon/>
-                        </Button>
-                    </Link>
-                </Tooltip>
-            </Protect>
+                        <Login className="w-6 h-6"/>
+                        <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
+                            Login&hellip;
+                        </NavbarLabel>
+                    </NavbarItem>
 
-            <div className="grow"/>
+                    <Activity
+                        mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'open' || !import.meta.env.VITE_REIGSTRATION_TYPE)}>
+                        <NavbarItem
+                            className="flex w-2xs mx-4 [&>*]:w-full"
+                            href="/id/create"
+                            onClick={() => close()}
+                        >
+                            <Login className="w-6 h-6"/>
+                            <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
+                                Register&hellip;
+                            </NavbarLabel>
+                        </NavbarItem>
+                    </Activity>
+
+                    <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'waitlist')}>
+                        <NavbarItem
+                            className="flex w-2xs mx-4 [&>*]:w-full"
+                            href="/id/waitlist"
+                            onClick={() => close()}
+                        >
+                            <Login className="w-6 h-6"/>
+                            <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
+                                Join the Waitlist&hellip;
+                            </NavbarLabel>
+                        </NavbarItem>
+                    </Activity>
+
+                    <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'closed')}>
+                        <NavbarItem
+                            className="flex w-2xs mx-4 [&>*]:w-full"
+                            href="/p/new"
+                            onClick={() => close()}
+                        >
+                            <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
+                                Registration Closed.
+                            </NavbarLabel>
+                        </NavbarItem>
+                    </Activity>
+                </SignedOut>
+
+                {resources.map((pack, colIdx) => (
+                    <NavbarItem
+                        key={colIdx}
+                        className={cn("flex w-2xs mx-4 [&>*]:w-full", currentResource.id === pack.id && "ring-1 rounded ring-default bg-card")}
+                        onClick={() => switchResource(pack)}
+                    >
+                        <img
+                            data-slot="avatar"
+                            className="rounded-sm w-6 h-6 border overflow-hidden"
+                            src={pack.images?.avatar || '/img/default-avatar.png'}
+                        />
+                        <div className="flex flex-col -space-y-1 relative">
+                            <NavbarLabel>{pack.display_name}</NavbarLabel>
+                            <NavbarLabel className="text-muted-foreground text-xs">
+                                @{pack.slug}
+                                {/*<TextTicker*/}
+                                {/*    texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...', 'Click in for more...']}*/}
+                                {/*    interval={1500 + colIdx * Math.random() * 1000}/>*/}
+                            </NavbarLabel>
+                        </div>
+                        <Tooltip
+                            content={
+                                <>
+                                    <Heading className="!text-sm">System fault precautions are in effect.</Heading>
+                                    <Text className="!text-xs">
+                                        Our content moderation system is currently having some issues.
+                                        We've temporarily enabled stricter (but sensitive) filtering which
+                                        may block valid content. We're extremely sorry. /rek.
+                                    </Text>
+                                </>
+                            }>
+                            <ExclamationTriangleIcon
+                                data-hardcoded-reasoning="Rheo manages feature flags - can't change due to Rheo being down."
+                                className="!fill-orange-500"/>
+                        </Tooltip>
+                        {/*<ChevronDownIcon/>*/}
+                    </NavbarItem>
+                ))}
+            </div>
         </div>
     )
 }

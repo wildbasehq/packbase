@@ -50,8 +50,8 @@ import UserDropdown from "@/components/layout/user-dropdown";
 import {AlignLeft} from "@/components/icons/plump/AlignLeft.tsx";
 import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
 import {motion} from "motion/react"
-import Link from "@/components/shared/link.tsx";
 import Tooltip from "@/components/shared/tooltip.tsx";
+import PackSwitcher from "@/components/layout/resource/pack-switcher.tsx";
 
 const NavbarItems = [
     {
@@ -266,8 +266,8 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
 
                 {/* Dropdown content, moves below content down */}
                 <Activity mode={isVisible(isWHOpen)}>
-                    <div className="absolute top-12 px-4 py-2.5">
-                        <WhatsHappeningDropdown/>
+                    <div className="absolute top-12 w-full">
+                        <WhatsHappeningDropdown close={() => setIsWHOpen(false)}/>
                     </div>
                 </Activity>
 
@@ -302,7 +302,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     }}
                     whileHover={isWHOpen ? 'interactEntry' : undefined}
                     onClick={() => isWHOpen && setIsWHOpen(false)}
-                    className={cn(isWHOpen && '[&>*]:!pointer-events-none', 'relative flex overflow-hidden grow m-1 lg:rounded-lg lg:bg-white lg:ring-1 ring-default lg:shadow-xs dark:lg:bg-zinc-900')}
+                    className={cn(isWHOpen && '[&>*]:!pointer-events-none', 'relative flex overflow-hidden grow m-1 lg:rounded-xl lg:bg-white lg:border-[0.1rem] ring-default lg:shadow-xs dark:lg:bg-n-8')}
                 >
                     {/* Sidebar on mobile */}
                     <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
@@ -334,38 +334,68 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     )
 }
 
-function WhatsHappeningDropdown() {
-    const items = [
-        // col 1
-        [
-            {name: 'Packbase', href: '/'},
-        ],
-        // col 2
-        [
-            {name: 'Packbase', href: '/'},
-        ],
-        // col 3
-        [
-            {name: 'Packbase', href: '/'},
-        ],
-    ]
+function WhatsHappeningDropdown({close}: { close: () => void }) {
+    const packs = Array.from({length: 28}, (_, i) => ({outage: true, name: `Pack ${i + 1}`, slug: `/pack${i + 1}`}))
+    const scrollRef = React.useRef<HTMLDivElement | null>(null)
+    const [hasLeftOverflow, setHasLeftOverflow] = React.useState(false)
+    const [hasRightOverflow, setHasRightOverflow] = React.useState(false)
+    const {currentResource, setCurrentResource, resources} = useResourceStore()
+
+    const updateOverflowShadows = React.useCallback(() => {
+        const el = scrollRef.current
+        if (!el) return
+
+        const {scrollLeft, scrollWidth, clientWidth} = el
+        const maxScrollLeft = scrollWidth - clientWidth
+
+        // Small epsilon to avoid flicker due to fractional scroll values
+        const epsilon = 1
+
+        setHasLeftOverflow(scrollLeft > epsilon)
+        setHasRightOverflow(scrollLeft < maxScrollLeft - epsilon)
+    }, [])
+
+    const handleHorizontalWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+        // If the user scrolls vertically with the wheel, move horizontally instead.
+        if (event.deltaY !== 0) {
+            event.preventDefault()
+            const el = event.currentTarget
+            el.scrollLeft += event.deltaY
+            // After adjusting scrollLeft manually, update shadows
+            window.requestAnimationFrame(updateOverflowShadows)
+        }
+    }
+
+    const handleScroll = () => {
+        updateOverflowShadows()
+    }
+
+    React.useEffect(() => {
+        // Initialize on mount (and when layout changes)
+        updateOverflowShadows()
+        const handleResize = () => updateOverflowShadows()
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [updateOverflowShadows])
 
     return (
-        <div className="grid grid-cols-3 gap-6">
-            {items.map((column, colIdx) => (
-                <ul key={colIdx} className="space-y-2">
-                    {column.map((item, itemIdx) => (
-                        <li key={`${colIdx}-${itemIdx}-${item.name}`}>
-                            <Link
-                                href={item.href}
-                                className="text-xl font-bold text-foreground hover:underline"
-                            >
-                                {item.name}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            ))}
+        <div className="relative w-full px-4">
+            {/* Scroll container */}
+            <PackSwitcher onChange={close}/>
+
+            {/* Left gradient (only when there's content to the left) */}
+            {hasLeftOverflow && (
+                <div
+                    className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-muted to-transparent"
+                />
+            )}
+
+            {/* Right gradient (only when there's content to the right) */}
+            {hasRightOverflow && (
+                <div
+                    className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-muted to-transparent"
+                />
+            )}
         </div>
     )
 }

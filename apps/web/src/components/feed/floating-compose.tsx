@@ -231,7 +231,7 @@ export default function FloatingCompose() {
                     {/*        <HardDisk className="fill-muted-foreground w-full h-full"/>*/}
                     {/*    </div>*/}
                     {/*</Tooltip>*/}
-                    <div className="flex items-center justify-center gap-2" />
+                    <div className="flex items-center justify-center gap-2"/>
                     <div className="flex items-center gap-2">
                         <Activity mode={isVisible(!!channel)}>
                             <div className="flex items-center gap-1">
@@ -761,7 +761,7 @@ export function TagsInput({
 
             <Activity mode={isVisible(!usePlainEditor)}>
                 <div
-                    className="flex flex-wrap gap-2 p-2 border rounded-xl bg-background min-h-[2.5rem] items-center relative">
+                    className="flex flex-wrap gap-2 p-2 border rounded-xl min-h-[2.5rem] items-center relative before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:bg-white before:shadow-sm dark:before:hidden bg-transparent dark:bg-white/5">
                     <Activity mode={isVisible(!!forcedTag)}>
                         <Tooltip content={(
                             <div className="flex flex-col gap-1">
@@ -794,7 +794,7 @@ export function TagsInput({
                                 ref={el => tagRefs.current[tag] = el}
                                 className={cn(
                                     "flex items-center gap-1 px-2 py-1 rounded-md text-sm",
-                                    isValid ? "bg-primary/10 text-primary" : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                    isValid ? "bg-indigo-500/10 text-indigo-500" : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
                                 )}
                             >
                                 <Activity mode={isVisible(!isValid)}>
@@ -804,7 +804,7 @@ export function TagsInput({
                                 <button
                                     onClick={() => removeTag(tag)}
                                     className={cn(
-                                        isValid ? "hover:text-primary/70" : "hover:text-amber-600/70 dark:hover:text-amber-400/70"
+                                        isValid ? "hover:text-indigo-500/70" : "hover:text-amber-600/70 dark:hover:text-amber-400/70"
                                     )}
                                 >
                                     ×

@@ -1,23 +1,22 @@
-import { t } from 'elysia';
-import { YapockType } from '@/index';
-import { ErrorTypebox } from '@/utils/errors';
-import { HTTPError } from '@/lib/HTTPError';
+import {t} from 'elysia';
+import {YapockType} from '@/index';
+import {ErrorTypebox} from '@/utils/errors';
+import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
-import clerkClient from '@/db/auth';
-import { NotificationManager } from '@/utils/NotificationManager';
-import { getUserClerkByID } from '@/utils/clerk';
+import {NotificationManager} from '@/utils/NotificationManager';
+import {getUserClerkByID} from '@/utils/clerk';
 import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app
         .post(
             '',
-            async ({ params: { id }, body: { slot = '👍' }, set, user }: any) => {
-                await requiresToken({ set, user });
+            async ({params: {id}, body: {slot = '👍'}, set, user}: any) => {
+                await requiresToken({set, user});
 
                 let postExists;
                 try {
-                    postExists = await prisma.posts.findUnique({ where: { id }, select: { user_id: true, body: true } });
+                    postExists = await prisma.posts.findUnique({where: {id}, select: {user_id: true, body: true}});
                 } catch (postError) {
                     set.status = 500;
                     throw HTTPError.fromError(postError);
@@ -77,7 +76,7 @@ export default (app: YapockType) =>
                     throw HTTPError.fromError(insertError);
                 }
 
-                await NotificationManager.createNotification(postExists.user_id, 'howl_react', `${user.sessionClaims.nickname} reacted :${slot}:`, postExists.body, {
+                await NotificationManager.createNotification(postExists.user_id, 'howl_react', `${user.sessionClaims.nickname} reacted ${slot}`, postExists.body, {
                     post_id: id,
                     user: {
                         id: user.sub,
@@ -110,8 +109,8 @@ export default (app: YapockType) =>
         )
         .delete(
             '',
-            async ({ params: { id }, set, user }) => {
-                await requiresToken({ set, user });
+            async ({params: {id}, set, user}) => {
+                await requiresToken({set, user});
 
                 try {
                     await prisma.posts_reactions.deleteMany({

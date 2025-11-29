@@ -8,6 +8,7 @@
 @import 'tailwindcss';
 @import 'tailwind-rounded-out';
 @import './_color.css';
+@import './_scrollbar.css';
 /*@config "../../tailwind.config.js";*/
 
 /* Import Tailwind configuration files */

@@ -1,0 +1,3 @@
+* {
+    @apply [scrollbar-width:thin] [scrollbar-color:theme(colors.zinc.500)_transparent] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-500/70 [&::-webkit-scrollbar-thumb]:rounded-full
+}
