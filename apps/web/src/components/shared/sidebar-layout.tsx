@@ -177,7 +177,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                 <NavbarLabel>Packbase</NavbarLabel>
                                 <NavbarLabel className="text-muted-foreground text-xs">
                                     <TextTicker
-                                        texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...', 'Click in for more...']}
+                                        texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...']}
                                         interval={2000}/>
                                 </NavbarLabel>
                             </div>
