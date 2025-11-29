@@ -14,6 +14,14 @@
       "description": "Profile visibility setting",
       "category": "privacy",
       "db": "profiles.post_privacy"
+    },
+    "show_nsfw": {
+      "type": "boolean",
+      "default": false,
+      "userModifiable": true,
+      "description": "Show NSFW content",
+      "category": "content",
+      "db": "profiles.show_nsfw"
     }
   }
 }

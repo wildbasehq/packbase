@@ -195,7 +195,7 @@ export default function ThreadPost({
                             {/* tag debug */}
                             <div className="mt-3 flex flex-wrap gap-1">
                                 <Text className="!text-[0.75rem]" alt>
-                                    (debug) Tags:
+                                    Tags:
                                 </Text>
                                 {post.tags?.map((tag) => (
                                     <Badge>

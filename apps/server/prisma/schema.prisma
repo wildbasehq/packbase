@@ -28,6 +28,7 @@ model storage {
 
   @@schema("public")
 }
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model packs {
@@ -151,6 +152,7 @@ model profiles {
   space_type    String    @default("default")
   post_privacy  String    @default("everyone")
   invited_by    String?   @db.Uuid
+  show_nsfw     Boolean   @default(false)
   owner_id      String
   last_online   DateTime?
 
@@ -214,16 +216,16 @@ model user_themes {
 
 /// Folders owned by users (replaces profiles.settings JSON folders)
 model folders {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at  DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime  @default(now()) @db.Timestamptz(6)
-  user_id     String    @db.Uuid
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+  user_id     String   @db.Uuid
   name        String
   description String?
   emoji       String?
-  mode        String    // 'dynamic' | 'manual'
+  mode        String // 'dynamic' | 'manual'
   query       String?
-  howl_ids    String[]  @default([])
+  howl_ids    String[] @default([])
 
   @@index([user_id], type: Hash)
   @@schema("public")
