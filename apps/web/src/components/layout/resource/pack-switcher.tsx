@@ -74,116 +74,133 @@ export default function PackSwitcher({onChange}: {
     }, [updateOverflowShadows])
 
     return (
-        <div
-            ref={scrollRef}
-            className="w-full overflow-x-auto py-4 overflow-y-hidden"
-            onWheel={handleHorizontalWheel}
-            onScroll={handleScroll}
-        >
-            <div className="inline-grid w-max grid-rows-3 grid-flow-col gap-2 auto-cols-max">
-                <NavbarItem
-                    className="flex w-2xs mx-4 [&>*]:w-full"
-                    href="/p/new"
-                    onClick={() => onChange({})}
-                >
-                    <GlobeAsiaAustraliaIcon className="w-6 h-6"/>
-                    <NavbarLabel className="text-muted-foreground group-hover:text-foreground">Explore / Create
-                        Packs&hellip;</NavbarLabel>
-                </NavbarItem>
-
-                <SignedOut>
+        <>
+            <div
+                ref={scrollRef}
+                className="w-full overflow-x-auto py-4 overflow-y-hidden"
+                onWheel={handleHorizontalWheel}
+                onScroll={handleScroll}
+            >
+                <div className="inline-grid w-max grid-rows-3 grid-flow-col gap-2 auto-cols-max">
                     <NavbarItem
                         className="flex w-2xs mx-4 [&>*]:w-full"
-                        href="/id/login"
+                        href="/p/new"
                         onClick={() => onChange({})}
                     >
-                        <Login className="w-6 h-6"/>
-                        <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
-                            Login&hellip;
-                        </NavbarLabel>
+                        <GlobeAsiaAustraliaIcon className="w-6 h-6"/>
+                        <NavbarLabel className="text-muted-foreground group-hover:text-foreground">Explore / Create
+                            Packs&hellip;</NavbarLabel>
                     </NavbarItem>
 
-                    <Activity
-                        mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'open' || !import.meta.env.VITE_REIGSTRATION_TYPE)}>
+                    <SignedOut>
                         <NavbarItem
                             className="flex w-2xs mx-4 [&>*]:w-full"
-                            href="/id/create"
+                            href="/id/login"
                             onClick={() => onChange({})}
                         >
                             <Login className="w-6 h-6"/>
                             <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
-                                Register&hellip;
+                                Login&hellip;
                             </NavbarLabel>
                         </NavbarItem>
-                    </Activity>
 
-                    <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'waitlist')}>
-                        <NavbarItem
-                            className="flex w-2xs mx-4 [&>*]:w-full"
-                            href="/id/create"
-                            onClick={() => onChange({})}
-                        >
-                            <Login className="w-6 h-6"/>
-                            <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
-                                Join the Waitlist&hellip;
-                            </NavbarLabel>
-                        </NavbarItem>
-                    </Activity>
-
-                    <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'closed')}>
-                        <NavbarItem
-                            className="flex w-2xs mx-4 [&>*]:w-full"
-                            href="/p/new"
-                            onClick={() => onChange({})}
-                        >
-                            <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
-                                Registration Closed.
-                            </NavbarLabel>
-                        </NavbarItem>
-                    </Activity>
-                </SignedOut>
-
-                <SignedIn>
-                    {[resourceDefault, ...resources].map((pack, colIdx) => (
-                        <NavbarItem
-                            key={colIdx}
-                            className={cn("flex w-2xs mx-4 [&>*]:w-full", currentResource.id === pack.id && "ring-1 rounded ring-default bg-card")}
-                            onClick={() => switchResource(pack)}
-                        >
-                            <img
-                                data-slot="avatar"
-                                className="rounded-sm shrink-0 w-6 h-6 border overflow-hidden"
-                                src={pack.images?.avatar || '/img/default-avatar.png'}
-                            />
-                            <div className="flex flex-col -space-y-1 w-full relative">
-                                <NavbarLabel>{pack.display_name}</NavbarLabel>
-                                <NavbarLabel className="text-muted-foreground text-xs">
-                                    @{pack.slug}
-                                    {/*<TextTicker*/}
-                                    {/*    texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...', 'Click in for more...']}*/}
-                                    {/*    interval={1500 + colIdx * Math.random() * 1000}/>*/}
+                        <Activity
+                            mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'open' || !import.meta.env.VITE_REIGSTRATION_TYPE)}>
+                            <NavbarItem
+                                className="flex w-2xs mx-4 [&>*]:w-full"
+                                href="/id/create"
+                                onClick={() => onChange({})}
+                            >
+                                <Login className="w-6 h-6"/>
+                                <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
+                                    Register&hellip;
                                 </NavbarLabel>
-                            </div>
-                            <Tooltip
-                                content={
-                                    <>
-                                        <Heading className="!text-sm">System fault precautions are in effect.</Heading>
-                                        <Text className="!text-xs">
-                                            Our content moderation system is currently having some issues.
-                                            We've temporarily enabled stricter (but sensitive) filtering which
-                                            may block valid content. We're extremely sorry. /rek.
-                                        </Text>
-                                    </>
-                                }>
-                                <ExclamationTriangleIcon
-                                    data-hardcoded-reasoning="Rheo manages feature flags - can't change due to Rheo being down."
-                                    className="!fill-orange-500"/>
-                            </Tooltip>
-                            {/*<ChevronDownIcon/>*/}
-                        </NavbarItem>
-                    ))}
-                </SignedIn>
+                            </NavbarItem>
+                        </Activity>
+
+                        <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'waitlist')}>
+                            <NavbarItem
+                                className="flex w-2xs mx-4 [&>*]:w-full"
+                                href="/id/create"
+                                onClick={() => onChange({})}
+                            >
+                                <Login className="w-6 h-6"/>
+                                <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
+                                    Join the Waitlist&hellip;
+                                </NavbarLabel>
+                            </NavbarItem>
+                        </Activity>
+
+                        <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'closed')}>
+                            <NavbarItem
+                                className="flex w-2xs mx-4 [&>*]:w-full"
+                                href="/p/new"
+                                onClick={() => onChange({})}
+                            >
+                                <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
+                                    Registration Closed.
+                                </NavbarLabel>
+                            </NavbarItem>
+                        </Activity>
+                    </SignedOut>
+
+                    <SignedIn>
+                        {[resourceDefault, ...resources].map((pack, colIdx) => (
+                            <NavbarItem
+                                key={colIdx}
+                                className={cn("flex w-2xs mx-4 [&>*]:w-full", currentResource.id === pack.id && "ring-1 rounded ring-default bg-card")}
+                                onClick={() => switchResource(pack)}
+                            >
+                                <img
+                                    data-slot="avatar"
+                                    className="rounded-sm shrink-0 w-6 h-6 border overflow-hidden"
+                                    src={pack.images?.avatar || '/img/default-avatar.png'}
+                                />
+                                <div className="flex flex-col -space-y-1 w-full relative">
+                                    <NavbarLabel>{pack.display_name}</NavbarLabel>
+                                    <NavbarLabel className="text-muted-foreground text-xs">
+                                        @{pack.slug}
+                                        {/*<TextTicker*/}
+                                        {/*    texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...', 'Click in for more...']}*/}
+                                        {/*    interval={1500 + colIdx * Math.random() * 1000}/>*/}
+                                    </NavbarLabel>
+                                </div>
+                                <Tooltip
+                                    content={
+                                        <>
+                                            <Heading className="!text-sm">System fault precautions are in
+                                                effect.</Heading>
+                                            <Text className="!text-xs">
+                                                Our content moderation system is currently having some issues.
+                                                We've temporarily enabled stricter (but sensitive) filtering which
+                                                may block valid content. We're extremely sorry. /rek.
+                                            </Text>
+                                        </>
+                                    }>
+                                    <ExclamationTriangleIcon
+                                        data-hardcoded-reasoning="Rheo manages feature flags - can't change due to Rheo being down."
+                                        className="!fill-orange-500"/>
+                                </Tooltip>
+                                {/*<ChevronDownIcon/>*/}
+                            </NavbarItem>
+                        ))}
+                    </SignedIn>
+                </div>
             </div>
-        </div>
+
+            {/* Left gradient (only when there's content to the left) */}
+            {hasLeftOverflow && (
+                <div
+                    className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-muted to-transparent"
+                />
+            )}
+
+            {/* Right gradient (only when there's content to the right) */}
+            {hasRightOverflow && (
+                <div
+                    className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-muted to-transparent"
+                />
+            )}
+        </>
     )
 }

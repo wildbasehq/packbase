@@ -119,7 +119,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     const [seenPackTour, setSeenPackTour] = useLocalStorage('seen-pack-tour', false)
     const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
     const [isWHOpen, setIsWHOpen] = useState(false)
-    const {currentResource, resourceDefault} = useResourceStore()
+    const {currentResource} = useResourceStore()
 
     return (
         <div className="flex min-h-svh h-screen w-full relative bg-muted">
@@ -366,67 +366,10 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
 }
 
 function WhatsHappeningDropdown({close}: { close: () => void }) {
-    const packs = Array.from({length: 28}, (_, i) => ({outage: true, name: `Pack ${i + 1}`, slug: `/pack${i + 1}`}))
-    const scrollRef = React.useRef<HTMLDivElement | null>(null)
-    const [hasLeftOverflow, setHasLeftOverflow] = React.useState(false)
-    const [hasRightOverflow, setHasRightOverflow] = React.useState(false)
-    const {currentResource, setCurrentResource, resources} = useResourceStore()
-
-    const updateOverflowShadows = React.useCallback(() => {
-        const el = scrollRef.current
-        if (!el) return
-
-        const {scrollLeft, scrollWidth, clientWidth} = el
-        const maxScrollLeft = scrollWidth - clientWidth
-
-        // Small epsilon to avoid flicker due to fractional scroll values
-        const epsilon = 1
-
-        setHasLeftOverflow(scrollLeft > epsilon)
-        setHasRightOverflow(scrollLeft < maxScrollLeft - epsilon)
-    }, [])
-
-    const handleHorizontalWheel = (event: React.WheelEvent<HTMLDivElement>) => {
-        // If the user scrolls vertically with the wheel, move horizontally instead.
-        if (event.deltaY !== 0) {
-            event.preventDefault()
-            const el = event.currentTarget
-            el.scrollLeft += event.deltaY
-            // After adjusting scrollLeft manually, update shadows
-            window.requestAnimationFrame(updateOverflowShadows)
-        }
-    }
-
-    const handleScroll = () => {
-        updateOverflowShadows()
-    }
-
-    React.useEffect(() => {
-        // Initialize on mount (and when layout changes)
-        updateOverflowShadows()
-        const handleResize = () => updateOverflowShadows()
-        window.addEventListener('resize', handleResize)
-        return () => window.removeEventListener('resize', handleResize)
-    }, [updateOverflowShadows])
-
     return (
         <div className="relative w-full px-4">
             {/* Scroll container */}
             <PackSwitcher onChange={close}/>
-
-            {/* Left gradient (only when there's content to the left) */}
-            {hasLeftOverflow && (
-                <div
-                    className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-muted to-transparent"
-                />
-            )}
-
-            {/* Right gradient (only when there's content to the right) */}
-            {hasRightOverflow && (
-                <div
-                    className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-muted to-transparent"
-                />
-            )}
         </div>
     )
 }
