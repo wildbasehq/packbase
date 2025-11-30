@@ -260,7 +260,7 @@ function Folder({folder, refetch}: {
 
     return (
         <SidebarItem key={folder.id} className="group"
-                     href={`/${user?.username ? '@' + user.username : 'user/me'}/folders/${folder.id}`}>
+                     href={`folders/${folder.id}`}>
             <div className="flex items-start justify-between gap-2">
                 <div className="flex flex-1 w-full">
                     <span className="text-xl" aria-hidden>{folder.emoji || '📁'}</span>
