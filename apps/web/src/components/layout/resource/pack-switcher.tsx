@@ -121,7 +121,7 @@ export default function PackSwitcher({onChange}: {
                     <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'waitlist')}>
                         <NavbarItem
                             className="flex w-2xs mx-4 [&>*]:w-full"
-                            href="/id/waitlist"
+                            href="/id/create"
                             onClick={() => onChange({})}
                         >
                             <Login className="w-6 h-6"/>
