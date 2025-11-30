@@ -188,7 +188,7 @@ export default function PackSwitcher({onChange}: {
             {/* Left gradient (only when there's content to the left) */}
             {hasLeftOverflow && (
                 <div
-                    className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-muted to-transparent"
+                    className="pointer-events-none absolute inset-y-0 left-7 w-32 bg-gradient-to-r from-muted to-transparent"
                 />
             )}
 
