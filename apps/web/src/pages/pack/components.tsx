@@ -22,7 +22,7 @@ export default function PackFeedController({overrideFeedID, channelID, feedQuery
     return (
         <div className="relative">
             {/* Pack header (if in a specific pack) */}
-            {currentResource && currentResource?.slug !== 'universe' && <PackHeader pack={currentResource}/>}
+            {currentResource && !currentResource.standalone && <PackHeader pack={currentResource}/>}
 
             <Protect>
                 <div className="flex flex-col">

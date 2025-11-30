@@ -169,18 +169,29 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                             onClick={() => setIsWHOpen(!isWHOpen)}
                         >
                             <Activity mode={isVisible(currentResource.standalone)}>
-                                <div
-                                    data-slot="avatar"
-                                    className="rounded-sm w-6 h-6 border overflow-hidden bg-primary-cosmos flex justify-center items-center">
-                                    <Logo noStyle fullSize
-                                          className="w-4 h-4 invert"/>
-                                </div>
+                                <Activity mode={isVisible(isSignedIn)}>
+                                    <img
+                                        data-slot="avatar"
+                                        className="rounded-sm w-6 h-6 border overflow-hidden shrink-0"
+                                        src={currentResource.images?.avatar || '/img/default-avatar.png'}
+                                    />
+                                </Activity>
+
+                                <Activity mode={isVisible(!isSignedIn)}>
+                                    <div
+                                        data-slot="avatar"
+                                        className="rounded-sm w-6 h-6 border overflow-hidden shrink-0 bg-primary-cosmos flex justify-center items-center">
+                                        <Logo noStyle fullSize
+                                              className="w-4 h-4 invert"/>
+                                    </div>
+                                </Activity>
                             </Activity>
 
-                            <Activity mode={isVisible(!currentResource.standalone)}>
+                            <Activity
+                                mode={isVisible(!currentResource.standalone)}>
                                 <img
                                     data-slot="avatar"
-                                    className="rounded-sm w-6 h-6 border overflow-hidden"
+                                    className="rounded-sm w-6 h-6 border shrink-0 overflow-hidden"
                                     src={currentResource.images?.avatar || '/img/default-avatar.png'}
                                 />
                             </Activity>

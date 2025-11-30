@@ -7,18 +7,17 @@ import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
 import {ExclamationTriangleIcon, GlobeAsiaAustraliaIcon} from '@heroicons/react/20/solid'
 import {useLocation} from 'wouter'
 import {Activity, useCallback, useEffect, useRef, useState} from "react"
-import {Heading, Logo, NavbarItem, NavbarLabel} from "@/src/components";
+import {Heading, NavbarItem, NavbarLabel} from "@/src/components";
 import {Text} from "@/components/shared/text.tsx";
 import {SignedIn, SignedOut} from "@clerk/clerk-react";
 import {Login} from "@/components/icons/plump/Login.tsx";
 import {cn, isVisible} from "@/lib";
-import TextTicker from "@/components/shared/text-ticker.tsx";
 
 export default function PackSwitcher({onChange}: {
     onChange: (resource: any) => void
 }) {
-    const {currentResource, setCurrentResource, resources} = useResourceStore()
-    const {resourceDefault, loading, setLoading} = useUIStore()
+    const {currentResource, setCurrentResource, resources, resourceDefault} = useResourceStore()
+    const {loading, setLoading} = useUIStore()
     const {user} = useUserAccountStore()
     const [, navigate] = useLocation()
     const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -145,81 +144,45 @@ export default function PackSwitcher({onChange}: {
                 </SignedOut>
 
                 <SignedIn>
-                    <NavbarItem
-                        className={cn("flex w-2xs mx-4 [&>*]:w-full", currentResource.id === resourceDefault.id && "ring-1 rounded ring-default bg-card")}
-                        onClick={() => switchResource(resourceDefault)}
-                    >
-                        <div
-                            data-slot="avatar"
-                            className="rounded-sm w-6 h-6 border overflow-hidden bg-primary-cosmos flex justify-center items-center">
-                            <Logo noStyle fullSize
-                                  className="w-4 h-4 invert"/>
-                        </div>
-                        <div className="flex flex-col -space-y-1 relative">
-                            <NavbarLabel>{resourceDefault.display_name}</NavbarLabel>
-                            <NavbarLabel className="text-muted-foreground text-xs">
-                                <TextTicker
-                                    texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...']}
-                                    interval={2000}/>
-                            </NavbarLabel>
-                        </div>
-                        <Tooltip
-                            content={
-                                <>
-                                    <Heading className="!text-sm">System fault precautions are in effect.</Heading>
-                                    <Text className="!text-xs">
-                                        Our content moderation system is currently having some issues.
-                                        We've temporarily enabled stricter (but sensitive) filtering which
-                                        may block valid content. We're extremely sorry. /rek.
-                                    </Text>
-                                </>
-                            }>
-                            <ExclamationTriangleIcon
-                                data-hardcoded-reasoning="Rheo manages feature flags - can't change due to Rheo being down."
-                                className="!fill-orange-500"/>
-                        </Tooltip>
-                        {/*<ChevronDownIcon/>*/}
-                    </NavbarItem>
+                    {[resourceDefault, ...resources].map((pack, colIdx) => (
+                        <NavbarItem
+                            key={colIdx}
+                            className={cn("flex w-2xs mx-4 [&>*]:w-full", currentResource.id === pack.id && "ring-1 rounded ring-default bg-card")}
+                            onClick={() => switchResource(pack)}
+                        >
+                            <img
+                                data-slot="avatar"
+                                className="rounded-sm shrink-0 w-6 h-6 border overflow-hidden"
+                                src={pack.images?.avatar || '/img/default-avatar.png'}
+                            />
+                            <div className="flex flex-col -space-y-1 w-full relative">
+                                <NavbarLabel>{pack.display_name}</NavbarLabel>
+                                <NavbarLabel className="text-muted-foreground text-xs">
+                                    @{pack.slug}
+                                    {/*<TextTicker*/}
+                                    {/*    texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...', 'Click in for more...']}*/}
+                                    {/*    interval={1500 + colIdx * Math.random() * 1000}/>*/}
+                                </NavbarLabel>
+                            </div>
+                            <Tooltip
+                                content={
+                                    <>
+                                        <Heading className="!text-sm">System fault precautions are in effect.</Heading>
+                                        <Text className="!text-xs">
+                                            Our content moderation system is currently having some issues.
+                                            We've temporarily enabled stricter (but sensitive) filtering which
+                                            may block valid content. We're extremely sorry. /rek.
+                                        </Text>
+                                    </>
+                                }>
+                                <ExclamationTriangleIcon
+                                    data-hardcoded-reasoning="Rheo manages feature flags - can't change due to Rheo being down."
+                                    className="!fill-orange-500"/>
+                            </Tooltip>
+                            {/*<ChevronDownIcon/>*/}
+                        </NavbarItem>
+                    ))}
                 </SignedIn>
-
-                {resources.map((pack, colIdx) => (
-                    <NavbarItem
-                        key={colIdx}
-                        className={cn("flex w-2xs mx-4 [&>*]:w-full", currentResource.id === pack.id && "ring-1 rounded ring-default bg-card")}
-                        onClick={() => switchResource(pack)}
-                    >
-                        <img
-                            data-slot="avatar"
-                            className="rounded-sm w-6 h-6 border overflow-hidden"
-                            src={pack.images?.avatar || '/img/default-avatar.png'}
-                        />
-                        <div className="flex flex-col -space-y-1 w-full relative">
-                            <NavbarLabel>{pack.display_name}</NavbarLabel>
-                            <NavbarLabel className="text-muted-foreground text-xs">
-                                @{pack.slug}
-                                {/*<TextTicker*/}
-                                {/*    texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...', 'Click in for more...']}*/}
-                                {/*    interval={1500 + colIdx * Math.random() * 1000}/>*/}
-                            </NavbarLabel>
-                        </div>
-                        <Tooltip
-                            content={
-                                <>
-                                    <Heading className="!text-sm">System fault precautions are in effect.</Heading>
-                                    <Text className="!text-xs">
-                                        Our content moderation system is currently having some issues.
-                                        We've temporarily enabled stricter (but sensitive) filtering which
-                                        may block valid content. We're extremely sorry. /rek.
-                                    </Text>
-                                </>
-                            }>
-                            <ExclamationTriangleIcon
-                                data-hardcoded-reasoning="Rheo manages feature flags - can't change due to Rheo being down."
-                                className="!fill-orange-500"/>
-                        </Tooltip>
-                        {/*<ChevronDownIcon/>*/}
-                    </NavbarItem>
-                ))}
             </div>
         </div>
     )

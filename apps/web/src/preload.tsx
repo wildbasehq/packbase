@@ -37,7 +37,7 @@ function PreloadChild({children}: { children: ReactNode }) {
 
     const {setUser} = useUserAccountStore()
     const {setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities} = useUIStore()
-    const {setResources} = useResourceStore()
+    const {setResources, setResourceDefault} = useResourceStore()
     const {session, isSignedIn, isLoaded} = useSession()
 
     const {data: userMeData, isLoading: userMeLoading} = useContentFrame('get', 'user.me', undefined, {
@@ -76,6 +76,18 @@ function PreloadChild({children}: { children: ReactNode }) {
         if (isSignedIn) {
             setUser(userMeData)
             setStatus('auth:@me')
+            setResourceDefault({
+                id: '00000000-0000-0000-0000-000000000000',
+                display_name: userMeData.display_name || userMeData.username || 'Packbase',
+                slug: 'universe',
+                standalone: true,
+                images: userMeData.images,
+                ticker: [
+                    'Now in public alpha testing!',
+                    'Invite Badge Event extended',
+                    'Universe pack deletion soon'
+                ]
+            })
 
             proceed()
         } else {

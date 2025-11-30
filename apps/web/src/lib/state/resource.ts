@@ -7,6 +7,7 @@ interface ResourceStore {
     currentResource: any
     resourceDefault: any
     resources: any[]
+    setResourceDefault: (resourceDefault: any) => void
     setCurrentResource: (currentResource: any) => void
     setResources: (resources: any[]) => void
 }
@@ -27,6 +28,11 @@ export const useResourceStore = create<ResourceStore>(set => ({
     currentResource: resourceDefault,
     resources: [],
     resourceDefault,
+    setResourceDefault: resourceDefault =>
+        set(state => ({
+            ...state,
+            resourceDefault,
+        })),
     setCurrentResource: currentResource =>
         set(state => ({
             ...state,
