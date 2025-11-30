@@ -84,7 +84,7 @@ export default function PackSwitcher({onChange}: {
                 <NavbarItem
                     className="flex w-2xs mx-4 [&>*]:w-full"
                     href="/p/new"
-                    onClick={() => close()}
+                    onClick={() => onChange({})}
                 >
                     <GlobeAsiaAustraliaIcon className="w-6 h-6"/>
                     <NavbarLabel className="text-muted-foreground group-hover:text-foreground">Explore / Create
@@ -95,6 +95,7 @@ export default function PackSwitcher({onChange}: {
                     <NavbarItem
                         className="flex w-2xs mx-4 [&>*]:w-full"
                         href="/id/login"
+                        onClick={() => onChange({})}
                     >
                         <Login className="w-6 h-6"/>
                         <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
@@ -107,6 +108,7 @@ export default function PackSwitcher({onChange}: {
                         <NavbarItem
                             className="flex w-2xs mx-4 [&>*]:w-full"
                             href="/id/create"
+                            onClick={() => onChange({})}
                         >
                             <Login className="w-6 h-6"/>
                             <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
@@ -119,6 +121,7 @@ export default function PackSwitcher({onChange}: {
                         <NavbarItem
                             className="flex w-2xs mx-4 [&>*]:w-full"
                             href="/id/waitlist"
+                            onClick={() => onChange({})}
                         >
                             <Login className="w-6 h-6"/>
                             <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
