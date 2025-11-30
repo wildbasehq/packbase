@@ -19,7 +19,7 @@ export default (app: YapockType) =>
                     return {error: 'Folder not found'};
                 }
 
-                const profile = await prisma.profiles.findUnique({where: {id: user.sub}});
+                const profile = await prisma.profiles.findUnique({where: {id: folder.user_id}});
                 return {
                     folder: folder as unknown as Folder,
                     profile: {
