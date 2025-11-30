@@ -16,6 +16,11 @@ const resourceDefault = {
     slug: 'universe',
     display_name: 'Packbase',
     standalone: true,
+    ticker: [
+        'Now in public alpha testing!',
+        'Invite Badge Event extended',
+        'Universe pack deletion soon'
+    ]
 }
 
 export const useResourceStore = create<ResourceStore>(set => ({
@@ -41,4 +46,4 @@ export const settingsResource = {
 }
 
 // Export the resourceDefault for use in other stores
-export { resourceDefault }
+export {resourceDefault}

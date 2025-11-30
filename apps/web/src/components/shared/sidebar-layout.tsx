@@ -43,7 +43,6 @@ import useWindowSize from '@/lib/hooks/use-window-size.ts'
 import ResizablePanel from '@/components/shared/resizable'
 import {News} from '../ui/sidebar-news'
 import {useLocation} from "wouter";
-import TextTicker from "@/components/shared/text-ticker.tsx";
 import {useLocalStorage} from "usehooks-ts";
 import {Text} from "@/components/shared/text.tsx";
 import UserDropdown from "@/components/layout/user-dropdown";
@@ -52,6 +51,7 @@ import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
 import {motion} from "motion/react"
 import Tooltip from "@/components/shared/tooltip.tsx";
 import PackSwitcher from "@/components/layout/resource/pack-switcher.tsx";
+import TextTicker from "@/components/shared/text-ticker.tsx";
 
 const NavbarItems = [
     {
@@ -119,6 +119,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     const [seenPackTour, setSeenPackTour] = useLocalStorage('seen-pack-tour', false)
     const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
     const [isWHOpen, setIsWHOpen] = useState(false)
+    const {currentResource, resourceDefault} = useResourceStore()
 
     return (
         <div className="flex min-h-svh h-screen w-full relative bg-muted">
@@ -167,24 +168,43 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                             className="flex w-2xs h-8 [&>*]:w-full"
                             onClick={() => setIsWHOpen(!isWHOpen)}
                         >
-                            <div
-                                data-slot="avatar"
-                                className="rounded-sm w-6 h-6 border overflow-hidden bg-primary-cosmos flex justify-center items-center">
-                                <Logo noStyle fullSize
-                                      className="w-4 h-4 invert"/>
-                            </div>
-                            <div className="flex flex-col -space-y-1 relative">
-                                <NavbarLabel>Packbase</NavbarLabel>
+                            <Activity mode={isVisible(currentResource.standalone)}>
+                                <div
+                                    data-slot="avatar"
+                                    className="rounded-sm w-6 h-6 border overflow-hidden bg-primary-cosmos flex justify-center items-center">
+                                    <Logo noStyle fullSize
+                                          className="w-4 h-4 invert"/>
+                                </div>
+                            </Activity>
+
+                            <Activity mode={isVisible(!currentResource.standalone)}>
+                                <img
+                                    data-slot="avatar"
+                                    className="rounded-sm w-6 h-6 border overflow-hidden"
+                                    src={currentResource.images?.avatar || '/img/default-avatar.png'}
+                                />
+                            </Activity>
+
+                            <div className="flex flex-col -space-y-1 flex-1 relative">
+                                <NavbarLabel>{currentResource.display_name}</NavbarLabel>
                                 <NavbarLabel className="text-muted-foreground text-xs">
-                                    <TextTicker
-                                        texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...']}
-                                        interval={2000}/>
+                                    <Activity mode={isVisible(currentResource.ticker)}>
+                                        <TextTicker
+                                            texts={currentResource.ticker}
+                                            interval={2000}/>
+                                    </Activity>
+
+                                    <Activity mode={isVisible(!currentResource.ticker?.length)}>
+                                        @{currentResource.slug}
+                                    </Activity>
                                 </NavbarLabel>
                             </div>
+
                             <Tooltip
                                 content={
                                     <>
-                                        <Heading className="!text-sm">System fault precautions are in effect.</Heading>
+                                        <Heading className="!text-sm">System fault precautions are in
+                                            effect.</Heading>
                                         <Text className="!text-xs">
                                             Our content moderation system is currently having some issues.
                                             We've temporarily enabled stricter (but sensitive) filtering which
@@ -194,7 +214,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                 }>
                                 <ExclamationTriangleIcon
                                     data-hardcoded-reasoning="Rheo manages feature flags - can't change due to Rheo being down."
-                                    className="!fill-orange-500"/>
+                                    className="!fill-orange-500 w-5 h-5"/>
                             </Tooltip>
                             {/*<ChevronDownIcon/>*/}
                         </NavbarItem>

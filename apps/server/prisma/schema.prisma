@@ -76,7 +76,7 @@ model packs_pages {
   icon          String?
   tenant_id     String          @db.Uuid
   query         String?
-  ticker        String?
+  ticker        String[]        @default([])
   order         Int             @default(0)
   packs         packs           @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "pack.pages_tenant_id_fkey")
   posts         posts[]

@@ -3,7 +3,7 @@ import {AnimatePresence, motion} from 'motion/react'
 import {Transition} from "motion";
 
 export default function TextTicker({
-                                       texts,
+                                       texts = [],
                                        interval
                                    }: {
     texts: string[]
@@ -25,6 +25,8 @@ export default function TextTicker({
         damping: 30,
         mass: 1
     }
+
+    if (texts.length === 0) return null
 
     return (
         <div
