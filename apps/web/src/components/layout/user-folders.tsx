@@ -183,7 +183,7 @@ function FolderForm({
     )
 }
 
-export default function UserFolders({user: folderUser}: { user: { id: string } }) {
+export default function UserFolders({user: folderUser}: { user: { id: string; username: string } }) {
     const {show, hide} = useModal()
     const {user} = useUserAccountStore()
     const {slug} = useParams<{ slug: string }>()
@@ -228,19 +228,20 @@ export default function UserFolders({user: folderUser}: { user: { id: string } }
 
             <div className="flex flex-col gap-2">
                 {folders.map(f => (
-                    <Folder folder={f} refetch={refetch} key={f.id}/>
+                    <Folder folder={f} user={folderUser} refetch={refetch} key={f.id}/>
                 ))}
             </div>
         </div>
     )
 }
 
-function Folder({folder, refetch}: {
+function Folder({folder, user, refetch}: {
     folder: Folder
+    user: { id: string; username: string }
     refetch: () => void
 }) {
-    const {user} = useUserAccountStore()
     const {show, hide} = useModal()
+    const {user: currentUser} = useUserAccountStore()
 
     const updateMutation = useContentFrameMutation('patch', `folder.${folder.id}`, {onSuccess: () => refetch()})
     const deleteMutation = useContentFrameMutation('delete', `folder.${folder.id}`, {onSuccess: () => refetch()})
@@ -260,7 +261,7 @@ function Folder({folder, refetch}: {
 
     return (
         <SidebarItem key={folder.id} className="group"
-                     href={`folders/${folder.id}`}>
+                     href={`/@${user.username}/folders/${folder.id}`}>
             <div className="flex items-start justify-between gap-2">
                 <div className="flex flex-1 w-full">
                     <span className="text-xl" aria-hidden>{folder.emoji || '📁'}</span>
@@ -273,18 +274,21 @@ function Folder({folder, refetch}: {
                         </Activity>
                     </div>
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
-                    <div onClick={() => show(<FolderForm
-                        initial={folder}
-                        onCancel={() => hide()}
-                        onSave={(input) => onUpdate(input)}
-                    />)}>
-                        <PencilSquareIcon className="h-4 w-4"/>
+
+                {user.id === currentUser.id && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                        <div onClick={() => show(<FolderForm
+                            initial={folder}
+                            onCancel={() => hide()}
+                            onSave={(input) => onUpdate(input)}
+                        />)}>
+                            <PencilSquareIcon className="h-4 w-4"/>
+                        </div>
+                        <div onClick={() => onDelete()}>
+                            <TrashIcon className="h-4 w-4"/>
+                        </div>
                     </div>
-                    <div onClick={() => onDelete()}>
-                        <TrashIcon className="h-4 w-4"/>
-                    </div>
-                </div>
+                )}
             </div>
         </SidebarItem>
     )
