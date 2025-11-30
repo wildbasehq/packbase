@@ -275,7 +275,7 @@ function Folder({folder, user, refetch}: {
                     </div>
                 </div>
 
-                {user.id === currentUser.id && (
+                {user.id === currentUser?.id && (
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
                         <div onClick={() => show(<FolderForm
                             initial={folder}
