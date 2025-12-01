@@ -68,7 +68,7 @@ class ErrorBoundaryImpl extends React.Component<ErrorBoundaryProps, ErrorBoundar
             // Default fallback UI
             return (
                 <Alert className="flex !justify-center !items-center w-screen h-screen !rounded-none !border-0">
-                    <div className="flex flex-col">
+                    <div className="flex flex-col max-w-6xl">
                         <div className="flex items-center gap-4">
                             <AlertTitle>
                                 <SadComputerIcon className="h-12 w-fit"/>
@@ -82,7 +82,7 @@ class ErrorBoundaryImpl extends React.Component<ErrorBoundaryProps, ErrorBoundar
                                     recover. {navigator.appName === 'Packbase' ? "You'll need to restart this software entirely." : "Reload this page to try again."}
                                     <br/>
                                     This shouldn't happen. <Link href="https://discord.gg/StuuK55gYA" target="_blank"
-                                                                 className="text-primary">Report it <ArrowUpRightIcon
+                                                                 className="text-indigo-500">Report it <ArrowUpRightIcon
                                     className="h-4 w-4 inline-flex"/></Link>,
                                     otherwise it will never be fixed.
                                 </Text>
@@ -102,7 +102,7 @@ class ErrorBoundaryImpl extends React.Component<ErrorBoundaryProps, ErrorBoundar
                         <CodeGroup title="Context"
                                    code={this.state.error instanceof Error ? this.state.error.message : 'No error message available'}>
                             <Code
-                                title="String">{this.state.error instanceof Error ? this.state.error.stack : 'No stack trace available'}</Code>
+                                title="String">{this.state.error instanceof Error ? this.state.error.stack?.split('\n').slice(0, 5).join('\n') : 'No stack trace available'}</Code>
                         </CodeGroup>
                     </div>
                 </Alert>

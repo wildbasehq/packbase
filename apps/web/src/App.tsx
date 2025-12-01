@@ -2,15 +2,15 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, { lazy, useEffect } from 'react'
-import { SidebarLayout } from '@/components/shared/sidebar-layout.tsx'
-import { Providers } from './provider.tsx'
-import { SidebarProvider } from '@/lib/context/sidebar-context'
-import { AppTabs, LogoSpinner } from '@/src/components'
+import React, {lazy, useEffect} from 'react'
+import {SidebarLayout} from '@/components/shared/sidebar-layout.tsx'
+import {Providers} from './provider.tsx'
+import {SidebarProvider} from '@/lib/context/sidebar-context'
+import {AppTabs, LogoSpinner} from '@/src/components'
 import Body from '@/components/layout/body.tsx'
-import { ClerkLoaded, ClerkLoading } from '@clerk/clerk-react'
+import {ClerkLoaded, ClerkLoading} from '@clerk/clerk-react'
 import Preload from '@/src/preload.tsx'
-import { ProjectName, ProjectSafeName } from '@/lib'
+import {ProjectName, ProjectSafeName} from '@/lib'
 import BrowserCheck from '@/components/modal/browser-check.tsx'
 import Routes from '@/src/Routes.tsx'
 import CommandPalette from '@/components/modal/command-palette.tsx'
@@ -56,12 +56,13 @@ __/\\_| |__   __ _ ___  ___
     return (
         <Providers>
             {/* Browser check */}
-            <BrowserCheck />
-            <CommandPalette />
+            <BrowserCheck/>
+            <CommandPalette/>
 
             <SidebarProvider>
                 <div className="absolute bottom-0 left-0 z-40 w-full sm:hidden">
-                    <AppTabs className="border-0 !rounded-none !rounded-t-md ring-1 ring-default items-center justify-center" />
+                    <AppTabs
+                        className="border-0 !rounded-none !rounded-t-md ring-1 ring-default items-center justify-center"/>
                 </div>
 
                 <SidebarLayout>
@@ -71,7 +72,7 @@ __/\\_| |__   __ _ ___  ___
                                 <div className="w-full h-full">
                                     <ClerkLoading>
                                         <Body bodyClassName="h-full" className="!h-full items-center justify-center">
-                                            <LogoSpinner />
+                                            <LogoSpinner/>
                                             <span className="text-sm mt-1">Checking Wild ID</span>
                                         </Body>
                                     </ClerkLoading>
@@ -79,9 +80,9 @@ __/\\_| |__   __ _ ___  ___
                                     <ClerkLoaded>
                                         <Preload>
                                             <div id="NGRoot" className="h-full overflow-y-auto overflow-x-hidden">
-                                                <WaitlistCheck />
+                                                <WaitlistCheck/>
 
-                                                <Routes />
+                                                <Routes/>
                                             </div>
                                         </Preload>
                                     </ClerkLoaded>
