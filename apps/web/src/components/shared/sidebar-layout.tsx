@@ -279,7 +279,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                             <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon"/>
                                             <SidebarLabel>Discord</SidebarLabel>
                                         </DropdownItem>
-                                        <DropdownItem href="https://wildbase.xyz/" target="_blank">
+                                        <DropdownItem href="https://wildhq.org/" target="_blank">
                                             <WildbaseAsteriskIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
                                             <SidebarLabel>Wildbase</SidebarLabel>
                                         </DropdownItem>
