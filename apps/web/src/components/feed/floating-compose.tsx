@@ -761,7 +761,7 @@ export function TagsInput({
 
             <Activity mode={isVisible(!usePlainEditor)}>
                 <div
-                    className="flex flex-wrap gap-2 p-2 border rounded-xl min-h-[2.5rem] items-center relative before:absolute before:inset-px before:rounded-[calc(var(--radius-lg)-1px)] before:bg-white before:shadow-sm dark:before:hidden bg-transparent dark:bg-white/5">
+                    className="flex flex-wrap gap-2 p-2 border rounded-xl min-h-[2.5rem] items-center relative bg-transparent">
                     <Activity mode={isVisible(!!forcedTag)}>
                         <Tooltip content={(
                             <div className="flex flex-col gap-1">

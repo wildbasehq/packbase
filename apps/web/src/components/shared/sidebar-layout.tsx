@@ -52,6 +52,7 @@ import {motion} from "motion/react"
 import Tooltip from "@/components/shared/tooltip.tsx";
 import PackSwitcher from "@/components/layout/resource/pack-switcher.tsx";
 import TextTicker from "@/components/shared/text-ticker.tsx";
+import {SupportHeadIcon} from "@/components/icons/plump/suppot-head.tsx";
 
 const NavbarItems = [
     {
@@ -269,6 +270,10 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                                       target="_blank">
                                             <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
                                             <SidebarLabel>Feedback</SidebarLabel>
+                                        </DropdownItem>
+                                        <DropdownItem href="https://help.wildhq.org" target="_blank">
+                                            <SupportHeadIcon className="w-4 h-4 inline-flex"/>
+                                            <SidebarLabel>Support</SidebarLabel>
                                         </DropdownItem>
                                         <DropdownItem href="https://discord.gg/StuuK55gYA" target="_blank">
                                             <SiDiscord className="w-4 h-4 inline-flex" data-slot="icon"/>

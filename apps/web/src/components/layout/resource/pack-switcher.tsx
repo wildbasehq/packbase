@@ -185,6 +185,7 @@ export default function PackSwitcher({onChange}: {
                     ))}
                 </SignedIn>
             </div>
+            
             {/* Left gradient (only when there's content to the left) */}
             {hasLeftOverflow && (
                 <div
