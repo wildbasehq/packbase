@@ -147,7 +147,7 @@ export function AppTabs({className = ''}: { className?: string }) {
 
                 {/* Revealed panel (vertical list) */}
                 <div
-                    className="pointer-events-auto"
+                    className="pointer-events-auto overflow-y-auto overscroll-contain touch-pan-y"
                     style={{height: EXPANDED}}
                 >
                     <div className="p-3">
