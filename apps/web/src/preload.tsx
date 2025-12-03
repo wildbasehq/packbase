@@ -37,7 +37,7 @@ function PreloadChild({children}: { children: ReactNode }) {
 
     const {setUser} = useUserAccountStore()
     const {setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities} = useUIStore()
-    const {setResources, setResourceDefault} = useResourceStore()
+    const {resourceDefault, setResources, setResourceDefault} = useResourceStore()
     const {session, isSignedIn, isLoaded} = useSession()
 
     const {data: userMeData, isLoading: userMeLoading} = useContentFrame('get', 'user.me', undefined, {
@@ -85,7 +85,8 @@ function PreloadChild({children}: { children: ReactNode }) {
                 ticker: [
                     'Now in public alpha testing!',
                     'Invite Badge Event extended',
-                    'Universe pack deletion soon'
+                    'Universe pack deletion',
+                    'R18 content allowed'
                 ]
             })
 

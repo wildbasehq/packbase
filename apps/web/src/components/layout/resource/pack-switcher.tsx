@@ -76,13 +76,13 @@ export default function PackSwitcher({onChange}: {
     return (
         <div
             ref={scrollRef}
-            className="w-full overflow-x-auto py-4 overflow-y-hidden"
+            className="w-full"
             onWheel={handleHorizontalWheel}
             onScroll={handleScroll}
         >
             <div className="inline-grid w-max grid-rows-3 grid-flow-col gap-2 auto-cols-max">
                 <NavbarItem
-                    className="flex w-2xs mx-4 [&>*]:w-full"
+                    className="flex w-2xs [&>*]:w-full"
                     href="/p/new"
                     onClick={() => onChange({})}
                 >
@@ -106,7 +106,7 @@ export default function PackSwitcher({onChange}: {
                     <Activity
                         mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'open' || !import.meta.env.VITE_REIGSTRATION_TYPE)}>
                         <NavbarItem
-                            className="flex w-2xs mx-4 [&>*]:w-full"
+                            className="flex w-2xs [&>*]:w-full"
                             href="/id/create"
                             onClick={() => onChange({})}
                         >
@@ -119,7 +119,7 @@ export default function PackSwitcher({onChange}: {
 
                     <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'waitlist')}>
                         <NavbarItem
-                            className="flex w-2xs mx-4 [&>*]:w-full"
+                            className="flex w-2xs [&>*]:w-full"
                             href="/id/create"
                             onClick={() => onChange({})}
                         >
@@ -132,7 +132,7 @@ export default function PackSwitcher({onChange}: {
 
                     <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'closed')}>
                         <NavbarItem
-                            className="flex w-2xs mx-4 [&>*]:w-full"
+                            className="flex w-2xs [&>*]:w-full"
                             href="/p/new"
                             onClick={() => onChange({})}
                         >
@@ -147,7 +147,7 @@ export default function PackSwitcher({onChange}: {
                     {[resourceDefault, ...resources].map((pack, colIdx) => (
                         <NavbarItem
                             key={colIdx}
-                            className={cn("flex w-2xs mx-4 [&>*]:w-full", currentResource.id === pack.id && "ring-1 rounded ring-default bg-card")}
+                            className={cn("flex w-2xs [&>*]:w-full", currentResource.id === pack.id && "ring-1 rounded ring-default bg-card")}
                             onClick={() => switchResource(pack)}
                         >
                             <img

@@ -3,10 +3,9 @@
  */
 
 import {Button} from '@/components/shared'
-import {Heading} from '@/components/shared/heading.tsx'
 import {Text} from '@/components/shared/text.tsx'
 import React from 'react'
-import {Alert, AlertDescription, AlertTitle} from '@/src/components'
+import {Alert, AlertDescription, AlertTitle, Heading} from '@/src/components'
 
 export default function SettingsDeleteAccount() {
     return (

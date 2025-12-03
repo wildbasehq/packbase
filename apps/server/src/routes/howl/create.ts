@@ -127,13 +127,13 @@ export default (app: YapockType) =>
                 }[] = [];
                 let i = 0;
                 for (const asset of assets) {
-                    const upload = await uploadFile('packbase-public-profiles', `${user.sub}/${data.id}/${i}.{ext}`, asset.data);
+                    const upload = await uploadFile(process.env.S3_PROFILES_BUCKET, `${user.sub}/${data.id}/${i}.{ext}`, asset.data);
                     if (upload.error) {
                         // delete post
                         await prisma.posts.delete({where: {id: data.id}});
 
                         // also delete uploaded assets
-                        const storage = createStorage('packbase-public-profiles');
+                        const storage = createStorage(process.env.S3_PROFILES_BUCKET);
                         for (const asset of uploadedAssets) {
                             await storage.deleteFile(user.sub, `${data.id}/${asset.data.name}`);
                         }

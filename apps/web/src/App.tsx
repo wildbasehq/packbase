@@ -6,9 +6,9 @@ import React, {lazy, useEffect} from 'react'
 import {SidebarLayout} from '@/components/shared/sidebar-layout.tsx'
 import {Providers} from './provider.tsx'
 import {SidebarProvider} from '@/lib/context/sidebar-context'
-import {AppTabs, LogoSpinner} from '@/src/components'
+import {AppTabs, FloatingCompose, LogoSpinner} from '@/src/components'
 import Body from '@/components/layout/body.tsx'
-import {ClerkLoaded, ClerkLoading} from '@clerk/clerk-react'
+import {ClerkLoaded, ClerkLoading, SignedIn} from '@clerk/clerk-react'
 import Preload from '@/src/preload.tsx'
 import {ProjectName, ProjectSafeName} from '@/lib'
 import BrowserCheck from '@/components/modal/browser-check.tsx'
@@ -58,11 +58,13 @@ __/\\_| |__   __ _ ___  ___
             {/* Browser check */}
             <BrowserCheck/>
             <CommandPalette/>
+            <SignedIn>
+                <FloatingCompose/>
+            </SignedIn>
 
             <SidebarProvider>
                 <div className="absolute bottom-0 left-0 z-40 w-full sm:hidden">
-                    <AppTabs
-                        className="border-0 !rounded-none !rounded-t-md ring-1 ring-default items-center justify-center"/>
+                    <AppTabs/>
                 </div>
 
                 <SidebarLayout>

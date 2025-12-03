@@ -1,7 +1,6 @@
 import React from 'react'
 import PagedModal from './index'
-import {Text} from '@/components/shared/text'
-import {Heading} from '@/components/shared/heading'
+import {Heading, Text} from '@/components/shared'
 import {BellIcon, CogIcon, HomeIcon, UserIcon} from '@heroicons/react/24/outline'
 
 /**

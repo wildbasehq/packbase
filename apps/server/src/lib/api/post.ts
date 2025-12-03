@@ -1,9 +1,9 @@
-import { Database } from '@/database.types';
-import { UserProfile } from '@/models/defs';
-import { getUser } from '@/routes/user/[username]';
-import { getPack } from '@/routes/pack/[id]';
-import posthog, { distinctId } from '@/utils/posthog';
-import { HTTPError } from '@/lib/HTTPError';
+import {Database} from '@/database.types';
+import {UserProfile} from '@/models/defs';
+import {getUser} from '@/routes/user/[username]';
+import {getPack} from '@/routes/pack/[id]';
+import posthog, {distinctId} from '@/utils/posthog';
+import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import createStorage from '@/lib/storage';
 import requiresToken from '@/utils/identity/requires-token';
@@ -18,8 +18,8 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
         if (id === 'universe') {
             // Set ID to most recent post
             const randomPost = await prisma.posts.findFirst({
-                select: { id: true },
-                orderBy: { created_at: 'desc' },
+                select: {id: true},
+                orderBy: {created_at: 'desc'},
                 take: 1,
             });
             if (!randomPost) {
@@ -30,7 +30,7 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
 
         try {
             const fetchData = await prisma.posts.findUnique({
-                where: { id },
+                where: {id},
             });
 
             if (!fetchData) {
@@ -81,8 +81,8 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
     delete data.user_id;
 
     const reactions = await prisma.posts_reactions.findMany({
-        where: { post_id: id },
-        select: { actor_id: true, slot: true },
+        where: {post_id: id},
+        select: {actor_id: true, slot: true},
     });
 
     if (reactions.length > 0) {
@@ -100,8 +100,8 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
 
     // Comments - sorted by created_at
     const comments = await prisma.posts.findMany({
-        where: { parent: id },
-        orderBy: { created_at: 'asc' },
+        where: {parent: id},
+        orderBy: {created_at: 'asc'},
     });
 
     if (comments.length > 0) {
@@ -136,13 +136,17 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
     return data;
 }
 
-export async function deletePost({ params: { id }, set, user }: { params: { id: string }; set: { status: number }; user: { sub: string } }) {
-    await requiresToken({ set, user });
+export async function deletePost({params: {id}, set, user}: {
+    params: { id: string };
+    set: { status: number };
+    user: { sub: string }
+}) {
+    await requiresToken({set, user});
 
     // Check user ID against post user ID
     const post = await prisma.posts.findUnique({
-        where: { id },
-        select: { user_id: true, assets: true },
+        where: {id},
+        select: {user_id: true, assets: true},
     });
 
     if (!post) {
@@ -159,7 +163,7 @@ export async function deletePost({ params: { id }, set, user }: { params: { id: 
 
     try {
         await prisma.posts.delete({
-            where: { id },
+            where: {id},
         });
     } catch (error: any) {
         set.status = 400;
@@ -171,7 +175,7 @@ export async function deletePost({ params: { id }, set, user }: { params: { id: 
 
     // If post has assets, delete them too
     if (post.assets && (post.assets as any).length > 0) {
-        const storage = createStorage('packbase-public-profiles');
+        const storage = createStorage(process.env.S3_PROFILES_BUCKET);
 
         // List files in the user's folder for this post
         const listResult = await storage.listFiles(user.sub, `${id}`);

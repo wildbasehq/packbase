@@ -77,7 +77,7 @@ export function Strong({className, ...props}: ComponentPropsWithoutRef<'strong'>
     return <strong {...props} className={cn(className, 'font-medium text-zinc-950 dark:text-white')}/>
 }
 
-export function Code({className, ...props}: ComponentPropsWithoutRef<'code'>) {
+export function CodeText({className, ...props}: ComponentPropsWithoutRef<'code'>) {
     return (
         <code
             {...props}

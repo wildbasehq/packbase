@@ -11,7 +11,7 @@ import {Input} from '@/components/shared/input'
 import {Button} from '@/components/shared/button'
 import {Field, SidebarItem} from "@/src/components";
 import {useModal} from "@/components/modal/provider.tsx";
-import {TagsInput} from "@/components/feed/floating-compose.tsx";
+import {TagsInput} from "@/components/howl-creator/tags-input";
 import {useParams} from "wouter";
 
 export type Folder = {

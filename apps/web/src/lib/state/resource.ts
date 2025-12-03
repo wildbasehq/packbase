@@ -1,4 +1,5 @@
 import {create} from 'zustand'
+import {persist} from "zustand/middleware";
 
 /**
  * Resource store
@@ -6,7 +7,17 @@ import {create} from 'zustand'
 interface ResourceStore {
     currentResource: any
     resourceDefault: any
-    resources: any[]
+    resources: {
+        display_name: string,
+        slug: string,
+        id: string,
+        standalone: boolean,
+        ticker?: string[],
+        images?: {
+            avatar?: string,
+            header?: string,
+        }
+    }[]
     setResourceDefault: (resourceDefault: any) => void
     setCurrentResource: (currentResource: any) => void
     setResources: (resources: any[]) => void
@@ -20,11 +31,12 @@ const resourceDefault = {
     ticker: [
         'Now in public alpha testing!',
         'Invite Badge Event extended',
-        'Universe pack deletion soon'
+        'Universe pack deletion',
+        'R18 content allowed'
     ]
 }
 
-export const useResourceStore = create<ResourceStore>(set => ({
+export const useResourceStore = create(persist<ResourceStore>(set => ({
     currentResource: resourceDefault,
     resources: [],
     resourceDefault,
@@ -43,6 +55,8 @@ export const useResourceStore = create<ResourceStore>(set => ({
             ...state,
             resources,
         })),
+}), {
+    name: 'resource',
 }))
 
 export const settingsResource = {

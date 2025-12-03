@@ -1,23 +1,22 @@
 import ThrowError from '@/utils/errors';
 import sharp from 'sharp';
-import { UserProfile } from '@/models/defs';
-import { similarity } from '@/utils/similarity';
-import { YapockType } from '@/index';
-import { getUser, UserCache } from '@/routes/user/[username]';
-import { t } from 'elysia';
+import {UserProfile} from '@/models/defs';
+import {similarity} from '@/utils/similarity';
+import {YapockType} from '@/index';
+import {getUser, UserCache} from '@/routes/user/[username]';
+import {t} from 'elysia';
 import BannedUsernames from '@/tables/banned_usernames.json';
-import { HTTPError } from '@/lib/HTTPError';
+import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import requiresToken from '@/utils/identity/requires-token';
 import createStorage from '@/lib/storage';
-import clerkClient from '@/db/auth';
 
 export default (app: YapockType) =>
     app
         .get(
             '',
             async (res: { set: any; user: any }) => {
-                const { set, user } = res;
+                const {set, user} = res;
                 if (!user) {
                     set.status = 401;
                     throw HTTPError.unauthorized({
@@ -79,8 +78,8 @@ export default (app: YapockType) =>
         )
         .post(
             '',
-            async ({ set, body, user }) => {
-                requiresToken({ set, user });
+            async ({set, body, user}) => {
+                requiresToken({set, user});
 
                 return await updateUser(
                     {
@@ -116,7 +115,15 @@ interface Update {
 
 type NewProfile = Update & { bio?: string; id: string };
 
-export async function updateUser({ username, display_name, slug, space_type, post_privacy, about, images }: Update, set: any, currentUser: { sub: any }) {
+export async function updateUser({
+                                     username,
+                                     display_name,
+                                     slug,
+                                     space_type,
+                                     post_privacy,
+                                     about,
+                                     images
+                                 }: Update, set: any, currentUser: { sub: any }) {
     if (username) {
         for (const bannedUsername of BannedUsernames) {
             if (similarity(username, bannedUsername) > 0.8) {
@@ -143,7 +150,7 @@ export async function updateUser({ username, display_name, slug, space_type, pos
     }
 
     const userProfile = await prisma.profiles.findUnique({
-        where: { id: currentUser.sub },
+        where: {id: currentUser.sub},
     });
 
     let newProfile: Update & { bio?: string; id: string } = {
@@ -174,7 +181,7 @@ export async function updateUser({ username, display_name, slug, space_type, pos
             });
         } else {
             await prisma.profiles.update({
-                where: { id: currentUser.sub },
+                where: {id: currentUser.sub},
                 data: newProfile,
             });
         }
@@ -203,7 +210,7 @@ export async function updateUser({ username, display_name, slug, space_type, pos
             .toBuffer();
 
         // Create a storage instance
-        const storage = createStorage('packbase-public-profiles');
+        const storage = createStorage(process.env.S3_PROFILES_BUCKET);
 
         // Convert the buffer to base64 for our storage class
         const base64Data = `data:${header.ctype};base64,${resized.toString('base64')}`;
@@ -224,7 +231,7 @@ export async function updateUser({ username, display_name, slug, space_type, pos
 
     try {
         await prisma.profiles.update({
-            where: { id: currentUser.sub },
+            where: {id: currentUser.sub},
             data: {
                 ...(newProfile.images.header && {
                     images_header: newProfile.images.header,

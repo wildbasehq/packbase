@@ -6,7 +6,7 @@ import {motion} from 'motion/react'
 export default function Tooltip({
                                     children,
                                     content,
-                                    delayDuration = 0,
+                                    delayDuration = 250,
                                     side = 'top',
                                 }: {
     children: ReactNode

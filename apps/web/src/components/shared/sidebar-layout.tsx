@@ -17,10 +17,8 @@ import {
     DropdownButton,
     DropdownItem,
     DropdownMenu,
-    FloatingCompose,
     Heading,
     Logo,
-    Mobile,
     Sidebar,
     SidebarBody,
     SidebarFooter,
@@ -28,12 +26,7 @@ import {
     SidebarLabel,
     SidebarSpacer,
 } from '@/src/components'
-import {
-    ExclamationTriangleIcon,
-    MagnifyingGlassIcon,
-    QuestionMarkCircleIcon,
-    SparklesIcon
-} from '@heroicons/react/20/solid'
+import {ChevronDownIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
 import {FaceSmileIcon} from '@heroicons/react/16/solid'
 import {SiDiscord} from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
@@ -49,7 +42,6 @@ import UserDropdown from "@/components/layout/user-dropdown";
 import {AlignLeft} from "@/components/icons/plump/AlignLeft.tsx";
 import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
 import {motion} from "motion/react"
-import Tooltip from "@/components/shared/tooltip.tsx";
 import PackSwitcher from "@/components/layout/resource/pack-switcher.tsx";
 import TextTicker from "@/components/shared/text-ticker.tsx";
 import {SupportHeadIcon} from "@/components/icons/plump/suppot-head.tsx";
@@ -119,7 +111,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     const [location] = useLocation()
     const [seenPackTour, setSeenPackTour] = useLocalStorage('seen-pack-tour', false)
     const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
-    const [isWHOpen, setIsWHOpen] = useState(false)
+    const [isWHOpen, setIsWHOpen] = useLocalStorage<any>('wh-open', false)
     const {currentResource} = useResourceStore()
 
     return (
@@ -159,14 +151,8 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                 <div
                     className="min-w-0 bg-sidebar px-4">
                     <Navbar>
-                        <Mobile>
-                            <NavbarItem onClick={() => setShowSidebar(true)} aria-label="Open navigation">
-                                <OpenMenuIcon/>
-                            </NavbarItem>
-                        </Mobile>
-
                         <NavbarItem
-                            className="flex w-2xs h-8 [&>*]:w-full"
+                            className="flex w-full md:w-2xs h-8 [&>*]:w-full"
                             onClick={() => setIsWHOpen(!isWHOpen)}
                         >
                             <Activity mode={isVisible(currentResource.standalone)}>
@@ -198,37 +184,21 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                             </Activity>
 
                             <div className="flex flex-col -space-y-1 flex-1 relative">
-                                <NavbarLabel>{currentResource.display_name}</NavbarLabel>
+                                <NavbarLabel>{currentResource?.display_name || 'dummy'}</NavbarLabel>
                                 <NavbarLabel className="text-muted-foreground text-xs">
-                                    <Activity mode={isVisible(currentResource.ticker)}>
+                                    <Activity mode={isVisible(currentResource?.ticker)}>
                                         <TextTicker
                                             texts={currentResource.ticker}
                                             interval={2000}/>
                                     </Activity>
 
-                                    <Activity mode={isVisible(!currentResource.ticker?.length)}>
-                                        @{currentResource.slug}
+                                    <Activity mode={isVisible(!currentResource?.ticker?.length)}>
+                                        @{currentResource?.slug || 'dummy'}
                                     </Activity>
                                 </NavbarLabel>
                             </div>
 
-                            <Tooltip
-                                content={
-                                    <>
-                                        <Heading className="!text-sm">System fault precautions are in
-                                            effect.</Heading>
-                                        <Text className="!text-xs">
-                                            Our content moderation system is currently having some issues.
-                                            We've temporarily enabled stricter (but sensitive) filtering which
-                                            may block valid content. We're extremely sorry. /rek.
-                                        </Text>
-                                    </>
-                                }>
-                                <ExclamationTriangleIcon
-                                    data-hardcoded-reasoning="Rheo manages feature flags - can't change due to Rheo being down."
-                                    className="!fill-orange-500 w-5 h-5"/>
-                            </Tooltip>
-                            {/*<ChevronDownIcon/>*/}
+                            <ChevronDownIcon/>
                         </NavbarItem>
 
                         <Desktop>
@@ -293,18 +263,19 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                         </Desktop>
 
                         <SignedIn>
-                            <AlignLeft className="w-7 h-7 fill-indigo-600"
-                                       onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)}/>
-                            <UserDropdown/>
+                            <Desktop>
+                                <AlignLeft className="w-7 h-7 fill-indigo-600"
+                                           onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)}/>
+
+                                <UserDropdown/>
+                            </Desktop>
                         </SignedIn>
                     </Navbar>
                 </div>
 
                 {/* Dropdown content, moves below content down */}
                 <Activity mode={isVisible(isWHOpen)}>
-                    <div className="absolute top-12 w-full">
-                        <WhatsHappeningDropdown close={() => setIsWHOpen(false)}/>
-                    </div>
+                    <WhatsHappeningDropdown close={() => setIsWHOpen(false)}/>
                 </Activity>
 
                 {/* Bottom gradient transparent to bg-card */}
@@ -317,17 +288,15 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     animate={isWHOpen ? 'open' : 'closed'}
                     variants={{
                         open: {
-                            y: '12rem',
+                            marginTop: '12rem',
                             opacity: 0.85,
-                            filter: 'blur(2px)',
-                            scale: 1
+                            filter: 'blur(1px)'
                         },
                         closed: {
-                            y: 0,
-                            scale: 1
+                            marginTop: 0,
                         },
                         interactEntry: {
-                            y: '11.5rem'
+                            marginTop: '11.5rem'
                         }
                     }}
                     transition={{
@@ -349,9 +318,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                         // Sidebar content for desktop
                         <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                     )}
-                    <div className="max-w-3xl mx-auto absolute left-0 right-0 top-0">
-                        <FloatingCompose/>
-                    </div>
+
                     <div className={`mx-auto h-full w-full overflow-y-auto ${isSignedIn ? 'max-w-6xl' : ''}`}>
                         <div className={isSignedIn ? 'pt-6' : ''}>
                             {children}
@@ -372,7 +339,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
 
 function WhatsHappeningDropdown({close}: { close: () => void }) {
     return (
-        <div className="relative w-full px-4">
+        <div className="absolute top-16 w-full px-4">
             {/* Scroll container */}
             <PackSwitcher onChange={close}/>
         </div>

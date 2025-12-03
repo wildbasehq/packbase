@@ -19,7 +19,7 @@ export default (app: YapockType) =>
             }
 
             try {
-                const storage = createStorage('packbase-public-profiles');
+                const storage = createStorage(process.env.S3_PROFILES_BUCKET);
                 console.log('Fetching storage information for user:', user.sub);
                 const result = await storage.listFiles(user.sub);
 

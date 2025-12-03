@@ -36,6 +36,8 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
     const [, navigate] = useLocation()
 
     useEffect(() => {
+        if (!deleteSql || deleteSql.trim().length === 0) return
+
         const newDeleteSql = `DELETE
                               FROM ${page?.slug || 'posts'}
                               WHERE ${deleteKey} = ANY ($1::uuid[])`
@@ -179,8 +181,8 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
                                 size="xl"
                                 summary={
                                     !deleteKey || !deleteSql
-                                        ? "Others won't be able to delete rows."
-                                        : `When others delete rows, the "${deleteKey || 'id'}" column will be used to delete the rows. The SQL to delete the rows is: ${deleteSql || ''}`
+                                        ? "Moderators won't be able to delete rows."
+                                        : `When moderators delete rows, the "${deleteKey || 'id'}" column will be used to delete the rows. The SQL to delete the rows is: ${deleteSql || ''}`
                                 }
                                 title="Batch Delete (optional)"
                             >
@@ -269,7 +271,13 @@ export function QueryEditor(props: { page?: QueryPage; onSaved?: (page: QueryPag
                                     justifyContent: 'space-between',
                                     marginBottom: 8
                                 }}>
-                                    <div style={{fontWeight: 600}}>SQL Editor</div>
+                                    <div>
+                                        <div style={{fontWeight: 600}}>SQL Editor</div>
+                                        <div style={{color: 'var(--cds-text-secondary)'}}>
+                                            Moderators using this table cannot change SQL. While the DB only
+                                            contains public content, select wisely.
+                                        </div>
+                                    </div>
                                     <Button kind="secondary" size="sm" onClick={runPreview} disabled={isRunning}>
                                         {isRunning ? <InlineLoading description="Running"/> : 'Run preview'}
                                     </Button>

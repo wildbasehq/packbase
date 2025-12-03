@@ -2,9 +2,7 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {Button} from '@/components/shared'
-import {Heading} from '@/components/shared/heading'
-import {Text} from '@/components/shared/text'
+import {Button, Heading, Text} from '@/components/shared'
 import React from 'react'
 
 export default function ResourceDeletePage() {
