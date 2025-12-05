@@ -12,7 +12,7 @@ import ImageUploadStack, {type Image} from '../feed/image-placeholder-stack'
 import {toast} from 'sonner'
 import {useModal} from '@/components/modal/provider'
 import PackbaseInstance from '@/lib/workers/global-event-emit.ts'
-import {Avatar, Badge, BubblePopover, Editor, Heading} from "@/src/components";
+import {Avatar, Badge, BubblePopover, Editor, Heading, LoadingCircle} from "@/src/components";
 import {ChevronRightIcon} from "@heroicons/react/24/outline";
 import Tooltip from "@/components/shared/tooltip.tsx";
 import {Camera, HardDisk} from "@/components/icons/plump";
@@ -209,6 +209,7 @@ export default function FloatingCompose() {
                         addAttachment={addAttachment}
                         submitHowl={submitHowl}
                         setCurrentPage={setCurrentPage}
+                        uploading={uploading}
                     />
                 </Activity>
 
@@ -237,7 +238,8 @@ function FloatingComposeContent({
                                     fileInputRef,
                                     addAttachment,
                                     submitHowl,
-                                    setCurrentPage
+                                    setCurrentPage,
+                                    uploading
                                 }: {
     channel?: string;
     channelName: string | null;
@@ -250,6 +252,7 @@ function FloatingComposeContent({
     addAttachment: (files: FileList | null) => void;
     submitHowl: () => void;
     setCurrentPage: (value: 'editor' | 'content-labelling') => void;
+    uploading: boolean;
 }) {
     return (
         <>
@@ -352,12 +355,19 @@ function FloatingComposeContent({
                     </ComposeButton>
                 </div>
                 <ComposeButton
-                    className="p-1 rounded-full"
+                    className={cn("p-1 rounded-full", uploading && "cursor-not-allowed opacity-80")}
                     onClick={() => {
+                        if (uploading) return
                         submitHowl()
                     }}
                 >
-                    <ArrowDownIcon className="w-5 h-5 fill-muted-foreground"/>
+                    <Activity mode={isVisible(!uploading)}>
+                        <ArrowDownIcon className="w-5 h-5 fill-muted-foreground"/>
+                    </Activity>
+
+                    <Activity mode={isVisible(uploading)}>
+                        <LoadingCircle/>
+                    </Activity>
                 </ComposeButton>
             </div>
         </>
