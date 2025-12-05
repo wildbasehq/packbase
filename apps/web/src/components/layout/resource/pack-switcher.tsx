@@ -93,7 +93,7 @@ export default function PackSwitcher({onChange}: {
 
                 <SignedOut>
                     <NavbarItem
-                        className="flex w-2xs mx-4 [&>*]:w-full"
+                        className="flex w-2xs [&>*]:w-full"
                         href="/id/login"
                         onClick={() => onChange({})}
                     >

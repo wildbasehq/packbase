@@ -49,7 +49,7 @@ const animConfig = {
 }
 
 const links = [
-    {name: 'Join Waitlist', href: '/id/create', primary: true},
+    {name: 'Join Packbase', href: '/id/create', primary: true},
     {
         name: 'Discord Community',
         href: 'https://discord.gg/StuuK55gYA',
