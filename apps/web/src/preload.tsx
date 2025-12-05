@@ -74,13 +74,13 @@ function PreloadChild({children}: { children: ReactNode }) {
         }
 
         if (isSignedIn) {
-            if (!userMeData) {
-                setError({
-                    cause: 'User data is missing!!!',
-                    message: 'We may be down right now, or just a one-off problem. Try reloading.'
-                })
-                return
-            }
+            // if (!userMeData) {
+            //     setError({
+            //         cause: 'User data is missing!!!',
+            //         message: 'We may be down right now, or just a one-off problem. Try reloading.'
+            //     })
+            //     return
+            // }
 
             setUser(userMeData)
             setStatus('auth:@me')
