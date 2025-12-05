@@ -30,6 +30,7 @@ import {
 import {useResourceStore} from '@/src/lib'
 import {toast} from 'sonner'
 import StoreItemModal from "@/pages/store/[item]/page.tsx";
+import {EllipsisHorizontalIcon} from "@heroicons/react/24/solid";
 
 type StoreItem = {
     id: string
@@ -112,6 +113,7 @@ export default function StorePage() {
                             {h.action === 'TRINKET_PURCHASE_OK' && <ArrowTrendingUpIcon/>}
                             {h.action === 'TRINKET_BALANCE_CHANGED_OK' && <ArrowTrendingDownIcon/>}
                             {h.action === 'TRINKET_BALANCE_TRANSFER_OK' && <ArrowPathIcon/>}
+                            {h.action === 'TRINKET_BALANCE_SET_OK' && <EllipsisHorizontalIcon/>}
                             <div className="flex flex-col min-w-0">
                                 <SidebarLabel>{h.action.toTitleCase()}</SidebarLabel>
                                 <SidebarLabel>
