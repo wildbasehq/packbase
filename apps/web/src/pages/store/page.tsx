@@ -7,6 +7,7 @@ import {vg} from '@/lib/api'
 import Categories from './categories.json'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import {
+    BubblePopover,
     Button,
     Divider,
     Heading,
@@ -19,7 +20,6 @@ import {
 import {SidebarPortal} from '@/lib/context/sidebar-context'
 import {Text} from '@/components/shared/text'
 import {BentoGenericUnlockableBadge} from '@/src/lib/utils/pak'
-import StoreItemModal from './[item]/page'
 import {
     ArrowPathIcon,
     ArrowTrendingDownIcon,
@@ -28,8 +28,8 @@ import {
     ShoppingBagIcon,
 } from '@heroicons/react/20/solid'
 import {useResourceStore} from '@/src/lib'
-import Popover from '@/components/shared/popover'
 import {toast} from 'sonner'
+import StoreItemModal from "@/pages/store/[item]/page.tsx";
 
 type StoreItem = {
     id: string
@@ -177,28 +177,29 @@ export default function StorePage() {
 
                             <div className="flex gap-2 mt-2">
                                 {canBuyItem(item) && (
-                                    <Popover
-                                        content={
-                                            <div className="p-4 bg-sidebar max-w-xs">
-                                                <StoreItemModal
-                                                    item={item}
-                                                    trinkets={trinketCount}
-                                                    onPurchaseSuccess={() => {
-                                                        toast.success('Purchased successfully!')
-                                                        setItems(prev =>
-                                                            prev.map(i => (i.id === item.id ? {
-                                                                ...i,
-                                                                ownedAmount: i.ownedAmount + 1
-                                                            } : i))
-                                                        )
-                                                        setTrinketCount(trinketCount - item.price)
-                                                    }}
-                                                />
-                                            </div>
-                                        }
+                                    <BubblePopover
+                                        id={`store-item-${item.id}`}
+                                        trigger={({setOpen}) => (
+                                            <Button outline onClick={() => setOpen(true)}>Buy</Button>
+                                        )}
                                     >
-                                        <Button outline>Buy</Button>
-                                    </Popover>
+                                        <div className="max-w-xs">
+                                            <StoreItemModal
+                                                item={item}
+                                                trinkets={trinketCount}
+                                                onPurchaseSuccess={() => {
+                                                    toast.success('Purchased successfully!')
+                                                    setItems(prev =>
+                                                        prev.map(i => (i.id === item.id ? {
+                                                            ...i,
+                                                            ownedAmount: i.ownedAmount + 1
+                                                        } : i))
+                                                    )
+                                                    setTrinketCount(trinketCount - item.price)
+                                                }}
+                                            />
+                                        </div>
+                                    </BubblePopover>
                                 )}
 
                                 {!canBuyItem(item) && (
