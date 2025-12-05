@@ -8,12 +8,13 @@ import {Providers} from './provider.tsx'
 import {SidebarProvider} from '@/lib/context/sidebar-context'
 import {AppTabs, FloatingCompose, LogoSpinner} from '@/src/components'
 import Body from '@/components/layout/body.tsx'
-import {ClerkLoaded, ClerkLoading, SignedIn} from '@clerk/clerk-react'
+import {ClerkFailed, ClerkLoaded, ClerkLoading, SignedIn} from '@clerk/clerk-react'
 import Preload from '@/src/preload.tsx'
 import {ProjectName, ProjectSafeName} from '@/lib'
 import BrowserCheck from '@/components/modal/browser-check.tsx'
 import Routes from '@/src/Routes.tsx'
 import CommandPalette from '@/components/modal/command-palette.tsx'
+import {ExclamationTriangleIcon} from "@heroicons/react/20/solid";
 
 // Lazy load components
 const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
@@ -78,6 +79,12 @@ __/\\_| |__   __ _ ___  ___
                                             <span className="text-sm mt-1">Checking Wild ID</span>
                                         </Body>
                                     </ClerkLoading>
+                                    <ClerkFailed>
+                                        <Body bodyClassName="h-full" className="!h-full items-center justify-center">
+                                            <ExclamationTriangleIcon className="h-12 w-12 text-red-500"/>
+                                            <span className="mt-1 text-red-500">Wild ID is DOWN.</span>
+                                        </Body>
+                                    </ClerkFailed>
 
                                     <ClerkLoaded>
                                         <Preload>
