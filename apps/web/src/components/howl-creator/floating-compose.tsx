@@ -12,13 +12,16 @@ import ImageUploadStack, {type Image} from '../feed/image-placeholder-stack'
 import {toast} from 'sonner'
 import {useModal} from '@/components/modal/provider'
 import PackbaseInstance from '@/lib/workers/global-event-emit.ts'
-import {Avatar, Badge, BubblePopover, Editor, Heading, LoadingCircle} from "@/src/components";
+import {Avatar, Badge, BubblePopover, Editor, Heading, LoadingCircle, PopoverHeader} from "@/src/components";
 import {ChevronRightIcon} from "@heroicons/react/24/outline";
 import Tooltip from "@/components/shared/tooltip.tsx";
 import {Camera, HardDisk} from "@/components/icons/plump";
 import {HashtagIcon} from "@heroicons/react/16/solid";
 import PostSettingsModal from "@/components/howl-creator/post-settings-modal.tsx";
 import {ChatBubbleExclamation} from "@/components/icons/plump/chat-bubble-exclamation.tsx";
+
+
+export type AvailablePagesType = 'editor' | 'content-labelling' | 'mature-rating-from-sfw-warning'
 
 function ComposeButton({onClick, children, className}: {
     onClick?: () => void;
@@ -49,7 +52,7 @@ export default function FloatingCompose() {
     }>()
 
     // Page state
-    const [currentPage, setCurrentPage] = useState<'editor' | 'content-labelling'>('editor')
+    const [currentPage, setCurrentPage] = useState<AvailablePagesType>('editor')
 
     const [channelName, setChannelName] = useState<string | null>(null)
     const [body, setBody] = useState<string>('')
@@ -204,6 +207,7 @@ export default function FloatingCompose() {
                         images={images}
                         setImages={setImages}
                         editorRef={editorRef}
+                        body={body}
                         setBody={setBody}
                         fileInputRef={fileInputRef}
                         addAttachment={addAttachment}
@@ -216,11 +220,23 @@ export default function FloatingCompose() {
                 <Activity mode={isVisible(currentPage === 'content-labelling')}>
                     <PostSettingsModal selectedTags={selectedTags}
                                        selectedContentLabel={selectedContentLabel}
-                                       onClose={({tags, contentLabel}) => {
+                                       onClose={({tags, contentLabel, toPage = 'editor'}) => {
                                            setSelectedTags(tags)
                                            setSelectedContentLabel(contentLabel)
-                                           setCurrentPage('editor')
+                                           setCurrentPage(toPage)
                                        }}/>
+                </Activity>
+
+                <Activity mode={isVisible(currentPage === 'mature-rating-from-sfw-warning')}>
+                    <div className="p-6">
+                        <PopoverHeader
+                            title="Set your account as R18?"
+                            description="This is a requirement if you want to use higher content labelling. You can't change back unless you delete all non-SFW content from your account."
+                            variant="warning"
+                            onClose={() => setCurrentPage('content-labelling')}
+                            onPrimaryAction={() => setCurrentPage('editor')}
+                        />
+                    </div>
                 </Activity>
             </BubblePopover>
         </div>
@@ -234,6 +250,7 @@ function FloatingComposeContent({
                                     images,
                                     setImages,
                                     editorRef,
+                                    body,
                                     setBody,
                                     fileInputRef,
                                     addAttachment,
@@ -247,6 +264,7 @@ function FloatingComposeContent({
     images: Image[];
     setImages: (images: Image[]) => void;
     editorRef: React.MutableRefObject<any>;
+    body: string;
     setBody: (body: string) => void;
     fileInputRef: React.RefObject<HTMLInputElement>;
     addAttachment: (files: FileList | null) => void;
@@ -311,6 +329,7 @@ function FloatingComposeContent({
 
             <div className="flex-grow p-4 overflow-y-auto max-h-[calc(100vh-11rem)]">
                 <Editor
+                    defaultValue={body}
                     onUpdate={e => {
                         editorRef.current = e
                         setBody(e?.storage.markdown.getMarkdown())
