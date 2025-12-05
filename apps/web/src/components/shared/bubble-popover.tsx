@@ -2,15 +2,15 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react'
+import {Activity, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react'
 import {createPortal} from 'react-dom'
 import {AnimatePresence, LayoutGroup, motion} from 'motion/react'
-import {CheckCircleIcon, ExclamationCircleIcon, QuestionMarkCircleIcon} from '@heroicons/react/24/outline'
 import {XIcon} from 'lucide-react'
-import {ExclamationTriangleIcon} from "@heroicons/react/20/solid";
-import {Desktop, Mobile} from "@/src/components";
+import {CheckCircleIcon, ExclamationCircleIcon, QuestionMarkCircleIcon} from "@heroicons/react/24/outline";
+import {Button, Desktop, Mobile} from "@/src/components";
 import {Drawer} from "vaul"
-import {cn} from "@/lib";
+import {cn, isVisible} from "@/lib";
+import {ExclamationTriangleIcon} from "@heroicons/react/20/solid";
 
 export interface BubblePopoverProps {
     /** Unique id for Framer Motion layoutId grouping */
@@ -277,6 +277,18 @@ export interface PopoverHeaderProps {
     description?: ReactNode
     /** Right icon element, e.g., close icon (decorative by default) */
     rightIcon?: ReactNode
+
+    /** Callback invoked when the close button is clicked */
+    onClose?: () => void
+
+    /** Callback invoked when the primary action button is clicked */
+    onPrimaryAction?: () => void
+
+    /** Override the cancel button text */
+    cancelButtonText?: string
+
+    /** Override the primary action button text */
+    primaryButtonText?: string
 }
 
 /**
@@ -287,6 +299,10 @@ export function PopoverHeader({
                                   title,
                                   description,
                                   rightIcon,
+                                  onClose,
+                                  onPrimaryAction,
+                                  cancelButtonText,
+                                  primaryButtonText
                               }: PopoverHeaderProps) {
     const prevVariant = useRef(variant);
 
@@ -298,7 +314,7 @@ export function PopoverHeader({
 
         switch (variant) {
             case 'info':
-                return <QuestionMarkCircleIcon className="w-12 h-12 text-muted-foreground"/>;
+                return <QuestionMarkCircleIcon className="w-12 h-12 text-indigo-500"/>;
             case 'warning':
                 return <ExclamationCircleIcon className="w-12 h-12 text-amber-500"/>;
             case 'destructive':
@@ -316,11 +332,13 @@ export function PopoverHeader({
                 <span className="shrink-0">
                     {Icon}
                 </span>
-                <span className="h-fit w-fit rounded-full bg-muted p-2">
-                    {rightIcon ?? (
-                        <XIcon className="h-4 w-4 stroke-[4px] text-muted-foreground" absoluteStrokeWidth/>
-                    )}
-                </span>
+                {onClose && (
+                    <span className="h-fit w-fit rounded-full bg-muted p-2" onClick={onClose}>
+                        {rightIcon ?? (
+                            <XIcon className="h-4 w-4 stroke-[4px] text-muted-foreground" absoluteStrokeWidth/>
+                        )}
+                    </span>
+                )}
             </motion.div>
 
             <motion.h2 className="mt-2.5 text-[22px] select-none font-semibold text-foreground md:font-medium">
@@ -332,6 +350,22 @@ export function PopoverHeader({
                     {description}
                 </p>
             ) : null}
+
+            <Activity mode={isVisible(!!onClose || !!onPrimaryAction)}>
+                <div className="mt-6 flex justify-end space-x-2">
+                    {onClose && (
+                        <Button outline className="w-full" onClick={onClose}>
+                            {cancelButtonText || 'Cancel'}
+                        </Button>
+                    )}
+
+                    {onPrimaryAction && (
+                        <Button color="indigo" className="w-full" onClick={onPrimaryAction}>
+                            {primaryButtonText ?? 'Continue'}
+                        </Button>
+                    )}
+                </div>
+            </Activity>
         </motion.header>
     )
 }

@@ -8,6 +8,7 @@ import {Heading, Text} from '@/components/shared/text.tsx'
 import {Button} from '@/components/shared/button'
 import {TagsInput} from './tags-input'
 import ContentLabelInput from './content-label-input'
+import {AvailablePagesType} from "@/components/howl-creator/floating-compose.tsx";
 
 export default function PostSettingsModal({
                                               selectedTags,
@@ -19,6 +20,7 @@ export default function PostSettingsModal({
     onClose: (options: {
         tags: string
         contentLabel: string
+        toPage?: AvailablePagesType
     }) => void
 }) {
     const [selectedTagsState, setSelectedTagsState] = useState<string>(selectedTags)
@@ -37,10 +39,6 @@ export default function PostSettingsModal({
                     <Text size="sm" className="mb-2">
                         Tags
                     </Text>
-                    <Text size="xs" alt className="mb-2">
-                        These tags help others find or filter your howl. Press enter to add a tag, or press backspace to
-                        remove the last tag.
-                    </Text>
 
                     <TagsInput
                         forcedTag={selectedContentLabelState}
@@ -58,7 +56,13 @@ export default function PostSettingsModal({
                     <Button onClick={() => {
                         onClose({
                             tags: selectedTagsState,
-                            contentLabel: selectedContentLabelState
+                            contentLabel: selectedContentLabelState,
+                            ...(![
+                                'rating_safe',
+                                'rating_mature'
+                            ].includes(selectedContentLabelState)) && {
+                                toPage: 'mature-rating-from-sfw-warning'
+                            }
                         })
                     }}>
                         Done
