@@ -264,7 +264,7 @@ function FloatingComposeContent({
                         <div className="flex items-center gap-1">
                             <Avatar
                                 src={currentResource.images?.avatar}
-                                initials={currentResource.slug[0]}
+                                initials={currentResource.slug?.[0] || 'D'}
                                 className="!rounded-full size-6"
                             />
                             <ChevronRightIcon className="w-5 h-5 text-muted-foreground"/>
