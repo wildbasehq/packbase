@@ -314,11 +314,8 @@ export default function NUEModal({config}: CharacterTextBoxProps) {
                                         <Activity mode={isVisible(isLoading)}>
                                             Loading
                                         </Activity>
-                                        <Activity mode={isVisible(!isLoading && currentStepIndex < steps.length - 1)}>
+                                        <Activity mode={isVisible(!isLoading)}>
                                             Next
-                                        </Activity>
-                                        <Activity mode={isVisible(!isLoading && currentStepIndex === steps.length - 1)}>
-                                            Quit yapping, let me in!
                                         </Activity>
                                     </Button>
                                 </>
@@ -430,7 +427,7 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                     "Your access here is considered a privilege. Breaking any rules may result in immediate account termination.",
                     "***Remember***: We're far from a company - we're just a bunch of passionate people who want to make a great community. No one working on (or using) Packbase deserves to be harassed.",
                     "***Double Remember: IT'S AN ALPHA. THINGS BREAK. YOU WOULDN'T GO TO A CONSTRUCTION SITE AND COMPLAIN YOU CAN'T TAKE A SHIT. ALSO; OUR EMAILS AREN'T FOR BUG REPORTS. DO NOT POST ABOUT PACKBASE ON HYPER-CRITICAL FORUMS BECAUSE SOMETHING \"FUNCTIONS LIKE SHIT\". THIS REMINDER IS TARGETED. YOU KNOW WHO YOU ARE.***",
-                    "__**BY CLICKING \"Quit yapping, let me in!\", YOU AGREE TO EVERY SINGLE STATEMENT MADE ABOVE.**__"
+                    "__**BY CLICKING \"Next\", YOU AGREE TO EVERY SINGLE STATEMENT MADE ABOVE.**__"
                 ],
                 expression: Expressions.UNIMPRESSED,
                 onComplete: async formData => {
