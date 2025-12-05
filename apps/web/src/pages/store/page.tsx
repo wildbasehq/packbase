@@ -180,6 +180,7 @@ export default function StorePage() {
                             <div className="flex gap-2 mt-2">
                                 {canBuyItem(item) && (
                                     <BubblePopover
+                                        isCentered
                                         id={`store-item-${item.id}`}
                                         trigger={({setOpen}) => (
                                             <Button outline onClick={() => setOpen(true)}>Buy</Button>
