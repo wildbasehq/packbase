@@ -11,6 +11,10 @@ import CustomKeymap from './custom-keymap'
 
 export const defaultExtensions = [
     StarterKit.configure({
+        history: {
+            depth: 100,
+            newGroupDelay: 500,
+        },
         heading: {
             levels: [1, 2, 3],
             HTMLAttributes: {
@@ -53,7 +57,7 @@ export const defaultExtensions = [
             color: '#DBEAFE',
             width: 4,
         },
-        gapcursor: false,
+        gapcursor: false
     }),
     // patch to fix horizontal rule bug: https://github.com/ueberdosis/tiptap/pull/3859#issuecomment-1536799740
     HorizontalRule.extend({
@@ -83,11 +87,11 @@ export const defaultExtensions = [
     //         class: 'text-stone-400 underline underline-offset-[3px] hover:text-stone-600 transition-colors cursor-pointer',
     //     },
     // }),
-    UpdatedImage.configure({
-        HTMLAttributes: {
-            class: 'rounded-lg border border-stone-200',
-        },
-    }),
+    // UpdatedImage.configure({
+    //     HTMLAttributes: {
+    //         class: 'rounded-lg border border-stone-200',
+    //     },
+    // }),
     Placeholder.configure({
         placeholder: ({node}) => {
             if (node.type.name === 'heading') {
