@@ -8,7 +8,7 @@
 //         : `${window.location.protocol}//api.${window.location.hostname.replace('www.', '')}/api/`) : '/api/') + 'v2/';
 import VoyageSDK from 'voyagesdk-ts'
 
-import './cron/check-update.ts'
+// import './cron/check-update.ts'
 import {WorkerStore} from '@/lib/workers'
 import {formatRelativeTime} from '../utils/date.ts'
 

@@ -41,8 +41,8 @@ export function Avatar({
             className={cn(
                 className,
                 // Basic layout
-                'inline-grid shrink-0 align-middle [--avatar-radius:20%] [--ring-opacity:20%] *:col-start-1 *:row-start-1',
-                'outline outline-3 -outline-offset-2 outline-black/(--ring-opacity) dark:outline-white/(--ring-opacity)',
+                'inline-grid shrink-0 align-middle [--avatar-radius:20%] *:col-start-1 *:row-start-1',
+                'ring ring-border',
                 // Add the correct border radius
                 square ? 'rounded-(--avatar-radius) *:rounded-(--avatar-radius)' : 'rounded-full *:rounded-full'
             )}

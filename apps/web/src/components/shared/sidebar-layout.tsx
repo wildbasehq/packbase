@@ -45,6 +45,8 @@ import {motion} from "motion/react"
 import PackSwitcher from "@/components/layout/resource/pack-switcher.tsx";
 import TextTicker from "@/components/shared/text-ticker.tsx";
 import {SupportHeadIcon} from "@/components/icons/plump/suppot-head.tsx";
+import {EllipsisHorizontalIcon} from "@heroicons/react/24/solid";
+import PackSettingsDropdown from "@/components/pack/settings-dropdown.tsx";
 
 const NavbarItems = [
     {
@@ -200,6 +202,13 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
 
                             <ChevronDownIcon/>
                         </NavbarItem>
+
+                        <Dropdown>
+                            <DropdownButton as={NavbarItem} aria-label="More options">
+                                <EllipsisHorizontalIcon/>
+                            </DropdownButton>
+                            <PackSettingsDropdown/>
+                        </Dropdown>
 
                         <Desktop>
                             <NavbarDivider/>

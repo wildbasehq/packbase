@@ -10,39 +10,34 @@
  * - Support for complex expressions (AND, OR, NOT, comparisons, wildcards, fuzzy search)
  */
 
-import { PrismaClient } from '@prisma/client';
 import {
-    QueryNode,
-    WhereClauseNode,
-    TableRefNode,
-    ColumnRefNode,
-    ExpressionNode,
-    NodeType,
     AndExprNode,
-    OrExprNode,
-    NotExprNode,
-    EqualsExprNode,
-    GreaterThanExprNode,
-    LessThanExprNode,
-    GreaterThanEqualsExprNode,
-    LessThanEqualsExprNode,
     BetweenExprNode,
-    ExistsExprNode,
-    SortExprNode,
-    WildcardExprNode,
-    FuzzyExprNode,
-    ExactExprNode,
-    CaseExprNode,
-    StringLiteralNode,
-    NumberLiteralNode,
     BooleanLiteralNode,
+    CaseExprNode,
+    EqualsExprNode,
+    ExactExprNode,
+    ExpressionNode,
+    FuzzyExprNode,
+    GreaterThanEqualsExprNode,
+    GreaterThanExprNode,
+    LessThanEqualsExprNode,
+    LessThanExprNode,
+    NodeType,
+    NotExprNode,
+    NumberLiteralNode,
+    OrExprNode,
+    QueryNode,
     SearchResult,
-    SearchError,
+    SortExprNode,
+    StringLiteralNode,
+    WhereClauseNode,
+    WildcardExprNode,
 } from './types';
 
 // Import Prisma client
 import prisma from '@/db/prisma';
-import { isValidUUID } from '@/utils/dm/validation';
+import {isValidUUID} from '@/utils/dm/validation';
 
 export class SearchExecutionError extends Error {
     readonly code: string;
@@ -86,7 +81,7 @@ const VALID_TABLES: Record<string, TableConfig> = {
     },
     posts: {
         idField: 'id',
-        searchableFields: ['content_type', 'body', 'uuid:tenant_id', 'uuid:channel_id', 'uuid:id'],
+        searchableFields: ['content_type', 'body', 'uuid:tenant_id', 'uuid:channel_id', 'uuid:id', 'uuid:user_id'],
     },
     profiles: {
         idField: 'id',
@@ -534,7 +529,12 @@ export class QueryExecutor {
                     },
                 };
             }
-            return null;
+            // Invalid UUIDs should yield no results while keeping Prisma conditions valid
+            return {
+                [columnName]: {
+                    in: [],
+                },
+            };
         }
 
         if (columnName === 'content_type') {
@@ -587,7 +587,7 @@ export class QueryExecutor {
             })
             .filter((condition) => condition !== null);
 
-        return conditions.length > 0 ? { OR: conditions } : {};
+        return conditions.length > 0 ? {OR: conditions} : {};
     }
 
     storeNamedQuery(name: string, query: QueryNode): void {

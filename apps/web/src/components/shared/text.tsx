@@ -3,14 +3,16 @@ import {ComponentPropsWithoutRef, ElementType, JSX, ReactNode} from 'react'
 import Link from './link'
 
 const textSize = {
-    xs: 'text-xs',
-    sm: 'text-sm',
-    md: 'text-base',
-    lg: 'text-lg',
-    xl: 'text-xl',
-    '2xl': 'text-2xl',
-    '3xl': 'text-3xl',
+    xs: '!text-xs/6',
+    sm: '!text-sm/6',
+    md: '!text-base/6',
+    lg: '!text-lg/6',
+    xl: '!text-xl/6',
+    '2xl': '!text-2xl/6',
+    '3xl': '!text-3xl/6',
 }
+
+export type TextSize = keyof typeof textSize
 
 export function Heading({
                             as,
@@ -21,9 +23,9 @@ export function Heading({
                         }: {
     as?: ElementType
     children?: ReactNode
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
+    size?: TextSize
     alt?: boolean
-    [ke_y: string]: any
+    [_key: string]: any
 }): JSX.Element {
     const Comp = as || 'h1'
     props.className = cn(

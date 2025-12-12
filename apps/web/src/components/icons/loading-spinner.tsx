@@ -3,31 +3,35 @@
  */
 
 import styles from './loading-spinner.module.css'
-import {CSSProperties} from "react";
 import {cn} from "@/lib";
 
-export default function LoadingSpinner({className, speed = 0.5}: { className?: string; speed?: number }) {
+const bars = Array(12).fill(0)
+
+export default function LoadingSpinner({
+                                           color,
+                                           size = 20,
+                                           className
+                                       }: {
+    color?: string
+    size?: number
+    className?: string
+}) {
+    const colorDynamic = 'var(--muted-foreground)'
     return (
         <div
-            className={cn('dark:invert', styles.spinner, className)}
+            className={cn(styles.wrapper, className)}
             style={
                 {
-                    '--spinner-duration': `${speed}s`,
-                } as CSSProperties
+                    '--spinner-size': `${size}px`,
+                    '--spinner-color': color || colorDynamic
+                } as React.CSSProperties
             }
         >
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
+            <div className={styles.spinner}>
+                {bars.map((_, i) => (
+                    <div className={styles.bar} key={`spinner-bar-${i}`}/>
+                ))}
+            </div>
         </div>
     )
 }

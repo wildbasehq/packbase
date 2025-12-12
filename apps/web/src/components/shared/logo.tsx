@@ -9,7 +9,7 @@ import {LoadingSpinner} from '@/src/components'
 export const Logo = ({...props}) => {
     props.className = props.noStyle ? props.className : cn(
         props.className,
-        !props.noColorTheme && 'bg-[#F5F6FC] dark:bg-primary dark:fill-white',
+        !props.noColorTheme && 'bg-primary fill-white',
         'ring-1 ring-inset ring-n-7/25 rounded-xl w-8 h-8 flex justify-center items-center p-1.5'
     )
 

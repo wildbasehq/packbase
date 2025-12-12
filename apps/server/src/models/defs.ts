@@ -92,7 +92,7 @@ export const PackCreateBody = t.Object({
     slug: t.String({
         minLength: 3,
         maxLength: 20,
-        pattern: '^(?=.{3,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$',
+        pattern: '^(?=.{3,20}$)(?![-.])(?!.*[-.]{2})[a-zA-Z0-9.-]+(?<![-.])$',
     }),
     description: t.String({
         maxLength: 256,
@@ -105,7 +105,7 @@ export const PackEditBody = t.Object({
             default: '',
             minLength: 3,
             maxLength: 20,
-            pattern: '^(?=.{3,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$',
+            pattern: '^(?=.{3,20}$)(?![-.])(?!.*[-.]{2})[a-zA-Z0-9.-]+(?<![-.])$',
         }),
     ),
     display_name: t.Optional(

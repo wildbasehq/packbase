@@ -26,8 +26,8 @@ const useRunningWorkers = () => {
 
 // Simple spinner component that shows when any job is running
 const WorkerSpinner = () => {
-    const {isQueueActive, runningCount, queuedCount, jobs} = useRunningWorkers()
-    if (!isQueueActive) return null
+    const {isQueueActive, jobs} = useRunningWorkers()
+    if (!isQueueActive) return <></>
 
     return (
         <>
@@ -43,11 +43,7 @@ const WorkerSpinner = () => {
                     </div>
                 }
             >
-                <div className="flex h-8">
-                    <LoadingSpinner className="-8 -mt-5.5"/>{' '}
-                    {/*<span*/}
-                    {/*    className="text-xs inline-flex items-center -ml-4">{runningCount + queuedCount} working</span>*/}
-                </div>
+                <LoadingSpinner/>
             </Tooltip>
         </>
     )

@@ -5,7 +5,7 @@
 import React, {FormEvent, useEffect, useState} from 'react'
 import {LoadingCircle} from '@/components/icons'
 import {Heading, Text} from '@/components/shared/text'
-import {Button, Textarea} from '@/components/shared'
+import {Button, Desktop, Textarea} from '@/components/shared'
 import {vg} from '@/lib/api'
 import {useResourceStore} from '@/lib'
 import {toast} from 'sonner'
@@ -63,7 +63,10 @@ const PRIVACY_OPTIONS: PrivacyOption[] = [
 /**
  * CreatePackModal - Component for creating a new pack
  */
-function CreatePackModal({close}: { close: () => void }) {
+export function CreatePackModal({close, onCreate}: {
+    close?: () => void
+    onCreate?: (pack: Pack) => void
+}) {
     const [selected] = useState<PrivacyOption>(PRIVACY_OPTIONS[0])
     const [submitting, setSubmitting] = useState(false)
     const [formData, setFormData] = useState({
@@ -108,7 +111,11 @@ function CreatePackModal({close}: { close: () => void }) {
             }
 
             toast.success(`Pack "${data.display_name}" created successfully!`)
-            window.location.href = `/p/${data.slug}`
+            if (onCreate) {
+                onCreate(data);
+            } else {
+                window.location.href = `/p/${data.slug}`;
+            }
         } catch (err) {
             toast.error('Failed to create pack. Please try again.')
             setSubmitting(false)
@@ -116,40 +123,48 @@ function CreatePackModal({close}: { close: () => void }) {
     }
 
     return (
-        <form onSubmit={createPack} className="flex flex-col-reverse w-full md:max-w-2xl lg:max-w-4xl md:flex-row">
+        <form onSubmit={createPack}
+              className="flex flex-col-reverse w-full md:max-w-2xl lg:max-w-4xl md:flex-row">
             <div className="flex flex-col justify-between md:w-1/2 md:border-r">
-                <div className="flex-1 grow p-6 space-y-6">
-                    <div className="flex items-center space-x-3">
-                        <div className="inline-flex shrink-0 items-center justify-center rounded-xl bg-muted/50 p-3">
-                            <UserGroupIcon className="size-5" aria-hidden={true}/>
+                <Desktop>
+                    <div className="flex-1 grow p-6 space-y-6">
+                        <div className="flex items-center space-x-3">
+                            <div
+                                className="inline-flex shrink-0 items-center justify-center rounded-xl bg-muted/50 p-3">
+                                <UserGroupIcon className="size-5" aria-hidden={true}/>
+                            </div>
+                            <div className="space-y-0.5">
+                                <Heading>{formData?.display_name || 'Pack Name'}</Heading>
+                                <Text
+                                    alt>{formData?.slug ? `@${formData.slug}` : 'Pack information will show here'}</Text>
+                            </div>
                         </div>
-                        <div className="space-y-0.5">
-                            <Heading>{formData?.display_name || 'Pack Name'}</Heading>
-                            <Text alt>{formData?.slug ? `@${formData.slug}` : 'Pack information will show here'}</Text>
+                        <Separator className="my-4"/>
+                        <div>
+                            <Heading size="sm">Description</Heading>
+                            <Markdown componentClassName="!leading-6 mt-1 !text-muted-foreground">
+                                {formData?.description || '*Packs that describe what they are are more likely to be discovered!*'}
+                            </Markdown>
+                        </div>
+                        <div>
+                            <Heading size="sm">Tips</Heading>
+                            <Text as="div" alt className="!leading-6 mt-1">
+                                <ul className="list-disc list-inside">
+                                    <li>The call sign must be unique, but the name can be anything.</li>
+                                    <li>After creation, don't forget to add an icon and banner image!</li>
+                                </ul>
+                            </Text>
                         </div>
                     </div>
-                    <Separator className="my-4"/>
-                    <div>
-                        <Heading size="sm">Description</Heading>
-                        <Markdown componentClassName="!leading-6 mt-1 !text-muted-foreground">
-                            {formData?.description || '*Packs that describe what they are are more likely to be discovered!*'}
-                        </Markdown>
-                    </div>
-                    <div>
-                        <Heading size="sm">Tips</Heading>
-                        <Text as="div" alt className="!leading-6 mt-1">
-                            <ul className="list-disc list-inside">
-                                <li>The call sign must be unique, but the name can be anything.</li>
-                                <li>After creation, don't forget to add an icon and banner image!</li>
-                            </ul>
-                        </Text>
-                    </div>
-                </div>
+                </Desktop>
+
                 <div className="flex items-center justify-between border-t p-4">
-                    <Button type="button" plain onClick={close}>
-                        Cancel
-                    </Button>
-                    <Button color="indigo" type="submit">
+                    {close && (
+                        <Button type="button" plain onClick={close}>
+                            Cancel
+                        </Button>
+                    )}
+                    <Button color="indigo" type="submit" submissionState={submitting ? 'pending' : 'idle'}>
                         Create
                     </Button>
                 </div>
@@ -201,17 +216,6 @@ function CreatePackModal({close}: { close: () => void }) {
                         onChange={handleInputChange}
                     />
                 </Field>
-
-                <div>
-                    <div className="flex items-center space-x-3 mb-2">
-                        <Text className="inline-flex size-6 items-center justify-center rounded-lg bg-muted/50">4</Text>
-                        <Heading className="!text-sm font-medium flex-1">
-                            By clicking "Create", you agree that you have the right to use and act on the information
-                            you provide, and that
-                            it does not violate any third-party rights.
-                        </Heading>
-                    </div>
-                </div>
             </div>
         </form>
     )

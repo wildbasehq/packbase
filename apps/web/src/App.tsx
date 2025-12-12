@@ -15,6 +15,7 @@ import BrowserCheck from '@/components/modal/browser-check.tsx'
 import Routes from '@/src/Routes.tsx'
 import CommandPalette from '@/components/modal/command-palette.tsx'
 import {ExclamationTriangleIcon} from "@heroicons/react/20/solid";
+import DefaultPackSunset from "@/pages/pack/universe/default-pack-sunset.tsx";
 
 // Lazy load components
 const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
@@ -59,47 +60,61 @@ __/\\_| |__   __ _ ___  ___
             {/* Browser check */}
             <BrowserCheck/>
             <CommandPalette/>
-            <SignedIn>
-                <FloatingCompose/>
-            </SignedIn>
 
             <SidebarProvider>
-                <div className="absolute bottom-0 left-0 z-40 w-full sm:hidden">
-                    <AppTabs/>
-                </div>
+                {(window.location.pathname === '/p/universe/sunset' || window.location.pathname === '/p/universe/sunset/') && (
+                    <Preload>
+                        <DefaultPackSunset/>
+                    </Preload>
+                )}
 
-                <SidebarLayout>
-                    <div id="NGContentArea" className="flex h-full overflow-hidden">
-                        <div className="grow">
-                            <main className="flex flex-1 h-full">
-                                <div className="w-full h-full">
-                                    <ClerkLoading>
-                                        <Body bodyClassName="h-full" className="!h-full items-center justify-center">
-                                            <LogoSpinner/>
-                                            <span className="text-sm mt-1">Checking Wild ID</span>
-                                        </Body>
-                                    </ClerkLoading>
-                                    <ClerkFailed>
-                                        <Body bodyClassName="h-full" className="!h-full items-center justify-center">
-                                            <ExclamationTriangleIcon className="h-12 w-12 text-red-500"/>
-                                            <span className="mt-1 text-red-500">Wild ID is DOWN.</span>
-                                        </Body>
-                                    </ClerkFailed>
+                {!(window.location.pathname === '/p/universe/sunset' || window.location.pathname === '/p/universe/sunset/') && (
+                    <>
+                        <SignedIn>
+                            <FloatingCompose/>
+                        </SignedIn>
 
-                                    <ClerkLoaded>
-                                        <Preload>
-                                            <div id="NGRoot" className="h-full overflow-y-auto overflow-x-hidden">
-                                                <WaitlistCheck/>
-
-                                                <Routes/>
-                                            </div>
-                                        </Preload>
-                                    </ClerkLoaded>
-                                </div>
-                            </main>
+                        <div className="absolute bottom-0 left-0 z-40 w-full sm:hidden">
+                            <AppTabs/>
                         </div>
-                    </div>
-                </SidebarLayout>
+
+                        <SidebarLayout>
+                            <div id="NGContentArea" className="flex h-full overflow-hidden">
+                                <div className="grow">
+                                    <main className="flex flex-1 h-full">
+                                        <div className="w-full h-full">
+                                            <ClerkLoading>
+                                                <Body bodyClassName="h-full"
+                                                      className="!h-full items-center justify-center">
+                                                    <LogoSpinner/>
+                                                    <span className="text-sm mt-1">Checking Wild ID</span>
+                                                </Body>
+                                            </ClerkLoading>
+                                            <ClerkFailed>
+                                                <Body bodyClassName="h-full"
+                                                      className="!h-full items-center justify-center">
+                                                    <ExclamationTriangleIcon className="h-12 w-12 text-red-500"/>
+                                                    <span className="mt-1 text-red-500">Wild ID is DOWN.</span>
+                                                </Body>
+                                            </ClerkFailed>
+
+                                            <ClerkLoaded>
+                                                <Preload>
+                                                    <div id="NGRoot"
+                                                         className="h-full overflow-y-auto overflow-x-hidden">
+                                                        <WaitlistCheck/>
+
+                                                        <Routes/>
+                                                    </div>
+                                                </Preload>
+                                            </ClerkLoaded>
+                                        </div>
+                                    </main>
+                                </div>
+                            </div>
+                        </SidebarLayout>
+                    </>
+                )}
             </SidebarProvider>
         </Providers>
     )

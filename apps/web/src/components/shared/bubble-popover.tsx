@@ -10,7 +10,7 @@ import {CheckCircleIcon, ExclamationCircleIcon, QuestionMarkCircleIcon} from "@h
 import {Button, Desktop, Mobile} from "@/src/components";
 import {Drawer} from "vaul"
 import {cn, isVisible} from "@/lib";
-import {ExclamationTriangleIcon} from "@heroicons/react/20/solid";
+import {ExclamationTriangleIcon} from "@heroicons/react/24/solid";
 
 export interface BubblePopoverProps {
     /** Unique id for Framer Motion layoutId grouping */
@@ -18,7 +18,7 @@ export interface BubblePopoverProps {
     /** Trigger button / element */
     trigger: (props: { open: boolean; setOpen: (open: boolean) => void }) => ReactNode
     /** Popover content. Will be rendered inside the animated card container. */
-    children: ReactNode
+    children: ((props: { setOpen: (open: boolean) => void }) => ReactNode) | ReactNode
     /** If true, render the popover centered on screen via a portal */
     isCentered?: boolean
     /** Explicit corner to open the popover from (only applicable when isCentered is false) */
@@ -70,29 +70,29 @@ export function BubblePopover({
         prevOpenRef.current = open
     }, [open])
 
+    const childrenRender = typeof children === 'function' ? children({setOpen}) : children
+
     return (
         <>
             <Mobile>
                 <Drawer.Root>
-                    <Drawer.Trigger>{trigger({open, setOpen})}</Drawer.Trigger>
+                    <Drawer.Trigger asChild>{trigger({open, setOpen})}</Drawer.Trigger>
                     <Drawer.Portal>
                         <Drawer.Overlay className="fixed inset-0 bg-black/40"/>
                         <Drawer.Content
-                            className="fixed md:inset-x-4 bottom-0 z-50 mx-auto w-full md:w-sm overflow-hidden rounded-3xl border bg-card p-6 drop-shadow-sm pointer-events-auto md:mx-auto"
+                            className="fixed flex md:inset-x-4 max-h-svh bottom-0 z-50 mx-auto w-full md:w-sm overflow-hidden rounded-3xl border bg-card p-6 drop-shadow-sm pointer-events-auto md:mx-auto"
                         >
-                            <div className="hidden sr-only">
-                                <Drawer.Title>
-                                    Bottom Drawer Sheet
-                                </Drawer.Title>
-                            </div>
+                            <div className="flex-1 overflow-y-scroll">
+                                <div className="hidden sr-only">
+                                    <Drawer.Title>
+                                        Bottom Drawer Sheet
+                                    </Drawer.Title>
+                                </div>
 
-                            {/**
-                             * Mobile: animate container height when inner content resizes
-                             * to match the drawer behavior in the example.
-                             */}
-                            <MobileAnimatedContent animateKey={animateKey}>
-                                {children}
-                            </MobileAnimatedContent>
+                                <MobileAnimatedContent animateKey={animateKey}>
+                                    {childrenRender}
+                                </MobileAnimatedContent>
+                            </div>
                         </Drawer.Content>
                     </Drawer.Portal>
                 </Drawer.Root>
@@ -103,6 +103,7 @@ export function BubblePopover({
                     <motion.div
                         ref={rootRef}
                         layoutId={`${id}-root-container`}
+                        style={{borderRadius: 24}}
                         aria-hidden={open ? true : undefined}
                         animate={{
                             filter: closingPulse ? 'blur(1px)' : 'blur(0px)',
@@ -143,7 +144,7 @@ export function BubblePopover({
                                     <div
                                         className={cn("fixed inset-0 z-[101] flex items-center justify-center pointer-events-none", className)}>
                                         <motion.div
-                                            className="w-sm overflow-hidden rounded-3xl border bg-card p-6 drop-shadow-sm pointer-events-auto"
+                                            className="w-sm overflow-hidden border bg-card p-6 drop-shadow-sm pointer-events-auto"
                                             layoutId={`${id}-root-container`}
                                             layout
                                             style={{borderRadius: 24}}
@@ -151,6 +152,9 @@ export function BubblePopover({
                                                 type: 'spring',
                                                 stiffness: 300,
                                                 damping: 24,
+                                                borderRadius: {
+                                                    duration: 0,
+                                                }
                                             }}
                                         >
                                             <motion.div
@@ -165,13 +169,13 @@ export function BubblePopover({
                                                     ease: [0.26, 0.08, 0.25, 1],
                                                 }}
                                             >
-                                                {children}
+                                                {childrenRender}
                                             </motion.div>
                                         </motion.div>
                                     </div>
                                 ) : (
                                     <motion.div
-                                        className={cn("absolute z-[101] w-sm overflow-hidden rounded-3xl border bg-card p-6 drop-shadow-sm", cornerClasses, className)}
+                                        className={cn("absolute z-[101] w-sm overflow-hidden border bg-card p-6 drop-shadow-sm", cornerClasses, className)}
                                         layoutId={`${id}-root-container`}
                                         layout
                                         style={{borderRadius: 24}}
@@ -179,6 +183,7 @@ export function BubblePopover({
                                             type: 'spring',
                                             stiffness: 300,
                                             damping: 24,
+                                            borderRadius: {duration: 0}
                                         }}
                                     >
                                         <motion.div
@@ -193,7 +198,7 @@ export function BubblePopover({
                                                 ease: [0.26, 0.08, 0.25, 1],
                                             }}
                                         >
-                                            {children}
+                                            {childrenRender}
                                         </motion.div>
                                     </motion.div>
                                 )

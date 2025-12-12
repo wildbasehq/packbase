@@ -29,7 +29,7 @@ const Link = forwardRef(function Link(
                 <a
                     {...shallowProps}
                     href={href}
-                    className={props.className}
+                    className={cn('text-indigo-500', props.className)}
                     ref={ref}
                     target="_blank"
                     rel="noopener noreferrer"

@@ -1,9 +1,9 @@
-import { similarity } from '@/utils/similarity';
-import { YapockType } from '@/index';
-import { PackCreateBody, PackResponse } from '@/models/defs';
-import { getPack } from '@/routes/pack/[id]';
-import { ErrorTypebox } from '@/utils/errors';
-import { HTTPError } from '@/lib/HTTPError';
+import {similarity} from '@/utils/similarity';
+import {YapockType} from '@/index';
+import {PackCreateBody, PackResponse} from '@/models/defs';
+import {getPack} from '@/routes/pack/[id]';
+import {ErrorTypebox} from '@/utils/errors';
+import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import requiresToken from '@/utils/identity/requires-token';
 
@@ -12,8 +12,8 @@ const banned = ['universe', 'new', 'settings'];
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ body: { display_name, slug, description }, set, user }) => {
-            await requiresToken({ set, user });
+        async ({body: {display_name, slug, description}, set, user}) => {
+            requiresToken({set, user});
 
             slug = slug.toLowerCase();
             for (const route of banned) {
@@ -26,8 +26,8 @@ export default (app: YapockType) =>
             }
 
             let pack = await prisma.packs.findFirst({
-                where: { slug },
-                select: { id: true },
+                where: {slug},
+                select: {id: true},
             });
             if (pack) {
                 set.status = 409;

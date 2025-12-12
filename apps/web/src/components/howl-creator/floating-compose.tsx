@@ -231,7 +231,7 @@ export default function FloatingCompose() {
                     <div className="p-6">
                         <PopoverHeader
                             title="Set your account as R18?"
-                            description="This is a requirement if you want to use higher content labelling. You can't change back unless you delete all non-SFW content from your account."
+                            description="If you howl with this rating, your account will be forced as R18. This is a requirement if you want to use higher content labelling. You can't change back unless you delete all non-SFW content from your account."
                             variant="warning"
                             onClose={() => setCurrentPage('content-labelling')}
                             onPrimaryAction={() => setCurrentPage('editor')}

@@ -46,7 +46,7 @@ const handleUserData = async (
         return
     }
 
-    const hasUsername = Boolean(data.username)
+    const hasUsername = !!data.username
     const userBuild = {
         id: data.id,
         username: data.username || 'new_here',

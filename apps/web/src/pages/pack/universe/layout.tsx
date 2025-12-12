@@ -2,7 +2,19 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {SidebarDivider, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection,} from '@/src/components'
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+    BubblePopover,
+    Button,
+    PopoverHeader,
+    SidebarDivider,
+    SidebarHeading,
+    SidebarItem,
+    SidebarLabel,
+    SidebarSection,
+} from '@/src/components'
 import {SidebarPortal} from '@/lib/context/sidebar-context.tsx'
 import {Newspaper} from '@/components/icons/plump/Newspaper'
 import {ChatBubbleSmileyIcon} from '@/components/icons/plump'
@@ -12,6 +24,7 @@ import {useResourceStore} from "@/lib";
 // import {motion} from "motion/react"
 // import {XIcon} from "lucide-react";
 import {useLocalStorage} from "usehooks-ts";
+import {ExclamationTriangleIcon} from "@heroicons/react/20/solid";
 // import {ExclamationCircleIcon} from "@heroicons/react/24/outline";
 
 export default function UniversePackLayout({children}: { children: ReactNode }) {
@@ -28,44 +41,44 @@ export default function UniversePackLayout({children}: { children: ReactNode }) 
                 <UniverseSidebarContent/>
             </SidebarPortal>
 
-            {/*<Alert className="max-w-3xl mx-auto mt-8 overflow-visible" variant="destructive">*/}
-            {/*    <AlertTitle>*/}
-            {/*        <ExclamationTriangleIcon className="inline-flex w-5 h-5"/> The "Universe" is being sunset*/}
-            {/*    </AlertTitle>*/}
-            {/*    <AlertDescription>*/}
-            {/*        The Universe is the current Default Pack you howl into, and see content from all over Packbase.*/}
-            {/*        We're wanting to focus more on Packs themselves, and give you the control on setting the Default*/}
-            {/*        Pack - either your own or an already existing one. "Default Pack" is the Pack that shows when you go*/}
-            {/*        to the Home page.*/}
-            {/*        <br/><br/>*/}
-            {/*        You can switch right now if you'd like, but the moment you switch you cannot go back. You'll be*/}
-            {/*        forced to do*/}
-            {/*        this soon.*/}
-            {/*    </AlertDescription>*/}
+            <Alert className="max-w-3xl mx-auto mt-8 overflow-visible" variant="destructive">
+                <AlertTitle>
+                    <ExclamationTriangleIcon className="inline-flex w-5 h-5"/> The "Universe" is being sunset
+                </AlertTitle>
+                <AlertDescription>
+                    "Default Pack" is the Pack that shows when you go to the Home page. The Universe is the current
+                    Default Pack you howl into, and see content from all over Packbase. We're wanting to go back to our
+                    roots and focus more on Packs themselves, so we'll be sunsetting the global Universe pack for now.
+                    <br/><br/>
+                    You can switch right now if you'd like, but the moment you switch you cannot go back. You'll be
+                    forced to do this soon.
+                    <br/><br/>
+                    Don't get used to this - this is a one-off migration for those who have content on the Universe.
+                </AlertDescription>
 
-            {/*    <div className="flex justify-end mt-4">*/}
-            {/*        <BubblePopover*/}
-            {/*            id="cdp-modal"*/}
-            {/*            trigger={({setOpen}) => (*/}
-            {/*                <Button color="amber" onClick={() => setOpen(true)}>*/}
-            {/*                    Change Default Pack Now*/}
-            {/*                </Button>*/}
-            {/*            )}*/}
-            {/*        >*/}
-            {/*            <PopoverHeader*/}
-            {/*                variant="destructive"*/}
-            {/*                title="Change Default Pack"*/}
-            {/*                description="Switching from the Universe is permanent, this can never be undone."*/}
-            {/*            />*/}
+                <div className="flex justify-end mt-4">
+                    <BubblePopover
+                        id="cdp-modal"
+                        trigger={({setOpen}) => (
+                            <Button color="red" onClick={() => setOpen(true)}>
+                                Change Default Pack Now
+                            </Button>
+                        )}
+                    >
+                        <PopoverHeader
+                            variant="destructive"
+                            title="Change Default Pack"
+                            description="Switching from the Universe is permanent and can never be undone."
+                        />
 
-            {/*            <div className="flex gap-4 [&>*]:w-full mt-3">*/}
-            {/*                <Button outline>*/}
-            {/*                    Continue*/}
-            {/*                </Button>*/}
-            {/*            </div>*/}
-            {/*        </BubblePopover>*/}
-            {/*    </div>*/}
-            {/*</Alert>*/}
+                        <div className="flex gap-4 [&>*]:w-full mt-3">
+                            <Button color="red" onClick={() => window.location.href = '/p/universe/sunset'}>
+                                I Understand, Change Anyway
+                            </Button>
+                        </div>
+                    </BubblePopover>
+                </div>
+            </Alert>
 
             {children}
         </>
