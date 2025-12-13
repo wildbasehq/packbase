@@ -18,15 +18,15 @@ const SearchAPI = (app: YapockType) =>
                 const {q, allowedTables} = query;
                 const parsed = parseQuery(q);
                 const {
-                    results,
-                    variables
+                    variables,
+                    ...result
                 } = await executeQuery(parsed.statements, allowedTables?.replaceAll(' ', '')?.split(','))
 
                 const timeEnd = Date.now() - timeStart;
                 log(`Search query ${q} took ${timeEnd}ms`);
 
                 return {
-                    results,
+                    ...result,
                     variables,
                     ms: timeEnd
                 };

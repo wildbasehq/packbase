@@ -3,7 +3,6 @@ import {t} from 'elysia';
 import requiresToken from '@/utils/identity/requires-token';
 import {type Folder, FolderSchema} from '@/routes/folders';
 import prisma from '@/db/prisma';
-import {getUserClerkByID} from "@/utils/clerk";
 
 export default (app: YapockType) =>
     app
@@ -26,7 +25,7 @@ export default (app: YapockType) =>
                         id: profile.id,
                         display_name: profile.display_name || profile.username,
                         username: profile.username,
-                        images_avatar: (await getUserClerkByID(profile.owner_id).then((user) => user?.imageUrl)) || null
+                        images_avatar: `${process.env.HOSTNAME}/user/${profile.id}/avatar`
                     }
                 };
             },

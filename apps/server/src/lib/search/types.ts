@@ -5,7 +5,7 @@ export type QueryValue =
     | { type: 'date'; value: { from?: string; to?: string } }
     | { type: 'empty' }
     | { type: 'not_empty' }
-    | { type: 'variable'; name: string; key?: string; mode: 'ANY' | 'ALL' };
+    | { type: 'variable'; name: string; key?: string; mode: 'ANY' | 'ALL' | 'ONE' };
 
 export type ColumnSelector = {
     table: string;
@@ -26,9 +26,11 @@ export type Aggregation = 'COUNT' | 'UNIQUE' | 'FIRST' | 'LAST';
 
 export type Assignment = {
     name: string;
+    targetKey?: string;
     query: ExpressionNode;
     asColumn?: string; // legacy single-column support
     asColumns?: string[]; // preferred multi-column support
+    asAll?: boolean; // AS *
     aggregation?: Aggregation;
 };
 
@@ -37,6 +39,7 @@ export type Statement = Assignment | {
     expr: ExpressionNode;
     asColumn?: string; // legacy single-column support
     asColumns?: string[]; // preferred multi-column support
+    asAll?: boolean; // AS *
     aggregation?: Aggregation
 };
 
@@ -53,6 +56,7 @@ export type ExecutionContext = {
     variables: Record<string, VariableValue>;
     allowedTables?: string[];
     relationChecks?: WeakMap<WhereNode, (record: Record<string, any>) => boolean>;
+    loop?: { variable: string; value: any; index: number };
 };
 
 export type ParsedQuery = {

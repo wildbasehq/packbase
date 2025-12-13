@@ -30,7 +30,7 @@ import {ChevronDownIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIc
 import {FaceSmileIcon} from '@heroicons/react/16/solid'
 import {SiDiscord} from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
-import {SignedIn, useSession} from '@clerk/clerk-react'
+import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
 import {cn, isVisible, WorkerSpinner} from '@/lib'
 import useWindowSize from '@/lib/hooks/use-window-size.ts'
 import ResizablePanel from '@/components/shared/resizable'
@@ -47,6 +47,7 @@ import TextTicker from "@/components/shared/text-ticker.tsx";
 import {SupportHeadIcon} from "@/components/icons/plump/suppot-head.tsx";
 import {EllipsisHorizontalIcon} from "@heroicons/react/24/solid";
 import PackSettingsDropdown from "@/components/pack/settings-dropdown.tsx";
+import {TbFaceId} from "react-icons/tb";
 
 const NavbarItems = [
     {
@@ -155,7 +156,10 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     <Navbar>
                         <NavbarItem
                             className="flex w-full md:w-2xs h-8 [&>*]:w-full"
-                            onClick={() => setIsWHOpen(!isWHOpen)}
+                            onClick={() => {
+                                if (!isSignedIn) return
+                                setIsWHOpen(!isWHOpen)
+                            }}
                         >
                             <Activity mode={isVisible(currentResource.standalone)}>
                                 <Activity mode={isVisible(isSignedIn)}>
@@ -203,12 +207,14 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                             <ChevronDownIcon/>
                         </NavbarItem>
 
-                        <Dropdown>
-                            <DropdownButton as={NavbarItem} aria-label="More options">
-                                <EllipsisHorizontalIcon/>
-                            </DropdownButton>
-                            <PackSettingsDropdown/>
-                        </Dropdown>
+                        <SignedIn>
+                            <Dropdown>
+                                <DropdownButton as={NavbarItem} aria-label="More options">
+                                    <EllipsisHorizontalIcon/>
+                                </DropdownButton>
+                                <PackSettingsDropdown/>
+                            </Dropdown>
+                        </SignedIn>
 
                         <Desktop>
                             <NavbarDivider/>
@@ -271,6 +277,12 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                             </NavbarSection>
                         </Desktop>
 
+                        <SignedOut>
+                            <NavbarDivider/>
+                            <NavbarItem href="/id/login" current={location.startsWith('/id/login')} aria-label="Login">
+                                <TbFaceId data-slot="icon"/>
+                            </NavbarItem>
+                        </SignedOut>
                         <SignedIn>
                             <Desktop>
                                 <AlignLeft className="w-7 h-7 fill-indigo-600"

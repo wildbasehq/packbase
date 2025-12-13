@@ -15,10 +15,14 @@ const parseAggregation = (segment: string): { aggregation?: Aggregation; rest: s
     return {rest: segment};
 };
 
-const parseAsColumn = (segment: string): { asColumn?: string; asColumns?: string[]; rest: string } => {
-    const match = segment.match(/^AS\s+([A-Za-z0-9_\.]+(?:\s*,\s*[A-Za-z0-9_\.]+)*)\s*/i);
+const parseAsColumn = (segment: string): { asColumn?: string; asColumns?: string[]; asAll?: boolean; rest: string } => {
+    const match = segment.match(/^AS\s+([A-Za-z0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*/i);
     if (match) {
-        const columns = match[1].split(',').map((c) => c.trim()).filter(Boolean);
+        const raw = match[1].trim();
+        if (raw === '*') {
+            return {asAll: true, rest: segment.slice(match[0].length)};
+        }
+        const columns = raw.split(',').map((c) => c.trim()).filter(Boolean);
         return {
             asColumn: columns.length === 1 ? columns[0] : undefined,
             asColumns: columns.length > 1 ? columns : undefined,
@@ -28,10 +32,10 @@ const parseAsColumn = (segment: string): { asColumn?: string; asColumns?: string
     return {rest: segment};
 };
 
-const parseVariableAssignment = (input: string): { name: string; inner: string } | null => {
-    const match = input.match(/^\$([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(\[.*)$/s);
+const parseVariableAssignment = (input: string): { name: string; targetKey?: string; inner: string } | null => {
+    const match = input.match(/^\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_]+))?\s*=\s*(\[.*)$/s);
     if (!match) return null;
-    return {name: match[1], inner: match[2]};
+    return {name: match[1], targetKey: match[2], inner: match[3]};
 };
 
 const splitPipeline = (input: string): string[] => {
@@ -64,7 +68,7 @@ const parseValue = (raw: string): QueryValue => {
     if (/^\(\s*EMPTY\s*\)$/i.test(trimmed)) return {type: 'empty'};
     if (/^\(\s*NOT\s+EMPTY\s*\)$/i.test(trimmed)) return {type: 'not_empty'};
 
-    const variableMatch = trimmed.match(/^\(\s*\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_\.]+))?\s*->\s*(ANY|ALL)\s*\)$/i);
+    const variableMatch = trimmed.match(/^\(\s*\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_\.]+))?\s*->\s*(ANY|ALL|ONE)\s*\)$/i);
     if (variableMatch) {
         return {
             type: 'variable',
@@ -200,6 +204,7 @@ export const parseQuery = (input: string): ParsedQuery => {
     for (const raw of segments) {
         const assign = parseVariableAssignment(raw);
         const targetName = assign?.name;
+        const targetKey = assign?.targetKey;
         const body = assign ? assign.inner : raw;
         const pipelineParts = splitPipeline(body);
         if (!pipelineParts.length) continue;
@@ -209,30 +214,43 @@ export const parseQuery = (input: string): ParsedQuery => {
             let trailingAs: string | undefined;
             let trailingAsColumns: string[] | undefined;
             let trimmedPart = part;
-            const trailingMatch = trimmedPart.match(/^(.*\])\s+AS\s+([A-Za-z0-9_\.]+(?:\s*,\s*[A-Za-z0-9_\.]+)*)\s*$/i);
+            const trailingMatch = trimmedPart.match(/^(.*\])\s+AS\s+([A-Za-z0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*$/i);
             if (trailingMatch) {
                 trimmedPart = trailingMatch[1];
-                const cols = trailingMatch[2].split(',').map((c) => c.trim()).filter(Boolean);
-                trailingAs = cols.length === 1 ? cols[0] : undefined;
-                trailingAsColumns = cols.length > 1 ? cols : undefined;
+                const raw = trailingMatch[2].trim();
+                if (raw === '*') {
+                    trailingAs = undefined;
+                    trailingAsColumns = ['*'];
+                } else {
+                    const cols = raw.split(',').map((c) => c.trim()).filter(Boolean);
+                    trailingAs = cols.length === 1 ? cols[0] : undefined;
+                    trailingAsColumns = cols.length > 1 ? cols : undefined;
+                }
             }
 
             let remaining = trimOuterBrackets(trimmedPart); // inner content
 
             const {aggregation, rest: aggRest} = parseAggregation(remaining);
             remaining = aggRest;
-            const {asColumn: leadingAs, asColumns: leadingAsColumns, rest} = parseAsColumn(remaining);
+            const {
+                asColumn: leadingAs,
+                asColumns: leadingAsColumns,
+                asAll: leadingAsAll,
+                rest
+            } = parseAsColumn(remaining);
             const asColumn = leadingAs || trailingAs;
-            const asColumns = leadingAsColumns || trailingAsColumns;
+            let asColumns = leadingAsColumns || trailingAsColumns;
+            const asAll = leadingAsAll || (asColumns?.[0] === '*' ? true : undefined);
+            if (asAll) asColumns = undefined;
             remaining = rest;
 
             const expr = parseExpression(remaining.trim());
 
             const isLast = idx === pipelineParts.length - 1;
             if (targetName && isLast) {
-                statements.push({name: targetName, query: expr, asColumn, asColumns, aggregation});
+                statements.push({name: targetName, targetKey, query: expr, asColumn, asColumns, asAll, aggregation});
             } else {
-                statements.push({type: 'expression', expr, asColumn, asColumns, aggregation});
+                statements.push({type: 'expression', expr, asColumn, asColumns, asAll, aggregation});
             }
         });
     }

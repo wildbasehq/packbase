@@ -55,7 +55,15 @@ to extend or modify it safely.
 6. **Variables**: Stored with metadata `{ values, column?, columns?, ids?, table? }`. `_prev` mirrors the last
    statement.
 7. **Errors**: Parser/executor throw descriptive errors; route wraps as `{ error: 'INVALID_QUERY', message }` with HTTP
-   400.
+    400.
+
+### Enriching variable objects with nested assignments
+
+- Assign into an existing variable’s objects by suffixing the variable name with a key during assignment:
+  `$posts:user = [Where profiles:id ($posts:user_id->ONE)] AS *;`
+    - The executor loops each element of `$posts`, binds `->ONE` to that element, runs the query, and stores the first
+      matching result under `user` for each object.
+    - `->ONE` requires loop context; using it without being inside such an assignment will throw.
 
 ## Extending the DSL
 

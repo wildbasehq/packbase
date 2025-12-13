@@ -44,6 +44,8 @@ const scalarToColumnType = (field: Prisma.DMMF.Field): ColumnType | undefined =>
             return isList ? 'number_array' : 'number';
         case 'BigInt':
             return 'bigint';
+        case 'Uuid':
+            return 'uuid';
         case 'Boolean':
             return 'boolean';
         case 'DateTime':

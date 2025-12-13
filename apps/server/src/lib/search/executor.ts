@@ -1,6 +1,7 @@
 import prisma from '@/db/prisma';
 import {ExecutionContext, ExpressionNode, QueryValue, Statement, VariableValue, WhereNode} from './types';
 import {getColumn, getDefaultIdColumn, Relations, Schemas} from './schema';
+import {ensureAllColumnsAllowed, ensureColumnsWhitelisted, ensureTableWhitelisted} from './whitelist';
 
 type Predicate = (record: Record<string, any>) => boolean;
 
@@ -39,6 +40,18 @@ const buildValuePredicate = (value: QueryValue, ctx: ExecutionContext, columnNam
         case 'variable': {
             const variable = ctx.variables[value.name];
             if (!variable) return () => false;
+
+            // ONE mode binds to the current loop iteration for this variable
+            if (value.mode === 'ONE') {
+                if (!ctx.loop || ctx.loop.variable !== value.name) {
+                    throw new Error(`Variable ${value.name} with ONE requires loop context`);
+                }
+                const current = ctx.loop.value;
+                const keyVal = value.key
+                    ? (current && typeof current === 'object' && !Array.isArray(current) ? current[value.key] : undefined)
+                    : current;
+                return (v: any) => v === keyVal;
+            }
 
             // If variable values are objects, require a key to be specified
             const sample = variable.values?.[0];
@@ -199,6 +212,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     // Determine table from first atom encountered
     const table = findTable(expr);
     if (!table) throw new Error('Unable to infer table from query');
+    ensureTableWhitelisted(table);
     if (ctx.allowedTables && !ctx.allowedTables.includes(table)) {
         throw new Error('Table not allowed');
     }
@@ -206,7 +220,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     const idColumn = stmt.asColumn || stmt.asColumns?.[0] || getDefaultIdColumn(table)?.name || 'id';
     const neededColumns = new Set<string>([idColumn]);
     if (stmt.asColumns?.length) stmt.asColumns.forEach((c) => neededColumns.add(c));
-    const selectAll = needsAllColumns(expr);
+    let selectAll = stmt.asAll || needsAllColumns(expr);
     gatherColumns(expr, neededColumns);
 
     const relationNodes = collectRelationNodes(expr);
@@ -220,9 +234,12 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     }
 
     if (selectAll) {
+        ensureAllColumnsAllowed(table);
         const schema = Schemas[table];
         if (!schema) throw new Error(`Unknown schema for table ${table}`);
         Object.keys(schema.columns).forEach((c) => neededColumns.add(c));
+    } else {
+        ensureColumnsWhitelisted(table, Array.from(neededColumns));
     }
 
     // Select only required columns to reduce payload
@@ -232,44 +249,75 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     if (relationNodes.length) {
         ctx.relationChecks = await buildRelationResolvers(relationNodes, rows);
     }
+    const shapeResults = (subset: any[]): any[] => {
+        let values: any[];
+        if (stmt.asAll) {
+            values = subset.map((r: any) => ({...r}));
+        } else if (stmt.asColumns?.length) {
+            values = subset.map((r: any) => Object.fromEntries(stmt.asColumns!.map((c) => [c, r[c]])));
+        } else {
+            values = subset.map((r: any) => r[idColumn]);
+            if (stmt.asColumn && stmt.asColumn !== idColumn) {
+                values = subset.map((r: any) => r[stmt.asColumn!]);
+            }
+        }
+
+        if (stmt.aggregation) {
+            switch (stmt.aggregation) {
+                case 'COUNT':
+                    values = [subset.length];
+                    break;
+                case 'UNIQUE':
+                    values = Array.from(new Set(values));
+                    break;
+                case 'FIRST':
+                    values = values.length ? [values[0]] : [];
+                    break;
+                case 'LAST':
+                    values = values.length ? [values[values.length - 1]] : [];
+                    break;
+            }
+        }
+        return values;
+    };
+
+    if ('name' in stmt && stmt.targetKey) {
+        const parent = ctx.variables[stmt.name];
+        if (!parent) throw new Error(`Variable ${stmt.name} not found for assignment`);
+        if (!Array.isArray(parent.values)) throw new Error(`Variable ${stmt.name} is not an array and cannot be extended`);
+
+        const mergedValues = parent.values.map((v: any, idx: number) => {
+            ctx.loop = {variable: stmt.name, value: v, index: idx};
+            const predicate = buildWherePredicate(expr, ctx);
+            const filtered = rows.filter((r: any) => predicate(r));
+            const values = shapeResults(filtered);
+            const child = values.length ? values[0] : undefined;
+            const base = v && typeof v === 'object' && !Array.isArray(v) ? {...v} : {value: v};
+            base[stmt.targetKey!] = child;
+            return base;
+        });
+        ctx.loop = undefined;
+
+        parent.values = mergedValues;
+        ctx.variables[stmt.name] = parent;
+        ctx.variables['_prev'] = parent;
+        return {name: stmt.name, values: parent.values};
+    }
+
     const predicate = buildWherePredicate(expr, ctx);
     const filtered = rows.filter((r: any) => predicate(r));
+    const resultValues = shapeResults(filtered);
 
-    let resultValues: any[];
-    if (stmt.asColumns?.length) {
-        resultValues = filtered.map((r: any) => Object.fromEntries(stmt.asColumns!.map((c) => [c, r[c]])));
-    } else {
-        resultValues = filtered.map((r: any) => r[idColumn]);
-        if (stmt.asColumn && stmt.asColumn !== idColumn) {
-            resultValues = filtered.map((r: any) => r[stmt.asColumn!]);
-        }
-    }
-
-    if (stmt.aggregation) {
-        switch (stmt.aggregation) {
-            case 'COUNT':
-                resultValues = [filtered.length];
-                break;
-            case 'UNIQUE':
-                resultValues = Array.from(new Set(resultValues));
-                break;
-            case 'FIRST':
-                resultValues = resultValues.length ? [resultValues[0]] : [];
-                break;
-            case 'LAST':
-                resultValues = resultValues.length ? [resultValues[resultValues.length - 1]] : [];
-                break;
-        }
-    }
-
-    const columnMeta = stmt.asColumns?.length
+    const columnMeta = stmt.asColumns?.length || stmt.asAll
         ? undefined
         : getColumn(table, stmt.asColumn || idColumn);
     const variableValue: VariableValue = {
         values: resultValues,
         column: columnMeta,
-        columns: stmt.asColumns?.map((c) => getColumn(table, c)).filter(Boolean) as any,
-        ids: stmt.asColumns?.length ? filtered.map((r: any) => r[idColumn]) : undefined,
+        columns: stmt.asAll
+            ? Object.values(Schemas[table]?.columns ?? {}) as any
+            : stmt.asColumns?.map((c) => getColumn(table, c)).filter(Boolean) as any,
+        ids: stmt.asAll || stmt.asColumns?.length ? filtered.map((r: any) => r[idColumn]) : undefined,
         table
     };
 
@@ -300,5 +348,11 @@ export const executeQuery = async (statements: Statement[], allowedTables?: stri
         const res = await runStatement(stmt, ctx);
         results.push(res);
     }
-    return {results, variables: ctx.variables};
+    const returnObj = {
+        variables: ctx.variables
+    };
+
+    const result = results[results.length - 1];
+    returnObj[result.name || 'result'] = result.values;
+    return returnObj;
 };

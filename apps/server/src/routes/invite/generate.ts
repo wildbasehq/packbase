@@ -1,49 +1,44 @@
 // Allow a user to generate codes as long as they pass a quick ECG test.
 
-import { t } from 'elysia';
-import { YapockType } from '@/index';
-import { ErrorTypebox } from '@/utils/errors';
-import { HTTPError } from '@/lib/HTTPError';
+import {t} from 'elysia';
+import {YapockType} from '@/index';
+import {ErrorTypebox} from '@/utils/errors';
+import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import clerkClient from '@/db/auth';
-import { Invitation } from '@clerk/backend';
+import {Invitation} from '@clerk/backend';
 import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ set, body, user, logAudit }) => {
-            if (!process.env.PACKBASE_WAITLIST) {
-                set.status = 404;
-                return;
-            }
-
-            await requiresToken({ set, user });
+        async ({set, body, user, logAudit}) => {
+            await requiresToken({set, user});
 
             let is_admin = user.sessionClaims?.roles?.includes('admin');
 
             if (!is_admin) {
                 let points = 0;
                 const posts = await prisma.posts.findMany({
-                    where: { user_id: user.sub },
-                    select: { id: true },
+                    where: {user_id: user.sub},
+                    select: {id: true},
                 });
                 if (!posts) {
                     set.status = 403;
-                    throw HTTPError.forbidden({ summary: 'Not enough points' });
+                    throw HTTPError.forbidden({summary: 'Not enough points'});
                 }
 
                 let postPointWeight = 0.3;
                 points += posts.length * postPointWeight;
 
                 const invites = await prisma.profiles.findMany({
-                    where: { invited_by: user.sub },
-                    select: { id: true },
+                    where: {invited_by: user.sub},
+                    select: {id: true},
                 });
 
                 if (invites && invites.length >= 100) {
                     set.status = 403;
-                    throw HTTPError.forbidden({ summary: 'Too many invited people' });
+                    throw HTTPError.forbidden({summary: 'Too many invited people'});
                 }
 
                 let invitePointWeight = 0.7;
@@ -56,7 +51,7 @@ export default (app: YapockType) =>
 
                 if (process.env.PACKBASE_WAITLIST_POINTS && points < parseInt(process.env.PACKBASE_WAITLIST_POINTS)) {
                     set.status = 403;
-                    throw HTTPError.forbidden({ summary: 'Not enough points' });
+                    throw HTTPError.forbidden({summary: 'Not enough points'});
                 }
             }
 
@@ -66,7 +61,7 @@ export default (app: YapockType) =>
 
             if (invited.data.length > 0) {
                 set.status = 403;
-                throw HTTPError.forbidden({ summary: 'Email already invited' });
+                throw HTTPError.forbidden({summary: 'Email already invited'});
             }
 
             let inviteCreated: Invitation | undefined = undefined;
@@ -78,7 +73,7 @@ export default (app: YapockType) =>
 
                 if (!inviteCreated) {
                     set.status = 500;
-                    throw HTTPError.serverError({ summary: 'Failed to create invite' });
+                    throw HTTPError.serverError({summary: 'Failed to create invite'});
                 }
 
                 // Add to invite table
@@ -94,7 +89,7 @@ export default (app: YapockType) =>
             } catch (createError) {
                 set.status = 500;
                 console.log(createError);
-                throw HTTPError.serverError({ summary: 'Failed to create invite' });
+                throw HTTPError.serverError({summary: 'Failed to create invite'});
             }
 
             logAudit({
@@ -120,7 +115,7 @@ export default (app: YapockType) =>
             body: t.Optional(
                 t.Object({
                     invite_type: t.Optional(t.String()),
-                    for: t.Optional(t.String({ description: 'The user ID to generate the invite for.' })),
+                    for: t.Optional(t.String({description: 'The user ID to generate the invite for.'})),
                     email: t.String({
                         description: 'The email address to generate the invite for.',
                     }),

@@ -1,22 +1,22 @@
-import { YapockType } from '@/index';
-import { t } from 'elysia';
-import { UserProfile } from '@/models/defs';
-import posthog, { distinctId } from '@/utils/posthog';
-import { HTTPError } from '@/lib/HTTPError';
+import {YapockType} from '@/index';
+import {t} from 'elysia';
+import {UserProfile} from '@/models/defs';
+import posthog, {distinctId} from '@/utils/posthog';
+import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import clerkClient from '@/db/auth';
 
 export const UserCache = new Map<
     string,
     typeof UserProfile & {
-        expires_after: number;
-    }
+    expires_after: number;
+}
 >();
 
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({ params, user, set }) => {
+        async ({params, user, set}) => {
             const userRes = await getUser({
                 by: 'username',
                 value: params.username,
@@ -49,7 +49,7 @@ export default (app: YapockType) =>
         },
     );
 
-export async function getUser({ by, value, user, scope }: { by: string; value: string; user?: any; scope?: string }) {
+export async function getUser({by, value, user, scope}: { by: string; value: string; user?: any; scope?: string }) {
     const timer = new Date().getTime();
     // let cached: typeof UserProfile & { expires_after: number } | undefined
     //
@@ -66,7 +66,7 @@ export async function getUser({ by, value, user, scope }: { by: string; value: s
 
     try {
         // Create a dynamic where condition based on the 'by' parameter
-        const whereCondition = { [by]: value };
+        const whereCondition = {[by]: value};
 
         if (by === 'username') {
             const userFind = await clerkClient.users.getUserList({
@@ -82,13 +82,13 @@ export async function getUser({ by, value, user, scope }: { by: string; value: s
             where: whereCondition,
             ...(scope === 'basic'
                 ? {
-                      select: {
-                          id: true,
-                          owner_id: true,
-                          display_name: true,
-                          bio: true,
-                      },
-                  }
+                    select: {
+                        id: true,
+                        owner_id: true,
+                        display_name: true,
+                        bio: true,
+                    },
+                }
                 : {}),
         });
 
@@ -123,7 +123,7 @@ export async function getUser({ by, value, user, scope }: { by: string; value: s
     delete data.bio;
 
     data.images = {
-        avatar: clerkUser.imageUrl || null,
+        avatar: `${process.env.HOSTNAME}/user/${data.id}/avatar`,
         header: data.images_header,
     };
 

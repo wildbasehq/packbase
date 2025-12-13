@@ -19,6 +19,7 @@ import {toast} from "sonner";
 import {LoadingSpinner, MediaGallery} from "@/src/components";
 import {useCountdown, useCounter} from "usehooks-ts";
 import {AnimatePresence, motion, useAnimation} from "motion/react";
+import {getAvatar} from "@/lib/api/get-avatar.ts";
 
 type SetPackFunction = (pack: { id: string, slug: string, display_name: string, description?: string }) => void
 const MemoBackground = memo(SkewedCardGridBackground);
@@ -41,12 +42,11 @@ export default function DefaultPackSunset() {
 
                 vg.search.get({
                     query: {
-                        page,
-                        q: `[Where posts:user_id ("${user.id}")]`
+                        q: `$posts = [Where posts:user_id ("${user.id}") AND posts:tenant_id ("00000000-0000-0000-0000-000000000000")] AS *;\n$posts:user = [Where profiles:id ($posts:user_id->ONE)] AS *;`
                     }
                 }).then(({data: response}) => {
                     setLoading(false)
-                    const posts = response?.data?.posts.filter(post => post.pack.id === "00000000-0000-0000-0000-000000000000")
+                    const posts = response?.posts?.filter(post => post.tenant_id === "00000000-0000-0000-0000-000000000000")
                     setPostsBG([...Array(Math.max(25, posts?.length || 0)).keys()].map(i => posts?.[i % (posts?.length || 1)]))
                 })
             }, 500)
@@ -75,8 +75,7 @@ export default function DefaultPackSunset() {
             </Activity>
 
             <div
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full bg-[radial-gradient(var(--background)_15%,transparent_100%)] -z-[1]"/>
-
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(var(--background)_15%,transparent_100%)] -z-[1]"/>
 
             <div
                 className="max-w-md space-y-8 overflow-x-hidden overflow-y-auto px-2 py-8 rounded-4xl">
@@ -558,6 +557,7 @@ function SkewedCardGridBackground({posts, exit}: {
         id: string
         body: string
         user: {
+            id: string
             username: string
             images?: {
                 avatar?: string
@@ -599,7 +599,7 @@ function SkewedCardGridBackground({posts, exit}: {
                                             x: row % 2 === 0 ? 0 : 250,
                                             transition: {
                                                 duration: 3,
-                                                delay: row % 2 === 0 ? (15 - i) * 0.25 : i * 0.25,
+                                                delay: row % 2 === 0 ? (15 - i) * 0.15 : i * 0.15,
                                                 ease: "easeInOut"
                                             }
                                         },
@@ -620,7 +620,7 @@ function SkewedCardGridBackground({posts, exit}: {
                                     {(post && post.user) && (
                                         <>
                                             <div className="flex items-center gap-2 mb-2">
-                                                <Avatar src={post.user.images?.avatar} initials={post.user.username[0]}
+                                                <Avatar src={getAvatar(post.user.id)} initials={post.user.username[0]}
                                                         className="size-6 shrink-0"/>
                                                 <Text className="font-bold truncate text-xs">
                                                     {post.user.username}
@@ -650,6 +650,7 @@ function CardMarquee({posts}: {
         id: string
         body: string
         user: {
+            id: string
             username: string
             images?: {
                 avatar?: string
@@ -706,7 +707,7 @@ function CardMarquee({posts}: {
                         {(post && post.user) && (
                             <>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <Avatar src={post.user.images?.avatar} initials={post.user.username[0]}
+                                    <Avatar src={getAvatar(post.user.id)} initials={post.user.username[0]}
                                             className="size-6 shrink-0"/>
                                     <Text className="font-bold truncate text-xs">
                                         {post.user.username}

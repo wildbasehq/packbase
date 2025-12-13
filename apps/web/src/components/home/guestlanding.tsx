@@ -422,7 +422,7 @@ function FeaturePromiseGrid() {
         {
             icon: 'GlobeAltIcon',
             title: 'Transparent & Open',
-            description: "By the end of private alpha, we'll make our spending and income public, plus open-source key components.",
+            description: "By the end of the alpha, we'll make our spending and income public, plus open-source key components.",
         },
         {
             icon: 'HeartIcon',

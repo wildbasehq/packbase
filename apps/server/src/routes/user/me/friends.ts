@@ -1,31 +1,31 @@
-import { YapockType } from '@/index';
-import { t } from 'elysia';
+import {YapockType} from '@/index';
+import {t} from 'elysia';
 import clerkClient from '@/db/auth';
 import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({ set, user }) => {
-            await requiresToken({ set, user });
+        async ({set, user}) => {
+            await requiresToken({set, user});
 
             // Raw SQL query for optimal performance; using prisma on a large dataset is pretty slow
             let friends = (await prisma.$queryRaw`
-                    SELECT DISTINCT p.id,
-                                    p.username,
-                                    p.display_name,
-                                    p.owner_id,
-                                    p.last_online,
-                                    COALESCE(p.last_online, '1970-01-01') AS last_online_sort,
-                                    p.display_name                        AS display_name_sort
-                    FROM profiles p
-                             INNER JOIN "profiles.followers" f1 ON p.id = f1.following_id
-                             INNER JOIN "profiles.followers" f2 ON p.id = f2.user_id
-                    WHERE f1.user_id = ${user.sub}::uuid
+                SELECT DISTINCT p.id,
+                                p.username,
+                                p.display_name,
+                                p.owner_id,
+                                p.last_online,
+                                COALESCE(p.last_online, '1970-01-01') AS last_online_sort,
+                                p.display_name                        AS display_name_sort
+                FROM profiles p
+                         INNER JOIN "profiles.followers" f1 ON p.id = f1.following_id
+                         INNER JOIN "profiles.followers" f2 ON p.id = f2.user_id
+                WHERE f1.user_id = ${user.sub}::uuid
                     AND f2.following_id = ${user.sub}::uuid
-                    ORDER BY last_online_sort DESC, display_name_sort
-                        LIMIT 100
-                `) as Array<{
+                ORDER BY last_online_sort DESC, display_name_sort
+                    LIMIT 100
+            `) as Array<{
                 id: string;
                 username: string;
                 display_name: string | null;
@@ -45,7 +45,7 @@ export default (app: YapockType) =>
                         online?: boolean;
                         status?: string;
                     } = friend;
-                    if (clerkUser.imageUrl) user.images_avatar = clerkUser.imageUrl;
+                    user.images_avatar = `${process.env.HOSTNAME}/user/${friend.id}/avatar`;
                     if (clerkUser.username) user.username = clerkUser.username;
 
                     if (isOnline) {

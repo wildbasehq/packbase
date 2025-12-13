@@ -4,7 +4,6 @@ import {ErrorTypebox} from '@/utils/errors';
 import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import {NotificationManager} from '@/utils/NotificationManager';
-import {getUserClerkByID} from '@/utils/clerk';
 import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
@@ -81,7 +80,7 @@ export default (app: YapockType) =>
                     user: {
                         id: user.sub,
                         username: user.sessionClaims.nickname,
-                        images_avatar: (await getUserClerkByID(user.userId).then((user) => user?.imageUrl)) || null,
+                        images_avatar: `${process.env.HOSTNAME}/user/${user.sub}/avatar`
                     },
                 });
 

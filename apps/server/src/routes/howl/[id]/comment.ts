@@ -4,14 +4,13 @@ import {ErrorTypebox} from '@/utils/errors';
 import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import {NotificationManager} from '@/utils/NotificationManager';
-import {getUserClerkByID} from '@/utils/clerk';
 import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ params: { id }, body: { body }, set, user, error }) => {
-            await requiresToken({ set, user });
+        async ({params: {id}, body: {body}, set, user, error}) => {
+            await requiresToken({set, user});
 
             body = body.trim();
             if (body.length === 0) {
@@ -22,8 +21,8 @@ export default (app: YapockType) =>
             let postExists;
             try {
                 postExists = await prisma.posts.findUnique({
-                    where: { id },
-                    select: { user_id: true, id: true },
+                    where: {id},
+                    select: {user_id: true, id: true},
                 });
             } catch (postError) {
                 set.status = 500;
@@ -54,7 +53,7 @@ export default (app: YapockType) =>
                     user: {
                         id: user.sub,
                         username: user.sessionClaims.nickname,
-                        images_avatar: (await getUserClerkByID(user.userId).then((user) => user?.imageUrl)) || null,
+                        images_avatar: `${process.env.HOSTNAME}/user/${user.sub}/avatar`,
                     },
                 });
             } catch (insertError) {

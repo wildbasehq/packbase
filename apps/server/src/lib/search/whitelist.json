@@ -1,0 +1,11 @@
+{
+  "profiles": [
+    "ALLOW_ALL_COLUMNS"
+  ],
+  "posts": [
+    "ALLOW_ALL_COLUMNS"
+  ],
+  "packs": [
+    "ALLOW_ALL_COLUMNS"
+  ]
+}

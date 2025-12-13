@@ -1,5 +1,4 @@
 import prisma from '@/db/prisma';
-import getClerkAvatar from '@/utils/get-clerk-avatar';
 
 /**
  * BulkPostLoader - Efficiently loads multiple posts with a single query
@@ -93,7 +92,7 @@ export class BulkPostLoader {
                         bio: profile.bio,
                     },
                     images: {
-                        avatar: profile.images_avatar,
+                        avatar: `${process.env.HOSTNAME}/user/${profile.id}/avatar`,
                         header: profile.images_header,
                     },
                 };
@@ -169,7 +168,7 @@ export class BulkPostLoader {
                                 bio: userProfile.bio,
                             },
                             images: {
-                                avatar: userProfile.images_avatar,
+                                avatar: `${process.env.HOSTNAME}/user/${userProfile.id}/avatar`,
                                 header: userProfile.images_header,
                             },
                         };
@@ -247,8 +246,6 @@ export class BulkPostLoader {
                     ...profile,
                 };
 
-                const userAvatar = await getClerkAvatar(profile.owner_id);
-
                 // Metadata
                 const userBadges = await prisma.inventory.findFirst({
                     where: {
@@ -262,9 +259,7 @@ export class BulkPostLoader {
                     profileBuild.badge = userBadges.item_id;
                 }
 
-                if (userAvatar) {
-                    profileBuild.images_avatar = userAvatar;
-                }
+                profileBuild.images_avatar = `${process.env.HOSTNAME}/user/${profileBuild.id}/avatar`;
 
                 profilesMap[profile.id] = profileBuild;
             }
