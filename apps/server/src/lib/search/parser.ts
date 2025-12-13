@@ -1,12 +1,20 @@
 import {Aggregation, ColumnSelector, ExpressionNode, ParsedQuery, QueryValue, Statement, WhereNode} from './types';
 import {isValidTable} from './schema';
 
+/**
+ * Remove a single pair of outer square brackets if present while keeping inner whitespace.
+ * Used to normalize pipeline segments that are enclosed in [] for easier downstream parsing.
+ */
 const trimOuterBrackets = (input: string): string => {
     const trimmed = input.trim();
     if (trimmed.startsWith('[') && trimmed.endsWith(']')) return trimmed.slice(1, -1).trim();
     return trimmed;
 };
 
+/**
+ * Parse an aggregation prefix at the start of a segment, e.g. `COUNT()`.
+ * Returns the aggregation token (upper-cased) and the remaining unparsed segment.
+ */
 const parseAggregation = (segment: string): { aggregation?: Aggregation; rest: string } => {
     const aggMatch = segment.match(/^(COUNT|UNIQUE|FIRST|LAST)\(\)\s*/i);
     if (aggMatch) {
@@ -15,6 +23,10 @@ const parseAggregation = (segment: string): { aggregation?: Aggregation; rest: s
     return {rest: segment};
 };
 
+/**
+ * Parse an `AS` projection from a segment.
+ * Supports single column, comma-delimited columns, or `*` to project all columns.
+ */
 const parseAsColumn = (segment: string): { asColumn?: string; asColumns?: string[]; asAll?: boolean; rest: string } => {
     const match = segment.match(/^AS\s+([A-Za-z0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*/i);
     if (match) {
@@ -32,12 +44,20 @@ const parseAsColumn = (segment: string): { asColumn?: string; asColumns?: string
     return {rest: segment};
 };
 
+/**
+ * Detect a variable assignment of the form `$var[:target]=[ ... ]`.
+ * Returns the variable name, optional target key, and the raw inner query text to parse later.
+ */
 const parseVariableAssignment = (input: string): { name: string; targetKey?: string; inner: string } | null => {
     const match = input.match(/^\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_]+))?\s*=\s*(\[.*)$/s);
     if (!match) return null;
     return {name: match[1], targetKey: match[2], inner: match[3]};
 };
 
+/**
+ * Split a full query string into pipeline segments separated by top-level bracketed expressions.
+ * Maintains association between trailing `AS` clauses and the preceding bracketed block.
+ */
 const splitPipeline = (input: string): string[] => {
     const parts: string[] = [];
     let depth = 0;
@@ -63,6 +83,13 @@ const splitPipeline = (input: string): string[] => {
     return parts;
 };
 
+/**
+ * Parse the value portion of a WHERE atom. Supports
+ * - ("text"[:i|s]) with optional wildcards *prefix/suffix
+ * - ("from".."to") date ranges
+ * - (EMPTY) / (NOT EMPTY)
+ * - ($var[:key] -> ANY|ALL|ONE) variable references
+ */
 const parseValue = (raw: string): QueryValue => {
     const trimmed = raw.trim();
     if (/^\(\s*EMPTY\s*\)$/i.test(trimmed)) return {type: 'empty'};
@@ -113,6 +140,10 @@ const parseColumnSelector = (segment: string): ColumnSelector => {
     return {table, columns: cols?.length ? cols : undefined};
 };
 
+/**
+ * Parse a relation hop of the form `Where A -> B` (forward) or `Where A <- B` (backward).
+ * Returns a relation node or null if the segment is not a relation clause.
+ */
 const parseRelation = (segment: string): WhereNode | null => {
     const relMatch = segment.match(/^Where\s+([A-Za-z0-9_]+)\s*(->|<-)\s*([A-Za-z0-9_]+)/i);
     if (relMatch) {
@@ -126,18 +157,29 @@ const parseRelation = (segment: string): WhereNode | null => {
     return null;
 };
 
+/**
+ * Parse a single atomic WHERE clause (either relation or basic column comparison).
+ * Normalizes missing leading `Where` keyword for more permissive syntax.
+ */
 const parseAtom = (segment: string): WhereNode => {
-    const relation = parseRelation(segment);
+    // Allow atoms that omit the leading "Where" by normalizing here
+    const normalized = /^Where\s+/i.test(segment.trim()) ? segment : `Where ${segment}`;
+
+    const relation = parseRelation(normalized);
     if (relation) return relation;
-    const valueMatch = segment.match(/\(.*\)$/s);
+    const valueMatch = normalized.match(/\(.*\)$/s);
     if (!valueMatch) throw new Error(`Missing value in clause: ${segment}`);
     const valueStr = valueMatch[0];
-    const selectorStr = segment.slice(0, segment.length - valueStr.length).trim();
+    const selectorStr = normalized.slice(0, normalized.length - valueStr.length).trim();
     const selector = parseColumnSelector(selectorStr);
     const value = parseValue(valueStr);
     return {kind: 'basic', selector, value};
 };
 
+/**
+ * Split an expression string on top-level delimiters (AND/OR) while
+ * respecting bracket/parenthesis nesting to avoid splitting inside values.
+ */
 const splitTopLevel = (input: string, delimiters: string[]): string[] => {
     const parts: string[] = [];
     let current = '';
@@ -168,6 +210,10 @@ const splitTopLevel = (input: string, delimiters: string[]): string[] => {
     return parts;
 };
 
+/**
+ * Recursively parse boolean expressions with NOT/AND/OR precedence.
+ * Leaves terminals as ATOM nodes handled by `parseAtom`.
+ */
 const parseExpression = (segment: string): ExpressionNode => {
     // Handle NOT
     if (segment.toUpperCase().startsWith('NOT ')) {
@@ -198,6 +244,10 @@ const parseExpression = (segment: string): ExpressionNode => {
     return {op: 'ATOM', where: parseAtom(segment)};
 };
 
+/**
+ * Parse a full search query string into a sequence of statements.
+ * Supports semicolon-separated statements, pipeline segments, leading/trailing AS, and variable assignment.
+ */
 export const parseQuery = (input: string): ParsedQuery => {
     const statements: Statement[] = [];
     const segments = input.split(/;+/).map((s) => s.trim()).filter(Boolean);

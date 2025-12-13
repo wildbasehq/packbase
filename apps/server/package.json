@@ -20,7 +20,7 @@
   "dependencies": {
     "@ai-sdk/openai-compatible": "^1.0.15",
     "@aws-sdk/client-s3": "^3.848.0",
-    "@clerk/backend": "^1.32.2",
+    "@clerk/backend": "^2.27.0",
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/swagger": "^1.1.5",
     "@faker-js/faker": "^10.1.0",

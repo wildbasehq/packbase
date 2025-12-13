@@ -61,7 +61,7 @@ export * from './user/header'
 export * from './user/info-col'
 
 // API
-export * from './content-frame'
+export * from '@/lib/hooks/content-frame.tsx'
 
 // Frames
 export * from './frames'

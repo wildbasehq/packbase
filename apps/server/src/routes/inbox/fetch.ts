@@ -1,13 +1,13 @@
-import { YapockType } from '@/index';
-import { t } from 'elysia';
-import { NotificationFetchQuery, NotificationType, Pagination } from '@/models/defs';
-import { NotificationManager } from '@/utils/NotificationManager';
-import { HTTPError } from '@/lib/HTTPError';
+import {YapockType} from '@/index';
+import {t} from 'elysia';
+import {NotificationFetchQuery, NotificationType, Pagination} from '@/models/defs';
+import {NotificationManager} from '@/lib/NotificationManager';
+import {HTTPError} from '@/lib/HTTPError';
 
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({ query, user, set }) => {
+        async ({query, user, set}) => {
             if (!user) {
                 set.status = 401;
                 throw HTTPError.unauthorized({
@@ -15,7 +15,7 @@ export default (app: YapockType) =>
                 });
             }
 
-            const { limit = 20, cursor, unread_only = false } = query;
+            const {limit = 20, cursor, unread_only = false} = query;
 
             try {
                 const result = await NotificationManager.getUserNotifications(user.sub, limit as number, cursor, !!unread_only);

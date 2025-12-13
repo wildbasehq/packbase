@@ -5,7 +5,7 @@
 import React, {Activity, useMemo, useState} from 'react'
 import {Heading, Text} from '@/components/shared/text'
 import {PencilSquareIcon, PlusIcon, TrashIcon} from '@heroicons/react/24/solid'
-import {useContentFrame, useContentFrameMutation} from '@/components/shared/content-frame'
+import {useContentFrame, useContentFrameMutation} from '@/lib/hooks/content-frame.tsx'
 import {isVisible, useUserAccountStore} from '@/lib'
 import {Input} from '@/components/shared/input'
 import {Button} from '@/components/shared/button'
@@ -204,7 +204,7 @@ export default function UserFolders({user: folderUser}: { user: { id: string; us
 
     const onCreate = async (input: Partial<Folder>) => {
         if (input.mode === 'dynamic' && input.query && !input.query.startsWith('[')) {
-            input.query = `[tag ${input.query}] ${user.id}`
+            input.query = `[Where posts:tags (${input.query}) AND posts:user_id ("${user.id}")]`
         }
 
         await createMutation.mutateAsync(input)

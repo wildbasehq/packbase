@@ -7,7 +7,7 @@ import {isVisible, useResourceStore, useUIStore, useUserAccountStore} from '@/li
 import {Activity, ReactNode, useEffect, useState} from 'react'
 import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
 import {LogoSpinner} from '@/src/components'
-import {useContentFrame} from '@/components/shared/content-frame'
+import {useContentFrame} from '@/lib/hooks/content-frame.tsx'
 import NUEModal, {createNUEFlow} from '@/components/seen-once/nue-modal'
 import {toast} from 'sonner'
 

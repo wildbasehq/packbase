@@ -1,13 +1,13 @@
-import { YapockType } from '@/index';
-import { t } from 'elysia';
-import { NotificationReadBody } from '@/models/defs';
-import { NotificationManager } from '@/utils/NotificationManager';
-import { HTTPError } from '@/lib/HTTPError';
+import {YapockType} from '@/index';
+import {t} from 'elysia';
+import {NotificationReadBody} from '@/models/defs';
+import {NotificationManager} from '@/lib/NotificationManager';
+import {HTTPError} from '@/lib/HTTPError';
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ body, user, set }) => {
+        async ({body, user, set}) => {
             if (!user) {
                 set.status = 401;
                 throw HTTPError.unauthorized({
@@ -15,7 +15,7 @@ export default (app: YapockType) =>
                 });
             }
 
-            const { id, ids, all } = body;
+            const {id, ids, all} = body;
 
             // Validate that at least one option is provided
             if (!id && !ids && !all) {

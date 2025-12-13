@@ -1,5 +1,5 @@
 import prisma from '@/db/prisma';
-import trinketManager, {toParentId} from '@/utils/trinket-manager';
+import trinketManager, {toParentId} from '@/lib/trinket-manager';
 import {HTTPError} from '@/lib/HTTPError';
 import Items from '@/lib/store/items.json';
 import debug from "debug";

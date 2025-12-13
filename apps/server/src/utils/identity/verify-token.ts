@@ -1,7 +1,7 @@
 import clerkClient from '@/db/auth';
 import prisma from '@/db/prisma';
-import trinketManager, {toParentId} from './trinket-manager';
-import {NotificationManager} from './NotificationManager';
+import trinketManager, {toParentId} from '../../lib/trinket-manager';
+import {NotificationManager} from '../../lib/NotificationManager';
 import Debug from 'debug';
 
 const log = {
@@ -30,14 +30,27 @@ export default async function verifyToken(req: any) {
 
     try {
         const shadowReq = req.clone();
-        const authReq = await clerkClient.authenticateRequest(shadowReq, {
-            authorizedParties
-        });
 
-        if (authReq.isSignedIn) {
-            const user = authReq.toAuth();
-            userId = user.userId;
-            log.info(`Authenticated user: ${userId}`);
+        // If auth header starts with `ak_`, it's an API key
+        if (shadowReq.headers.authorization?.startsWith('Bearer ak_')) {
+            const apiKey = await clerkClient.apiKeys.verify(shadowReq.headers.authorization.replace('Bearer ', ''));
+
+            if (apiKey.revoked || apiKey.expired || !apiKey.subject.startsWith('user_')) {
+                throw new Error('Invalid API key');
+            }
+
+            userId = apiKey.subject
+            log.info(`Authenticated user via API Key: ${userId}`);
+        } else {
+            const authReq = await clerkClient.authenticateRequest(shadowReq, {
+                authorizedParties
+            });
+
+            if (authReq.isSignedIn) {
+                const user = authReq.toAuth();
+                userId = user.userId;
+                log.info(`Authenticated user: ${userId}`);
+            }
         }
     } catch (e) {
         log.error('Failed to authenticate request:', e);

@@ -29,7 +29,7 @@ const createApiCall = async (method: string, path: string, requestData?: any, to
         'Content-Type': 'application/json',
         Accept: 'application/json',
     }
-    if (token) headers['Authorization'] = `Bearer ${token}`
+    if (token) headers['Authorization'] = `${token}`
 
     const res = await fetch(`${API_URL}/${path.split('.').join('/')}`, {
         method: method.toUpperCase(),

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.31.4",
+    "@clerk/react": "^5.54.0",
     "@clerk/themes": "^2.2.46",
     "@elysiajs/eden": "^1.2.0",
     "@emoji-mart/data": "^1.2.1",

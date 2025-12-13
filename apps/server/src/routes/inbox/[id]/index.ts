@@ -1,13 +1,13 @@
-import { YapockType } from '@/index';
-import { t } from 'elysia';
-import { NotificationType } from '@/models/defs';
-import { NotificationManager } from '@/utils/NotificationManager';
-import { HTTPError } from '@/lib/HTTPError';
+import {YapockType} from '@/index';
+import {t} from 'elysia';
+import {NotificationType} from '@/models/defs';
+import {NotificationManager} from '@/lib/NotificationManager';
+import {HTTPError} from '@/lib/HTTPError';
 
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({ params, user, set }) => {
+        async ({params, user, set}) => {
             if (!user) {
                 set.status = 401;
                 throw HTTPError.unauthorized({

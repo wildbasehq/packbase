@@ -4,7 +4,7 @@
 
 import React, {Activity, useEffect, useState} from 'react'
 import {useParams} from 'wouter'
-import {useContentFrame} from '@/components/shared/content-frame'
+import {useContentFrame} from '@/lib/hooks/content-frame.tsx'
 import Body from '@/components/layout/body'
 import {Feed, FeedError, FeedList, FeedLoading} from '@/components/feed'
 import {Heading, Text} from '@/components/shared/text'

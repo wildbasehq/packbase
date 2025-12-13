@@ -4,7 +4,7 @@
 
 import {SidebarPortal} from '@/lib/context/sidebar-context.tsx'
 import {BadgeButton, Button, SidebarDivider, SidebarItem, SidebarLabel, SidebarSection} from '@/src/components'
-import ContentFrame, {useContentFrame, useContentFrameMutation} from '@/components/shared/content-frame.tsx'
+import ContentFrame, {useContentFrame, useContentFrameMutation} from '@/lib/hooks/content-frame.tsx'
 import {Avatar} from '@/components/shared/avatar.tsx'
 import {useLocation, useParams} from 'wouter'
 import {ReactNode, useEffect, useMemo} from 'react'

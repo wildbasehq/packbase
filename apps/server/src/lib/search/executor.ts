@@ -1,10 +1,17 @@
 import prisma from '@/db/prisma';
 import {ExecutionContext, ExpressionNode, QueryValue, Statement, VariableValue, WhereNode} from './types';
+import {makeCacheKey, withQueryCache} from './cache';
 import {getColumn, getDefaultIdColumn, Relations, Schemas} from './schema';
 import {ensureAllColumnsAllowed, ensureColumnsWhitelisted, ensureTableWhitelisted} from './whitelist';
 
+/**
+ * Predicate used to filter in-memory result sets produced by Prisma queries.
+ */
 type Predicate = (record: Record<string, any>) => boolean;
 
+/**
+ * Build a predicate for string matching with optional prefix/suffix wildcards and case sensitivity.
+ */
 const buildStringPredicate = (value: string, caseSensitive: boolean, prefix?: boolean, suffix?: boolean): Predicate => {
     return (recordValue: any) => {
         if (typeof recordValue !== 'string') return false;
@@ -16,6 +23,10 @@ const buildStringPredicate = (value: string, caseSensitive: boolean, prefix?: bo
     };
 };
 
+/**
+ * Build a predicate that checks whether a date value falls within a [from, to] range.
+ * Accepts any value coercible by `new Date()`; invalid dates cause the predicate to fail.
+ */
 const buildDatePredicate = (from?: string, to?: string): Predicate => {
     return (recordValue: any) => {
         if (!recordValue) return false;
@@ -27,6 +38,10 @@ const buildDatePredicate = (from?: string, to?: string): Predicate => {
     };
 };
 
+/**
+ * Convert a parsed query value into a runtime predicate, optionally aware of context variables.
+ * Handles string/dates, emptiness checks, and variable-based comparisons (ANY/ALL/ONE modes).
+ */
 const buildValuePredicate = (value: QueryValue, ctx: ExecutionContext, columnName?: string): Predicate => {
     switch (value.type) {
         case 'string':
@@ -77,6 +92,10 @@ const buildValuePredicate = (value: QueryValue, ctx: ExecutionContext, columnNam
     }
 };
 
+/**
+ * Recursively compile an expression tree into a predicate operating on a single record.
+ * Relation atoms delegate to relationChecks prepared earlier; unsupported groups always fail.
+ */
 const buildWherePredicate = (expr: ExpressionNode, ctx: ExecutionContext): Predicate => {
     switch (expr.op) {
         case 'ATOM': {
@@ -113,6 +132,9 @@ const buildWherePredicate = (expr: ExpressionNode, ctx: ExecutionContext): Predi
     }
 };
 
+/**
+ * Collect explicitly referenced column names in an expression tree into the accumulator.
+ */
 const gatherColumns = (expr: ExpressionNode, acc: Set<string>) => {
     if (expr.op === 'ATOM') {
         if (expr.where.kind === 'basic' && expr.where.selector.columns) {
@@ -126,6 +148,9 @@ const gatherColumns = (expr: ExpressionNode, acc: Set<string>) => {
     }
 };
 
+/**
+ * Determine if any atom in the expression requires all columns (no explicit column list).
+ */
 const needsAllColumns = (expr: ExpressionNode): boolean => {
     if (expr.op === 'ATOM') {
         if (expr.where.kind === 'basic' && !expr.where.selector.columns) return true;
@@ -135,6 +160,9 @@ const needsAllColumns = (expr: ExpressionNode): boolean => {
     return needsAllColumns(expr.left) || needsAllColumns(expr.right);
 };
 
+/**
+ * Extract all relation nodes from an expression tree to pre-build relation resolvers.
+ */
 const collectRelationNodes = (expr: ExpressionNode, acc: WhereNode[] = []): WhereNode[] => {
     if (expr.op === 'ATOM') {
         if (expr.where.kind === 'relation') acc.push(expr.where);
@@ -147,6 +175,77 @@ const collectRelationNodes = (expr: ExpressionNode, acc: WhereNode[] = []): Wher
     return acc;
 };
 
+/**
+ * Attempt to translate an expression tree into a Prisma `where` object for pushdown filtering.
+ * Only supports simple basic atoms on a single column; falls back to in-memory filtering otherwise.
+ */
+const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
+    switch (expr.op) {
+        case 'ATOM': {
+            const where = expr.where;
+            if (where.kind !== 'basic') return null;
+            if (!where.selector.columns || where.selector.columns.length !== 1) return null;
+            const column = where.selector.columns[0];
+            const value = where.value;
+            const columnMeta = table ? getColumn(table, column) : undefined;
+            const columnType = columnMeta?.type;
+
+            if (value.type === 'string') {
+                // Check if string looks like UUID
+                if (columnType === 'string' && value.value.length === 36 && value.value.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)) {
+                    return {[column]: value.value};
+                }
+
+                if (!value.prefix && !value.suffix && ['number', 'bigint', 'boolean', 'date'].includes(columnType || '')) {
+                    return {[column]: value.value};
+                }
+
+                // Only use text operators on string columns; otherwise fall back to exact match when possible.
+                if (columnType === 'string') {
+                    const mode = value.caseSensitive ? undefined : 'insensitive';
+                    if (value.prefix) return {[column]: {startsWith: value.value, mode}};
+                    if (value.suffix) return {[column]: {endsWith: value.value, mode}};
+                    return {[column]: {contains: value.value, mode}};
+                }
+
+                return null;
+            }
+
+            if (value.type === 'date') {
+                // Only build date filters for date columns
+                if (columnType !== 'date') return null;
+
+                const filters: Record<string, any> = {};
+                if (value.value.from) filters.gte = new Date(value.value.from).toISOString();
+                if (value.value.to) filters.lte = new Date(value.value.to).toISOString();
+                if (Object.keys(filters).length) return {[column]: filters};
+                return null;
+            }
+
+            // Other value types (variable, empty, not_empty) not pushed down
+            return null;
+        }
+        case 'AND': {
+            const left = buildPrismaWhere(expr.left, table);
+            const right = buildPrismaWhere(expr.right, table);
+            if (left && right) return {AND: [left, right]};
+            return null;
+        }
+        case 'OR': {
+            const left = buildPrismaWhere(expr.left, table);
+            const right = buildPrismaWhere(expr.right, table);
+            if (left && right) return {OR: [left, right]};
+            return null;
+        }
+        case 'NOT':
+            // NOT is not pushed down in this simplified builder
+            return null;
+    }
+};
+
+/**
+ * Locate relation metadata for a given from/to pair respecting traversal direction.
+ */
 const findRelationMeta = (from: string, to: string, direction: 'forward' | 'backward') => {
     if (direction === 'forward') {
         return Relations.find((r) => r.from === from && r.to === to);
@@ -154,6 +253,10 @@ const findRelationMeta = (from: string, to: string, direction: 'forward' | 'back
     return Relations.find((r) => r.from === to && r.to === from);
 };
 
+/**
+ * For each relation node, pre-compute a predicate that validates if a row participates in the relation.
+ * Fetches related rows once using the keys present in the current result set, then caches lookups.
+ */
 const buildRelationResolvers = async (relations: WhereNode[], rows: any[]) => {
     const checks = new WeakMap<WhereNode, (record: Record<string, any>) => boolean>();
     for (const rel of relations) {
@@ -207,6 +310,14 @@ const buildRelationResolvers = async (relations: WhereNode[], rows: any[]) => {
     return checks;
 };
 
+/**
+ * Execute a single parsed statement:
+ * 1) infer target table, enforce whitelist
+ * 2) compute needed columns (projection, relations, aggregates)
+ * 3) run Prisma query with pushdown where possible
+ * 4) shape/aggregate results
+ * 5) write results into variable slots if named
+ */
 const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     const expr = 'expr' in stmt ? stmt.expr : stmt.query;
     // Determine table from first atom encountered
@@ -245,10 +356,12 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     // Select only required columns to reduce payload
     const select = Object.fromEntries(Array.from(neededColumns).map((c) => [c, true]));
 
-    const rows = await (prisma as any)[table].findMany({select});
+    const prismaWhere = buildPrismaWhere(expr, table);
+    const rows = await (prisma as any)[table].findMany({select, where: prismaWhere ?? undefined});
     if (relationNodes.length) {
         ctx.relationChecks = await buildRelationResolvers(relationNodes, rows);
     }
+    // Format the filtered rows into the requested projection/aggregation shape
     const shapeResults = (subset: any[]): any[] => {
         let values: any[];
         if (stmt.asAll) {
@@ -331,6 +444,9 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     return {values: resultValues};
 };
 
+/**
+ * Infer the primary table referenced by the expression (first basic or relation atom encountered).
+ */
 const findTable = (expr: ExpressionNode): string | null => {
     if (expr.op === 'ATOM') {
         if (expr.where.kind === 'basic') return expr.where.selector.table;
@@ -341,18 +457,26 @@ const findTable = (expr: ExpressionNode): string | null => {
     }
 };
 
+/**
+ * Execute a parsed query consisting of one or more statements, honoring optional table allowlist.
+ * Returns an object containing variables and the final result set under its name (or `result`).
+ */
 export const executeQuery = async (statements: Statement[], allowedTables?: string[]) => {
-    const ctx: ExecutionContext = {schemas: {}, variables: {}, allowedTables};
-    const results: any[] = [];
-    for (const stmt of statements) {
-        const res = await runStatement(stmt, ctx);
-        results.push(res);
-    }
-    const returnObj = {
-        variables: ctx.variables
-    };
+    const key = makeCacheKey(statements, allowedTables);
 
-    const result = results[results.length - 1];
-    returnObj[result.name || 'result'] = result.values;
-    return returnObj;
+    return withQueryCache(key, async () => {
+        const ctx: ExecutionContext = {schemas: {}, variables: {}, allowedTables};
+        const results: any[] = [];
+        for (const stmt of statements) {
+            const res = await runStatement(stmt, ctx);
+            results.push(res);
+        }
+        const returnObj = {
+            variables: ctx.variables
+        };
+
+        const result = results[results.length - 1];
+        returnObj[result.name || 'result'] = result.values;
+        return returnObj;
+    });
 };

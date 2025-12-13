@@ -1,5 +1,5 @@
 import {useParams} from 'wouter'
-import ContentFrame, {useContentFrame, useContentFrameMutation} from '@/components/shared/content-frame.tsx'
+import ContentFrame, {useContentFrame, useContentFrameMutation} from '@/lib/hooks/content-frame.tsx'
 import {Avatar} from '@/components/shared/avatar.tsx'
 import {useSession} from '@clerk/clerk-react'
 import {API_URL, useUserAccountStore} from '@/lib'

@@ -3,7 +3,7 @@ import {YapockType} from '@/index';
 import {ErrorTypebox} from '@/utils/errors';
 import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
-import {NotificationManager} from '@/utils/NotificationManager';
+import {NotificationManager} from '@/lib/NotificationManager';
 import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>

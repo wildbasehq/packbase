@@ -12,7 +12,7 @@ import prisma from '@/db/prisma';
 import {Elysia} from 'elysia';
 import {cors} from '@elysiajs/cors';
 import Debug from 'debug';
-import verifyToken from '@/utils/verify-token';
+import verifyToken from '@/utils/identity/verify-token';
 import {swagger} from '@elysiajs/swagger';
 import {autoload} from 'elysia-autoload';
 import deleteNulls from '@/utils/delete-nulls';
