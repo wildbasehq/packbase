@@ -120,6 +120,18 @@ export class Lexer {
           this.addToken(TokenType.LESS_THAN, char);
         }
         break;
+      case '.':
+        if (this.match('.')) {
+          this.addToken(TokenType.RANGE, '..');
+        } else {
+          throw new SearchLexerError(
+            `Unexpected character: .`,
+            this.line,
+            this.column - 1,
+            'UNEXPECTED_CHARACTER'
+          );
+        }
+        break;
 
       // Handle string literals
       case '"':

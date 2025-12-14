@@ -351,6 +351,40 @@ export class Parser {
 
         // Handle parenthesized expressions
         if (this.match(TokenType.OPEN_PAREN)) {
+            // Check for range syntax: (value..value)
+            if (this.check(TokenType.STRING) || this.check(TokenType.NUMBER)) {
+                const startTok = this.advance();
+                const startIsString = startTok.type === TokenType.STRING;
+
+                if (this.match(TokenType.RANGE)) {
+                    // Right-hand side
+                    const endTok = this.consume(
+                        startIsString ? TokenType.STRING : TokenType.NUMBER,
+                        startIsString
+                            ? "Expected string literal after '..' in range expression"
+                            : "Expected number literal after '..' in range expression",
+                    );
+                    this.consume(TokenType.CLOSE_PAREN, "Expected ')' after range expression");
+
+                    const startNode = startIsString
+                        ? ({ type: NodeType.STRING_LITERAL, value: startTok.value } as StringLiteralNode)
+                        : ({ type: NodeType.NUMBER_LITERAL, value: Number(startTok.value) } as NumberLiteralNode);
+                    const endNode = startIsString
+                        ? ({ type: NodeType.STRING_LITERAL, value: endTok.value } as StringLiteralNode)
+                        : ({ type: NodeType.NUMBER_LITERAL, value: Number(endTok.value) } as NumberLiteralNode);
+
+                    return {
+                        type: NodeType.BETWEEN_EXPR,
+                        start: startNode as any,
+                        end: endNode as any,
+                        position: {
+                            start: { line: startTok.position.line, column: startTok.position.column - 1 },
+                            end: { line: this.previous().position.line, column: this.previous().position.column },
+                        },
+                    };
+                }
+            }
+
             // Check if the next token is a string literal
             if (this.check(TokenType.STRING)) {
                 const stringToken = this.advance();

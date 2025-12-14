@@ -83,8 +83,12 @@ export interface SearchOptions {
  * // Query with case sensitivity
  * const results = await search('[Where profiles CASE=true ("John")]');
  *
- * // Query with range
+ * // Query with range (date using BETWEEN)
  * const results = await search('[Where posts:created_at BETWEEN ("2023-01-01" AND "2023-12-31")]');
+ *
+ * // Query with range (numbers and strings using ..)
+ * const results = await search('[Where posts:likes (10..99)]');
+ * const results = await search('[Where profiles:username ("".."some-id")]');
  *
  * // Query with fuzzy matching
  * const results = await search('[Where profiles FUZZY=2 ("john")]');
