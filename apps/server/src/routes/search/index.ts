@@ -23,7 +23,6 @@ const SearchAPI = (app: YapockType) =>
                 } = await executeQuery(parsed.statements)
 
                 const timeEnd = Date.now() - timeStart;
-                log(`Search query ${q} took ${timeEnd}ms`);
 
                 return {
                     ...result,

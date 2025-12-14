@@ -2,6 +2,49 @@ import {Aggregation, ColumnSelector, ExpressionNode, ParsedQuery, QueryValue, St
 import {isValidTable} from './schema';
 
 /**
+ * Strip `//` line comments from a query string while preserving newlines and keeping
+ * `//` that appear inside double-quoted string literals.
+ */
+const stripLineComments = (input: string): string => {
+    let result = '';
+    let inString = false;
+    let escape = false;
+
+    for (let i = 0; i < input.length; i++) {
+        const ch = input[i];
+        const next = input[i + 1];
+
+        if (!inString && ch === '/' && next === '/') {
+            // Skip until end of line but keep the newline itself (if any)
+            while (i < input.length && input[i] !== '\n') {
+                i++;
+            }
+            if (i < input.length && input[i] === '\n') {
+                result += '\n';
+            }
+            continue;
+        }
+
+        result += ch;
+
+        if (inString) {
+            if (escape) {
+                escape = false;
+            } else if (ch === '\\') {
+                escape = true;
+            } else if (ch === '"') {
+                inString = false;
+            }
+        } else if (ch === '"') {
+            inString = true;
+            escape = false;
+        }
+    }
+
+    return result;
+};
+
+/**
  * Remove a single pair of outer square brackets if present while keeping inner whitespace.
  * Used to normalize pipeline segments that are enclosed in [] for easier downstream parsing.
  */
@@ -56,7 +99,7 @@ const parseVariableAssignment = (input: string): { name: string; targetKey?: str
 
 /**
  * Split a full query string into pipeline segments separated by top-level bracketed expressions.
- * Maintains association between trailing `AS` clauses and the preceding bracketed block.
+ * Maintains association between trailing "AS" clauses and the preceding bracketed block.
  */
 const splitPipeline = (input: string): string[] => {
     const parts: string[] = [];
@@ -281,7 +324,8 @@ const parseExpression = (segment: string): ExpressionNode => {
  */
 export const parseQuery = (input: string): ParsedQuery => {
     const statements: Statement[] = [];
-    const segments = input.split(/;+/).map((s) => s.trim()).filter(Boolean);
+    const cleaned = stripLineComments(input);
+    const segments = cleaned.split(/;+/).map((s) => s.trim()).filter(Boolean);
     for (const raw of segments) {
         const assign = parseVariableAssignment(raw);
         const targetName = assign?.name;
@@ -295,7 +339,7 @@ export const parseQuery = (input: string): ParsedQuery => {
             let trailingAs: string | undefined;
             let trailingAsColumns: string[] | undefined;
             let trimmedPart = part;
-            const trailingMatch = trimmedPart.match(/^(.*\])\s+AS\s+([A-Za-z0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*$/i);
+            const trailingMatch = trimmedPart.match(/^(.*\])\s+AS\s+([A-ZaZ0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*$/i);
             if (trailingMatch) {
                 trimmedPart = trailingMatch[1];
                 const raw = trailingMatch[2].trim();

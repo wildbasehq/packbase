@@ -142,13 +142,7 @@ const buildWherePredicate = (expr: ExpressionNode, ctx: ExecutionContext): Predi
                 return (record: Record<string, any>) => {
                     const cols = where.selector.columns ?? Object.keys(record);
                     const checkFn = where.value.type === 'list' ? 'every' : 'some';
-                    return cols[checkFn]((c) => {
-                        console.log(`Record value for column ${c}: ${record[c]}`);
-                        if (checkFn === 'every' && getColumn(where.selector.table, c)?.isID) return true
-
-                        const pred = predicate(record[c])
-                        console.log(`Checking column ${c} with value ${record[c]} (${checkFn}) against predicate: ${pred}`);
-                    });
+                    return cols[checkFn]((c) => predicate(record[c]));
                 };
             }
             if (where.kind === 'relation') {

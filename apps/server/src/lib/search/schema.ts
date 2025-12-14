@@ -82,7 +82,7 @@ const buildSchemas = (): Record<string, TableSchema> => {
             columns[field.name] = {
                 name: field.name,
                 type,
-                isID: field.isId || field.nativeType?.includes('Uuid') || false,
+                isID: field.isId || field.nativeType?.includes('Uuid') || field.name === 'owner_id',
                 isOptional: field.isRequired === false,
             };
         }

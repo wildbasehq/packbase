@@ -198,7 +198,7 @@ function useCommandPaletteSearch() {
                     }
                     ${allowedTables.includes("profiles") && `$profiles = [Where profiles (${queryBuildFromRaw(query)})] AS *;`}
                     ${allowedTables.includes("packs") && `$packs = [Where packs (${queryBuildFromRaw(query)})] AS *;`}
-                    `.trim()
+                    `.trim().replaceAll('                    ', '')
                 }
 
                 const searchResults = await vg.search.get({
