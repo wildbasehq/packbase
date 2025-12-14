@@ -4,6 +4,11 @@ import {makeCacheKey, withQueryCache} from './cache';
 import {getColumn, getDefaultIdColumn, Relations, Schemas} from './schema';
 import {ensureAllColumnsAllowed, ensureColumnsWhitelisted, ensureTableWhitelisted} from './whitelist';
 import {HTTPError} from "@/lib/HTTPError";
+import debug from 'debug';
+
+const logExec = debug('vg:search:executor');
+const logPrisma = debug('vg:search:executor:prisma');
+const logPred = debug('vg:search:executor:predicate');
 
 /**
  * Predicate used to filter in-memory result sets produced by Prisma queries.
@@ -14,6 +19,9 @@ type Predicate = (record: Record<string, any>) => boolean;
  * Build a predicate for string matching with optional prefix/suffix wildcards and case sensitivity.
  */
 const buildStringPredicate = (value: string, caseSensitive: boolean, prefix?: boolean, suffix?: boolean): Predicate => {
+    if (logPred.enabled) {
+        logPred('buildStringPredicate value="%s" caseSensitive=%s prefix=%s suffix=%s', value, caseSensitive, !!prefix, !!suffix);
+    }
     return (recordValue: any) => {
         if (typeof recordValue !== 'string') return false;
         const target = caseSensitive ? recordValue : recordValue.toLowerCase();
@@ -44,6 +52,9 @@ const buildDatePredicate = (from?: string, to?: string): Predicate => {
  * Handles string/dates, emptiness checks, and variable-based comparisons (ANY/ALL/ONE modes).
  */
 const buildValuePredicate = (value: QueryValue, ctx: ExecutionContext, columnName?: string): Predicate => {
+    if (logPred.enabled) {
+        logPred('buildValuePredicate type=%s column=%s', value.type, columnName ?? '<any>');
+    }
     switch (value.type) {
         case 'string': {
             return buildStringPredicate(value.value, value.caseSensitive, value.prefix, value.suffix);
@@ -134,6 +145,9 @@ const buildValuePredicate = (value: QueryValue, ctx: ExecutionContext, columnNam
  * Relation atoms delegate to relationChecks prepared earlier; unsupported groups always fail.
  */
 const buildWherePredicate = (expr: ExpressionNode, ctx: ExecutionContext): Predicate => {
+    if (logPred.enabled) {
+        logPred('buildWherePredicate op=%s', expr.op);
+    }
     switch (expr.op) {
         case 'ATOM': {
             const where = expr.where;
@@ -218,6 +232,9 @@ const collectRelationNodes = (expr: ExpressionNode, acc: WhereNode[] = []): Wher
  * Only supports simple basic atoms on a single column; falls back to in-memory filtering otherwise.
  */
 const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
+    if (logPrisma.enabled) {
+        logPrisma('buildPrismaWhere table=%s op=%s', table ?? '<unknown>', expr.op);
+    }
     switch (expr.op) {
         case 'ATOM': {
             const where = expr.where;
@@ -227,6 +244,10 @@ const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
             const value = where.value;
             const columnMeta = table ? getColumn(table, column) : undefined;
             const columnType = columnMeta?.type;
+
+            if (logPrisma.enabled) {
+                logPrisma('ATOM where pushdown attempt table=%s column=%s type=%s valueType=%s', table, column, columnType, value.type);
+            }
 
             if (value.type === 'string') {
                 // Check if string looks like UUID
@@ -266,17 +287,25 @@ const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
         case 'AND': {
             const left = buildPrismaWhere(expr.left, table);
             const right = buildPrismaWhere(expr.right, table);
+            if (logPrisma.enabled) {
+                logPrisma('AND pushdown left=%s right=%s', !!left, !!right);
+            }
             if (left && right) return {AND: [left, right]};
             return null;
         }
         case 'OR': {
             const left = buildPrismaWhere(expr.left, table);
             const right = buildPrismaWhere(expr.right, table);
+            if (logPrisma.enabled) {
+                logPrisma('OR pushdown left=%s right=%s', !!left, !!right);
+            }
             if (left && right) return {OR: [left, right]};
             return null;
         }
         case 'NOT':
-            // NOT is not pushed down in this simplified builder
+            if (logPrisma.enabled) {
+                logPrisma('NOT not pushed down');
+            }
             return null;
     }
 };
@@ -297,10 +326,16 @@ const findRelationMeta = (from: string, to: string, direction: 'forward' | 'back
  */
 const buildRelationResolvers = async (relations: WhereNode[], rows: any[]) => {
     const checks = new WeakMap<WhereNode, (record: Record<string, any>) => boolean>();
+    if (logExec.enabled) {
+        logExec('buildRelationResolvers: relations=%d rows=%d', relations.length, rows.length);
+    }
     for (const rel of relations) {
         if (rel.kind !== 'relation') continue;
         const meta = findRelationMeta(rel.from, rel.to, rel.direction);
         if (!meta) {
+            if (logExec.enabled) {
+                logExec('No relation meta found for %s %s %s', rel.from, rel.direction, rel.to);
+            }
             checks.set(rel, () => false);
             continue;
         }
@@ -314,6 +349,10 @@ const buildRelationResolvers = async (relations: WhereNode[], rows: any[]) => {
             const values = keyFields.map((f) => row[f]);
             if (values.some((v) => v === undefined || v === null)) continue;
             keyTuples.push(values.map((v) => `${v}`));
+        }
+
+        if (logExec.enabled) {
+            logExec('Relation %s %s %s keyTuples=%d', rel.from, rel.direction, rel.to, keyTuples.length);
         }
 
         if (keyTuples.length === 0) {
@@ -331,6 +370,10 @@ const buildRelationResolvers = async (relations: WhereNode[], rows: any[]) => {
             where: {OR: whereClauses},
             select: Object.fromEntries(targetFields.map((f) => [f, true])),
         });
+
+        if (logExec.enabled) {
+            logExec('Relation %s %s %s targetRows=%d', rel.from, rel.direction, rel.to, targetRows.length);
+        }
 
         const existing = new Set<string>();
         for (const row of targetRows) {
@@ -358,11 +401,25 @@ const buildRelationResolvers = async (relations: WhereNode[], rows: any[]) => {
  */
 const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     const expr = 'expr' in stmt ? stmt.expr : stmt.query;
+    if (logExec.enabled) {
+        logExec('runStatement start type=%s asColumn=%s asColumns=%o asAll=%s aggregation=%s',
+            'name' in stmt ? 'assignment' : 'expression',
+            (stmt as any).asColumn,
+            (stmt as any).asColumns,
+            (stmt as any).asAll,
+            (stmt as any).aggregation);
+    }
     // Determine table from first atom encountered
     const table = findTable(expr);
     if (!table) throw new Error('Unable to infer table from query');
+    if (logExec.enabled) {
+        logExec('runStatement table=%s allowedTables=%o', table, ctx.allowedTables);
+    }
     ensureTableWhitelisted(table);
     if (ctx.allowedTables && !ctx.allowedTables.includes(table)) {
+        if (logExec.enabled) {
+            logExec('Table %s not in allowedTables, aborting', table);
+        }
         throw new Error('Table not allowed');
     }
 
@@ -391,13 +448,26 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         ensureColumnsWhitelisted(table, Array.from(neededColumns));
     }
 
+    if (logExec.enabled) {
+        logExec('runStatement neededColumns=%o selectAll=%s', Array.from(neededColumns), selectAll);
+    }
+
     // Select only required columns to reduce payload
     const select = Object.fromEntries(Array.from(neededColumns).map((c) => [c, true]));
 
     const prismaWhere = buildPrismaWhere(expr, table);
+    if (logPrisma.enabled) {
+        logPrisma('Prisma findMany table=%s selectKeys=%o where=%o', table, Object.keys(select), prismaWhere);
+    }
     const rows = await (prisma as any)[table].findMany({select, where: prismaWhere ?? undefined});
+    if (logPrisma.enabled) {
+        logPrisma('Prisma findMany table=%s rows=%d', table, rows.length);
+    }
 
     if (relationNodes.length) {
+        if (logExec.enabled) {
+            logExec('runStatement building relation resolvers for %d relations', relationNodes.length);
+        }
         ctx.relationChecks = await buildRelationResolvers(relationNodes, rows);
     }
 
@@ -461,6 +531,9 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
 
     const predicate = buildWherePredicate(expr, ctx);
     const filtered = rows.filter((r: any) => predicate(r));
+    if (logExec.enabled) {
+        logExec('runStatement filtered rows=%d (from %d)', filtered.length, rows.length);
+    }
     const resultValues = shapeResults(filtered);
 
     const columnMeta = stmt.asColumns?.length || stmt.asAll
@@ -506,6 +579,10 @@ const findTable = (expr: ExpressionNode): string | null => {
 export const executeQuery = async (statements: Statement[]) => {
     const key = makeCacheKey(statements);
 
+    if (logExec.enabled) {
+        logExec('executeQuery start statements=%d cacheKeyLen=%d', statements.length, key.length);
+    }
+
     return withQueryCache(key, async () => {
         const ctx: ExecutionContext = {schemas: {}, variables: {}};
         const results: any[] = [];
@@ -513,7 +590,10 @@ export const executeQuery = async (statements: Statement[]) => {
             try {
                 const res = await runStatement(stmt, ctx);
                 results.push(res);
-            } catch (err) {
+            } catch (err: any) {
+                if (logExec.enabled) {
+                    logExec('runStatement error: %s', err?.message ?? err);
+                }
                 if (err.message.includes('Unknown argument `contains`')) {
                     throw HTTPError.badRequest({
                         summary: 'Trying to search column with unsupported type. Are you trying to search a UUID/JSON/Date/Etc. with partial string matching?',

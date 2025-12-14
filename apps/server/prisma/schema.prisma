@@ -93,19 +93,21 @@ model packs_pages {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model posts {
-  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at      DateTime          @default(now()) @db.Timestamptz(6)
-  tenant_id       String            @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
-  content_type    String
-  body            String?
-  user_id         String            @db.Uuid
-  assets          Json[]
-  parent          String?           @db.Uuid
-  channel_id      String?           @db.Uuid
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  tenant_id    String   @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+  content_type String
+  body         String?
+  user_id      String   @db.Uuid
+  assets       Json[]
+  parent       String?  @db.Uuid
+  channel_id   String?  @db.Uuid
+
   posts           posts?            @relation("postsToposts", fields: [parent], references: [id], onDelete: Cascade)
   other_posts     posts[]           @relation("postsToposts")
   packs           packs             @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
   packs_pages     packs_pages?      @relation(fields: [channel_id], references: [id], onDelete: SetNull)
+  profiles        profiles          @relation(fields: [user_id], references: [id], onDelete: Cascade)
   posts_reactions posts_reactions[]
   tags            String[]
   classification  Json?
@@ -161,7 +163,8 @@ model profiles {
   default_pack  String    @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
 
   // Relation
-  packs packs @relation(fields: [default_pack], references: [id], onDelete: NoAction)
+  packs packs[]
+  posts posts[]
 
   @@index([default_pack], type: Hash)
   @@schema("public")

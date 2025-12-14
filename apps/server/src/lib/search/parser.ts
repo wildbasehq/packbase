@@ -1,11 +1,20 @@
+import debug from 'debug';
 import {Aggregation, ColumnSelector, ExpressionNode, ParsedQuery, QueryValue, Statement, WhereNode} from './types';
 import {isValidTable} from './schema';
+
+const logParser = debug('vg:search:parser');
+const logValue = debug('vg:search:parser:value');
+const logWhere = debug('vg:search:parser:where');
 
 /**
  * Strip `//` line comments from a query string while preserving newlines and keeping
  * `//` that appear inside double-quoted string literals.
  */
 const stripLineComments = (input: string): string => {
+    if (logParser.enabled) {
+        const preview = input.length > 200 ? input.slice(0, 200) + '…' : input;
+        logParser('stripLineComments inputLen=%d preview="%s"', input.length, preview);
+    }
     let result = '';
     let inString = false;
     let escape = false;
@@ -39,6 +48,10 @@ const stripLineComments = (input: string): string => {
             inString = true;
             escape = false;
         }
+    }
+
+    if (logParser.enabled) {
+        logParser('stripLineComments outputLen=%d', result.length);
     }
 
     return result;
@@ -136,17 +149,25 @@ const splitPipeline = (input: string): string[] => {
  */
 const parseValue = (raw: string): QueryValue => {
     const trimmed = raw.trim();
+    if (logValue.enabled) {
+        const preview = trimmed.length > 200 ? trimmed.slice(0, 200) + '…' : trimmed;
+        logValue('parseValue rawLen=%d preview="%s"', trimmed.length, preview);
+    }
     if (/^\(\s*EMPTY\s*\)$/i.test(trimmed)) return {type: 'empty'};
     if (/^\(\s*NOT\s+EMPTY\s*\)$/i.test(trimmed)) return {type: 'not_empty'};
 
     const variableMatch = trimmed.match(/^\(\s*\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_\.]+))?\s*->\s*(ANY|ALL|ONE)\s*\)$/i);
     if (variableMatch) {
-        return {
+        const value: QueryValue = {
             type: 'variable',
             name: variableMatch[1],
             key: variableMatch[2],
             mode: variableMatch[3].toUpperCase() as 'ANY' | 'ALL'
         };
+        if (logValue.enabled) {
+            logValue('parseValue variable name=%s key=%s mode=%s', value.name, value.key, value.mode);
+        }
+        return value;
     }
 
     // Lists: one or more quoted values, optional trailing :i|s flag
@@ -175,6 +196,10 @@ const parseValue = (raw: string): QueryValue => {
                 return {value, or: or ? true : undefined, not: not ? true : undefined};
             });
 
+            if (logValue.enabled) {
+                logValue('parseValue list items=%d caseSensitive=%s', items.length, flag === 's');
+            }
+
             return {type: 'list', items, caseSensitive: flag === 's'};
         }
     }
@@ -186,6 +211,9 @@ const parseValue = (raw: string): QueryValue => {
         const prefix = text.startsWith('*');
         const suffix = text.endsWith('*');
         const core = text.replace(/^\*/, '').replace(/\*$/, '');
+        if (logValue.enabled) {
+            logValue('parseValue string len=%d caseSensitive=%s prefix=%s suffix=%s', core.length, flag === 's', prefix, suffix);
+        }
         return {
             type: 'string',
             value: core,
@@ -195,13 +223,19 @@ const parseValue = (raw: string): QueryValue => {
         };
     }
 
-    const rangeMatch = trimmed.match(/^\(\s*"([^"]+)"\s*\.\.\s*"?([^"\)]*)"?\s*\)$/);
+    const rangeMatch = trimmed.match(/^\(\s*"([^\"]+)"\s*\.\.\s*"?([^"\)]*)"?\s*\)$/);
     if (rangeMatch) {
         const from = rangeMatch[1] || undefined;
         const to = rangeMatch[2] || undefined;
+        if (logValue.enabled) {
+            logValue('parseValue date from=%s to=%s', from, to);
+        }
         return {type: 'date', value: {from: from || undefined, to: to || undefined}};
     }
 
+    if (logValue.enabled) {
+        logValue('parseValue unsupported raw="%s"', trimmed);
+    }
     throw new Error(`Unsupported value: ${raw}`);
 };
 
@@ -211,7 +245,11 @@ const parseColumnSelector = (segment: string): ColumnSelector => {
     const table = match[1];
     if (!isValidTable(table)) throw new Error(`Unknown table: ${table}`);
     const cols = match[2]?.split(',').map((c) => c.trim()).filter(Boolean);
-    return {table, columns: cols?.length ? cols : undefined};
+    const selector: ColumnSelector = {table, columns: cols?.length ? cols : undefined};
+    if (logWhere.enabled) {
+        logWhere('parseColumnSelector table=%s columns=%o', selector.table, selector.columns ?? '*');
+    }
+    return selector;
 };
 
 /**
@@ -221,12 +259,16 @@ const parseColumnSelector = (segment: string): ColumnSelector => {
 const parseRelation = (segment: string): WhereNode | null => {
     const relMatch = segment.match(/^Where\s+([A-Za-z0-9_]+)\s*(->|<-)\s*([A-Za-z0-9_]+)/i);
     if (relMatch) {
-        return {
+        const node: WhereNode = {
             kind: 'relation',
             direction: relMatch[2] === '->' ? 'forward' : 'backward',
             from: relMatch[1],
             to: relMatch[3],
         };
+        if (logWhere.enabled) {
+            logWhere('parseRelation from=%s direction=%s to=%s', node.from, node.direction, node.to);
+        }
+        return node;
     }
     return null;
 };
@@ -247,7 +289,11 @@ const parseAtom = (segment: string): WhereNode => {
     const selectorStr = normalized.slice(0, normalized.length - valueStr.length).trim();
     const selector = parseColumnSelector(selectorStr);
     const value = parseValue(valueStr);
-    return {kind: 'basic', selector, value};
+    const node: WhereNode = {kind: 'basic', selector, value};
+    if (logWhere.enabled) {
+        logWhere('parseAtom basic table=%s columns=%o valueType=%s', selector.table, selector.columns ?? '*', value.type);
+    }
+    return node;
 };
 
 /**
@@ -262,8 +308,6 @@ const splitTopLevel = (input: string, delimiters: string[]): string[] => {
         const ch = input[i];
         if (ch === '[' || ch === '(') depth++;
         if (ch === ']' || ch === ')') depth--;
-        const nextTwo = input.slice(i, i + 3).toUpperCase();
-        const nextThree = input.slice(i, i + 4).toUpperCase();
         let matched = '';
         for (const d of delimiters) {
             const target = d.toUpperCase();
@@ -281,6 +325,9 @@ const splitTopLevel = (input: string, delimiters: string[]): string[] => {
         current += ch;
     }
     if (current.trim()) parts.push(current.trim());
+    if (logParser.enabled) {
+        logParser('splitTopLevel delimiters=%o parts=%d', delimiters, parts.length);
+    }
     return parts;
 };
 
@@ -291,12 +338,20 @@ const splitTopLevel = (input: string, delimiters: string[]): string[] => {
 const parseExpression = (segment: string): ExpressionNode => {
     // Handle NOT
     if (segment.toUpperCase().startsWith('NOT ')) {
-        return {op: 'NOT', expr: parseExpression(segment.slice(4).trim())};
+        const expr = parseExpression(segment.slice(4).trim());
+        const node: ExpressionNode = {op: 'NOT', expr};
+        if (logWhere.enabled) {
+            logWhere('parseExpression NOT');
+        }
+        return node;
     }
 
     // Split OR at top level
     const orParts = splitTopLevel(segment, [' OR ']);
     if (orParts.length > 1) {
+        if (logWhere.enabled) {
+            logWhere('parseExpression OR parts=%d', orParts.length);
+        }
         return orParts.slice(1).reduce<ExpressionNode>((acc, part) => ({
             op: 'OR',
             left: acc,
@@ -307,6 +362,9 @@ const parseExpression = (segment: string): ExpressionNode => {
     // Split AND at top level
     const andParts = splitTopLevel(segment, [' AND ']);
     if (andParts.length > 1) {
+        if (logWhere.enabled) {
+            logWhere('parseExpression AND parts=%d', andParts.length);
+        }
         return andParts.slice(1).reduce<ExpressionNode>((acc, part) => ({
             op: 'AND',
             left: acc,
@@ -314,8 +372,12 @@ const parseExpression = (segment: string): ExpressionNode => {
         }), parseExpression(andParts[0]));
     }
 
+    const atom = parseAtom(segment);
+    if (logWhere.enabled) {
+        logWhere('parseExpression ATOM kind=%s', atom.kind);
+    }
     // Atom
-    return {op: 'ATOM', where: parseAtom(segment)};
+    return {op: 'ATOM', where: atom};
 };
 
 /**
@@ -323,33 +385,50 @@ const parseExpression = (segment: string): ExpressionNode => {
  * Supports semicolon-separated statements, pipeline segments, leading/trailing AS, and variable assignment.
  */
 export const parseQuery = (input: string): ParsedQuery => {
+    if (logParser.enabled) {
+        const preview = input.length > 200 ? input.slice(0, 200) + '…' : input;
+        logParser('parseQuery rawLen=%d preview="%s"', input.length, preview);
+    }
     const statements: Statement[] = [];
     const cleaned = stripLineComments(input);
     const segments = cleaned.split(/;+/).map((s) => s.trim()).filter(Boolean);
+    if (logParser.enabled) {
+        logParser('parseQuery segments=%d', segments.length);
+    }
     for (const raw of segments) {
         const assign = parseVariableAssignment(raw);
         const targetName = assign?.name;
         const targetKey = assign?.targetKey;
         const body = assign ? assign.inner : raw;
+        if (logParser.enabled && assign) {
+            logParser('parseQuery assignment name=%s targetKey=%s', targetName, targetKey);
+        }
         const pipelineParts = splitPipeline(body);
         if (!pipelineParts.length) continue;
+
+        if (logParser.enabled) {
+            logParser('parseQuery pipelineParts=%d', pipelineParts.length);
+        }
 
         pipelineParts.forEach((part, idx) => {
             // Support trailing "AS <column>" after the bracketed expression
             let trailingAs: string | undefined;
             let trailingAsColumns: string[] | undefined;
             let trimmedPart = part;
-            const trailingMatch = trimmedPart.match(/^(.*\])\s+AS\s+([A-ZaZ0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*$/i);
+            const trailingMatch = trimmedPart.match(/^(.*\])\s+AS\s+([A-Za-z0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*$/i);
             if (trailingMatch) {
                 trimmedPart = trailingMatch[1];
-                const raw = trailingMatch[2].trim();
-                if (raw === '*') {
+                const rawAs = trailingMatch[2].trim();
+                if (rawAs === '*') {
                     trailingAs = undefined;
                     trailingAsColumns = ['*'];
                 } else {
-                    const cols = raw.split(',').map((c) => c.trim()).filter(Boolean);
+                    const cols = rawAs.split(',').map((c) => c.trim()).filter(Boolean);
                     trailingAs = cols.length === 1 ? cols[0] : undefined;
                     trailingAsColumns = cols.length > 1 ? cols : undefined;
+                }
+                if (logParser.enabled) {
+                    logParser('parseQuery trailing AS columns=%o', trailingAsColumns ?? trailingAs);
                 }
             }
 
@@ -369,6 +448,16 @@ export const parseQuery = (input: string): ParsedQuery => {
             if (asAll) asColumns = undefined;
             remaining = rest;
 
+            if (logParser.enabled) {
+                logParser('parseQuery segment idx=%d aggregation=%s asColumn=%s asColumns=%o asAll=%s',
+                    idx,
+                    aggregation,
+                    asColumn,
+                    asColumns,
+                    asAll,
+                );
+            }
+
             const expr = parseExpression(remaining.trim());
 
             const isLast = idx === pipelineParts.length - 1;
@@ -378,6 +467,9 @@ export const parseQuery = (input: string): ParsedQuery => {
                 statements.push({type: 'expression', expr, asColumn, asColumns, asAll, aggregation});
             }
         });
+    }
+    if (logParser.enabled) {
+        logParser('parseQuery statements=%d', statements.length);
     }
     return {statements};
 };

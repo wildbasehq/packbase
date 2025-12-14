@@ -1,4 +1,7 @@
 import {Statement} from './types';
+import debug from 'debug';
+
+const logCache = debug('vg:search:cache');
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 // Cache results for         ^ 5 Minutes
@@ -16,16 +19,23 @@ const cache = new Map<string, CacheEntry<any>>();
  */
 export const makeCacheKey = (statements: Statement[], allowedTables?: string[]): string => {
     const normalizedAllowed = allowedTables ? [...allowedTables].sort() : undefined;
-    return JSON.stringify({statements, allowedTables: normalizedAllowed});
+    const key = JSON.stringify({statements, allowedTables: normalizedAllowed});
+    logCache('Computed cache key: %s', key);
+    return key;
 };
 
 const getCached = <T>(key: string): Promise<T> | undefined => {
     const entry = cache.get(key);
-    if (!entry) return undefined;
+    if (!entry) {
+        logCache('Cache miss for key: %s', key);
+        return undefined;
+    }
     if (Date.now() > entry.expiresAt) {
+        logCache('Cache expired for key: %s', key);
         cache.delete(key);
         return undefined;
     }
+    logCache('Cache hit for key: %s', key);
     return entry.value as Promise<T>;
 };
 
@@ -34,6 +44,7 @@ const setCached = <T>(key: string, value: Promise<T>) => {
         value,
         expiresAt: Date.now() + CACHE_TTL_MS,
     });
+    logCache('Inserted key into cache: %s', key);
 };
 
 /**
@@ -50,13 +61,17 @@ export const withQueryCache = async <T>(key: string, compute: () => Promise<T>):
     try {
         return await promise;
     } catch (error) {
+        logCache('Error occurred, invalidating cache key: %s', key);
         cache.delete(key);
         throw error;
     }
 };
 
 /** Clear all cached search results (primarily for tests). */
-export const clearQueryCache = () => cache.clear();
+export const clearQueryCache = () => {
+    cache.clear();
+    logCache('Cleared all cache');
+};
 
 /** Exposed for tests to align expectations with implementation. */
 export const QUERY_CACHE_TTL_MS = CACHE_TTL_MS;

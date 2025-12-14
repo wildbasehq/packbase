@@ -1,4 +1,5 @@
 import {Prisma} from '@prisma/client';
+import debug from 'debug';
 
 /**
  * Narrowed representation of the scalar types supported by the search layer.
@@ -66,6 +67,8 @@ const scalarToColumnType = (field: Prisma.DMMF.Field): ColumnType | undefined =>
     }
 };
 
+const logSchema = debug('vg:search:schema');
+
 /**
  * Walk the Prisma DMMF models and build a simplified schema map of tables -> columns.
  * Only scalar fields are included; relational/object fields are excluded.
@@ -85,11 +88,13 @@ const buildSchemas = (): Record<string, TableSchema> => {
                 isID: field.isId || field.nativeType?.includes('Uuid') || field.name === 'owner_id',
                 isOptional: field.isRequired === false,
             };
+            logSchema('Processed field for schema %s: %O', model.name, columns[field.name]);
         }
         schemas[model.name] = {
             name: model.name,
             columns,
         };
+        logSchema('Built schema for model %s: %O', model.name, schemas[model.name]);
     }
     return schemas;
 };
@@ -115,6 +120,7 @@ const buildRelations = (): RelationMeta[] => {
                 toFields: field.relationToFields as string[],
                 isList: field.isList,
             });
+            logSchema('Built relation %s -> %s on field %s', model.name, field.type, field.name);
         }
     }
     return relations;

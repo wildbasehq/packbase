@@ -1,4 +1,7 @@
+import debug from 'debug';
 import whitelistJSON from './whitelist.json'
+
+const logWhitelist = debug('vg:search:whitelist');
 
 /** Mapping of table name -> allowed column names. */
 export type TableColumnWhitelist = Record<string, string[]>;
@@ -12,6 +15,7 @@ export const getWhitelistedColumns = (table: string): string[] | undefined => wh
 /** Assert that a table is present in the whitelist. */
 export const ensureTableWhitelisted = (table: string) => {
     if (!whitelist[table]) throw new Error(`Table ${table} is not allowed`);
+    logWhitelist(`Table ${table} is allowed`);
 };
 
 /**
@@ -27,6 +31,7 @@ export const ensureColumnsWhitelisted = (table: string, columns: string[]) => {
 
     const missing = columns.filter((c) => !allowed.includes(c));
     if (missing.length) throw new Error(`Columns ${missing.join(', ')} are not allowed on table ${table}`);
+    logWhitelist(`Columns ${columns.join(', ')} are allowed on table ${table}`);
 };
 
 /**
@@ -39,4 +44,5 @@ export const ensureAllColumnsAllowed = (table: string) => {
         // This is so we can still allow querying all columns, but disallow querying all at once.
         throw new Error(`Accessing all columns on table ${table} is not allowed`);
     }
+    logWhitelist(`All columns are allowed on table ${table}`);
 };
