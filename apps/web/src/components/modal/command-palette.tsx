@@ -693,7 +693,7 @@ export default function CommandPalette() {
                         transition={{duration: 2, ease: "circOut"}}
                     >
                         <div
-                            className="absolute inset-x-0 top-0 h-full w-full bg-white/5 backdrop-blur-[1px] mask-middle"
+                            className="absolute inset-x-0 top-0 h-full w-full bg-white/5 backdrop-blur-[1px] mask-middle bg-gradient-to-b from-transparent via-white/5 to-transparent"
                         />
                     </motion.div>
                 )}

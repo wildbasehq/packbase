@@ -41,12 +41,11 @@ model packs {
   owner_id      String?  @db.Uuid
   images_header String?
 
-  // Relation
-  packs_memberships packs_memberships[]
-  packs_pages       packs_pages[]
-  posts             posts[]
-  pack_themes       pack_themes[]
-  used_as_default   profiles[]
+  // Relations
+  memberships packs_memberships[]
+  pages       packs_pages[]
+  posts       posts[]
+  themes      pack_themes[]
 
   @@index([owner_id])
   @@schema("public")
@@ -54,13 +53,15 @@ model packs {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model packs_memberships {
-  id          BigInt   @id(map: "packs_memberships_pkey") @default(autoincrement())
-  joined_at   DateTime @default(now()) @db.Timestamptz(6)
-  tenant_id   String   @db.Uuid
-  user_id     String   @db.Uuid
-  packs       packs    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "public_packs_memberships_tenant_id_fkey")
+  id        BigInt   @id(map: "packs_memberships_pkey") @default(autoincrement())
+  joined_at DateTime @default(now()) @db.Timestamptz(6)
+  tenant_id String   @db.Uuid
+  user_id   String   @db.Uuid
+
+  pack packs @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "public_packs_memberships_tenant_id_fkey")
+
   // Bitwise permissions
-  permissions Int?     @default(0)
+  permissions Int? @default(0)
 
   @@index([tenant_id], type: Hash)
   @@index([user_id], type: Hash)
@@ -70,21 +71,22 @@ model packs_memberships {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model packs_pages {
-  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at    DateTime        @default(now()) @db.Timestamptz(6)
-  updated_at    DateTime        @default(now()) @db.Timestamp(6)
-  title         String
-  slug          String
-  description   String?
-  icon          String?
-  tenant_id     String          @db.Uuid
-  query         String?
-  ticker        String[]        @default([])
-  order         Int             @default(0)
-  packs         packs           @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "pack.pages_tenant_id_fkey")
-  posts         posts[]
-  chat_messages chat_messages[]
-  chat_presence chat_presence[]
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamp(6)
+  title       String
+  slug        String
+  description String?
+  icon        String?
+  tenant_id   String   @db.Uuid
+  query       String?
+  ticker      String[] @default([])
+  order       Int      @default(0)
+
+  pack         packs           @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "pack.pages_tenant_id_fkey")
+  posts        posts[]
+  chatMessages chat_messages[]
+  chatPresence chat_presence[]
 
   @@index([tenant_id], type: Hash)
   @@map("packs.pages")
@@ -103,14 +105,16 @@ model posts {
   parent       String?  @db.Uuid
   channel_id   String?  @db.Uuid
 
-  posts           posts?            @relation("postsToposts", fields: [parent], references: [id], onDelete: Cascade)
-  other_posts     posts[]           @relation("postsToposts")
-  packs           packs             @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
-  packs_pages     packs_pages?      @relation(fields: [channel_id], references: [id], onDelete: SetNull)
-  profiles        profiles          @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  posts_reactions posts_reactions[]
-  tags            String[]
-  classification  Json?
+  parentPost posts?  @relation("PostToParent", fields: [parent], references: [id], onDelete: Cascade)
+  replies    posts[] @relation("PostToParent")
+
+  pack      packs             @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  channel   packs_pages?      @relation(fields: [channel_id], references: [id], onDelete: SetNull)
+  author    profiles          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  reactions posts_reactions[]
+
+  tags           String[]
+  classification Json?
 
   @@index([parent], type: Hash)
   @@index([tenant_id], type: Hash)
@@ -125,7 +129,8 @@ model posts_reactions {
   created_at DateTime @default(now()) @db.Timestamptz(6)
   actor_id   String   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   slot       String   @default("thumbs_up")
-  posts      posts    @relation(fields: [post_id], references: [id], onDelete: Cascade, map: "public_posts_reactions_post_id_fkey")
+
+  post posts @relation(fields: [post_id], references: [id], onDelete: Cascade, map: "public_posts_reactions_post_id_fkey")
 
   @@id([post_id, actor_id, slot], map: "posts_reactions_pkey")
   @@index([actor_id], type: Hash)
@@ -162,9 +167,21 @@ model profiles {
   last_online   DateTime?
   default_pack  String    @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
 
-  // Relation
-  packs packs[]
-  posts posts[]
+  // Relations
+  posts           posts[]
+  themes          user_themes[]
+  folders         folders[]
+  followers       profiles_followers[] @relation("ProfileFollowersUser")
+  following       profiles_followers[] @relation("ProfileFollowersFollowing")
+  notifications   notifications[]
+  chat_messages   chat_messages[]
+  chat_presence   chat_presence[]
+  chat_reactions  chat_reactions[]
+  dm_participants dm_participants[]
+  dm_messages     dm_messages[]
+  invites         invites[]
+  packsId         String?              @db.Uuid
+  admin_audit_log admin_audit_log[]
 
   @@index([default_pack], type: Hash)
   @@schema("public")
@@ -177,9 +194,12 @@ model profiles_followers {
   user_id      String   @db.Uuid
   following_id String   @db.Uuid
 
+  user      profiles @relation("ProfileFollowersUser", fields: [user_id], references: [id], onDelete: Cascade)
+  following profiles @relation("ProfileFollowersFollowing", fields: [following_id], references: [id], onDelete: Cascade)
+
   @@index([user_id])
-  @@index([following_id]) // Add this index
-  @@index([user_id, following_id]) // Composite index for better performance
+  @@index([following_id])
+  @@index([user_id, following_id])
   @@map("profiles.followers")
   @@schema("public")
 }
@@ -220,6 +240,8 @@ model user_themes {
   css        String
   is_active  Boolean  @default(false)
 
+  user profiles @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
   @@index([user_id], type: Hash)
   @@map("user.themes")
   @@schema("public")
@@ -238,6 +260,8 @@ model folders {
   query       String?
   howl_ids    String[] @default([])
 
+  user profiles @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
   @@index([user_id], type: Hash)
   @@schema("public")
 }
@@ -253,7 +277,7 @@ model pack_themes {
   css        String
   is_active  Boolean  @default(false)
 
-  packs packs @relation(fields: [pack_id], references: [id], onDelete: Cascade)
+  pack packs @relation(fields: [pack_id], references: [id], onDelete: Cascade)
 
   @@index([pack_id], type: Hash)
   @@index([pack_id, is_active])
@@ -274,6 +298,8 @@ model notifications {
   metadata   Json?
   related_id String?   @db.Uuid
 
+  user profiles? @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
   @@index([user_id], type: Hash)
   @@index([read], type: Hash)
   @@schema("public")
@@ -288,6 +314,8 @@ model inventory {
   // For "badges"
   is_set  Boolean @default(false)
 
+  // optional: relation if user_id -> profiles.id in DB
+  // user profiles? @relation(fields: [user_id], references: [id], onDelete: Cascade)
   @@unique([item_id, user_id])
   @@schema("public")
 }
@@ -298,6 +326,11 @@ model invites {
   invited_by String   @db.Uuid
   email      String
   created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  // optional: relation if invited_by -> profiles.id
+  // inviter profiles @relation(fields: [invited_by], references: [id], onDelete: Cascade)
+  profilesId String?   @db.Uuid
+  profiles   profiles? @relation(fields: [profilesId], references: [id])
 
   @@schema("public")
 }
@@ -316,10 +349,11 @@ model chat_messages {
   deleted_at   DateTime? @db.Timestamptz(6)
   metadata     Json?     @default("{}")
 
-  packs_pages packs_pages      @relation(fields: [channel_id], references: [id], onDelete: Cascade)
-  reply       chat_messages?   @relation("ChatMessageReplies", fields: [reply_to], references: [id], onDelete: SetNull)
-  replies     chat_messages[]  @relation("ChatMessageReplies")
-  reactions   chat_reactions[]
+  channel   packs_pages      @relation(fields: [channel_id], references: [id], onDelete: Cascade)
+  user      profiles         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  reply     chat_messages?   @relation("ChatMessageReplies", fields: [reply_to], references: [id], onDelete: SetNull)
+  replies   chat_messages[]  @relation("ChatMessageReplies")
+  reactions chat_reactions[]
 
   @@index([channel_id, created_at])
   @@index([user_id])
@@ -334,7 +368,8 @@ model chat_presence {
   status     String   @default("online")
   last_seen  DateTime @default(now()) @db.Timestamptz(6)
 
-  packs_pages packs_pages @relation(fields: [channel_id], references: [id], onDelete: Cascade)
+  channel packs_pages @relation(fields: [channel_id], references: [id], onDelete: Cascade)
+  user    profiles    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([channel_id, user_id])
   @@index([channel_id])
@@ -350,19 +385,22 @@ model chat_reactions {
   created_at DateTime @default(now()) @db.Timestamptz(6)
 
   message chat_messages @relation(fields: [message_id], references: [id], onDelete: Cascade)
+  user    profiles      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([message_id, user_id, emoji])
   @@index([message_id])
+  @@index([user_id])
   @@schema("public")
 }
 
 /// DM channels for 1:1 direct messages (Discord-like)
 model dm_channels {
-  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at      DateTime          @default(now()) @db.Timestamptz(6)
-  last_message_id String?           @db.Uuid
-  dm_participants dm_participants[]
-  dm_messages     dm_messages[]
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  last_message_id String?  @db.Uuid
+
+  participants dm_participants[]
+  messages     dm_messages[]
 
   @@schema("public")
 }
@@ -374,6 +412,7 @@ model dm_participants {
   last_read_at DateTime? @db.Timestamptz(6)
 
   channel dm_channels @relation(fields: [channel_id], references: [id], onDelete: Cascade)
+  user    profiles    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([channel_id, user_id])
   @@index([user_id])
@@ -394,6 +433,7 @@ model dm_messages {
   metadata     Json?     @default("{}")
 
   channel dm_channels   @relation(fields: [channel_id], references: [id], onDelete: Cascade)
+  author  profiles      @relation(fields: [author_id], references: [id], onDelete: Cascade)
   reply   dm_messages?  @relation("DMMessageReplies", fields: [reply_to], references: [id], onDelete: SetNull)
   replies dm_messages[] @relation("DMMessageReplies")
 
@@ -421,12 +461,14 @@ model admin_query_pages {
 
 model admin_audit_log {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id      String   @db.Uuid
+  user_id      String?  @db.Uuid
   action       String
   model_type   String
   model_id     String
   model_object Json
   created_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  profiles profiles? @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
