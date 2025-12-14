@@ -1,4 +1,3 @@
-import UserAvatar from '@/components/shared/user/avatar'
 // @ts-ignore
 import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
@@ -6,6 +5,8 @@ import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak'
 import * as HoverCard from '@radix-ui/react-hover-card'
 import {cn} from '@/lib'
 import {ReactNode} from "react";
+import {Avatar, Text} from "@/src/components";
+import {getAvatar} from "@/lib/api/get-avatar.ts";
 
 export default function UserInfoCol({
                                         user,
@@ -15,15 +16,11 @@ export default function UserInfoCol({
                                         className,
                                     }: {
     user: any // object
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+    size?: number
     tag?: ReactNode
     children?: ReactNode
     className?: string
 }) {
-    // const [snap, setSnap] = useState<number | string | null>('148px')
-
-    // const DrawerRoot = inDrawer ? Drawer.NestedRoot : Drawer.Root
-
     return (
         <HoverCard.Root>
             <HoverCard.Trigger className={cn('select-none no-underline!', className)}>
@@ -50,14 +47,17 @@ export function UserInfo({
                              tag,
                          }: {
     user: any // object
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+    size?: number
     tag?: ReactNode
 }) {
     return (
         <div className="flex flex-row items-center gap-2">
-            <UserAvatar user={user} size={size}/>
+            <Avatar initials={user.username.substring(0, 2)} src={getAvatar(user.id)} style={{
+                width: size ?? '2rem',
+                height: size ?? '2rem',
+            }}/>
             <div className="flex flex-col">
-                <Link href={`/@${user.username}`} className="text-default text-sm font-semibold">
+                <Link href={`/@${user.username}`} className="text-foreground text-sm font-semibold">
                     {user.display_name || user.username}
                     {user.type &&
                         <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20}/>}
@@ -66,10 +66,9 @@ export function UserInfo({
                                                      height={20}/>
                     )}
                 </Link>
-                <span
-                    className="text-muted-foreground w-32 self-baseline overflow-hidden text-ellipsis whitespace-nowrap text-xs unicorn:text-on-surface-variant/50">
-                    {tag || user.tag || user.username || 'piss'}
-                </span>
+                <Text alt>
+                    {tag || user.tag || user.username || 'dummy'}
+                </Text>
             </div>
         </div>
     )
@@ -92,10 +91,10 @@ export function UserHoverCard({user}: { user: any }) {
             )}
 
             <div className="z-50 flex flex-col gap-[7px]">
-                <UserAvatar size="3xl" user={user}/>
+                <Avatar initials={user.username.substring(0, 2)} src={getAvatar(user.id)} className="size-14"/>
                 <div className="flex flex-col gap-4">
                     <div>
-                        <div className="text-md">
+                        <Text as="div" className="text-md">
                             {user.display_name || user.username}
                             {user.type && (
                                 <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5"
@@ -109,8 +108,9 @@ export function UserHoverCard({user}: { user: any }) {
                                     height={20}
                                 />
                             )}
-                        </div>
-                        <div className="text-muted-foreground text-sm">@{user.username}</div>
+                        </Text>
+
+                        <Text alt>@{user.username}</Text>
                     </div>
                     <Markdown className="text-sm">{user.about?.bio}</Markdown>
                     {user.mutuals && (

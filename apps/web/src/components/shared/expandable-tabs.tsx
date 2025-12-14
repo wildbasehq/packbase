@@ -7,7 +7,6 @@ import {cn, isVisible} from '@/lib/utils'
 import {LucideIcon} from 'lucide-react'
 import {useLocation} from 'wouter'
 import {SearchBox} from '@/components/shared/search-box.tsx'
-import {useSearch} from '@/lib'
 
 interface TabInterface {
     title?: string
@@ -70,12 +69,12 @@ export function ExpandableTabs({
                                }: ExpandableTabsProps) {
     const [selected, setSelected] = React.useState<number | null>(null)
     const [, setLocation] = useLocation()
-    const {query} = useSearch()
 
     // Inside your component before the return statement, add:
     const prevQueryStartsWithBracket = useRef(false)
     const [gradientDirection, setGradientDirection] = useState('forward')
 
+    const query = "[Test]"
     // Add this effect to track query changes
     useEffect(() => {
         const currentStartsWithBracket = query?.startsWith('[')

@@ -22,7 +22,6 @@ const NotFound = lazy(() => import('@/src/not-found.tsx'))
 const PackAdd = lazy(() => import('@/pages/pack/new/page.tsx'))
 const TermsPage = lazy(() => import('@/pages/terms/page.tsx'))
 const UserProfile = lazy(() => import('@/pages/user/[...slug]/page.tsx'))
-const SearchPage = lazy(() => import('@/pages/search/page.tsx'))
 const ChatThreadPage = lazy(() => import('@/pages/c/[id]/page.tsx'))
 const GuestLanding = lazy(() => import('@/components/home/guestlanding.tsx'))
 
@@ -48,12 +47,6 @@ export default function Routes() {
                 <SignedOut>
                     <GuestLanding/>
                 </SignedOut>
-            </Route>
-
-            <Route path="/search">
-                <Suspense fallback={<LoadingFallback/>}>
-                    <SearchPage/>
-                </Suspense>
             </Route>
 
             <Route path="/terms">

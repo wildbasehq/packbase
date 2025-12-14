@@ -5,6 +5,7 @@ import {TableColumn, TableSchema} from './schema';
  */
 export type QueryValue =
     | { type: 'string'; value: string; caseSensitive: boolean; prefix?: boolean; suffix?: boolean }
+    | { type: 'list'; items: { value: string; or?: boolean; not?: boolean }[]; caseSensitive: boolean }
     | { type: 'date'; value: { from?: string; to?: string } }
     | { type: 'empty' }
     | { type: 'not_empty' }

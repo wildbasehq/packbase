@@ -86,6 +86,7 @@ const splitPipeline = (input: string): string[] => {
 /**
  * Parse the value portion of a WHERE atom. Supports
  * - ("text"[:i|s]) with optional wildcards *prefix/suffix
+ * - lists of quoted values: ("foo" "~bar" "-baz" [:i|s])
  * - ("from".."to") date ranges
  * - (EMPTY) / (NOT EMPTY)
  * - ($var[:key] -> ANY|ALL|ONE) variable references
@@ -103,6 +104,36 @@ const parseValue = (raw: string): QueryValue => {
             key: variableMatch[2],
             mode: variableMatch[3].toUpperCase() as 'ANY' | 'ALL'
         };
+    }
+
+    // Lists: one or more quoted values, optional trailing :i|s flag
+    const listMatch = trimmed.match(/^\(\s*((?:"[\s\S]*?"\s*)+)(?::([is]))?\s*\)$/i);
+    if (listMatch) {
+        const itemsRaw = listMatch[1];
+        const flag = listMatch[2];
+        const itemMatches = Array.from(itemsRaw.matchAll(/"([\s\S]*?)"/g));
+
+        const firstValue = itemMatches[0]?.[1] ?? '';
+        const hasSpecialPrefix = firstValue.startsWith('~') || firstValue.startsWith('-');
+
+        if (itemMatches.length > 2 || hasSpecialPrefix) {
+            const items = itemMatches.map((m) => {
+                let value = m[1];
+                let or = false;
+                let not = false;
+                if (value.startsWith('~')) {
+                    or = true;
+                    value = value.slice(1);
+                } else if (value.startsWith('-')) {
+                    not = true;
+                    value = value.slice(1);
+                }
+
+                return {value, or: or ? true : undefined, not: not ? true : undefined};
+            });
+
+            return {type: 'list', items, caseSensitive: flag === 's'};
+        }
     }
 
     const stringMatch = trimmed.match(/^\(\s*"([\s\S]*)"\s*(?::([is]))?\s*\)$/i);

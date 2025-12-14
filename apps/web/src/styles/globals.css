@@ -58,6 +58,10 @@
     .shimmer-template {
         @apply before:absolute before:border-n-5 before:inset-0 before:border-t before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-n-5/5 before:to-transparent;
     }
+
+    .mask-middle {
+        mask: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%);
+    }
 }
 
 /* Tailwind classes are now used for grid layout styling */

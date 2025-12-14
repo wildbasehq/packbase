@@ -3,6 +3,7 @@ import {ExecutionContext, ExpressionNode, QueryValue, Statement, VariableValue, 
 import {makeCacheKey, withQueryCache} from './cache';
 import {getColumn, getDefaultIdColumn, Relations, Schemas} from './schema';
 import {ensureAllColumnsAllowed, ensureColumnsWhitelisted, ensureTableWhitelisted} from './whitelist';
+import {HTTPError} from "@/lib/HTTPError";
 
 /**
  * Predicate used to filter in-memory result sets produced by Prisma queries.
@@ -44,8 +45,44 @@ const buildDatePredicate = (from?: string, to?: string): Predicate => {
  */
 const buildValuePredicate = (value: QueryValue, ctx: ExecutionContext, columnName?: string): Predicate => {
     switch (value.type) {
-        case 'string':
+        case 'string': {
             return buildStringPredicate(value.value, value.caseSensitive, value.prefix, value.suffix);
+        }
+
+        case 'list': {
+            const itemPredicates = value.items.map((item) => {
+                const predicate = buildStringPredicate(item.value, value.caseSensitive);
+                return {predicate, or: item.or, not: item.not};
+            });
+
+            return (v: any) => {
+                // Support matching against string columns or array columns of strings
+                const values = Array.isArray(v) ? v : [v];
+                if (values.length === 0) return false;
+
+                // Negatives must all be absent
+                const negatives = itemPredicates.filter((i) => i.not);
+                if (negatives.length) {
+                    const negHit = values.some((val) => negatives.some((n) => n.predicate(val)));
+                    if (negHit) return false;
+                }
+
+                const positives = itemPredicates.filter((i) => !i.not);
+                if (!positives.length) return true;
+
+                const orItems = positives.filter((p) => p.or);
+                const andItems = positives.filter((p) => !p.or);
+
+                // All AND items must match at least one value
+                if (andItems.length && !andItems.every((p) => values.some((val) => p.predicate(val)))) return false;
+
+                // OR items: if present, require at least one match.
+                if (orItems.length && !orItems.some((p) => values.some((val) => p.predicate(val)))) return false;
+
+                // If only AND items existed and passed, or both AND and OR conditions satisfied, accept
+                return true;
+            };
+        }
         case 'date':
             return buildDatePredicate(value.value.from, value.value.to);
         case 'empty':
@@ -104,7 +141,14 @@ const buildWherePredicate = (expr: ExpressionNode, ctx: ExecutionContext): Predi
                 const predicate = buildValuePredicate(where.value, ctx, where.selector.columns?.[0]);
                 return (record: Record<string, any>) => {
                     const cols = where.selector.columns ?? Object.keys(record);
-                    return cols.some((c) => predicate(record[c]));
+                    const checkFn = where.value.type === 'list' ? 'every' : 'some';
+                    return cols[checkFn]((c) => {
+                        console.log(`Record value for column ${c}: ${record[c]}`);
+                        if (checkFn === 'every' && getColumn(where.selector.table, c)?.isID) return true
+
+                        const pred = predicate(record[c])
+                        console.log(`Checking column ${c} with value ${record[c]} (${checkFn}) against predicate: ${pred}`);
+                    });
                 };
             }
             if (where.kind === 'relation') {
@@ -358,9 +402,11 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
 
     const prismaWhere = buildPrismaWhere(expr, table);
     const rows = await (prisma as any)[table].findMany({select, where: prismaWhere ?? undefined});
+
     if (relationNodes.length) {
         ctx.relationChecks = await buildRelationResolvers(relationNodes, rows);
     }
+
     // Format the filtered rows into the requested projection/aggregation shape
     const shapeResults = (subset: any[]): any[] => {
         let values: any[];
@@ -409,11 +455,13 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
             base[stmt.targetKey!] = child;
             return base;
         });
+
         ctx.loop = undefined;
 
         parent.values = mergedValues;
         ctx.variables[stmt.name] = parent;
         ctx.variables['_prev'] = parent;
+
         return {name: stmt.name, values: parent.values};
     }
 
@@ -461,22 +509,34 @@ const findTable = (expr: ExpressionNode): string | null => {
  * Execute a parsed query consisting of one or more statements, honoring optional table allowlist.
  * Returns an object containing variables and the final result set under its name (or `result`).
  */
-export const executeQuery = async (statements: Statement[], allowedTables?: string[]) => {
-    const key = makeCacheKey(statements, allowedTables);
+export const executeQuery = async (statements: Statement[]) => {
+    const key = makeCacheKey(statements);
 
     return withQueryCache(key, async () => {
-        const ctx: ExecutionContext = {schemas: {}, variables: {}, allowedTables};
+        const ctx: ExecutionContext = {schemas: {}, variables: {}};
         const results: any[] = [];
         for (const stmt of statements) {
-            const res = await runStatement(stmt, ctx);
-            results.push(res);
+            try {
+                const res = await runStatement(stmt, ctx);
+                results.push(res);
+            } catch (err) {
+                if (err.message.includes('Unknown argument `contains`')) {
+                    throw HTTPError.badRequest({
+                        summary: 'Trying to search column with unsupported type. Are you trying to search a UUID/JSON/Date/Etc. with partial string matching?',
+                    });
+                }
+            }
         }
-        const returnObj = {
+
+        const returnObj: any = {
             variables: ctx.variables
         };
 
-        const result = results[results.length - 1];
-        returnObj[result.name || 'result'] = result.values;
+        for (const res of results) {
+            const name = (res as any).name || 'result';
+            returnObj[name] = (res as any).values;
+        }
+
         return returnObj;
     });
 };

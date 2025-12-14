@@ -19,6 +19,7 @@ export type ColumnType =
 export type TableColumn = {
     name: string;
     type: ColumnType;
+    isID: boolean;
     isOptional: boolean;
 };
 
@@ -81,6 +82,7 @@ const buildSchemas = (): Record<string, TableSchema> => {
             columns[field.name] = {
                 name: field.name,
                 type,
+                isID: field.isId || field.nativeType?.includes('Uuid') || false,
                 isOptional: field.isRequired === false,
             };
         }
@@ -142,6 +144,7 @@ export const getDefaultIdColumn = (table: string): TableColumn | undefined => {
     return {
         name: idField.name,
         type,
+        isID: true,
         isOptional: false,
     };
 };
