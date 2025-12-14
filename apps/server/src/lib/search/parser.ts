@@ -1,6 +1,6 @@
 import debug from 'debug';
-import {Aggregation, ColumnSelector, ExpressionNode, ParsedQuery, QueryValue, Statement, WhereNode} from './types';
-import {isValidTable} from './schema';
+import { Aggregation, ColumnSelector, ExpressionNode, ParsedQuery, QueryValue, Statement, WhereNode } from './types';
+import { isValidTable } from './schema';
 
 const logParser = debug('vg:search:parser');
 const logValue = debug('vg:search:parser:value');
@@ -74,9 +74,9 @@ const trimOuterBrackets = (input: string): string => {
 const parseAggregation = (segment: string): { aggregation?: Aggregation; rest: string } => {
     const aggMatch = segment.match(/^(COUNT|UNIQUE|FIRST|LAST)\(\)\s*/i);
     if (aggMatch) {
-        return {aggregation: aggMatch[1].toUpperCase() as Aggregation, rest: segment.slice(aggMatch[0].length)};
+        return { aggregation: aggMatch[1].toUpperCase() as Aggregation, rest: segment.slice(aggMatch[0].length) };
     }
-    return {rest: segment};
+    return { rest: segment };
 };
 
 /**
@@ -88,7 +88,7 @@ const parseAsColumn = (segment: string): { asColumn?: string; asColumns?: string
     if (match) {
         const raw = match[1].trim();
         if (raw === '*') {
-            return {asAll: true, rest: segment.slice(match[0].length)};
+            return { asAll: true, rest: segment.slice(match[0].length) };
         }
         const columns = raw.split(',').map((c) => c.trim()).filter(Boolean);
         return {
@@ -97,22 +97,24 @@ const parseAsColumn = (segment: string): { asColumn?: string; asColumns?: string
             rest: segment.slice(match[0].length)
         };
     }
-    return {rest: segment};
+    return { rest: segment };
 };
 
 /**
- * Detect a variable assignment of the form `$var[:target]=[ ... ]`.
+ * Detect a variable assignment of the form `$var[:target]=[ ... ]` or `$var[:target]=@PAGE(...)`.
  * Returns the variable name, optional target key, and the raw inner query text to parse later.
  */
 const parseVariableAssignment = (input: string): { name: string; targetKey?: string; inner: string } | null => {
-    const match = input.match(/^\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_]+))?\s*=\s*(\[.*)$/s);
+    // Allow starting with [ (normal query) or @ (page wrapper)
+    const match = input.match(/^\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_]+))?\s*=\s*([\[@].*)$/s);
     if (!match) return null;
-    return {name: match[1], targetKey: match[2], inner: match[3]};
+    return { name: match[1], targetKey: match[2], inner: match[3] };
 };
 
 /**
  * Split a full query string into pipeline segments separated by top-level bracketed expressions.
  * Maintains association between trailing "AS" clauses and the preceding bracketed block.
+ * Also respects parentheses for @PAGE(...) grouping.
  */
 const splitPipeline = (input: string): string[] => {
     const parts: string[] = [];
@@ -122,21 +124,83 @@ const splitPipeline = (input: string): string[] => {
     for (let i = 0; i < input.length; i++) {
         const ch = input[i];
 
+        // Check for @PAGE start to treat it as a segment starter
+        const isPageStart = ch === '@' && input.slice(i).toUpperCase().startsWith('@PAGE');
+
         // If we're about to start a new bracketed group while not nested,
         // flush the previous accumulator (this keeps trailing "AS <col>" with the group).
-        if (ch === '[' && depth === 0 && current.trim()) {
+        if ((ch === '[' || isPageStart) && depth === 0 && current.trim()) {
             parts.push(current.trim());
             current = '';
         }
 
         current += ch;
 
-        if (ch === '[') depth++;
-        else if (ch === ']') depth--;
+        if (ch === '[' || ch === '(') depth++;
+        else if (ch === ']' || ch === ')') depth--;
     }
 
     if (current.trim()) parts.push(current.trim());
     return parts;
+};
+
+/**
+ * Parse a @PAGE(skip, take, [Query]) wrapper.
+ * Returns the skip/take values and the inner query string (including any trailing AS).
+ */
+const parsePageWrapper = (input: string): { skip?: string | number; take?: string | number; inner: string } => {
+    const trimmed = input.trim();
+    if (!trimmed.toUpperCase().startsWith('@PAGE')) {
+        return { inner: input };
+    }
+
+    // Find the closing parenthesis for @PAGE(...)
+    let depth = 0;
+    let endIdx = -1;
+    const startIdx = trimmed.indexOf('(');
+    if (startIdx === -1) throw new Error("Invalid @PAGE syntax: missing parenthesis");
+
+    for (let i = startIdx; i < trimmed.length; i++) {
+        if (trimmed[i] === '(') depth++;
+        else if (trimmed[i] === ')') {
+            depth--;
+            if (depth === 0) {
+                endIdx = i;
+                break;
+            }
+        }
+    }
+
+    if (endIdx === -1) throw new Error("Unclosed @PAGE");
+
+    const argsContent = trimmed.slice(startIdx + 1, endIdx);
+    const trailing = trimmed.slice(endIdx + 1);
+
+    // Expect: skip, take, [Query]
+    // We find the first two commas to separate skip and take
+    const firstComma = argsContent.indexOf(',');
+    const secondComma = argsContent.indexOf(',', firstComma + 1);
+
+    if (firstComma === -1 || secondComma === -1) {
+        throw new Error("Invalid @PAGE arguments. Expected: @PAGE(skip, take, [Query])");
+    }
+
+    const skipRaw = argsContent.slice(0, firstComma).trim();
+    const takeRaw = argsContent.slice(firstComma + 1, secondComma).trim();
+    const queryRaw = argsContent.slice(secondComma + 1).trim();
+
+    const parseNumOrVar = (val: string) => {
+        if (val.startsWith('$')) return val;
+        const num = parseInt(val, 10);
+        if (isNaN(num)) return val; // Fallback to string if not a valid number, though likely invalid
+        return num;
+    };
+
+    return {
+        skip: parseNumOrVar(skipRaw),
+        take: parseNumOrVar(takeRaw),
+        inner: queryRaw + trailing
+    };
 };
 
 /**
@@ -153,8 +217,8 @@ const parseValue = (raw: string): QueryValue => {
         const preview = trimmed.length > 200 ? trimmed.slice(0, 200) + '…' : trimmed;
         logValue('parseValue rawLen=%d preview="%s"', trimmed.length, preview);
     }
-    if (/^\(\s*EMPTY\s*\)$/i.test(trimmed)) return {type: 'empty'};
-    if (/^\(\s*NOT\s+EMPTY\s*\)$/i.test(trimmed)) return {type: 'not_empty'};
+    if (/^\(\s*EMPTY\s*\)$/i.test(trimmed)) return { type: 'empty' };
+    if (/^\(\s*NOT\s+EMPTY\s*\)$/i.test(trimmed)) return { type: 'not_empty' };
 
     const variableMatch = trimmed.match(/^\(\s*\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_\.]+))?\s*->\s*(ANY|ALL|ONE)\s*\)$/i);
     if (variableMatch) {
@@ -193,14 +257,14 @@ const parseValue = (raw: string): QueryValue => {
                     value = value.slice(1);
                 }
 
-                return {value, or: or ? true : undefined, not: not ? true : undefined};
+                return { value, or: or ? true : undefined, not: not ? true : undefined };
             });
 
             if (logValue.enabled) {
                 logValue('parseValue list items=%d caseSensitive=%s', items.length, flag === 's');
             }
 
-            return {type: 'list', items, caseSensitive: flag === 's'};
+            return { type: 'list', items, caseSensitive: flag === 's' };
         }
     }
 
@@ -230,7 +294,7 @@ const parseValue = (raw: string): QueryValue => {
         if (logValue.enabled) {
             logValue('parseValue date from=%s to=%s', from, to);
         }
-        return {type: 'date', value: {from: from || undefined, to: to || undefined}};
+        return { type: 'date', value: { from: from || undefined, to: to || undefined } };
     }
 
     if (logValue.enabled) {
@@ -245,7 +309,7 @@ const parseColumnSelector = (segment: string): ColumnSelector => {
     const table = match[1];
     if (!isValidTable(table)) throw new Error(`Unknown table: ${table}`);
     const cols = match[2]?.split(',').map((c) => c.trim()).filter(Boolean);
-    const selector: ColumnSelector = {table, columns: cols?.length ? cols : undefined};
+    const selector: ColumnSelector = { table, columns: cols?.length ? cols : undefined };
     if (logWhere.enabled) {
         logWhere('parseColumnSelector table=%s columns=%o', selector.table, selector.columns ?? '*');
     }
@@ -289,7 +353,7 @@ const parseAtom = (segment: string): WhereNode => {
     const selectorStr = normalized.slice(0, normalized.length - valueStr.length).trim();
     const selector = parseColumnSelector(selectorStr);
     const value = parseValue(valueStr);
-    const node: WhereNode = {kind: 'basic', selector, value};
+    const node: WhereNode = { kind: 'basic', selector, value };
     if (logWhere.enabled) {
         logWhere('parseAtom basic table=%s columns=%o valueType=%s', selector.table, selector.columns ?? '*', value.type);
     }
@@ -339,7 +403,7 @@ const parseExpression = (segment: string): ExpressionNode => {
     // Handle NOT
     if (segment.toUpperCase().startsWith('NOT ')) {
         const expr = parseExpression(segment.slice(4).trim());
-        const node: ExpressionNode = {op: 'NOT', expr};
+        const node: ExpressionNode = { op: 'NOT', expr };
         if (logWhere.enabled) {
             logWhere('parseExpression NOT');
         }
@@ -377,7 +441,7 @@ const parseExpression = (segment: string): ExpressionNode => {
         logWhere('parseExpression ATOM kind=%s', atom.kind);
     }
     // Atom
-    return {op: 'ATOM', where: atom};
+    return { op: 'ATOM', where: atom };
 };
 
 /**
@@ -411,10 +475,12 @@ export const parseQuery = (input: string): ParsedQuery => {
         }
 
         pipelineParts.forEach((part, idx) => {
+            const { skip, take, inner } = parsePageWrapper(part);
+
             // Support trailing "AS <column>" after the bracketed expression
             let trailingAs: string | undefined;
             let trailingAsColumns: string[] | undefined;
-            let trimmedPart = part;
+            let trimmedPart = inner;
             const trailingMatch = trimmedPart.match(/^(.*\])\s+AS\s+([A-Za-z0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*$/i);
             if (trailingMatch) {
                 trimmedPart = trailingMatch[1];
@@ -434,7 +500,7 @@ export const parseQuery = (input: string): ParsedQuery => {
 
             let remaining = trimOuterBrackets(trimmedPart); // inner content
 
-            const {aggregation, rest: aggRest} = parseAggregation(remaining);
+            const { aggregation, rest: aggRest } = parseAggregation(remaining);
             remaining = aggRest;
             const {
                 asColumn: leadingAs,
@@ -462,14 +528,14 @@ export const parseQuery = (input: string): ParsedQuery => {
 
             const isLast = idx === pipelineParts.length - 1;
             if (targetName && isLast) {
-                statements.push({name: targetName, targetKey, query: expr, asColumn, asColumns, asAll, aggregation});
+                statements.push({ name: targetName, targetKey, query: expr, asColumn, asColumns, asAll, aggregation, skip, take });
             } else {
-                statements.push({type: 'expression', expr, asColumn, asColumns, asAll, aggregation});
+                statements.push({ type: 'expression', expr, asColumn, asColumns, asAll, aggregation, skip, take });
             }
         });
     }
     if (logParser.enabled) {
         logParser('parseQuery statements=%d', statements.length);
     }
-    return {statements};
+    return { statements };
 };

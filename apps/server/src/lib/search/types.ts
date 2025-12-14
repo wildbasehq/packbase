@@ -41,6 +41,8 @@ export type Assignment = {
     asColumns?: string[]; // preferred multi-column support
     asAll?: boolean; // AS *
     aggregation?: Aggregation;
+    skip?: number | string;
+    take?: number | string;
 };
 
 /** Expression-only statement (no variable target). */
@@ -51,6 +53,8 @@ export type Statement = Assignment | {
     asColumns?: string[]; // preferred multi-column support
     asAll?: boolean; // AS *
     aggregation?: Aggregation
+    skip?: number | string;
+    take?: number | string;
 };
 
 /** Runtime storage for materialized variable values and metadata. */
