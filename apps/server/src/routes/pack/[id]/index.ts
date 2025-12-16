@@ -43,7 +43,7 @@ export default (app: YapockType) =>
         // Edit
         .post(
             '',
-            async ({params: {id}, set, user, body}: { params: { id: string }; set: any; user: any; body: any }) => {
+            async ({params: {id}, set, user, body}) => {
                 requiresToken({set, user})
                 if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.ManagePack))) {
                     set.status = 403
@@ -88,7 +88,7 @@ export default (app: YapockType) =>
 
                 if (images) {
                     if (images.avatar) {
-                        const upload = await uploadFile('packbase-public-packs', `${id}/avatar.{ext}`, images.avatar, true)
+                        const upload = await uploadFile(process.env.S3_PACKS_BUCKET, `${id}/avatar.{ext}`, images.avatar, true)
                         if (upload.error) {
                             throw HTTPError.fromError(upload.error)
                         }
@@ -106,7 +106,7 @@ export default (app: YapockType) =>
                     }
 
                     if (images.header) {
-                        const upload = await uploadFile('packbase-public-packs', `${id}/header.{ext}`, images.header, true)
+                        const upload = await uploadFile(process.env.S3_PACKS_BUCKET, `${id}/header.{ext}`, images.header, true)
                         if (upload.error) {
                             throw HTTPError.fromError(upload.error)
                         }
@@ -165,14 +165,6 @@ function convertBigIntsToNumbers(obj: any): any {
 }
 
 export async function getPack(id: string, scope?: string, userId?: string) {
-    if (id === '00000000-0000-0000-0000-000000000000')
-        return {
-            created_at: '1970-01-01T00:00:00.000Z',
-            owner_id: '00000000-0000-0000-0000-000000000000',
-            id: '00000000-0000-0000-0000-000000000000',
-            display_name: 'Universe',
-            slug: 'universe',
-        }
     const timer = new Date().getTime()
     let cached = PackCache.get(id)
     if (cached && cached.expires_after < Date.now()) {

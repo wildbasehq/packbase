@@ -3,7 +3,6 @@ import {lazy, Suspense} from "react"
 import {Redirect, Route, Switch} from "wouter"
 import {LogoSpinner} from "@/src/components";
 import Body from "@/components/layout/body.tsx";
-import UniversePackLayout from "@/pages/pack/universe/layout.tsx";
 import PackChannelThread from "@/pages/pack/[slug]/[channel]/[thread]/page.tsx";
 import ChatLayout from "@/pages/c/layout.tsx";
 import NotSelected from "@/pages/c/not-selected.tsx";
@@ -14,7 +13,6 @@ import UserFolderPage from "@/pages/user/[...slug]/folders/[id]/page.tsx";
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
 const IDLogin = lazy(() => import('@/pages/id/login/page.tsx'))
 const IDWaitlist = lazy(() => import('@/pages/id/waitlist/page.tsx'))
-const UniversePack = lazy(() => import('@/pages/pack/universe/page.tsx'))
 const PackChannel = lazy(() => import('@/pages/pack/[slug]/[channel]/page.tsx'))
 const PackLayout = lazy(() => import('@/pages/pack/[slug]/layout.tsx'))
 const PackHome = lazy(() => import('@/pages/pack/[slug]/page.tsx'))
@@ -42,7 +40,7 @@ export default function Routes() {
         <Switch>
             <Route path="/">
                 <SignedIn>
-                    <Redirect to="/p/universe"/>
+                    <Redirect to="/me"/>
                 </SignedIn>
                 <SignedOut>
                     <GuestLanding/>
@@ -90,34 +88,6 @@ export default function Routes() {
                         <Suspense fallback={<LoadingFallback/>}>
                             <PackAdd/>
                         </Suspense>
-                    </Route>
-
-                    <Route path="/universe" nest>
-                        <UniversePackLayout>
-                            <Route path="/">
-                                <Suspense fallback={<LoadingFallback/>}>
-                                    <UniversePack/>
-                                </Suspense>
-                            </Route>
-
-                            <Route path="/cosmos">
-                                <SignedOut>
-                                    <Redirect to="/"/>
-                                </SignedOut>
-
-                                <SignedIn>
-                                    <Suspense fallback={<LoadingFallback/>}>
-                                        <UniversePack useEverythingQuery/>
-                                    </Suspense>
-                                </SignedIn>
-                            </Route>
-
-                            <Route path="/:channel/:id" nest>
-                                <Suspense fallback={<LoadingFallback/>}>
-                                    <PackChannelThread/>
-                                </Suspense>
-                            </Route>
-                        </UniversePackLayout>
                     </Route>
 
                     <Route path="/:slug" nest>

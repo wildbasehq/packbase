@@ -12,7 +12,6 @@ import {usePerformanceMonitor} from '@/components/chat/usePerformanceMonitor.ts'
 import {useQueryClient} from '@tanstack/react-query'
 import {useUserAccountStore} from '@/lib'
 import {HomeModernIcon} from '@heroicons/react/24/solid'
-import {UniverseSidebarContent} from '../pack/universe/layout'
 
 export default function ChatLayout({children}: { children: ReactNode }) {
     const {id} = useParams<{ id: string }>()
@@ -37,7 +36,7 @@ export default function ChatLayout({children}: { children: ReactNode }) {
     return (
         <>
             <SidebarPortal>
-                <UniverseSidebarContent/>
+                <ChatSidebarContent/>
             </SidebarPortal>
             {children}
         </>

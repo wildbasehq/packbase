@@ -3,33 +3,25 @@
  */
 
 import Tooltip from '@/components/shared/tooltip'
-import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
-import {ExclamationTriangleIcon, GlobeAsiaAustraliaIcon} from '@heroicons/react/20/solid'
+import {useResourceStore, useUIStore} from '@/lib/state'
+import {GlobeAsiaAustraliaIcon, MagnifyingGlassIcon, StarIcon} from '@heroicons/react/20/solid'
 import {useLocation} from 'wouter'
-import {Activity, useCallback, useEffect, useRef, useState} from "react"
-import {Heading, NavbarItem, NavbarLabel} from "@/src/components";
-import {Text} from "@/components/shared/text.tsx";
-import {SignedIn, SignedOut} from "@clerk/clerk-react";
-import {Login} from "@/components/icons/plump/Login.tsx";
-import {cn, isVisible} from "@/lib";
+import {useCallback, useEffect, useRef, useState} from "react"
+import {NavbarItem, NavbarLabel} from "@/src/components";
+import {SignedIn} from "@clerk/clerk-react";
+import {cn} from "@/lib";
 
 export default function PackSwitcher({onChange}: {
     onChange: (resource: any) => void
 }) {
     const {currentResource, setCurrentResource, resources, resourceDefault} = useResourceStore()
-    const {loading, setLoading} = useUIStore()
-    const {user} = useUserAccountStore()
+    const {setLoading} = useUIStore()
     const [, navigate] = useLocation()
     const scrollRef = useRef<HTMLDivElement | null>(null)
     const [hasLeftOverflow, setHasLeftOverflow] = useState(false)
     const [hasRightOverflow, setHasRightOverflow] = useState(false)
 
     const switchResource = (resource: any) => {
-        if (loading || currentResource.id === resource.id) {
-            if (resource.slug === 'universe') navigate('/p/universe')
-        }
-
-        resource.is_owner = currentResource.owner_id === user?.id
         setCurrentResource(resource)
         setLoading(true)
         navigate(`/p/${resource.slug}`)
@@ -81,73 +73,11 @@ export default function PackSwitcher({onChange}: {
             onScroll={handleScroll}
         >
             <div className="inline-grid w-max grid-rows-3 grid-flow-col gap-2 auto-cols-max">
-                <NavbarItem
-                    className="flex w-2xs [&>*]:w-full"
-                    href="/p/new"
-                    onClick={() => onChange({})}
-                >
-                    <GlobeAsiaAustraliaIcon className="w-6 h-6"/>
-                    <NavbarLabel className="text-muted-foreground group-hover:text-foreground">Explore / Create
-                        Packs&hellip;</NavbarLabel>
-                </NavbarItem>
-
-                <SignedOut>
-                    <NavbarItem
-                        className="flex w-2xs [&>*]:w-full"
-                        href="/id/login"
-                        onClick={() => onChange({})}
-                    >
-                        <Login className="w-6 h-6"/>
-                        <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
-                            Login&hellip;
-                        </NavbarLabel>
-                    </NavbarItem>
-
-                    <Activity
-                        mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'open' || !import.meta.env.VITE_REIGSTRATION_TYPE)}>
-                        <NavbarItem
-                            className="flex w-2xs [&>*]:w-full"
-                            href="/id/create"
-                            onClick={() => onChange({})}
-                        >
-                            <Login className="w-6 h-6"/>
-                            <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
-                                Register&hellip;
-                            </NavbarLabel>
-                        </NavbarItem>
-                    </Activity>
-
-                    <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'waitlist')}>
-                        <NavbarItem
-                            className="flex w-2xs [&>*]:w-full"
-                            href="/id/create"
-                            onClick={() => onChange({})}
-                        >
-                            <Login className="w-6 h-6"/>
-                            <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
-                                Join the Waitlist&hellip;
-                            </NavbarLabel>
-                        </NavbarItem>
-                    </Activity>
-
-                    <Activity mode={isVisible(import.meta.env.VITE_REIGSTRATION_TYPE === 'closed')}>
-                        <NavbarItem
-                            className="flex w-2xs [&>*]:w-full"
-                            href="/p/new"
-                            onClick={() => onChange({})}
-                        >
-                            <NavbarLabel className="text-muted-foreground group-hover:text-foreground">
-                                Registration Closed.
-                            </NavbarLabel>
-                        </NavbarItem>
-                    </Activity>
-                </SignedOut>
-
                 <SignedIn>
-                    {[resourceDefault, ...resources].map((pack, colIdx) => (
+                    {[...resources].map((pack, colIdx) => (
                         <NavbarItem
                             key={colIdx}
-                            className={cn("flex w-2xs [&>*]:w-full", currentResource.id === pack.id && "ring-1 rounded ring-default bg-card")}
+                            className={cn("flex w-2xs *:w-full", currentResource.id === pack.id && "ring-1 rounded ring-default bg-card")}
                             onClick={() => switchResource(pack)}
                         >
                             <img
@@ -155,6 +85,7 @@ export default function PackSwitcher({onChange}: {
                                 className="rounded-sm shrink-0 w-6 h-6 border overflow-hidden"
                                 src={pack.images?.avatar || '/img/default-avatar.png'}
                             />
+
                             <div className="flex flex-col -space-y-1 w-full relative">
                                 <NavbarLabel>{pack.display_name}</NavbarLabel>
                                 <NavbarLabel className="text-muted-foreground text-xs">
@@ -164,39 +95,50 @@ export default function PackSwitcher({onChange}: {
                                     {/*    interval={1500 + colIdx * Math.random() * 1000}/>*/}
                                 </NavbarLabel>
                             </div>
-                            <Tooltip
-                                content={
-                                    <>
-                                        <Heading className="!text-sm">System fault precautions are in
-                                            effect.</Heading>
-                                        <Text className="!text-xs">
-                                            Our content moderation system is currently having some issues.
-                                            We've temporarily enabled stricter (but sensitive) filtering which
-                                            may block valid content. We're extremely sorry. /rek.
-                                        </Text>
-                                    </>
-                                }>
-                                <ExclamationTriangleIcon
-                                    data-hardcoded-reasoning="Rheo manages feature flags - can't change due to Rheo being down."
-                                    className="!fill-orange-500"/>
-                            </Tooltip>
+
+                            {pack.id === resourceDefault?.id && (
+                                <Tooltip
+                                    delayDuration={1000}
+                                    content="Default Pack">
+                                    <StarIcon/>
+                                </Tooltip>
+                            )}
+
+                            {pack.temporary && (
+                                <Tooltip
+                                    delayDuration={1000}
+                                    content="From Search. Will disappear when navigating away.">
+                                    <MagnifyingGlassIcon/>
+                                </Tooltip>
+                            )}
+
                             {/*<ChevronDownIcon/>*/}
                         </NavbarItem>
                     ))}
+
+                    <NavbarItem
+                        className="flex w-2xs *:w-full"
+                        href="/p/new"
+                        onClick={() => onChange({})}
+                    >
+                        <GlobeAsiaAustraliaIcon className="w-6 h-6"/>
+                        <NavbarLabel className="text-muted-foreground group-hover:text-foreground">Explore / Create
+                            Packs&hellip;</NavbarLabel>
+                    </NavbarItem>
                 </SignedIn>
             </div>
 
             {/* Left gradient (only when there's content to the left) */}
             {hasLeftOverflow && (
                 <div
-                    className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-muted to-transparent"
+                    className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-linear-to-r from-muted to-transparent"
                 />
             )}
 
             {/* Right gradient (only when there's content to the right) */}
             {hasRightOverflow && (
                 <div
-                    className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-muted to-transparent"
+                    className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-linear-to-l from-muted to-transparent"
                 />
             )}
         </div>

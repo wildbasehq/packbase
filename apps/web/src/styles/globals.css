@@ -17,6 +17,7 @@
 @import './tailwind/spacing.css';
 @import './tailwind/animations.css';
 
+@plugin './tailwind/highlight.js';
 @plugin "tailwindcss-animate";
 /*
  ---break---

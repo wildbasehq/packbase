@@ -44,10 +44,12 @@ function PreloadChild({children}: { children: ReactNode }) {
         id: 'user.me',
         enabled: isSignedIn,
     })
+
     const {data: userPacksData, isLoading: userPacksLoading} = useContentFrame('get', 'user.me.packs', undefined, {
         id: 'user.me.packs',
         enabled: isSignedIn,
     })
+
     const {data: server} = useContentFrame('get', 'server.describeServer', undefined, {
         id: 'server.describeServer',
     })
@@ -74,29 +76,19 @@ function PreloadChild({children}: { children: ReactNode }) {
         }
 
         if (isSignedIn) {
-            // if (!userMeData) {
-            //     setError({
-            //         cause: 'User data is missing!!!',
-            //         message: 'We may be down right now, or just a one-off problem. Try reloading.'
-            //     })
-            //     return
-            // }
+            setStatus('auth:@me')
+
+            if (!userMeData) {
+                throw new Error('User data not found after sign-in. Try reloading.')
+            }
+
+            if (userMeData.default_pack === '00000000-0000-0000-0000-000000000000' && !window.location.pathname.startsWith('/p/universe/sunset')) {
+                window.location.pathname = '/p/universe/sunset'
+                return
+            }
 
             setUser(userMeData)
-            setStatus('auth:@me')
-            setResourceDefault({
-                id: '00000000-0000-0000-0000-000000000000',
-                display_name: userMeData.display_name || userMeData.username || 'Packbase',
-                slug: 'universe',
-                standalone: true,
-                images: userMeData.images,
-                ticker: [
-                    'Now in public alpha testing!',
-                    'Invite Badge Event extended',
-                    'Universe pack deletion',
-                    'R18 content allowed'
-                ]
-            })
+            setResourceDefault(userMeData.default_pack)
 
             proceed()
         } else {
@@ -161,11 +153,11 @@ function PreloadChild({children}: { children: ReactNode }) {
                     <LogoSpinner/>
                     <span className="text-sm mt-1">
                         <Activity
-                            mode={isVisible(serviceLoading.startsWith('auth'))}>
+                            mode={isVisible(serviceLoading === 'auth')}>
                             Checking data...
                         </Activity>
                         <Activity
-                            mode={isVisible(serviceLoading.startsWith('auth:@me'))}>
+                            mode={isVisible(serviceLoading === 'auth:@me')}>
                             Getting profile...
                         </Activity>
                         <Activity mode={isVisible(serviceLoading.startsWith('cron'))}>Welcome!</Activity>

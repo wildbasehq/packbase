@@ -15,7 +15,7 @@ import {useFeedHandlers} from './hooks/use-feed-handlers'
 import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
 
 export default function Feed({
-                                 packID = '00000000-0000-0000-0000-000000000000',
+                                 packID,
                                  channelID,
                                  feedQueryOverride,
                                  titleOverride,
@@ -72,8 +72,7 @@ export default function Feed({
     const isFirstPageLoading = isLoading && page === 1
 
     return (
-        <div className="relative pb-20 max-w-3xl space-y-4 mx-auto">
-
+        <div className="pb-20 max-w-3xl space-y-4 mx-auto">
             {isFirstPageLoading ? (
                 <FeedLoading isMasonry={false} message="Loading howls..."/>
             ) : (

@@ -6,7 +6,7 @@ import React, {Activity, useEffect, useState} from 'react'
 import {useParams} from 'wouter'
 import {useContentFrame} from '@/lib/hooks/content-frame.tsx'
 import Body from '@/components/layout/body'
-import {Feed, FeedError, FeedList, FeedLoading} from '@/components/feed'
+import {Feed, FeedError, FeedLoading} from '@/components/feed'
 import {Heading, Text} from '@/components/shared/text'
 import {vg} from '@/lib/api'
 import {isVisible} from "@/lib";
@@ -84,9 +84,6 @@ export default function UserFolderPage() {
                         <div className="flex items-center gap-2">
                             <span className="text-2xl" aria-hidden>{folder.emoji || '📁'}</span>
                             <Heading size="md">{folder.name}</Heading>
-                            {folder.mode === 'dynamic' &&
-                                <span
-                                    className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Dynamic</span>}
                         </div>
                         {folder.description && <Text size="sm" alt className="mt-1">{folder.description}</Text>}
                     </div>
@@ -97,27 +94,7 @@ export default function UserFolderPage() {
                 </div>
             )}
 
-            {folder?.mode === 'dynamic' && (
-                <Feed feedQueryOverride={folder.query}/>
-            )}
-
-            {folder?.mode === 'manual' && (
-                <div className="relative pb-20 max-w-3xl space-y-4 mx-auto">
-                    <Activity mode={isVisible(loadingManual)}>
-                        <FeedLoading isMasonry={false} message="Loading howls..."/>
-                    </Activity>
-
-                    <Activity mode={isVisible(manualError)}>
-                        <FeedError error={manualError as any}/>
-                    </Activity>
-
-                    <Activity mode={isVisible(manualPosts.length > 0)}>
-                        <FeedList posts={manualPosts as any} hasMore={false} onLoadMore={async () => {
-                        }} onPostDelete={() => {
-                        }}/>
-                    </Activity>
-                </div>
-            )}
+            <Feed feedQueryOverride={folder?.query}/>
         </div>
     )
 }

@@ -3,7 +3,6 @@
  */
 
 import {useResourceStore} from '@/lib/state'
-import PackHeader from '@/components/shared/pack/header'
 import {Feed} from '@/components/feed'
 import {Protect} from '@clerk/clerk-react'
 
@@ -17,21 +16,18 @@ export default function PackFeedController({overrideFeedID, channelID, feedQuery
     const {currentResource} = useResourceStore()
 
     // Determine feed ID based on context
-    const feedID = overrideFeedID || (currentResource?.slug === 'universe' ? 'universe:home' : currentResource?.id)
+    const feedID = overrideFeedID || currentResource.id
 
     return (
-        <div className="relative">
-            {/* Pack header (if in a specific pack) */}
-            {currentResource && !currentResource.standalone && <PackHeader pack={currentResource}/>}
-
-            <Protect>
+        <Protect>
+            <div className="relative">
                 <div className="flex flex-col">
                     {/* Feed container */}
                     <div className="p-4 sm:p-8">
                         <Feed packID={feedID} channelID={channelID} feedQueryOverride={feedQueryOverride}/>
                     </div>
                 </div>
-            </Protect>
-        </div>
+            </div>
+        </Protect>
     )
 }

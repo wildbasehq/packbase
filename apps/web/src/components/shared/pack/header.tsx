@@ -4,6 +4,7 @@ import {Button} from '@/components/shared'
 import {vg} from '@/lib/api'
 import {toast} from 'sonner'
 import {MinusIcon, PlusIcon} from '@heroicons/react/16/solid'
+import {hasPackPermissionBit, PACK_PERMISSIONS} from "@/lib/utils/has-pack-permission-bit.ts";
 
 export default function PackHeader({...props}: any) {
     const pack = props.pack
@@ -36,11 +37,6 @@ export default function PackHeader({...props}: any) {
                             </div>
                         </div>
                     </div>
-                    {!pack.is_owner && (
-                        <div>
-                            <PackMembershipButton pack={pack}/>
-                        </div>
-                    )}
                 </div>
                 <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
                     <Heading>{pack.display_name || pack.slug}</Heading>
@@ -88,8 +84,14 @@ function PackMembershipButton({pack}: { pack: any }) {
         )
     }
 
+    if (hasPackPermissionBit(pack.membership?.permissions, PACK_PERMISSIONS.Owner)) {
+        return (
+            <></>
+        )
+    }
+
     return (
-        <Button outline onClick={packLeave} disabled={(pack.membership?.permissions & 1) === 1}>
+        <Button outline onClick={packLeave}>
             <MinusIcon data-slot="icon"/> Leave
         </Button>
     )

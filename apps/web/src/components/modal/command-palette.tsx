@@ -16,7 +16,7 @@ import {
     UserCircleIcon,
     UserGroupIcon
 } from "@heroicons/react/20/solid";
-import {vg} from "@/lib";
+import {cn, vg} from "@/lib";
 import PackHeader from "@/components/shared/pack/header";
 import {LoadingSpinner, UserHoverCard} from "@/src/components";
 import UserInfoCol from "@/components/shared/user/info-col.tsx";
@@ -189,15 +189,15 @@ function useCommandPaletteSearch() {
                 let finalQuery = query.trim();
                 if (!finalQuery.startsWith('[') && !finalQuery.startsWith('$')) {
                     finalQuery = `
-                    ${allowedTables.includes("posts") &&
-                    `
+                    ${allowedTables.includes("posts") ?
+                        `
                     $posts = [Where posts (${queryBuildFromRaw(query)})] AS *;
                     $posts:user = [Where profiles ($posts:user_id->ONE)] AS *;
                     $posts:pack = [Where packs ($posts:tenant_id->ONE)] AS *;
-                    `
+                    ` : ''
                     }
-                    ${allowedTables.includes("profiles") && `$profiles = [Where profiles (${queryBuildFromRaw(query)})] AS *;`}
-                    ${allowedTables.includes("packs") && `$packs = [Where packs (${queryBuildFromRaw(query)})] AS *;`}
+                    ${allowedTables.includes("profiles") ? `$profiles = [Where profiles (${queryBuildFromRaw(query)})] AS *;` : ''}
+                    ${allowedTables.includes("packs") ? `$packs = [Where packs (${queryBuildFromRaw(query)})] AS *;` : ''}
                     `.trim().replaceAll('                    ', '')
                 }
 
@@ -278,14 +278,8 @@ function CommandPaletteInput({
                 className="col-start-1 row-start-1 h-11 w-full rounded-t-xl border-b border-border bg-sidebar pr-4 pl-11 text-sm text-foreground outline-hidden placeholder:text-muted-foreground focus-visible:ring-offset-background sm:h-12 sm:text-base"
                 placeholder="Search profiles, packs, and posts..."
                 onChange={(event) => setRawQuery(event.target.value)}
-                onKeyDown={(event) => {
-                    if (event.key === "Escape") {
-                        event.preventDefault();
-                        // Clear the query; dialog-level handler will close if needed
-                        setRawQuery("");
-                    }
-                }}
                 value={rawQuery}
+
             />
             <MagnifyingGlassIcon
                 className="pointer-events-none col-start-1 row-start-1 ml-4 size-5 self-center text-muted-foreground"
@@ -321,14 +315,14 @@ function CommandPalettePreview({activeOption}: { activeOption: any }) {
 
     return (
         <div
-            className="hidden h-96 w-1/2 flex-none flex-col divide-y divide-border overflow-y-auto bg-muted/40 sm:flex">
+            className="hidden h-96 w-full flex-none flex-col divide-y divide-border overflow-y-auto bg-muted/40 sm:flex">
             {type === "profile" && (
                 <div className="p-6">
                     <UserHoverCard user={activeOption}/>
                 </div>
             )}
             {type === "pack" && (
-                <div className="p-6">
+                <div className="px-6">
                     <PackHeader pack={activeOption}/>
                 </div>
             )}
@@ -364,192 +358,213 @@ function CommandPaletteResultsList({
 }) {
     const showStateShell = isLoading || hasResults || rawQuery === "?" || (query !== "" && !hasResults);
 
-    if (!showStateShell) return null;
-
     return (
-        <ComboboxOptions
-            as="div"
-            static
-            hold
-            className="flex w-full transform-gpu divide-x divide-border"
+        <motion.div
+            animate={showStateShell ? "visible" : "hidden"}
+            variants={{
+                hidden: {
+                    height: 1,
+                },
+                visible: {
+                    height: "24rem",
+                }
+            }}
+            transition={{
+                type: 'spring',
+                stiffness: 300,
+                damping: 25,
+                duration: 0.65,
+            }}
+            className="shadow-[3px_0_8px_0_rgba(0,0,0,0.1)]"
         >
-            <div
-                className={classNames(
-                    "max-h-96 min-w-0 flex-auto scroll-py-4 overflow-y-auto px-6 py-4",
-                    "text-sm",
-                )}
+            <ComboboxOptions
+                as="div"
+                static
+                hold
+                className="flex w-full transform-gpu divide-x divide-border"
             >
-                {isLoading && (
-                    <div className="px-6 py-14 text-center text-sm" role="status" aria-live="polite">
-                        <LoadingSpinner className="mx-auto size-6"/>
-                        <p className="mt-4 text-muted-foreground">Searching the universe...</p>
-                    </div>
-                )}
+                <div
+                    className={classNames(
+                        "max-h-96 min-w-0 flex-auto scroll-py-4 overflow-y-auto px-6 py-4",
+                        "text-sm",
+                    )}
+                >
+                    {isLoading && (
+                        <div className="px-6 py-14 text-center text-sm" role="status" aria-live="polite">
+                            <LoadingSpinner className="mx-auto size-6"/>
+                            <p className="mt-4 text-muted-foreground">Searching the universe...</p>
+                        </div>
+                    )}
 
-                {!isLoading && hasResults && (
-                    <div className="-mx-2 space-y-4 text-sm text-foreground">
-                        {filteredProfiles.length > 0 && (
-                            <CommandPaletteSection title="Profiles">
-                                {filteredProfiles.map((profile) => (
-                                    <ComboboxOption
-                                        as="div"
-                                        key={profile.id}
-                                        value={profile}
-                                        className="group flex cursor-default items-center gap-3 rounded-md px-2 py-2.5 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
-                                    >
-                                        {profile.images?.avatar ? (
-                                            <img
-                                                src={profile.images.avatar}
-                                                alt=""
-                                                className="size-7 flex-none rounded-full"
-                                            />
-                                        ) : (
-                                            <UserCircleIcon
-                                                className="size-7 flex-none text-muted-foreground group-data-focus:text-white"
+                    {!isLoading && hasResults && (
+                        <div className="-mx-2 space-y-4 text-sm text-foreground">
+                            {filteredProfiles.length > 0 && (
+                                <CommandPaletteSection title="Profiles">
+                                    {filteredProfiles.map((profile) => (
+                                        <ComboboxOption
+                                            as="div"
+                                            key={profile.id}
+                                            value={profile}
+                                            className="group flex cursor-default items-center gap-3 rounded-md px-2 py-2.5 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
+                                        >
+                                            {profile.images?.avatar ? (
+                                                <img
+                                                    src={profile.images.avatar}
+                                                    alt=""
+                                                    className="size-7 flex-none rounded-full"
+                                                />
+                                            ) : (
+                                                <UserCircleIcon
+                                                    className="size-7 flex-none text-muted-foreground group-data-focus:text-white"
+                                                    aria-hidden="true"
+                                                />
+                                            )}
+                                            <div className="min-w-0 flex-auto">
+                                                <p className="truncate text-sm font-medium">{profile.display_name}</p>
+                                                {profile.description && (
+                                                    <p className="truncate text-xs text-muted-foreground group-data-focus:text-indigo-100">
+                                                        {profile.description}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </ComboboxOption>
+                                    ))}
+                                </CommandPaletteSection>
+                            )}
+
+                            {filteredPacks.length > 0 && (
+                                <CommandPaletteSection title="Packs">
+                                    {filteredPacks.map((pack) => (
+                                        <ComboboxOption
+                                            as="div"
+                                            key={pack.id}
+                                            value={pack}
+                                            className="group flex cursor-default items-center gap-3 rounded-md px-2 py-2.5 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
+                                        >
+                                            {pack.images?.avatar ? (
+                                                <img
+                                                    src={pack.images.avatar}
+                                                    alt=""
+                                                    className="size-7 flex-none rounded-full"
+                                                />
+                                            ) : (
+                                                <UserGroupIcon
+                                                    className="size-7 flex-none text-muted-foreground group-data-focus:text-white"
+                                                    aria-hidden="true"
+                                                />
+                                            )}
+                                            <div className="min-w-0 flex-auto">
+                                                <p className="truncate text-sm font-medium">{pack.display_name}</p>
+                                                {pack.description && (
+                                                    <p className="truncate text-xs text-muted-foreground group-data-focus:text-indigo-100">
+                                                        {pack.description}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </ComboboxOption>
+                                    ))}
+                                </CommandPaletteSection>
+                            )}
+
+                            {filteredPosts.length > 0 && (
+                                <CommandPaletteSection title="Posts">
+                                    {filteredPosts.map((post) => (
+                                        <ComboboxOption
+                                            as="div"
+                                            key={post.id}
+                                            value={post}
+                                            className="group flex cursor-default items-center gap-3 rounded-md px-2 py-2.5 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
+                                        >
+                                            <RectangleStackIcon
+                                                className="size-6 flex-none text-muted-foreground group-data-focus:text-white"
                                                 aria-hidden="true"
                                             />
-                                        )}
-                                        <div className="min-w-0 flex-auto">
-                                            <p className="truncate text-sm font-medium">{profile.display_name}</p>
-                                            {profile.description && (
-                                                <p className="truncate text-xs text-muted-foreground group-data-focus:text-indigo-100">
-                                                    {profile.description}
+                                            <div className="min-w-0 flex-auto">
+                                                {post.user && (
+                                                    <p className="text-xs text-muted-foreground group-data-focus:text-indigo-100">
+                                                        {post.user.display_name}
+                                                    </p>
+                                                )}
+                                                <p className="truncate text-sm">
+                                                    {post.body?.substring(0, 80)}
+                                                    {post.body && post.body.length > 80 ? "…" : ""}
                                                 </p>
-                                            )}
-                                        </div>
-                                    </ComboboxOption>
-                                ))}
-                            </CommandPaletteSection>
-                        )}
+                                            </div>
+                                        </ComboboxOption>
+                                    ))}
+                                </CommandPaletteSection>
+                            )}
+                        </div>
+                    )}
 
-                        {filteredPacks.length > 0 && (
-                            <CommandPaletteSection title="Packs">
-                                {filteredPacks.map((pack) => (
-                                    <ComboboxOption
-                                        as="div"
-                                        key={pack.id}
-                                        value={pack}
-                                        className="group flex cursor-default items-center gap-3 rounded-md px-2 py-2.5 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
-                                    >
-                                        {pack.images?.avatar ? (
-                                            <img
-                                                src={pack.images.avatar}
-                                                alt=""
-                                                className="size-7 flex-none rounded-full"
-                                            />
-                                        ) : (
-                                            <UserGroupIcon
-                                                className="size-7 flex-none text-muted-foreground group-data-focus:text-white"
-                                                aria-hidden="true"
-                                            />
-                                        )}
-                                        <div className="min-w-0 flex-auto">
-                                            <p className="truncate text-sm font-medium">{pack.display_name}</p>
-                                            {pack.description && (
-                                                <p className="truncate text-xs text-muted-foreground group-data-focus:text-indigo-100">
-                                                    {pack.description}
-                                                </p>
-                                            )}
-                                        </div>
-                                    </ComboboxOption>
-                                ))}
-                            </CommandPaletteSection>
-                        )}
+                    {rawQuery === "?" && !isLoading && (
+                        <div
+                            className="px-6 py-14 text-center text-sm sm:px-14"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <LifebuoyIcon
+                                className="mx-auto size-6 text-muted-foreground"
+                                aria-hidden="true"
+                            />
+                            <p className="mt-4 text-sm font-semibold text-foreground">
+                                Help with searching
+                            </p>
+                            <p className="mt-2 text-sm text-muted-foreground">
+                                Use the command palette to quickly jump to profiles, packs, and posts across
+                                Packbase.
+                            </p>
+                            <ul className="mt-4 space-y-1 text-xs text-muted-foreground">
+                                <li>
+                                    <kbd
+                                        className="rounded border border-border bg-card px-1 py-0.5 text-[11px] font-mono">
+                                        @
+                                    </kbd>{" "}
+                                    Search profiles only
+                                </li>
+                                <li>
+                                    <kbd
+                                        className="rounded border border-border bg-card px-1 py-0.5 text-[11px] font-mono">
+                                        #
+                                    </kbd>{" "}
+                                    Search packs only
+                                </li>
+                                <li>
+                                    Type anything else to search across everything.
+                                </li>
+                            </ul>
+                            <p className="mt-4 text-xs text-muted-foreground">
+                                Pro tip: Hit <span className="font-mono">Ctrl</span>/<span
+                                className="font-mono">⌘</span>
+                                <span className="font-mono">+K</span> from anywhere to open this.
+                            </p>
+                        </div>
+                    )}
 
-                        {filteredPosts.length > 0 && (
-                            <CommandPaletteSection title="Posts">
-                                {filteredPosts.map((post) => (
-                                    <ComboboxOption
-                                        as="div"
-                                        key={post.id}
-                                        value={post}
-                                        className="group flex cursor-default items-center gap-3 rounded-md px-2 py-2.5 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
-                                    >
-                                        <RectangleStackIcon
-                                            className="size-6 flex-none text-muted-foreground group-data-focus:text-white"
-                                            aria-hidden="true"
-                                        />
-                                        <div className="min-w-0 flex-auto">
-                                            {post.user && (
-                                                <p className="text-xs text-muted-foreground group-data-focus:text-indigo-100">
-                                                    {post.user.display_name}
-                                                </p>
-                                            )}
-                                            <p className="truncate text-sm">
-                                                {post.body?.substring(0, 80)}
-                                                {post.body && post.body.length > 80 ? "…" : ""}
-                                            </p>
-                                        </div>
-                                    </ComboboxOption>
-                                ))}
-                            </CommandPaletteSection>
-                        )}
-                    </div>
-                )}
+                    {!isLoading && query !== "" && rawQuery !== "?" && !hasResults && (
+                        <div
+                            className="px-6 py-14 text-center text-sm sm:px-14"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <ExclamationTriangleIcon
+                                className="mx-auto size-6 text-muted-foreground"
+                                aria-hidden="true"
+                            />
+                            <p className="mt-4 font-semibold text-foreground">No results found</p>
+                            <p className="mt-2 text-muted-foreground">
+                                We couldn't find anything that matches that term. Try a different keyword or
+                                use <span className="font-mono">@name</span> or <span
+                                className="font-mono">#pack</span>.
+                            </p>
+                        </div>
+                    )}
+                </div>
 
-                {rawQuery === "?" && !isLoading && (
-                    <div
-                        className="px-6 py-14 text-center text-sm sm:px-14"
-                        role="status"
-                        aria-live="polite"
-                    >
-                        <LifebuoyIcon
-                            className="mx-auto size-6 text-muted-foreground"
-                            aria-hidden="true"
-                        />
-                        <p className="mt-4 text-sm font-semibold text-foreground">
-                            Help with searching
-                        </p>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Use the command palette to quickly jump to profiles, packs, and posts across
-                            Packbase.
-                        </p>
-                        <ul className="mt-4 space-y-1 text-xs text-muted-foreground">
-                            <li>
-                                <kbd className="rounded border border-border bg-card px-1 py-0.5 text-[11px] font-mono">
-                                    @
-                                </kbd>{" "}
-                                Search profiles only
-                            </li>
-                            <li>
-                                <kbd className="rounded border border-border bg-card px-1 py-0.5 text-[11px] font-mono">
-                                    #
-                                </kbd>{" "}
-                                Search packs only
-                            </li>
-                            <li>
-                                Type anything else to search across everything.
-                            </li>
-                        </ul>
-                        <p className="mt-4 text-xs text-muted-foreground">
-                            Pro tip: Hit <span className="font-mono">Ctrl</span>/<span className="font-mono">⌘</span>
-                            <span className="font-mono">+K</span> from anywhere to open this.
-                        </p>
-                    </div>
-                )}
-
-                {!isLoading && query !== "" && rawQuery !== "?" && !hasResults && (
-                    <div
-                        className="px-6 py-14 text-center text-sm sm:px-14"
-                        role="status"
-                        aria-live="polite"
-                    >
-                        <ExclamationTriangleIcon
-                            className="mx-auto size-6 text-muted-foreground"
-                            aria-hidden="true"
-                        />
-                        <p className="mt-4 font-semibold text-foreground">No results found</p>
-                        <p className="mt-2 text-muted-foreground">
-                            We couldn't find anything that matches that term. Try a different keyword or
-                            use <span className="font-mono">@name</span> or <span className="font-mono">#pack</span>.
-                        </p>
-                    </div>
-                )}
-            </div>
-
-            {/* Preview panel rendered from parent via render prop */}
-            <ComboboxOptionsPreviewSlot/>
-        </ComboboxOptions>
+                {/* Preview panel rendered from parent via render prop */}
+                <ComboboxOptionsPreviewSlot/>
+            </ComboboxOptions>
+        </motion.div>
     );
 }
 
@@ -645,9 +660,6 @@ export default function CommandPalette() {
                 e.preventDefault();
                 setOpen((prev) => !prev);
             }
-            if (e.key === "Escape") {
-                setOpen(false);
-            }
         };
 
         document.addEventListener("keydown", handleKeyDown);
@@ -671,7 +683,6 @@ export default function CommandPalette() {
             open={open}
             onClose={() => {
                 setOpen(false);
-                setRawQuery("");
             }}
             aria-label="Command palette search"
         >
@@ -687,13 +698,31 @@ export default function CommandPalette() {
                         key="command-palette-shimmer"
                         aria-hidden="true"
                         role="presentation"
-                        className="pointer-events-none h-full w-full fixed inset-0 -z-[1] overflow-hidden"
+                        className="pointer-events-none h-full w-full fixed inset-0 -z-1 overflow-hidden"
                         initial={{y: "-100%"}}
                         animate={{y: "100%"}}
-                        transition={{duration: 2, ease: "circOut"}}
+                        transition={{duration: 0.65, ease: "linear"}}
                     >
                         <div
-                            className="absolute inset-x-0 top-0 h-full w-full bg-white/5 backdrop-blur-[1px] mask-middle bg-gradient-to-b from-transparent via-white/5 to-transparent"
+                            className="absolute inset-x-0 top-0 h-full w-full backdrop-blur-[1px] mask-middle"
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {open && (
+                    <motion.div
+                        key="command-palette-halo"
+                        aria-hidden="true"
+                        role="presentation"
+                        className="pointer-events-none fixed -top-full inset-0 -z-1 overflow-hidden"
+                        initial={{opacity: 0.2}}
+                        animate={{opacity: [0.2, 0.25, 0]}}
+                        transition={{duration: 2, times: [0, 0.15, 1], ease: "easeOut"}}
+                    >
+                        <div
+                            className="absolute animate-hue inset-0 bg-[radial-gradient(circle_at_center,rgba(129,140,248,0.35)_0,rgba(236,72,153,0.25)_15%,rgba(34,197,94,0.18)_45%,rgba(252,211,77,0.12)_70%,transparent_100%)] mask-[linear-gradient(to_bottom,transparent_0,black_18%,black_100%)] mask-size-[100%_100%] mask-no-repeat"
                         />
                     </motion.div>
                 )}
@@ -717,7 +746,11 @@ export default function CommandPalette() {
                             <>
                                 <CommandPaletteInput rawQuery={rawQuery} setRawQuery={setRawQuery}/>
 
-                                <div className="flex flex-col sm:flex-row">
+                                <div
+                                    className={cn(
+                                        "grid grid-cols-1 grid-rows-2 overflow-hidden divide-x divide-border sm:grid-cols-2 sm:grid-rows-1",
+                                        (!hasResults || isLoading) && "sm:grid-cols-1",
+                                    )}>
                                     <CommandPaletteResultsList
                                         isLoading={isLoading}
                                         hasResults={hasResults}

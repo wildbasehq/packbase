@@ -74,6 +74,7 @@ export function DropdownItem({
         // Icons
         '*:data-[slot=icon]:col-start-1 *:data-[slot=icon]:row-start-1 *:data-[slot=icon]:-ml-0.5 *:data-[slot=icon]:mr-2.5 *:data-[slot=icon]:size-5 sm:*:data-[slot=icon]:mr-2 sm:*:data-[slot=icon]:size-4',
         '*:data-[slot=icon]:text-zinc-500 data-focus:*:data-[slot=icon]:text-white dark:*:data-[slot=icon]:text-zinc-400 dark:data-focus:*:data-[slot=icon]:text-white',
+        '*:data-[slot=icon]:fill-zinc-500 data-focus:*:data-[slot=icon]:fill-white dark:*:data-[slot=icon]:fill-zinc-400 dark:data-focus:*:data-[slot=icon]:fill-white',
         // Avatar
         '*:data-[slot=avatar]:-ml-1 *:data-[slot=avatar]:mr-2.5 *:data-[slot=avatar]:size-6 sm:*:data-[slot=avatar]:mr-2 sm:*:data-[slot=avatar]:size-5'
     )

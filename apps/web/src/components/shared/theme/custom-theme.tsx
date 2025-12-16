@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react'
 import {vg} from '@/lib/api'
 import {Theme} from '@/lib/api/theme'
 import {PackThemeAPI} from '@/lib/api/pack-theme'
+import {useLocalStorage} from "usehooks-ts";
 
 // Component to render custom theme HTML and CSS for users or packs
 interface CustomThemeProps {
@@ -11,8 +12,25 @@ interface CustomThemeProps {
 
 export function CustomTheme({userId, packId}: CustomThemeProps) {
     const [theme, setTheme] = useState<Theme | null>(null)
+    const [loadTheme, setLoadTheme] = useLocalStorage<'true' | 'false' | 'ask'>('load-custom-content-htmlcss', 'ask');
 
     useEffect(() => {
+        if (loadTheme === 'false') {
+            setTheme(null)
+            return
+        }
+
+        if (loadTheme === 'ask') {
+            const consent = window.confirm(`This ${userId ? 'profile' : ''}${packId ? 'Pack' : ''} wants to load custom HTML and CSS. Do you allow this? You can change this later in settings.`);
+            if (!consent) {
+                setLoadTheme('false')
+                setTheme(null)
+                return
+            } else {
+                setLoadTheme('true')
+            }
+        }
+
         if (userId && !packId) {
             // Fetch user theme
             vg.user({username: userId})
@@ -39,7 +57,7 @@ export function CustomTheme({userId, packId}: CustomThemeProps) {
                     setTheme(null)
                 })
         }
-    }, [userId, packId])
+    }, [userId, packId, loadTheme])
 
     if (!theme) return null
 

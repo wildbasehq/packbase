@@ -97,7 +97,7 @@ model packs_pages {
 model posts {
   id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   created_at   DateTime @default(now()) @db.Timestamptz(6)
-  tenant_id    String   @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+  tenant_id    String   @db.Uuid
   content_type String
   body         String?
   user_id      String   @db.Uuid
@@ -165,7 +165,7 @@ model profiles {
   show_nsfw     Boolean   @default(false)
   owner_id      String
   last_online   DateTime?
-  default_pack  String    @default(dbgenerated("'00000000-0000-0000-0000-000000000000'::uuid")) @db.Uuid
+  default_pack  String?   @db.Uuid
 
   // Relations
   posts           posts[]

@@ -46,7 +46,7 @@ export default function DefaultPackSunset() {
                     }
                 }).then(({data: response}) => {
                     setLoading(false)
-                    const posts = response?.posts?.filter(post => post.tenant_id === "00000000-0000-0000-0000-000000000000")
+                    const posts = response?.posts
                     setPostsBG([...Array(Math.max(25, posts?.length || 0)).keys()].map(i => posts?.[i % (posts?.length || 1)]))
                 })
             }, 500)
@@ -75,7 +75,7 @@ export default function DefaultPackSunset() {
             </Activity>
 
             <div
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(var(--background)_15%,transparent_100%)] -z-[1]"/>
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(var(--background)_15%,transparent_100%)] -z-1"/>
 
             <div
                 className="max-w-md space-y-8 overflow-x-hidden overflow-y-auto px-2 py-8 rounded-4xl">
@@ -128,6 +128,23 @@ function Onboard({loading, posts, setLoading, setPage, setFinaliseScreen}: {
         }
     }, [pack]);
 
+    const performSwitchover = () => {
+        setLoading(true)
+        vg.packs.default.patch({
+            pack_id: pack?.id
+        }).then(({status}) => {
+            setTimeout(() => {
+                if (status === 200) {
+                    toast.success('Default Pack switched successfully!')
+                    window.location.reload()
+                } else {
+                    setLoading(false)
+                    toast.error('Failed to switch Default Pack. Please try again.')
+                }
+            }, 1000)
+        })
+    }
+
     return (
         <div className="relative space-y-8">
             <PopoverHeader
@@ -136,8 +153,9 @@ function Onboard({loading, posts, setLoading, setPage, setFinaliseScreen}: {
             />
 
             <Text>
-                This action will fundamentally change the way Packbase functions and processes data for this
-                account, and thus your experience. Data will not get destroyed, but will move to a new location.
+                You must change the Default Pack before you continue to Packbase. Your previous default, The "Universe",
+                has been retired. Your current howls outside of a Pack must be moved, please choose how you'd like to
+                proceed.
             </Text>
 
             <Activity mode={isVisible(!ready)}>
@@ -153,10 +171,10 @@ function Onboard({loading, posts, setLoading, setPage, setFinaliseScreen}: {
 
                 <ArrowDownIcon className="size-6 mx-auto"/>
 
-                <FieldGroup className="!space-y-4">
+                <FieldGroup className="space-y-4!">
                     {loading && (
                         <div
-                            className="absolute top-0 left-0 right-0 rounded-2xl bottom-0 w-full h-full bg-card z-[1] flex items-center justify-center">
+                            className="absolute top-0 left-0 right-0 rounded-2xl bottom-0 w-full h-full bg-card z-1 flex items-center justify-center">
                             <LoadingSpinner size={24}/>
                         </div>
                     )}
@@ -175,7 +193,7 @@ function Onboard({loading, posts, setLoading, setPage, setFinaliseScreen}: {
 
             <Activity mode={isVisible(ready)}>
                 <div
-                    className="flex items-center gap-2 p-2 -mb-8 border border-b-0 rounded-t-3xl bg-gradient-to-b from-card to-transparent">
+                    className="flex items-center gap-2 p-2 -mb-8 border border-b-0 rounded-t-3xl bg-linear-to-b from-card to-transparent">
                     <Logo/>
                     <div className="flex flex-col">
                         <Text className="font-medium">Universe</Text>
@@ -185,7 +203,7 @@ function Onboard({loading, posts, setLoading, setPage, setFinaliseScreen}: {
                 <CardMarquee posts={posts}/>
 
                 <div
-                    className="flex items-center border border-t-0 rounded-b-3xl gap-2 p-2 bg-gradient-to-t from-card to-transparent -mt-16">
+                    className="flex items-center border border-t-0 rounded-b-3xl gap-2 p-2 bg-linear-to-t from-card to-transparent -mt-16">
                     <Avatar src={pack?.images?.avatar} initials={pack?.slug?.[0]} className="size-8"/>
                     <div className="flex flex-col">
                         <Text className="font-medium">{pack?.display_name}</Text>
@@ -209,9 +227,9 @@ function Onboard({loading, posts, setLoading, setPage, setFinaliseScreen}: {
                             <ArrowLeftIcon/> Nope, Go Back
                         </Button>
 
-                        <div className="flex-grow"/>
+                        <div className="grow"/>
 
-                        <Button>
+                        <Button onClick={() => performSwitchover()}>
                             Looks good, switch it now <ArrowRightIcon/>
                         </Button>
                     </div>
@@ -233,7 +251,7 @@ function CreateDefaultPack({disabled, setPack}: { disabled: boolean; setPack: Se
                                <Button outline
                                        disabled={disabled}
                                        submissionState={loading ? 'pending' : 'idle'}
-                                       className={cn(!loading && 'justify-start', "overflow-hidden items-center w-full !transition-all hover:ring-1 ring-default")}
+                                       className={cn(!loading && 'justify-start', "overflow-hidden items-center w-full transition-all! hover:ring-1 ring-default")}
                                        onClick={() => setOpen(true)}>
                                    <PlusIcon className="h-6 w-6 text-muted-foreground"/>
                                    <Text>
@@ -296,7 +314,7 @@ function SwitchUsingExistingPack({disabled, setPack}: { disabled: boolean; setPa
             <Drawer.Trigger asChild>
                 <Button outline
                         disabled={loadState === 'pending' || !hasEligible || disabled}
-                        className={cn(loadState === 'idle' && 'justify-start', "overflow-hidden items-center w-full !transition-all hover:ring-1 ring-default")}
+                        className={cn(loadState === 'idle' && 'justify-start', "overflow-hidden items-center w-full transition-all! hover:ring-1 ring-default")}
                         submissionState={loadState}
                         onClick={() => {
                             findAllOwnedPacks()
@@ -330,7 +348,7 @@ function SwitchUsingExistingPack({disabled, setPack}: { disabled: boolean; setPa
                             <Button
                                 outline
                                 key={pack.id}
-                                className="w-full !p-2 !justify-start"
+                                className="w-full p-2! justify-start!"
                                 onClick={() => {
                                     // handle pack selection
                                     setPack(pack)

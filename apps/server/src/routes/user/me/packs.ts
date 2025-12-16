@@ -1,33 +1,26 @@
-import { YapockType } from '@/index';
-import { getPack } from '@/routes/pack/[id]';
-import { t } from 'elysia';
-import { PackResponse } from '@/models/defs';
-import { ErrorTypebox } from '@/utils/errors';
-import { HTTPError } from '@/lib/HTTPError';
+import {YapockType} from '@/index';
+import {getPack} from '@/routes/pack/[id]';
+import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import requiresToken from '@/utils/identity/requires-token';
 
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({ set, user }) => {
-            await requiresToken({ set, user });
+        async ({set, user}) => {
+            await requiresToken({set, user});
 
-            return await getUserPacks({ user, set });
+            return await getUserPacks({user, set});
         },
         {
             detail: {
                 description: "Get the current user's packs.",
                 tags: ['User'],
             },
-            response: {
-                200: t.Array(PackResponse),
-                500: ErrorTypebox,
-            },
         },
     );
 
-export async function getUserPacks({ user, set, error }: any) {
+export async function getUserPacks({user, set, error}: any) {
     try {
         const memberships = await prisma.packs_memberships.findMany({
             where: {

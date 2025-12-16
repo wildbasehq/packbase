@@ -4,18 +4,18 @@ import {UserProfile} from '@/models/defs';
 import {similarity} from '@/utils/similarity';
 import {YapockType} from '@/index';
 import {getUser, UserCache} from '@/routes/user/[username]';
-import {t} from 'elysia';
 import BannedUsernames from '@/tables/banned_usernames.json';
 import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import requiresToken from '@/utils/identity/requires-token';
 import createStorage from '@/lib/storage';
+import PackMan from "@/lib/packs/PackMan";
 
 export default (app: YapockType) =>
     app
         .get(
             '',
-            async (res: { set: any; user: any }) => {
+            async (res) => {
                 const {set, user} = res;
                 if (!user) {
                     set.status = 401;
@@ -51,28 +51,29 @@ export default (app: YapockType) =>
                     unlockables: unlockedBadges.map((badge) => badge.item_id),
                 };
 
+                // Default pack
+                if (userProfile.default_pack && userProfile.default_pack !== '00000000-0000-0000-0000-000000000000') {
+                    const defaultPackMan = await PackMan.init(userProfile.default_pack, user.sub)
+
+                    if (!defaultPackMan) {
+                        throw HTTPError.serverError({
+                            summary: "Failed to load user's default pack.",
+                        })
+                    }
+
+                    const defaultPack = defaultPackMan.getPack();
+
+                    if (defaultPack) {
+                        userProfile.default_pack = defaultPack
+                    }
+                }
+
                 return userProfile;
             },
             {
                 detail: {
                     description: 'Get the current user.',
                     tags: ['User'],
-                },
-                response: {
-                    404: t.Undefined(),
-                    200: t.Union([
-                        t.Intersect([
-                            UserProfile,
-                            t.Optional(
-                                t.Object({
-                                    metadata: t.Optional(t.Any()),
-                                }),
-                            ),
-                        ]),
-                        t.Object({
-                            id: t.String(),
-                        }),
-                    ]),
                 },
             },
         )

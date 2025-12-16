@@ -6,7 +6,7 @@ import {FeedPostData} from './post'
 import {ReactNode} from "react";
 
 export interface FeedProps {
-    packID?: string
+    packID: string
     channelID?: string
     feedQueryOverride?: string
     titleOverride?: string

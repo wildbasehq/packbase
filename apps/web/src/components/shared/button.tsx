@@ -29,9 +29,9 @@ const styles = {
         // Optical border, implemented as the button background to avoid corner artifacts
         'border-transparent bg-(--btn-border)',
         // Dark mode: border is rendered on `after` so background is set to button background
-        'dark:bg-(--btn-bg)',
+        'dark:bg-linear-to-b dark:from-(--btn-bg-from) dark:to-(--btn-bg-to)',
         // Button background, implemented as foreground layer to stack on top of pseudo-border layer
-        'before:absolute before:inset-0 before:-z-10 before:rounded-full before:bg-(--btn-bg)',
+        'before:absolute before:inset-0 before:-z-10 before:rounded-full before:bg-linear-to-b before:from-(--btn-bg-from) before:to-(--btn-bg-to)',
         // Drop shadow, applied to the inset `before` layer so it blends with the border
         'before:shadow-sm',
         // Background color is moved to control and shadow is removed in dark mode so hide `before` pseudo
@@ -99,7 +99,7 @@ const styles = {
             '[--btn-icon:var(--color-zinc-400)] data-active:[--btn-icon:var(--color-zinc-300)] data-hover:[--btn-icon:var(--color-zinc-300)]',
         ],
         indigo: [
-            'text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg:var(--color-indigo-500)] [--btn-border:var(--color-indigo-600)]/90',
+            'text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg-from:var(--color-indigo-400)] [--btn-bg-to:var(--color-indigo-500)] [--btn-border:var(--color-indigo-600)]/90',
             '[--btn-icon:var(--color-indigo-300)] data-active:[--btn-icon:var(--color-indigo-200)] data-hover:[--btn-icon:var(--color-indigo-200)]',
         ],
         cyan: [
@@ -107,7 +107,7 @@ const styles = {
             '[--btn-icon:var(--color-cyan-500)]',
         ],
         red: [
-            'text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg:var(--color-red-600)] [--btn-border:var(--color-red-700)]/90',
+            'text-white [--btn-hover-overlay:var(--color-white)]/10 [--btn-bg-from:var(--color-red-500)] [--btn-bg-to:var(--color-red-600)] [--btn-border:var(--color-red-700)]/90',
             '[--btn-icon:var(--color-red-300)] data-active:[--btn-icon:var(--color-red-200)] data-hover:[--btn-icon:var(--color-red-200)]',
         ],
         orange: [

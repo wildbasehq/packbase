@@ -8,6 +8,7 @@ import {SidebarDivider, SidebarHeading, SidebarItem, SidebarLabel, SidebarSectio
 import {HashtagIcon, HomeIcon, MicrophoneIcon, PaperAirplaneIcon, PlusIcon} from '@heroicons/react/16/solid'
 import Popover from '@/components/shared/popover.tsx'
 import {vg} from '@/lib'
+import {hasPackPermissionBit, PACK_PERMISSIONS} from "@/lib/utils/has-pack-permission-bit.ts";
 
 export function PackChannels() {
     const {navigation} = useUIStore()
@@ -32,16 +33,9 @@ export function PackChannels() {
                 <div className="flex justify-between items-center">
                     <div className="flex items-center justify-between w-full">
                         <SidebarHeading>Channels</SidebarHeading>
-                        {currentResource.owner_id === user.id && <AddChannelButton/>}
+                        {hasPackPermissionBit(currentResource.membership?.permissions, PACK_PERMISSIONS.CreateChannels) &&
+                            <AddChannelButton/>}
                     </div>
-                    {/*<Button*/}
-                    {/*    plain*/}
-                    {/*    onClick={e => {*/}
-                    {/*        e.preventDefault()*/}
-                    {/*    }}*/}
-                    {/*>*/}
-                    {/*    +*/}
-                    {/*</Button>*/}
                 </div>
                 {navigation?.map(item => (
                     <Channel
@@ -91,7 +85,7 @@ function Channel({
 
             {badge && (
                 <span
-                    className="ml-auto flex-shrink-0 bg-indigo-500 text-white text-xxs font-medium rounded-full px-1.5 min-w-5 h-5 flex items-center justify-center">
+                    className="ml-auto shrink-0 bg-indigo-500 text-white text-xxs font-medium rounded-full px-1.5 min-w-5 h-5 flex items-center justify-center">
                     {badge}
                 </span>
             )}

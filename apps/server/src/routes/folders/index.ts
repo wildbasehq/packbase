@@ -9,9 +9,7 @@ export const FolderSchema = t.Object({
     name: t.String(),
     description: t.Optional(t.String()),
     emoji: t.Optional(t.String()),
-    mode: t.Union([t.Literal('dynamic'), t.Literal('manual')]),
     query: t.Optional(t.String()),
-    howl_ids: t.Optional(t.Array(t.String())),
     // created_at: t.String(),
     // updated_at: t.String(),
 });
@@ -21,9 +19,7 @@ export type Folder = {
     name: string;
     description?: string;
     emoji?: string;
-    mode: 'dynamic' | 'manual';
     query?: string; // when mode === 'dynamic'
-    howl_ids?: string[]; // when mode === 'manual'
     created_at: string;
     updated_at: string;
 };
@@ -67,17 +63,14 @@ export default (app: YapockType) =>
                 requiresToken({set, user});
                 const payload = body as Partial<Folder> & { name: string; mode: 'dynamic' | 'manual' };
 
-                if (!payload.name || !payload.mode) {
+                if (!payload.name) {
                     set.status = 400;
                     return {error: 'Missing required fields: name, mode'};
                 }
-                if (payload.mode === 'dynamic' && !payload.query) {
+
+                if (!payload.query) {
                     set.status = 400;
-                    return {error: 'Dynamic folders require a query'};
-                }
-                if (payload.mode === 'manual' && (!payload.howl_ids || !Array.isArray(payload.howl_ids))) {
-                    set.status = 400;
-                    return {error: 'Manual folders require howl_ids[]'};
+                    return {error: 'Folders require a query'};
                 }
 
                 const created = await prisma.folders.create({
@@ -86,9 +79,8 @@ export default (app: YapockType) =>
                         name: payload.name,
                         description: payload.description,
                         emoji: payload.emoji,
-                        mode: payload.mode,
-                        query: payload.mode === 'dynamic' ? payload.query : undefined,
-                        howl_ids: payload.mode === 'manual' ? (payload.howl_ids || []) : [],
+                        mode: 'dynamic',
+                        query: payload.query,
                     },
                 });
 
@@ -103,9 +95,7 @@ export default (app: YapockType) =>
                     name: t.String(),
                     description: t.Optional(t.String()),
                     emoji: t.Optional(t.String()),
-                    mode: t.Union([t.Literal('dynamic'), t.Literal('manual')]),
                     query: t.Optional(t.String()),
-                    howl_ids: t.Optional(t.Array(t.String())),
                 }),
                 response: {
                     200: t.Object({folder: FolderSchema}),

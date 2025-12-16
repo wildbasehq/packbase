@@ -114,22 +114,6 @@ const Yapock = new Elysia({})
             }
         }
 
-        // Well, the request is continuing, so we can log the audit
-        if (!url.pathname.startsWith('/admin') && !url.pathname.startsWith('/server/fwupd')) {
-            logAudit({
-                action: 'REQUEST_OK',
-                model_id: url.pathname,
-                model_type: 'request',
-                model_object: {
-                    request: {
-                        url: request.url, // Use request's URL for whole path incl domain
-                        method: request.method,
-                        body: request.body,
-                    },
-                },
-            });
-        }
-
         if (user?.sub) {
             // set their last_online
             await prisma.profiles.update({

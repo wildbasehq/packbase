@@ -9,7 +9,7 @@ export const UserProfile = t.Object(
             t.String({
                 minLength: 2,
                 maxLength: 40,
-                pattern: '^(?=.{2,40}$)(?![_.-])(?!.*[_.-]{2})[\\w.-]+(?<![_.-])$',
+                pattern: '^(?=.{2,40}$)(?![_.-])(?!.*[_.-]{2})(?!.*[_.-]$)[A-Za-z0-9_.-]+$',
             }),
         ),
         display_name: t.Optional(
@@ -169,9 +169,7 @@ export const PackResponse = t.Object({
     ),
     created_at: t.String(),
     owner_id: t.Optional(
-        t.String({
-            default: '00000000-0000-0000-0000-000000000000',
-        }),
+        t.String(),
     ),
     pages: t.Optional(
         t.Array(
@@ -191,9 +189,7 @@ export const PackResponse = t.Object({
 });
 
 export const HowlBody = t.Object({
-    tenant_id: t.String({
-        default: '00000000-0000-0000-0000-000000000000',
-    }),
+    tenant_id: t.String(),
     channel_id: t.Optional(t.String()),
     content_type: t.Union([t.Literal('markdown'), t.Literal('rich'), t.Literal('asset'), t.Literal('howling_alongside')]),
     body: t.Nullable(

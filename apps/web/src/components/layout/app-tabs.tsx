@@ -10,7 +10,7 @@ import {Avatar} from "@/src/components";
 import {Cog6ToothIcon} from "@heroicons/react/20/solid";
 import {navigate} from "wouter/use-browser-location";
 
-const SYSTEM_TABS = [
+const SYSTEM_TABS: any = [
     {
         id: 'SYS0000',
         display_name: 'Account Settings',
@@ -21,7 +21,7 @@ const SYSTEM_TABS = [
 
 export function AppTabs({className = ''}: { className?: string }) {
     const {resourceDefault, resources: resourcesFromStore} = useResourceStore()
-    const resources = useMemo(() => [resourceDefault, ...resourcesFromStore, ...SYSTEM_TABS], [resourceDefault, resourcesFromStore])
+    const resources = useMemo(() => [...resourcesFromStore, ...SYSTEM_TABS], [resourceDefault, resourcesFromStore])
     // Drag value for the sheet. 0 = collapsed, -EXPANDED = fully open
     const y = useMotionValue(0)
 

@@ -15,7 +15,7 @@ import {MediaGallery} from '.'
 import {UserProfileBasic} from '@/lib/defs/user'
 import {formatRelativeTime} from '@/lib/utils/date'
 import {Text} from '@/components/shared/text.tsx'
-import {AvatarButton, FeedPostData, LoadingCircle} from '@/src/components'
+import {AvatarButton, BubblePopover, FeedPostData, LoadingCircle, PopoverHeader} from '@/src/components'
 import {Button} from '@/components/shared'
 import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak.tsx'
 import Card from '@/components/shared/card.tsx'
@@ -95,13 +95,13 @@ export default function ThreadPost({
     }
 
     return (
-        <Card className={`relative !border-0 !max-w-full ${(isRoot ? '' : '!pl-12')} ${threadLineClass}`}>
+        <Card className={`!border-0 !max-w-full ${(isRoot ? '' : '!pl-12')} ${threadLineClass}`}>
             <div className={`relative ${(isRoot ? '' : 'pt-3')}`}>
                 <div className="flex gap-3">
                     {/* Avatar */}
                     <div className="flex-shrink-0 flex flex-col">
                         <UserAvatar user={post.user} size={depth > 0 ? 'md' : 'lg'} className="rounded-full"/>
-                        {post.pack && post.pack?.slug !== 'universe' && (
+                        {post.pack && (
                             <Link
                                 href={`/p/${post.pack.slug}`}
                                 className="relative h-12 before:absolute before:left-5 before:top-0 before:bottom-0 before:w-px before:bg-border"
@@ -147,22 +147,34 @@ export default function ThreadPost({
                                 <Text className="text-sm" alt>
                                     ·
                                 </Text>
-                                <Link href={`/p/universe/all/${post.id}`}>
+                                <Link href={`/p/${post.pack?.slug || 'universe'}/all/${post.id}`}>
                                     <time
                                         className="text-sm text-muted-foreground">{formatRelativeTime(post.created_at)}</time>
                                 </Link>
                             </UserInfoCol>
 
                             {/* Delete button for author */}
-                            {isAuthor && (
-                                <button onClick={onDelete}
-                                        className="p-1 text-muted-foreground hover:text-red-500 transition-colors">
-                                    <TrashIcon className="w-4 h-4"/>
-                                </button>
-                            )}
+                            <div>
+                                {isAuthor && (
+                                    <BubblePopover corner="top-right" id={`delete-howl-${post.id}`} trigger={
+                                        ({setOpen}) => (
+                                            <button onClick={() => setOpen(true)}
+                                                    className="p-1 text-muted-foreground hover:text-red-500 transition-colors">
+                                                <TrashIcon className="w-4 h-4"/>
+                                            </button>
+                                        )
+                                    }>
+                                        <PopoverHeader title="Delete Howl?"
+                                                       description="Deleting a howl is permanent and cannot be undone."
+                                                       onPrimaryAction={onDelete}
+                                                       variant="destructive"
+                                        />
+                                    </BubblePopover>
+                                )}
+                            </div>
                         </div>
 
-                        {post.pack && post.pack?.slug !== 'universe' && (
+                        {post.pack && (
                             <Link href={`/p/${post.pack.slug}`}>
                                 <Text size="xs" alt className="mb-1 items-center flex">
                                     <UserGroupIcon className="h-3 w-3 mr-1 inline-flex"/> howl'd

@@ -8,7 +8,6 @@ import {useResourceStore} from '@/lib/state'
 import {Navbar, NavbarDivider, NavbarItem, NavbarLabel, NavbarSection, NavbarSpacer} from '@/components/layout'
 import UserSidebar from '@/components/layout/user-sidebar.tsx'
 import {useSidebar} from '@/lib/context/sidebar-context'
-import ResourceSettings from '@/components/layout/resource'
 import {
     Badge,
     Button,
@@ -27,7 +26,7 @@ import {
     SidebarSpacer,
 } from '@/src/components'
 import {ChevronDownIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
-import {FaceSmileIcon} from '@heroicons/react/16/solid'
+import {FaceSmileIcon, HomeIcon} from '@heroicons/react/16/solid'
 import {SiDiscord} from 'react-icons/si'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
@@ -48,11 +47,24 @@ import {SupportHeadIcon} from "@/components/icons/plump/suppot-head.tsx";
 import {EllipsisHorizontalIcon} from "@heroicons/react/24/solid";
 import PackSettingsDropdown from "@/components/pack/settings-dropdown.tsx";
 import {TbFaceId} from "react-icons/tb";
+import {VerifiedBadge} from "@/components/layout/resource/pack-badge.tsx";
+import {useModal} from "@/components/modal/provider.tsx";
 
-const NavbarItems = [
+const NavbarItems: {
+    icon?: React.ComponentType<{ className?: string; 'data-slot'?: string }>;
+
+    // Prefix with ! to indicate no label, only icon
+    label: string;
+
+    href: string;
+    currentHref?: string;
+    limitedEvent?: boolean;
+    onlySignedIn?: boolean;
+}[] = [
     {
-        label: 'Home',
-        currentHref: '/p/universe',
+        icon: HomeIcon,
+        label: '!Home',
+        currentHref: '/',
         href: '/'
     },
     {
@@ -116,6 +128,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
     const [isWHOpen, setIsWHOpen] = useLocalStorage<any>('wh-open', false)
     const {currentResource} = useResourceStore()
+    const {show} = useModal()
 
     return (
         <div className="flex min-h-svh h-screen w-full relative bg-muted">
@@ -155,7 +168,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     className="min-w-0 bg-sidebar px-4">
                     <Navbar>
                         <NavbarItem
-                            className="flex w-full md:w-2xs h-8 [&>*]:w-full"
+                            className="flex w-full md:w-2xs h-8 *:w-full"
                             onClick={() => {
                                 if (!isSignedIn) return
                                 setIsWHOpen(!isWHOpen)
@@ -190,9 +203,11 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                             </Activity>
 
                             <div className="flex flex-col -space-y-1 flex-1 relative">
-                                <NavbarLabel>{currentResource?.display_name || 'dummy'}</NavbarLabel>
+                                <NavbarLabel>
+                                    {currentResource?.display_name || 'dummy'}
+                                </NavbarLabel>
                                 <NavbarLabel className="text-muted-foreground text-xs">
-                                    <Activity mode={isVisible(currentResource?.ticker)}>
+                                    <Activity mode={isVisible(!!currentResource?.ticker?.length)}>
                                         <TextTicker
                                             texts={currentResource.ticker}
                                             interval={2000}/>
@@ -203,6 +218,13 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                     </Activity>
                                 </NavbarLabel>
                             </div>
+                            <Activity
+                                mode={isVisible((currentResource.verified || currentResource.standalone || currentResource.slug === 'support'))}>
+                                <VerifiedBadge
+                                    tooltipText="This is an official pack which represents the creator or organisation behind it."/>
+                            </Activity>
+
+                            <NavbarSpacer/>
 
                             <ChevronDownIcon/>
                         </NavbarItem>
@@ -212,7 +234,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                 <DropdownButton as={NavbarItem} aria-label="More options">
                                     <EllipsisHorizontalIcon/>
                                 </DropdownButton>
-                                <PackSettingsDropdown/>
+                                <PackSettingsDropdown show={show}/>
                             </Dropdown>
                         </SignedIn>
 
@@ -226,9 +248,14 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                         <NavbarItem href={item.href}
                                                     current={location.startsWith(item.currentHref || item.href)}
                                                     key={item.href}>
-                                            {item.label}
+                                            {item.icon && (
+                                                <item.icon className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                            )}
+
+                                            {!item.label.startsWith('!') && item.label}
+
                                             {item.limitedEvent &&
-                                                <Badge className="!py-0" color="indigo">Limited</Badge>}
+                                                <Badge className="py-0!" color="indigo">Limited</Badge>}
                                         </NavbarItem>
                                     ))}
                             </NavbarSection>
@@ -368,7 +395,6 @@ function WhatsHappeningDropdown({close}: { close: () => void }) {
 }
 
 function SidebarContentContainer({children}: { children: React.ReactNode }) {
-    const {currentResource} = useResourceStore()
     const [articlesUnread, setArticlesUnread] = useState(false)
     const [sidebarWidth, setSidebarWidth] = useState<number>(320)
 
@@ -382,17 +408,6 @@ function SidebarContentContainer({children}: { children: React.ReactNode }) {
                 maxWidth={560}
             >
                 <div className="pt-4 flex flex-col" style={{width: sidebarWidth ?? 320}}>
-                    {!currentResource.standalone && (
-                        <nav aria-label="Sections" className="flex flex-col min-h-14"
-                             style={{width: sidebarWidth ?? 320}}>
-                            <div className="relative flex h-full items-center px-5 py-2 overflow-hidden">
-                                <div className="w-full">
-                                    <ResourceSettings/>
-                                </div>
-                            </div>
-                        </nav>
-                    )}
-
                     <Sidebar className="w-full">
                         <SidebarBody>
                             {children}

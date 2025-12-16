@@ -234,7 +234,7 @@ function SearchablePackList() {
         const fetchPacks = async () => {
             try {
                 const {data} = await vg.packs.get()
-                setPacks(data?.packs.filter(pack => pack.slug !== 'universe') || [])
+                setPacks(data?.packs)
                 setPacksHidden(data?.hidden || 0)
             } catch (error) {
                 toast.error('Failed to fetch packs')

@@ -52,8 +52,7 @@ export default function WaitlistCheck() {
     const CurrentServiceIcon = ServiceStates[serviceStatus].icon
     const shouldRender = user && user.anonUser
     const isHomePage = location === '/'
-    const isUniversePage = location === '/p/universe'
-    const shouldShowDog = !isHomePage && !isUniversePage
+    const shouldShowDog = !isHomePage
 
     return (
         <Activity mode={isVisible(shouldRender)}>

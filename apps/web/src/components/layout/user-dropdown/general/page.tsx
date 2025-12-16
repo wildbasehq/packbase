@@ -4,14 +4,14 @@
 
 import {
     Button,
-    Checkbox,
-    CheckboxField,
-    CheckboxGroup,
     Description,
     Field,
     FieldGroup,
     Input,
     Label,
+    Switch,
+    SwitchField,
+    SwitchGroup,
     Textarea
 } from '@/components/shared'
 import React, {useEffect} from 'react'
@@ -116,9 +116,8 @@ const ProfileSettingsComponent: React.FC = ({noHeader}: { noHeader?: boolean }) 
                     How you interact
                 </span>
 
-                <CheckboxGroup>
-                    <CheckboxField>
-                        <Checkbox name="is-r18" defaultChecked={isAdultRestricted} disabled={canChangeAdultRestricted}/>
+                <SwitchGroup>
+                    <SwitchField>
                         <Label>
                             I post and/or interact with content that's R18
                         </Label>
@@ -127,8 +126,9 @@ const ProfileSettingsComponent: React.FC = ({noHeader}: { noHeader?: boolean }) 
                             opted out of R18 content. This is automatically enabled when you post your first R18
                             howl and cannot be disabled until all R18 content has been removed from your profile.
                         </Description>
-                    </CheckboxField>
-                </CheckboxGroup>
+                        <Switch name="is-r18" defaultChecked={isAdultRestricted} disabled={canChangeAdultRestricted}/>
+                    </SwitchField>
+                </SwitchGroup>
 
             </FieldGroup>
             <FieldGroup>

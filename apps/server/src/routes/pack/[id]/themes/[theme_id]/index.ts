@@ -1,7 +1,7 @@
 import {YapockType} from '@/index'
 import {HTTPError} from '@/lib/HTTPError'
 import validateThemeContent from '@/lib/themes/validateThemeContent'
-import {PackTheme, UpdatePackTheme} from '@/models/pack-themes.model'
+import {UpdatePackTheme} from '@/models/pack-themes.model'
 import {t} from 'elysia'
 import prisma from '@/db/prisma'
 import PackMan from '@/lib/packs/PackMan'
@@ -103,14 +103,6 @@ export default (app: YapockType) =>
                     theme_id: t.String(),
                 }),
                 body: UpdatePackTheme,
-                response: {
-                    200: PackTheme,
-                    400: t.Undefined(),
-                    401: t.Undefined(),
-                    403: t.Undefined(),
-                    404: t.Undefined(),
-                    500: t.Undefined(),
-                },
             },
         )
         // Delete a pack theme (owner only)
@@ -169,14 +161,5 @@ export default (app: YapockType) =>
                     id: t.String(),
                     theme_id: t.String(),
                 }),
-                response: {
-                    200: t.Object({
-                        success: t.Boolean(),
-                    }),
-                    401: t.Undefined(),
-                    403: t.Undefined(),
-                    404: t.Undefined(),
-                    500: t.Undefined(),
-                },
             },
         );

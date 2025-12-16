@@ -39,7 +39,7 @@ export default (app: YapockType) =>
             }
         }
     )
-        .post(
+        .patch(
             '',
             async ({set, user, body}) => {
                 requiresToken({set, user});
@@ -75,6 +75,17 @@ export default (app: YapockType) =>
                         set.status = 403;
                         throw HTTPError.forbidden({summary: "You do not have permission to switch to this pack."});
                     }
+
+                    // Switch universe posts to the new pack
+                    await prisma.posts.updateMany({
+                        where: {
+                            user_id: user.sub,
+                            tenant_id: '00000000-0000-0000-0000-000000000000'
+                        },
+                        data: {
+                            tenant_id: pack_id
+                        }
+                    });
                 }
 
                 await prisma.profiles.update({

@@ -12,22 +12,9 @@ const HowlCache = new Map<string, Database['public']['Tables']['posts']['Row'] &
 
 export async function getPost(id: string, post?: (Database['public']['Tables']['posts']['Row'] & typeof UserProfile) | undefined) {
     const timer = new Date().getTime();
-    const cached = id !== 'universe' ? HowlCache.get(id) : null;
+    const cached = HowlCache.get(id);
     let data = post || cached;
     if (!data) {
-        if (id === 'universe') {
-            // Set ID to most recent post
-            const randomPost = await prisma.posts.findFirst({
-                select: {id: true},
-                orderBy: {created_at: 'desc'},
-                take: 1,
-            });
-            if (!randomPost) {
-                return null;
-            }
-            id = randomPost.id;
-        }
-
         try {
             const fetchData = await prisma.posts.findUnique({
                 where: {id},

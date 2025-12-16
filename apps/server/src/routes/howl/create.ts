@@ -16,8 +16,6 @@ export default (app: YapockType) =>
         async ({body: {tenant_id, channel_id, assets, body, content_type, tags}, set, user}) => {
             await requiresToken({set, user});
 
-            if (tenant_id === 'universe') tenant_id = '00000000-0000-0000-0000-000000000000';
-
             body = body?.trim() || '';
             if (body.length === 0 && (!assets || assets.length === 0)) {
                 set.status = 400;
@@ -33,15 +31,13 @@ export default (app: YapockType) =>
                 });
             }
 
-            if (tenant_id !== '00000000-0000-0000-0000-000000000000') {
-                const tenant = await prisma.packs.findUnique({where: {id: tenant_id}});
+            const tenant = await prisma.packs.findUnique({where: {id: tenant_id}});
 
-                if (!tenant) {
-                    set.status = 404;
-                    throw HTTPError.notFound({
-                        summary: 'Tenant not found',
-                    });
-                }
+            if (!tenant) {
+                set.status = 404;
+                throw HTTPError.notFound({
+                    summary: 'Tenant not found',
+                });
             }
 
             // If channel_id is provided, verify it exists and belongs to the specified tenant

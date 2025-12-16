@@ -34,7 +34,7 @@ const Page: React.FC<PageProps> = ({id: providedId, title, description, icon: Ic
 }
 
 const PageBody: React.FC<{ children: ReactNode }> = ({children}) => {
-    return <div className="h-full overflow-y-auto p-6">{children}</div>
+    return <div className="h-full w-full overflow-y-auto p-6 relative">{children}</div>
 }
 
 // The main PagedModal component

@@ -1,7 +1,7 @@
-import { HTTPError } from '@/lib/HTTPError';
-import posthog, { distinctId } from '@/utils/posthog';
+import {HTTPError} from '@/lib/HTTPError';
+import posthog, {distinctId} from '@/utils/posthog';
 import getIDTypeDefault from '@/utils/get-id-type';
-import { BulkPostLoader } from '@/lib/BulkPostLoader';
+import {BulkPostLoader} from '@/lib/BulkPostLoader';
 import prisma from '@/db/prisma';
 
 /**
@@ -22,18 +22,14 @@ export class FeedController {
     constructor(
         private readonly getIDType: (id: string) => Promise<number> = getIDTypeDefault,
         private readonly bulkPostLoader: BulkPostLoader = new BulkPostLoader(),
-    ) {}
+    ) {
+    }
 
     /**
      * Get feed data based on feed type and parameters
      */
     async getFeed(feedId: string, selfUserId: string, page: number = 1): Promise<{ data: any[]; has_more: boolean }> {
         const timer = Date.now();
-
-        // Handle universe ID
-        if (feedId === 'universe') {
-            feedId = '00000000-0000-0000-0000-000000000000';
-        }
 
         try {
             let result;
@@ -42,7 +38,7 @@ export class FeedController {
             if (feedId === 'universe:home') {
                 result = await this.getHomeFeed(selfUserId, page);
             } else {
-                const idType = feedId.startsWith('00000000') ? 1 : await this.getIDType(feedId);
+                const idType = await this.getIDType(feedId);
 
                 if (idType === 1) {
                     // Pack feed
@@ -84,26 +80,26 @@ export class FeedController {
 
             // Create where clause based on following and packs
             const whereClause: any = {
-                content_type: { not: 'howling_alongside' },
+                content_type: {not: 'howling_alongside'},
             };
 
             if (followingIds.length > 0 || packIds.length > 0) {
                 whereClause.OR = [];
 
                 if (followingIds.length > 0) {
-                    whereClause.OR.push({ user_id: { in: followingIds } });
+                    whereClause.OR.push({user_id: {in: followingIds}});
                 }
 
                 if (packIds.length > 0) {
-                    whereClause.OR.push({ tenant_id: { in: packIds } });
+                    whereClause.OR.push({tenant_id: {in: packIds}});
                 }
             }
 
             // Get paginated post IDs using Prisma
             const postIdData = await prisma.posts.findMany({
-                select: { id: true, created_at: true },
+                select: {id: true, created_at: true},
                 where: whereClause,
-                orderBy: { created_at: 'desc' },
+                orderBy: {created_at: 'desc'},
                 skip,
                 take: itemsPerPage,
             });
@@ -136,12 +132,12 @@ export class FeedController {
         try {
             // Get paginated post IDs for this user
             const postIdData = await prisma.posts.findMany({
-                select: { id: true, created_at: true },
+                select: {id: true, created_at: true},
                 where: {
                     user_id: userId,
-                    content_type: { not: 'howling_alongside' },
+                    content_type: {not: 'howling_alongside'},
                 },
-                orderBy: { created_at: 'desc' },
+                orderBy: {created_at: 'desc'},
                 skip: (page - 1) * FeedController.ITEMS_PER_PAGE,
                 take: FeedController.ITEMS_PER_PAGE,
             });
@@ -168,6 +164,10 @@ export class FeedController {
      * Get feed posts from a specific pack using bulk loading
      */
     async getPackFeed(packId: string, page: number, userId?: string): Promise<{ data: any[]; has_more: boolean }> {
+        if (!packId) {
+            throw new Error('Need pack ID to get feed')
+        }
+        
         // Check cache
         const cacheKey = `pack:${packId}:${page}`;
 
@@ -176,12 +176,12 @@ export class FeedController {
 
             // Get paginated post IDs for this pack using Prisma
             const postIdData = await prisma.posts.findMany({
-                select: { id: true, created_at: true },
+                select: {id: true, created_at: true},
                 where: {
-                    content_type: { not: 'howling_alongside' },
-                    ...(packId !== '00000000-0000-0000-0000-000000000000' ? { tenant_id: packId } : {}),
+                    content_type: {not: 'howling_alongside'},
+                    tenant_id: packId
                 },
-                orderBy: { created_at: 'desc' },
+                orderBy: {created_at: 'desc'},
                 skip: (page - 1) * itemsPerPage,
                 take: itemsPerPage,
             });
@@ -208,9 +208,12 @@ export class FeedController {
      * Process post IDs into full post data
      * This helper method eliminates code duplication across different feed types
      */
-    private async processPostIds(postIdData: any[] | null, selfUserId?: string): Promise<{ data: any[]; has_more: boolean }> {
+    private async processPostIds(postIdData: any[] | null, selfUserId?: string): Promise<{
+        data: any[];
+        has_more: boolean
+    }> {
         if (!postIdData?.length) {
-            return { data: [], has_more: false };
+            return {data: [], has_more: false};
         }
 
         // Extract post IDs
@@ -240,8 +243,8 @@ export class FeedController {
         try {
             // Fetch from database using Prisma
             const data = await prisma.profiles_followers.findMany({
-                select: { following_id: true },
-                where: { user_id: userId },
+                select: {following_id: true},
+                where: {user_id: userId},
             });
 
             // Update cache
@@ -268,8 +271,8 @@ export class FeedController {
         try {
             // Fetch from database using Prisma
             const data = await prisma.packs_memberships.findMany({
-                select: { tenant_id: true },
-                where: { user_id: userId },
+                select: {tenant_id: true},
+                where: {user_id: userId},
             });
 
             // Update cache

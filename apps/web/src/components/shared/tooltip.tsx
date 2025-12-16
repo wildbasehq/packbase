@@ -2,6 +2,7 @@ import {ReactNode} from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import {Heading, Text} from '@/components/shared/text'
 import {motion} from 'motion/react'
+import {cn} from "@/lib";
 
 export default function Tooltip({
                                     children,
@@ -29,7 +30,11 @@ export default function Tooltip({
                 <TooltipPrimitive.Portal>
                     <TooltipPrimitive.Content asChild side={side || 'top'}>
                         <motion.div
-                            className="rounded bg-primary-midnight max-w-76 px-4 py-2 z-[100] text-sm select-none text-white [&>*]:!text-white shadow-md relative"
+                            className={cn(
+                                // base
+                                "rounded bg-primary-midnight max-w-76 px-4 py-2 z-100 select-none text-white *:text-white! shadow-md relative",
+                                typeof content === 'string' ? "text-xs" : "text-sm",
+                            )}
                             initial={{opacity: 0, [animateDirection]: -5, rotateX: -20}}
                             animate={{opacity: 1, [animateDirection]: 0, rotateX: 0}}
                             exit={{opacity: 0, [animateDirection]: -5, rotateX: -20}}

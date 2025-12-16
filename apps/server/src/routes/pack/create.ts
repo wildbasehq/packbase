@@ -1,11 +1,9 @@
 import {similarity} from '@/utils/similarity';
 import {YapockType} from '@/index';
-import {PackCreateBody, PackResponse} from '@/models/defs';
-import {getPack} from '@/routes/pack/[id]';
-import {ErrorTypebox} from '@/utils/errors';
+import {PackCreateBody} from '@/models/defs';
 import {HTTPError} from '@/lib/HTTPError';
-import prisma from '@/db/prisma';
 import requiresToken from '@/utils/identity/requires-token';
+import PackMan from "@/lib/packs/PackMan";
 
 const banned = ['universe', 'new', 'settings'];
 
@@ -25,54 +23,18 @@ export default (app: YapockType) =>
                 }
             }
 
-            let pack = await prisma.packs.findFirst({
-                where: {slug},
-                select: {id: true},
-            });
-            if (pack) {
-                set.status = 409;
-                throw HTTPError.conflict({
-                    summary: 'Pack already exists with that slug',
-                });
+            const pack = await PackMan.create(display_name, slug, description, user.sub)
+            if (pack instanceof PackMan) {
+                return pack.getPack()
             }
 
-            let data;
-            try {
-                data = await prisma.packs.create({
-                    data: {
-                        owner_id: user.sub,
-                        display_name,
-                        slug,
-                        description,
-                    },
-                });
-            } catch (error) {
-                set.status = 400;
-                throw HTTPError.badRequest({
-                    summary: error.message || 'An unexpected problem happened',
-                });
-            }
+            if (!pack.success) throw HTTPError.badRequest({
+                summary: pack.error,
+            })
 
-            if (!data) {
-                set.status = 400;
-                throw HTTPError.badRequest({
-                    summary: 'Failed to create pack',
-                });
-            }
-
-            try {
-                await prisma.packs_memberships.create({
-                    data: {
-                        tenant_id: data.id,
-                        user_id: user.sub,
-                    },
-                });
-            } catch (error) {
-                console.error('Failed to create pack membership:', error);
-                // Continue even if membership creation fails
-            }
-
-            return await getPack(data.id, undefined, user.sub);
+            return HTTPError.serverError({
+                summary: 'An unknown error occurred while creating the pack. It might be created?',
+            })
         },
         {
             body: PackCreateBody,
@@ -80,10 +42,10 @@ export default (app: YapockType) =>
                 description: 'Create a new pack.',
                 tags: ['Pack'],
             },
-            response: {
-                200: PackResponse,
-                400: ErrorTypebox,
-                403: ErrorTypebox,
-            },
+            // response: {
+            //     200: PackResponse,
+            //     400: ErrorTypebox,
+            //     403: ErrorTypebox,
+            // },
         },
     );

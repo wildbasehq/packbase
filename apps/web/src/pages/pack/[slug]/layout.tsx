@@ -45,14 +45,7 @@ export default function PackLayout({children}: { children: ReactNode }) {
 
                     if (res.status === 404) {
                         setError({cause: 404, message: 'Not Found'})
-                        setNavigation([
-                            {
-                                name: 'Back to the Universe',
-                                description: '',
-                                href: '/p/universe',
-                                icon: OrbitIcon,
-                            },
-                        ])
+                        setNavigation([])
                     } else {
                         // Builds the navigation menu for the pack. Forces 'Home' to be the first item, then adds the rest from API.
                         let naviBuild = []
@@ -71,7 +64,7 @@ export default function PackLayout({children}: { children: ReactNode }) {
                         setNavigation(naviBuild)
 
                         const resource = tempResources.find(r => r.id === res.data.id)
-                        if (!resource && slug !== 'universe') {
+                        if (!resource) {
                             res.data.temporary = true
                             tempResources.push(res.data)
                             setResources(tempResources)
@@ -80,14 +73,7 @@ export default function PackLayout({children}: { children: ReactNode }) {
                     }
                 })
                 .catch((e: any) => {
-                    setNavigation([
-                        {
-                            name: 'Back to the Universe',
-                            description: '',
-                            href: '/p/universe',
-                            icon: OrbitIcon,
-                        },
-                    ])
+                    setNavigation([])
                     setError(e)
                     setLoading(false)
                 })
@@ -126,7 +112,6 @@ export default function PackLayout({children}: { children: ReactNode }) {
                             <Heading className="items-center">
                                 <FaceFrownIcon className="text-default mr-1 inline-block h-6 w-6"/>
                                 {error.cause === 404 ? `The Cosmos can't find ${slug}` : `Packbase can\'t continue`}
-                                {error.cause === 404 && slug === 'universe' && `. Someone setup Packbase wrong :/`}
                             </Heading>
                             <p className="text-muted-foreground mt-1 text-sm leading-6">
                                 {error.cause === 404 ? (
@@ -134,25 +119,8 @@ export default function PackLayout({children}: { children: ReactNode }) {
                                         This pack may no longer exist as it isn't in our database.
                                         <br/>
                                         <br/>
-                                        {slug === 'universe' ? (
-                                            <>
-                                                Someone internally screwed something up, it ain't your fault! If the
-                                                universe pack is
-                                                missing, chances are *a lot* of other post data is missing as well. Or
-                                                someone accidentally
-                                                changed the universe slug, either way, you'll have to wait. Sorry!
-                                                <br/>
-                                                <br/>
-                                                If this is your first time running Packbase, this should have been
-                                                automatically created. Check your database connection!
-                                            </>
-                                        ) : (
-                                            <>
-                                                If you came here from your pack list, please reload to update
-                                                it &mdash; they might've
-                                                changed their @name.
-                                            </>
-                                        )}
+                                        If you came here from your pack list, please reload to update it &mdash; they
+                                        might've changed their @name.
                                     </span>
                                 ) : (
                                     `${error.cause || 'Something went wrong'}: ${error.message || error.stack}`

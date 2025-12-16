@@ -365,7 +365,9 @@ export function PopoverHeader({
                     )}
 
                     {onPrimaryAction && (
-                        <Button color="indigo" className="w-full" onClick={onPrimaryAction}>
+                        // @ts-ignore - Button color prop inferred from variant
+                        <Button color={variant === 'destructive' ? 'red' : 'indigo'} className="w-full"
+                                onClick={onPrimaryAction}>
                             {primaryButtonText ?? 'Continue'}
                         </Button>
                     )}

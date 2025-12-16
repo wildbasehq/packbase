@@ -1,23 +1,32 @@
 import {create} from 'zustand'
 import {persist} from "zustand/middleware";
 
+type Resource = {
+    verified?: boolean;
+    display_name: string,
+    slug: string,
+    id: string,
+    standalone: boolean,
+    ticker?: string[],
+    images?: {
+        avatar?: string,
+        header?: string,
+    }
+    membership?: {
+        permissions?: number
+    }
+
+    // If user isn't a member
+    temporary?: boolean,
+}
+
 /**
  * Resource store
  */
 interface ResourceStore {
-    currentResource: any
+    currentResource: Resource
     resourceDefault: any
-    resources: {
-        display_name: string,
-        slug: string,
-        id: string,
-        standalone: boolean,
-        ticker?: string[],
-        images?: {
-            avatar?: string,
-            header?: string,
-        }
-    }[]
+    resources: Resource[]
     setResourceDefault: (resourceDefault: any) => void
     setCurrentResource: (currentResource: any) => void
     setResources: (resources: any[]) => void
@@ -51,10 +60,18 @@ export const useResourceStore = create(persist<ResourceStore>(set => ({
             currentResource,
         })),
     setResources: resources =>
-        set(state => ({
-            ...state,
-            resources,
-        })),
+        set(state => {
+            if (!Array.isArray(resources)) return {...state, resources}
+            const currentId = state.resourceDefault?.id
+            if (!currentId) return {...state, resources}
+            const idx = resources.findIndex(r => r.id === currentId)
+            if (idx <= 0) return {...state, resources}
+            const prioritized = [resources[idx], ...resources.slice(0, idx), ...resources.slice(idx + 1)]
+            return {
+                ...state,
+                resources: prioritized,
+            }
+        }),
 }), {
     name: 'resource',
 }))

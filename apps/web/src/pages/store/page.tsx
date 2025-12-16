@@ -57,11 +57,6 @@ export default function StorePage() {
     const [history, setHistory] = useState<any[]>([])
 
     useEffect(() => {
-        setCurrentResource({
-            id: 'store',
-            display_name: 'Trinket Exchange',
-        })
-
         document.title = 'Packbase • Store'
 
         setLoading(true)

@@ -73,9 +73,16 @@ export const SidebarItem = forwardRef(function SidebarItem(
     ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>
 ) {
     const [pathname] = useLocation()
+
     if (typeof current === 'undefined') {
-        current = 'href' in props ? pathname === props.href : false
+        const normalize = (p?: string) =>
+            typeof p === 'undefined' ? undefined : (p.replace(/[?#].*$/, '').replace(/\/+$/, '') || '/')
+
+        const currentPath = normalize(pathname)
+        const hrefPath = 'href' in props ? normalize(String(props.href)) : undefined
+        current = 'href' in props ? currentPath === hrefPath : false
     }
+
     let classes = clsx(
         // Base
         'flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left text-base/6 font-medium text-default sm:py-2 sm:text-sm/5',

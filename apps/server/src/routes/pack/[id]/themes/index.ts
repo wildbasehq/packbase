@@ -1,7 +1,7 @@
 import {YapockType} from '@/index'
 import {HTTPError} from '@/lib/HTTPError'
 import validateThemeContent from '@/lib/themes/validateThemeContent'
-import {CreatePackTheme, PackTheme, PackThemesList} from '@/models/pack-themes.model'
+import {CreatePackTheme} from '@/models/pack-themes.model'
 import {t} from 'elysia'
 import prisma from '@/db/prisma'
 import PackMan from '@/lib/packs/PackMan'
@@ -48,14 +48,7 @@ export default (app: YapockType) =>
                 detail: {
                     description: 'Get all themes for a specific pack (owner only).',
                     tags: ['Pack', 'Themes'],
-                },
-                response: {
-                    200: PackThemesList,
-                    401: t.Undefined(),
-                    403: t.Undefined(),
-                    404: t.Undefined(),
-                    500: t.Undefined(),
-                },
+                }
             },
         )
         // Create a new theme for a pack (owner only)
@@ -127,14 +120,6 @@ export default (app: YapockType) =>
                     description: 'Create a new theme for a pack (owner only).',
                     tags: ['Pack', 'Themes'],
                 },
-                body: CreatePackTheme,
-                response: {
-                    200: PackTheme,
-                    400: t.Undefined(),
-                    401: t.Undefined(),
-                    403: t.Undefined(),
-                    404: t.Undefined(),
-                    500: t.Undefined(),
-                },
+                body: CreatePackTheme
             },
         );

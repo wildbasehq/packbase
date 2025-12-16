@@ -1,5 +1,11 @@
 import {packs, packs_memberships} from '@prisma/client'
-import {HTTPError} from '@/lib/HTTPError'
+import debug from "debug";
+
+const log = {
+    info: debug('vg:packman:info'),
+    warn: debug('vg:packman:warn'),
+    error: debug('vg:packman:error'),
+}
 
 export default class PackMan {
     private _pack: packs
@@ -7,15 +13,25 @@ export default class PackMan {
     public static PERMISSIONS = {
         Owner: 1,
         Administrator: 2,
-        ManageMembers: 4,
-        ManagePack: 8,
-        ManageHowls: 16,
+        BanMembers: 4,
+        KickMembers: 8,
+        CreateChannels: 16,
+        EditChannels: 32,
+        DeleteChannels: 64,
+        DeleteHowls: 128,
+        CreateHowls: 256,
+        ManagePack: 512,
     }
 
     private constructor(pack: packs, user?: packs_memberships) {
-        if (!pack) throw new Error('Pack not found')
+        log.info('PackMan.constructor called %s', pack?.id)
+        if (!pack) {
+            log.error('PackMan.constructor: pack not provided')
+            throw new Error('Pack not found')
+        }
         this._pack = pack
-        if (user) this._user = user
+        this._user = user ?? null
+        log.info('PackMan.constructor initialized', {packId: this._pack.id, userId: this._user?.user_id ?? null})
     }
 
     /**
@@ -25,29 +41,41 @@ export default class PackMan {
      * @returns
      */
     static async init(packID: string, userID?: string) {
-        prisma.packs
+        log.info('PackMan.init called', {packID, userID: userID ?? null})
+        return prisma.packs
             .findUnique({
                 where: {
                     id: packID,
                 },
             })
-            .then((pack) => {
+            .then(async (pack) => {
+                if (!pack) {
+                    log.warn('PackMan.init: pack not found', packID)
+                    return
+                }
+                log.info('PackMan.init: pack found', pack.id)
+
                 if (userID) {
-                    prisma.packs_memberships
+                    const user = await prisma.packs_memberships
                         .findFirst({
                             where: {tenant_id: packID, user_id: userID},
                         })
-                        .then((user) => {
-                            if (!user) throw new Error('User not found')
-                            return new PackMan(pack, user)
+
+                    if (user) {
+                        log.info('PackMan.init: membership found', {
+                            packId: pack.id,
+                            membershipId: user.id,
+                            userId: user.user_id
                         })
-                        .catch((error) => {
-                            throw new Error('User not found')
-                        })
+                        return new PackMan(pack, user)
+                    }
+
+                    log.warn('PackMan.init: membership not found', {packId: pack.id, userID})
+                    throw new Error('Pack membership not found')
                 }
-            })
-            .catch((error) => {
-                throw new Error('Pack not found')
+
+                log.warn('PackMan.init: no userID provided; not initializing PackMan instance for a user', {packId: pack.id})
+                return
             })
     }
 
@@ -60,6 +88,7 @@ export default class PackMan {
      * @param owner_id
      */
     static async create(display_name: string, slug: string, description: string, owner_id: string) {
+        log.info('PackMan.create called', {display_name, slug, owner_id})
         let pack: packs | null = null
         let membership: packs_memberships | null = null
         try {
@@ -71,10 +100,12 @@ export default class PackMan {
                     description,
                 },
             })
+            log.info('PackMan.create: pack created', {packId: pack.id})
         } catch (error) {
+            log.error('PackMan.create: pack create failed', {error: (error as any)?.message ?? error})
             return {
                 success: false,
-                error: error.message,
+                error: (error as any)?.message ?? String(error),
             }
         }
 
@@ -85,14 +116,17 @@ export default class PackMan {
                     user_id: owner_id,
                 },
             })
+            log.info('PackMan.create: membership created', {packId: pack.id, membershipId: membership.id})
 
             if (pack && membership) {
+                log.info('PackMan.create: returning PackMan instance', {packId: pack.id, membershipId: membership.id})
                 return new PackMan(pack, membership)
             }
         } catch (error) {
+            log.error('PackMan.create: membership create failed', {error: (error as any)?.message ?? error})
             return {
                 success: false,
-                error: error.message,
+                error: (error as any)?.message ?? String(error),
             }
         }
     }
@@ -102,6 +136,7 @@ export default class PackMan {
      * @returns
      */
     getPack() {
+        log.info('PackMan.getPack called', {packId: this._pack.id})
         return this._pack
     }
 
@@ -115,20 +150,23 @@ export default class PackMan {
         slug?: string;
         description?: string
     }) {
+        log.info('PackMan.update called', {packId: this._pack.id, data})
         try {
             this._pack = await prisma.packs.update({
                 where: {id: this._pack.id},
                 data,
             })
+            log.info('PackMan.update: update successful', {packId: this._pack.id})
 
             return {
                 success: true,
                 pack: this._pack,
             }
         } catch (error) {
+            log.error('PackMan.update: update failed', {packId: this._pack.id, error: (error as any)?.message ?? error})
             return {
                 success: false,
-                error: error.message,
+                error: (error as any)?.message ?? String(error),
             }
         }
     }
@@ -140,13 +178,26 @@ export default class PackMan {
      * @returns
      */
     async hasPermission(permission: number) {
-        if (!this._user) return false
-        return (this._user.permissions & permission) === permission
+        log.info('PackMan.hasPermission called', {packId: this._pack.id, permission})
+        if (!this._user) {
+            log.warn('PackMan.hasPermission: no user on PackMan instance', {packId: this._pack.id})
+            return false
+        }
+
+        const result = (this._user.permissions & permission) === permission
+        log.info('PackMan.hasPermission: result', {
+            packId: this._pack.id,
+            userId: this._user.user_id,
+            permission,
+            result
+        })
+        return result
     }
 
     // Ditto, but static public
     static async hasPermission(user_id: string, tenant_id: string, permission: number) {
         // Get user
+        log.info('PackMan.hasPermission (static) called', {tenant_id, user_id, permission})
         try {
             const user = await prisma.packs_memberships.findFirst({
                 where: {
@@ -155,10 +206,28 @@ export default class PackMan {
                 }
             })
 
-            if (!user) return false
-            console.log('will accept', user.permissions, permission, (user.permissions & permission))
-            return (user.permissions & permission) === permission
+            if (!user) {
+                log.warn('PackMan.hasPermission (static): membership not found', {tenant_id, user_id})
+                return false
+            }
+
+            const bitAnd = (user.permissions & permission)
+            const result = bitAnd === permission
+            log.info('PackMan.hasPermission (static): permission check', {
+                tenant_id,
+                user_id,
+                userPermissions: user.permissions,
+                permission,
+                bitAnd,
+                result
+            })
+            return result
         } catch (error) {
+            log.error('PackMan.hasPermission (static): error during check', {
+                tenant_id,
+                user_id,
+                error: (error as any)?.message ?? error
+            })
             return false
         }
     }

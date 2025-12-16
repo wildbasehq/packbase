@@ -92,7 +92,7 @@ __/\\_| |__   __ _ ___  ___
                                             </ClerkLoading>
                                             <ClerkFailed>
                                                 <Body bodyClassName="h-full"
-                                                      className="!h-full items-center justify-center">
+                                                      className="h-full! items-center justify-center">
                                                     <ExclamationTriangleIcon className="h-12 w-12 text-red-500"/>
                                                     <span className="mt-1 text-red-500">Wild ID is DOWN.</span>
                                                 </Body>
