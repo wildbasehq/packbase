@@ -221,7 +221,7 @@ function Hero() {
 
                 <div
                     className="mt-8 p-6 max-w-2xl mx-auto bg-sidebar rounded transform skew-x-4 ring-1 ring-default shadow">
-                    <Text className="text-lg sm:text-xl font-medium transform -skew-x-4">
+                    <Text className="text-lg sm:text-xl font-medium transform -skew-x-4 [&>span]:font-lexend!">
                         Join the Pack-based social platform where <HighlightedText>communities come
                         first</HighlightedText>. No ads, no
                         algorithms, just authentic conversations in your own space.
