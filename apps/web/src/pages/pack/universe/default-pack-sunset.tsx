@@ -36,7 +36,7 @@ export default function DefaultPackSunset() {
         vg.packs.default.get().then(({data}) => {
             setTimeout(() => {
                 if (!data?.requires_switch) {
-                    setError(`You have already switched off from the Universe.`)
+                    window.location.href = '/'
                     return
                 }
 
