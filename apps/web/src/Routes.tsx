@@ -26,7 +26,8 @@ const GuestLanding = lazy(() => import('@/components/home/guestlanding.tsx'))
 const SetupAccountPage = lazy(() => import('@/pages/me/setup/page.tsx'))
 
 // Me
-const EverythingPage = lazy(() => import('@/pages/me/everything/page.tsx'))
+const MeEverythingPage = lazy(() => import('@/pages/me/everything/page.tsx'))
+const MeFollowingPage = lazy(() => import('@/pages/me/following/page.tsx'))
 
 // Store
 const StoreLayout = lazy(() => import('@/pages/store/layout.tsx'))
@@ -34,7 +35,7 @@ const StorePage = lazy(() => import('@/pages/store/page.tsx'))
 
 // Loading fallback component
 const LoadingFallback = () => (
-    <Body bodyClassName="h-full" className="!h-full items-center justify-center">
+    <Body bodyClassName="h-full" className="h-full! items-center justify-center">
         <LogoSpinner/>
         <span className="text-sm mt-1">Welcome!</span>
     </Body>
@@ -107,12 +108,14 @@ export default function Routes() {
 
                         <PackLayout>
                             <Route path="/following">
-                                <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}/following` : '~/@me'}/>
+                                <Suspense fallback={<LoadingFallback/>}>
+                                    <MeFollowingPage/>
+                                </Suspense>
                             </Route>
 
                             <Route path="/everything">
                                 <Suspense fallback={<LoadingFallback/>}>
-                                    <EverythingPage/>
+                                    <MeEverythingPage/>
                                 </Suspense>
                             </Route>
                         </PackLayout>
