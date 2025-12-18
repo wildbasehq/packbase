@@ -25,6 +25,9 @@ const ChatThreadPage = lazy(() => import('@/pages/c/[id]/page.tsx'))
 const GuestLanding = lazy(() => import('@/components/home/guestlanding.tsx'))
 const SetupAccountPage = lazy(() => import('@/pages/me/setup/page.tsx'))
 
+// Me
+const EverythingPage = lazy(() => import('@/pages/me/everything/page.tsx'))
+
 // Store
 const StoreLayout = lazy(() => import('@/pages/store/layout.tsx'))
 const StorePage = lazy(() => import('@/pages/store/page.tsx'))
@@ -99,6 +102,16 @@ export default function Routes() {
                         <Route path="/setup">
                             <Suspense fallback={<LoadingFallback/>}>
                                 <SetupAccountPage/>
+                            </Suspense>
+                        </Route>
+
+                        <Route path="/following">
+                            <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}/following` : '~/@me'}/>
+                        </Route>
+
+                        <Route path="/everything">
+                            <Suspense fallback={<LoadingFallback/>}>
+                                <EverythingPage/>
                             </Suspense>
                         </Route>
 

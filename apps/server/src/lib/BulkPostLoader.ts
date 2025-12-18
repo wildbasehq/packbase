@@ -17,6 +17,9 @@ export class BulkPostLoader {
     async loadPosts(postIds: string[], currentUserId?: string): Promise<Record<string, any>> {
         if (!postIds.length) return {};
 
+        // Don't load more than 25 posts at once
+        postIds = postIds.slice(0, 25);
+
         try {
             // First, fetch the posts with minimal related data
             const posts = await prisma.posts.findMany({

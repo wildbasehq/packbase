@@ -9,10 +9,12 @@ import {HashtagIcon, HomeIcon, MicrophoneIcon, PaperAirplaneIcon, PlusIcon} from
 import Popover from '@/components/shared/popover.tsx'
 import {vg} from '@/lib'
 import {hasPackPermissionBit, PACK_PERMISSIONS} from "@/lib/utils/has-pack-permission-bit.ts";
+import {ChatBubbleSmileyIcon} from "@/components/icons/plump";
+import {SparklesIcon} from "@heroicons/react/20/solid";
 
 export function PackChannels() {
     const {navigation} = useUIStore()
-    const {currentResource} = useResourceStore()
+    const {currentResource, resourceDefault} = useResourceStore()
     const {user} = useUserAccountStore()
 
     if (!user) return <></>
@@ -23,11 +25,42 @@ export function PackChannels() {
                     <SidebarItem href={`/p/${currentResource.slug}`}>
                         <HomeIcon/>
                         <div className="flex flex-col min-w-0">
-                            <SidebarLabel>Home</SidebarLabel>
+                            <SidebarLabel>General</SidebarLabel>
+                            <span className="text-xs text-muted-foreground max-w-[200px]">
+                                The main hub for {currentResource.display_name || currentResource.slug}.
+                            </span>
                         </div>
                     </SidebarItem>
                 )}
             </SidebarSection>
+            {currentResource.id === resourceDefault.id && (
+                <>
+                    <SidebarDivider/>
+                    <SidebarHeading>
+                        Your Stuff
+                    </SidebarHeading>
+
+                    <SidebarItem href="/me/following">
+                        <ChatBubbleSmileyIcon/>
+                        <div className="flex flex-col min-w-0">
+                            <SidebarLabel>Following</SidebarLabel>
+                            <span className="text-xs text-muted-foreground max-w-[200px]">
+                                See posts from users you follow & Packs you're apart of.
+                            </span>
+                        </div>
+                    </SidebarItem>
+
+                    <SidebarItem href="/me/everything">
+                        <SparklesIcon className="h-5 w-5"/>
+                        <div className="flex flex-col min-w-0">
+                            <SidebarLabel>Everything</SidebarLabel>
+                            <span className="text-xs text-muted-foreground max-w-[200px]">
+                                A stream of all public posts on Packbase.
+                            </span>
+                        </div>
+                    </SidebarItem>
+                </>
+            )}
             <SidebarDivider/>
             <SidebarSection>
                 <div className="flex justify-between items-center">
