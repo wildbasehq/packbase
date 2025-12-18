@@ -44,14 +44,14 @@ export default function ImageUploadStack({images, setImages}: {
     return (
         <div ref={containerRef} className="relative w-full select-none">
             <div className="relative h-24">
-                {images.map((img, index) => (
+                {images?.map((img, index) => (
                     <DraggableCard
                         key={img.id}
                         id={img.id}
                         index={index}
                         src={img.src}
                         containerWidth={containerWidth}
-                        total={images.length}
+                        total={images?.length || 0}
                         onReorder={handleReorder}
                         onRemove={handleRemove}
                     />

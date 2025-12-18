@@ -120,7 +120,7 @@ export default function FloatingCompose() {
                 }
                 const reader = new FileReader()
                 reader.onloadend = () => {
-                    newImages.push({id: `${file.name}-${crypto.randomUUID()}`, src: reader.result as string})
+                    newImages?.push({id: `${file.name}-${crypto.randomUUID()}`, src: reader.result as string})
 
                     if (i === files.length - 1) {
                         setImages([...images, ...newImages])
@@ -362,7 +362,7 @@ function FloatingComposeContent({
 
             {!user?.requires_setup && (
                 <>
-                    {images.length > 0 && (
+                    {images?.length > 0 && (
                         <div className="px-4 pb-2">
                             <ImageUploadStack images={images} setImages={setImages}/>
                         </div>
