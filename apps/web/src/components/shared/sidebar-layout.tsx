@@ -75,15 +75,6 @@ const NavbarItems: {
     }
 ]
 
-function OpenMenuIcon() {
-    return (
-        <svg data-slot="icon" viewBox="0 0 20 20" aria-hidden="true">
-            <path
-                d="M2 6.75C2 6.33579 2.33579 6 2.75 6H17.25C17.6642 6 18 6.33579 18 6.75C18 7.16421 17.6642 7.5 17.25 7.5H2.75C2.33579 7.5 2 7.16421 2 6.75ZM2 13.25C2 12.8358 2.33579 12.5 2.75 12.5H17.25C17.6642 12.5 18 12.8358 18 13.25C18 13.6642 17.6642 14 17.25 14H2.75C2.33579 14 2 13.6642 2 13.25Z"/>
-        </svg>
-    )
-}
-
 function CloseMenuIcon() {
     return (
         <svg data-slot="icon" viewBox="0 0 20 20" aria-hidden="true">
@@ -184,7 +175,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                         />
 
                         <div
-                            className="backdrop-blur-md bg-card/50 h-18 w-1/6 opacity-80 absolute inset-0 rounded pointer-events-none mask-r-from-70%"/>
+                            className="backdrop-blur-md bg-card/50 h-18 w-1/6 opacity-80 absolute inset-0 pointer-events-none mask-r-from-70%"/>
                     </Activity>
 
                     <Navbar className="z-10">
@@ -210,6 +201,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                         data-slot="avatar"
                                         className="rounded-sm w-6 h-6 border shrink-0 overflow-hidden z-1"
                                         src={currentResource.images?.avatar || '/img/default-avatar.png'}
+                                        alt={`${currentResource.display_name} avatar`}
                                     />
                                 </Activity>
 
@@ -344,7 +336,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
 
                 {/* Bottom gradient transparent to bg-card */}
                 <div
-                    className="absolute z-50 bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-muted/50"/>
+                    className="absolute z-50 bottom-0 left-0 right-0 h-8 bg-linear-to-b from-transparent to-muted/50"/>
 
                 {/* Content */}
                 <motion.div
@@ -371,7 +363,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     }}
                     whileHover={isWHOpen ? 'interactEntry' : undefined}
                     onClick={() => isWHOpen && setIsWHOpen(false)}
-                    className={cn(isWHOpen && '[&>*]:!pointer-events-none', 'relative flex overflow-hidden grow m-1 lg:rounded-xl lg:bg-white lg:border-[0.1rem] ring-default lg:shadow-xs dark:lg:bg-n-8')}
+                    className={cn(isWHOpen && '*:pointer-events-none!', 'relative flex overflow-hidden grow m-1 lg:rounded-xl lg:bg-white lg:border-[0.1rem] ring-default lg:shadow-xs dark:lg:bg-n-8')}
                 >
                     {/* Sidebar on mobile */}
                     <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
@@ -429,7 +421,7 @@ function SidebarContentContainer({children}: { children: React.ReactNode }) {
                         </SidebarBody>
 
                         <SidebarFooter
-                            className={articlesUnread ? 'bg-gradient-to-b from-transparent to-muted/50' : ''}>
+                            className={articlesUnread ? 'bg-linear-to-b from-transparent to-muted/50' : ''}>
                             <SidebarHeading>(c) ✱base - Private alpha, things break!</SidebarHeading>
                             <div className="bottom-0 w-full">
                                 <News toggleUnread={setArticlesUnread}/>
