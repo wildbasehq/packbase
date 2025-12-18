@@ -21,7 +21,7 @@ export default function BrowserCheck() {
     }
 
     useEffect(() => {
-        // if (hasSeenWarningModal) return
+        if (hasSeenWarningModal) return
 
         // @ts-ignore
         if (isOpera) {
