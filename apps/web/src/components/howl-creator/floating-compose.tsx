@@ -295,7 +295,7 @@ function FloatingComposeContent({
                 <div className="flex items-center gap-2">
                     <Avatar square
                             src={currentResource?.images?.avatar || '/img/default-avatar.png'}
-                            initials={getInitials(currentResource.display_name)}
+                            initials={getInitials(currentResource?.display_name || 'Dummy')}
                             className="size-6"
                     />
                     <Activity mode={isVisible(!!channel)}>
@@ -309,7 +309,7 @@ function FloatingComposeContent({
                     </Activity>
 
                     <Activity mode={isVisible(!channel)}>
-                        <Heading size="sm">{currentResource.display_name}</Heading>
+                        <Heading size="sm">{currentResource?.display_name}</Heading>
                     </Activity>
                 </div>
                 <Tooltip

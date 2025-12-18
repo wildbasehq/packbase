@@ -85,6 +85,10 @@ class ErrorBoundaryImpl extends React.Component<ErrorBoundaryProps, ErrorBoundar
                                                                  className="text-indigo-500">Report it <ArrowUpRightIcon
                                     className="h-4 w-4 inline-flex"/></Link>,
                                     otherwise it will never be fixed.
+                                    <br/>
+                                    Disable any ad-blockers or trackers for us to properly collect error data (via
+                                    Sentry, PII OFF). This will the first thing we'd ask you to do if a fix isn't
+                                    immediately obvious.
                                 </Text>
                                 <div className="space-x-2 mt-4">
                                     <Button href="https://work.wildbase.xyz">

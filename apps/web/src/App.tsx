@@ -27,9 +27,9 @@ function App() {
         // if current resource is missing any data, reset to default
         if (
             !currentResource ||
-            !currentResource.id ||
-            !currentResource.slug ||
-            !currentResource.display_name
+            !currentResource?.id ||
+            !currentResource?.slug ||
+            !currentResource?.display_name
         ) {
             setCurrentResource(resourceDefault || resourceDefaultPackbase)
         }
