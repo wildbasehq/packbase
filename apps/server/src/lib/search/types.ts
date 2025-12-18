@@ -62,6 +62,8 @@ export type Statement = Assignment | {
     currentUserId?: string;
     name?: string; // For variable assignment
     targetKey?: string; // For nested assignment like $var.posts
+    skip?: number | string;
+    take?: number | string;
 };
 
 /** Runtime storage for materialized variable values and metadata. */

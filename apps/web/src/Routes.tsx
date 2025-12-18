@@ -105,15 +105,17 @@ export default function Routes() {
                             </Suspense>
                         </Route>
 
-                        <Route path="/following">
-                            <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}/following` : '~/@me'}/>
-                        </Route>
+                        <PackLayout>
+                            <Route path="/following">
+                                <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}/following` : '~/@me'}/>
+                            </Route>
 
-                        <Route path="/everything">
-                            <Suspense fallback={<LoadingFallback/>}>
-                                <EverythingPage/>
-                            </Suspense>
-                        </Route>
+                            <Route path="/everything">
+                                <Suspense fallback={<LoadingFallback/>}>
+                                    <EverythingPage/>
+                                </Suspense>
+                            </Route>
+                        </PackLayout>
 
                         {/* Fallback */}
                         <Route>

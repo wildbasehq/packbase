@@ -205,13 +205,15 @@ const parsePageWrapper = (input: string): { skip?: string | number; take?: strin
 };
 
 /**
- * Parse a @BULKPOSTLOAD(currentUserId, [Query]) wrapper.
- * Returns the currentUserId and the inner query string.
+ * Parse a @BULKPOSTLOAD(currentUserId, [Query]) or @BULKPOSTLOAD(@PAGE(...)) wrapper.
+ * Returns the currentUserId and the inner query string (which may contain @PAGE).
  */
 const parseBulkPostLoadWrapper = (input: string, userId?: string): {
     isBulkPostLoad: boolean;
     currentUserId?: string;
-    inner: string
+    inner: string;
+    skip?: string | number;
+    take?: string | number;
 } => {
     const trimmed = input.trim();
     if (!trimmed.toUpperCase().startsWith('@BULKPOSTLOAD')) {
@@ -240,34 +242,60 @@ const parseBulkPostLoadWrapper = (input: string, userId?: string): {
     const argsContent = trimmed.slice(startIdx + 1, endIdx);
     const trailing = trimmed.slice(endIdx + 1);
 
-    // Check if there's a comma (meaning currentUserId is provided)
-    const firstComma = argsContent.indexOf(',');
-
     let currentUserId: string | undefined = userId;
     let queryRaw: string;
+    let skip: string | number | undefined;
+    let take: string | number | undefined;
 
-    if (firstComma === -1) {
-        // No comma, only query: @BULKPOSTLOAD([Query])
+    // Check if the content starts with @PAGE
+    if (argsContent.trim().toUpperCase().startsWith('@PAGE')) {
+        // @BULKPOSTLOAD(@PAGE(...))
         queryRaw = argsContent.trim();
-    } else {
-        // Has comma: @BULKPOSTLOAD(currentUserId, [Query])
-        const userIdRaw = argsContent.slice(0, firstComma).trim();
-        queryRaw = argsContent.slice(firstComma + 1).trim();
 
-        // Remove quotes if present
-        if (userIdRaw.startsWith('"') && userIdRaw.endsWith('"')) {
-            currentUserId = userIdRaw.slice(1, -1);
-        } else if (userIdRaw.startsWith('$')) {
-            currentUserId = userIdRaw; // Keep variable reference as-is
+        // Parse the @PAGE wrapper to extract skip/take
+        const pageResult = parsePageWrapper(queryRaw);
+        skip = pageResult.skip;
+        take = pageResult.take;
+        queryRaw = pageResult.inner;
+    } else {
+        // Check if there's a comma (meaning currentUserId is provided)
+        const firstComma = argsContent.indexOf(',');
+
+        if (firstComma === -1) {
+            // No comma, only query: @BULKPOSTLOAD([Query])
+            queryRaw = argsContent.trim();
         } else {
-            currentUserId = userIdRaw;
+            // Has comma: @BULKPOSTLOAD(currentUserId, [Query]) or @BULKPOSTLOAD(currentUserId, @PAGE(...))
+            const userIdRaw = argsContent.slice(0, firstComma).trim();
+            const afterComma = argsContent.slice(firstComma + 1).trim();
+
+            // Parse userId
+            if (userIdRaw.startsWith('"') && userIdRaw.endsWith('"')) {
+                currentUserId = userIdRaw.slice(1, -1);
+            } else if (userIdRaw.startsWith('$')) {
+                currentUserId = userIdRaw; // Keep variable reference as-is
+            } else {
+                currentUserId = userIdRaw;
+            }
+
+            // Check if query part is @PAGE
+            if (afterComma.toUpperCase().startsWith('@PAGE')) {
+                const pageResult = parsePageWrapper(afterComma);
+                skip = pageResult.skip;
+                take = pageResult.take;
+                queryRaw = pageResult.inner;
+            } else {
+                queryRaw = afterComma;
+            }
         }
     }
 
     return {
         isBulkPostLoad: true,
         currentUserId,
-        inner: queryRaw + trailing
+        inner: queryRaw + trailing,
+        skip,
+        take
     };
 };
 
@@ -544,7 +572,17 @@ export const parseQuery = (input: string, userId?: string): ParsedQuery => {
 
         pipelineParts.forEach((part, idx) => {
             const {skip, take, inner} = parsePageWrapper(part);
-            const {isBulkPostLoad, currentUserId, inner: bulkInner} = parseBulkPostLoadWrapper(inner, userId);
+            const {
+                isBulkPostLoad,
+                currentUserId,
+                inner: bulkInner,
+                skip: bulkSkip,
+                take: bulkTake
+            } = parseBulkPostLoadWrapper(inner, userId);
+
+            // Use skip/take from @BULKPOSTLOAD's @PAGE if present, otherwise from outer @PAGE
+            const effectiveSkip = bulkSkip ?? skip;
+            const effectiveTake = bulkTake ?? take;
 
             // Support trailing "AS <column>" after the bracketed expression
             let trailingAs: string | undefined;
@@ -584,13 +622,15 @@ export const parseQuery = (input: string, userId?: string): ParsedQuery => {
             remaining = rest;
 
             if (logParser.enabled) {
-                logParser('parseQuery segment idx=%d aggregation=%s asColumn=%s asColumns=%o asAll=%s isBulkPostLoad=%s',
+                logParser('parseQuery segment idx=%d aggregation=%s asColumn=%s asColumns=%o asAll=%s isBulkPostLoad=%s skip=%s take=%s',
                     idx,
                     aggregation,
                     asColumn,
                     asColumns,
                     asAll,
                     isBulkPostLoad,
+                    effectiveSkip,
+                    effectiveTake,
                 );
             }
 
@@ -608,6 +648,8 @@ export const parseQuery = (input: string, userId?: string): ParsedQuery => {
                         expr,
                         asColumn,
                         currentUserId,
+                        skip: effectiveSkip,
+                        take: effectiveTake,
                     });
                 } else {
                     // No variable assignment
@@ -616,6 +658,8 @@ export const parseQuery = (input: string, userId?: string): ParsedQuery => {
                         expr,
                         asColumn,
                         currentUserId,
+                        skip: effectiveSkip,
+                        take: effectiveTake,
                     });
                 }
                 return;
@@ -631,11 +675,20 @@ export const parseQuery = (input: string, userId?: string): ParsedQuery => {
                     asColumns,
                     asAll,
                     aggregation,
-                    skip,
-                    take
+                    skip: effectiveSkip,
+                    take: effectiveTake
                 });
             } else {
-                statements.push({type: 'expression', expr, asColumn, asColumns, asAll, aggregation, skip, take});
+                statements.push({
+                    type: 'expression',
+                    expr,
+                    asColumn,
+                    asColumns,
+                    asAll,
+                    aggregation,
+                    skip: effectiveSkip,
+                    take: effectiveTake
+                });
             }
         });
     }

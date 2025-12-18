@@ -484,21 +484,30 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     const skip = 'skip' in stmt ? resolveNum(stmt.skip) : undefined;
     const take = 'take' in stmt ? resolveNum(stmt.take) : undefined;
 
+    // Fetch one extra row to check if there are more results
+    const fetchTake = take !== undefined ? take + 1 : undefined;
+
     const rows = await (prisma as any)[table].findMany({
         select,
         where: prismaWhere ?? undefined,
         skip,
-        take
+        take: fetchTake
     });
     if (logPrisma.enabled) {
         logPrisma('Prisma findMany table=%s rows=%d', table, rows.length);
     }
 
+    // Check if there are more results
+    const hasMore = take !== undefined && rows.length > take;
+
+    // Remove the extra row if we fetched it
+    const actualRows = hasMore ? rows.slice(0, take) : rows;
+
     if (relationNodes.length) {
         if (logExec.enabled) {
             logExec('runStatement building relation resolvers for %d relations', relationNodes.length);
         }
-        ctx.relationChecks = await buildRelationResolvers(relationNodes, rows);
+        ctx.relationChecks = await buildRelationResolvers(relationNodes, actualRows);
     }
 
     // Format the filtered rows into the requested projection/aggregation shape
@@ -542,7 +551,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         const mergedValues = parent.values.map((v: any, idx: number) => {
             ctx.loop = {variable: stmt.name, value: v, index: idx};
             const predicate = buildWherePredicate(expr, ctx);
-            const filtered = rows.filter((r: any) => predicate(r));
+            const filtered = actualRows.filter((r: any) => predicate(r));
             const values = shapeResults(filtered);
             const child = values.length ? values[0] : undefined;
             const base = v && typeof v === 'object' && !Array.isArray(v) ? {...v} : {value: v};
@@ -556,13 +565,13 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         ctx.variables[stmt.name] = parent;
         ctx.variables['_prev'] = parent;
 
-        return {name: stmt.name, values: parent.values};
+        return {name: stmt.name, values: parent.values, hasMore};
     }
 
     const predicate = buildWherePredicate(expr, ctx);
-    const filtered = rows.filter((r: any) => predicate(r));
+    const filtered = actualRows.filter((r: any) => predicate(r));
     if (logExec.enabled) {
-        logExec('runStatement filtered rows=%d (from %d)', filtered.length, rows.length);
+        logExec('runStatement filtered rows=%d (from %d)', filtered.length, actualRows.length);
     }
     const resultValues = shapeResults(filtered);
 
@@ -586,11 +595,11 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     if ('name' in stmt) {
         ctx.variables[stmt.name] = variableValue;
         ctx.variables['_prev'] = variableValue;
-        return {name: stmt.name, values: resultValues};
+        return {name: stmt.name, values: resultValues, hasMore};
     }
 
     ctx.variables['_prev'] = variableValue;
-    return {values: resultValues};
+    return {values: resultValues, hasMore};
 };
 
 /**
@@ -632,11 +641,45 @@ export const executeQuery = async (statements: Statement[]) => {
                     };
                     const queryResult = await runStatement(queryStmt, ctx);
 
-                    // Extract post IDs from the result
-                    const postIds = (queryResult.values || []).filter((id: any) => id != null);
+                    // Extract post IDs from the result and hasMore from query
+                    let postIds = (queryResult.values || []).filter((id: any) => id != null);
+                    let hasMore = queryResult.hasMore || false;
 
                     if (logExec.enabled) {
-                        logExec('bulkpostload: got %d post IDs', postIds.length);
+                        logExec('bulkpostload: got %d post IDs before pagination, hasMore=%s', postIds.length, hasMore);
+                    }
+
+                    // Apply skip/take if provided
+                    const resolveNum = (val: string | number | undefined): number | undefined => {
+                        if (val === undefined) return undefined;
+                        if (typeof val === 'number') return val;
+                        if (val.startsWith('$')) {
+                            const varName = val.slice(1);
+                            const v = ctx.variables[varName]?.values?.[0];
+                            return typeof v === 'number' ? v : Number(v);
+                        }
+                        return Number(val);
+                    };
+
+                    const skip = 'skip' in stmt ? resolveNum(stmt.skip) : undefined;
+                    const take = 'take' in stmt ? resolveNum(stmt.take) : undefined;
+
+                    if (skip !== undefined || take !== undefined) {
+                        const startIdx = skip ?? 0;
+
+                        // Check if there are more items after pagination
+                        if (take !== undefined) {
+                            const totalAvailable = postIds.length;
+                            const endIdx = startIdx + take;
+                            hasMore = endIdx < totalAvailable || hasMore;
+                            postIds = postIds.slice(startIdx, endIdx);
+                        } else {
+                            postIds = postIds.slice(startIdx);
+                        }
+
+                        if (logExec.enabled) {
+                            logExec('bulkpostload: applied pagination skip=%d take=%d, result=%d post IDs, hasMore=%s', skip, take, postIds.length, hasMore);
+                        }
                     }
 
                     // Use BulkPostLoader to enrich the posts
@@ -658,9 +701,9 @@ export const executeQuery = async (statements: Statement[]) => {
                         };
                         ctx.variables[stmt.name] = variableValue;
                         ctx.variables['_prev'] = variableValue;
-                        results.push({name: stmt.name, values: enrichedPosts});
+                        results.push({name: stmt.name, values: enrichedPosts, hasMore});
                     } else {
-                        results.push({values: enrichedPosts});
+                        results.push({values: enrichedPosts, hasMore});
                     }
                     continue;
                 }
@@ -686,6 +729,11 @@ export const executeQuery = async (statements: Statement[]) => {
         for (const res of results) {
             const name = (res as any).name || 'result';
             returnObj[name] = (res as any).values;
+
+            // Add hasMore if it exists
+            if ((res as any).hasMore !== undefined) {
+                returnObj[`${name}_has_more`] = (res as any).hasMore;
+            }
         }
 
         return returnObj;

@@ -99,6 +99,74 @@ describe('BulkPostLoad Parser', () => {
             throw new Error('Expected bulkpostload statement');
         }
     });
+
+    it('should parse @BULKPOSTLOAD with @PAGE wrapper', () => {
+        const query = '@BULKPOSTLOAD(@PAGE(0, 10, [Where posts:channel_id ("channel-123")]))';
+        const result = parseQuery(query);
+
+        expect(result.statements).toHaveLength(1);
+        const stmt = result.statements[0];
+
+        if ('type' in stmt && stmt.type === 'bulkpostload') {
+            expect(stmt.skip).toBe(0);
+            expect(stmt.take).toBe(10);
+            expect(stmt.expr).toBeDefined();
+        } else {
+            throw new Error('Expected bulkpostload statement');
+        }
+    });
+
+    it('should parse @BULKPOSTLOAD with currentUserId and @PAGE wrapper', () => {
+        const query = '@BULKPOSTLOAD("user-456", @PAGE(5, 15, [Where posts:channel_id ("channel-789")]))';
+        const result = parseQuery(query);
+
+        expect(result.statements).toHaveLength(1);
+        const stmt = result.statements[0];
+
+        if ('type' in stmt && stmt.type === 'bulkpostload') {
+            expect(stmt.currentUserId).toBe('user-456');
+            expect(stmt.skip).toBe(5);
+            expect(stmt.take).toBe(15);
+            expect(stmt.expr).toBeDefined();
+        } else {
+            throw new Error('Expected bulkpostload statement');
+        }
+    });
+
+    it('should parse @BULKPOSTLOAD with variable assignment and @PAGE', () => {
+        const query = '$posts = @BULKPOSTLOAD(@PAGE(0, 20, [Where posts:id ("post-abc")]))';
+        const result = parseQuery(query);
+
+        expect(result.statements).toHaveLength(1);
+        const stmt = result.statements[0];
+
+        if ('type' in stmt && stmt.type === 'bulkpostload') {
+            expect(stmt.name).toBe('posts');
+            expect(stmt.skip).toBe(0);
+            expect(stmt.take).toBe(20);
+            expect(stmt.expr).toBeDefined();
+        } else {
+            throw new Error('Expected bulkpostload statement');
+        }
+    });
+
+    it('should parse @BULKPOSTLOAD with variable userId and @PAGE wrapper', () => {
+        const query = '$enrichedPosts = @BULKPOSTLOAD($currentUser, @PAGE(10, 25, [Where posts:channel_id ("channel-xyz")]))';
+        const result = parseQuery(query);
+
+        expect(result.statements).toHaveLength(1);
+        const stmt = result.statements[0];
+
+        if ('type' in stmt && stmt.type === 'bulkpostload') {
+            expect(stmt.name).toBe('enrichedPosts');
+            expect(stmt.currentUserId).toBe('$currentUser');
+            expect(stmt.skip).toBe(10);
+            expect(stmt.take).toBe(25);
+            expect(stmt.expr).toBeDefined();
+        } else {
+            throw new Error('Expected bulkpostload statement');
+        }
+    });
 });
 
 

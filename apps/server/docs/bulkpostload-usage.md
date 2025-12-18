@@ -8,6 +8,8 @@ reactions, comments, packs, pages) using the `BulkPostLoader` class.
 ```
 @BULKPOSTLOAD([query])
 @BULKPOSTLOAD(currentUserId, [query])
+@BULKPOSTLOAD(@PAGE(skip, take, [query]))
+@BULKPOSTLOAD(currentUserId, @PAGE(skip, take, [query]))
 ```
 
 ## Examples
@@ -50,12 +52,31 @@ $posts = @BULKPOSTLOAD([Where posts:channel_id ("channel-123")])
 $enrichedPosts = @BULKPOSTLOAD($currentUser, [Where posts:id ("post-123")])
 ```
 
+### With Pagination (@PAGE)
+
+Use `@PAGE` for pagination - it will automatically add `hasMore` to indicate if more results exist:
+
+```
+$posts = @BULKPOSTLOAD(@PAGE(0, 20, [Where posts:channel_id ("channel-123")]))
+```
+
+This returns:
+
+- `posts`: Array of 20 enriched posts
+- `posts_hasMore`: Boolean indicating if more posts exist beyond the current page
+
+### With User Context and Pagination
+
+```
+$enrichedPosts = @BULKPOSTLOAD($userId, @PAGE(10, 25, [Where posts:channel_id ("channel-xyz")]))
+```
+
 ### Complex Queries
 
 Use complex WHERE clauses:
 
 ```
-$posts = @BULKPOSTLOAD($userId, [Where posts:channel_id ("channel-123") AND posts:created_at ("2023-01-01".."2023-12-31")])
+$posts = @BULKPOSTLOAD($userId, @PAGE(0, 50, [Where posts:channel_id ("channel-123") AND posts:created_at ("2023-01-01".."2023-12-31")]))
 ```
 
 ### With Projection
@@ -64,6 +85,43 @@ Specify which column to extract post IDs from (defaults to 'id'):
 
 ```
 @BULKPOSTLOAD([Where posts:id ("some-id")] AS id)
+```
+
+## Pagination with hasMore
+
+When using `@PAGE(skip, take, [query])`, the system automatically:
+
+1. Fetches one extra row beyond the `take` limit
+2. Checks if more results exist
+3. Adds a `hasMore` property to the result (named `{variableName}_hasMore` or `result_hasMore`)
+
+Example response structure:
+
+```javascript
+{
+    posts: [...], // Array of enriched posts
+        posts_hasMore
+:
+    true, // More results available
+        variables
+:
+    { ...
+    }
+}
+```
+
+This allows you to implement infinite scroll or pagination UI:
+
+```typescript
+const result = await executeQuery('$posts = @BULKPOSTLOAD(@PAGE(0, 20, [Where posts:channel_id ("channel-123")]))');
+const posts = result.posts;
+const hasMore = result.posts_hasMore;
+
+// In your UI
+if (hasMore) {
+    // Show "Load More" button
+    // Next query would use @PAGE(20, 20, ...)
+}
 ```
 
 ## What Gets Loaded
@@ -135,5 +193,4 @@ Returns an object mapping post IDs to their complete data:
 ## Performance
 
 The `BulkPostLoader` efficiently batches all database queries to minimize database round-trips, making it much faster
-than loading posts one at a time.
-
+than loading posts one at a time. It also limits to a maximum of 25 posts per load for optimal performance.
