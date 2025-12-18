@@ -72,7 +72,7 @@ function navigateFromResult(item: any) {
     const type = getItemType(item);
 
     if (type === "pack" && item.slug) {
-        window.location.href = `/${item.slug}`;
+        window.location.href = `/p/${item.slug}`;
         return;
     }
 
