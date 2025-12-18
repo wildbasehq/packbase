@@ -1,22 +1,16 @@
-import { YapockType } from '@/index';
-import { t } from 'elysia';
-import requiresToken from '@/utils/identity/requires-token';
+import {YapockType} from '@/index';
+import {t} from 'elysia';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({
-            set,
-            body,
-            user,
-        }: {
-            set: any;
-            body: {
-                badge: string;
-            };
-            user: any;
-        }) => {
-            requiresToken({ set, user });
+                   set,
+                   body,
+                   user,
+               }) => {
+            await requiresAccount({set, user});
 
             const userBadge = await prisma.inventory.findFirst({
                 where: {

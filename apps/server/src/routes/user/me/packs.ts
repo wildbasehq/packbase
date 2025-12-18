@@ -2,13 +2,13 @@ import {YapockType} from '@/index';
 import {getPack} from '@/routes/pack/[id]';
 import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
-import requiresToken from '@/utils/identity/requires-token';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app.get(
         '',
         async ({set, user}) => {
-            await requiresToken({set, user});
+            await requiresAccount({set, user});
 
             return await getUserPacks({user, set});
         },

@@ -1,8 +1,9 @@
-import { t } from 'elysia';
-import { YapockType } from '@/index';
+import {t} from 'elysia';
+import {YapockType} from '@/index';
 import prisma from '@/db/prisma';
-import { HTTPError } from '@/lib/HTTPError';
-import { CommonErrorResponses, DM_ERROR_CODES } from '@/utils/dm/errors';
+import {HTTPError} from '@/lib/HTTPError';
+import {CommonErrorResponses, DM_ERROR_CODES} from '@/utils/dm/errors';
+import requiresAccount from "@/utils/identity/requires-account";
 
 // Message response schema
 const MessageResponse = t.Object({
@@ -22,17 +23,11 @@ export default (app: YapockType) =>
         // PATCH /dm/messages/:id
         .patch(
             '',
-            async ({ set, user, params, body }) => {
-                if (!user?.sub) {
-                    set.status = 401;
-                    throw HTTPError.unauthorized({
-                        summary: 'Authentication required to edit DM messages',
-                        code: DM_ERROR_CODES.UNAUTHORIZED,
-                    });
-                }
+            async ({set, user, params, body}) => {
+                await requiresAccount({set, user});
 
-                const { id } = params as { id: string };
-                const { content } = body as { content?: string };
+                const {id} = params as { id: string };
+                const {content} = body as { content?: string };
                 if (!content || !content.trim()) {
                     set.status = 400;
                     throw HTTPError.badRequest({
@@ -50,7 +45,7 @@ export default (app: YapockType) =>
                     });
                 }
 
-                const msg = await prisma.dm_messages.findUnique({ where: { id } });
+                const msg = await prisma.dm_messages.findUnique({where: {id}});
                 if (!msg) {
                     set.status = 404;
                     throw HTTPError.notFound({
@@ -67,7 +62,10 @@ export default (app: YapockType) =>
                     });
                 }
 
-                const updated = await prisma.dm_messages.update({ where: { id }, data: { content: content.trim(), edited_at: new Date() } });
+                const updated = await prisma.dm_messages.update({
+                    where: {id},
+                    data: {content: content.trim(), edited_at: new Date()}
+                });
 
                 // Return with consistent timestamp serialization
                 return {
@@ -83,8 +81,8 @@ export default (app: YapockType) =>
                 };
             },
             {
-                detail: { description: 'Edit a DM message by id', tags: ['DM'] },
-                body: t.Object({ content: t.String() }),
+                detail: {description: 'Edit a DM message by id', tags: ['DM']},
+                body: t.Object({content: t.String()}),
                 response: {
                     200: MessageResponse,
                     400: CommonErrorResponses[400],
@@ -98,7 +96,7 @@ export default (app: YapockType) =>
         // DELETE /dm/messages/:id (soft delete)
         .delete(
             '',
-            async ({ set, user, params }) => {
+            async ({set, user, params}) => {
                 if (!user?.sub) {
                     set.status = 401;
                     throw HTTPError.unauthorized({
@@ -107,9 +105,9 @@ export default (app: YapockType) =>
                     });
                 }
 
-                const { id } = params as { id: string };
+                const {id} = params as { id: string };
 
-                const msg = await prisma.dm_messages.findUnique({ where: { id } });
+                const msg = await prisma.dm_messages.findUnique({where: {id}});
                 if (!msg) {
                     set.status = 404;
                     throw HTTPError.notFound({
@@ -126,7 +124,7 @@ export default (app: YapockType) =>
                     });
                 }
 
-                const updated = await prisma.dm_messages.update({ where: { id }, data: { deleted_at: new Date() } });
+                const updated = await prisma.dm_messages.update({where: {id}, data: {deleted_at: new Date()}});
 
                 // Return with consistent timestamp serialization
                 return {
@@ -142,7 +140,7 @@ export default (app: YapockType) =>
                 };
             },
             {
-                detail: { description: 'Delete (soft) a DM message by id', tags: ['DM'] },
+                detail: {description: 'Delete (soft) a DM message by id', tags: ['DM']},
                 response: {
                     200: MessageResponse,
                     401: CommonErrorResponses[401],

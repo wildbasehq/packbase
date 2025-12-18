@@ -32,6 +32,34 @@ export default function FeedPost({post, onDelete, postState}: FeedPostProps) {
         }
     }
 
+    const handleDeleteComment = (commentId: string) => {
+        try {
+            const {error} = vg.howl({id: commentId}).delete()
+
+            if (error) {
+                const errorMessage = error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'
+                toast.error(errorMessage)
+                return
+            }
+
+            toast.success('Comment deleted')
+
+            const newPostContent = {...postContent}
+            if (newPostContent.comments) {
+                newPostContent.comments = newPostContent.comments.filter(c => c.id !== commentId)
+                setPostContent(newPostContent)
+            }
+
+            if (postState) {
+                const [posts, setPosts] = postState
+                setPosts(posts.map(p => (p.id === postContent.id ? newPostContent : p)))
+            }
+        } catch (err) {
+            toast.error('Failed to delete comment')
+            console.error(err)
+        }
+    }
+
     const handleComment = (comment: FeedPostData) => {
         const newPostContent = {...postContent}
         if (!newPostContent.comments) newPostContent.comments = []
@@ -51,6 +79,7 @@ export default function FeedPost({post, onDelete, postState}: FeedPostProps) {
                 signedInUser={signedInUser}
                 onDelete={handleDelete}
                 onComment={handleComment}
+                onDeleteComment={handleDeleteComment}
                 isRoot={true}
                 depth={0}
             />

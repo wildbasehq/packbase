@@ -77,9 +77,18 @@ export default function PackSwitcher({onChange}: {
                     {[...resources].map((pack, colIdx) => (
                         <NavbarItem
                             key={colIdx}
-                            className={cn("flex w-2xs *:w-full", currentResource.id === pack.id && "ring-1 rounded ring-default bg-card")}
+                            className={cn("relative overflow-hidden flex w-2xs rounded *:w-full", currentResource.id === pack.id && "ring-1 ring-default bg-card")}
                             onClick={() => switchResource(pack)}
                         >
+                            {pack.images?.header && (
+                                <img
+                                    data-slot="banner"
+                                    className="absolute inset-0 w-full h-full object-cover opacity-10"
+                                    src={pack.images?.header}
+                                    alt={`${pack.display_name} banner`}
+                                />
+                            )}
+
                             <img
                                 data-slot="avatar"
                                 className="rounded-sm shrink-0 w-6 h-6 border overflow-hidden"

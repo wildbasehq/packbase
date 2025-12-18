@@ -1,16 +1,9 @@
 import {create} from 'zustand'
-import {resourceDefault} from '@/src/lib'
 
 /**
  * Resource UI store, not persistent
  */
 interface ResourceUIStore {
-    resourceDefault: {
-        id: string | number
-        display_name: string
-        icon?: string
-        standalone: boolean
-    }
     hidden: boolean
     loading: boolean
     connecting: boolean
@@ -34,7 +27,6 @@ interface ResourceUIStore {
 }
 
 export const useUIStore = create<ResourceUIStore>(set => ({
-    resourceDefault,
     hidden: false,
     loading: true,
     connecting: true,

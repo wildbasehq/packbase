@@ -51,18 +51,9 @@ export default (app: YapockType) =>
 
 export async function getUser({by, value, user, scope}: { by: string; value: string; user?: any; scope?: string }) {
     const timer = new Date().getTime();
-    // let cached: typeof UserProfile & { expires_after: number } | undefined
-    //
-    // UserCache.forEach((v, k) => {
-    //     if (v[by] === value) {
-    //         cached = v
-    //     }
-    // })
 
     let data;
     let clerkUser;
-    // if (!cached || cached.expires_after < Date.now()) {
-    //     if (cached) UserCache.delete(cached.id)
 
     try {
         // Create a dynamic where condition based on the 'by' parameter
@@ -106,16 +97,8 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
         // Handle specific Prisma errors if needed
         throw error;
     }
-    // } else {
-    //     const {expires_after, ...profile} = cached
-    //
-    //     data = profile
-    // }
 
     if (!data) return;
-
-    // Cache for 5 minutes
-    // UserCache.set(data.id, {...data, expires_after: Date.now() + 1000 * 60 * 5})
 
     data.about = {
         bio: data.bio,
@@ -143,6 +126,24 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
             if (followingData) {
                 data.following = true;
             }
+
+            // Set online status
+            if (scope === 'pack_member') {
+                data.online = data.last_online && Date.now() - new Date(data.last_online).getTime() < 5 * 60 * 1000;
+                if (!data.online) {
+                    const timeDiff = Date.now() - new Date(data.last_online).getTime();
+                    const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
+
+                    if (hoursAgo < 24) {
+                        if (hoursAgo === 0) {
+                            const minutesAgo = Math.floor(timeDiff / (1000 * 60));
+                            user.status = `seen ${minutesAgo} minute${minutesAgo === 1 ? '' : 's'} ago`;
+                        } else {
+                            user.status = `seen ${hoursAgo} hour${hoursAgo === 1 ? '' : 's'} ago`;
+                        }
+                    }
+                }
+            }
         } catch (error) {
             // If there's an error, we'll just continue without setting following status
         }
@@ -155,6 +156,7 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
             is_set: true,
         },
     });
+
     if (userBadges) {
         data.badge = userBadges.item_id;
     }

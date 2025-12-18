@@ -200,7 +200,7 @@ function Hero() {
                 <Heading
                     className="!text-2xl flex justify-center items-center [&>*]:!text-white tracking-tight font-new-spirit-bold overflow-visible sm:!text-5xl">
                     <div>
-                        <Logo fullSize className="h-5 w-5 mr-2 sm:!h-10 sm:!w-10 sm:mr-4 -mt-1.5"/>
+                        <Logo className="h-5 w-5 mr-2 sm:!h-10 sm:!w-10 sm:mr-4 -mt-1.5"/>
                     </div>
                     <VerticalCutReveal
                         reverse

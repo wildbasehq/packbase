@@ -1,7 +1,7 @@
-import { YapockType } from '@/index';
-import { HTTPError } from '@/lib/HTTPError';
+import {YapockType} from '@/index';
 import validateThemeContent from '@/lib/themes/validateThemeContent';
-import { t } from 'elysia';
+import {t} from 'elysia';
+import requiresAccount from "@/utils/identity/requires-account";
 
 // Define the validation response schema
 const ValidationResponse = t.Object({
@@ -15,13 +15,8 @@ const ValidationResponse = t.Object({
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ set, body, user }) => {
-            if (!user) {
-                set.status = 401;
-                throw HTTPError.unauthorized({
-                    summary: 'You must be logged in to validate theme content.',
-                });
-            }
+        async ({set, body, user}) => {
+            await requiresAccount({set, user});
 
             // Validate the theme content in dry run mode (no errors thrown)
             return validateThemeContent(

@@ -1,28 +1,28 @@
-import { t } from 'elysia';
-import { YapockType } from '@/index';
+import {t} from 'elysia';
+import {YapockType} from '@/index';
 import prisma from '@/db/prisma';
-import { HTTPError } from '@/lib/HTTPError';
+import {HTTPError} from '@/lib/HTTPError';
 import mapChannel from '@/utils/channels/mapChannel';
-import { CommonErrorResponses, DM_ERROR_CODES } from '@/utils/dm/errors';
+import {CommonErrorResponses, DM_ERROR_CODES} from '@/utils/dm/errors';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app
         // GET /dm/channels/:id
         .get(
             '',
-            async ({ set, user, params }) => {
-                if (!user?.sub) {
-                    set.status = 401;
-                    throw HTTPError.unauthorized({
-                        summary: 'Authentication required to access DM channel',
-                        code: DM_ERROR_CODES.UNAUTHORIZED,
-                    });
-                }
+            async ({set, user, params}) => {
+                await requiresAccount({set, user});
 
-                const { id } = params as { id: string };
+                const {id} = params as { id: string };
 
                 // Ensure the user participates in the channel
-                const isParticipant = await prisma.dm_participants.findFirst({ where: { channel_id: id, user_id: user.sub } });
+                const isParticipant = await prisma.dm_participants.findFirst({
+                    where: {
+                        channel_id: id,
+                        user_id: user.sub
+                    }
+                });
                 if (!isParticipant) {
                     set.status = 403;
                     throw HTTPError.forbidden({
@@ -56,7 +56,7 @@ export default (app: YapockType) =>
                 return payload;
             },
             {
-                detail: { description: 'Get a DM channel by id', tags: ['DM'] },
+                detail: {description: 'Get a DM channel by id', tags: ['DM']},
                 response: {
                     200: t.Any(),
                     401: CommonErrorResponses[401],

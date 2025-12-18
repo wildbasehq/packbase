@@ -42,10 +42,11 @@ model packs {
   images_header String?
 
   // Relations
-  memberships packs_memberships[]
-  pages       packs_pages[]
-  posts       posts[]
-  themes      pack_themes[]
+  memberships  packs_memberships[]
+  pages        packs_pages[]
+  posts        posts[]
+  themes       pack_themes[]
+  packsBanneds packs_banned[]
 
   @@index([owner_id])
   @@schema("public")
@@ -90,6 +91,23 @@ model packs_pages {
 
   @@index([tenant_id], type: Hash)
   @@map("packs.pages")
+  @@schema("public")
+}
+
+model packs_banned {
+  id         BigInt   @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  tenant_id  String   @db.Uuid
+  user_id    String   @db.Uuid
+  reason     String?
+
+  pack packs    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "public_packs_banned_tenant_id_fkey")
+  user profiles @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "public_packs_banned_user_id_fkey")
+
+  @@unique([tenant_id, user_id], map: "packs_banned_tenant_user_unique")
+  @@index([tenant_id], type: Hash)
+  @@index([user_id], type: Hash)
+  @@map("packs.banned")
   @@schema("public")
 }
 
@@ -181,7 +199,7 @@ model profiles {
   dm_messages     dm_messages[]
   invites         invites[]
   packsId         String?              @db.Uuid
-  admin_audit_log admin_audit_log[]
+  packsBanneds    packs_banned[]
 
   @@index([default_pack], type: Hash)
   @@schema("public")
@@ -206,8 +224,8 @@ model profiles_followers {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model profiles_settings {
-  id   String @id @db.Uuid
-  json Json?  @db.Json
+  id                       String    @id @db.Uuid
+  last_default_pack_switch DateTime? @db.Timestamptz(6)
 
   @@map("profiles.settings")
   @@schema("public")
@@ -467,9 +485,7 @@ model admin_audit_log {
   model_id     String
   model_object Json
   created_at   DateTime @default(now()) @db.Timestamptz(6)
-
-  profiles profiles? @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
+  
   @@schema("public")
 }
 

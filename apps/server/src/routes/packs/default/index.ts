@@ -2,6 +2,48 @@ import {YapockType} from "@/index";
 import requiresToken from "@/utils/identity/requires-token";
 import {t} from "elysia";
 import {HTTPError} from "@/lib/HTTPError";
+import getUserPrivateSettings from "@/utils/get-user-private-settings";
+
+export async function checkDefaultPackSetup(userId: string) {
+    const profile = await prisma.profiles.findFirst({
+        where: {
+            id: userId
+        },
+        select: {
+            id: true,
+            default_pack: true
+        }
+    })
+
+    const lastSwitch = await getUserPrivateSettings(userId, 'last_default_pack_switch')
+    // More than 30 days since last switch
+    const can_switch = !lastSwitch || (Date.now() - new Date(lastSwitch || 0).getTime()) > 30 * 24 * 60 * 60 * 1000;
+
+    const requires_switch = !!(await hasPostsInUniverse(userId));
+    // !profile?.default_pack
+    const requires_setup = !profile?.default_pack;
+
+    return {
+        id: profile.default_pack,
+        requires_switch,
+        requires_setup,
+        can_switch,
+    }
+}
+
+async function hasPostsInUniverse(userId: string) {
+    return await prisma.posts.findFirst({
+        where: {
+            user_id: userId,
+            tenant_id: '00000000-0000-0000-0000-000000000000'
+        },
+        select: {
+            id: true,
+            user_id: true,
+            tenant_id: true
+        }
+    });
+}
 
 export default (app: YapockType) =>
     app.get(
@@ -9,34 +51,7 @@ export default (app: YapockType) =>
         async ({set, user}) => {
             requiresToken({set, user});
 
-            const profile = await prisma.profiles.findFirst({
-                where: {
-                    id: user.sub
-                },
-                select: {
-                    id: true,
-                    default_pack: true
-                }
-            })
-
-            const hasPostsInUniverse = await prisma.posts.findFirst({
-                where: {
-                    user_id: user.sub,
-                    tenant_id: '00000000-0000-0000-0000-000000000000'
-                },
-                select: {
-                    id: true,
-                    user_id: true,
-                    tenant_id: true
-                }
-            });
-
-            const requires_switch = !!hasPostsInUniverse;
-
-            return {
-                id: profile.default_pack,
-                requires_switch
-            }
+            return await checkDefaultPackSetup(user.sub)
         }
     )
         .patch(
@@ -45,19 +60,7 @@ export default (app: YapockType) =>
                 requiresToken({set, user});
                 const {pack_id} = body;
 
-                const hasUniversePosts = await prisma.posts.findFirst({
-                    where: {
-                        user_id: user.sub,
-                        tenant_id: '00000000-0000-0000-0000-000000000000'
-                    },
-                    select: {
-                        id: true,
-                        user_id: true,
-                        tenant_id: true
-                    }
-                });
-
-                if (hasUniversePosts) {
+                if ((await hasPostsInUniverse(user.sub))) {
                     const targetPack = await prisma.packs.findUnique({
                         where: {id: pack_id},
                         select: {

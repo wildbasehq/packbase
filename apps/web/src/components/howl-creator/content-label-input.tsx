@@ -6,9 +6,9 @@
 import {Field, Label, Listbox, ListboxLabel, ListboxOption} from '@/src/components'
 
 export default function ContentLabelInput({
-                                               value,
-                                               onChange
-                                           }: {
+                                              value,
+                                              onChange
+                                          }: {
     value: string
     onChange: (v: string) => void
 }) {
@@ -21,14 +21,14 @@ export default function ContentLabelInput({
             label: 'R18 - Suggestive',
             value: 'rating_suggestive'
         },
-        {
-            label: 'M, MA16 - Mature',
-            value: 'rating_mature'
-        },
-        {
-            label: 'G, PG - SFW',
-            value: 'rating_safe'
-        }
+        // {
+        //     label: 'M, MA16 - Mature',
+        //     value: 'rating_mature'
+        // },
+        // {
+        //     label: 'G, PG - SFW',
+        //     value: 'rating_safe'
+        // }
     ]
     return (
         <Field>

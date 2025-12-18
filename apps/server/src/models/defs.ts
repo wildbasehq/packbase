@@ -9,7 +9,7 @@ export const UserProfile = t.Object(
             t.String({
                 minLength: 2,
                 maxLength: 40,
-                pattern: '^(?=.{2,40}$)(?![_.-])(?!.*[_.-]{2})(?!.*[_.-]$)[A-Za-z0-9_.-]+$',
+                pattern: '^(?=.{2,40}$)(?![_-])(?!.*[_-]{2})(?!.*[_-]$)[A-Za-z0-9_-]+$',
             }),
         ),
         display_name: t.Optional(
@@ -92,7 +92,7 @@ export const PackCreateBody = t.Object({
     slug: t.String({
         minLength: 3,
         maxLength: 20,
-        pattern: '^(?=.{3,20}$)(?![-.])(?!.*[-.]{2})[a-zA-Z0-9.-]+(?<![-.])$',
+        pattern: '^(?=.{2,40}$)(?![_-])(?!.*[_-]{2})(?!.*[_-]$)[A-Za-z_-]+$',
     }),
     description: t.String({
         maxLength: 256,
@@ -105,7 +105,7 @@ export const PackEditBody = t.Object({
             default: '',
             minLength: 3,
             maxLength: 20,
-            pattern: '^(?=.{3,20}$)(?![-.])(?!.*[-.]{2})[a-zA-Z0-9.-]+(?<![-.])$',
+            pattern: '^(?=.{2,40}$)(?![_-])(?!.*[_-]{2})(?!.*[_-]$)[A-Za-z_-]+$',
         }),
     ),
     display_name: t.Optional(

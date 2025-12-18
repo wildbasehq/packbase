@@ -5,6 +5,7 @@ import {HTTPError} from '@/lib/HTTPError';
 import {CommonErrorResponses, DM_ERROR_CODES} from '@/utils/dm/errors';
 import {CreateMessageBody, MESSAGE_TYPES, validateMessageType} from '@/utils/dm/validation';
 import {DMRateLimiter} from '@/utils/dm/rate-limiter';
+import requiresAccount from "@/utils/identity/requires-account";
 
 // Message response schema
 const MessageResponse = t.Object({
@@ -25,13 +26,8 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user, params, query}) => {
-                if (!user?.sub) {
-                    set.status = 401;
-                    throw HTTPError.unauthorized({
-                        summary: 'Authentication required to access DM messages',
-                        code: DM_ERROR_CODES.UNAUTHORIZED,
-                    });
-                }
+                await requiresAccount({set, user});
+
 
                 const {id} = params as { id: string };
                 // Ensure the user participates in the channel

@@ -15,36 +15,36 @@ export function formatRelativeTime(dateString: string): string {
 
     // Less than 10 seconds ago
     if (seconds < 10) {
-        return 'just now'
+        return 'now'
     }
 
     // Less than a minute ago
     if (seconds < 60) {
-        return `${seconds}s ago`
+        return `${seconds}s`
     }
 
     // Minutes ago (up to 60 minutes)
     const minutes = Math.floor(seconds / 60)
     if (minutes < 60) {
-        return `${minutes}m ago`
+        return `${minutes}m`
     }
 
     // Hours ago (up to 24 hours)
     const hours = Math.floor(minutes / 60)
     if (hours < 24) {
-        return `${hours}h ago`
+        return `${hours}h`
     }
 
     // Days ago (up to 7 days)
     const days = Math.floor(hours / 24)
     if (days < 7) {
-        return days === 1 ? 'yesterday' : `${days}d ago`
+        return days === 1 ? 'yesterday' : `${days}d`
     }
 
     // Weeks ago (up to 4 weeks)
     const weeks = Math.floor(days / 7)
     if (weeks < 4) {
-        return `${weeks}w ago`
+        return `${weeks}w`
     }
 
     // More than a month ago - use formatted date

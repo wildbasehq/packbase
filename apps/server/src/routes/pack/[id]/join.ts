@@ -7,17 +7,20 @@ import {HTTPError} from '@/lib/HTTPError'
 import prisma from '@/db/prisma'
 import requiresToken from '@/utils/identity/requires-token'
 import PackMan from '@/lib/packs/PackMan'
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app
         .post(
             '',
             async ({params: {id}, set, user}) => {
-                await requiresToken({set, user})
+                await requiresAccount({set, user});
 
                 const packExists = await getPack(id, 'id')
-                if (!packExists) {
-                    set.status = 404
+                if (!packExists || id === '00000000-0000-0000-0000-000000000000') {
+                    throw HTTPError.notFound({
+                        summary: 'Pack not available',
+                    })
                     return
                 }
 

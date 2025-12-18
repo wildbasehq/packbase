@@ -137,7 +137,7 @@ const colors = {
 type Color = keyof typeof colors
 
 export function Switch({
-                           color = 'dark/zinc',
+                           color = 'indigo',
                            className,
                            ...props
                        }: {

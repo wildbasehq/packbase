@@ -7,14 +7,14 @@ import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import createStorage from '@/lib/storage';
 import Baozi from '@/lib/events';
-import requiresToken from '@/utils/identity/requires-token';
 import sanitizeTags from '@/utils/sanitize-tags';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({body: {tenant_id, channel_id, assets, body, content_type, tags}, set, user}) => {
-            await requiresToken({set, user});
+            await requiresAccount({set, user});
 
             body = body?.trim() || '';
             if (body.length === 0 && (!assets || assets.length === 0)) {

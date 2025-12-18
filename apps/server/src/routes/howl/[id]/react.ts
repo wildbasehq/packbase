@@ -5,13 +5,14 @@ import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import {NotificationManager} from '@/lib/NotificationManager';
 import requiresToken from '@/utils/identity/requires-token';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app
         .post(
             '',
             async ({params: {id}, body: {slot = '👍'}, set, user}: any) => {
-                await requiresToken({set, user});
+                await requiresAccount({set, user});
 
                 let postExists;
                 try {

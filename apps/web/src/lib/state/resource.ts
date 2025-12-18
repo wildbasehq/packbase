@@ -32,23 +32,17 @@ interface ResourceStore {
     setResources: (resources: any[]) => void
 }
 
-const resourceDefault = {
+export const resourceDefaultPackbase = {
     id: '00000000-0000-0000-0000-000000000000',
     slug: 'universe',
     display_name: 'Packbase',
-    standalone: true,
-    ticker: [
-        'Now in public alpha testing!',
-        'Invite Badge Event extended',
-        'Universe pack deletion',
-        'R18 content allowed'
-    ]
+    standalone: true
 }
 
 export const useResourceStore = create(persist<ResourceStore>(set => ({
-    currentResource: resourceDefault,
+    currentResource: resourceDefaultPackbase,
     resources: [],
-    resourceDefault,
+    resourceDefault: resourceDefaultPackbase,
     setResourceDefault: resourceDefault =>
         set(state => ({
             ...state,
@@ -81,6 +75,3 @@ export const settingsResource = {
     display_name: 'Configure',
     standalone: true,
 }
-
-// Export the resourceDefault for use in other stores
-export {resourceDefault}

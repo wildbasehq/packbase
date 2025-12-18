@@ -4,7 +4,7 @@
 
 // src/components/howl-creator/floating-compose.tsx
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
-import {useParams} from 'wouter'
+import {useLocation} from 'wouter'
 import {Activity, ReactNode, useEffect, useRef, useState} from 'react'
 import {ArrowDownIcon, PlusIcon} from '@heroicons/react/20/solid'
 import {cn, isVisible, vg} from '@/src/lib'
@@ -12,13 +12,24 @@ import ImageUploadStack, {type Image} from '../feed/image-placeholder-stack'
 import {toast} from 'sonner'
 import {useModal} from '@/components/modal/provider'
 import PackbaseInstance from '@/lib/workers/global-event-emit.ts'
-import {Avatar, Badge, BubblePopover, Editor, Heading, LoadingCircle, PopoverHeader} from "@/src/components";
+import {
+    Avatar,
+    Badge,
+    BubblePopover,
+    Editor,
+    Heading,
+    LoadingCircle,
+    Logo,
+    PopoverHeader,
+    Text
+} from "@/src/components";
 import {ChevronRightIcon} from "@heroicons/react/24/outline";
 import Tooltip from "@/components/shared/tooltip.tsx";
 import {Camera, HardDisk} from "@/components/icons/plump";
 import {HashtagIcon} from "@heroicons/react/16/solid";
 import PostSettingsModal from "@/components/howl-creator/post-settings-modal.tsx";
 import {ChatBubbleExclamation} from "@/components/icons/plump/chat-bubble-exclamation.tsx";
+import getInitials from "@/lib/utils/get-initials.ts";
 
 
 export type AvailablePagesType = 'editor' | 'content-labelling' | 'mature-rating-from-sfw-warning'
@@ -47,9 +58,10 @@ export default function FloatingCompose() {
     const {currentResource} = useResourceStore()
     const modal = useModal()
 
-    let {channel} = useParams<{
-        channel: string
-    }>()
+    // Get channel ID from url, i.e. /p/pack/channel/
+    // Cannot use useParams here because this component is outside of router context
+    const [location] = useLocation()
+    const channel = location.split('/')[3] || undefined
 
     // Page state
     const [currentPage, setCurrentPage] = useState<AvailablePagesType>('editor')
@@ -65,10 +77,11 @@ export default function FloatingCompose() {
     const editorRef = useRef<any>(null)
 
     useEffect(() => {
+        console.log(channel, location.split('/'))
         if (channel) {
             setChannelName(navigation.find(item => item.href.endsWith(channel))?.name)
         }
-    }, [channel])
+    }, [location, channel])
 
     useEffect(() => {
         let uploadingTimeout
@@ -272,19 +285,21 @@ function FloatingComposeContent({
     setCurrentPage: (value: 'editor' | 'content-labelling') => void;
     uploading: boolean;
 }) {
+    const {user} = useUserAccountStore()
+
     return (
         <>
             {/* Top small bar */}
             <div className="min-h-12 border-b flex items-center justify-between px-4">
-                <div className="flex items-center justify-center gap-2"/>
+                <Logo className="fill-muted-foreground h-5 w-5"/>
                 <div className="flex items-center gap-2">
+                    <Avatar square
+                            src={currentResource?.images?.avatar || '/img/default-avatar.png'}
+                            initials={getInitials(currentResource.display_name)}
+                            className="size-6"
+                    />
                     <Activity mode={isVisible(!!channel)}>
                         <div className="flex items-center gap-1">
-                            <Avatar
-                                src={currentResource.images?.avatar}
-                                initials={currentResource.slug?.[0] || 'D'}
-                                className="!rounded-full size-6"
-                            />
                             <ChevronRightIcon className="w-5 h-5 text-muted-foreground"/>
                             <Heading size="sm" className="flex justify-center items-center">
                                 <HashtagIcon className="w-4 h-4 inline-flex fill-muted-foreground"/>
@@ -327,68 +342,80 @@ function FloatingComposeContent({
                 </Tooltip>
             </div>
 
-            <div className="flex-grow p-4 overflow-y-auto max-h-[calc(100vh-11rem)]">
-                <Editor
-                    defaultValue={body}
-                    onUpdate={e => {
-                        editorRef.current = e
-                        setBody(e?.storage.markdown.getMarkdown())
-                    }}
-                />
-            </div>
+            <div className="grow p-4 overflow-y-auto max-h-[calc(100vh-11rem)]">
+                {user.requires_setup && (
+                    <Text className="text-center text-sm text-red-500">
+                        You need to complete your account setup before you can post howls.
+                    </Text>
+                )}
 
-            {images.length > 0 && (
-                <div className="px-4 pb-2">
-                    <ImageUploadStack images={images} setImages={setImages}/>
-                </div>
-            )}
-
-            {/* Bottom small bar */}
-            <div className="h-12 flex items-center justify-between px-2">
-                {/* Button group */}
-                <div className="flex items-center gap-1">
-                    <ComposeButton
-                        className="rounded-l-[0.85rem] rounded-r-sm"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        <input
-                            aria-hidden
-                            className="hidden"
-                            type="file"
-                            ref={fileInputRef}
-                            multiple
-                            accept="image/*"
-                            onChange={e => addAttachment(e.target.files)}
-                        />
-                        <Camera className="w-5 h-5 fill-primary-light p-0.5"/>
-                    </ComposeButton>
-
-                    {/* Post Settings Button */}
-                    <ComposeButton
-                        className="rounded-r-[0.85rem] rounded-l-sm"
-                        onClick={() => {
-                            setCurrentPage('content-labelling')
+                {!user.requires_setup && (
+                    <Editor
+                        defaultValue={body}
+                        onUpdate={e => {
+                            editorRef.current = e
+                            setBody(e?.storage.markdown.getMarkdown())
                         }}
-                    >
-                        <ChatBubbleExclamation className="h-5 fill-primary-light"/>
-                    </ComposeButton>
-                </div>
-                <ComposeButton
-                    className={cn("p-1 rounded-full", uploading && "cursor-not-allowed opacity-80")}
-                    onClick={() => {
-                        if (uploading) return
-                        submitHowl()
-                    }}
-                >
-                    <Activity mode={isVisible(!uploading)}>
-                        <ArrowDownIcon className="w-5 h-5 fill-muted-foreground"/>
-                    </Activity>
-
-                    <Activity mode={isVisible(uploading)}>
-                        <LoadingCircle/>
-                    </Activity>
-                </ComposeButton>
+                    />
+                )}
             </div>
+
+            {!user.requires_setup && (
+                <>
+                    {images.length > 0 && (
+                        <div className="px-4 pb-2">
+                            <ImageUploadStack images={images} setImages={setImages}/>
+                        </div>
+                    )}
+
+                    {/* Bottom small bar */}
+                    <div className="h-12 flex items-center justify-between px-2">
+                        {/* Button group */}
+                        <div className="flex items-center gap-1">
+                            <ComposeButton
+                                className="rounded-l-[0.85rem] rounded-r-sm"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <input
+                                    aria-hidden
+                                    className="hidden"
+                                    type="file"
+                                    ref={fileInputRef}
+                                    multiple
+                                    accept="image/*"
+                                    onChange={e => addAttachment(e.target.files)}
+                                />
+                                <Camera className="w-5 h-5 fill-primary-light p-0.5"/>
+                            </ComposeButton>
+
+                            {/* Post Settings Button */}
+                            <ComposeButton
+                                className="rounded-r-[0.85rem] rounded-l-sm"
+                                onClick={() => {
+                                    setCurrentPage('content-labelling')
+                                }}
+                            >
+                                <ChatBubbleExclamation className="h-5 fill-primary-light"/>
+                            </ComposeButton>
+                        </div>
+                        <ComposeButton
+                            className={cn("p-1 rounded-full", uploading && "cursor-not-allowed opacity-80")}
+                            onClick={() => {
+                                if (uploading) return
+                                submitHowl()
+                            }}
+                        >
+                            <Activity mode={isVisible(!uploading)}>
+                                <ArrowDownIcon className="w-5 h-5 fill-muted-foreground"/>
+                            </Activity>
+
+                            <Activity mode={isVisible(uploading)}>
+                                <LoadingCircle/>
+                            </Activity>
+                        </ComposeButton>
+                    </div>
+                </>
+            )}
         </>
     )
 }

@@ -80,7 +80,10 @@ __/\\_| |__   __ _ ___  ___
 
                         <SidebarLayout>
                             <div id="NGContentArea" className="flex h-full overflow-hidden">
-                                <div className="grow">
+                                <div className="grow w-full">
+                                    {/* top white shadow */}
+                                    <div
+                                        className="pointer-events-none absolute top-0 left-0 z-50 h-12 w-full bg-linear-to-b from-white/80 to-white/0 dark:from-zinc-900/80 dark:to-zinc-900/0"/>
                                     <main className="flex flex-1 h-full">
                                         <div className="w-full h-full">
                                             <ClerkLoading>

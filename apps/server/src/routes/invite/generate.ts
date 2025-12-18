@@ -7,13 +7,13 @@ import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import clerkClient from '@/db/auth';
 import {Invitation} from '@clerk/backend';
-import requiresToken from '@/utils/identity/requires-token';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({set, body, user, logAudit}) => {
-            await requiresToken({set, user});
+            await requiresAccount({set, user});
 
             let is_admin = user.sessionClaims?.roles?.includes('admin');
 

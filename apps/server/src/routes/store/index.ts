@@ -1,9 +1,9 @@
 import {t} from 'elysia';
 import {YapockType} from '@/index';
-import requiresToken from '@/utils/identity/requires-token';
 import StoreManager from '@/lib/StoreManager';
 import Items from '@/lib/store/items.json';
 import trinketManager from '@/lib/trinket-manager';
+import requiresAccount from "@/utils/identity/requires-account";
 
 const store = new StoreManager();
 
@@ -12,7 +12,7 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({user, set}) => {
-                requiresToken({set, user});
+                await requiresAccount({set, user});
                 const items = await store.listWithOwnership(user.sub);
                 const trinketCount = await trinketManager.getBalance(`user:${user.sub}`);
                 const history = await prisma.admin_audit_log.findMany({

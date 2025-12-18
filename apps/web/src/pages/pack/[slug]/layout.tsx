@@ -9,15 +9,17 @@ import {vg} from '@/lib/api'
 import {useResourceStore, useUIStore} from '@/lib/state'
 import {FaceFrownIcon} from '@heroicons/react/24/solid'
 import {OrbitIcon} from 'lucide-react'
-import {ReactNode, useEffect, useState} from 'react'
+import {Activity, ReactNode, useEffect, useState} from 'react'
 import {useParams} from 'wouter'
 import {PackChannels} from '@/src/components'
 import {SidebarPortal} from '@/lib/context/sidebar-context.tsx'
 import {CustomTheme} from '@/components/shared/theme/custom-theme'
+import {isVisible} from "@/lib";
+import PackJoinCTA from "@/components/pack/pack-join-cta.tsx";
 
 export default function PackLayout({children}: { children: ReactNode }) {
-    const {resourceDefault, loading, setLoading, setNavigation} = useUIStore()
-    const {resources, currentResource, setCurrentResource, setResources} = useResourceStore()
+    const {loading, setLoading, setNavigation} = useUIStore()
+    const {resources, currentResource, resourceDefault, setCurrentResource, setResources} = useResourceStore()
     const [error, setError] = useState<any>(null)
 
     const {slug} = useParams<{ slug: string }>()
@@ -133,10 +135,14 @@ export default function PackLayout({children}: { children: ReactNode }) {
         )
 
     return (
-        <div>
+        <div className="relative">
             <SidebarPortal>
                 <PackChannels/>
             </SidebarPortal>
+
+            <Activity mode={isVisible(currentResource.temporary)}>
+                <PackJoinCTA/>
+            </Activity>
 
             {currentResource && <CustomTheme packId={currentResource.id}/>}
             {children}

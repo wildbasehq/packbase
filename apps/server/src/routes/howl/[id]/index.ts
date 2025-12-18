@@ -1,16 +1,15 @@
-import { YapockType } from '@/index';
-import { HowlResponse } from '@/models/defs';
-import { t } from 'elysia';
-import { ErrorTypebox } from '@/utils/errors';
-import { deletePost, getPost } from '@/lib/api/post';
+import {YapockType} from '@/index';
+import {t} from 'elysia';
+import {ErrorTypebox} from '@/utils/errors';
+import {deletePost, getPost} from '@/lib/api/post';
 
 export default (app: YapockType) =>
     app
         // @ts-ignore - Not sure what's going on here
         .get(
             '',
-            async ({ params, set }) => {
-                const { id } = params;
+            async ({params, set}) => {
+                const {id} = params;
                 const post = await getPost(id);
                 if (!post) {
                     set.status = 400;
@@ -30,11 +29,11 @@ export default (app: YapockType) =>
                     }),
                 }),
                 response: {
-                    200: HowlResponse,
                     404: t.Null(),
                 },
             },
         )
+        // @ts-ignore - Not sure what's going on here
         .delete('', deletePost, {
             detail: {
                 description: 'Remove a howl',

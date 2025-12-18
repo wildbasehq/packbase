@@ -8,6 +8,7 @@ import ChatLayout from "@/pages/c/layout.tsx";
 import NotSelected from "@/pages/c/not-selected.tsx";
 import UserLayout from "@/pages/user/[...slug]/layout.tsx";
 import UserFolderPage from "@/pages/user/[...slug]/folders/[id]/page.tsx";
+import {useUserAccountStore} from "@/lib";
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
@@ -22,6 +23,7 @@ const TermsPage = lazy(() => import('@/pages/terms/page.tsx'))
 const UserProfile = lazy(() => import('@/pages/user/[...slug]/page.tsx'))
 const ChatThreadPage = lazy(() => import('@/pages/c/[id]/page.tsx'))
 const GuestLanding = lazy(() => import('@/components/home/guestlanding.tsx'))
+const SetupAccountPage = lazy(() => import('@/pages/me/setup/page.tsx'))
 
 // Store
 const StoreLayout = lazy(() => import('@/pages/store/layout.tsx'))
@@ -36,6 +38,7 @@ const LoadingFallback = () => (
 )
 
 export default function Routes() {
+    const {user} = useUserAccountStore()
     return (
         <Switch>
             <Route path="/">
@@ -71,6 +74,7 @@ export default function Routes() {
             </Route>
 
             <Route path="/store" nest>
+                <RequiresAccount/>
                 <Suspense fallback={<LoadingFallback/>}>
                     <StoreLayout>
                         <Route path="/">
@@ -80,6 +84,20 @@ export default function Routes() {
                         </Route>
                     </StoreLayout>
                 </Suspense>
+            </Route>
+
+            <Route path="/me" nest>
+                <SignedOut>
+                    <Redirect to="~/id/login"/>
+                </SignedOut>
+
+                <RequiresAccount/>
+
+                <Route path="/setup">
+                    <Suspense fallback={<LoadingFallback/>}>
+                        <SetupAccountPage/>
+                    </Suspense>
+                </Route>
             </Route>
 
             <Route path="/p" nest>
@@ -119,6 +137,7 @@ export default function Routes() {
             </Route>
 
             <Route path="/c" nest>
+                <RequiresAccount/>
                 <Switch>
                     <Route path="/">
                         <ChatLayout>
@@ -152,15 +171,6 @@ export default function Routes() {
                 </UserLayout>
             </Route>
 
-
-            <Route path="/stuff" nest>
-                <div></div>
-            </Route>
-
-            <Route path="/settings" nest>
-                <div></div>
-            </Route>
-
             <Route>
                 <Suspense fallback={<LoadingFallback/>}>
                     <NotFound/>
@@ -169,4 +179,15 @@ export default function Routes() {
         </Switch>
 
     )
+}
+
+function RequiresAccount() {
+    const {user} = useUserAccountStore()
+    if (!user) {
+        return <Redirect to="~/id/login"/>
+    }
+
+    if (user?.requires_setup) {
+        return <Redirect to="~/me/setup"/>
+    }
 }

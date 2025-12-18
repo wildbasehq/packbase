@@ -14,28 +14,30 @@ import {
     SwitchGroup,
     Textarea
 } from '@/components/shared'
-import React, {useEffect} from 'react'
+import React, {createRef, useEffect, useMemo, useState} from 'react'
 import {useUserAccountStore, vg} from '@/lib'
 import {toast} from 'sonner'
 import {PhotoIcon} from '@heroicons/react/24/solid'
+import UnsavedChangesWarning from "@/components/ui/unsaved-changes.tsx";
 
 const ProfileSettingsComponent: React.FC = ({noHeader}: { noHeader?: boolean }) => {
     const {user} = useUserAccountStore()
 
     // Text
-    const bioRef = React.useMemo(() => React.createRef<HTMLTextAreaElement>(), [])
-    const displayNameRef = React.useMemo(() => React.createRef<HTMLInputElement>(), [])
+    const bioRef = useMemo(() => createRef<HTMLTextAreaElement>(), [])
+    const displayNameRef = useMemo(() => createRef<HTMLInputElement>(), [])
 
     // Checkbox
     const isAdultRestricted = user?.is_r18 ?? false
     const canChangeAdultRestricted = user?.is_r18 ?? false
 
     // Uploads
-    const coverPicRef = React.useMemo(() => React.createRef<HTMLInputElement>(), [])
+    const coverPicRef = useMemo(() => createRef<HTMLInputElement>(), [])
 
 
-    const [submitting, setSubmitting] = React.useState<boolean>(false)
-    const [coverPicPreview, setCoverPicPreview] = React.useState<string | undefined>(undefined)
+    const [submitting, setSubmitting] = useState(false)
+    const [coverPicPreview, setCoverPicPreview] = useState<string | undefined>(undefined)
+    const [hasChanges, setHasChanges] = useState(false)
 
     // When coverPicRef gets a valid photo uploaded, set the preview to the base64
     useEffect(() => {
@@ -97,7 +99,7 @@ const ProfileSettingsComponent: React.FC = ({noHeader}: { noHeader?: boolean }) 
     }
 
     return (
-        <form className="space-y-8">
+        <form className="relative space-y-8" onSubmit={saveProfile} onChangeCapture={() => setHasChanges(true)}>
             {!noHeader && (
                 <>
                     <div className="border-b pb-4 mb-4 border-n-5/10">
@@ -126,7 +128,8 @@ const ProfileSettingsComponent: React.FC = ({noHeader}: { noHeader?: boolean }) 
                             opted out of R18 content. This is automatically enabled when you post your first R18
                             howl and cannot be disabled until all R18 content has been removed from your profile.
                         </Description>
-                        <Switch name="is-r18" defaultChecked={isAdultRestricted} disabled={canChangeAdultRestricted}/>
+                        <Switch name="is_r18" defaultChecked={isAdultRestricted} disabled={canChangeAdultRestricted}
+                                onChange={() => setHasChanges(true)}/>
                     </SwitchField>
                 </SwitchGroup>
 
@@ -191,10 +194,12 @@ const ProfileSettingsComponent: React.FC = ({noHeader}: { noHeader?: boolean }) 
             </FieldGroup>
 
             <div className="mt-4">
-                <Button type="submit" className="btn btn-primary" onClick={saveProfile} disabled={submitting}>
+                <Button type="submit" disabled={submitting}>
                     {submitting ? 'Saving...' : 'Save'}
                 </Button>
             </div>
+
+            <UnsavedChangesWarning hasChanges={hasChanges} submitting={submitting}/>
         </form>
     )
 }

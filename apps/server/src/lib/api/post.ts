@@ -123,11 +123,7 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
     return data;
 }
 
-export async function deletePost({params: {id}, set, user}: {
-    params: { id: string };
-    set: { status: number };
-    user: { sub: string }
-}) {
+export async function deletePost({params: {id}, set, user}) {
     await requiresToken({set, user});
 
     // Check user ID against post user ID

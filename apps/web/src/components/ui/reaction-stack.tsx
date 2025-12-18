@@ -8,10 +8,12 @@
 'use client'
 
 import * as React from 'react'
-import { cn } from '@/src/lib/utils'
-import { EmojiPicker, EmojiPickerSearch, EmojiPickerContent, EmojiPickerFooter } from '@/src/components/ui/emoji-picker'
-import { CSSProperties } from 'react'
-import { vg } from '@/src/lib'
+import {CSSProperties} from 'react'
+import {cn} from '@/src/lib/utils'
+import {EmojiPicker, EmojiPickerContent, EmojiPickerFooter, EmojiPickerSearch} from '@/src/components/ui/emoji-picker'
+import {vg} from '@/src/lib'
+import Popover from "@/components/shared/popover.tsx";
+import {FaceSmileIcon} from "@heroicons/react/20/solid";
 
 /**
  * Represents a single reaction with its metadata
@@ -59,25 +61,25 @@ export type ClientReactionStackProps = {
  * ```
  */
 export function ClientReactionStack({
-    reactions,
-    onToggle,
-    onAdd,
-    allowAdd = false,
-    showPicker,
-    defaultShowPicker = false,
-    maxVisible = 5,
-    size = 'md',
-    disabled = false,
-    className,
-    renderPill,
-}: ClientReactionStackProps) {
+                                        reactions,
+                                        onToggle,
+                                        onAdd,
+                                        allowAdd = false,
+                                        showPicker,
+                                        defaultShowPicker = false,
+                                        maxVisible = 5,
+                                        size = 'md',
+                                        disabled = false,
+                                        className,
+                                        renderPill,
+                                    }: ClientReactionStackProps) {
     const [internalShowPicker, setInternalShowPicker] = React.useState(defaultShowPicker)
     const [expanded, setExpanded] = React.useState(false)
 
     const isPickerVisible = showPicker !== undefined ? showPicker : internalShowPicker
 
     const sizeClasses = {
-        sm: 'h-6 px-1.5 text-xs',
+        sm: 'h-6 px-1 text-xs',
         md: 'h-7 px-2 text-xs',
     }
 
@@ -161,39 +163,39 @@ export function ClientReactionStack({
                         sizeClasses[size]
                     )}
                 >
-                    <span className="text-muted-foreground">{expanded ? '−' : `+${reactions.length - maxVisible}`}</span>
+                    <span
+                        className="text-muted-foreground">{expanded ? '−' : `+${reactions.length - maxVisible}`}</span>
                 </button>
             )}
 
             {/* Add Reaction Button */}
             {allowAdd && (
                 <div className="relative">
-                    <button
-                        onClick={togglePicker}
-                        disabled={disabled}
-                        className={cn(
-                            'inline-flex items-center justify-center rounded-md border bg-muted px-2 text-xs',
-                            'hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                            'disabled:opacity-50 disabled:cursor-not-allowed',
-                            sizeClasses[size]
-                        )}
-                        aria-label="Add reaction"
-                    >
-                        <span className="text-muted-foreground">+</span>
-                    </button>
-
-                    {/* Emoji Picker */}
-                    {isPickerVisible && (
-                        <div className="absolute top-full left-0 z-50 mt-1">
-                            <div className="rounded-md border bg-popover shadow-lg">
+                    <Popover content={<>
+                        <div className="z-50">
+                            <div className="rounded-md bg-sidebar shadow-lg">
                                 <EmojiPicker onEmojiSelect={handleAddEmoji}>
-                                    <EmojiPickerSearch placeholder="Search emoji" />
-                                    <EmojiPickerContent />
-                                    <EmojiPickerFooter />
+                                    <EmojiPickerSearch placeholder="Search emoji"/>
+                                    <EmojiPickerContent/>
+                                    <EmojiPickerFooter/>
                                 </EmojiPicker>
                             </div>
                         </div>
-                    )}
+                    </>}>
+                        <button
+                            disabled={disabled}
+                            className={cn(
+                                'inline-flex items-center justify-center rounded-md border bg-muted text-xs',
+                                'hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                                'disabled:opacity-50 disabled:cursor-not-allowed',
+                                sizeClasses[size],
+                                visibleReactions.length === 0 && 'aria-[expanded=false]:hidden group-hover:inline-flex!',
+                            )}
+                            aria-label="Add reaction"
+                        >
+                            <FaceSmileIcon className="w-4 h-4 text-muted-foreground"/>
+                        </button>
+                    </Popover>
                 </div>
             )}
         </div>
@@ -226,12 +228,12 @@ export type ServerReactionStackProps = {
  * ```
  */
 export function ServerReactionStack({
-    entityId,
-    endpoint = '/howl/{entityId}/react',
-    initialReactions = [],
-    max,
-    ...clientProps
-}: ServerReactionStackProps) {
+                                        entityId,
+                                        endpoint = '/howl/{entityId}/react',
+                                        initialReactions = [],
+                                        max,
+                                        ...clientProps
+                                    }: ServerReactionStackProps) {
     const [reactions, setReactions] = React.useState<Reaction[]>(initialReactions)
     const [loading, setLoading] = React.useState(false)
 
@@ -243,7 +245,11 @@ export function ServerReactionStack({
                 // Optimistic update
                 setReactions(prev =>
                     prev
-                        .map(r => (r.key === key ? { ...r, reactedByMe: nextReacted, count: r.count + (nextReacted ? 1 : -1) } : r))
+                        .map(r => (r.key === key ? {
+                            ...r,
+                            reactedByMe: nextReacted,
+                            count: r.count + (nextReacted ? 1 : -1)
+                        } : r))
                         .filter(r => r.count > 0)
                 )
 
@@ -255,9 +261,9 @@ export function ServerReactionStack({
                     endpoint,
                 })
 
-                const action = nextReacted ? vg.howl({ id: entityId }).react.post : vg.howl({ id: entityId }).react.delete
+                const action = nextReacted ? vg.howl({id: entityId}).react.post : vg.howl({id: entityId}).react.delete
 
-                const { error } = await action({ slot: key })
+                const {error} = await action({slot: key})
                 if (error) {
                     console.error('Failed to toggle reaction:', error)
                     throw error
@@ -266,7 +272,11 @@ export function ServerReactionStack({
                 console.error('Failed to toggle reaction:', error)
                 // Revert optimistic update on error
                 setReactions(prev =>
-                    prev.map(r => (r.key === key ? { ...r, reactedByMe: !nextReacted, count: r.count + (nextReacted ? -1 : 1) } : r))
+                    prev.map(r => (r.key === key ? {
+                        ...r,
+                        reactedByMe: !nextReacted,
+                        count: r.count + (nextReacted ? -1 : 1)
+                    } : r))
                 )
             } finally {
                 setLoading(false)
@@ -315,7 +325,7 @@ export function ServerReactionStack({
                     endpoint,
                 })
 
-                const { error } = await vg.howl({ id: entityId }).react.post({ slot: key })
+                const {error} = await vg.howl({id: entityId}).react.post({slot: key})
                 if (error) {
                     console.error('Failed to add reaction:', error)
                     throw error
@@ -329,5 +339,6 @@ export function ServerReactionStack({
         [reactions, max, entityId, endpoint, handleToggle]
     )
 
-    return <ClientReactionStack {...clientProps} reactions={reactions} onToggle={handleToggle} onAdd={handleAdd} disabled={loading} />
+    return <ClientReactionStack {...clientProps} reactions={reactions} onToggle={handleToggle} onAdd={handleAdd}
+                                disabled={loading}/>
 }

@@ -4,7 +4,7 @@
 
 import * as Headless from '@headlessui/react'
 import React, {Activity, useState} from 'react'
-import {useResourceStore} from '@/lib/state'
+import {useResourceStore, useUserAccountStore} from '@/lib/state'
 import {Navbar, NavbarDivider, NavbarItem, NavbarLabel, NavbarSection, NavbarSpacer} from '@/components/layout'
 import UserSidebar from '@/components/layout/user-sidebar.tsx'
 import {useSidebar} from '@/lib/context/sidebar-context'
@@ -121,6 +121,7 @@ function MobileSidebar({open, close, children}: React.PropsWithChildren<{ open: 
 export function SidebarLayout({children}: React.PropsWithChildren) {
     let [showSidebar, setShowSidebar] = useState(false)
     const {isSignedIn} = useSession()
+    const {user} = useUserAccountStore()
     const {sidebarContent} = useSidebar()
     const {isMobile} = useWindowSize()
     const [location] = useLocation()
@@ -166,81 +167,96 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                 {/* Content */}
                 <div
                     className="min-w-0 bg-sidebar px-4">
-                    <Navbar>
-                        <NavbarItem
-                            className="flex w-full md:w-2xs h-8 *:w-full"
-                            onClick={() => {
-                                if (!isSignedIn) return
-                                setIsWHOpen(!isWHOpen)
-                            }}
-                        >
-                            <Activity mode={isVisible(currentResource.standalone)}>
-                                <Activity mode={isVisible(isSignedIn)}>
+                    {user?.images?.header && (
+                        <img src={user.images.header} alt="Header image"
+                             className="absolute inset-0 h-18 w-full object-cover opacity-25 mask-b-to-95% mask-r-from-80% pointer-events-none select-none"/>
+                    )}
+
+                    <Activity mode={isVisible(!!currentResource.images?.header)}>
+                        <motion.img
+                            data-slot="banner"
+                            className="absolute inset-0 w-1/3 h-18 object-cover mask-radial-to-70% mask-radial-at-top-left pointer-events-none select-none"
+                            src={currentResource.images?.header}
+                            alt={`${currentResource.display_name} banner`}
+                            initial={{opacity: 0.5}}
+                            animate={{opacity: [0.5, 1, 0.85]}}
+                            transition={{duration: 0.5, times: [0, 0.35, 1], ease: "easeOut"}}
+                        />
+
+                        <div
+                            className="backdrop-blur-md bg-card/50 h-18 w-1/6 opacity-80 absolute inset-0 rounded pointer-events-none mask-r-from-70%"/>
+                    </Activity>
+
+                    <Navbar className="z-10">
+                        <Activity mode={isVisible(((isSignedIn && !user.requires_setup) || !isSignedIn))}>
+                            <NavbarItem
+                                className="flex w-full md:w-2xs h-8 *:w-full"
+                                onClick={() => {
+                                    if (!isSignedIn) return
+                                    setIsWHOpen(!isWHOpen)
+                                }}
+                            >
+                                <Activity mode={isVisible(currentResource.standalone)}>
+                                    <div
+                                        data-slot="avatar"
+                                        className="rounded-sm w-6 h-6 border overflow-hidden shrink-0 bg-primary-cosmos flex justify-center items-center">
+                                        <Logo className="w-4 h-4 fill-white"/>
+                                    </div>
+                                </Activity>
+
+                                <Activity
+                                    mode={isVisible(!currentResource.standalone)}>
                                     <img
                                         data-slot="avatar"
-                                        className="rounded-sm w-6 h-6 border overflow-hidden shrink-0"
+                                        className="rounded-sm w-6 h-6 border shrink-0 overflow-hidden z-1"
                                         src={currentResource.images?.avatar || '/img/default-avatar.png'}
                                     />
                                 </Activity>
 
-                                <Activity mode={isVisible(!isSignedIn)}>
-                                    <div
-                                        data-slot="avatar"
-                                        className="rounded-sm w-6 h-6 border overflow-hidden shrink-0 bg-primary-cosmos flex justify-center items-center">
-                                        <Logo noStyle fullSize
-                                              className="w-4 h-4 invert"/>
-                                    </div>
+                                <div
+                                    className="flex flex-col -space-y-1 flex-1 relative rounded px-2 z-1">
+                                    <NavbarLabel>
+                                        {currentResource?.display_name || 'dummy'}
+                                    </NavbarLabel>
+
+                                    <NavbarLabel className="text-muted-foreground text-xs">
+                                        <Activity mode={isVisible(!!currentResource?.ticker?.length)}>
+                                            <TextTicker
+                                                texts={currentResource.ticker}
+                                                interval={2000}/>
+                                        </Activity>
+
+                                        <Activity mode={isVisible(!currentResource?.ticker?.length)}>
+                                            @{currentResource?.slug || 'dummy'}
+                                        </Activity>
+                                    </NavbarLabel>
+                                </div>
+                                <Activity
+                                    mode={isVisible((currentResource.verified || currentResource.standalone || currentResource.slug === 'support'))}>
+                                    <VerifiedBadge
+                                        tooltipText="This is an official pack which represents the creator or organisation behind it."/>
                                 </Activity>
-                            </Activity>
 
-                            <Activity
-                                mode={isVisible(!currentResource.standalone)}>
-                                <img
-                                    data-slot="avatar"
-                                    className="rounded-sm w-6 h-6 border shrink-0 overflow-hidden"
-                                    src={currentResource.images?.avatar || '/img/default-avatar.png'}
-                                />
-                            </Activity>
+                                <NavbarSpacer/>
 
-                            <div className="flex flex-col -space-y-1 flex-1 relative">
-                                <NavbarLabel>
-                                    {currentResource?.display_name || 'dummy'}
-                                </NavbarLabel>
-                                <NavbarLabel className="text-muted-foreground text-xs">
-                                    <Activity mode={isVisible(!!currentResource?.ticker?.length)}>
-                                        <TextTicker
-                                            texts={currentResource.ticker}
-                                            interval={2000}/>
-                                    </Activity>
+                                <ChevronDownIcon className="z-1"/>
+                            </NavbarItem>
 
-                                    <Activity mode={isVisible(!currentResource?.ticker?.length)}>
-                                        @{currentResource?.slug || 'dummy'}
-                                    </Activity>
-                                </NavbarLabel>
-                            </div>
-                            <Activity
-                                mode={isVisible((currentResource.verified || currentResource.standalone || currentResource.slug === 'support'))}>
-                                <VerifiedBadge
-                                    tooltipText="This is an official pack which represents the creator or organisation behind it."/>
-                            </Activity>
+                            <SignedIn>
+                                <Dropdown>
+                                    <DropdownButton as={NavbarItem} aria-label="More options">
+                                        <EllipsisHorizontalIcon/>
+                                    </DropdownButton>
+                                    <PackSettingsDropdown show={show}/>
+                                </Dropdown>
+                            </SignedIn>
 
-                            <NavbarSpacer/>
-
-                            <ChevronDownIcon/>
-                        </NavbarItem>
-
-                        <SignedIn>
-                            <Dropdown>
-                                <DropdownButton as={NavbarItem} aria-label="More options">
-                                    <EllipsisHorizontalIcon/>
-                                </DropdownButton>
-                                <PackSettingsDropdown show={show}/>
-                            </Dropdown>
-                        </SignedIn>
+                            <Desktop>
+                                <NavbarDivider/>
+                            </Desktop>
+                        </Activity>
 
                         <Desktop>
-                            <NavbarDivider/>
-
                             <NavbarSection>
                                 {NavbarItems
                                     .filter(item => !item.onlySignedIn || (item.onlySignedIn && isSignedIn))
@@ -368,9 +384,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     )}
 
                     <div className={`mx-auto h-full w-full overflow-y-auto ${isSignedIn ? 'max-w-6xl' : ''}`}>
-                        <div className={isSignedIn ? 'pt-6' : ''}>
-                            {children}
-                        </div>
+                        {children}
                     </div>
                 </motion.div>
                 {/*</main>*/}

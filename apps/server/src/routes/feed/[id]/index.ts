@@ -1,9 +1,10 @@
-import { FeedController } from '@/lib/FeedController';
-import { YapockType } from '@/index';
-import { t } from 'elysia';
-import { HowlResponse } from '@/models/defs';
-import { HTTPError } from '@/lib/HTTPError';
+import {FeedController} from '@/lib/FeedController';
+import {YapockType} from '@/index';
+import {t} from 'elysia';
+import {HowlResponse} from '@/models/defs';
+import {HTTPError} from '@/lib/HTTPError';
 import requiresToken from '@/utils/identity/requires-token';
+import requiresAccount from "@/utils/identity/requires-account";
 
 // Initialize a shared instance of controllers
 const feedController = new FeedController();
@@ -11,7 +12,7 @@ const feedController = new FeedController();
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({ set, params: { id }, query: { page = 1 }, user }) => {
+        async ({set, params: {id}, query: {page = 1}, user}) => {
             // Check for maintenance mode
             if (process.env.MAINTENANCE) {
                 set.status = 503;
@@ -21,10 +22,12 @@ export default (app: YapockType) =>
                 };
             }
 
+            await requiresAccount({set, user});
+
             try {
                 // Special handling for home feed - requires authentication
                 if (id === 'universe:home') {
-                    await requiresToken({ set, user });
+                    await requiresToken({set, user});
                 }
 
                 // Get feed data

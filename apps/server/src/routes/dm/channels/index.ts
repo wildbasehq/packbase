@@ -4,6 +4,7 @@ import prisma from '@/db/prisma';
 import {HTTPError} from '@/lib/HTTPError';
 import mapChannel from '@/utils/channels/mapChannel';
 import {CommonErrorResponses, DM_ERROR_CODES} from '@/utils/dm/errors';
+import requiresAccount from "@/utils/identity/requires-account";
 
 // Channel response schemas
 const RecipientResponse = t.Object({
@@ -39,13 +40,7 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user}) => {
-                if (!user?.sub) {
-                    set.status = 401;
-                    throw HTTPError.unauthorized({
-                        summary: 'Authentication required to access DM channels',
-                        code: DM_ERROR_CODES.UNAUTHORIZED,
-                    });
-                }
+                await requiresAccount({set, user});
 
                 const links = await prisma.dm_participants.findMany({
                     where: {user_id: user.sub},
@@ -97,7 +92,7 @@ export default (app: YapockType) =>
                 if (userId === user.sub) {
                     const selfExisting = await prisma.dm_channels.findFirst({
                         where: {
-                            dm_participants: {
+                            participants: {
                                 some: {user_id: user.sub},
                                 every: {user_id: user.sub}, // ensures only self is a participant
                             },

@@ -15,7 +15,7 @@ import React, {
 import {Heading, Text} from '@/components/shared/text.tsx'
 import Link from '@/components/shared/link.tsx'
 import {isVisible, useResourceStore} from '@/lib'
-import {Desktop, Tab, TabsLayout, useContentFrame} from '@/src/components'
+import {Code, CodeGroup, Desktop, Tab, TabsLayout, useContentFrame} from '@/src/components'
 import {useInterval, useLocalStorage} from 'usehooks-ts'
 import UserAvatar from '@/components/shared/user/avatar.tsx'
 import {InboxContent, UserMultipleAccounts} from '@/components/icons/plump'
@@ -112,7 +112,6 @@ export default function UserSidebar() {
                         >
                             <Tab title="People" icon={UserMultipleAccounts}>
                                 {pack_id && !standalone && <PackMembersContainer/>}
-                                {(!pack_id || standalone) && <FriendsListContainer/>}
                                 <div className="flex-grow"/>
                             </Tab>
                             <Tab title="Notifications" icon={InboxContent}>
@@ -145,64 +144,47 @@ export function UserActionsContainer() {
     )
 }
 
-function FriendsListContainer() {
-    const {
-        data: friendsResponse,
-        refetch
-    } = useContentFrame('get', 'user.me.friends', undefined, {id: 'user.me.friends'})
-
-    const friends = friendsResponse?.friends || []
-
-    useInterval(refetch, 60000)
-
-    return (
-        <div className="flex flex-col space-y-4">
-            {friends?.length ? (
-                <div className="flex items-center justify-between mx-3">
-                    <Text size="sm">Friends</Text>
-                </div>
-            ) : (
-                <div className="items-center justify-between mx-3">
-                    <Heading size="sm">You have no friends. How sad :(</Heading>
-                    <Text size="sm">
-                        Let's go <Link href="/p/new">find you some</Link>.
-                    </Text>
-                </div>
-            )}
-
-            {/* Avatar with display name */}
-            <div className="flex flex-col space-y-2">
-                {friends?.map(friend => (
-                    <Link
-                        href={`/@${friend.username}`}
-                        key={friend.id}
-                        className="flex !text-foreground items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
-                    >
-                        <div className="flex items-center gap-2">
-                            <UserAvatar user={friend} size={32} showOnlineStatus={true}/>
-                            <div className="flex flex-col">
-                                <Text size="sm">{friend.display_name}</Text>
-                                {friend.status && (
-                                    <Text size="xs" alt>
-                                        {friend.status}
-                                    </Text>
-                                )}
-                            </div>
-                        </div>
-                    </Link>
-                ))}
-            </div>
-        </div>
-    )
-}
-
 function PackMembersContainer() {
     const {
         currentResource: {id},
     } = useResourceStore()
-    const {data: members, refetch} = useContentFrame('get', `pack.${id}.members`, undefined, {id: `pack.${id}.members`})
 
-    useInterval(refetch, 60000)
+    const {
+        data: membersResponse,
+        refetch: refetchMembers
+    } = useContentFrame('get', `pack.${id}.members`, undefined, {id: `pack.${id}.members`})
+
+    const {
+        data: friendsResponse,
+        refetch: refetchFriends
+    } = useContentFrame('get', 'user.me.friends', undefined, {id: 'user.me.friends'})
+
+    const friends = friendsResponse?.friends || []
+    const members = (membersResponse || []).map((member: any) => {
+        const friend = friends.find((f: any) => f.id === member.id)
+        return {
+            ...member,
+            ...(friend ? {
+                is_friend: true,
+                status: friend.status,
+                isOnline: friend.isOnline,
+            } : {}),
+        }
+    })
+    const friendIds = new Set(friends.map((f: any) => f.id))
+
+    const sortedMembersByFriends = [...members].sort((a: any, b: any) => {
+        const aIsFriend = friendIds.has(a.id)
+        const bIsFriend = friendIds.has(b.id)
+
+        if (aIsFriend === bIsFriend) return 0
+        return aIsFriend ? -1 : 1
+    })
+
+    useInterval(() => {
+        refetchMembers()
+        refetchFriends()
+    }, 30000)
 
     return (
         <div className="flex flex-col space-y-4">
@@ -213,26 +195,30 @@ function PackMembersContainer() {
                         {members?.length} total
                     </Text>
                 </div>
-
             </Activity>
 
             <Activity mode={isVisible(!members?.length)}>
                 <div className="items-center justify-between mx-3">
                     <Heading size="sm">This pack has no members. You shouldn't be seeing this!</Heading>
                     <Text size="sm">pls report :(</Text>
+                    <CodeGroup title={`GET pack.${id}.members`}
+                               code={JSON.stringify(members, null, 2)}>
+                        <Code
+                            title="String">{JSON.stringify(members, null, 2)}</Code>
+                    </CodeGroup>
                 </div>
             </Activity>
 
             {/* Avatar with display name */}
             <div className="flex flex-col space-y-2">
-                {members?.map(member => (
+                {sortedMembersByFriends?.map(member => (
                     <Link
                         href={`/@${member.username}`}
                         key={member.id}
-                        className="flex !text-foreground items-center justify-between ring-default transition-all hover:bg-n-2/25 hover:ring-2 dark:hover:bg-n-6/50 rounded mx-2 px-1 py-1"
+                        className="flex text-foreground! items-center justify-between ring-default transition-all hover:transition-shadow hover:bg-muted hover:ring-2 rounded mx-2 px-2 py-1"
                     >
                         <div className="flex items-center gap-2">
-                            <UserAvatar user={member} size={32} showOnlineStatus={false}/>
+                            <UserAvatar user={member} size={32} showOnlineStatus={true}/>
                             <div className="flex flex-col">
                                 <Text size="sm">{member.display_name || member.username}</Text>
                                 {member.status && (

@@ -1,11 +1,12 @@
-import { YapockType } from '@/index';
-import { getUser } from '@/routes/user/[username]';
+import {YapockType} from '@/index';
+import {getUser} from '@/routes/user/[username]';
 import prisma from '@/db/prisma';
-import { isValidUUID } from '@/utils/dm/validation';
+import {isValidUUID} from '@/utils/dm/validation';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
-    app.get('', async ({ params: { id }, set, user }) => {
-        // await requiresUserProfile({set, user})
+    app.get('', async ({params: {id}, set, user}) => {
+        await requiresAccount({set, user});
 
         if (!isValidUUID(id)) {
             set.status = 404;
@@ -13,9 +14,10 @@ export default (app: YapockType) =>
         }
 
         const packExists = await prisma.packs.findUnique({
-            where: { id },
-            select: { id: true },
+            where: {id},
+            select: {id: true},
         });
+
         if (!packExists) {
             set.status = 404;
             return;
@@ -24,8 +26,8 @@ export default (app: YapockType) =>
         let data;
         try {
             data = await prisma.packs_memberships.findMany({
-                where: { tenant_id: id },
-                select: { user_id: true, joined_at: true },
+                where: {tenant_id: id},
+                select: {user_id: true, joined_at: true},
             });
 
             if (!data || data.length === 0) {
@@ -41,6 +43,8 @@ export default (app: YapockType) =>
             let profile = await getUser({
                 by: 'id',
                 value: member.user_id,
+                user,
+                scope: 'pack_member'
             });
 
             profile.joined_at = member.joined_at.toISOString();

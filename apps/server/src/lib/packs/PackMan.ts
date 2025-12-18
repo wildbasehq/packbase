@@ -1,5 +1,8 @@
 import {packs, packs_memberships} from '@prisma/client'
 import debug from "debug";
+import prisma from '@/db/prisma'
+import {FeedController} from '@/lib/FeedController'
+import {PackMembershipCache} from '@/routes/pack/[id]'
 
 const log = {
     info: debug('vg:packman:info'),
@@ -166,6 +169,149 @@ export default class PackMan {
             log.error('PackMan.update: update failed', {packId: this._pack.id, error: (error as any)?.message ?? error})
             return {
                 success: false,
+                error: (error as any)?.message ?? String(error),
+            }
+        }
+    }
+
+    /**
+     * Kick a member from the pack
+     * @param targetUserId - The user ID to remove from this pack
+     */
+    async kickMember(targetUserId: string) {
+        log.info('PackMan.kickMember called', {
+            packId: this._pack.id,
+            actingUserId: this._user?.user_id ?? null,
+            targetUserId,
+        })
+
+        if (!this._user) {
+            log.warn('PackMan.kickMember: no acting user on PackMan instance', {packId: this._pack.id})
+            return {
+                success: false as const,
+                error: 'Not a pack member',
+            }
+        }
+
+        // Prevent self-kick via this method – leaving should use the leave route
+        if (this._user.user_id === targetUserId) {
+            log.warn('PackMan.kickMember: acting user attempted to kick self', {
+                packId: this._pack.id,
+                userId: this._user.user_id,
+            })
+
+            return {
+                success: false as const,
+                error: 'Use leave endpoint to exit a pack',
+            }
+        }
+
+        const canKick = await this.hasPermission(PackMan.PERMISSIONS.KickMembers)
+        if (!canKick) {
+            log.warn('PackMan.kickMember: missing KickMembers permission', {
+                packId: this._pack.id,
+                actingUserId: this._user.user_id,
+            })
+            return {
+                success: false as const,
+                error: 'Missing permission',
+            }
+        }
+
+        // Fetch target user's membership to compare permissions
+        let targetMembership: packs_memberships | null = null
+        try {
+            targetMembership = await prisma.packs_memberships.findFirst({
+                where: {
+                    tenant_id: this._pack.id,
+                    user_id: targetUserId,
+                },
+            })
+        } catch (error) {
+            log.error('PackMan.kickMember: error fetching target membership', {
+                packId: this._pack.id,
+                targetUserId,
+                error: (error as any)?.message ?? error,
+            })
+            return {
+                success: false as const,
+                error: (error as any)?.message ?? String(error),
+            }
+        }
+
+        if (!targetMembership) {
+            log.warn('PackMan.kickMember: membership not found for target user before delete', {
+                packId: this._pack.id,
+                targetUserId,
+            })
+            return {
+                success: false as const,
+                error: 'Membership not found',
+            }
+        }
+
+        // If the target has strictly higher permissions than the acting user, deny the kick
+        if (targetMembership.permissions > this._user.permissions || targetMembership.user_id === this._pack.owner_id) {
+            log.warn('PackMan.kickMember: target has higher permissions than acting user; denying kick', {
+                packId: this._pack.id,
+                actingUserId: this._user.user_id,
+                actingPermissions: this._user.permissions,
+                targetUserId,
+                targetPermissions: targetMembership.permissions,
+            })
+            return {
+                success: false as const,
+                error: 'Cannot kick a member with higher permissions',
+            }
+        }
+
+        try {
+            const result = await prisma.packs_memberships.deleteMany({
+                where: {
+                    tenant_id: this._pack.id,
+                    user_id: targetUserId,
+                },
+            })
+
+            if (result.count === 0) {
+                log.warn('PackMan.kickMember: membership not found for target user', {
+                    packId: this._pack.id,
+                    targetUserId,
+                })
+                return {
+                    success: false as const,
+                    error: 'Membership not found',
+                }
+            }
+
+            // Invalidate membership cache entries for this pack + target user
+            PackMembershipCache.forEach((v, k) => {
+                if (v.tenant_id === this._pack.id && v.user_id === targetUserId) {
+                    PackMembershipCache.delete(k)
+                }
+            })
+
+            // Invalidate target user's pack feed cache
+            FeedController.packCache.delete(targetUserId)
+
+            log.info('PackMan.kickMember: member kicked successfully', {
+                packId: this._pack.id,
+                targetUserId,
+                deletedCount: result.count,
+            })
+
+            return {
+                success: true as const,
+                kickedUserId: targetUserId,
+            }
+        } catch (error) {
+            log.error('PackMan.kickMember: error while kicking member', {
+                packId: this._pack.id,
+                targetUserId,
+                error: (error as any)?.message ?? error,
+            })
+            return {
+                success: false as const,
                 error: (error as any)?.message ?? String(error),
             }
         }

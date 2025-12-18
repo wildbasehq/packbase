@@ -4,13 +4,13 @@ import {ErrorTypebox} from '@/utils/errors';
 import {HTTPError} from '@/lib/HTTPError';
 import prisma from '@/db/prisma';
 import {NotificationManager} from '@/lib/NotificationManager';
-import requiresToken from '@/utils/identity/requires-token';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({params: {id}, body: {body}, set, user, error}) => {
-            await requiresToken({set, user});
+            await requiresAccount({set, user});
 
             body = body.trim();
             if (body.length === 0) {
@@ -22,7 +22,7 @@ export default (app: YapockType) =>
             try {
                 postExists = await prisma.posts.findUnique({
                     where: {id},
-                    select: {user_id: true, id: true},
+                    select: {user_id: true, id: true, tenant_id: true},
                 });
             } catch (postError) {
                 set.status = 500;
@@ -42,6 +42,7 @@ export default (app: YapockType) =>
                         body,
                         user_id: user.sub,
                         content_type: 'howling_alongside',
+                        tenant_id: postExists.tenant_id
                     },
                     select: {
                         id: true,

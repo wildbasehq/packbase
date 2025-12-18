@@ -7,7 +7,7 @@ import {LoadingCircle} from '@/components/icons'
 import {Heading, Text} from '@/components/shared/text'
 import {Button, Desktop, Textarea} from '@/components/shared'
 import {vg} from '@/lib/api'
-import {useResourceStore} from '@/lib'
+import {useResourceStore, useUserAccountStore} from '@/lib'
 import {toast} from 'sonner'
 import {MagnifyingGlassIcon} from '@heroicons/react/24/solid'
 import PackCard from '@/components/shared/pack/card'
@@ -18,6 +18,8 @@ import Rive from '@rive-app/react-canvas'
 import {UserGroupIcon} from '@heroicons/react/20/solid'
 import {Separator} from '@radix-ui/react-dropdown-menu'
 import Markdown from '@/components/shared/markdown.tsx'
+import {ExclamationDiamondIcon} from "@/components/icons/plump/exclamation-diamond.tsx";
+import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
 
 // Types
 type PrivacyOption = {
@@ -103,7 +105,7 @@ export function CreatePackModal({close, onCreate}: {
                     `Whoops! ${error.status}: ${
                         (error.status as unknown as number) === 403
                             ? 'You cannot create Packs at this time.'
-                            : error.value.summary || "You might've missed a required property."
+                            : error.value.summary || "Check details and try again"
                     }${error.value.property ? ` (/${error.value.on}${error.value.property})` : ''}`
                 )
                 setSubmitting(false)
@@ -197,6 +199,9 @@ export function CreatePackModal({close, onCreate}: {
                     </div>
                     <Description className="!text-xs">
                         Used to quickly get to your pack via URL, and optionally show as a flair on profiles.
+                        <br/>
+                        <br/>
+                        Only lowercase letters, hyphens, and underscores are allowed.
                     </Description>
                     <Input type="text" name="slug" placeholder="rawr" value={formData.slug} onChange={handleInputChange}
                            className="mt-1"/>
@@ -265,16 +270,20 @@ function SearchablePackList() {
                 </div>
 
                 <div className="relative w-full sm:w-64">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <button
+                        className="flex w-full items-center border bg-muted rounded py-1 px-2 gap-2 hover:bg-muted/80 hover:ring-1 ring-default transition-shadow"
+                        aria-label="Search Packs"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => PackbaseInstance.emit('search-open', {
+                            searchQuery: '#'
+                        })}
+                    >
                         <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" aria-hidden="true"/>
-                    </div>
-                    <Input
-                        type="text"
-                        placeholder="Search packs"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        className="[&>&]:pl-12"
-                    />
+                        <Text alt>
+                            Search Packs...
+                        </Text>
+                    </button>
                 </div>
             </div>
 
@@ -303,6 +312,7 @@ function SearchablePackList() {
  * PackAdd - Main component for the pack creation page
  */
 export default function PackAdd() {
+    const {user} = useUserAccountStore()
     const {setCurrentResource} = useResourceStore()
     const {show, hide} = useModal()
 
@@ -355,6 +365,24 @@ export default function PackAdd() {
                     <Rive src="/img/rive/pack-bench.riv" stateMachines="Animation" className="w-full h-[18rem]"/>
                 </div>
             </div>
+
+            {user?.requires_setup && (
+                <div className="p-4 bg-muted border border-amber-500 rounded-lg">
+                    <Heading size="xl" className="mb-2 items-center flex">
+                        <ExclamationDiamondIcon className="size-6 mr-2 text-yellow-500"
+                                                aria-hidden="true"/>
+                        Your first Pack will be your default!!
+                    </Heading>
+                    <Text>
+                        Since this is your first time on Packbase, the first Pack you create will be set as your
+                        Default Pack. You can change this later in your account settings.
+                        <br/><br/>
+                        Your "Default Pack" will be the one you see when going to your home page, and will be the Pack
+                        used for any actions that require a Pack context by default (i.e. Howling). Don't worry, you can
+                        always change your default Pack later, and can howl into any pack as long as you're a member!
+                    </Text>
+                </div>
+            )}
 
             <SearchablePackList/>
         </div>

@@ -2,6 +2,7 @@ import {YapockType} from '@/index';
 import {t} from 'elysia';
 import requiresToken from '@/utils/identity/requires-token';
 import prisma from '@/db/prisma';
+import requiresAccount from "@/utils/identity/requires-account";
 
 // Shared types
 export const FolderSchema = t.Object({
@@ -39,7 +40,7 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({query, set, user}) => {
-                requiresToken({set, user});
+                await requiresAccount({set, user});
                 const folders = await readUserFolders(query.user);
                 return {folders};
             },

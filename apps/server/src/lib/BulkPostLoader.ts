@@ -176,9 +176,20 @@ export class BulkPostLoader {
                         userMap[userProfile.id] = userProfile;
                     }
 
+                    // Reactions fetched forcefully
+                    const userReactions = await this.fetchReactions([comment.id]);
+                    const reactionSlots = userReactions.filter(r => r.post_id === comment.id).map(r => r.slot);
+                    comment.reactions = reactionSlots.map(slot => ({
+                        key: slot,
+                        emoji: slot,
+                        count: 1,
+                        reactedByMe: currentUserId === comment.user_id,
+                    }));
+
                     post.comments.push({
                         id: comment.id,
                         body: comment.body,
+                        reactions: comment.reactions,
                         created_at: comment.created_at.toISOString(),
                         user: userProfile,
                     });
@@ -274,7 +285,9 @@ export class BulkPostLoader {
     /**
      * Fetch reactions for posts
      */
-    private async fetchReactions(postIds: string[]): Promise<any[]> {
+    private async fetchReactions(postIds: string[]): Promise<{
+        post_id: string; actor_id: string; slot: string
+    }[]> {
         if (!postIds.length) return [];
 
         try {

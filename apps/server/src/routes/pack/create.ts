@@ -2,8 +2,8 @@ import {similarity} from '@/utils/similarity';
 import {YapockType} from '@/index';
 import {PackCreateBody} from '@/models/defs';
 import {HTTPError} from '@/lib/HTTPError';
-import requiresToken from '@/utils/identity/requires-token';
 import PackMan from "@/lib/packs/PackMan";
+import requiresAccount from "@/utils/identity/requires-account";
 
 const banned = ['universe', 'new', 'settings'];
 
@@ -11,7 +11,7 @@ export default (app: YapockType) =>
     app.post(
         '',
         async ({body: {display_name, slug, description}, set, user}) => {
-            requiresToken({set, user});
+            await requiresAccount({set, user});
 
             slug = slug.toLowerCase();
             for (const route of banned) {

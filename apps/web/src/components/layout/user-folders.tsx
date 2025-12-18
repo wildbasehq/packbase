@@ -125,7 +125,7 @@ export default function UserFolders({user: folderUser}: { user: { id: string; us
 
     const onCreate = async (input: Partial<Folder>) => {
         if (input.query && !input.query.startsWith('[')) {
-            input.query = `[Where posts:tags (${input.query}) AND posts:user_id ("${user.id}")]`
+            input.query = `[Where posts:tags (${input.query}) AND posts:user_id ("${folderUser.id}")]`
         }
 
         await createMutation.mutateAsync(input)
@@ -134,14 +134,14 @@ export default function UserFolders({user: folderUser}: { user: { id: string; us
 
     return (
         <div className="space-y-3">
-            <Activity mode={isVisible(folderUser.id === user?.id)}>
-                <div className="flex items-center justify-between">
-                    <Heading size="sm">Folders</Heading>
+            <div className="flex items-center justify-between">
+                <Heading size="sm">Folders</Heading>
+                <Activity mode={isVisible(folderUser.id === user?.id)}>
                     <Button plain onClick={() => show(<FolderForm onCancel={() => hide()} onSave={onCreate}/>)}>
                         <PlusIcon className="h-4 w-4 mr-1"/> New
                     </Button>
-                </div>
-            </Activity>
+                </Activity>
+            </div>
 
             {isLoading && <Text size="xs" alt>Loading folders…</Text>}
 

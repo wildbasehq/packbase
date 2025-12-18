@@ -1,7 +1,6 @@
 import {YapockType} from '@/index';
-import {t} from 'elysia';
-import requiresToken from '@/utils/identity/requires-token';
 import createStorage from '@/lib/storage';
+import requiresAccount from "@/utils/identity/requires-account";
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
 const storageCache = new Map<string, { data: { totalBytes: number; fileCount: number }; timestamp: number }>();
@@ -10,7 +9,7 @@ export default (app: YapockType) =>
     app.get(
         '',
         async ({set, user}) => {
-            requiresToken({set, user});
+            await requiresAccount({set, user});
 
             // Check cache
             const cached = storageCache.get(user.sub);
@@ -66,23 +65,6 @@ export default (app: YapockType) =>
             detail: {
                 description: "Get the current user's storage usage in bytes",
                 tags: ['User'],
-            },
-            response: {
-                200: t.Object({
-                    totalBytes: t.Number({
-                        description: 'Total storage used in bytes',
-                    }),
-                    fileCount: t.Number({
-                        description: 'Total number of files',
-                    }),
-                    tier: t.String({
-                        description: 'Storage tier',
-                    }),
-                }),
-                500: t.Object({
-                    error: t.String(),
-                    totalBytes: t.Number(),
-                }),
             },
             beforeHandle: ({set}) => {
                 set.headers['Cache-Control'] = 'public, max-age=300';

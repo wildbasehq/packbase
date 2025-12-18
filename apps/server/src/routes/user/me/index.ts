@@ -10,6 +10,7 @@ import prisma from '@/db/prisma';
 import requiresToken from '@/utils/identity/requires-token';
 import createStorage from '@/lib/storage';
 import PackMan from "@/lib/packs/PackMan";
+import {checkDefaultPackSetup} from "@/routes/packs/default";
 
 export default (app: YapockType) =>
     app
@@ -68,7 +69,13 @@ export default (app: YapockType) =>
                     }
                 }
 
-                return userProfile;
+                const defaultPackSetup = await checkDefaultPackSetup(user.sub);
+
+                return {
+                    ...userProfile,
+                    requires_setup: defaultPackSetup.requires_setup,
+                    requires_switch: defaultPackSetup.requires_switch,
+                };
             },
             {
                 detail: {

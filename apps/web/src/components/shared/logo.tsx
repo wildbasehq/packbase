@@ -2,46 +2,22 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React from 'react'
+import React, {SVGProps} from 'react'
 import {cn} from '@/lib/utils'
 import {LoadingSpinner} from '@/src/components'
 
-export const Logo = ({...props}) => {
-    props.className = props.noStyle ? props.className : cn(
-        props.className,
-        !props.noColorTheme && 'bg-primary fill-white',
-        'ring-1 ring-inset ring-n-7/25 rounded-xl w-8 h-8 flex justify-center items-center p-1.5'
-    )
-
-    // == For Yipnyap ==
-    // @ts-ignore
-    // const color500 = colors['blue']['400']
-    // @ts-ignore
-    // const color600 = colors['blue']['500']
-    delete props.noColorTheme
+export const Logo = (props: SVGProps<SVGSVGElement>) => {
     return (
-        // <svg width="27" viewBox="0 0 27 22" aria-hidden="true" {...props}>
-        //     <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        //         <stop offset="0%" stopColor={color500} />
-        //         <stop offset="100%" stopColor={color600} />
-        //     </linearGradient>
-        //     <path fill="url(#logoGrad)"
-        // d="M19.72,1.99c.05-.12,0-.2-.14-.16l-3.99,1.04c-.13,.04-.31,.15-.4,.25l-3.01,3.42c-.09,.1-.05,.2,.08,.23l4.77,.78c.13,.02,.29-.06,.34-.19l2.34-5.37Zm7.1,10.39c.13,.02,.21,.14,.17,.27l-.5,1.61c-.04,.13-.16,.3-.28,.37l-1.9,1.29c-.11,.08-.32,.15-.45,.16l-8.15,.7c-.14,.01-.32,.1-.41,.2l-4.57,4.97c-.09,.1-.21,.08-.26-.05l-1.75-4.29c-.05-.13-.2-.22-.34-.21l-6.62,.57c-.14,.01-.22-.09-.18-.22l1.46-5.13c.04-.13-.03-.28-.16-.34L.1,11.05c-.12-.06-.13-.16-.02-.24l4.18-2.96c.11-.08,.2-.14,.2-.14,0,0,.05-.1,.12-.22L7.28,2.63c.07-.12,.22-.27,.34-.33L12.12,.02c.12-.06,.2,0,.17,.13l-1.41,6.99c-.03,.13,.06,.26,.2,.28l7.43,1.2c.13,.02,.3,.13,.37,.25l1.5,2.4c.07,.12,.24,.22,.37,.25l6.05,.86Z"/>
-        // <path className="fill-white"
-        // d="M14.45,9.91c-.09-.1-.05-.17,.08-.15l3.16,.45c.13,.02,.3,.13,.37,.25l.25,.4c.07,.12,.04,.27-.07,.35l-.63,.43c-.11,.08-.32,.15-.45,.16l-.77,.06c-.14,.01-.32-.06-.41-.17l-1.53-1.78Z"/>
-        // </svg>
-        <div {...props}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245.22 229.23"
-                 className={props.fullSize ? 'w-full h-full' : 'w-5 h-5'}>
-                <path
-                    d="M227.15,228.09l-20.69-9.23-17.23-7.69c-16.63,2.45-34.44,1.06-53.07-5.23a98,98,0,0,1-59.57-55.19C44.83,73.69,100.63,0,173.64,0A105.62,105.62,0,0,1,240.1,23.39l-8.49,18a5.26,5.26,0,0,1-4.59,3L108.67,48.37c-4.31.15-7.91,3.6-7.94,8.83l25,77.93A14.24,14.24,0,0,0,137,144.84l63,9.65-12.35,13.58-.15.18a14.26,14.26,0,0,0,11,23.3h.23l43.84-.67.17,1.62L245.15,215A12.84,12.84,0,0,1,227.15,228.09Z"/>
-                <path d="M45.52,120.88H7.5a7.5,7.5,0,0,1,0-15h38a7.5,7.5,0,1,1,0,15Z"/>
-                <path
-                    d="M45.52,86.63a7.6,7.6,0,0,1-2.38-.39L9,74.82A7.5,7.5,0,0,1,13.78,60.6L47.9,72a7.5,7.5,0,0,1-2.38,14.61Z"/>
-                <path
-                    d="M12.57,167.69a7.5,7.5,0,0,1-2.82-14.45l33.73-13.7a7.5,7.5,0,1,1,5.64,13.9l-33.73,13.7A7.57,7.57,0,0,1,12.57,167.69Z"/>
-            </svg>
-        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245.22 229.23" data-slot="icon"
+             fill="currentColor" {...props}>
+            <path
+                d="M227.15,228.09l-20.69-9.23-17.23-7.69c-16.63,2.45-34.44,1.06-53.07-5.23a98,98,0,0,1-59.57-55.19C44.83,73.69,100.63,0,173.64,0A105.62,105.62,0,0,1,240.1,23.39l-8.49,18a5.26,5.26,0,0,1-4.59,3L108.67,48.37c-4.31.15-7.91,3.6-7.94,8.83l25,77.93A14.24,14.24,0,0,0,137,144.84l63,9.65-12.35,13.58-.15.18a14.26,14.26,0,0,0,11,23.3h.23l43.84-.67.17,1.62L245.15,215A12.84,12.84,0,0,1,227.15,228.09Z"/>
+            <path d="M45.52,120.88H7.5a7.5,7.5,0,0,1,0-15h38a7.5,7.5,0,1,1,0,15Z"/>
+            <path
+                d="M45.52,86.63a7.6,7.6,0,0,1-2.38-.39L9,74.82A7.5,7.5,0,0,1,13.78,60.6L47.9,72a7.5,7.5,0,0,1-2.38,14.61Z"/>
+            <path
+                d="M12.57,167.69a7.5,7.5,0,0,1-2.82-14.45l33.73-13.7a7.5,7.5,0,1,1,5.64,13.9l-33.73,13.7A7.57,7.57,0,0,1,12.57,167.69Z"/>
+        </svg>
     )
 }
 
@@ -75,7 +51,7 @@ export const LogoSpinner = ({
                     isLoading ? 'opacity-0' : 'opacity-100'
                 )}
             >
-                <Logo noStyle fullSize className="w-full h-full flex justify-center items-center dark:fill-white"/>
+                <Logo className="w-full h-full flex justify-center items-center dark:fill-white"/>
             </div>
 
             <LoadingSpinner

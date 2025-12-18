@@ -6,8 +6,8 @@ import {PackEditBody, PackResponse} from '@/models/defs'
 import posthog, {distinctId} from '@/utils/posthog'
 import {HTTPError} from '@/lib/HTTPError'
 import prisma from '@/db/prisma'
-import requiresToken from '@/utils/identity/requires-token'
 import PackMan from '@/lib/packs/PackMan'
+import requiresAccount from "@/utils/identity/requires-account";
 
 export const PackCache = new Map<string, any>()
 export const PackMembershipCache = new Map<string, any>()
@@ -44,7 +44,8 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({params: {id}, set, user, body}) => {
-                requiresToken({set, user})
+                await requiresAccount({set, user});
+
                 if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.ManagePack))) {
                     set.status = 403
                     throw HTTPError.forbidden({
@@ -214,6 +215,7 @@ export async function getPack(id: string, scope?: string, userId?: string) {
         const membersCount = await prisma.packs_memberships.count({
             where: {tenant_id: pack.id},
         })
+
         pack.statistics = {
             members: membersCount || -1,
             heartbeat: await packCalculateHeartbeat(pack.id),

@@ -115,7 +115,7 @@ const styles = {
             '[--btn-icon:var(--color-orange-300)] data-active:[--btn-icon:var(--color-orange-200)] data-hover:[--btn-icon:var(--color-orange-200)]',
         ],
         amber: [
-            'text-amber-950 [--btn-hover-overlay:var(--color-white)]/25 [--btn-bg:var(--color-amber-400)] [--btn-border:var(--color-amber-500)]/80',
+            'text-amber-950 [--btn-hover-overlay:var(--color-white)]/25 [--btn-bg-from:var(--color-amber-400)] [--btn-bg-to:var(--color-amber-500)] [--btn-border:var(--color-amber-500)]/80',
             '[--btn-icon:var(--color-amber-600)]',
         ],
         yellow: [

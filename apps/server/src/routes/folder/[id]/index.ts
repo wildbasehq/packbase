@@ -3,6 +3,7 @@ import {t} from 'elysia';
 import requiresToken from '@/utils/identity/requires-token';
 import {type Folder, FolderSchema} from '@/routes/folders';
 import prisma from '@/db/prisma';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app
@@ -10,7 +11,7 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user, params}) => {
-                requiresToken({set, user});
+                await requiresAccount({set, user});
                 const {id} = params as { id: string };
                 const folder = await prisma.folders.findFirst({where: {id}});
                 if (!folder) {
@@ -63,19 +64,13 @@ export default (app: YapockType) =>
                     return {error: 'Folder not found'};
                 }
 
-                const nextMode = payload.mode ?? (current.mode as 'dynamic' | 'manual');
-                const nextQuery = nextMode === 'dynamic' ? (payload.query ?? (current as any).query) : undefined;
-                const nextHowls = nextMode === 'manual' ? (payload.howl_ids ?? (current as any).howl_ids) : [];
-
                 const updated = await prisma.folders.update({
                     where: {id},
                     data: {
                         name: payload.name ?? current.name,
                         description: payload.description ?? current.description ?? undefined,
                         emoji: payload.emoji ?? current.emoji ?? undefined,
-                        mode: nextMode,
-                        query: nextQuery,
-                        howl_ids: nextHowls,
+                        query: payload.query ?? current.query ?? undefined,
                         updated_at: new Date(),
                     },
                 });

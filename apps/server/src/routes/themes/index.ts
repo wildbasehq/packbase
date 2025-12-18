@@ -4,6 +4,7 @@ import validateThemeContent from '@/lib/themes/validateThemeContent';
 import {Theme, ThemesList} from '@/models/themes.model';
 import {t} from 'elysia';
 import prisma from '@/db/prisma';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app
@@ -11,12 +12,7 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user}) => {
-                if (!user) {
-                    set.status = 401;
-                    throw HTTPError.unauthorized({
-                        summary: 'You must be logged in to access your themes.',
-                    });
-                }
+                await requiresAccount({set, user});
 
                 try {
                     return await prisma.user_themes.findMany({
@@ -48,12 +44,7 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({set, body, user}) => {
-                if (!user) {
-                    set.status = 401;
-                    throw HTTPError.unauthorized({
-                        summary: 'You must be logged in to create a theme.',
-                    });
-                }
+                await requiresAccount({set, user});
 
                 // Validate and sanitize HTML and CSS
                 const {html: sanitizedHTML, css: sanitizedCSS} = validateThemeContent({

@@ -2,6 +2,7 @@ import React, {Activity, ReactNode, useEffect} from 'react'
 import {PagedModalProvider, usePagedModal} from './context'
 import clsx from 'clsx'
 import {Text} from '@/components/shared/text'
+import {cn} from "@/lib";
 
 export interface PageProps {
     id?: string
@@ -33,8 +34,8 @@ const Page: React.FC<PageProps> = ({id: providedId, title, description, icon: Ic
     return <>{children}</>
 }
 
-const PageBody: React.FC<{ children: ReactNode }> = ({children}) => {
-    return <div className="h-full w-full overflow-y-auto p-6 relative">{children}</div>
+const PageBody: React.FC<{ children: ReactNode; className?: string; }> = ({children, className}) => {
+    return <div className={cn("h-full w-full overflow-y-auto p-6 relative", className)}>{children}</div>
 }
 
 // The main PagedModal component
@@ -65,7 +66,7 @@ const PagedModalContent: React.FC<PagedModalProps> = ({children, className, head
             )}
         >
             {/* Sidebar */}
-            <div className="hidden sm:block flex-shrink-0 border-r w-[25%] bg-sidebar">
+            <div className="hidden sm:block shrink-0 border-r w-[25%]">
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     {header && <div className="p-4 border-b">{header}</div>}
@@ -79,8 +80,8 @@ const PagedModalContent: React.FC<PagedModalProps> = ({children, className, head
                                         key={page.id}
                                         onClick={() => setActivePage(page.id)}
                                         className={clsx(
-                                            activePage === page.id ? 'bg-n-2/25 dark:bg-n-6/50' : 'hover:bg-n-2/25 dark:hover:bg-n-6/50',
-                                            'ring-default/25 ring-default group w-full items-center justify-start gap-4 rounded px-4 py-3 transition-all hover:ring-2'
+                                            activePage === page.id ? 'bg-muted' : 'hover:bg-muted',
+                                            'ring-default group w-full items-center justify-start gap-4 rounded px-4 py-3 transition-all hover:transition-shadow hover:ring-2'
                                         )}
                                     >
                                         <div onClick={() => setActivePage(page.id)}

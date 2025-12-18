@@ -58,7 +58,7 @@ export default function UserAvatar({
                     {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size}/>}
                 </div>
             </Activity>
-            
+
             <Activity mode={isVisible(hasIcon)}>
                 <div className="relative" style={props.style}>
                     <img

@@ -3,25 +3,18 @@
  */
 
 import Body from '@/components/layout/body'
-import {isVisible, useResourceStore, useUIStore, useUserAccountStore} from '@/lib'
-import {Activity, ReactNode, useEffect, useState} from 'react'
+import {isVisible, resourceDefaultPackbase, useResourceStore, useUIStore, useUserAccountStore} from '@/lib'
+import React, {Activity, ReactNode, useEffect, useState} from 'react'
 import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
-import {LogoSpinner} from '@/src/components'
+import {Button, Heading, LogoSpinner, Text} from '@/src/components'
 import {useContentFrame} from '@/lib/hooks/content-frame.tsx'
-import NUEModal, {createNUEFlow} from '@/components/seen-once/nue-modal'
-import {toast} from 'sonner'
+import SadComputerIcon from "@/components/icons/sad-computer.tsx";
 
 export default function Preload({children}: { children: ReactNode }) {
     return (
         <>
             <SignedIn>
-                {/*<WebsocketFrame*/}
-                {/*    onConnect={() => console.log('Connected to websocket')}*/}
-                {/*    onDisconnect={() => console.log('Disconnected from websocket')}*/}
-                {/*    onMessage={message => console.log('Received message:', message)}*/}
-                {/*>*/}
                 <PreloadChild>{children}</PreloadChild>
-                {/*</WebsocketFrame>*/}
             </SignedIn>
             <SignedOut>
                 <PreloadChild>{children}</PreloadChild>
@@ -33,11 +26,10 @@ export default function Preload({children}: { children: ReactNode }) {
 function PreloadChild({children}: { children: ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`auth`)
     const [error, setError] = useState<any | null>(null)
-    const [showNUE, setShowNUE] = useState(false)
 
     const {setUser} = useUserAccountStore()
     const {setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities} = useUIStore()
-    const {resourceDefault, setResources, setResourceDefault} = useResourceStore()
+    const {setResources, setCurrentResource, setResourceDefault} = useResourceStore()
     const {session, isSignedIn, isLoaded} = useSession()
 
     const {data: userMeData, isLoading: userMeLoading} = useContentFrame('get', 'user.me', undefined, {
@@ -79,20 +71,39 @@ function PreloadChild({children}: { children: ReactNode }) {
             setStatus('auth:@me')
 
             if (!userMeData) {
-                throw new Error('User data not found after sign-in. Try reloading.')
+                // Already has failed mechanism?
+                if (window.location.search.includes('failed_mechanism=auth_profile')) {
+                    setError({
+                        cause: 'Failed to load user profile',
+                        message: 'There was an issue loading your profile. Packbase already attempted to resolve this automatically and failed. Please contact support.\n\nThe servers are online.',
+                    })
+
+                    return
+                }
+
+                // Redirect with query param `falied_mechanism=auth_profile`
+                window.location.href = `/me?failed_mechanism=auth_profile`
+                return
             }
 
-            if (userMeData.default_pack === '00000000-0000-0000-0000-000000000000' && !window.location.pathname.startsWith('/p/universe/sunset')) {
+            if (userMeData.requires_switch && !window.location.pathname.startsWith('/p/universe/sunset')) {
                 window.location.pathname = '/p/universe/sunset'
                 return
             }
 
             setUser(userMeData)
-            setResourceDefault(userMeData.default_pack)
+            setResourceDefault(userMeData.default_pack || resourceDefaultPackbase)
+
+            if (!window.location.pathname.startsWith('/p/')) {
+                // Force select default pack
+                setCurrentResource(userMeData.default_pack)
+            }
 
             proceed()
         } else {
             setUser(null)
+            setResources([])
+            setResourceDefault(resourceDefaultPackbase)
             proceed()
         }
     }, [session, isSignedIn, userMeLoading, userPacksData, userPacksLoading, server])
@@ -111,45 +122,33 @@ function PreloadChild({children}: { children: ReactNode }) {
         setStatus('proceeding')
         setLoading(false)
         setConnecting(false)
-
-        const shouldShowNUE = isSignedIn && (!userMeData || isProfileIncomplete(userMeData))
-        if (shouldShowNUE) {
-            setShowNUE(true)
-        }
     }
 
-    // Helper function to check if profile is incomplete
-    const isProfileIncomplete = (userData: any) => {
-        const hasValidDisplayName = userData?.display_name?.trim().length > 0
-        const hasValidBio = userData?.about?.bio?.trim().length > 0
-
-        return !hasValidDisplayName || !hasValidBio
-    }
     return (
         <>
+            <Activity mode={isVisible(error)}>
+                <Body bodyClassName="h-full" className="h-full! items-center justify-center">
+                    <div className="max-w-md">
+                        <SadComputerIcon className="h-12 w-fit mx-auto"/>
+                        <Heading className="mb-4 text-2xl">
+                            {error?.cause}
+                        </Heading>
+                        <Text className="mb-4">{error?.message || 'An unknown error occurred.'}</Text>
+                        <Button
+                            onClick={() => window.location.href = '/'}
+                        >
+                            Hard Reset
+                        </Button>
+                    </div>
+                </Body>
+            </Activity>
+
             {serviceLoading === 'proceeding' ? (
                 <>
-                    <Activity mode={isVisible(showNUE)}>
-                        <NUEModal
-                            config={{
-                                ...createNUEFlow(),
-                                onComplete: () => {
-                                    window.location.reload()
-                                },
-                                onCancel: () => {
-                                    toast.message('Snoozed until next reload')
-                                    setShowNUE(false)
-                                },
-                            }}
-                        />
-                    </Activity>
-
-                    <Activity mode={isVisible(!showNUE)}>
-                        {children}
-                    </Activity>
+                    {children}
                 </>
             ) : (
-                <Body bodyClassName="h-full" className="!h-full items-center justify-center">
+                <Body bodyClassName="h-full" className="h-full! items-center justify-center">
                     <LogoSpinner/>
                     <span className="text-sm mt-1">
                         <Activity

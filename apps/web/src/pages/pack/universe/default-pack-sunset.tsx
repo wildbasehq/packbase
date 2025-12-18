@@ -160,7 +160,7 @@ function Onboard({loading, posts, setLoading, setPage, setFinaliseScreen}: {
 
             <Activity mode={isVisible(!ready)}>
                 <div className="flex items-center gap-2 py-2 px-3 border rounded-full">
-                    <Logo/>
+                    <Logo className="h-8 w-8"/>
                     <div className="flex flex-col">
                         <Text className="font-medium">Universe</Text>
                         <Text className="text-sm text-muted-foreground">
@@ -194,7 +194,7 @@ function Onboard({loading, posts, setLoading, setPage, setFinaliseScreen}: {
             <Activity mode={isVisible(ready)}>
                 <div
                     className="flex items-center gap-2 p-2 -mb-8 border border-b-0 rounded-t-3xl bg-linear-to-b from-card to-transparent">
-                    <Logo/>
+                    <Logo className="h-8 w-8"/>
                     <div className="flex flex-col">
                         <Text className="font-medium">Universe</Text>
                     </div>
@@ -463,6 +463,20 @@ function DataReset() {
             document.removeEventListener('visibilitychange', handleVisibilityChange)
         }
     }, []);
+
+    useEffect(() => {
+        if (countdown <= 0.9) {
+            vg.user.me.reset.post().then(({status}) => {
+                if (status === 200) {
+                    window.location.pathname = '/'
+                } else {
+                    toast.error('Failed to reset data. Please try again.')
+                }
+            }).catch(() => {
+                toast.error('Failed to reset data. Please try again.')
+            })
+        }
+    }, [countdown])
 
 
     const digits = countdown.toString().padStart(2, '0').split('')

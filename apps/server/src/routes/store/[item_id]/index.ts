@@ -1,9 +1,9 @@
 import {t} from 'elysia';
 import {YapockType} from '@/index';
-import requiresToken from '@/utils/identity/requires-token';
 import StoreManager from '@/lib/StoreManager';
 import Items from '@/lib/store/items.json';
 import {HTTPError} from '@/lib/HTTPError';
+import requiresAccount from "@/utils/identity/requires-account";
 
 const store = new StoreManager();
 
@@ -11,7 +11,7 @@ export default (app: YapockType) =>
     app.post(
         '',
         async ({user, set, params, body}) => {
-            requiresToken({set, user});
+            await requiresAccount({set, user});
             const itemId = params.item_id;
 
             if (!(itemId in Items)) {

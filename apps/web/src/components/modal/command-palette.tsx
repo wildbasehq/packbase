@@ -668,7 +668,11 @@ export default function CommandPalette() {
 
     // Listen for global Packbase event to open search
     useEffect(() => {
-        const cancelInstance = PackbaseInstance.on("search-open", () => {
+        const cancelInstance = PackbaseInstance.on("search-open", (event) => {
+            if (event.data?.searchQuery) {
+                setRawQuery(event.data.searchQuery);
+            }
+
             setOpen(true);
         });
 

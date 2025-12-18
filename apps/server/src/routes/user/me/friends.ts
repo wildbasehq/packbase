@@ -1,13 +1,13 @@
 import {YapockType} from '@/index';
 import {t} from 'elysia';
 import clerkClient from '@/db/auth';
-import requiresToken from '@/utils/identity/requires-token';
+import requiresAccount from "@/utils/identity/requires-account";
 
 export default (app: YapockType) =>
     app.get(
         '',
         async ({set, user}) => {
-            await requiresToken({set, user});
+            await requiresAccount({set, user});
 
             // Raw SQL query for optimal performance; using prisma on a large dataset is pretty slow
             let friends = (await prisma.$queryRaw`

@@ -2,7 +2,6 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import Modal from '@/components/modal'
 import {Heading} from '@/components/shared/text.tsx'
 import {Activity, ChangeEvent, ReactNode, useEffect, useState} from 'react'
 import {Button} from '@/components/shared'
@@ -11,8 +10,9 @@ import {AnimatedCharacter, Expressions} from '@/components/shared/animated-chara
 import SelectPills from '@/components/shared/input/select-pills.tsx'
 import {Alert, AlertDescription, Checkbox, CheckboxField, Field, Input, InputGroup, Textarea} from '@/src/components'
 import {Label} from '@headlessui/react'
-import {isVisible, vg} from '@/lib'
+import {cn, isVisible, vg} from '@/lib'
 import {toast} from 'sonner'
+import {AnimatePresence, motion} from 'motion/react'
 
 /**
  * Character Text Box Modal for user guidance and onboarding
@@ -77,6 +77,7 @@ export default function NUEModal({config}: CharacterTextBoxProps) {
     const [isLoading, setIsLoading] = useState(false)
     const [formData, setFormData] = useState<Record<string, any>>({})
     const [formError, setFormError] = useState<string | null>(null)
+    const [direction, setDirection] = useState<'left' | 'right'>('left')
 
     const currentStep = steps[currentStepIndex]
 
@@ -121,6 +122,7 @@ export default function NUEModal({config}: CharacterTextBoxProps) {
         }
 
         if (currentStepIndex < steps.length - 1) {
+            setDirection('left')
             setCurrentStepIndex(currentStepIndex + 1)
             // Reset form data when moving to next step
             // setFormData({})
@@ -131,6 +133,7 @@ export default function NUEModal({config}: CharacterTextBoxProps) {
 
     const handlePrevious = () => {
         if (currentStepIndex > 0) {
+            setDirection('right')
             setCurrentStepIndex(currentStepIndex - 1)
         }
     }
@@ -181,8 +184,8 @@ export default function NUEModal({config}: CharacterTextBoxProps) {
     }
 
     return (
-        <Modal showModal={showModal} setShowModal={handleClose}
-               className="relative !bg-muted w-[52rem] !z-[100] !overflow-visible">
+        <div
+            className="relative bg-muted w-[52rem] z-100 overflow-visible rounded-2xl ring-1 ring-border">
             {/* Character mascot */}
             <div className="absolute -top-6/7 md:-left-1/8 md:!-top-13 pointer-events-none w-1/2">
                 <AnimatedCharacter
@@ -206,7 +209,11 @@ export default function NUEModal({config}: CharacterTextBoxProps) {
                             {steps.map((_, index) => (
                                 <div
                                     key={index}
-                                    className={`w-2 h-2 rounded-full ${index <= currentStepIndex ? 'bg-primary' : 'bg-n-5'}`}
+                                    className={cn(
+                                        'w-2 h-2 rounded-full',
+                                        currentStepIndex === index && 'bg-primary-lime border-2',
+                                        currentStepIndex !== index && ((index <= currentStepIndex) ? 'bg-indigo-500' : 'bg-n-5'),
+                                    )}
                                 />
                             ))}
                         </div>
@@ -221,110 +228,147 @@ export default function NUEModal({config}: CharacterTextBoxProps) {
 
                 {/* Main content area */}
                 <div
-                    className="bg-white dark:bg-n-8 shadow p-4 overflow-y-auto h-[18rem] rounded gap-4 justify-center items-center">
-                    {/* Text content */}
-                    <div className="space-y-4">
-                        <Heading size="xl">{currentStep.title}</Heading>
-                        <div className="space-y-2">
-                            {currentStep.content.map((content, i) => (
-                                <Markdown key={i}>{content}</Markdown>
-                            ))}
-                        </div>
+                    className="bg-white dark:bg-n-8 shadow overflow-hidden h-[18rem] rounded gap-4 justify-center items-center relative">
+                    <div className="overflow-y-auto overflow-x-hidden h-full p-4">
+                        {/* Text content */}
+                        <AnimatePresence mode="popLayout" initial={false} custom={direction}>
+                            <motion.div
+                                key={currentStepIndex}
+                                custom={direction}
+                                variants={{
+                                    enter: (direction: string) => ({
+                                        x: direction === 'left' ? 200 : -200,
+                                        opacity: 0,
+                                        filter: 'blur(4px)',
+                                        scale: 0.95,
+                                    }),
+                                    center: {
+                                        x: 0,
+                                        opacity: 1,
+                                        filter: 'blur(0px)',
+                                        scale: 1,
+                                    },
+                                    exit: (direction: string) => ({
+                                        x: direction === 'left' ? -200 : 200,
+                                        opacity: 0,
+                                        filter: 'blur(4px)',
+                                        scale: 0.95,
+                                    }),
+                                }}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{
+                                    type: 'spring',
+                                    stiffness: 500,
+                                    damping: 35,
+                                }}
+                                className="space-y-4"
+                            >
+                                <Heading size="xl">{currentStep.title}</Heading>
+                                <div className="space-y-2">
+                                    {currentStep.content.map((content, i) => (
+                                        <Markdown key={i}>{content}</Markdown>
+                                    ))}
+                                </div>
 
-                        {/* Form element */}
-                        {currentStep.form && (
-                            <div className="mt-4 space-y-3">
-                                {formError && (
-                                    <div
-                                        className="p-2 mb-2 text-sm font-medium text-red-800 bg-red-100 rounded-md dark:bg-red-900 dark:text-red-200">
-                                        {formError}
+                                {/* Form element */}
+                                {currentStep.form && (
+                                    <div className="mt-4 space-y-3">
+                                        {formError && (
+                                            <div
+                                                className="p-2 mb-2 text-sm font-medium text-red-800 bg-red-100 rounded-md dark:bg-red-900 dark:text-red-200">
+                                                {formError}
+                                            </div>
+                                        )}
+                                        {currentStep.form.fields.map(field => (
+                                            <InputGroup key={field.name} className="space-y-1">
+                                                {field.type === 'select' ? (
+                                                    <SelectPills
+                                                        label={field.label + (field.required ? ' *' : '')}
+                                                        onChange={selected => handleSelectChange(field.name, selected)}
+                                                        options={[
+                                                            ...(field.options?.map(option => ({
+                                                                name: option.label,
+                                                                id: option.value,
+                                                                desc: option.desc,
+                                                                disabled: option.disabled,
+                                                                warn: option.warn,
+                                                            })) || []),
+                                                        ]}
+                                                    />
+                                                ) : field.type === 'textarea' ? (
+                                                    <Field>
+                                                        <Textarea placeholder={field.placeholder} name={field.name}
+                                                                  onChange={handleFormChange}/>
+                                                    </Field>
+                                                ) : field.type === 'checkbox' ? (
+                                                    <CheckboxField>
+                                                        <Checkbox
+                                                            name={field.name}
+                                                            value={field.name}
+                                                            aria-required={field.required}
+                                                            onChange={checked => handleCheckboxChange(field.name, checked)}
+                                                        />
+                                                        <Label className="text-sm">{field.label}</Label>
+                                                    </CheckboxField>
+                                                ) : (
+                                                    <Input
+                                                        id={field.name}
+                                                        name={field.name}
+                                                        type={field.type}
+                                                        placeholder={field.placeholder}
+                                                        required={field.required}
+                                                        value={formData[field.name] || field.defaultValue || ''}
+                                                        onChange={handleFormChange}
+                                                    />
+                                                )}
+                                            </InputGroup>
+                                        ))}
                                     </div>
                                 )}
-                                {currentStep.form.fields.map(field => (
-                                    <InputGroup key={field.name} className="space-y-1">
-                                        {field.type === 'select' ? (
-                                            <SelectPills
-                                                label={field.label + (field.required ? ' *' : '')}
-                                                onChange={selected => handleSelectChange(field.name, selected)}
-                                                options={[
-                                                    ...(field.options?.map(option => ({
-                                                        name: option.label,
-                                                        id: option.value,
-                                                        desc: option.desc,
-                                                        disabled: option.disabled,
-                                                        warn: option.warn,
-                                                    })) || []),
-                                                ]}
-                                            />
-                                        ) : field.type === 'textarea' ? (
-                                            <Field>
-                                                <Textarea placeholder={field.placeholder} name={field.name}
-                                                          onChange={handleFormChange}/>
-                                            </Field>
-                                        ) : field.type === 'checkbox' ? (
-                                            <CheckboxField>
-                                                <Checkbox
-                                                    name={field.name}
-                                                    value={field.name}
-                                                    aria-required={field.required}
-                                                    onChange={checked => handleCheckboxChange(field.name, checked)}
-                                                />
-                                                <Label className="text-sm">{field.label}</Label>
-                                            </CheckboxField>
-                                        ) : (
-                                            <Input
-                                                id={field.name}
-                                                name={field.name}
-                                                type={field.type}
-                                                placeholder={field.placeholder}
-                                                required={field.required}
-                                                value={formData[field.name] || field.defaultValue || ''}
-                                                onChange={handleFormChange}
-                                            />
-                                        )}
-                                    </InputGroup>
-                                ))}
-                            </div>
-                        )}
 
-                        {/* Custom component */}
-                        {currentStep.customComponent && <div className="mt-4">{currentStep.customComponent}</div>}
+                                {/* Custom component */}
+                                {currentStep.customComponent &&
+                                    <div className="mt-4">{currentStep.customComponent}</div>}
 
-                        {/* Action buttons */}
-                        <div className="flex gap-2 mt-4">
-                            {currentStep.buttons ? (
-                                currentStep.buttons.map((button, index) => (
-                                    <Button
-                                        key={index}
-                                        onClick={() => button.action(handlePrevious, handleNext)}
-                                        // @ts-ignore
-                                        color={button.variant ?? 'indigo'}
-                                    >
-                                        {button.text}
-                                    </Button>
-                                ))
-                            ) : (
-                                <>
-                                    {currentStepIndex > 0 && (
-                                        <Button outline onClick={handlePrevious} disabled={isLoading}>
-                                            Previous
-                                        </Button>
+                                {/* Action buttons */}
+                                <div className="flex gap-2 mt-4">
+                                    {currentStep.buttons ? (
+                                        currentStep.buttons.map((button, index) => (
+                                            <Button
+                                                key={index}
+                                                onClick={() => button.action(handlePrevious, handleNext)}
+                                                // @ts-ignore
+                                                color={button.variant ?? 'indigo'}
+                                            >
+                                                {button.text}
+                                            </Button>
+                                        ))
+                                    ) : (
+                                        <>
+                                            {currentStepIndex > 0 && (
+                                                <Button outline onClick={handlePrevious} disabled={isLoading}>
+                                                    Previous
+                                                </Button>
+                                            )}
+                                            <Button onClick={handleNext} color="indigo" disabled={isLoading}>
+                                                <Activity mode={isVisible(isLoading)}>
+                                                    Loading
+                                                </Activity>
+                                                <Activity mode={isVisible(!isLoading)}>
+                                                    Next
+                                                </Activity>
+                                            </Button>
+                                        </>
                                     )}
-                                    <Button onClick={handleNext} color="indigo" disabled={isLoading}>
-                                        <Activity mode={isVisible(isLoading)}>
-                                            Loading
-                                        </Activity>
-                                        <Activity mode={isVisible(!isLoading)}>
-                                            Next
-                                        </Activity>
-                                    </Button>
-                                </>
-                            )}
-                        </div>
+                                </div>
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
                 </div>
             </div>
-        </Modal>
+        </div>
     )
 }
 
@@ -375,35 +419,6 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                             type: 'textarea',
                             placeholder: 'Tell us a little about yourself',
                             required: true,
-                        },
-                    ],
-                },
-            },
-            {
-                id: 'subdomain',
-                title: 'Want a free site?',
-                content: [
-                    'We can give you a free subdomain (your username) for your static site theme, or you can link a custom domain (// ALPHA NOTE: NOT ADDED. TBD //).',
-                    'It must be about you specifically, and it must be unique. Want to host your company? Shove it in a /folder.',
-                ],
-                expression: Expressions.MOTIVATED,
-                form: {
-                    fields: [
-                        {
-                            name: 'subdomain',
-                            label: ' ',
-                            type: 'select',
-                            options: [
-                                {
-                                    value: 'none',
-                                    label: 'Nothing',
-                                },
-                                {
-                                    value: 'free',
-                                    label: 'Subdomain',
-                                },
-                            ],
-                            required: false,
                         },
                     ],
                 },

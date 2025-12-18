@@ -11,7 +11,21 @@ export const PACK_PERMISSIONS = {
     ManagePack: 512,
 }
 
-export function hasPackPermissionBit(userPermissions: number, permissionBit: number): boolean {
+export function hasPackPermissionBit(userPermissions: number, permissionBit: number | {
+    type: 'all' | 'any',
+    bits: number[]
+}[]): boolean {
+    if (Array.isArray(permissionBit)) {
+        return permissionBit.every(perm => {
+            if (perm.type === 'all') {
+                return perm.bits.every(bit => hasPackPermissionBit(userPermissions, bit))
+            } else if (perm.type === 'any') {
+                return perm.bits.some(bit => hasPackPermissionBit(userPermissions, bit))
+            }
+            return false
+        })
+    }
+
     return (userPermissions & permissionBit) === permissionBit
 }
 

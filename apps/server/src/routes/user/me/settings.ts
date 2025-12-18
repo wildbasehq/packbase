@@ -1,14 +1,14 @@
 import {Settings} from "@/lib/settings";
 import {t} from "elysia";
 import {YapockType} from '@/index';
-import requiresToken from "@/utils/identity/requires-token";
+import requiresAccount from "@/utils/identity/requires-account";
 
 
 export default (app: YapockType) =>
     app.get(
         '',
         async ({set, user}) => {
-            requiresToken({set, user});
+            await requiresAccount({set, user});
             const settings = new Settings();
             const userObj = await prisma.profiles.findUnique({
                 where: {
@@ -17,7 +17,7 @@ export default (app: YapockType) =>
             });
 
             delete userObj.type
-            
+
             return (
                 await settings.getSettingValues({
                     model: 'user',
