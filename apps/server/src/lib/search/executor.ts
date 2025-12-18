@@ -487,9 +487,19 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     // Fetch one extra row to check if there are more results
     const fetchTake = take !== undefined ? take + 1 : undefined;
 
+    // Check if table has a created_at column and add orderBy if it exists
+    const schema = Schemas[table];
+    const hasCreatedAt = schema?.columns['created_at'];
+    const orderBy = hasCreatedAt ? {created_at: 'desc' as const} : undefined;
+
+    if (logPrisma.enabled) {
+        logPrisma('Prisma findMany table=%s orderBy=%o', table, orderBy);
+    }
+
     const rows = await (prisma as any)[table].findMany({
         select,
         where: prismaWhere ?? undefined,
+        orderBy,
         skip,
         take: fetchTake
     });
