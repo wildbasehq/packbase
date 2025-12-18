@@ -8,7 +8,7 @@ import ChatLayout from "@/pages/c/layout.tsx";
 import NotSelected from "@/pages/c/not-selected.tsx";
 import UserLayout from "@/pages/user/[...slug]/layout.tsx";
 import UserFolderPage from "@/pages/user/[...slug]/folders/[id]/page.tsx";
-import {useUserAccountStore} from "@/lib";
+import {useResourceStore, useUserAccountStore} from "@/lib";
 
 // Lazy load all pages
 const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
@@ -39,6 +39,8 @@ const LoadingFallback = () => (
 
 export default function Routes() {
     const {user} = useUserAccountStore()
+    const {resourceDefault} = useResourceStore()
+
     return (
         <Switch>
             <Route path="/">
@@ -93,11 +95,18 @@ export default function Routes() {
 
                 <RequiresAccount/>
 
-                <Route path="/setup">
-                    <Suspense fallback={<LoadingFallback/>}>
-                        <SetupAccountPage/>
-                    </Suspense>
-                </Route>
+                <Switch>
+                    <Route path="/setup">
+                        <Suspense fallback={<LoadingFallback/>}>
+                            <SetupAccountPage/>
+                        </Suspense>
+                    </Route>
+
+                    {/* Fallback */}
+                    <Route>
+                        <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}` : '~/@me'}/>
+                    </Route>
+                </Switch>
             </Route>
 
             <Route path="/p" nest>

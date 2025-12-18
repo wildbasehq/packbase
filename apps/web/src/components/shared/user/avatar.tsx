@@ -2,9 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import BoringAvatar from 'boring-avatars'
-import {cn, isVisible} from "@/lib";
-import {Activity} from "react";
+import {cn} from "@/lib";
+import {getAvatar} from "@/lib/api/get-avatar.ts";
 
 export default function UserAvatar({
                                        user,
@@ -38,40 +37,20 @@ export default function UserAvatar({
     }
 
     const isOnline = user?.online
-    const hasIcon = ((user?.images?.avatar || user?.images_avatar)) || icon
 
     return (
         <>
-            <Activity mode={isVisible(!hasIcon)}>
-                <div
-                    className={cn(props.className, `relative items-center justify-center overflow-hidden rounded-md bg-n-5 text-white`)}
-                    style={props.style}
-                    title={`${user?.username || user?.display_name || props.display_name}'s avatar`}
-                >
-                    <BoringAvatar
-                        variant="beam"
-                        square
-                        size={typeof size === 'number' ? size : sizes[size]}
-                        name={user?.username || props.name || 'packbase'}
-                        {...props}
-                    />
-                    {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size}/>}
-                </div>
-            </Activity>
-
-            <Activity mode={isVisible(hasIcon)}>
-                <div className="relative" style={props.style}>
-                    <img
-                        width={1024}
-                        height={1024}
-                        src={user?.images?.avatar || user?.images_avatar || icon}
-                        alt={`${user?.username || props.display_name}'s avatar`}
-                        {...props}
-                        className={cn(props.className, `inline-flex items-center justify-center overflow-hidden rounded-md text-white`)}
-                    />
-                    {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size}/>}
-                </div>
-            </Activity>
+            <div className="relative" style={props.style}>
+                <img
+                    width={1024}
+                    height={1024}
+                    src={getAvatar(user?.id) || icon}
+                    alt={`${user?.username || props.display_name}'s avatar`}
+                    {...props}
+                    className={cn(props.className, `inline-flex items-center justify-center overflow-hidden rounded-md text-white`)}
+                />
+                {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size}/>}
+            </div>
         </>
     )
 }
