@@ -18,6 +18,10 @@ export default function ProfileHeader({...props}: any) {
 
     const {user} = useUserAccountStore()
 
+    if (!profile) {
+        return null
+    }
+    
     return (
         <div className="relative" id="profile-header">
             <div id="profile-banner-container">

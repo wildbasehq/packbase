@@ -34,6 +34,10 @@ function UserMenu() {
 
     const {signOut} = useAuth()
 
+    if (!user) {
+        return null
+    }
+
     return (
         <DropdownHeader className="flex w-96 flex-col p-0!">
             <div className="h-fit w-full rounded-xl rounded-br bg-white/50 shadow-sm dark:bg-n-6/50">
