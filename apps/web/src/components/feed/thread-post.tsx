@@ -462,14 +462,17 @@ export default function ThreadPost({
 
                 {/* Nested comments as thread continuation */}
                 {showNested && post.comments && post.comments.length > 0 && (
-                    <ThreadComments comments={post.comments}/>
+                    <ThreadComments comments={post.comments} handleNestedDelete={handleNestedDelete}/>
                 )}
             </div>
         </div>
     )
 }
 
-function ThreadComments({comments}: { comments?: FeedPostData[] }) {
+function ThreadComments({comments, handleNestedDelete}: {
+    comments?: FeedPostData[];
+    handleNestedDelete?: (commentId: string) => void
+}) {
     const {user: signedInUser} = useUserAccountStore()
 
     return (
@@ -479,7 +482,7 @@ function ThreadComments({comments}: { comments?: FeedPostData[] }) {
                     <div className="flex group px-2 py-1 gap-2 hover:bg-muted rounded-2xl" key={comment.id}>
                         <UserAvatar size="sm" user={comment.user} className="mt-1.5 rounded-full!"/>
 
-                        <div className="flex flex-col">
+                        <div className="flex flex-col w-full">
                             <UserInfoCol user={comment.user} className="flex">
                                 <div className="flex items-center gap-1.5 min-w-0">
                                     <Link
@@ -506,7 +509,7 @@ function ThreadComments({comments}: { comments?: FeedPostData[] }) {
                                     )}
                                 </div>
 
-                                <div className="flex items-center ml-1 gap-1 text-xs text-muted-foreground">
+                                <div className="flex items-center ml-1 gap-1 flex-1 text-xs text-muted-foreground">
                                     <Text className="truncate" alt>
                                         @{comment.user?.username}
                                     </Text>
@@ -515,6 +518,25 @@ function ThreadComments({comments}: { comments?: FeedPostData[] }) {
                                           className="text-muted-foreground hover:underline">
                                         <time suppressHydrationWarning>{formatRelativeTime(comment.created_at)}</time>
                                     </Link>
+
+                                    {comment.user?.id === signedInUser?.id && (
+                                        <>
+                                            <span className="text-[0.6rem]">•</span>
+                                            <span className="text-red-500 font-medium">You</span>
+
+                                            <div className="grow flex-1"/>
+
+                                            <Button
+                                                plain
+                                                type="button"
+                                                onClick={() => handleNestedDelete && handleNestedDelete(comment.id)}
+                                                className="inline-flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-500/5 transition-colors p-0"
+                                                aria-label="Delete comment"
+                                            >
+                                                <TrashIcon className="w-4 h-4"/>
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
                             </UserInfoCol>
 
