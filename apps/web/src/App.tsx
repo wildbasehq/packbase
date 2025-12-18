@@ -10,7 +10,7 @@ import {AppTabs, FloatingCompose, LogoSpinner} from '@/src/components'
 import Body from '@/components/layout/body.tsx'
 import {ClerkFailed, ClerkLoaded, ClerkLoading, SignedIn} from '@clerk/clerk-react'
 import Preload from '@/src/preload.tsx'
-import {ProjectName, ProjectSafeName} from '@/lib'
+import {ProjectName, ProjectSafeName, resourceDefaultPackbase, useResourceStore} from '@/lib'
 import BrowserCheck from '@/components/modal/browser-check.tsx'
 import Routes from '@/src/Routes.tsx'
 import CommandPalette from '@/components/modal/command-palette.tsx'
@@ -21,6 +21,20 @@ import DefaultPackSunset from "@/pages/pack/universe/default-pack-sunset.tsx";
 const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
 
 function App() {
+    const {currentResource, setCurrentResource, resourceDefault} = useResourceStore()
+
+    useEffect(() => {
+        // if current resource is missing any data, reset to default
+        if (
+            !currentResource ||
+            !currentResource.id ||
+            !currentResource.slug ||
+            !currentResource.display_name
+        ) {
+            setCurrentResource(resourceDefault || resourceDefaultPackbase)
+        }
+    }, [currentResource]);
+
     useEffect(() => {
         const styles = {
             subtitle: 'color: #4a90e2; font-size: 14px; font-weight: bold;',
