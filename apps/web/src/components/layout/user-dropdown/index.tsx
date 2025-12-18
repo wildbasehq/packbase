@@ -47,6 +47,8 @@ function UserMenu() {
                             <Heading>{user.display_name || user.username}</Heading>
                             <Text alt>{user.username}</Text>
                         </div>
+                        <div className="grow"/>
+                        <Cog6ToothIcon className="h-5 w-5 text-muted-foreground"/>
                     </div>
                 </div>
             </div>
