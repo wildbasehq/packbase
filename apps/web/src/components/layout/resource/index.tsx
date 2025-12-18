@@ -37,13 +37,13 @@ export function ResourceSettingsModal() {
             <Avatar
                 square
                 className="w-12 h-12"
-                initials={currentResource.display_name?.charAt(0)}
-                alt={currentResource.display_name}
-                src={currentResource.images?.avatar}
+                initials={currentResource?.display_name?.charAt(0)}
+                alt={currentResource?.display_name}
+                src={currentResource?.images?.avatar}
             />
             <div className="ml-3 grow">
-                <Heading>{currentResource.display_name || currentResource.slug}</Heading>
-                <Text alt>{currentResource.slug}</Text>
+                <Heading>{currentResource?.display_name || currentResource?.slug}</Heading>
+                <Text alt>{currentResource?.slug}</Text>
             </div>
         </div>
     )

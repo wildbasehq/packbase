@@ -80,32 +80,32 @@ export default function PackSwitcher({onChange}: {
                             className={cn("relative overflow-hidden flex w-2xs rounded *:w-full", currentResource.id === pack.id && "ring-1 ring-default bg-card")}
                             onClick={() => switchResource(pack)}
                         >
-                            {pack.images?.header && (
+                            {pack?.images?.header && (
                                 <img
                                     data-slot="banner"
                                     className="absolute inset-0 w-full h-full object-cover opacity-10"
-                                    src={pack.images?.header}
-                                    alt={`${pack.display_name} banner`}
+                                    src={pack?.images?.header}
+                                    alt={`${pack?.display_name} banner`}
                                 />
                             )}
 
                             <img
                                 data-slot="avatar"
                                 className="rounded-sm shrink-0 w-6 h-6 border overflow-hidden"
-                                src={pack.images?.avatar || '/img/default-avatar.png'}
+                                src={pack?.images?.avatar || '/img/default-avatar.png'}
                             />
 
                             <div className="flex flex-col -space-y-1 w-full relative">
-                                <NavbarLabel>{pack.display_name}</NavbarLabel>
+                                <NavbarLabel>{pack?.display_name}</NavbarLabel>
                                 <NavbarLabel className="text-muted-foreground text-xs">
-                                    @{pack.slug}
+                                    @{pack?.slug}
                                     {/*<TextTicker*/}
                                     {/*    texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...', 'Click in for more...']}*/}
                                     {/*    interval={1500 + colIdx * Math.random() * 1000}/>*/}
                                 </NavbarLabel>
                             </div>
 
-                            {pack.id === resourceDefault?.id && (
+                            {pack?.id === resourceDefault?.id && (
                                 <Tooltip
                                     delayDuration={1000}
                                     content="Default Pack">
@@ -113,7 +113,7 @@ export default function PackSwitcher({onChange}: {
                                 </Tooltip>
                             )}
 
-                            {pack.temporary && (
+                            {pack?.temporary && (
                                 <Tooltip
                                     delayDuration={1000}
                                     content="From Search. Will disappear when navigating away.">

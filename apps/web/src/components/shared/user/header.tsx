@@ -26,7 +26,7 @@ export default function ProfileHeader({...props}: any) {
                     height={1080}
                     width={1920}
                     className="pointer-events-none aspect-banner w-full rounded-bl rounded-br object-cover"
-                    src={(profile.images?.header || '/img/background/generic-generated.png') + `?v=${new Date().getTime()}`}
+                    src={(profile?.images?.header || '/img/background/generic-generated.png') + `?v=${new Date().getTime()}`}
                     alt="Profile cover"
                 />
             </div>

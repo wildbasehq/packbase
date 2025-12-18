@@ -77,11 +77,11 @@ export function UserInfo({
 export function UserHoverCard({user}: { user: any }) {
     return (
         <>
-            {user.images?.header && (
+            {user?.images?.header && (
                 <div className="pointer-events-none absolute right-0 top-0 h-full w-full">
                     {/*<div className="absolute w-full h-full bg-card/90 rounded"/>*/}
                     <img
-                        src={user.images?.header}
+                        src={user?.images?.header}
                         width={1080}
                         height={1080}
                         className="h-full w-full rounded object-cover object-center opacity-10"

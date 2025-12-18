@@ -357,13 +357,13 @@ export default function ThreadPost({
 
                 {post.pack && (
                     <Link
-                        href={`/p/${post.pack.slug}`}
+                        href={`/p/${post.pack?.slug}`}
                         className="relative mt-3 inline-flex items-center justify-center"
                     >
                         <AvatarButton
-                            src={post.pack.images?.avatar}
-                            alt={post.pack.display_name}
-                            initials={post.pack.display_name[0]}
+                            src={post.pack?.images?.avatar}
+                            alt={post.pack?.display_name}
+                            initials={post.pack?.display_name[0]}
                             className="aspect-square h-8 w-8 rounded-lg border border-border bg-background shadow-sm"
                             square
                         />

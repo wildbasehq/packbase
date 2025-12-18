@@ -167,8 +167,8 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                         <motion.img
                             data-slot="banner"
                             className="absolute inset-0 w-1/3 h-18 object-cover mask-radial-to-70% mask-radial-at-top-left pointer-events-none select-none"
-                            src={currentResource.images?.header}
-                            alt={`${currentResource.display_name} banner`}
+                            src={currentResource?.images?.header}
+                            alt={`${currentResource?.display_name} banner`}
                             initial={{opacity: 0.5}}
                             animate={{opacity: [0.5, 1, 0.85]}}
                             transition={{duration: 0.5, times: [0, 0.35, 1], ease: "easeOut"}}
