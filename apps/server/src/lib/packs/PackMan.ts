@@ -70,6 +70,7 @@ export default class PackMan {
                             membershipId: user.id,
                             userId: user.user_id
                         })
+
                         return new PackMan(pack, user)
                     }
 
@@ -138,7 +139,7 @@ export default class PackMan {
                     where: {id: owner_id},
                     data: {default_pack: pack.id},
                 })
-                
+
                 log.info('PackMan.create: set default_pack for user', {userId: owner_id, packId: pack.id})
             }
 
@@ -162,6 +163,18 @@ export default class PackMan {
     getPack() {
         log.info('PackMan.getPack called', {packId: this._pack.id})
         return this._pack
+    }
+
+    /**
+     * Get the user membership
+     * @returns
+     */
+    getUserMembership() {
+        log.info('PackMan.getUserMembership called', {
+            packId: this._pack.id,
+            userId: this._user?.user_id ?? null,
+        })
+        return this._user
     }
 
     /**

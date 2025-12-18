@@ -66,6 +66,7 @@ export default (app: YapockType) =>
 
                     if (defaultPack) {
                         userProfile.default_pack = defaultPack
+                        userProfile.default_pack.membership = defaultPackMan.getUserMembership();
                     }
                 }
 
