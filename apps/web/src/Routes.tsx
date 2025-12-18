@@ -1,6 +1,6 @@
 import {SignedIn, SignedOut} from "@clerk/clerk-react"
 import {lazy, Suspense} from "react"
-import {Redirect, Route, Switch} from "wouter"
+import {Redirect, Route, Switch, useLocation} from "wouter"
 import {LogoSpinner} from "@/src/components";
 import Body from "@/components/layout/body.tsx";
 import PackChannelThread from "@/pages/pack/[slug]/[channel]/[thread]/page.tsx";
@@ -76,16 +76,17 @@ export default function Routes() {
             </Route>
 
             <Route path="/store" nest>
-                <RequiresAccount/>
-                <Suspense fallback={<LoadingFallback/>}>
-                    <StoreLayout>
-                        <Route path="/">
-                            <Suspense fallback={<LoadingFallback/>}>
-                                <StorePage/>
-                            </Suspense>
-                        </Route>
-                    </StoreLayout>
-                </Suspense>
+                <RequiresAccount>
+                    <Suspense fallback={<LoadingFallback/>}>
+                        <StoreLayout>
+                            <Route path="/">
+                                <Suspense fallback={<LoadingFallback/>}>
+                                    <StorePage/>
+                                </Suspense>
+                            </Route>
+                        </StoreLayout>
+                    </Suspense>
+                </RequiresAccount>
             </Route>
 
             <Route path="/me" nest>
@@ -93,20 +94,20 @@ export default function Routes() {
                     <Redirect to="~/id/login"/>
                 </SignedOut>
 
-                <RequiresAccount/>
+                <RequiresAccount>
+                    <Switch>
+                        <Route path="/setup">
+                            <Suspense fallback={<LoadingFallback/>}>
+                                <SetupAccountPage/>
+                            </Suspense>
+                        </Route>
 
-                <Switch>
-                    <Route path="/setup">
-                        <Suspense fallback={<LoadingFallback/>}>
-                            <SetupAccountPage/>
-                        </Suspense>
-                    </Route>
-
-                    {/* Fallback */}
-                    <Route>
-                        <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}` : '~/@me'}/>
-                    </Route>
-                </Switch>
+                        {/* Fallback */}
+                        <Route>
+                            <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}` : '~/@me'}/>
+                        </Route>
+                    </Switch>
+                </RequiresAccount>
             </Route>
 
             <Route path="/p" nest>
@@ -146,24 +147,25 @@ export default function Routes() {
             </Route>
 
             <Route path="/c" nest>
-                <RequiresAccount/>
-                <Switch>
-                    <Route path="/">
-                        <ChatLayout>
-                            <Suspense fallback={<LoadingFallback/>}>
-                                <NotSelected/>
-                            </Suspense>
-                        </ChatLayout>
-                    </Route>
+                <RequiresAccount>
+                    <Switch>
+                        <Route path="/">
+                            <ChatLayout>
+                                <Suspense fallback={<LoadingFallback/>}>
+                                    <NotSelected/>
+                                </Suspense>
+                            </ChatLayout>
+                        </Route>
 
-                    <Route path="/:id">
-                        <ChatLayout>
-                            <Suspense fallback={<LoadingFallback/>}>
-                                <ChatThreadPage/>
-                            </Suspense>
-                        </ChatLayout>
-                    </Route>
-                </Switch>
+                        <Route path="/:id">
+                            <ChatLayout>
+                                <Suspense fallback={<LoadingFallback/>}>
+                                    <ChatThreadPage/>
+                                </Suspense>
+                            </ChatLayout>
+                        </Route>
+                    </Switch>
+                </RequiresAccount>
             </Route>
 
             {/* jank */}
@@ -190,13 +192,17 @@ export default function Routes() {
     )
 }
 
-function RequiresAccount() {
+function RequiresAccount({children}: { children?: React.ReactNode }) {
     const {user} = useUserAccountStore()
+    const [location] = useLocation()
+
     if (!user) {
         return <Redirect to="~/id/login"/>
     }
 
-    if (user?.requires_setup) {
-        return <Redirect to="~/me/setup"/>
+    if (user?.requires_setup && !location.startsWith('/setup')) {
+        return <Redirect to={"~/me/setup"}/>
     }
+
+    return children
 }

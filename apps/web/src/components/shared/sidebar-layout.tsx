@@ -214,7 +214,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                     <NavbarLabel className="text-muted-foreground text-xs">
                                         <Activity mode={isVisible(!!currentResource?.ticker?.length)}>
                                             <TextTicker
-                                                texts={currentResource.ticker}
+                                                texts={currentResource?.ticker}
                                                 interval={2000}/>
                                         </Activity>
 
@@ -224,7 +224,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                     </NavbarLabel>
                                 </div>
                                 <Activity
-                                    mode={isVisible((currentResource.verified || currentResource.standalone || currentResource.slug === 'support'))}>
+                                    mode={isVisible((currentResource?.verified || currentResource?.standalone || currentResource?.slug === 'support'))}>
                                     <VerifiedBadge
                                         tooltipText="This is an official pack which represents the creator or organisation behind it."/>
                                 </Activity>

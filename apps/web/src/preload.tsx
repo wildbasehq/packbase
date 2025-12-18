@@ -96,7 +96,7 @@ function PreloadChild({children}: { children: ReactNode }) {
 
             if (!window.location.pathname.startsWith('/p/')) {
                 // Force select default pack
-                setCurrentResource(userMeData.default_pack)
+                setCurrentResource(userMeData.default_pack || resourceDefaultPackbase)
             }
 
             proceed()

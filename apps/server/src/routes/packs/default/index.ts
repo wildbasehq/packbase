@@ -21,7 +21,7 @@ export async function checkDefaultPackSetup(userId: string) {
 
     const requires_switch = !!(await hasPostsInUniverse(userId));
     // !profile?.default_pack
-    const requires_setup = !profile?.default_pack;
+    const requires_setup = true;
 
     return {
         id: profile.default_pack,
