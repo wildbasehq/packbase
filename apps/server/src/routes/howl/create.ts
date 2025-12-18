@@ -9,6 +9,7 @@ import createStorage from '@/lib/storage';
 import Baozi from '@/lib/events';
 import sanitizeTags from '@/utils/sanitize-tags';
 import requiresAccount from "@/utils/identity/requires-account";
+import {clearQueryCache} from "@/lib/search/cache";
 
 export default (app: YapockType) =>
     app.post(
@@ -111,6 +112,10 @@ export default (app: YapockType) =>
                 set.status = 400;
                 throw HTTPError.fromError(error);
             }
+
+            clearQueryCache(`~${dbCreate.tenant_id}`)
+            clearQueryCache(`~${dbCreate.channel_id}`)
+            clearQueryCache(`~${dbCreate.user_id}`)
 
             if (assets && assets.length > 0) {
                 // @ts-ignore

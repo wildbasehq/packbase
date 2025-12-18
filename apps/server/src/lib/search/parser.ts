@@ -1,6 +1,6 @@
 import debug from 'debug';
-import { Aggregation, ColumnSelector, ExpressionNode, ParsedQuery, QueryValue, Statement, WhereNode } from './types';
-import { isValidTable } from './schema';
+import {Aggregation, ColumnSelector, ExpressionNode, ParsedQuery, QueryValue, Statement, WhereNode} from './types';
+import {isValidTable} from './schema';
 
 const logParser = debug('vg:search:parser');
 const logValue = debug('vg:search:parser:value');
@@ -74,9 +74,9 @@ const trimOuterBrackets = (input: string): string => {
 const parseAggregation = (segment: string): { aggregation?: Aggregation; rest: string } => {
     const aggMatch = segment.match(/^(COUNT|UNIQUE|FIRST|LAST)\(\)\s*/i);
     if (aggMatch) {
-        return { aggregation: aggMatch[1].toUpperCase() as Aggregation, rest: segment.slice(aggMatch[0].length) };
+        return {aggregation: aggMatch[1].toUpperCase() as Aggregation, rest: segment.slice(aggMatch[0].length)};
     }
-    return { rest: segment };
+    return {rest: segment};
 };
 
 /**
@@ -88,7 +88,7 @@ const parseAsColumn = (segment: string): { asColumn?: string; asColumns?: string
     if (match) {
         const raw = match[1].trim();
         if (raw === '*') {
-            return { asAll: true, rest: segment.slice(match[0].length) };
+            return {asAll: true, rest: segment.slice(match[0].length)};
         }
         const columns = raw.split(',').map((c) => c.trim()).filter(Boolean);
         return {
@@ -97,7 +97,7 @@ const parseAsColumn = (segment: string): { asColumn?: string; asColumns?: string
             rest: segment.slice(match[0].length)
         };
     }
-    return { rest: segment };
+    return {rest: segment};
 };
 
 /**
@@ -108,7 +108,7 @@ const parseVariableAssignment = (input: string): { name: string; targetKey?: str
     // Allow starting with [ (normal query) or @ (page wrapper)
     const match = input.match(/^\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_]+))?\s*=\s*([\[@].*)$/s);
     if (!match) return null;
-    return { name: match[1], targetKey: match[2], inner: match[3] };
+    return {name: match[1], targetKey: match[2], inner: match[3]};
 };
 
 /**
@@ -151,7 +151,7 @@ const splitPipeline = (input: string): string[] => {
 const parsePageWrapper = (input: string): { skip?: string | number; take?: string | number; inner: string } => {
     const trimmed = input.trim();
     if (!trimmed.toUpperCase().startsWith('@PAGE')) {
-        return { inner: input };
+        return {inner: input};
     }
 
     // Find the closing parenthesis for @PAGE(...)
@@ -217,8 +217,8 @@ const parseValue = (raw: string): QueryValue => {
         const preview = trimmed.length > 200 ? trimmed.slice(0, 200) + '…' : trimmed;
         logValue('parseValue rawLen=%d preview="%s"', trimmed.length, preview);
     }
-    if (/^\(\s*EMPTY\s*\)$/i.test(trimmed)) return { type: 'empty' };
-    if (/^\(\s*NOT\s+EMPTY\s*\)$/i.test(trimmed)) return { type: 'not_empty' };
+    if (/^\(\s*EMPTY\s*\)$/i.test(trimmed)) return {type: 'empty'};
+    if (/^\(\s*NOT\s+EMPTY\s*\)$/i.test(trimmed)) return {type: 'not_empty'};
 
     const variableMatch = trimmed.match(/^\(\s*\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_\.]+))?\s*->\s*(ANY|ALL|ONE)\s*\)$/i);
     if (variableMatch) {
@@ -257,14 +257,14 @@ const parseValue = (raw: string): QueryValue => {
                     value = value.slice(1);
                 }
 
-                return { value, or: or ? true : undefined, not: not ? true : undefined };
+                return {value, or: or ? true : undefined, not: not ? true : undefined};
             });
 
             if (logValue.enabled) {
                 logValue('parseValue list items=%d caseSensitive=%s', items.length, flag === 's');
             }
 
-            return { type: 'list', items, caseSensitive: flag === 's' };
+            return {type: 'list', items, caseSensitive: flag === 's'};
         }
     }
 
@@ -294,7 +294,7 @@ const parseValue = (raw: string): QueryValue => {
         if (logValue.enabled) {
             logValue('parseValue date from=%s to=%s', from, to);
         }
-        return { type: 'date', value: { from: from || undefined, to: to || undefined } };
+        return {type: 'date', value: {from: from || undefined, to: to || undefined}};
     }
 
     if (logValue.enabled) {
@@ -309,7 +309,7 @@ const parseColumnSelector = (segment: string): ColumnSelector => {
     const table = match[1];
     if (!isValidTable(table)) throw new Error(`Unknown table: ${table}`);
     const cols = match[2]?.split(',').map((c) => c.trim()).filter(Boolean);
-    const selector: ColumnSelector = { table, columns: cols?.length ? cols : undefined };
+    const selector: ColumnSelector = {table, columns: cols?.length ? cols : undefined};
     if (logWhere.enabled) {
         logWhere('parseColumnSelector table=%s columns=%o', selector.table, selector.columns ?? '*');
     }
@@ -353,7 +353,7 @@ const parseAtom = (segment: string): WhereNode => {
     const selectorStr = normalized.slice(0, normalized.length - valueStr.length).trim();
     const selector = parseColumnSelector(selectorStr);
     const value = parseValue(valueStr);
-    const node: WhereNode = { kind: 'basic', selector, value };
+    const node: WhereNode = {kind: 'basic', selector, value};
     if (logWhere.enabled) {
         logWhere('parseAtom basic table=%s columns=%o valueType=%s', selector.table, selector.columns ?? '*', value.type);
     }
@@ -403,7 +403,7 @@ const parseExpression = (segment: string): ExpressionNode => {
     // Handle NOT
     if (segment.toUpperCase().startsWith('NOT ')) {
         const expr = parseExpression(segment.slice(4).trim());
-        const node: ExpressionNode = { op: 'NOT', expr };
+        const node: ExpressionNode = {op: 'NOT', expr};
         if (logWhere.enabled) {
             logWhere('parseExpression NOT');
         }
@@ -438,10 +438,10 @@ const parseExpression = (segment: string): ExpressionNode => {
 
     const atom = parseAtom(segment);
     if (logWhere.enabled) {
-        logWhere('parseExpression ATOM kind=%s', atom.kind);
+        logWhere('parseExpression ATOM kind=%s', atom.kind, atom);
     }
     // Atom
-    return { op: 'ATOM', where: atom };
+    return {op: 'ATOM', where: atom};
 };
 
 /**
@@ -475,7 +475,7 @@ export const parseQuery = (input: string): ParsedQuery => {
         }
 
         pipelineParts.forEach((part, idx) => {
-            const { skip, take, inner } = parsePageWrapper(part);
+            const {skip, take, inner} = parsePageWrapper(part);
 
             // Support trailing "AS <column>" after the bracketed expression
             let trailingAs: string | undefined;
@@ -500,7 +500,7 @@ export const parseQuery = (input: string): ParsedQuery => {
 
             let remaining = trimOuterBrackets(trimmedPart); // inner content
 
-            const { aggregation, rest: aggRest } = parseAggregation(remaining);
+            const {aggregation, rest: aggRest} = parseAggregation(remaining);
             remaining = aggRest;
             const {
                 asColumn: leadingAs,
@@ -528,14 +528,24 @@ export const parseQuery = (input: string): ParsedQuery => {
 
             const isLast = idx === pipelineParts.length - 1;
             if (targetName && isLast) {
-                statements.push({ name: targetName, targetKey, query: expr, asColumn, asColumns, asAll, aggregation, skip, take });
+                statements.push({
+                    name: targetName,
+                    targetKey,
+                    query: expr,
+                    asColumn,
+                    asColumns,
+                    asAll,
+                    aggregation,
+                    skip,
+                    take
+                });
             } else {
-                statements.push({ type: 'expression', expr, asColumn, asColumns, asAll, aggregation, skip, take });
+                statements.push({type: 'expression', expr, asColumn, asColumns, asAll, aggregation, skip, take});
             }
         });
     }
     if (logParser.enabled) {
         logParser('parseQuery statements=%d', statements.length);
     }
-    return { statements };
+    return {statements};
 };

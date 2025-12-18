@@ -14,12 +14,12 @@ interface UseFeedQueryProps {
 }
 
 export function useFeedQuery({
-    packID,
-    channelID,
-    feedQueryOverride,
-    page,
-    isSignedIn,
-}: UseFeedQueryProps) {
+                                 packID,
+                                 channelID,
+                                 feedQueryOverride,
+                                 page,
+                                 isSignedIn,
+                             }: UseFeedQueryProps) {
     const hasChannelID = Boolean(channelID)
     const hasFeedQuery = Boolean(feedQueryOverride)
     const isSearch = hasChannelID || hasFeedQuery
@@ -29,6 +29,7 @@ export function useFeedQuery({
         queryKey,
         queryFn: async () => {
             if (isSearch) {
+                console.log('Fetching search page', {channelID, feedQueryOverride, page})
                 return fetchSearchPage({
                     channelID: channelID!,
                     q: feedQueryOverride,

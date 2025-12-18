@@ -31,11 +31,11 @@ export async function fetchFeedPage({packID, page = 1}: FeedPageParams): Promise
 }
 
 export async function fetchSearchPage({channelID, q, page}: SearchPageParams): Promise<FeedPageResult> {
-    const query = q || `$posts = [Where posts:channel_id ("${channelID}")]`
+    const query = q || `$posts = @BULKPOSTLOAD([Where posts:channel_id ("${channelID}")])`
     const response = await vg.search.get({query: {page, q: query}})
 
     return {
-        posts: response.data?.data?.posts || [],
+        posts: response.data?.posts || [],
         hasMore: response.data?.has_more || false,
     }
 }

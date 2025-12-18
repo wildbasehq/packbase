@@ -68,7 +68,25 @@ export const withQueryCache = async <T>(key: string, compute: () => Promise<T>):
 };
 
 /** Clear all cached search results (primarily for tests). */
-export const clearQueryCache = () => {
+export const clearQueryCache = (key?: string) => {
+    if (key) {
+        if (key.startsWith('~')) {
+            // Find any key that contains the substring after '~'
+            const substring = key.slice(1);
+            for (const existingKey of cache.keys()) {
+                if (existingKey.includes(substring)) {
+                    cache.delete(existingKey);
+                    logCache('Cleared cache for key: %s', existingKey);
+                }
+            }
+            return;
+        }
+        
+        cache.delete(key);
+        logCache('Cleared cache for key: %s', key);
+        return;
+    }
+
     cache.clear();
     logCache('Cleared all cache');
 };
