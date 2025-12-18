@@ -41,7 +41,7 @@ export default function viteConfig(sourceDir) {
         build: {
             target: 'esnext',
             minify: 'esbuild',
-            sourcemap: true,
+            sourcemap: false,
             rollupOptions: {
                 output: {
                     manualChunks(id) {
