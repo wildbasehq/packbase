@@ -55,6 +55,13 @@ export type Statement = Assignment | {
     aggregation?: Aggregation
     skip?: number | string;
     take?: number | string;
+} | {
+    type: 'bulkpostload';
+    expr: ExpressionNode;
+    asColumn?: string;
+    currentUserId?: string;
+    name?: string; // For variable assignment
+    targetKey?: string; // For nested assignment like $var.posts
 };
 
 /** Runtime storage for materialized variable values and metadata. */

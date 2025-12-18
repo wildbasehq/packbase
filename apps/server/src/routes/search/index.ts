@@ -12,11 +12,11 @@ const log = require('debug')('vg:search');
 const SearchAPI = (app: YapockType) =>
     app.get(
         '',
-        async ({query, set}) => {
+        async ({query, user, set}) => {
             const timeStart = Date.now();
             try {
                 const {q, allowedTables} = query;
-                const parsed = parseQuery(q);
+                const parsed = parseQuery(q, user?.sub);
                 const {
                     variables,
                     ...result

@@ -114,7 +114,7 @@ const parseVariableAssignment = (input: string): { name: string; targetKey?: str
 /**
  * Split a full query string into pipeline segments separated by top-level bracketed expressions.
  * Maintains association between trailing "AS" clauses and the preceding bracketed block.
- * Also respects parentheses for @PAGE(...) grouping.
+ * Also respects parentheses for @PAGE(...) and @BULKPOSTLOAD(...) grouping.
  */
 const splitPipeline = (input: string): string[] => {
     const parts: string[] = [];
@@ -124,12 +124,13 @@ const splitPipeline = (input: string): string[] => {
     for (let i = 0; i < input.length; i++) {
         const ch = input[i];
 
-        // Check for @PAGE start to treat it as a segment starter
+        // Check for @PAGE or @BULKPOSTLOAD start to treat it as a segment starter
         const isPageStart = ch === '@' && input.slice(i).toUpperCase().startsWith('@PAGE');
+        const isBulkPostLoadStart = ch === '@' && input.slice(i).toUpperCase().startsWith('@BULKPOSTLOAD');
 
         // If we're about to start a new bracketed group while not nested,
         // flush the previous accumulator (this keeps trailing "AS <col>" with the group).
-        if ((ch === '[' || isPageStart) && depth === 0 && current.trim()) {
+        if ((ch === '[' || isPageStart || isBulkPostLoadStart) && depth === 0 && current.trim()) {
             parts.push(current.trim());
             current = '';
         }
@@ -199,6 +200,73 @@ const parsePageWrapper = (input: string): { skip?: string | number; take?: strin
     return {
         skip: parseNumOrVar(skipRaw),
         take: parseNumOrVar(takeRaw),
+        inner: queryRaw + trailing
+    };
+};
+
+/**
+ * Parse a @BULKPOSTLOAD(currentUserId, [Query]) wrapper.
+ * Returns the currentUserId and the inner query string.
+ */
+const parseBulkPostLoadWrapper = (input: string, userId?: string): {
+    isBulkPostLoad: boolean;
+    currentUserId?: string;
+    inner: string
+} => {
+    const trimmed = input.trim();
+    if (!trimmed.toUpperCase().startsWith('@BULKPOSTLOAD')) {
+        return {isBulkPostLoad: false, inner: input};
+    }
+
+    // Find the closing parenthesis for @BULKPOSTLOAD(...)
+    let depth = 0;
+    let endIdx = -1;
+    const startIdx = trimmed.indexOf('(');
+    if (startIdx === -1) throw new Error("Invalid @BULKPOSTLOAD syntax: missing parenthesis");
+
+    for (let i = startIdx; i < trimmed.length; i++) {
+        if (trimmed[i] === '(') depth++;
+        else if (trimmed[i] === ')') {
+            depth--;
+            if (depth === 0) {
+                endIdx = i;
+                break;
+            }
+        }
+    }
+
+    if (endIdx === -1) throw new Error("Unclosed @BULKPOSTLOAD");
+
+    const argsContent = trimmed.slice(startIdx + 1, endIdx);
+    const trailing = trimmed.slice(endIdx + 1);
+
+    // Check if there's a comma (meaning currentUserId is provided)
+    const firstComma = argsContent.indexOf(',');
+
+    let currentUserId: string | undefined = userId;
+    let queryRaw: string;
+
+    if (firstComma === -1) {
+        // No comma, only query: @BULKPOSTLOAD([Query])
+        queryRaw = argsContent.trim();
+    } else {
+        // Has comma: @BULKPOSTLOAD(currentUserId, [Query])
+        const userIdRaw = argsContent.slice(0, firstComma).trim();
+        queryRaw = argsContent.slice(firstComma + 1).trim();
+
+        // Remove quotes if present
+        if (userIdRaw.startsWith('"') && userIdRaw.endsWith('"')) {
+            currentUserId = userIdRaw.slice(1, -1);
+        } else if (userIdRaw.startsWith('$')) {
+            currentUserId = userIdRaw; // Keep variable reference as-is
+        } else {
+            currentUserId = userIdRaw;
+        }
+    }
+
+    return {
+        isBulkPostLoad: true,
+        currentUserId,
         inner: queryRaw + trailing
     };
 };
@@ -448,7 +516,7 @@ const parseExpression = (segment: string): ExpressionNode => {
  * Parse a full search query string into a sequence of statements.
  * Supports semicolon-separated statements, pipeline segments, leading/trailing AS, and variable assignment.
  */
-export const parseQuery = (input: string): ParsedQuery => {
+export const parseQuery = (input: string, userId?: string): ParsedQuery => {
     if (logParser.enabled) {
         const preview = input.length > 200 ? input.slice(0, 200) + '…' : input;
         logParser('parseQuery rawLen=%d preview="%s"', input.length, preview);
@@ -476,11 +544,12 @@ export const parseQuery = (input: string): ParsedQuery => {
 
         pipelineParts.forEach((part, idx) => {
             const {skip, take, inner} = parsePageWrapper(part);
+            const {isBulkPostLoad, currentUserId, inner: bulkInner} = parseBulkPostLoadWrapper(inner, userId);
 
             // Support trailing "AS <column>" after the bracketed expression
             let trailingAs: string | undefined;
             let trailingAsColumns: string[] | undefined;
-            let trimmedPart = inner;
+            let trimmedPart = bulkInner;
             const trailingMatch = trimmedPart.match(/^(.*\])\s+AS\s+([A-Za-z0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*$/i);
             if (trailingMatch) {
                 trimmedPart = trailingMatch[1];
@@ -515,16 +584,42 @@ export const parseQuery = (input: string): ParsedQuery => {
             remaining = rest;
 
             if (logParser.enabled) {
-                logParser('parseQuery segment idx=%d aggregation=%s asColumn=%s asColumns=%o asAll=%s',
+                logParser('parseQuery segment idx=%d aggregation=%s asColumn=%s asColumns=%o asAll=%s isBulkPostLoad=%s',
                     idx,
                     aggregation,
                     asColumn,
                     asColumns,
                     asAll,
+                    isBulkPostLoad,
                 );
             }
 
             const expr = parseExpression(remaining.trim());
+
+            // If this is a @BULKPOSTLOAD wrapper, create a bulkpostload statement
+            if (isBulkPostLoad) {
+                const isLast = idx === pipelineParts.length - 1;
+                if (targetName && isLast) {
+                    // Variable assignment with bulkpostload
+                    statements.push({
+                        type: 'bulkpostload',
+                        name: targetName,
+                        targetKey,
+                        expr,
+                        asColumn,
+                        currentUserId,
+                    });
+                } else {
+                    // No variable assignment
+                    statements.push({
+                        type: 'bulkpostload',
+                        expr,
+                        asColumn,
+                        currentUserId,
+                    });
+                }
+                return;
+            }
 
             const isLast = idx === pipelineParts.length - 1;
             if (targetName && isLast) {

@@ -1,9 +1,10 @@
 import prisma from '@/db/prisma';
-import { ExecutionContext, ExpressionNode, QueryValue, Statement, VariableValue, WhereNode } from './types';
-import { makeCacheKey, withQueryCache } from './cache';
-import { getColumn, getDefaultIdColumn, Relations, Schemas } from './schema';
-import { ensureAllColumnsAllowed, ensureColumnsWhitelisted, ensureTableWhitelisted } from './whitelist';
-import { HTTPError } from "@/lib/HTTPError";
+import {ExecutionContext, ExpressionNode, QueryValue, Statement, VariableValue, WhereNode} from './types';
+import {makeCacheKey, withQueryCache} from './cache';
+import {getColumn, getDefaultIdColumn, Relations, Schemas} from './schema';
+import {ensureAllColumnsAllowed, ensureColumnsWhitelisted, ensureTableWhitelisted} from './whitelist';
+import {HTTPError} from "@/lib/HTTPError";
+import {BulkPostLoader} from "@/lib/BulkPostLoader";
 import debug from 'debug';
 
 const logExec = debug('vg:search:executor');
@@ -63,7 +64,7 @@ const buildValuePredicate = (value: QueryValue, ctx: ExecutionContext, columnNam
         case 'list': {
             const itemPredicates = value.items.map((item) => {
                 const predicate = buildStringPredicate(item.value, value.caseSensitive);
-                return { predicate, or: item.or, not: item.not };
+                return {predicate, or: item.or, not: item.not};
             });
 
             return (v: any) => {
@@ -252,19 +253,19 @@ const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
             if (value.type === 'string') {
                 // Check if string looks like UUID
                 if (columnType === 'string' && value.value.length === 36 && value.value.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)) {
-                    return { [column]: value.value };
+                    return {[column]: value.value};
                 }
 
                 if (!value.prefix && !value.suffix && ['number', 'bigint', 'boolean', 'date'].includes(columnType || '')) {
-                    return { [column]: value.value };
+                    return {[column]: value.value};
                 }
 
                 // Only use text operators on string columns; otherwise fall back to exact match when possible.
                 if (columnType === 'string') {
                     const mode = value.caseSensitive ? undefined : 'insensitive';
-                    if (value.prefix) return { [column]: { startsWith: value.value, mode } };
-                    if (value.suffix) return { [column]: { endsWith: value.value, mode } };
-                    return { [column]: { contains: value.value, mode } };
+                    if (value.prefix) return {[column]: {startsWith: value.value, mode}};
+                    if (value.suffix) return {[column]: {endsWith: value.value, mode}};
+                    return {[column]: {contains: value.value, mode}};
                 }
 
                 return null;
@@ -277,7 +278,7 @@ const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
                 const filters: Record<string, any> = {};
                 if (value.value.from) filters.gte = new Date(value.value.from).toISOString();
                 if (value.value.to) filters.lte = new Date(value.value.to).toISOString();
-                if (Object.keys(filters).length) return { [column]: filters };
+                if (Object.keys(filters).length) return {[column]: filters};
                 return null;
             }
 
@@ -290,7 +291,7 @@ const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
             if (logPrisma.enabled) {
                 logPrisma('AND pushdown left=%s right=%s', !!left, !!right);
             }
-            if (left && right) return { AND: [left, right] };
+            if (left && right) return {AND: [left, right]};
             return null;
         }
         case 'OR': {
@@ -299,7 +300,7 @@ const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
             if (logPrisma.enabled) {
                 logPrisma('OR pushdown left=%s right=%s', !!left, !!right);
             }
-            if (left && right) return { OR: [left, right] };
+            if (left && right) return {OR: [left, right]};
             return null;
         }
         case 'NOT':
@@ -367,7 +368,7 @@ const buildRelationResolvers = async (relations: WhereNode[], rows: any[]) => {
         const whereClauses = uniqueTuples.map((vals) => Object.fromEntries(targetFields.map((f, idx) => [f, vals[idx]])));
 
         const targetRows = await (prisma as any)[targetTable].findMany({
-            where: { OR: whereClauses },
+            where: {OR: whereClauses},
             select: Object.fromEntries(targetFields.map((f) => [f, true])),
         });
 
@@ -400,6 +401,11 @@ const buildRelationResolvers = async (relations: WhereNode[], rows: any[]) => {
  * 5) write results into variable slots if named
  */
 const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
+    // Handle bulkpostload statements in the main executeQuery function, not here
+    if ('type' in stmt && stmt.type === 'bulkpostload') {
+        throw new Error('bulkpostload statements should be handled in executeQuery, not runStatement');
+    }
+
     const expr = 'expr' in stmt ? stmt.expr : stmt.query;
     if (logExec.enabled) {
         logExec('runStatement start type=%s asColumn=%s asColumns=%o asAll=%s aggregation=%s',
@@ -423,10 +429,14 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         throw new Error('Table not allowed');
     }
 
-    const idColumn = stmt.asColumn || stmt.asColumns?.[0] || getDefaultIdColumn(table)?.name || 'id';
+    const idColumn = 'asColumn' in stmt && stmt.asColumn
+        ? stmt.asColumn
+        : ('asColumns' in stmt && stmt.asColumns?.[0])
+            ? stmt.asColumns[0]
+            : getDefaultIdColumn(table)?.name || 'id';
     const neededColumns = new Set<string>([idColumn]);
-    if (stmt.asColumns?.length) stmt.asColumns.forEach((c) => neededColumns.add(c));
-    let selectAll = stmt.asAll || needsAllColumns(expr);
+    if ('asColumns' in stmt && stmt.asColumns?.length) stmt.asColumns.forEach((c) => neededColumns.add(c));
+    let selectAll = ('asAll' in stmt && stmt.asAll) || needsAllColumns(expr);
     gatherColumns(expr, neededColumns);
 
     const relationNodes = collectRelationNodes(expr);
@@ -471,8 +481,8 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         return Number(val);
     };
 
-    const skip = resolveNum(stmt.skip);
-    const take = resolveNum(stmt.take);
+    const skip = 'skip' in stmt ? resolveNum(stmt.skip) : undefined;
+    const take = 'take' in stmt ? resolveNum(stmt.take) : undefined;
 
     const rows = await (prisma as any)[table].findMany({
         select,
@@ -494,18 +504,18 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     // Format the filtered rows into the requested projection/aggregation shape
     const shapeResults = (subset: any[]): any[] => {
         let values: any[];
-        if (stmt.asAll) {
-            values = subset.map((r: any) => ({ ...r }));
-        } else if (stmt.asColumns?.length) {
+        if ('asAll' in stmt && stmt.asAll) {
+            values = subset.map((r: any) => ({...r}));
+        } else if ('asColumns' in stmt && stmt.asColumns?.length) {
             values = subset.map((r: any) => Object.fromEntries(stmt.asColumns!.map((c) => [c, r[c]])));
         } else {
             values = subset.map((r: any) => r[idColumn]);
-            if (stmt.asColumn && stmt.asColumn !== idColumn) {
+            if ('asColumn' in stmt && stmt.asColumn && stmt.asColumn !== idColumn) {
                 values = subset.map((r: any) => r[stmt.asColumn!]);
             }
         }
 
-        if (stmt.aggregation) {
+        if ('aggregation' in stmt && stmt.aggregation) {
             switch (stmt.aggregation) {
                 case 'COUNT':
                     values = [subset.length];
@@ -530,12 +540,12 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         if (!Array.isArray(parent.values)) throw new Error(`Variable ${stmt.name} is not an array and cannot be extended`);
 
         const mergedValues = parent.values.map((v: any, idx: number) => {
-            ctx.loop = { variable: stmt.name, value: v, index: idx };
+            ctx.loop = {variable: stmt.name, value: v, index: idx};
             const predicate = buildWherePredicate(expr, ctx);
             const filtered = rows.filter((r: any) => predicate(r));
             const values = shapeResults(filtered);
             const child = values.length ? values[0] : undefined;
-            const base = v && typeof v === 'object' && !Array.isArray(v) ? { ...v } : { value: v };
+            const base = v && typeof v === 'object' && !Array.isArray(v) ? {...v} : {value: v};
             base[stmt.targetKey!] = child;
             return base;
         });
@@ -546,7 +556,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         ctx.variables[stmt.name] = parent;
         ctx.variables['_prev'] = parent;
 
-        return { name: stmt.name, values: parent.values };
+        return {name: stmt.name, values: parent.values};
     }
 
     const predicate = buildWherePredicate(expr, ctx);
@@ -556,27 +566,31 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     }
     const resultValues = shapeResults(filtered);
 
-    const columnMeta = stmt.asColumns?.length || stmt.asAll
+    const hasAsColumns = 'asColumns' in stmt && stmt.asColumns?.length;
+    const hasAsAll = 'asAll' in stmt && stmt.asAll;
+    const columnMeta = hasAsColumns || hasAsAll
         ? undefined
-        : getColumn(table, stmt.asColumn || idColumn);
+        : getColumn(table, ('asColumn' in stmt && stmt.asColumn) ? stmt.asColumn : idColumn);
     const variableValue: VariableValue = {
         values: resultValues,
         column: columnMeta,
-        columns: stmt.asAll
+        columns: hasAsAll
             ? Object.values(Schemas[table]?.columns ?? {}) as any
-            : stmt.asColumns?.map((c) => getColumn(table, c)).filter(Boolean) as any,
-        ids: stmt.asAll || stmt.asColumns?.length ? filtered.map((r: any) => r[idColumn]) : undefined,
+            : hasAsColumns && 'asColumns' in stmt
+                ? stmt.asColumns?.map((c) => getColumn(table, c)).filter(Boolean) as any
+                : undefined,
+        ids: (hasAsAll || hasAsColumns) ? filtered.map((r: any) => r[idColumn]) : undefined,
         table
     };
 
     if ('name' in stmt) {
         ctx.variables[stmt.name] = variableValue;
         ctx.variables['_prev'] = variableValue;
-        return { name: stmt.name, values: resultValues };
+        return {name: stmt.name, values: resultValues};
     }
 
     ctx.variables['_prev'] = variableValue;
-    return { values: resultValues };
+    return {values: resultValues};
 };
 
 /**
@@ -604,10 +618,53 @@ export const executeQuery = async (statements: Statement[]) => {
     }
 
     return withQueryCache(key, async () => {
-        const ctx: ExecutionContext = { schemas: {}, variables: {} };
+        const ctx: ExecutionContext = {schemas: {}, variables: {}};
         const results: any[] = [];
         for (const stmt of statements) {
             try {
+                // Handle @BULKPOSTLOAD statements specially
+                if ('type' in stmt && stmt.type === 'bulkpostload') {
+                    // First execute the underlying query to get post IDs
+                    const queryStmt: Statement = {
+                        type: 'expression',
+                        expr: stmt.expr,
+                        asColumn: stmt.asColumn || 'id',
+                    };
+                    const queryResult = await runStatement(queryStmt, ctx);
+
+                    // Extract post IDs from the result
+                    const postIds = (queryResult.values || []).filter((id: any) => id != null);
+
+                    if (logExec.enabled) {
+                        logExec('bulkpostload: got %d post IDs', postIds.length);
+                    }
+
+                    // Use BulkPostLoader to enrich the posts
+                    const loader = new BulkPostLoader();
+                    const currentUserId = stmt.currentUserId?.startsWith('$')
+                        ? ctx.variables[stmt.currentUserId.slice(1)]?.values?.[0]
+                        : stmt.currentUserId;
+
+                    const postsMap = await loader.loadPosts(postIds, currentUserId);
+
+                    // Convert map to array maintaining order
+                    const enrichedPosts = postIds.map((id: string) => postsMap[id]).filter(Boolean);
+
+                    // Store in variables if this is an assignment
+                    if ('name' in stmt && stmt.name) {
+                        const variableValue: VariableValue = {
+                            values: enrichedPosts,
+                            table: 'posts'
+                        };
+                        ctx.variables[stmt.name] = variableValue;
+                        ctx.variables['_prev'] = variableValue;
+                        results.push({name: stmt.name, values: enrichedPosts});
+                    } else {
+                        results.push({values: enrichedPosts});
+                    }
+                    continue;
+                }
+
                 const res = await runStatement(stmt, ctx);
                 results.push(res);
             } catch (err: any) {

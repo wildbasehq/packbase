@@ -25,6 +25,11 @@ export const makeCacheKey = (statements: Statement[], allowedTables?: string[]):
 };
 
 const getCached = <T>(key: string): Promise<T> | undefined => {
+    if (isBulkCache(key)) {
+        logCache('Skipping cache for key (bulk post-load detected): %s', key);
+        return undefined;
+    }
+
     const entry = cache.get(key);
     if (!entry) {
         logCache('Cache miss for key: %s', key);
@@ -40,6 +45,11 @@ const getCached = <T>(key: string): Promise<T> | undefined => {
 };
 
 const setCached = <T>(key: string, value: Promise<T>) => {
+    if (isBulkCache(key)) {
+        logCache('Skipping cache for key (bulk post-load detected): %s', key);
+        return;
+    }
+
     cache.set(key, {
         value,
         expiresAt: Date.now() + CACHE_TTL_MS,
@@ -81,7 +91,7 @@ export const clearQueryCache = (key?: string) => {
             }
             return;
         }
-        
+
         cache.delete(key);
         logCache('Cleared cache for key: %s', key);
         return;
@@ -90,6 +100,10 @@ export const clearQueryCache = (key?: string) => {
     cache.clear();
     logCache('Cleared all cache');
 };
+
+function isBulkCache(key) {
+    return key.includes('"@BULKPOSTLOAD"') || key.includes("'@BULKPOSTLOAD'") || key.includes(`"type":"bulkpostload"`)
+}
 
 /** Exposed for tests to align expectations with implementation. */
 export const QUERY_CACHE_TTL_MS = CACHE_TTL_MS;
