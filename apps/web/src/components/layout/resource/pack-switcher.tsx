@@ -68,7 +68,7 @@ export default function PackSwitcher({onChange}: {
     return (
         <div
             ref={scrollRef}
-            className="w-full"
+            className="w-full overflow-x-auto"
             onWheel={handleHorizontalWheel}
             onScroll={handleScroll}
         >
