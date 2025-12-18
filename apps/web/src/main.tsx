@@ -12,6 +12,14 @@ import {dark} from '@clerk/themes'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ConfidentialOverlay} from "@/components/shared/confidential-overlay.tsx";
 import ErrorBoundary from "@/components/ui/error.tsx";
+import * as Sentry from "@sentry/react";
+
+Sentry.init({
+    dsn: "https://e8e3f611b91d18bfe786729b71514d2c@o275804.ingest.us.sentry.io/4510555338637312",
+    // Setting this option to true will send default PII data to Sentry.
+    // For example, automatic IP address collection on events
+    sendDefaultPii: false
+});
 
 declare global {
     interface String {
