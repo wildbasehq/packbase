@@ -36,29 +36,31 @@ export function PackChannels() {
             {currentResource.id === resourceDefault.id && (
                 <>
                     <SidebarDivider/>
-                    <SidebarHeading>
-                        Your Stuff
-                    </SidebarHeading>
+                    <SidebarSection>
+                        <SidebarHeading>
+                            Your Stuff
+                        </SidebarHeading>
 
-                    <SidebarItem href="/me/following">
-                        <ChatBubbleSmileyIcon/>
-                        <div className="flex flex-col min-w-0">
-                            <SidebarLabel>Following</SidebarLabel>
-                            <span className="text-xs text-muted-foreground max-w-[200px]">
+                        <SidebarItem href="/me/following">
+                            <ChatBubbleSmileyIcon/>
+                            <div className="flex flex-col min-w-0">
+                                <SidebarLabel>Following</SidebarLabel>
+                                <span className="text-xs text-muted-foreground max-w-[200px]">
                                 See posts from users you follow & Packs you're apart of.
                             </span>
-                        </div>
-                    </SidebarItem>
+                            </div>
+                        </SidebarItem>
 
-                    <SidebarItem href="/me/everything">
-                        <SparklesIcon className="h-5 w-5"/>
-                        <div className="flex flex-col min-w-0">
-                            <SidebarLabel>Everything</SidebarLabel>
-                            <span className="text-xs text-muted-foreground max-w-[200px]">
+                        <SidebarItem href="/me/everything">
+                            <SparklesIcon className="h-5 w-5"/>
+                            <div className="flex flex-col min-w-0">
+                                <SidebarLabel>Everything</SidebarLabel>
+                                <span className="text-xs text-muted-foreground max-w-[200px]">
                                 A stream of all public posts on Packbase.
                             </span>
-                        </div>
-                    </SidebarItem>
+                            </div>
+                        </SidebarItem>
+                    </SidebarSection>
                 </>
             )}
             <SidebarDivider/>
