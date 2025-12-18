@@ -109,78 +109,78 @@ export default function PagedContainer({
             <Pagination>
                 {page > 1 && <PaginationPrevious href={`?page=${page - 1}`}/>}
                 <PaginationList>
-                    {knownPages.length > 6
-                        ? (() => {
-                            const first = knownPages[0]
-                            const last = knownPages[knownPages.length - 1]
-                            const current = page
-                            const items = []
+                    {knownPages.length > 6 && (() => {
+                        const first = knownPages[0]
+                        const last = knownPages[knownPages.length - 1]
+                        const current = page
+                        const items = []
 
-                            // Always show first page
+                        // Always show first page
+                        items.push(
+                            <PaginationPage
+                                href={`?page=${first}`}
+                                key={first}
+                                current={current === first}
+                                onClick={() => setSearchParams({page: first.toString()})}
+                            >
+                                {first}
+                            </PaginationPage>
+                        )
+
+                        // Show gap if current page is far from first
+                        if (current > 4) {
+                            items.push(<PaginationGap key="gap-start"/>)
+                        }
+
+                        // Show up to 3 pages before and after current page, but within bounds
+                        const start = Math.max(current - 2, first + 1)
+                        const end = Math.min(current + 2, last - 1)
+
+                        for (let i = start; i <= end; i++) {
                             items.push(
                                 <PaginationPage
-                                    href={`?page=${first}`}
-                                    key={first}
-                                    current={current === first}
-                                    onClick={() => setSearchParams({page: first.toString()})}
+                                    href={`?page=${i}`}
+                                    key={i}
+                                    current={current === i}
+                                    onClick={() => setSearchParams({page: i.toString()})}
                                 >
-                                    {first}
+                                    {i}
                                 </PaginationPage>
                             )
+                        }
 
-                            // Show gap if current page is far from first
-                            if (current > 4) {
-                                items.push(<PaginationGap key="gap-start"/>)
-                            }
+                        // Show gap if current page is far from last
+                        if (current < last - 3) {
+                            items.push(<PaginationGap key="gap-end"/>)
+                        }
 
-                            // Show up to 3 pages before and after current page, but within bounds
-                            const start = Math.max(current - 2, first + 1)
-                            const end = Math.min(current + 2, last - 1)
+                        // Always show last page
+                        if (last !== first) {
+                            items.push(
+                                <PaginationPage
+                                    href={`?page=${last}`}
+                                    key={last}
+                                    current={current === last}
+                                    onClick={() => setSearchParams({page: last.toString()})}
+                                >
+                                    {last}
+                                </PaginationPage>
+                            )
+                        }
 
-                            for (let i = start; i <= end; i++) {
-                                items.push(
-                                    <PaginationPage
-                                        href={`?page=${i}`}
-                                        key={i}
-                                        current={current === i}
-                                        onClick={() => setSearchParams({page: i.toString()})}
-                                    >
-                                        {i}
-                                    </PaginationPage>
-                                )
-                            }
+                        return items
+                    })()}
 
-                            // Show gap if current page is far from last
-                            if (current < last - 3) {
-                                items.push(<PaginationGap key="gap-end"/>)
-                            }
-
-                            // Always show last page
-                            if (last !== first) {
-                                items.push(
-                                    <PaginationPage
-                                        href={`?page=${last}`}
-                                        key={last}
-                                        current={current === last}
-                                        onClick={() => setSearchParams({page: last.toString()})}
-                                    >
-                                        {last}
-                                    </PaginationPage>
-                                )
-                            }
-
-                            return items
-                        })()
-                        : knownPages.map(i => (
-                            <PaginationPage
-                                href={`?page=${i}`}
-                                key={i}
-                                current={page === i}
-                                onClick={() => setSearchParams({page: i.toString()})}
-                            >
-                                {i}
-                            </PaginationPage>
-                        ))}
+                    {(knownPages.length < 6 && knownPages.length > 1) && knownPages.map(i => (
+                        <PaginationPage
+                            href={`?page=${i}`}
+                            key={i}
+                            current={page === i}
+                            onClick={() => setSearchParams({page: i.toString()})}
+                        >
+                            {i}
+                        </PaginationPage>
+                    ))}
                 </PaginationList>
                 {hasMore && <PaginationNext href={`?page=${page + 1}`}/>}
             </Pagination>
