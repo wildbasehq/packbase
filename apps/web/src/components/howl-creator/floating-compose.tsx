@@ -343,13 +343,13 @@ function FloatingComposeContent({
             </div>
 
             <div className="grow p-4 overflow-y-auto max-h-[calc(100vh-11rem)]">
-                {user.requires_setup && (
+                {user?.requires_setup && (
                     <Text className="text-center text-sm text-red-500">
                         You need to complete your account setup before you can post howls.
                     </Text>
                 )}
 
-                {!user.requires_setup && (
+                {!user?.requires_setup && (
                     <Editor
                         defaultValue={body}
                         onUpdate={e => {
@@ -360,7 +360,7 @@ function FloatingComposeContent({
                 )}
             </div>
 
-            {!user.requires_setup && (
+            {!user?.requires_setup && (
                 <>
                     {images.length > 0 && (
                         <div className="px-4 pb-2">

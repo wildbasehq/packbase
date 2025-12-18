@@ -179,7 +179,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     </Activity>
 
                     <Navbar className="z-10">
-                        <Activity mode={isVisible(((isSignedIn && !user.requires_setup) || !isSignedIn))}>
+                        <Activity mode={isVisible(((isSignedIn && !user?.requires_setup) || !isSignedIn))}>
                             <NavbarItem
                                 className="flex w-full md:w-2xs h-8 *:w-full"
                                 onClick={() => {
