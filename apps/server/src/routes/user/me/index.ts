@@ -67,6 +67,16 @@ export default (app: YapockType) =>
                     if (defaultPack) {
                         userProfile.default_pack = defaultPack
                         userProfile.default_pack.membership = defaultPackMan.getUserMembership();
+
+                        if (userProfile.default_pack?.images_avatar) userProfile.default_pack.images = {
+                            ...userProfile.default_pack.images,
+                            avatar: userProfile.default_pack.images_avatar,
+                        };
+
+                        if (userProfile.default_pack?.images_header) userProfile.default_pack.images = {
+                            ...userProfile.default_pack.images,
+                            header: userProfile.default_pack.images_header,
+                        };
                     }
                 }
 
