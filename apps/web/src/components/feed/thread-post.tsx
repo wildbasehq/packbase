@@ -136,68 +136,15 @@ function ThreadPostHeader({post, isAuthor, onDelete}: ThreadPostHeaderProps) {
 
 interface ThreadPostBodyProps {
     body: string
-    tags?: string[] | null
 }
 
-function ThreadPostBody({body, tags}: ThreadPostBodyProps) {
-    const containsMature = hasMatureTags(tags)
-    const [showUnsavouryNotice, setShowUnsavouryNotice] = useState<boolean>(containsMature)
-
+function ThreadPostBody({body}: ThreadPostBodyProps) {
     return (
         <>
-            {/* Unsavoury content notice */}
-            {containsMature && (
-                <Activity mode={isVisible(containsMature)}>
-                    <div
-                        className="flex items-start justify-between mb-2 gap-3 rounded-xl border border-amber-300/70 bg-amber-50/80 px-3 py-2 text-xs text-amber-900 shadow-sm dark:border-amber-500/40 dark:bg-amber-950/40 dark:text-amber-100"
-                    >
-                        <div className="flex-1 text-xs leading-snug">
-                            <div className="mb-1 flex items-center gap-1.5">
-                                <ExclamationTriangleIcon className="h-4 w-4"/>
-                                <span className="font-medium">Heads up</span>
-                            </div>
-                            <span>
-                                This howl contains adult content that may not be suitable for everyone.
-                            </span>
-                            {tags && tags.length > 0 && (
-                                <span className="mt-1 block text-[0.7rem] font-medium">
-                                    Contains: {tags.join(', ')}
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex flex-col items-end gap-1">
-                            <Activity mode={isVisible(showUnsavouryNotice)}>
-                                <Button
-                                    color="amber"
-                                    className="!py-1 !px-2 !text-[0.7rem] rounded-full"
-                                    onClick={() => setShowUnsavouryNotice(false)}
-                                    aria-expanded={!showUnsavouryNotice}
-                                >
-                                    Show anyway
-                                </Button>
-                            </Activity>
-
-                            <Activity mode={isVisible(!showUnsavouryNotice)}>
-                                <Button
-                                    outline
-                                    className="!py-1 !px-2 !text-[0.7rem] rounded-full border-amber-400/60"
-                                    onClick={() => setShowUnsavouryNotice(true)}
-                                    aria-expanded={showUnsavouryNotice}
-                                >
-                                    Hide again
-                                </Button>
-                            </Activity>
-                        </div>
-                    </div>
-                </Activity>
-            )}
-
-            <Activity mode={isVisible(!containsMature || !showUnsavouryNotice)}>
-                {/* Post body */}
-                <div className="whitespace-normal break-words text-sm leading-relaxed">
-                    <Markdown>{body}</Markdown>
-                </div>
-            </Activity>
+            {/* Post body */}
+            <div className="whitespace-normal wrap-break-word text-sm leading-relaxed">
+                <Markdown>{body}</Markdown>
+            </div>
         </>
     )
 }
@@ -318,6 +265,10 @@ export default function ThreadPost({
     const [replyText, setReplyText] = useState('')
     const [isSubmittingReply, setIsSubmittingReply] = useState(false)
 
+    const tags = post?.tags
+    const containsMature = hasMatureTags(tags)
+    const [showUnsavouryNotice, setShowUnsavouryNotice] = useState<boolean>(containsMature)
+
     const isAuthor = post.user?.id === signedInUser?.id
     const showNested = depth < MAX_THREAD_DEPTH
 
@@ -433,9 +384,58 @@ export default function ThreadPost({
                     className={`relative group max-w-full! overflow-hidden rounded-2xl! border border-border/60 ${depthTintClass} transition-shadow hover:shadow-sm`}
                 >
                     <div className={innerPaddingClass}>
-                        {/* Body and media (with mature gating) */}
-                        <ThreadPostBody body={post.body} tags={post.tags}/>
-                        <ThreadPostMedia assets={post.assets}/>
+                        {/* Unsavoury content notice */}
+                        {containsMature && (
+                            <Activity mode={isVisible(containsMature)}>
+                                <div
+                                    className="flex items-start justify-between mb-2 gap-3 rounded-xl border border-amber-300/70 bg-amber-50/80 px-3 py-2 text-xs text-amber-900 shadow-sm dark:border-amber-500/40 dark:bg-amber-950/40 dark:text-amber-100"
+                                >
+                                    <div className="flex-1 text-xs leading-snug">
+                                        <div className="mb-1 flex items-center gap-1.5">
+                                            <ExclamationTriangleIcon className="h-4 w-4"/>
+                                            <span className="font-medium">Heads up</span>
+                                        </div>
+                                        <span>
+                                This howl contains adult content that may not be suitable for everyone.
+                            </span>
+                                        {tags && tags.length > 0 && (
+                                            <span className="mt-1 block text-[0.7rem] font-medium">
+                                    Contains: {tags.join(', ')}
+                                </span>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1">
+                                        <Activity mode={isVisible(showUnsavouryNotice)}>
+                                            <Button
+                                                color="amber"
+                                                className="!py-1 !px-2 !text-[0.7rem] rounded-full"
+                                                onClick={() => setShowUnsavouryNotice(false)}
+                                                aria-expanded={!showUnsavouryNotice}
+                                            >
+                                                Show anyway
+                                            </Button>
+                                        </Activity>
+
+                                        <Activity mode={isVisible(!showUnsavouryNotice)}>
+                                            <Button
+                                                outline
+                                                className="!py-1 !px-2 !text-[0.7rem] rounded-full border-amber-400/60"
+                                                onClick={() => setShowUnsavouryNotice(true)}
+                                                aria-expanded={showUnsavouryNotice}
+                                            >
+                                                Hide again
+                                            </Button>
+                                        </Activity>
+                                    </div>
+                                </div>
+                            </Activity>
+                        )}
+
+                        <Activity mode={isVisible(!containsMature || !showUnsavouryNotice)}>
+                            {/* Body and media (with mature gating) */}
+                            <ThreadPostBody body={post.body}/>
+                            <ThreadPostMedia assets={post.assets}/>
+                        </Activity>
 
                         {/* Actions */}
                         <ThreadPostActions
@@ -540,7 +540,7 @@ function ThreadComments({comments, handleNestedDelete}: {
                                 </div>
                             </UserInfoCol>
 
-                            <ThreadPostBody body={comment.body} tags={comment.tags}/>
+                            <ThreadPostBody body={comment.body}/>
                             <ThreadPostActions
                                 postId={comment.id}
                                 reactions={comment.reactions}
