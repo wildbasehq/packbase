@@ -123,7 +123,24 @@ export default class PackMan {
                     ),
                 },
             })
+
             log.info('PackMan.create: membership created', {packId: pack.id, membershipId: membership.id})
+
+            // First membership? Set their default_pack
+            const userMemberships = await prisma.packs_memberships.count({
+                where: {
+                    user_id: owner_id,
+                },
+            })
+
+            if (userMemberships === 1) {
+                await prisma.profiles.update({
+                    where: {id: owner_id},
+                    data: {default_pack: pack.id},
+                })
+                
+                log.info('PackMan.create: set default_pack for user', {userId: owner_id, packId: pack.id})
+            }
 
             if (pack && membership) {
                 log.info('PackMan.create: returning PackMan instance', {packId: pack.id, membershipId: membership.id})
