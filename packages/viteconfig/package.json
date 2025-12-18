@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "vite": "^7.1.10",
+    "@sentry/vite-plugin": "^4.6.1",
+    "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
-    "@tailwindcss/vite": "^4.1.14"
+    "vite": "^7.1.10"
   }
 }
