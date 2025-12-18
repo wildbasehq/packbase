@@ -159,11 +159,11 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                 <div
                     className="min-w-0 bg-sidebar px-4">
                     {user?.images?.header && (
-                        <img src={user.images.header} alt="Header image"
+                        <img src={user?.images.header} alt="Header image"
                              className="absolute inset-0 h-18 w-full object-cover opacity-25 mask-b-to-95% mask-r-from-80% pointer-events-none select-none"/>
                     )}
 
-                    <Activity mode={isVisible(!!currentResource.images?.header)}>
+                    <Activity mode={isVisible(!!currentResource?.images?.header)}>
                         <motion.img
                             data-slot="banner"
                             className="absolute inset-0 w-1/3 h-18 object-cover mask-radial-to-70% mask-radial-at-top-left pointer-events-none select-none"
@@ -187,7 +187,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                     setIsWHOpen(!isWHOpen)
                                 }}
                             >
-                                <Activity mode={isVisible(currentResource.standalone)}>
+                                <Activity mode={isVisible(currentResource?.standalone)}>
                                     <div
                                         data-slot="avatar"
                                         className="rounded-sm w-6 h-6 border overflow-hidden shrink-0 bg-primary-cosmos flex justify-center items-center">
@@ -196,12 +196,12 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                 </Activity>
 
                                 <Activity
-                                    mode={isVisible(!currentResource.standalone)}>
+                                    mode={isVisible(!currentResource?.standalone)}>
                                     <img
                                         data-slot="avatar"
                                         className="rounded-sm w-6 h-6 border shrink-0 overflow-hidden z-1"
-                                        src={currentResource.images?.avatar || '/img/default-avatar.png'}
-                                        alt={`${currentResource.display_name} avatar`}
+                                        src={currentResource?.images?.avatar || '/img/default-avatar.png'}
+                                        alt={`${currentResource?.display_name} avatar`}
                                     />
                                 </Activity>
 
