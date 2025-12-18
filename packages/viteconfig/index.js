@@ -2,6 +2,8 @@ import {defineConfig} from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import * as path from 'node:path'
+import {sentryVitePlugin} from "@sentry/vite-plugin";
+
 
 export default function viteConfig(sourceDir) {
     return defineConfig({
@@ -27,11 +29,19 @@ export default function viteConfig(sourceDir) {
             'import.meta.env.CF_PAGES_COMMIT_SHA': `"${process.env.CF_PAGES_COMMIT_SHA}"` || '"synced"',
         },
         // @ts-ignore
-        plugins: [react(), tailwindcss()],
+        plugins: [
+            react(),
+            tailwindcss(),
+            sentryVitePlugin({
+                authToken: process.env.SENTRY_AUTH_TOKEN,
+                org: "yipnyap",
+                project: "packbase-browser",
+            })
+        ],
         build: {
             target: 'esnext',
             minify: 'esbuild',
-            sourcemap: false,
+            sourcemap: true,
             rollupOptions: {
                 output: {
                     manualChunks(id) {
