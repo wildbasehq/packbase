@@ -117,6 +117,10 @@ export default class PackMan {
                 data: {
                     tenant_id: pack.id,
                     user_id: owner_id,
+                    permissions: Object.values(PackMan.PERMISSIONS).reduce(
+                        (sum, perm) => sum | (perm as number),
+                        0,
+                    ),
                 },
             })
             log.info('PackMan.create: membership created', {packId: pack.id, membershipId: membership.id})
