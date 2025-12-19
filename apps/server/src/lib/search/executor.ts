@@ -12,6 +12,72 @@ const logPrisma = debug('vg:search:executor:prisma');
 const logPred = debug('vg:search:executor:predicate');
 
 /**
+ * Calculate complexity overhead based on total number of keys and array items in a where clause.
+ * Each key or array item adds 0.25 to the base cost of 1.
+ */
+const calculateComplexity = (where: any | null): number => {
+    if (!where) return 0;
+
+    console.log('Calculating complexity for where:', JSON.stringify(where));
+
+    let count = 0;
+    const traverse = (obj: any) => {
+        if (!obj) return;
+
+        if (Array.isArray(obj)) {
+            // Count array items
+            count += obj.length;
+            obj.forEach(traverse);
+        } else if (typeof obj === 'object') {
+            // Count object keys
+            const keys = Object.keys(obj);
+            count += keys.length;
+
+            // Recursively traverse nested objects/arrays
+            for (const key of keys) {
+                traverse(obj[key]);
+            }
+        } else if (typeof obj === 'string') {
+            console.log('Counting string length for complexity:', obj);
+            // Count string lengths with 0.25 weight per character
+            count += obj.length;
+        }
+    };
+
+    traverse(where);
+    return count;
+};
+
+/**
+ * Track a database query in the meter.
+ * Throws an error if the total cost exceeds 1,000.
+ */
+const trackQuery = (ctx: ExecutionContext, where: any | null, addModifier?: number) => {
+    const complexity = calculateComplexity(where);
+    let cost = 1 + complexity;
+    // Also get if looping
+    if (ctx.loop) {
+        cost *= 1 + ctx.loop.index;
+    }
+
+    // Get amount of variables in context
+    cost += Object.keys(ctx.variables).length;
+
+    ctx.meter.count++;
+    ctx.meter.cost += cost + (addModifier || 0);
+
+    if (logExec.enabled) {
+        logExec('trackQuery: count=%d complexity=%d cost=%d total=%d', ctx.meter.count, complexity, cost, ctx.meter.cost);
+    }
+
+    if (ctx.meter.cost > 1000) {
+        throw HTTPError.payloadTooLarge({
+            summary: 'Query too complex',
+        })
+    }
+};
+
+/**
  * Predicate used to filter in-memory result sets produced by Prisma queries.
  */
 type Predicate = (record: Record<string, any>) => boolean;
@@ -232,7 +298,7 @@ const collectRelationNodes = (expr: ExpressionNode, acc: WhereNode[] = []): Wher
  * Attempt to translate an expression tree into a Prisma `where` object for pushdown filtering.
  * Only supports simple basic atoms on a single column; falls back to in-memory filtering otherwise.
  */
-const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
+const buildPrismaWhere = (expr: ExpressionNode, ctx: ExecutionContext, table?: string): any | null => {
     if (logPrisma.enabled) {
         logPrisma('buildPrismaWhere table=%s op=%s', table ?? '<unknown>', expr.op);
     }
@@ -240,54 +306,78 @@ const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
         case 'ATOM': {
             const where = expr.where;
             if (where.kind !== 'basic') return null;
-            if (!where.selector.columns || where.selector.columns.length !== 1) return null;
-            const column = where.selector.columns[0];
+            if (!where.selector.columns || where.selector.columns.length === 0) {
+                return null
+            }
+
+            const columns = where.selector.columns;
             const value = where.value;
-            const columnMeta = table ? getColumn(table, column) : undefined;
-            const columnType = columnMeta?.type;
 
-            if (logPrisma.enabled) {
-                logPrisma('ATOM where pushdown attempt table=%s column=%s type=%s valueType=%s', table, column, columnType, value.type);
-            }
+            // Helper function to build a condition for a single column
+            const buildColumnCondition = (column: string): any | null => {
+                const columnMeta = table ? getColumn(table, column) : undefined;
+                const columnType = columnMeta?.type;
 
-            if (value.type === 'string') {
-                // Check if string looks like UUID
-                if (columnType === 'string' && value.value.length === 36 && value.value.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)) {
-                    return {[column]: value.value};
+                if (logPrisma.enabled) {
+                    logPrisma('ATOM where pushdown attempt table=%s column=%s type=%s valueType=%s', table, column, columnType, value.type);
                 }
 
-                if (!value.prefix && !value.suffix && ['number', 'bigint', 'boolean', 'date'].includes(columnType || '')) {
-                    return {[column]: value.value};
+                if (value.type === 'string') {
+                    // Check if string looks like UUID
+                    if (columnType === 'string' && value.value.length === 36 && value.value.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)) {
+                        return {[column]: value.value};
+                    }
+
+                    if (!value.prefix && !value.suffix && ['number', 'bigint', 'boolean', 'date'].includes(columnType || '')) {
+                        return {[column]: value.value};
+                    }
+
+                    // Only use text operators on string columns; otherwise fall back to exact match when possible.
+                    if (columnType === 'string') {
+                        const mode = value.caseSensitive ? undefined : 'insensitive';
+                        if (value.prefix) return {[column]: {startsWith: value.value, mode}};
+                        if (value.suffix) return {[column]: {endsWith: value.value, mode}};
+                        return {[column]: {contains: value.value, mode}};
+                    }
+
+                    return null;
                 }
 
-                // Only use text operators on string columns; otherwise fall back to exact match when possible.
-                if (columnType === 'string') {
-                    const mode = value.caseSensitive ? undefined : 'insensitive';
-                    if (value.prefix) return {[column]: {startsWith: value.value, mode}};
-                    if (value.suffix) return {[column]: {endsWith: value.value, mode}};
-                    return {[column]: {contains: value.value, mode}};
+                if (value.type === 'date') {
+                    // Only build date filters for date columns
+                    if (columnType !== 'date') return null;
+
+                    const filters: Record<string, any> = {};
+                    if (value.value.from) filters.gte = new Date(value.value.from).toISOString();
+                    if (value.value.to) filters.lte = new Date(value.value.to).toISOString();
+                    if (Object.keys(filters).length) return {[column]: filters};
+                    return null;
                 }
 
+                // Other value types (variable, empty, not_empty) not pushed down
+                return null;
+            };
+
+            // Build conditions for all columns
+            const columnConditions = columns
+                .map(buildColumnCondition)
+                .filter((cond): cond is NonNullable<typeof cond> => cond !== null);
+
+            if (columnConditions.length === 0) {
                 return null;
             }
 
-            if (value.type === 'date') {
-                // Only build date filters for date columns
-                if (columnType !== 'date') return null;
-
-                const filters: Record<string, any> = {};
-                if (value.value.from) filters.gte = new Date(value.value.from).toISOString();
-                if (value.value.to) filters.lte = new Date(value.value.to).toISOString();
-                if (Object.keys(filters).length) return {[column]: filters};
-                return null;
+            // If only one column condition, return it directly
+            if (columnConditions.length === 1) {
+                return columnConditions[0];
             }
 
-            // Other value types (variable, empty, not_empty) not pushed down
-            return null;
+            // If multiple columns, combine them with OR
+            return {OR: columnConditions};
         }
         case 'AND': {
-            const left = buildPrismaWhere(expr.left, table);
-            const right = buildPrismaWhere(expr.right, table);
+            const left = buildPrismaWhere(expr.left, ctx, table);
+            const right = buildPrismaWhere(expr.right, ctx, table);
             if (logPrisma.enabled) {
                 logPrisma('AND pushdown left=%s right=%s', !!left, !!right);
             }
@@ -295,8 +385,8 @@ const buildPrismaWhere = (expr: ExpressionNode, table?: string): any | null => {
             return null;
         }
         case 'OR': {
-            const left = buildPrismaWhere(expr.left, table);
-            const right = buildPrismaWhere(expr.right, table);
+            const left = buildPrismaWhere(expr.left, ctx, table);
+            const right = buildPrismaWhere(expr.right, ctx, table);
             if (logPrisma.enabled) {
                 logPrisma('OR pushdown left=%s right=%s', !!left, !!right);
             }
@@ -325,7 +415,7 @@ const findRelationMeta = (from: string, to: string, direction: 'forward' | 'back
  * For each relation node, pre-compute a predicate that validates if a row participates in the relation.
  * Fetches related rows once using the keys present in the current result set, then caches lookups.
  */
-const buildRelationResolvers = async (relations: WhereNode[], rows: any[]) => {
+const buildRelationResolvers = async (relations: WhereNode[], rows: any[], ctx: ExecutionContext) => {
     const checks = new WeakMap<WhereNode, (record: Record<string, any>) => boolean>();
     if (logExec.enabled) {
         logExec('buildRelationResolvers: relations=%d rows=%d', relations.length, rows.length);
@@ -367,8 +457,12 @@ const buildRelationResolvers = async (relations: WhereNode[], rows: any[]) => {
 
         const whereClauses = uniqueTuples.map((vals) => Object.fromEntries(targetFields.map((f, idx) => [f, vals[idx]])));
 
+        // Track this relation query in the meter
+        const relationWhere = {OR: whereClauses};
+        trackQuery(ctx, relationWhere);
+
         const targetRows = await (prisma as any)[targetTable].findMany({
-            where: {OR: whereClauses},
+            where: relationWhere,
             select: Object.fromEntries(targetFields.map((f) => [f, true])),
         });
 
@@ -465,7 +559,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     // Select only required columns to reduce payload
     const select = Object.fromEntries(Array.from(neededColumns).map((c) => [c, true]));
 
-    const prismaWhere = buildPrismaWhere(expr, table);
+    const prismaWhere = buildPrismaWhere(expr, ctx, table);
     if (logPrisma.enabled) {
         logPrisma('Prisma findMany table=%s selectKeys=%o where=%o', table, Object.keys(select), prismaWhere);
     }
@@ -485,7 +579,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     const take = 'take' in stmt ? resolveNum(stmt.take) : undefined;
 
     // Fetch one extra row to check if there are more results
-    const fetchTake = take !== undefined ? take + 1 : undefined;
+    const fetchTake = take !== undefined ? take + 1 : 100;
 
     // Check if table has a created_at column and add orderBy if it exists
     const schema = Schemas[table];
@@ -496,6 +590,15 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         logPrisma('Prisma findMany table=%s orderBy=%o', table, orderBy);
     }
 
+    // Track this query in the meter
+    trackQuery(ctx, {
+        ...prismaWhere,
+        select,
+        orderBy,
+        skip,
+        take: fetchTake
+    }, skip * 0.25);
+
     const rows = await (prisma as any)[table].findMany({
         select,
         where: prismaWhere ?? undefined,
@@ -503,6 +606,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         skip,
         take: fetchTake
     });
+
     if (logPrisma.enabled) {
         logPrisma('Prisma findMany table=%s rows=%d', table, rows.length);
     }
@@ -517,7 +621,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         if (logExec.enabled) {
             logExec('runStatement building relation resolvers for %d relations', relationNodes.length);
         }
-        ctx.relationChecks = await buildRelationResolvers(relationNodes, actualRows);
+        ctx.relationChecks = await buildRelationResolvers(relationNodes, actualRows, ctx);
     }
 
     // Format the filtered rows into the requested projection/aggregation shape
@@ -637,7 +741,11 @@ export const executeQuery = async (statements: Statement[]) => {
     }
 
     return withQueryCache(key, async () => {
-        const ctx: ExecutionContext = {schemas: {}, variables: {}};
+        const ctx: ExecutionContext = {
+            schemas: {},
+            variables: {},
+            meter: {count: 0, cost: 0}
+        };
         const results: any[] = [];
         for (const stmt of statements) {
             try {
@@ -733,7 +841,11 @@ export const executeQuery = async (statements: Statement[]) => {
         }
 
         const returnObj: any = {
-            variables: ctx.variables
+            variables: ctx.variables,
+            meter: {
+                count: ctx.meter.count,
+                cost: ctx.meter.cost
+            }
         };
 
         for (const res of results) {

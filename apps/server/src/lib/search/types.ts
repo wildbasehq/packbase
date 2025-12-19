@@ -75,6 +75,12 @@ export type VariableValue = {
     table?: string;
 };
 
+/** Query meter to track database query complexity. */
+export type QueryMeter = {
+    count: number;
+    cost: number;
+};
+
 /** Execution-time context passed through predicate/build phases. */
 export type ExecutionContext = {
     schemas: Record<string, TableSchema>;
@@ -82,6 +88,7 @@ export type ExecutionContext = {
     allowedTables?: string[];
     relationChecks?: WeakMap<WhereNode, (record: Record<string, any>) => boolean>;
     loop?: { variable: string; value: any; index: number };
+    meter: QueryMeter;
 };
 
 /** Parsed search query consisting of one or more statements. */

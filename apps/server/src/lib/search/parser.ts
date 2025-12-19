@@ -1,6 +1,6 @@
 import debug from 'debug';
 import {Aggregation, ColumnSelector, ExpressionNode, ParsedQuery, QueryValue, Statement, WhereNode} from './types';
-import {isValidTable} from './schema';
+import {isValidTable, Schemas} from './schema';
 
 const logParser = debug('vg:search:parser');
 const logValue = debug('vg:search:parser:value');
@@ -404,7 +404,15 @@ const parseColumnSelector = (segment: string): ColumnSelector => {
     if (!match) throw new Error(`Invalid Where clause: ${segment}`);
     const table = match[1];
     if (!isValidTable(table)) throw new Error(`Unknown table: ${table}`);
-    const cols = match[2]?.split(',').map((c) => c.trim()).filter(Boolean);
+    let cols = match[2]?.split(',').map((c) => c.trim()).filter(Boolean);
+    if (!cols?.length) {
+        // Force all string columns if empty after filtering from schema
+        cols = Schemas[table]
+            ? Object.keys(Schemas[table].columns).filter(colName =>
+                Schemas[table].columns[colName].type === 'string' && !Schemas[table].columns[colName].isID
+            )
+            : [];
+    }
     const selector: ColumnSelector = {table, columns: cols?.length ? cols : undefined};
     if (logWhere.enabled) {
         logWhere('parseColumnSelector table=%s columns=%o', selector.table, selector.columns ?? '*');
