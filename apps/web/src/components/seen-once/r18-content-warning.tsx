@@ -42,12 +42,7 @@ export default function R18ContentWarning() {
     const handleDecline = () => {
         setIsOpen(false)
         // Redirect to a safe page or homepage
-        // Try going back in history first
-        if (window.history.length > 1) {
-            window.history.back()
-        } else {
-            window.location.href = '/'
-        }
+        window.location.href = '/'
     }
 
     return (
