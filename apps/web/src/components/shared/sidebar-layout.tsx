@@ -133,7 +133,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                         <Activity mode={isVisible(shouldSeePackTour)}>
                             {/* Floating callout for Packs feature */}
                             <div className="pointer-events-none fixed inset-0 z-51 flex items-start justify-start">
-                                <div className="relative mt-16 ml-6 max-w-sm pointer-events-auto">
+                                <div className="relative mt-16 ml-3 max-w-sm pointer-events-auto">
                                     {/* Pointer triangle */}
                                     <div className="absolute -top-2.5 -z-1 left-8">
                                         <div
@@ -145,7 +145,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
 
                                     {/* Card */}
                                     <Alert
-                                        className="rounded-lg border bg-sidebar p-4 shadow-xl">
+                                        className="rounded-2xl border bg-sidebar p-4 shadow-xl">
                                         <AlertTitle>Packs live up here!</AlertTitle>
                                         <AlertDescription className="text-muted-foreground">
                                             All your packs, pack creation, settings, and other pack-specific actions
@@ -379,7 +379,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     }}
                     whileHover={isWHOpen ? 'interactEntry' : undefined}
                     onClick={() => isWHOpen && setIsWHOpen(false)}
-                    className={cn(isWHOpen && '*:pointer-events-none!', 'relative flex overflow-hidden grow m-1 lg:rounded-xl lg:bg-white lg:border-[0.1rem] ring-default lg:shadow-xs dark:lg:bg-n-8')}
+                    className={cn(isWHOpen && '*:pointer-events-none!', 'relative flex overflow-hidden grow m-1 lg:rounded-3xl lg:bg-white lg:border-[0.1rem] ring-default lg:shadow-xs dark:lg:bg-n-8')}
                 >
                     {/* Sidebar on mobile */}
                     <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>

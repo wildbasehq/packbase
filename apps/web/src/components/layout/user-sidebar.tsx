@@ -107,7 +107,7 @@ export default function UserSidebar() {
                             defaultIndex={0}
                             suffix={<UserActionsContainer/>}
                             className="h-full"
-                            contentClassName="relative pt-8 bg-white border-[0.1rem] shadow-xs dark:bg-n-8 rounded-tr rounded-b-xl flex flex-col overflow-y-auto px-4 pb-8 h-full"
+                            contentClassName="relative pt-8 bg-white border-[0.1rem] shadow-xs dark:bg-n-8 rounded-tr rounded-b-3xl flex flex-col overflow-y-auto px-4 pb-8 h-full"
                             headerClassName="rounded-tr rounded-out-lt-3xl"
                         >
                             <Tab title="People" icon={UserMultipleAccounts}>
