@@ -3,6 +3,7 @@ import {t} from 'elysia';
 import requiresToken from '@/utils/identity/requires-token';
 import prisma from '@/db/prisma';
 import requiresAccount from "@/utils/identity/requires-account";
+import {HTTPError} from "@/lib/HTTPError";
 
 // Shared types
 export const FolderSchema = t.Object({
@@ -62,16 +63,29 @@ export default (app: YapockType) =>
             '',
             async ({set, user, body}) => {
                 requiresToken({set, user});
-                const payload = body as Partial<Folder> & { name: string; mode: 'dynamic' | 'manual' };
+                const payload = body as Partial<Folder> & { name: string; };
 
                 if (!payload.name) {
-                    set.status = 400;
-                    return {error: 'Missing required fields: name, mode'};
+                    throw HTTPError.badRequest({
+                        summary: 'Folder name is required.'
+                    })
                 }
 
                 if (!payload.query) {
-                    set.status = 400;
-                    return {error: 'Folders require a query'};
+                    throw HTTPError.badRequest({
+                        summary: 'Dynamic folders require a query to be set.'
+                    })
+                }
+
+                // Count existing folders
+                const existingCount = await prisma.folders.count({
+                    where: {user_id: user.sub},
+                });
+
+                if (existingCount >= 25) {
+                    throw HTTPError.forbidden({
+                        summary: 'Folder limit reached, delete existing folders to continue.'
+                    })
                 }
 
                 const created = await prisma.folders.create({

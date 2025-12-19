@@ -131,7 +131,7 @@ export default function UserFolders({user: folderUser}: { user: { id: string; us
         <div className="space-y-3">
             <div className="flex items-center justify-between">
                 <Heading size="sm">Folders</Heading>
-                <Activity mode={isVisible(folderUser.id === user?.id)}>
+                <Activity mode={isVisible(folderUser.id === user?.id && folders.length < 25)}>
                     <Button plain onClick={() => show(<FolderForm onCancel={() => hide()} onSave={onCreate}/>)}>
                         <PlusIcon className="h-4 w-4 mr-1"/> New
                     </Button>

@@ -70,7 +70,7 @@ const trackQuery = (ctx: ExecutionContext, where: any | null, addModifier?: numb
         logExec('trackQuery: count=%d complexity=%d cost=%d total=%d', ctx.meter.count, complexity, cost, ctx.meter.cost);
     }
 
-    if (ctx.meter.cost > 1000) {
+    if (ctx.meter.cost > 1024) {
         throw HTTPError.payloadTooLarge({
             summary: 'Query too complex',
         })
