@@ -2,8 +2,7 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {FormEvent, useEffect, useState} from 'react'
-import {LoadingCircle} from '@/components/icons'
+import React, {FormEvent, useCallback, useEffect, useState} from 'react'
 import {Heading, Text} from '@/components/shared/text'
 import {Button, Desktop, Textarea} from '@/components/shared'
 import {vg} from '@/lib/api'
@@ -20,6 +19,7 @@ import {Separator} from '@radix-ui/react-dropdown-menu'
 import Markdown from '@/components/shared/markdown.tsx'
 import {ExclamationDiamondIcon} from "@/components/icons/plump/exclamation-diamond.tsx";
 import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
+import {LoadingSpinner} from "@/src/components";
 
 // Types
 type PrivacyOption = {
@@ -150,7 +150,7 @@ export function CreatePackModal({close, onCreate}: {
                         </div>
                         <div>
                             <Heading size="sm">Tips</Heading>
-                            <Text as="div" alt className="!leading-6 mt-1">
+                            <Text as="div" alt className="leading-6! mt-1">
                                 <ul className="list-disc list-inside">
                                     <li>The call sign must be unique, but the name can be anything.</li>
                                     <li>After creation, don't forget to add an icon and banner image!</li>
@@ -197,7 +197,7 @@ export function CreatePackModal({close, onCreate}: {
                             Now a call sign
                         </Label>
                     </div>
-                    <Description className="!text-xs">
+                    <Description className="text-xs!">
                         Used to quickly get to your pack via URL, and optionally show as a flair on profiles.
                         <br/>
                         <br/>
@@ -233,16 +233,27 @@ function SearchablePackList() {
     const [packs, setPacks] = useState<Pack[]>([])
     const [packsHidden, setPacksHidden] = useState<number>(0)
     const [isLoading, setIsLoading] = useState(true)
-    const [searchQuery, setSearchQuery] = useState('')
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         const fetchPacks = async () => {
+            setIsLoading(true)
+            setError(null)
+
             try {
                 const {data} = await vg.packs.get()
-                setPacks(data?.packs)
-                setPacksHidden(data?.hidden || 0)
-            } catch (error) {
-                toast.error('Failed to fetch packs')
+
+                if (data) {
+                    setPacks(data.packs || [])
+                    setPacksHidden(data.hidden || 0)
+                } else {
+                    setPacks([])
+                }
+            } catch (err) {
+                const errorMessage = 'Failed to load packs. Please try again.'
+                setError(errorMessage)
+                toast.error(errorMessage)
+                console.error('Error fetching packs:', err)
             } finally {
                 setIsLoading(false)
             }
@@ -251,59 +262,98 @@ function SearchablePackList() {
         fetchPacks()
     }, [])
 
-    const filteredPacks = packs.filter(
-        pack =>
-            pack.display_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (pack.description && pack.description.toLowerCase().includes(searchQuery.toLowerCase()))
-    )
+    const handleSearchClick = useCallback(() => {
+        PackbaseInstance.emit('search-open', {
+            searchQuery: '#'
+        })
+    }, [])
 
-    return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <Heading size="lg">Discover Packs</Heading>
-                    {packsHidden > 0 && (
-                        <Text size="sm" alt>
-                            {packsHidden} pack{packsHidden !== 1 ? 's' : ''} already joined
-                        </Text>
-                    )}
-                </div>
-
-                <div className="relative w-full sm:w-64">
-                    <button
-                        className="flex w-full items-center border bg-muted rounded py-1 px-2 gap-2 hover:bg-muted/80 hover:ring-1 ring-default transition-shadow"
-                        aria-label="Search Packs"
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => PackbaseInstance.emit('search-open', {
-                            searchQuery: '#'
-                        })}
-                    >
-                        <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" aria-hidden="true"/>
-                        <Text alt>
-                            Search Packs...
-                        </Text>
-                    </button>
+    // Loading state
+    if (isLoading) {
+        return (
+            <div className="space-y-6">
+                <PackListHeader packsHidden={packsHidden} onSearchClick={handleSearchClick}/>
+                <div className="flex justify-center py-12">
+                    <LoadingSpinner/>
                 </div>
             </div>
+        )
+    }
 
-            {isLoading ? (
-                <div className="flex justify-center py-12">
-                    <LoadingCircle className="h-5 w-5"/>
-                </div>
-            ) : filteredPacks.length > 0 ? (
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {filteredPacks.map(pack => (
-                        <PackCard key={pack.id} pack={pack}/>
-                    ))}
-                </div>
-            ) : (
+    // Error state
+    if (error) {
+        return (
+            <div className="space-y-6">
+                <PackListHeader packsHidden={packsHidden} onSearchClick={handleSearchClick}/>
                 <div className="text-center py-16">
-                    <Text alt>
-                        {searchQuery ? `No packs matching "${searchQuery}"` : 'No packs available. Be the first to create one!'}
+                    <Text alt className="text-red-500">
+                        {error}
                     </Text>
                 </div>
-            )}
+            </div>
+        )
+    }
+
+    // Empty state
+    if (packs.length === 0) {
+        return (
+            <div className="space-y-6">
+                <PackListHeader packsHidden={packsHidden} onSearchClick={handleSearchClick}/>
+                <div className="text-center py-16">
+                    <Text alt>
+                        No packs available. Be the first to create one!
+                    </Text>
+                </div>
+            </div>
+        )
+    }
+
+    // Success state with packs
+    return (
+        <div className="space-y-6">
+            <PackListHeader packsHidden={packsHidden} onSearchClick={handleSearchClick}/>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {packs.map(pack => (
+                    <PackCard key={pack.id} pack={pack}/>
+                ))}
+            </div>
+        </div>
+    )
+}
+
+/**
+ * PackListHeader - Header component with title and search button
+ */
+function PackListHeader({
+                            packsHidden,
+                            onSearchClick
+                        }: {
+    packsHidden: number
+    onSearchClick: () => void
+}) {
+    return (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <Heading size="lg">Discover Packs</Heading>
+                {packsHidden > 0 && (
+                    <Text size="sm" alt>
+                        {packsHidden} pack{packsHidden === 1 ? '' : 's'} already joined
+                    </Text>
+                )}
+            </div>
+
+            <div className="relative w-full sm:w-64">
+                <button
+                    className="flex w-full items-center border bg-muted rounded py-1 px-2 gap-2 hover:bg-muted/80 hover:ring-1 ring-default transition-shadow"
+                    aria-label="Search Packs"
+                    onClick={onSearchClick}
+                >
+                    <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground" aria-hidden="true"/>
+                    <Text alt>
+                        Search Packs...
+                    </Text>
+                </button>
+            </div>
         </div>
     )
 }
