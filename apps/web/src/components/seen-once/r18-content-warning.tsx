@@ -40,7 +40,7 @@ export default function R18ContentWarning() {
     }
 
     const handleDecline = () => {
-        setIsOpen(false)
+        // setIsOpen(false)
         // Redirect to a safe page or homepage
         window.location.href = '/'
     }
