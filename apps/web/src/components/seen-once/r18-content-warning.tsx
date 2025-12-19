@@ -11,14 +11,17 @@ import {useLocalStorage} from "usehooks-ts";
 export default function R18ContentWarning() {
     const [isOpen, setIsOpen] = useState(false)
     const [doNotAskAgain, setDoNotAskAgain] = useLocalStorage<boolean>('r18-content-opt-in', false)
+    const [tags, setTags] = useState<string[]>([])
 
     useEffect(() => {
         // Listen for age verification request event
-        const unsubscribe = PackbaseInstance.on('request-r18-confirmation', () => {
+        const unsubscribe = PackbaseInstance.on('request-r18-confirmation', (event) => {
             // Only show modal if user hasn't already verified their age
             if (!doNotAskAgain) {
                 setIsOpen(true)
             }
+
+            setTags(event.data?.r18_tags || [])
         })
 
         // Cleanup listener on unmount
@@ -49,19 +52,36 @@ export default function R18ContentWarning() {
                 onClose={() => {
                 }} // Prevent closing without a choice
                 size="md"
-                aria-labelledby="age-verification-title"
-                aria-describedby="age-verification-description"
+                aria-labelledby="r18-confirmation-title"
+                aria-describedby="r18-confirmation-description"
                 blurBackground
             >
                 <div className="p-6">
-                    <DialogTitle id="age-verification-title">
+                    <DialogTitle id="r18-confirmation-title">
                         Profile contains R18 Content
                     </DialogTitle>
                     <DialogBody>
-                        <DialogDescription id="age-verification-description">
+                        <DialogDescription id="r18-confirmation-description">
                             Confirm that you'd like to see content intended for adults only (18+).
                             <br/><br/>
-
+                            {tags.length > 0 && (
+                                <>
+                                    This profile has been tagged with the following adult content warnings:
+                                    <ul className="list-disc list-inside mt-2">
+                                        {/* Show only 5. If more, display a count after */}
+                                        {tags.slice(0, 5).map((tag) => (
+                                            <li key={tag}>
+                                                {tag}
+                                            </li>
+                                        ))}
+                                        {tags.length > 5 && (
+                                            <li className="italic text-sm">
+                                                and {tags.length - 5} more...
+                                            </li>
+                                        )}
+                                    </ul>
+                                </>
+                            )}
                         </DialogDescription>
                     </DialogBody>
                     <DialogActions>

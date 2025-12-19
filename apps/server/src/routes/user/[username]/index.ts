@@ -161,6 +161,28 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
         data.badge = userBadges.item_id;
     }
 
+    if (data.is_r18) {
+        // Get unique adult content tags from their posts
+        const adultTags = await prisma.posts.findMany({
+            where: {
+                user_id: data.id,
+                tags: {
+                    hasSome: ['rating_suggestive', 'rating_explicit'],
+                },
+            },
+            select: {
+                tags: true,
+            },
+        });
+
+        const uniqueTags = new Set<string>();
+        adultTags.forEach((post) => {
+            post.tags.forEach(tag => uniqueTags.add(tag))
+        });
+
+        data.r18_tags = Array.from(uniqueTags);
+    }
+
     posthog.capture({
         distinctId,
         event: 'Viewed User',

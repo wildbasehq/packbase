@@ -18,7 +18,9 @@ export default function UserLayout({children}: { children: ReactNode }) {
     useEffect(() => {
         // if user.is_r18 is true, ask for verification
         if (user?.is_r18) {
-            PackbaseInstance.emit('request-r18-confirmation', {})
+            PackbaseInstance.emit('request-r18-confirmation', {
+                r18_tags: user.r18_tags || []
+            })
         }
     }, [user, isLoading]);
 
