@@ -226,7 +226,7 @@ function ThreadPostReplyForm({value, isSubmitting, disabled, onChange, onSubmit}
                     <div className="h-7 w-7 rounded-full bg-muted"/>
                 </div>
                 <div
-                    className="flex-1 rounded-2xl border px-3 py-1 text-sm shadow-sm transition focus-within:border-indigo-400 focus-within:bg-white focus-within:shadow-md dark:focus-within:border-indigo-400">
+                    className="flex-1 rounded-2xl border px-3 py-1 text-sm shadow-sm transition focus-within:border-indigo-400 focus-within:shadow-md dark:focus-within:border-indigo-400">
                     <textarea
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
