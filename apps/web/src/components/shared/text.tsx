@@ -17,7 +17,7 @@ export type TextSize = keyof typeof textSize
 export function Heading({
                             as,
                             children,
-                            size = 'md',
+                            size = 'lg',
                             alt,
                             ...props
                         }: {

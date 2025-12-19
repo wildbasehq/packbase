@@ -9,6 +9,9 @@ import {Navbar, NavbarDivider, NavbarItem, NavbarLabel, NavbarSection, NavbarSpa
 import UserSidebar from '@/components/layout/user-sidebar.tsx'
 import {useSidebar} from '@/lib/context/sidebar-context'
 import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
     Badge,
     Button,
     Desktop,
@@ -16,7 +19,6 @@ import {
     DropdownButton,
     DropdownItem,
     DropdownMenu,
-    Heading,
     Logo,
     Sidebar,
     SidebarBody,
@@ -36,7 +38,6 @@ import ResizablePanel from '@/components/shared/resizable'
 import {News} from '../ui/sidebar-news'
 import {useLocation} from "wouter";
 import {useLocalStorage} from "usehooks-ts";
-import {Text} from "@/components/shared/text.tsx";
 import UserDropdown from "@/components/layout/user-dropdown";
 import {AlignLeft} from "@/components/icons/plump/AlignLeft.tsx";
 import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
@@ -122,37 +123,47 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     const {currentResource} = useResourceStore()
     const {show} = useModal()
 
+    const shouldSeePackTour = user && !user?.requires_setup && !seenPackTour
+
     return (
         <div className="flex min-h-svh h-screen w-full relative bg-muted">
             <div className="relative isolate flex min-h-svh h-screen w-full flex-col bg-muted">
                 <SignedIn>
-                    <Activity mode={isVisible(!seenPackTour)}>
-                        {/* Floating callout for Packs feature */}
-                        <div className="pointer-events-none fixed inset-0 z-50 flex items-start justify-start">
-                            <div className="relative mt-16 ml-6 max-w-sm pointer-events-auto">
-                                {/* Pointer triangle */}
-                                <div
-                                    className="absolute -top-2 left-8 h-0 w-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white dark:border-b-zinc-900"/>
-
-                                {/* Card */}
-                                <div
-                                    className="rounded-lg border bg-card p-4 shadow-xl">
-                                    <Heading>Packs live up here!</Heading>
-                                    <Text>
-                                        All your packs, pack creation, settings, and other pack-specific actions have
-                                        moved
-                                        into
-                                        the header.
-                                    </Text>
-                                    <div className="mt-3 flex gap-2">
-                                        <Button onClick={() => setSeenPackTour(true)}>
-                                            Got it
-                                        </Button>
+                    <Desktop>
+                        <Activity mode={isVisible(shouldSeePackTour)}>
+                            {/* Floating callout for Packs feature */}
+                            <div className="pointer-events-none fixed inset-0 z-51 flex items-start justify-start">
+                                <div className="relative mt-16 ml-6 max-w-sm pointer-events-auto">
+                                    {/* Pointer triangle */}
+                                    <div className="absolute -top-2.5 -z-1 left-8">
+                                        <div
+                                            className="relative h-0 w-0 border-l-8 border-r-8 border-b-12 border-l-transparent border-r-transparent border-b-border">
+                                            <div
+                                                className="absolute -left-[7px] top-[1px] h-0 w-0 border-l-[7px] border-r-[7px] border-b-[10.5px] border-l-transparent border-r-transparent border-muted"/>
+                                        </div>
                                     </div>
+
+                                    {/* Card */}
+                                    <Alert
+                                        className="rounded-lg border bg-sidebar p-4 shadow-xl">
+                                        <AlertTitle>Packs live up here!</AlertTitle>
+                                        <AlertDescription className="text-muted-foreground">
+                                            All your packs, pack creation, settings, and other pack-specific actions
+                                            have
+                                            moved
+                                            into
+                                            the header.
+                                        </AlertDescription>
+                                        <div className="mt-3 flex gap-2">
+                                            <Button onClick={() => setSeenPackTour(true)}>
+                                                Got it
+                                            </Button>
+                                        </div>
+                                    </Alert>
                                 </div>
                             </div>
-                        </div>
-                    </Activity>
+                        </Activity>
+                    </Desktop>
                 </SignedIn>
 
                 {/* Content */}
@@ -181,9 +192,13 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     <Navbar className="z-10">
                         <Activity mode={isVisible(((isSignedIn && !user?.requires_setup) || !isSignedIn))}>
                             <NavbarItem
-                                className="flex w-full md:w-2xs h-8 *:w-full"
+                                className={cn(
+                                    "flex rounded w-full md:w-2xs h-8 *:w-full",
+                                    shouldSeePackTour && 'md:animate-shadow-pulse'
+                                )}
                                 onClick={() => {
                                     if (!isSignedIn) return
+                                    if (!seenPackTour) setSeenPackTour(true)
                                     setIsWHOpen(!isWHOpen)
                                 }}
                             >
@@ -314,9 +329,10 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
 
                         <SignedOut>
                             <NavbarDivider/>
-                            <NavbarItem href="/id/login" current={location.startsWith('/id/login')} aria-label="Login">
+                            <Button href="/id/login" aria-label="Login">
                                 <TbFaceId data-slot="icon"/>
-                            </NavbarItem>
+                                Login
+                            </Button>
                         </SignedOut>
                         <SignedIn>
                             <Desktop>

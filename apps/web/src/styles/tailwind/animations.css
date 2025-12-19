@@ -38,6 +38,7 @@
     --animate-gradient-move-x-half: gradient-move-x-half 2s linear infinite;
     --animate-aurora: aurora 8s ease-in-out infinite alternate;
     --animate-scale-in: scale-in 0.25s ease-in-out;
+    --animate-shadow-pulse: shadow-pulse 2s ease-in-out infinite;
 }
 
 /* Animation keyframes */
@@ -215,6 +216,15 @@
     }
 }
 
+@keyframes shadow-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 var(--ring), 0 0 0 2px var(--ring);
+    }
+    50% {
+        box-shadow: 0 0 0 4px var(--ring), 0 0 0 8px transparent;
+    }
+}
+
 /* Animation utility classes */
 @utility animate-fade-up {
     animation: var(--animate-fade-up);
@@ -267,3 +277,4 @@
     animation: gradient-move-x-half var(--duration-1000);
     animation-iteration-count: 1;
 }
+
