@@ -10,7 +10,7 @@
 - Packbase DX
     - Cost: $5/month
     - Features:
-        - Extended RSS `extended_rss`
+        - Extended Search `extended_search`
         - Supporter Badge `supporter_badge`
         - 50GB Storage `50gb_storage`
         - Howl Backgrounds `howl_backgrounds`

@@ -22,7 +22,7 @@ export default (app: YapockType) =>
                 });
             }
 
-            const postLimit = await checkUserBillingPermission(profile.owner_id, 'extended_rss') ? 100 : 5;
+            const postLimit = await checkUserBillingPermission(profile.owner_id, 'extended_search') ? 100 : 5;
             const posts = await prisma.posts.findMany({
                 where: {
                     user_id: profile.id,
