@@ -754,7 +754,7 @@ export default function GuestLanding() {
                 <Hero/>
                 <FeaturePromiseGrid/>
                 <PackShowcase/>
-                <MigrationSection/>
+                {/*<MigrationSection/>*/}
             </div>
 
             {/* Minimal footer */}
