@@ -93,17 +93,15 @@ export const SidebarItem = forwardRef(function SidebarItem(
         // Avatar
         '*:data-[slot=avatar]:-m-0.5 *:data-[slot=avatar]:size-7 *:data-[slot=avatar]:[--ring-opacity:10%] sm:*:data-[slot=avatar]:size-6',
         // Hover
-        'data-hover:bg-n-2/25 data-hover:*:data-[slot=icon]:fill-n-9 data-hover:ring-2 ring-default transition-all',
+        'data-hover:bg-muted/50 data-hover:*:data-[slot=icon]:fill-n-9 data-hover:ring-2 ring-default transition-all data-hover:transition-shadow',
         // Active
-        'data-active:bg-n-2/25 data-active:*:data-[slot=icon]:fill-n-9',
+        'data-active:bg-muted/50 data-active:*:data-[slot=icon]:fill-n-9',
         // Current - added shadow-inner for subtle inner shadow when current
-        'data-current:shadow-inner data-current:bg-n-1/25 data-current:*:data-[slot=icon]:fill-n-9 dark:shadow-n-9 data-current:dark:bg-n-8',
-        // Same with hover
-        'data-hover:shadow-inner dark:shadow-n-9',
+        'data-current:shadow-inner data-current:*:data-[slot=icon]:fill-n-9 dark:shadow-n-9',
         // Dark mode
         'dark:text-white dark:*:data-[slot=icon]:fill-n-4',
-        'dark:data-hover:bg-n-6/50 dark:data-hover:*:data-[slot=icon]:fill-white',
-        'dark:data-active:bg-n-6/50 dark:data-active:*:data-[slot=icon]:fill-white',
+        'dark:data-hover:*:data-[slot=icon]:fill-white',
+        'dark:data-active:*:data-[slot=icon]:fill-white',
         'dark:data-current:*:data-[slot=icon]:fill-white'
     )
 
