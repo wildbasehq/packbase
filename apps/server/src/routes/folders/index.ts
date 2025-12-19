@@ -82,7 +82,7 @@ export default (app: YapockType) =>
                     where: {user_id: user.sub},
                 });
 
-                if (existingCount >= 25) {
+                if (existingCount >= 10) {
                     throw HTTPError.forbidden({
                         summary: 'Folder limit reached, delete existing folders to continue.'
                     })
