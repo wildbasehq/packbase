@@ -3,7 +3,7 @@
  */
 
 import {isVisible} from "@/lib";
-import {Activity, StrictMode} from 'react'
+import React, {Activity, StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import App from './App.tsx'
 import MaintenancePage from './_maintenance.tsx'
@@ -13,6 +13,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ConfidentialOverlay} from "@/components/shared/confidential-overlay.tsx";
 import ErrorBoundary from "@/components/ui/error.tsx";
 import * as Sentry from "@sentry/react";
+import R18ContentWarning from "@/components/seen-once/r18-content-warning.tsx";
 
 Sentry.init({
     dsn: "https://e8e3f611b91d18bfe786729b71514d2c@o275804.ingest.us.sentry.io/4510555338637312",
@@ -62,6 +63,8 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <ErrorBoundary>
+            <R18ContentWarning/>
+
             <ClerkProvider
                 publishableKey={PUBLISHABLE_KEY}
                 afterSignOutUrl="/"
