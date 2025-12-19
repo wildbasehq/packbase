@@ -379,7 +379,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     }}
                     whileHover={isWHOpen ? 'interactEntry' : undefined}
                     onClick={() => isWHOpen && setIsWHOpen(false)}
-                    className={cn(isWHOpen && '*:pointer-events-none!', 'relative flex overflow-hidden grow m-1 lg:rounded-3xl lg:bg-white lg:border-[0.1rem] ring-default lg:shadow-xs dark:lg:bg-n-8')}
+                    className={cn(isWHOpen && '*:pointer-events-none!', 'relative flex overflow-hidden grow m-1 lg:rounded-2xl lg:bg-white lg:border-[0.1rem] ring-default lg:shadow-xs dark:lg:bg-n-8')}
                 >
                     {/* Sidebar on mobile */}
                     <MobileSidebar open={showSidebar} close={() => setShowSidebar(false)}>
