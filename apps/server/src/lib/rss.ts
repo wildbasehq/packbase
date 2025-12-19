@@ -45,7 +45,7 @@ export class RSSGenerator {
         });
 
         for (const post of posts) {
-            const postUrl = `${baseUrl}/p/${post.pack_slug || 'universe'}/${post.id}`;
+            const postUrl = `${baseUrl}/p/${post.pack_slug || 'universe'}/${post.channel_id || 'all'}/${post.id}`;
 
             // Prepare description/content
             let description = post.body || '';

@@ -39,6 +39,7 @@ export default (app: YapockType) =>
                     content_type: true,
                     assets: true,
                     tenant_id: true,
+                    channel_id: true,
                 },
             });
 
