@@ -6,6 +6,7 @@ export interface RSSPost extends Partial<posts> {
     created_at: Date;
     body: string | null;
     content_type: string;
+    pack_slug?: string | null;
 }
 
 export interface RSSProfile extends Partial<profiles> {
@@ -44,7 +45,7 @@ export class RSSGenerator {
         });
 
         for (const post of posts) {
-            const postUrl = `${baseUrl}/howl/${post.id}`;
+            const postUrl = `${baseUrl}/p/${post.pack_slug || 'universe'}/${post.id}`;
 
             // Prepare description/content
             let description = post.body || '';

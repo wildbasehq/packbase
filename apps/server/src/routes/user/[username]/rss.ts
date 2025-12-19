@@ -38,12 +38,24 @@ export default (app: YapockType) =>
                     body: true,
                     content_type: true,
                     assets: true,
+                    tenant_id: true,
                 },
             });
 
             // Get base URL from request
             const url = new URL(request.url);
-            const baseUrl = `${url.protocol}//${url.host}`;
+            const baseUrl = `${url.protocol}//packbase.app`;
+
+            // tenant_id to pack slug mapping
+            for (const post of posts) {
+                if (post.tenant_id) {
+                    const pack = await prisma.packs.findUnique({
+                        where: {id: post.tenant_id},
+                        select: {slug: true},
+                    });
+                    (post as any).pack_slug = pack?.slug || null;
+                }
+            }
 
             // Generate RSS feed
             const rssXml = RSSGenerator.generateUserFeed(
