@@ -32,7 +32,7 @@ function FolderForm({
     const [name, setName] = useState(initial?.name || '')
     const [description, setDescription] = useState(initial?.description || '')
     const [emoji, setEmoji] = useState(initial?.emoji || '📁')
-    const [query, setQuery] = useState(initial?.query || '')
+    const [query, setQuery] = useState((initial?.query?.match(/\[Where posts:tags \((.*?)\) AND posts:user_id \(".*?"\)\] AS \*/)?.[1] || '').trim().replaceAll("\"", "").replaceAll("~", "") || '')
 
     const canSave = useMemo(() => {
         if (!name.trim()) return false
@@ -79,12 +79,7 @@ function FolderForm({
             <div className="space-y-2">
                 <Text size="sm" className="font-medium">Search Query</Text>
                 <TagsInput
-                    value={
-                        // This could be better...
-                        query?.startsWith('[Where')
-                            ? (query.match(/\[Where posts:tags \((.*?)\) AND posts:user_id \(".*?"\)\]/)?.[1] || '').trim().replaceAll("\"", "")
-                            : query
-                    }
+                    value={query}
                     onChange={setQuery}/>
                 <Text size="xs" alt>
                     Search query is used to populate the folder. Howls must have all tags in the query.
@@ -125,7 +120,7 @@ export default function UserFolders({user: folderUser}: { user: { id: string; us
 
     const onCreate = async (input: Partial<Folder>) => {
         if (input.query && !input.query.startsWith('[')) {
-            input.query = `[Where posts:tags (${input.query}) AND posts:user_id ("${folderUser.id}")]`
+            input.query = `$posts = [Where posts:tags (${queryBuildFromRaw(input.query)}) AND posts:user_id ("${folderUser.id}")] AS *;\n$posts:user = [Where profiles ("${folderUser.id}")] AS *;`
         }
 
         await createMutation.mutateAsync(input)
@@ -169,7 +164,7 @@ function Folder({folder, user, refetch}: {
 
     const onUpdate = async (input: Partial<Folder>) => {
         if (input.query && !input.query.startsWith('[')) {
-            input.query = `[Where posts:tags (${queryBuildFromRaw(input.query)}) AND posts:user_id ("${user.id}")]`
+            input.query = `$posts = [Where posts:tags (${queryBuildFromRaw(input.query)}) AND posts:user_id ("${user.id}")] AS *;\n$posts:user = [Where profiles:id ("${user.id}")] AS *;`
         }
 
         await updateMutation.mutateAsync(input)

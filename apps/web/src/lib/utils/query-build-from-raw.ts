@@ -17,7 +17,7 @@ export function queryBuildFromRaw(query: string): string {
                         .trim()
                         .split(/\s+/)
                         .forEach((w) => {
-                            if (w.length > 0) parts.push(`"${w}"`);
+                            if (w.length > 0) parts.push(`"~${w}"`);
                         });
                 }
                 current = '"';
@@ -38,7 +38,7 @@ export function queryBuildFromRaw(query: string): string {
                     .trim()
                     .split(/\s+/)
                     .forEach((w) => {
-                        if (w.length > 0) parts.push(`"${w}"`);
+                        if (w.length > 0) parts.push(`"~${w}"`);
                     });
                 current = "";
             }
@@ -57,7 +57,7 @@ export function queryBuildFromRaw(query: string): string {
                 .trim()
                 .split(/\s+/)
                 .forEach((w) => {
-                    if (w.length > 0) parts.push(`"${w}"`);
+                    if (w.length > 0) parts.push(`"~${w}"`);
                 });
         }
     }

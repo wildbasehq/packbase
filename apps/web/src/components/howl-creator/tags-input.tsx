@@ -4,7 +4,7 @@
 
 // src/components/howl-creator/tags-input.tsx
 import {Activity, useEffect, useRef, useState} from 'react'
-import {Textarea} from '@/src/components'
+import {InputFieldClasses, Textarea} from '@/src/components'
 import {QuestionMarkCircleIcon} from '@heroicons/react/20/solid'
 import {cn, isVisible, vg} from '@/src/lib'
 import Tooltip from '@/components/shared/tooltip.tsx'
@@ -347,13 +347,13 @@ export function TagsInput({
 
             <Activity mode={isVisible(!usePlainEditor)}>
                 <div
-                    className="flex flex-wrap gap-2 p-2 border rounded-xl min-h-[2.5rem] items-center relative bg-transparent">
+                    className={cn("flex! flex-wrap gap-2 p-2 border rounded-xl min-h-[2.5rem] items-center relative", InputFieldClasses)}>
                     <Activity mode={isVisible(!!forcedTag)}>
                         <Tooltip content={(
                             <div className="flex flex-col gap-1">
                                 <span>System tags are required to ensure content safety and moderation.</span>
                                 <button
-                                    className="cursor-pointer text-xs text-left !text-muted-foreground"
+                                    className="cursor-pointer text-xs text-left text-muted-foreground!"
                                 >
                                     System tags directly affect your howl's visibility. Learn More &rarr;
                                 </button>
@@ -403,7 +403,7 @@ export function TagsInput({
                                     <div className="flex flex-col gap-1">
                                         <span>System doesn't know what {tag} is. It'll be queued for moderation.</span>
                                         <button
-                                            className="cursor-pointer text-xs text-left !text-muted-foreground"
+                                            className="cursor-pointer text-xs text-left text-muted-foreground!"
                                         >
                                             Learn More &rarr;
                                         </button>
@@ -414,7 +414,7 @@ export function TagsInput({
                                                     const newTags = tagsArray.map(t => t === tag ? suggestion : t).join(', ')
                                                     onChange(newTags)
                                                 }}
-                                                className="cursor-pointer text-xs text-left !text-muted-foreground"
+                                                className="cursor-pointer text-xs text-left text-muted-foreground!"
                                             >
                                                 Did you mean {suggestion}?
                                             </button>
@@ -463,7 +463,7 @@ export function TagsInput({
                 </div>
             </Activity>
 
-            <Button plain className="h-6 !px-2 !py-1 rounded-sm !text-xs !text-muted-foreground"
+            <Button plain className="h-6 px-2! py-1! rounded-sm text-xs! text-muted-foreground!"
                     onClick={() => setUsePlainEditor(!usePlainEditor)}>
                 Switch to {usePlainEditor ? 'Rich Editor' : 'Plain Editor'} &rarr;
             </Button>
