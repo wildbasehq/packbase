@@ -1,6 +1,6 @@
-import { test, expect, mock, describe, beforeEach } from 'bun:test';
-import { parseQuery } from '../src/lib/search/parser';
-import { executeQuery } from '../src/lib/search/executor';
+import {beforeEach, describe, expect, mock, test} from 'bun:test';
+import {parseQuery} from '../src/lib/search/parser';
+import {executeQuery} from '../src/lib/search/executor';
 
 // Mock prisma
 const mockFindMany = mock(() => Promise.resolve([]));
@@ -20,20 +20,23 @@ mock.module('@/db/prisma', () => ({
 // Mock schema
 mock.module('@/lib/search/schema', () => ({
     isValidTable: (t: string) => ['user', 'post'].includes(t),
-    getColumn: (t: string, c: string) => ({ type: 'string', name: c }),
-    getDefaultIdColumn: () => ({ name: 'id' }),
+    getColumn: (t: string, c: string) => ({type: 'string', name: c}),
+    getDefaultIdColumn: () => ({name: 'id'}),
     Schemas: {
-        user: { columns: { id: {}, name: {} } },
-        post: { columns: { id: {}, title: {} } }
+        user: {columns: {id: {}, name: {}}},
+        post: {columns: {id: {}, title: {}}}
     },
     Relations: []
 }));
 
 // Mock whitelist
 mock.module('@/lib/search/whitelist', () => ({
-    ensureTableWhitelisted: () => { },
-    ensureColumnsWhitelisted: () => { },
-    ensureAllColumnsAllowed: () => { }
+    ensureTableWhitelisted: () => {
+    },
+    ensureColumnsWhitelisted: () => {
+    },
+    ensureAllColumnsAllowed: () => {
+    }
 }));
 
 // Mock cache
@@ -74,6 +77,7 @@ describe('Search Pagination', () => {
         await executeQuery(parsed.statements);
 
         expect(mockFindMany).toHaveBeenCalled();
+        // @ts-ignore
         const args = mockFindMany.mock.calls[0]?.[0] as any;
         expect(args).toBeDefined();
         expect(args.skip).toBe(10);
@@ -94,6 +98,7 @@ describe('Search Pagination', () => {
 
         // First query: user count
         // Second query: post with skip=3
+        // @ts-ignore
         const args = mockFindMany.mock.calls[1]?.[0] as any;
         if (!args) throw new Error('Second call missing');
         console.log('Args:', args);

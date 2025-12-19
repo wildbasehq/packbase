@@ -3,10 +3,18 @@ import prisma from '@/db/prisma';
 import trinketManager, {toParentId} from '../../lib/trinket-manager';
 import {NotificationManager} from '../../lib/NotificationManager';
 import Debug from 'debug';
+import {SignedInAuthObject} from "@clerk/backend/internal";
 
 const log = {
     info: Debug('vg:verify-token'),
     error: Debug('vg:verify-token:error'),
+};
+
+type AuthUser = SignedInAuthObject & {
+    sub?: string;
+    sessionClaims: {
+        nickname?: string;
+    }
 };
 
 // queue
@@ -102,15 +110,15 @@ export default async function verifyToken(req: any) {
     }
 }
 
-async function verifyTokenProcess(req: any) {
-    let user;
+async function verifyTokenProcess(req: any): Promise<AuthUser> {
+    let user: AuthUser | undefined;
     try {
         const shadowReq = req.clone();
         const authReq = await clerkClient.authenticateRequest(shadowReq, {
             authorizedParties
         });
 
-        if (authReq.isSignedIn) {
+        if (authReq.isAuthenticated) {
             user = authReq.toAuth();
             if (!user.userId) {
                 log.info('No user ID in auth response');
