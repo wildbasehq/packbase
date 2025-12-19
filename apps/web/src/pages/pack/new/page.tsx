@@ -397,24 +397,27 @@ export default function PackAdd() {
 
     return (
         <div className="px-6 py-8 max-w-screen-xl mx-auto space-y-12">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8 p-6">
-                <div className="max-w-md">
-                    <Heading>Find yo' pack</Heading>
-                    <Text alt className="mt-2">
-                        Join packs that match your vibe or start your own lil community to find your people. Packs are
-                        public, open, weird,
-                        and (hopefully) fun~
-                    </Text>
-                    <div className="mt-6">
-                        <Button onClick={handleCreatePack} color="indigo">
-                            Create a Pack
-                        </Button>
+            {!user?.requires_setup && (
+                <div className="flex flex-col md:flex-row items-center justify-between gap-8 p-6">
+                    <div className="max-w-md">
+                        <Heading>Find 'yo pack</Heading>
+                        <Text alt className="mt-2">
+                            Join packs that match your vibe or start your own lil community to find your people. Packs
+                            are
+                            public, open, weird,
+                            and (hopefully) fun~
+                        </Text>
+                        <div className="mt-6">
+                            <Button onClick={handleCreatePack} color="indigo">
+                                Create a Pack
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="w-full max-w-lg">
+                        <Rive src="/img/rive/pack-bench.riv" stateMachines="Animation" className="w-full h-[18rem]"/>
                     </div>
                 </div>
-                <div className="w-full max-w-lg">
-                    <Rive src="/img/rive/pack-bench.riv" stateMachines="Animation" className="w-full h-[18rem]"/>
-                </div>
-            </div>
+            )}
 
             {user?.requires_setup && (
                 <div className="p-4 bg-muted border border-amber-500 rounded-lg">
