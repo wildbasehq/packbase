@@ -181,6 +181,7 @@ model profiles {
   post_privacy  String    @default("everyone")
   invited_by    String?   @db.Uuid
   show_nsfw     Boolean   @default(false)
+  is_r18        Boolean   @default(false)
   owner_id      String
   last_online   DateTime?
   default_pack  String?   @db.Uuid
@@ -485,7 +486,7 @@ model admin_audit_log {
   model_id     String
   model_object Json
   created_at   DateTime @default(now()) @db.Timestamptz(6)
-  
+
   @@schema("public")
 }
 

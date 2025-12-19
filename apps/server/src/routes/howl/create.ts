@@ -103,14 +103,20 @@ export default (app: YapockType) =>
                 tags: sanitisedTags,
             });
 
-            console.log('dbCreate', dbCreate);
-
             let data;
             try {
                 data = await prisma.posts.create({data: dbCreate});
             } catch (error) {
                 set.status = 400;
                 throw HTTPError.fromError(error);
+            }
+
+            // Set profile r18 status if necessary
+            if (sanitisedTags.includes('rating_suggestive') || sanitisedTags.includes('rating_explicit')) {
+                await prisma.profiles.update({
+                    where: {id: user.sub},
+                    data: {is_r18: true},
+                });
             }
 
             clearQueryCache(`~${dbCreate.tenant_id}`)

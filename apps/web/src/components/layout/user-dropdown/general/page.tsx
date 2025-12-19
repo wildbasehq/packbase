@@ -127,9 +127,10 @@ const ProfileSettingsComponent: React.FC = ({noHeader}: { noHeader?: boolean }) 
                             This marks your profile as R18 and applies some exposure limits to accounts that have
                             opted out of R18 content. This is automatically enabled when you post your first R18
                             howl and cannot be disabled until all R18 content has been removed from your profile.
+                            <br/><br/>
+                            Set this by posting R18 content; it cannot be changed manually.
                         </Description>
-                        <Switch name="is_r18" defaultChecked={isAdultRestricted} disabled={canChangeAdultRestricted}
-                                onChange={() => setHasChanges(true)}/>
+                        <Switch name="is_r18" defaultChecked={isAdultRestricted} disabled/>
                     </SwitchField>
                 </SwitchGroup>
 

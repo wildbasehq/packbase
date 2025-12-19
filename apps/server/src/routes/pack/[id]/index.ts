@@ -251,6 +251,7 @@ export async function getPack(id: string, scope?: string, userId?: string) {
                                 body: {
                                     not: null,
                                 },
+                                channel_id: page.id,
                                 created_at: {gte: yesterdayISOString}, // Use ISO string format for date comparison
                             },
                             orderBy: {
