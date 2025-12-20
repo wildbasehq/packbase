@@ -19,6 +19,7 @@ import {
     DropdownButton,
     DropdownItem,
     DropdownMenu,
+    FloatingCallout,
     Logo,
     Sidebar,
     SidebarBody,
@@ -134,37 +135,18 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                 <SignedIn>
                     <Desktop>
                         <Activity mode={isVisible(shouldSeePackTour)}>
-                            {/* Floating callout for Packs feature */}
-                            <div className="pointer-events-none fixed inset-0 z-51 flex items-start justify-start">
-                                <div className="relative mt-16 ml-3 max-w-sm pointer-events-auto">
-                                    {/* Pointer triangle */}
-                                    <div className="absolute -top-2.5 -z-1 left-8">
-                                        <div
-                                            className="relative h-0 w-0 border-l-8 border-r-8 border-b-12 border-l-transparent border-r-transparent border-b-border">
-                                            <div
-                                                className="absolute -left-[7px] top-[1px] h-0 w-0 border-l-[7px] border-r-[7px] border-b-[10.5px] border-l-transparent border-r-transparent border-muted"/>
-                                        </div>
+                            <FloatingCallout open={shouldSeePackTour}>
+                                <Alert className="rounded-2xl border bg-sidebar p-4 shadow-xl">
+                                    <AlertTitle>Packs live up here!</AlertTitle>
+                                    <AlertDescription className="text-muted-foreground">
+                                        All your packs, pack creation, settings, and other pack-specific actions have
+                                        moved into the header.
+                                    </AlertDescription>
+                                    <div className="mt-3 flex gap-2">
+                                        <Button onClick={() => setSeenPackTour(true)}>Got it</Button>
                                     </div>
-
-                                    {/* Card */}
-                                    <Alert
-                                        className="rounded-2xl border bg-sidebar p-4 shadow-xl">
-                                        <AlertTitle>Packs live up here!</AlertTitle>
-                                        <AlertDescription className="text-muted-foreground">
-                                            All your packs, pack creation, settings, and other pack-specific actions
-                                            have
-                                            moved
-                                            into
-                                            the header.
-                                        </AlertDescription>
-                                        <div className="mt-3 flex gap-2">
-                                            <Button onClick={() => setSeenPackTour(true)}>
-                                                Got it
-                                            </Button>
-                                        </div>
-                                    </Alert>
-                                </div>
-                            </div>
+                                </Alert>
+                            </FloatingCallout>
                         </Activity>
                     </Desktop>
                 </SignedIn>
@@ -255,6 +237,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                             <SignedIn>
                                 <Dropdown>
                                     <DropdownButton as={NavbarItem} aria-label="More options"
+                                                    id="pack-options-trigger"
                                                     className={shouldSeePackOptionsTour && 'rounded md:animate-shadow-pulse'}
                                                     onClick={() => {
                                                         if (!seenPackOptionsTour) setSeenPackOptionsTour(true)
@@ -265,35 +248,24 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                     <PackSettingsDropdown show={show}/>
                                 </Dropdown>
 
-                                {shouldSeePackOptionsTour && (
-                                    <div
-                                        className="pointer-events-none fixed inset-0 z-51 left-36 flex items-start">
-                                        <div className="relative mt-16 max-w-sm pointer-events-auto">
-                                            {/* Pointer triangle */}
-                                            <div className="absolute -top-2.5 -z-1 left-1/2 -translate-x-1/2">
-                                                <div
-                                                    className="relative h-0 w-0 border-l-8 border-r-8 border-b-12 border-l-transparent border-r-transparent border-b-border">
-                                                    <div
-                                                        className="absolute -left-[7px] top-[1px] h-0 w-0 border-l-[7px] border-r-[7px] border-b-[10.5px] border-l-transparent border-r-transparent border-muted"/>
-                                                </div>
+                                <Activity mode={isVisible(shouldSeePackOptionsTour)}>
+                                    <FloatingCallout
+                                        open={shouldSeePackOptionsTour}
+                                        trigger={document.getElementById('pack-options-trigger')}
+                                        anchorSide="bottom"
+                                        pointerAlign="center"
+                                    >
+                                        <Alert className="rounded-2xl border bg-sidebar p-4 shadow-xl">
+                                            <AlertTitle>Pack options are here!</AlertTitle>
+                                            <AlertDescription className="text-muted-foreground">
+                                                All pack-specific settings and actions can be found in this menu.
+                                            </AlertDescription>
+                                            <div className="mt-3 flex gap-2">
+                                                <Button onClick={() => setSeenPackOptionsTour(true)}>Got it</Button>
                                             </div>
-
-                                            {/* Card */}
-                                            <Alert
-                                                className="rounded-2xl border bg-sidebar p-4 shadow-xl">
-                                                <AlertTitle>Pack options are here!</AlertTitle>
-                                                <AlertDescription className="text-muted-foreground">
-                                                    All pack-specific settings and actions can be found in this menu.
-                                                </AlertDescription>
-                                                <div className="mt-3 flex gap-2">
-                                                    <Button onClick={() => setSeenPackOptionsTour(true)}>
-                                                        Got it
-                                                    </Button>
-                                                </div>
-                                            </Alert>
-                                        </div>
-                                    </div>
-                                )}
+                                        </Alert>
+                                    </FloatingCallout>
+                                </Activity>
                             </SignedIn>
 
                             <Desktop>
