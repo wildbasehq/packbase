@@ -59,7 +59,7 @@ interface ThreadPostHeaderProps {
 function ThreadPostHeader({post, isAuthor, onDelete}: ThreadPostHeaderProps) {
     return (
         <div
-            className="flex items-start justify-between px-4 pt-1 -mb-4 mr-4 bg-linear-to-b from-body to-neutral-100 dark:to-n-7 rounded-t h-12 bg-gradient-neutral-200 dark:bg-gradient-n-7">
+            className="flex items-start justify-between px-4 pt-1 -mb-4 mr-4 bg-linear-to-b from-body to-neutral-100 dark:to-n-7 rounded-t-xl h-12 bg-gradient-neutral-200 dark:bg-gradient-n-7">
             <div className="flex min-w-0 items-center gap-2">
                 {/* Name + badges */}
                 <UserInfoCol user={post.user} className="flex min-w-0 gap-0.5">
@@ -381,7 +381,7 @@ export default function ThreadPost({
             <div className="flex-1 min-w-0">
                 <ThreadPostHeader post={post} isAuthor={isAuthor} onDelete={onDelete}/>
                 <Card
-                    className={`relative group max-w-full! overflow-hidden rounded-2xl! border border-border/60 ${depthTintClass} transition-shadow hover:shadow-sm`}
+                    className={`relative group max-w-full! overflow-hidden rounded-xl! border border-border/60 ${depthTintClass} transition-shadow hover:shadow-sm`}
                 >
                     <div className={innerPaddingClass}>
                         {/* Unsavoury content notice */}
@@ -476,10 +476,10 @@ function ThreadComments({comments, handleNestedDelete}: {
     const {user: signedInUser} = useUserAccountStore()
 
     return (
-        <div className="flex flex-col bg-card ring ring-muted mx-4 rounded-b-2xl px-4 py-2 gap-2">
+        <div className="flex flex-col bg-card ring ring-muted mx-4 rounded-b-xl p-2 gap-2">
             {comments?.map((comment) => (
                 <>
-                    <div className="flex group px-2 py-1 gap-2 hover:bg-muted rounded-2xl" key={comment.id}>
+                    <div className="flex group px-2 py-1 gap-2 hover:bg-muted rounded-xl" key={comment.id}>
                         <UserAvatar size="sm" user={comment.user} className="mt-1.5 rounded-full!"/>
 
                         <div className="flex flex-col w-full">
