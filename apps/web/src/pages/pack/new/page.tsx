@@ -138,7 +138,7 @@ export function CreatePackModal({close, onCreate}: {
                             <div className="space-y-0.5">
                                 <Heading>{formData?.display_name || 'Pack Name'}</Heading>
                                 <Text
-                                    alt>{formData?.slug ? `@${formData.slug}` : 'Pack information will show here'}</Text>
+                                    alt>{formData?.slug ? `#${formData.slug}` : 'Pack information will show here'}</Text>
                             </div>
                         </div>
                         <Separator className="my-4"/>

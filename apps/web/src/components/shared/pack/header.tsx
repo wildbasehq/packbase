@@ -33,7 +33,7 @@ export default function PackHeader({...props}: any) {
                             <Heading>{pack.display_name || pack.slug}</Heading>
                             {/* Small @username */}
                             <div className="flex items-center">
-                                <Text alt>@{pack.slug}</Text>
+                                <Text alt>#{pack.slug}</Text>
                             </div>
                         </div>
                     </div>

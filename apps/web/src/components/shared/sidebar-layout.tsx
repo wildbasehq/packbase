@@ -219,7 +219,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                         </Activity>
 
                                         <Activity mode={isVisible(!currentResource?.ticker?.length)}>
-                                            @{currentResource?.slug || 'dummy'}
+                                            #{currentResource?.slug || 'dummy'}
                                         </Activity>
                                     </NavbarLabel>
                                 </div>

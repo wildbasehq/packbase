@@ -98,7 +98,7 @@ export default function PackSwitcher({onChange}: {
                             <div className="flex flex-col -space-y-1 w-full relative">
                                 <NavbarLabel>{pack?.display_name}</NavbarLabel>
                                 <NavbarLabel className="text-muted-foreground text-xs">
-                                    @{pack?.slug}
+                                    #{pack?.slug}
                                     {/*<TextTicker*/}
                                     {/*    texts={['Now in public alpha testing!', 'Invite Badge Event extended...', 'R18 content now allowed...', 'Click in for more...']}*/}
                                     {/*    interval={1500 + colIdx * Math.random() * 1000}/>*/}
