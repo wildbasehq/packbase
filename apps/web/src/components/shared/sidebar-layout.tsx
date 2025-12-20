@@ -248,24 +248,31 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                                     <PackSettingsDropdown show={show}/>
                                 </Dropdown>
 
-                                <Activity mode={isVisible(shouldSeePackOptionsTour)}>
-                                    <FloatingCallout
-                                        open={shouldSeePackOptionsTour}
-                                        trigger={document.getElementById('pack-options-trigger')}
-                                        anchorSide="bottom"
-                                        pointerAlign="center"
-                                    >
-                                        <Alert className="rounded-2xl border bg-sidebar p-4 shadow-xl">
-                                            <AlertTitle>Pack options are here!</AlertTitle>
-                                            <AlertDescription className="text-muted-foreground">
-                                                All pack-specific settings and actions can be found in this menu.
-                                            </AlertDescription>
-                                            <div className="mt-3 flex gap-2">
-                                                <Button onClick={() => setSeenPackOptionsTour(true)}>Got it</Button>
-                                            </div>
-                                        </Alert>
-                                    </FloatingCallout>
-                                </Activity>
+                                <SignedIn>
+                                    <Desktop>
+                                        <Activity mode={isVisible(shouldSeePackOptionsTour)}>
+                                            <FloatingCallout
+                                                open={shouldSeePackOptionsTour}
+                                                trigger={document.getElementById('pack-options-trigger')}
+                                                anchorSide="bottom"
+                                                pointerAlign="center"
+                                            >
+                                                <Alert className="rounded-2xl border bg-sidebar p-4 shadow-xl">
+                                                    <AlertTitle>Pack options are here!</AlertTitle>
+                                                    <AlertDescription className="text-muted-foreground">
+                                                        All pack-specific settings and actions can be found in this
+                                                        menu.
+                                                    </AlertDescription>
+                                                    <div className="mt-3 flex gap-2">
+                                                        <Button onClick={() => setSeenPackOptionsTour(true)}>Got
+                                                            it</Button>
+                                                    </div>
+                                                </Alert>
+                                            </FloatingCallout>
+                                        </Activity>
+
+                                    </Desktop>
+                                </SignedIn>
                             </SignedIn>
 
                             <Desktop>
