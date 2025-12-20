@@ -13,7 +13,7 @@ import PackCard from '@/components/shared/pack/card'
 import {useModal} from '@/components/modal/provider.tsx'
 import {Input} from '@/components/shared/input.tsx'
 import {Description, Field, Label} from '@/components/shared/fieldset.tsx'
-import Rive from '@rive-app/react-canvas'
+import {useRive} from '@rive-app/react-canvas'
 import {UserGroupIcon} from '@heroicons/react/20/solid'
 import {Separator} from '@radix-ui/react-dropdown-menu'
 import Markdown from '@/components/shared/markdown.tsx'
@@ -366,6 +366,12 @@ export default function PackAdd() {
     const {setCurrentResource} = useResourceStore()
     const {show, hide} = useModal()
 
+    const {RiveComponent} = useRive({
+        src: "/img/rive/pack-bench.riv",
+        stateMachines: "Animation",
+        autoplay: true
+    })
+
     document.title = 'Packbase • Discover Packs'
 
     useEffect(() => {
@@ -397,44 +403,53 @@ export default function PackAdd() {
 
     return (
         <div className="px-6 py-8 max-w-screen-xl mx-auto space-y-12">
-            {!user?.requires_setup && (
-                <div className="flex flex-col md:flex-row items-center justify-between gap-8 p-6">
-                    <div className="max-w-md">
-                        <Heading>Find 'yo pack</Heading>
-                        <Text alt className="mt-2">
-                            Join packs that match your vibe or start your own lil community to find your people. Packs
-                            are
-                            public, open, weird,
-                            and (hopefully) fun~
-                        </Text>
-                        <div className="mt-6">
-                            <Button onClick={handleCreatePack} color="indigo">
-                                Create a Pack
-                            </Button>
+            {user && (
+                <>
+                    {!user?.requires_setup && (
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-8 p-6">
+                            <div className="max-w-md">
+                                <Heading>Find 'yo pack</Heading>
+                                <Text alt className="mt-2">
+                                    Join packs that match your vibe or start your own lil community to find your people.
+                                    Packs
+                                    are
+                                    public, open, weird,
+                                    and (hopefully) fun~
+                                </Text>
+                                <div className="mt-6">
+                                    <Button onClick={handleCreatePack} color="indigo">
+                                        Create a Pack
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="w-full max-w-lg">
+                                <RiveComponent
+                                    className="w-full h-[18rem]"/>
+                            </div>
                         </div>
-                    </div>
-                    <div className="w-full max-w-lg">
-                        <Rive src="/img/rive/pack-bench.riv" stateMachines="Animation" className="w-full h-[18rem]"/>
-                    </div>
-                </div>
-            )}
+                    )}
 
-            {user?.requires_setup && (
-                <div className="p-4 bg-muted border border-amber-500 rounded-lg">
-                    <Heading size="xl" className="mb-2 items-center flex">
-                        <ExclamationDiamondIcon className="size-6 mr-2 text-yellow-500"
-                                                aria-hidden="true"/>
-                        Your first Pack will be your default!!
-                    </Heading>
-                    <Text>
-                        Since this is your first time on Packbase, the first Pack you create will be set as your
-                        Default Pack. You can change this later in your account settings.
-                        <br/><br/>
-                        Your "Default Pack" will be the one you see when going to your home page, and will be the Pack
-                        used for any actions that require a Pack context by default (i.e. Howling). Don't worry, you can
-                        always change your default Pack later, and can howl into any pack as long as you're a member!
-                    </Text>
-                </div>
+                    {user?.requires_setup && (
+                        <div className="p-4 bg-muted border border-amber-500 rounded-lg">
+                            <Heading size="xl" className="mb-2 items-center flex">
+                                <ExclamationDiamondIcon className="size-6 mr-2 text-yellow-500"
+                                                        aria-hidden="true"/>
+                                Your first Pack will be your default!!
+                            </Heading>
+                            <Text>
+                                Since this is your first time on Packbase, the first Pack you create will be set as your
+                                Default Pack. You can change this later in your account settings.
+                                <br/><br/>
+                                Your "Default Pack" will be the one you see when going to your home page, and will be
+                                the Pack
+                                used for any actions that require a Pack context by default (i.e. Howling). Don't worry,
+                                you can
+                                always change your default Pack later, and can howl into any pack as long as you're a
+                                member!
+                            </Text>
+                        </div>
+                    )}
+                </>
             )}
 
             <SearchablePackList/>
