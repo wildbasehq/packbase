@@ -40,10 +40,11 @@ function UserMenu() {
 
     return (
         <DropdownHeader className="flex w-96 flex-col p-0!">
-            <div className="h-fit w-full rounded-xl rounded-br bg-white/50 shadow-sm dark:bg-n-6/50">
-                <div className="p-2">
+            <div
+                className="h-fit w-full rounded-xl bg-muted border shadow-sm transition-all ring-default hover:bg-muted/50 hover:ring-2">
+                <div className="p-1">
                     <div
-                        className="ring-default flex items-center rounded px-4 py-4 transition-all hover:bg-muted hover:ring-2"
+                        className="flex items-center rounded-lg px-4 py-4"
                         onClick={() => show(<UserSettingsOption/>)}
                     >
                         <UserAvatar/>

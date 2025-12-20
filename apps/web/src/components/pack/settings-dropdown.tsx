@@ -8,13 +8,12 @@ import {
     Text
 } from "@/src/components";
 import {Cog6ToothIcon} from "@heroicons/react/20/solid";
-import {isVisible, useResourceStore, vg} from "@/lib";
+import {useResourceStore, vg} from "@/lib";
 import {
     hasPackAnyManagementPermissions,
     hasPackPermissionBit,
     PACK_PERMISSIONS
 } from "@/lib/utils/has-pack-permission-bit.ts";
-import {Activity} from "react";
 import LogoutIcon from "@/components/icons/logout.tsx";
 import {toast} from "sonner";
 
@@ -39,14 +38,16 @@ export default function PackSettingsDropdown({show}: {
 
             <DropdownDivider/>
 
-            <Activity mode={isVisible(hasPackAnyManagementPermissions(currentPermissions))}>
+            <DropdownItem className="hidden!"/>
+
+            {hasPackAnyManagementPermissions(currentPermissions) && (
                 <DropdownItem onClick={() => show(<ResourceSettingsModal/>)}>
                     <Cog6ToothIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
                     <SidebarLabel>Settings</SidebarLabel>
                 </DropdownItem>
-            </Activity>
+            )}
 
-            <Activity mode={isVisible(!hasPackPermissionBit(currentPermissions, PACK_PERMISSIONS.Owner))}>
+            {!hasPackPermissionBit(currentPermissions, PACK_PERMISSIONS.Owner) && (
                 <DropdownItem onClick={() => {
                     vg.pack({id: currentResource.id})
                         .join.delete()
@@ -60,7 +61,8 @@ export default function PackSettingsDropdown({show}: {
                     <LogoutIcon/>
                     <SidebarLabel>Leave Pack</SidebarLabel>
                 </DropdownItem>
-            </Activity>
+            )}
+
         </DropdownMenu>
     )
 }

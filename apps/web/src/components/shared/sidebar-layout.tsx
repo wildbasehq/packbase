@@ -117,13 +117,16 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
     const {sidebarContent} = useSidebar()
     const {isMobile} = useWindowSize()
     const [location] = useLocation()
+
     const [seenPackTour, setSeenPackTour] = useLocalStorage('seen-pack-tour', false)
+    const [seenPackOptionsTour, setSeenPackOptionsTour] = useLocalStorage('seen-pack-options-tour', false)
     const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
     const [isWHOpen, setIsWHOpen] = useLocalStorage<any>('wh-open', false)
     const {currentResource} = useResourceStore()
     const {show} = useModal()
 
     const shouldSeePackTour = user && !user?.requires_setup && !seenPackTour
+    const shouldSeePackOptionsTour = seenPackTour && !seenPackOptionsTour
 
     return (
         <div className="flex min-h-svh h-screen w-full relative bg-muted">
@@ -251,11 +254,46 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
 
                             <SignedIn>
                                 <Dropdown>
-                                    <DropdownButton as={NavbarItem} aria-label="More options">
+                                    <DropdownButton as={NavbarItem} aria-label="More options"
+                                                    className={shouldSeePackOptionsTour && 'rounded md:animate-shadow-pulse'}
+                                                    onClick={() => {
+                                                        if (!seenPackOptionsTour) setSeenPackOptionsTour(true)
+                                                    }}
+                                    >
                                         <EllipsisHorizontalIcon/>
                                     </DropdownButton>
                                     <PackSettingsDropdown show={show}/>
                                 </Dropdown>
+
+                                {shouldSeePackOptionsTour && (
+                                    <div
+                                        className="pointer-events-none fixed inset-0 z-51 left-36 flex items-start">
+                                        <div className="relative mt-16 max-w-sm pointer-events-auto">
+                                            {/* Pointer triangle */}
+                                            <div className="absolute -top-2.5 -z-1 left-1/2 -translate-x-1/2">
+                                                <div
+                                                    className="relative h-0 w-0 border-l-8 border-r-8 border-b-12 border-l-transparent border-r-transparent border-b-border">
+                                                    <div
+                                                        className="absolute -left-[7px] top-[1px] h-0 w-0 border-l-[7px] border-r-[7px] border-b-[10.5px] border-l-transparent border-r-transparent border-muted"/>
+                                                </div>
+                                            </div>
+
+                                            {/* Card */}
+                                            <Alert
+                                                className="rounded-2xl border bg-sidebar p-4 shadow-xl">
+                                                <AlertTitle>Pack options are here!</AlertTitle>
+                                                <AlertDescription className="text-muted-foreground">
+                                                    All pack-specific settings and actions can be found in this menu.
+                                                </AlertDescription>
+                                                <div className="mt-3 flex gap-2">
+                                                    <Button onClick={() => setSeenPackOptionsTour(true)}>
+                                                        Got it
+                                                    </Button>
+                                                </div>
+                                            </Alert>
+                                        </div>
+                                    </div>
+                                )}
                             </SignedIn>
 
                             <Desktop>

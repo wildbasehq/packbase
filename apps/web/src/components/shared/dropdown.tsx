@@ -44,7 +44,9 @@ export function DropdownMenu({
                     // Shadows
                     'shadow-lg ring-1 ring-n-8/10 dark:ring-inset dark:ring-white/10',
                     // Define grid at the menu level if subgrid is supported
-                    'supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_1fr_1.5rem_0.5rem_auto]'
+                    'supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_1fr_1.5rem_0.5rem_auto]',
+                    // First item has top rounding, last item has bottom rounding
+                    '[&>.cursor-default:first-of-type]:rounded-t-xl [&>.cursor-default:last-of-type]:rounded-b-xl',
                 )}
             />
         </Headless.Transition>
