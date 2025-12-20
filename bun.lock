@@ -22,7 +22,6 @@
         "@elysiajs/cors": "^1.2.0",
         "@elysiajs/swagger": "^1.1.5",
         "@faker-js/faker": "^10.1.0",
-        "@packbase/logseal": "workspace:*",
         "@prisma/client": "^6.4.1",
         "@supabase/ssr": "^0.1.0",
         "@supabase/supabase-js": "^2.49.1",
@@ -125,7 +124,6 @@
         "zustand": "^4.5.2",
       },
       "devDependencies": {
-        "@packbase/logseal": "workspace:*",
         "@packbase/viteconfig": "workspace:*",
         "@sentry/vite-plugin": "^4.6.1",
         "@tailwindcss/forms": "^0.5.3",
@@ -146,15 +144,6 @@
         "typescript": "^5.7.3",
         "unplugin-tailwindcss-mangle": "2.3.0",
         "vite": "^7.1.10",
-      },
-    },
-    "packages/logseal": {
-      "name": "@packbase/logseal",
-      "devDependencies": {
-        "@types/bun": "latest",
-      },
-      "peerDependencies": {
-        "typescript": "^5",
       },
     },
     "packages/viteconfig": {
@@ -480,8 +469,6 @@
     "@one-ini/wasm": ["@one-ini/wasm@0.1.1", "", {}, "sha512-XuySG1E38YScSJoMlqovLru4KTUNSjgVTIjyh7qMX6aNN5HY5Ct5LhRJdxO79JtTzKfzV/bnWpz+zquYrISsvw=="],
 
     "@opentelemetry/api": ["@opentelemetry/api@1.9.0", "", {}, "sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg=="],
-
-    "@packbase/logseal": ["@packbase/logseal@workspace:packages/logseal"],
 
     "@packbase/viteconfig": ["@packbase/viteconfig@workspace:packages/viteconfig"],
 
@@ -2158,8 +2145,6 @@
     "@isaacs/cliui/strip-ansi": ["strip-ansi@7.1.2", "", { "dependencies": { "ansi-regex": "^6.0.1" } }, "sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA=="],
 
     "@isaacs/cliui/wrap-ansi": ["wrap-ansi@8.1.0", "", { "dependencies": { "ansi-styles": "^6.1.0", "string-width": "^5.0.1", "strip-ansi": "^7.0.1" } }, "sha512-si7QWI6zUMq56bESFvagtmzMdGOtoxfR+Sez11Mobfc7tm+VkUckk9bW2UeffTGVUbOksxmSw0AA2gs8g71NCQ=="],
-
-    "@packbase/logseal/@types/bun": ["@types/bun@1.3.5", "", { "dependencies": { "bun-types": "1.3.5" } }, "sha512-RnygCqNrd3srIPEWBd5LFeUYG7plCoH2Yw9WaZGyNmdTEei+gWaHqydbaIRkIkcbXwhBT94q78QljxN0Sk838w=="],
 
     "@parcel/watcher/detect-libc": ["detect-libc@1.0.3", "", { "bin": { "detect-libc": "./bin/detect-libc.js" } }, "sha512-pGjwhsmsp4kL2RTz08wcOlGN83otlqHeD/Z5T8GXZB+/YcpQ/dgo+lbU8ZsGxV0HIvqqxo9l7mqYwyYMD9bKDg=="],
 
