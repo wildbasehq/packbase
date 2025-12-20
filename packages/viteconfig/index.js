@@ -44,35 +44,8 @@ export default function viteConfig(sourceDir) {
             sourcemap: false,
             rollupOptions: {
                 output: {
-                    manualChunks(id) {
-                        if (id.includes('node_modules')) {
-                            return 'vendor'
-                        }
-
-                        // Components
-                        if (id.includes('/src/components/')) {
-                            const componentPath = id.split('/src/components/')[1]
-                            const mainDir = componentPath.split('/')[0]
-                            return `component-${mainDir}`
-                        }
-
-                        // Source files
-                        if (id.includes('/src/')) {
-                            if (id.includes('/pages/')) {
-                                const pagePath = id.split('/pages/')[1]
-                                const pageSegment = pagePath.split('/')[0]
-                                return `page-${pageSegment}`
-                            }
-
-                            if (id.includes('/fonts/')) return 'fonts'
-                            if (id.includes('/images/')) return 'images'
-                            if (id.includes('/styles/')) return 'styles'
-
-                            // Main app files
-                            if (id.match(/\/src\/[^/]+\.tsx$/)) {
-                                return 'app'
-                            }
-                        }
+                    advancedChunks: {
+                        groups: [{name: 'vendor', test: /\/react(?:-dom)?/}]
                     },
 
                     chunkFileNames: 'assets/js/[name]-[hash].js',
@@ -85,7 +58,14 @@ export default function viteConfig(sourceDir) {
         },
 
         optimizeDeps: {
-            include: ['react', 'react-dom', 'react/jsx-runtime'],
+            include: [
+                'react',
+                'react-dom',
+                'react/jsx-runtime',
+                'react-dom/client',
+                'scheduler'
+            ],
+            exclude: ['@sentry/vite-plugin', '.bun', '.vite']
         },
 
         css: {

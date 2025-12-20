@@ -26,7 +26,7 @@ type AuthUser = SignedInAuthObject & {
  */
 const queue = new Set<string>();
 
-const authorizedParties = ['https://packbase.app', 'http://localhost:5173', 'http://localhost:8000', 'http://localhost:5933', 'http://localhost:5174', 'https://proto.packbase.app'];
+const authorizedParties = ['https://packbase.app', 'http://localhost:5173', 'http://localhost:4173', 'http://localhost:8000'];
 
 /**
  * Verifies a token and returns a user object
