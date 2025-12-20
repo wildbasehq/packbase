@@ -55,21 +55,36 @@ class Packbase {
     private dbPromise: Promise<IDBDatabase> | null = null
 
     constructor() {
-        this.log('Initializing Packbase v2')
+        console.log(
+            `%c      _
+__/\\_| |__   __ _ ___  ___
+\\    / '_ \\ / _\` / __|/ _ \\
+/_  _\\ |_) | (_| \\__ \\  __/
+  \\/ |_.__/ \\__,_|___/\\___|
+
+  (c) Wildbase 2025
+`,
+            'color: #ff6b35;'
+        )
+
+        console.log('')
+        console.log("Welcome. Don't run random scripts people send to you. That'd be fucking stupid as shit.")
+        console.log('')
+
         if (this.idbSupported) {
             this.openDB()
                 .then(() => this.restoreFromDB())
-                .then(() => this.log('IndexedDB state restored'))
-                .catch(err => console.warn('[Packbase] IndexedDB init failed:', err))
+                .then(() => this.log.info('IndexedDB state restored'))
+                .catch(err => this.log.warn('IndexedDB init failed:', err))
         } else {
-            this.log('IndexedDB not supported; running in memory-only mode')
+            this.log.info('IndexedDB not supported; running in memory-only mode')
         }
     }
 
     // ------------- Event API -------------
 
     on(eventName: string, callback: (data: PackbaseEventData) => void): () => void {
-        this.log(`on(): ${eventName}`)
+        this.log.info(`on(): ${eventName}`)
         if (!this.eventListeners.has(eventName)) {
             this.eventListeners.set(eventName, new Set())
         }
@@ -109,7 +124,7 @@ class Packbase {
                 try {
                     cb(eventData)
                 } catch (e) {
-                    console.error(`[Packbase] Error in listener for '${eventName}':`, e)
+                    this.log.error('Packbas SDK', `Error in listener for '${eventName}':`, e)
                 }
             }
         }
@@ -125,9 +140,9 @@ class Packbase {
 
         // Persist plugin and optionally functions (async, fire-and-forget)
         if (this.idbSupported) {
-            this.savePluginToDB(id, pluginInfo).catch(e => console.warn('[Packbase] Persist plugin failed:', e))
+            this.savePluginToDB(id, pluginInfo).catch(e => this.log.warn('Persist plugin failed:', e))
             if (functions) {
-                this.registerFunctions(id, functions).catch(e => console.warn('[Packbase] Persist functions failed:', e))
+                this.registerFunctions(id, functions).catch(e => this.log.warn('Persist functions failed:', e))
             }
         } else if (functions) {
             // Memory-only function registration
@@ -163,7 +178,7 @@ class Packbase {
                 await this.deletePluginFromDB(pluginId)
                 await this.deleteFunctionsForPluginFromDB(pluginId)
             } catch (e) {
-                console.warn('[Packbase] Unregister plugin DB cleanup failed:', e)
+                this.log.warn('Unregister plugin DB cleanup failed:', e)
             }
         }
 
@@ -310,14 +325,16 @@ class Packbase {
 
     // ------------- Utils (private) -------------
 
-    private log(...args: any[]) {
-        // eslint-disable-next-line no-console
-        console.debug('%c[Packbase SDK]', 'color:#059669;font-weight:bold;', ...args)
+    private log = {
+        debug: (msg: string, ...args: any[]) => log.debug('Packbase SDK', msg, ...args),
+        info: (msg: string, ...args: any[]) => log.info('Packbase SDK', msg, ...args),
+        warn: (msg: string, ...args: any[]) => log.warn('Packbase SDK', msg, ...args),
+        error: (msg: string, ...args: any[]) => log.error('Packbase SDK', msg, ...args),
     }
 
     private debugEvent(evt: PackbaseEventData) {
         // eslint-disable-next-line no-console
-        console.debug('[Packbase] Event emitted:', evt.type, evt)
+        this.log.debug('Event emitted:', evt.type, evt)
     }
 
     private generatePluginId(pluginInfo: PluginInfo): string {
@@ -346,7 +363,7 @@ class Packbase {
             if (typeof result === 'function') return result
             return null
         } catch (e) {
-            console.warn('[Packbase] Failed to deserialize function:', e)
+            this.log.warn('Failed to deserialize function:', e)
             return null
         }
     }

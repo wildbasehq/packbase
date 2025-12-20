@@ -208,7 +208,7 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
         const existingJob = state.jobs.get(id)
         if (existingJob) {
             if (!['completed', 'failed', 'cancelled'].includes(existingJob.status)) {
-                log.error('Worker', `Job ${id} already exists and is ${existingJob.status}`)
+                log.debug('Worker', `Job ${id} already exists and is ${existingJob.status}`)
                 return false
             }
             state.jobs.delete(id)
@@ -237,7 +237,7 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
             }
         }))
 
-        log.info('Worker', `Queued job ${id} with priority ${priority}`)
+        log.debug('Worker', `Queued job ${id} with priority ${priority}`)
         return true
     },
 
@@ -328,7 +328,7 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
                 }
             }))
 
-            log.info('Worker', `Cancelled job ${id}`)
+            log.debug('Worker', `Cancelled job ${id}`)
         }
     },
 
@@ -360,7 +360,7 @@ export const WorkerStore = create<WorkerState>((set, get) => ({
             }
         }))
 
-        log.info('Worker', `Requeued job ${id} for retry`)
+        log.debug('Worker', `Requeued job ${id} for retry`)
     },
 
     cleanup: () => {
@@ -416,7 +416,7 @@ function handleJobSuccess(id: string) {
         jobs: new Map(state.jobs).set(id, job)
     }))
 
-    log.info('Worker', `Job ${id} completed successfully`)
+    log.debug('Worker', `Job ${id} completed successfully`)
 }
 
 function handleJobFailure(id: string, error: Error) {

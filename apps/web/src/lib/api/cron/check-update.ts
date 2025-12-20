@@ -9,7 +9,7 @@ window.onload = () => {
 
     if (globalThis.check_update_cron) clearInterval(globalThis.check_update_cron)
     globalThis.check_update_cron = setInterval(async () => {
-        const c = import.meta.env.CF_PAGES_COMMIT_SHA
+        const c = import.meta.env.CF_COMMIT_SHA
         const response = await fetch(`${API_URL}/server/fwupd/check?c=${c}`)
         const {u, s} = await response.json()
 

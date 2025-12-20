@@ -26,7 +26,7 @@ export default function viteConfig(sourceDir) {
             },
         },
         define: {
-            'import.meta.env.CF_PAGES_COMMIT_SHA': `"${process.env.CF_PAGES_COMMIT_SHA}"` || '"synced"',
+            'import.meta.env.CF_COMMIT_SHA': `"${process.env.CF_COMMIT_SHA}"` || '"synced"',
         },
         // @ts-ignore
         plugins: [

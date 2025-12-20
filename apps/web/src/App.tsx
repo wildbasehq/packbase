@@ -10,7 +10,7 @@ import {AppTabs, FloatingCompose, LogoSpinner} from '@/src/components'
 import Body from '@/components/layout/body.tsx'
 import {ClerkFailed, ClerkLoaded, ClerkLoading, SignedIn} from '@clerk/clerk-react'
 import Preload from '@/src/preload.tsx'
-import {ProjectName, ProjectSafeName, resourceDefaultPackbase, useResourceStore} from '@/lib'
+import {resourceDefaultPackbase, useResourceStore} from '@/lib'
 import BrowserCheck from '@/components/modal/browser-check.tsx'
 import Routes from '@/src/Routes.tsx'
 import CommandPalette from '@/components/modal/command-palette.tsx'
@@ -34,40 +34,6 @@ function App() {
             setCurrentResource(resourceDefault || resourceDefaultPackbase)
         }
     }, [currentResource]);
-
-    useEffect(() => {
-        const styles = {
-            subtitle: 'color: #4a90e2; font-size: 14px; font-weight: bold;',
-            info: 'color: #666; font-size: 12px;',
-            accent: 'color: #ff6b35; font-weight: bold;',
-            success: 'color: #27ae60; font-weight: bold;',
-        }
-
-        console.log(
-            `%c      _
-__/\\_| |__   __ _ ___  ___
-\\    / '_ \\ / _\` / __|/ _ \\
-/_  _\\ |_) | (_| \\__ \\  __/
-  \\/ |_.__/ \\__,_|___/\\___|
-
-  (c) Wildbase 2025
-`,
-            'color: #ff6b35;'
-        )
-
-        console.log('')
-        console.log("Welcome. Don't run random scripts people send to you. That'd be fucking stupid as shit.")
-        console.log('')
-
-        console.log(`%cℹ️  ${ProjectName}:`, styles.accent)
-        console.log(`%c   • Framework: Vite, React ${React.version}`, styles.info)
-        console.log(`%c   • Language: TypeScript`, styles.info)
-        console.log(`%c   • Build: ${process.env.NODE_ENV || 'development'}`, styles.info)
-        console.log(`%c   • Advert. CN: ${ProjectSafeName}`, styles.info)
-        console.log('')
-
-        console.log('%c`base()`', 'color: #9b59b6; font-style: italic;')
-    }, [])
 
     return (
         <Providers>
