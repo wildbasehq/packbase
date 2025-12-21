@@ -601,7 +601,7 @@ function SkewedCardGridBackground({posts, exit}: {
 }) {
     return (
         <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background z-10"/>
+            <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-background z-10"/>
 
             <div
                 className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] flex flex-wrap gap-8 justify-center items-center content-center opacity-[0.25] transform -rotate-12">
