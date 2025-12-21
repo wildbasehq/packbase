@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from 'react'
-import {Button} from '@/components/shared'
+import {Button, Textarea} from '@/components/shared'
 
 interface MessageEditorProps {
     content: string
@@ -32,44 +32,29 @@ export function MessageEditor({content, onContentChange, onSave, onCancel, class
 
     return (
         <div className={`space-y-2 ${className || ''}`}>
-            <textarea
+            <Textarea
                 ref={textareaRef}
                 value={content}
                 onChange={e => onContentChange(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="
-                    w-full p-2 text-sm
-                    border border-border rounded-md
-                    resize-none
-                    focus:outline-none focus:ring-2 focus:ring-primary/50
-                    bg-background
-                    transition-all duration-150
-                "
-                rows={3}
+                rows={4}
                 placeholder="Edit message..."
             />
             <div className="flex gap-2 text-xs">
                 <Button
-                    color="indigo"
+                    outline
                     onClick={onSave}
-                    className="!px-3 !py-0.5 items-center justify-center flex !text-sm !font-medium"
-                    type="button"
+                    className="!px-3 py-0.5! items-center justify-center flex !text-sm !font-medium"
                 >
                     Save
                 </Button>
-                <button
+                <Button
+                    outline
                     onClick={onCancel}
-                    className="
-                        px-3 py-1.5
-                        bg-muted text-muted-foreground
-                        rounded-md
-                        hover:bg-muted/80
-                        transition-colors duration-150
-                    "
-                    type="button"
+                    className="px-3! py-0.5!"
                 >
                     Cancel
-                </button>
+                </Button>
                 <span className="text-muted-foreground ml-auto flex items-center">
                     <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px]">Esc</kbd> to cancel,
                     <kbd className="ml-1 px-1.5 py-0.5 bg-muted rounded text-[10px]">Ctrl+Enter</kbd> to save

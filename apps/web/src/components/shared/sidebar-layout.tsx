@@ -367,10 +367,6 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                     <WhatsHappeningDropdown close={() => setIsWHOpen(false)}/>
                 </Activity>
 
-                {/* Bottom gradient transparent to bg-card */}
-                <div
-                    className="absolute z-50 bottom-0 left-0 right-0 h-8 bg-linear-to-b from-transparent to-muted/50"/>
-
                 {/* Content */}
                 <motion.div
                     initial={true}
@@ -408,7 +404,8 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                         <SidebarContentContainer>{sidebarContent}</SidebarContentContainer>
                     )}
 
-                    <div className={`mx-auto h-full w-full overflow-y-auto ${isSignedIn ? 'max-w-6xl' : ''}`}>
+                    <div
+                        className={`mx-auto h-full w-full overflow-y-auto ${(isSignedIn && !location.includes('/c/')) ? 'max-w-6xl' : ''}`}>
                         {children}
                     </div>
                 </motion.div>
