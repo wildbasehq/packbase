@@ -9,6 +9,7 @@ import {Button} from '@/components/shared/button'
 import {TagsInput} from './tags-input'
 import ContentLabelInput from './content-label-input'
 import {AvailablePagesType} from "@/components/howl-creator/floating-compose.tsx";
+import {useUserAccountStore} from "@/lib";
 
 export default function PostSettingsModal({
                                               selectedTags,
@@ -23,6 +24,7 @@ export default function PostSettingsModal({
         toPage?: AvailablePagesType
     }) => void
 }) {
+    const {user} = useUserAccountStore()
     const [selectedTagsState, setSelectedTagsState] = useState<string>(selectedTags)
     const [selectedContentLabelState, setSelectedContentLabelState] = useState<string>(selectedContentLabel)
 
@@ -60,7 +62,7 @@ export default function PostSettingsModal({
                             ...(![
                                 'rating_safe',
                                 'rating_mature'
-                            ].includes(selectedContentLabelState)) && {
+                            ].includes(selectedContentLabelState) && !user.is_r18) && {
                                 toPage: 'mature-rating-from-sfw-warning'
                             }
                         })
