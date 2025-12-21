@@ -12,6 +12,7 @@ import {usePerformanceMonitor} from '@/components/chat/usePerformanceMonitor.ts'
 import {useQueryClient} from '@tanstack/react-query'
 import {useUserAccountStore} from '@/lib'
 import {HomeModernIcon} from '@heroicons/react/24/solid'
+import {getAvatar} from "@/lib/api/get-avatar.ts";
 
 export default function ChatLayout({children}: { children: ReactNode }) {
     const {id} = useParams<{ id: string }>()
@@ -111,7 +112,7 @@ function ChannelsList() {
             {channels.map((c: any) => {
                 const rec = c.recipients?.[0]
                 const name = rec?.display_name || rec?.username || 'Direct Message'
-                const avatarSrc = rec?.images_avatar || null
+                const avatarSrc = getAvatar(rec?.id) || null
                 const initials = (rec?.display_name || rec?.username || '?').slice(0, 1)
                 return (
                     <SidebarItem key={c.id} href={`/c/${c.id}`}>
