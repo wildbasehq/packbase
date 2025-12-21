@@ -1,6 +1,5 @@
 export * from './types'
 export * from './MessageInput'
-export * from './MessageList'
 export * from './MessageItem'
 
 // Example usage:
