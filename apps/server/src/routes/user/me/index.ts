@@ -11,18 +11,79 @@ import requiresToken from '@/utils/identity/requires-token';
 import createStorage from '@/lib/storage';
 import PackMan from "@/lib/packs/PackMan";
 import {checkDefaultPackSetup} from "@/routes/packs/default";
+import clerkClient from "@/db/auth";
+import {checkUserBillingPermission} from "@/utils/clerk/check-user-permission";
 
 export default (app: YapockType) =>
     app
         .get(
             '',
             async (res) => {
-                const {set, user} = res;
-                if (!user) {
-                    set.status = 401;
-                    throw HTTPError.unauthorized({
-                        summary: 'You must be logged in to access this resource.',
-                    });
+                const {set, user, query} = res as any;
+                requiresToken({set, user});
+
+                // Lightweight endpoint contract: if `?lec` exists, ONLY return these fields.
+                if (query?.lec !== undefined) {
+                    const [followers, ownedPacks] = await Promise.all([
+                        prisma.profiles_followers.count({
+                            where: {
+                                following_id: user.sub,
+                            },
+                        }),
+                        prisma.packs.findMany({
+                            where: {
+                                owner_id: user.sub,
+                            },
+                            select: {
+                                id: true,
+                            },
+                        }),
+                    ]);
+
+                    const ownedPackIds = ownedPacks.map((p) => p.id);
+
+                    const owned_pack_collective_amount = ownedPackIds.length
+                        ? await prisma.currency.aggregate({
+                            where: {
+                                parent_id: {
+                                    in: ownedPackIds.map((id) => `pack:${id}`),
+                                },
+                            },
+                            _sum: {
+                                amount: true,
+                            },
+                        }).then((r) => r._sum.amount ?? 0)
+                        : 0;
+
+                    let is_staff = false;
+                    let is_content_moderator = false;
+                    let is_dx = false;
+
+                    if (user?.userId) {
+                        try {
+                            const clerkUser = await clerkClient.users.getUser(user.userId);
+                            const privateMeta = (clerkUser?.privateMetadata ?? {}) as any;
+
+                            // allow a couple of key spellings to avoid tight coupling
+                            const staffValue = privateMeta.is_staff;
+                            const contentModerationValue = privateMeta.is_content_moderator;
+                            const dxValue = await checkUserBillingPermission(user.userId)
+
+                            is_staff = Boolean(staffValue);
+                            is_content_moderator = Boolean(contentModerationValue);
+                            is_dx = Boolean(dxValue);
+                        } catch (_) {
+                            // If Clerk is unavailable or the user can't be fetched, just default to false.
+                        }
+                    }
+
+                    return {
+                        followers,
+                        owned_pack_collective_amount,
+                        is_staff,
+                        is_content_moderator,
+                        is_dx,
+                    };
                 }
 
                 let userProfile = await getUser({
