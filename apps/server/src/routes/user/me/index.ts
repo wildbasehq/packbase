@@ -43,31 +43,34 @@ export default (app: YapockType) =>
                     const ownedPackIds = ownedPacks.map((p) => p.id);
 
                     const owned_pack_collective_amount = ownedPackIds.length
-                        ? await prisma.currency.aggregate({
+                        ? await prisma.packs_memberships.findMany({
                             where: {
-                                parent_id: {
-                                    in: ownedPackIds.map((id) => `pack:${id}`),
+                                tenant_id: {
+                                    in: ownedPackIds,
                                 },
                             },
-                            _sum: {
-                                amount: true,
-                            },
-                        }).then((r) => r._sum.amount ?? 0)
+                            select: {
+                                id: true
+                            }
+                        }).then((memberships) => memberships.length)
                         : 0;
 
                     let is_staff = false;
                     let is_content_moderator = false;
                     let is_dx = false;
+                    let username = null;
 
                     if (user?.userId) {
                         try {
                             const clerkUser = await clerkClient.users.getUser(user.userId);
                             const privateMeta = (clerkUser?.privateMetadata ?? {}) as any;
 
+                            username = clerkUser?.username || null;
+
                             // allow a couple of key spellings to avoid tight coupling
                             const staffValue = privateMeta.is_staff;
                             const contentModerationValue = privateMeta.is_content_moderator;
-                            const dxValue = await checkUserBillingPermission(user.userId)
+                            const dxValue = await checkUserBillingPermission(user.userId);
 
                             is_staff = Boolean(staffValue);
                             is_content_moderator = Boolean(contentModerationValue);
@@ -78,6 +81,7 @@ export default (app: YapockType) =>
                     }
 
                     return {
+                        username,
                         followers,
                         owned_pack_collective_amount,
                         is_staff,
