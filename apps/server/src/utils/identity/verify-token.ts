@@ -11,185 +11,226 @@ const log = {
 };
 
 type AuthUser = SignedInAuthObject & {
+    /**
+     * Internal profile id (prisma.profiles.id).
+     * Kept for backwards compatibility with existing routes.
+     */
     sub?: string;
     sessionClaims: {
         nickname?: string;
     }
 };
 
-// queue
-/**
- * Queue for verifying tokens, pauses promises if user.userId is in the queue,
- * this is to prevent multiple requests from the same user from creating multiple profiles
- *
- * dirty race condition fix
- */
-const queue = new Set<string>();
-
 const authorizedParties = ['https://packbase.app', 'http://localhost:5173', 'http://localhost:4173', 'http://localhost:8000'];
 
-/**
- * Verifies a token and returns a user object
- * Waits for the queue to be empty before returning the user object
- */
-export default async function verifyToken(req: any) {
-    // First, get the user ID from the request to check if it's in the queue
-    let userId: string | null = null;
+type Credentials =
+    | { kind: 'none' }
+    | { kind: 'apiKey'; token: string }
+    | { kind: 'clerkToken'; token: string };
+
+type HeaderGetter = { get(name: string): string | null };
+type RequestLike = { headers: HeaderGetter; clone(): any };
+
+// In-process per-user lock to prevent duplicate profile creation inside a single runtime.
+// (Still not distributed; DB uniqueness must be the real source of truth.)
+const profileCreationLocks = new Map<string, Promise<void>>();
+
+function normalizeAuthorization(raw: string | null): string | null {
+    if (!raw) return null;
+    const trimmed = raw.trim();
+    if (!trimmed) return null;
+    // `index.ts` currently strips "Bearer ", but callers may still pass it.
+    return trimmed.toLowerCase().startsWith('bearer ') ? trimmed.slice('bearer '.length).trim() : trimmed;
+}
+
+function extractCredentials(req: { headers: HeaderGetter }): Credentials {
+    const raw = normalizeAuthorization(req.headers.get('authorization'));
+    if (!raw) return {kind: 'none'};
+
+    // API keys in this codebase appear to be passed as raw tokens (see apps/server/src/index.ts).
+    // Clerk API keys can vary in prefix; treat a likely set as API keys.
+    if (raw.startsWith('ak_') || raw.startsWith('sk_') || raw.startsWith('pk_')) {
+        return {kind: 'apiKey', token: raw};
+    }
+
+    // Everything else: treat as a Clerk token (JWT/session or OAuth access token).
+    return {kind: 'clerkToken', token: raw};
+}
+
+async function withUserLock(userId: string, fn: () => Promise<void>) {
+    const existing = profileCreationLocks.get(userId);
+    if (existing) await existing;
+
+    const next = (async () => {
+        try {
+            await fn();
+        } finally {
+            // Only delete if we are still the active lock for this user.
+            if (profileCreationLocks.get(userId) === next) profileCreationLocks.delete(userId);
+        }
+    })();
+
+    profileCreationLocks.set(userId, next);
+    await next;
+}
+
+async function authenticate(req: RequestLike): Promise<
+    | { ok: true; user: AuthUser }
+    | { ok: false; reason: 'missing' | 'invalid' | 'error' }
+> {
+    const shadowReq = req.clone();
+    const creds = extractCredentials(shadowReq);
 
     try {
-        const shadowReq = req.clone();
+        if (creds.kind === 'none') return {ok: false, reason: 'missing'};
 
-        // If auth header starts with `ak_`, it's an API key
-        if (shadowReq.headers.authorization?.startsWith('Bearer ak_')) {
-            const apiKey = await clerkClient.apiKeys.verify(shadowReq.headers.authorization.replace('Bearer ', ''));
+        // Here for future proofing as we'd like to audit log later.
+        if (creds.kind === 'apiKey') {
+            const apiKey = await clerkClient.apiKeys.verify(creds.token);
 
-            if (apiKey.revoked || apiKey.expired || !apiKey.subject.startsWith('user_')) {
-                throw new Error('Invalid API key');
+            if (!apiKey || apiKey.revoked || apiKey.expired || !apiKey.subject) {
+                return {ok: false, reason: 'invalid'};
             }
 
-            userId = apiKey.subject
-            log.info(`Authenticated user via API Key: ${userId}`);
-        } else {
-            const authReq = await clerkClient.authenticateRequest(shadowReq, {
-                authorizedParties
-            });
-
-            if (authReq.isSignedIn) {
-                const user = authReq.toAuth();
-                userId = user.userId;
-                log.info(`Authenticated user: ${userId}`);
-            }
+            return {
+                ok: true,
+                user: {
+                    userId: apiKey.subject,
+                    sessionClaims: {},
+                } as unknown as AuthUser,
+            };
         }
+
+        const authReq = await clerkClient.authenticateRequest(shadowReq, {
+            authorizedParties,
+            acceptsToken: 'any',
+        });
+        
+        if (!authReq.isSignedIn) return {ok: false, reason: 'invalid'};
+
+        const user = authReq.toAuth() as unknown as AuthUser;
+        // Some Clerk auth modes (e.g. oauth token) may not include sessionClaims in the type surface.
+        // We keep the existing downstream expectation that `sessionClaims` exists.
+        if (!(user as any).sessionClaims) (user as any).sessionClaims = {};
+        if (!user?.userId) return {ok: false, reason: 'invalid'};
+
+        return {ok: true, user};
     } catch (e) {
-        log.error('Failed to authenticate request:', e);
-        // If we can't get the user ID, proceed without queue logic
-        return await verifyTokenProcess(req);
-    }
-
-    // If no user ID, proceed without queue logic
-    if (!userId) {
-        return await verifyTokenProcess(req);
-    }
-
-    // Wait for the user ID to be removed from the queue (with timeout)
-    const startTime = Date.now();
-    const timeout = 10000; // 10 seconds
-
-    if (queue.has(userId)) {
-        log.info(`User ${userId} is in queue, waiting for processing to complete`);
-    }
-
-    while (queue.has(userId)) {
-        // Check if we've exceeded the timeout
-        if (Date.now() - startTime > timeout) {
-            log.error(`Queue timeout for user ${userId} after ${timeout}ms`);
-            return null;
-        }
-
-        // Wait a bit before checking again
-        await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-
-    // Add the user ID to the queue
-    queue.add(userId);
-    log.info(`Added user ${userId} to queue, queue size: ${queue.size}`);
-
-    try {
-        // Process the token verification
-        log.info(`Processing token verification for user ${userId}`);
-        const result = await verifyTokenProcess(req);
-        log.info(`Token verification completed for user ${userId}`);
-        return result;
-    } catch (error) {
-        log.error(`Error during token verification for user ${userId}:`, error);
-        throw error;
-    } finally {
-        // Always remove the user ID from the queue when done
-        queue.delete(userId);
-        log.info(`Removed user ${userId} from queue, queue size: ${queue.size}`);
+        log.error('Auth provider error:', e);
+        return {ok: false, reason: 'error'};
     }
 }
 
-async function verifyTokenProcess(req: any): Promise<AuthUser> {
-    let user: AuthUser | undefined;
-    try {
-        const shadowReq = req.clone();
-        const authReq = await clerkClient.authenticateRequest(shadowReq, {
-            authorizedParties
+async function ensureProfileId(user: AuthUser): Promise<void> {
+    // If we already resolved the profile id, do nothing.
+    if (user.sub) return;
+
+    const userId = user.userId;
+    if (!userId) return;
+
+    const existing = await prisma.profiles.findFirst({
+        where: {owner_id: userId},
+        select: {id: true},
+    });
+
+    if (existing?.id) {
+        user.sub = existing.id;
+        return;
+    }
+
+    // Only auto-provision when we have a nickname; preserves prior behavior.
+    const nickname = user.sessionClaims?.nickname;
+    if (!nickname) return;
+
+    await withUserLock(userId, async () => {
+        // Re-check inside the lock.
+        const nowExisting = await prisma.profiles.findFirst({
+            where: {owner_id: userId},
+            select: {id: true},
         });
 
-        if (authReq.isAuthenticated) {
-            user = authReq.toAuth();
-            if (!user.userId) {
-                log.info('No user ID in auth response');
+        if (nowExisting?.id) {
+            user.sub = nowExisting.id;
+            return;
+        }
+
+        const email = (await clerkClient.users.getUser(userId))?.emailAddresses?.[0]?.emailAddress;
+
+        // Check user email in invites (best-effort; never block profile creation).
+        let isInvited: { id: string; invited_by: string } | null = null;
+        try {
+            const invites = await prisma.invites.findMany({
+                select: {id: true, invited_by: true, email: true},
+            });
+            const match = invites.find((invite) => Bun.password.verify(email, invite.email));
+            if (match) {
+                isInvited = {id: match.id, invited_by: match.invited_by};
+                log.info(`User ${userId} was invited by ${match.invited_by}, invite ID: ${match.id}`);
+            }
+        } catch (error) {
+            log.error('Error checking invites:', error);
+        }
+
+        try {
+            const newProfile = await prisma.profiles.create({
+                data: {
+                    owner_id: userId,
+                    username: nickname,
+                    invited_by: isInvited?.invited_by || null,
+                },
+                select: {id: true},
+            });
+
+            user.sub = newProfile.id;
+            log.info(`Created profile ${newProfile.id} for user ${userId}`);
+        } catch (e: any) {
+            // If we raced with another request/process, attempt to re-fetch.
+            const raced = await prisma.profiles.findFirst({
+                where: {owner_id: userId},
+                select: {id: true},
+            });
+            if (raced?.id) {
+                user.sub = raced.id;
                 return;
             }
 
-            log.info(`Looking up existing profile for user ${user.userId}`);
-            const userID = await prisma.profiles.findFirst({
-                where: {
-                    owner_id: user.userId,
-                },
-            });
+            log.error('Error creating profile:', e);
+            throw e;
+        }
 
-            user.sub = userID?.id;
-
-            if (!user.sub && user.sessionClaims.nickname) {
-                log.info(`Creating new user profile for ${user.userId} with nickname ${user.sessionClaims.nickname}`);
-                const email = (await clerkClient.users.getUser(user.userId))?.emailAddresses?.[0]?.emailAddress;
-                // Check user email in invites
-                let isInvited = null;
-
-                try {
-                    // Get all invites and compare hashed email to invites
-                    const invites = await prisma.invites.findMany();
-                    isInvited = invites.find((invite) => Bun.password.verify(email, invite.email));
-                    if (isInvited) {
-                        log.info(`User ${user.userId} was invited by ${isInvited.invited_by}, invite ID: ${isInvited.id}`);
-                    }
-                } catch (error) {
-                    log.error('Error checking invites:', error);
-                }
-
-                const newProfile = await prisma.profiles.create({
-                    data: {
-                        // UUID
-                        owner_id: user.userId,
-                        username: user.sessionClaims.nickname,
-                        invited_by: isInvited?.invited_by || null,
-                    },
-                });
-
-                log.info(`Created profile ${newProfile.id} for user ${user.userId}`);
-
-                // Delete the invite
-                if (isInvited) {
-                    await prisma.invites.delete({
-                        where: {
-                            id: isInvited.id,
-                        },
-                    });
-
-                    log.info(`Deleted invite ${isInvited.id} and awarding trinkets to inviter ${isInvited.invited_by}`);
-
-                    // Give trinkets to the inviter
-                    await trinketManager.increment(toParentId('user', isInvited.invited_by), 5);
-                    // Create a notification for the inviter
-                    await NotificationManager.createNotification(
-                        isInvited.invited_by,
-                        'invite',
-                        `${user.sessionClaims.nickname} joined you!`,
-                        `They took your invite with open arms. +T$5 was awarded!`,
-                    );
-                }
-
-                user.sub = newProfile.id;
-            } else if (user.sub) {
-                log.info(`Found existing profile ${user.sub} for user ${user.userId}`);
+        // Handle invite side-effects after successful profile creation (best-effort).
+        if (isInvited?.id && isInvited?.invited_by) {
+            const invited = isInvited;
+            try {
+                await prisma.invites.delete({where: {id: invited.id}});
+                await trinketManager.increment(toParentId('user', invited.invited_by), 5);
+                await NotificationManager.createNotification(
+                    invited.invited_by,
+                    'invite',
+                    `${nickname} joined you!`,
+                    `They took your invite with open arms. +T$5 was awarded!`,
+                );
+            } catch (e) {
+                log.error('Error processing invite side-effects:', e);
             }
         }
+    });
+}
+
+/**
+ * Authenticate a request and (if possible) attach `user.sub` (profile ID).
+ *
+ * Returns `undefined` for unauthenticated requests to match current call sites.
+ */
+export default async function verifyToken(req: any): Promise<AuthUser | undefined> {
+    const result = await authenticate(req as RequestLike);
+    if (!result.ok) return undefined;
+
+    try {
+        await ensureProfileId(result.user);
     } catch (e) {
-        log.error('Error in verifyTokenProcess:', e);
+        log.error('Profile resolution error:', e);
     }
-    return user;
+
+    return result.user;
 }
