@@ -44,7 +44,7 @@ export function MessageEditor({content, onContentChange, onSave, onCancel, class
                 <Button
                     outline
                     onClick={onSave}
-                    className="!px-3 py-0.5! items-center justify-center flex !text-sm !font-medium"
+                    className="px-3! py-0.5! items-center justify-center flex text-sm! font-medium!"
                 >
                     Save
                 </Button>
