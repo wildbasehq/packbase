@@ -25,7 +25,9 @@ export function useFeedQuery({
     const isSearch = hasChannelID || hasFeedQuery
     const queryKey = isSearch ? ['search', channelID, feedQueryOverride, page] : ['feed', packID, page]
 
-    const {data, isLoading, error} = useQuery<FeedPageResult>({
+    const {data, error, isLoading, refetch} = useQuery<FeedPageResult>({
+        // but this stops that behaviour.
+        retryOnMount: false,
         queryKey,
         queryFn: async () => {
             if (isSearch) {
@@ -43,7 +45,7 @@ export function useFeedQuery({
             }
         },
         enabled: isSignedIn,
-        placeholderData: previousData => previousData,
+        // placeholderData: previousData => previousData,
         staleTime: 5 * 60 * 1000, // 5 minutes
     })
 

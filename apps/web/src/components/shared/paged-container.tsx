@@ -22,12 +22,6 @@ export interface PagedContainerType {
     // == required ==
 
     /**
-     * Function to call when pagination changes, or when the component initiates
-     * @param {number} page
-     */
-    onNeedsContent: (page: number) => Promise<PagedContentLoadStatus>
-
-    /**
      * The actual content to render
      */
     children: ReactNode
@@ -40,12 +34,6 @@ export interface PagedContainerType {
      * @see apps/server/src/routes/search/index.ts
      */
     pages?: number
-
-    /**
-     * Component to show when content is loading
-     * @optional
-     */
-    loader?: ReactNode
 
     /**
      * Whether there's more content to load
@@ -67,123 +55,141 @@ export default function PagedContainer({
                                            pages,
                                            hasMore,
                                            children,
-                                           loader,
-                                           endMessage,
-                                           onNeedsContent
+                                           endMessage
                                        }: PagedContainerType) {
     const [searchParams, setSearchParams] = useSearchParams()
     const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
 
     // Stores known pages if pages isn't set.
     const [knownPages, setKnownPages] = useState<number[]>([])
-    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        if ((!!pages && page > pages) || page <= 1) {
+        if (!!pages && page > pages) {
             setSearchParams({page: '1'}, {replace: true})
             return
         }
-        setLoading(true)
-        onNeedsContent(page).then(status => {
-            setLoading(false)
-            if (status === PagedContentLoadStatus.ERROR) setSearchParams({page: '1'}, {replace: true})
-        })
 
         if (pages) {
             setKnownPages(Array.from({length: pages}, (_, i) => i + 1))
         } else {
-            // Pages isn't set, so we'll use any page counts we come across.
-            onNeedsContent(page).then(status => {
-                if (status === PagedContentLoadStatus.SUCCESS) setKnownPages(prev => [...new Set([...prev, page].sort((a, b) => a - b))])
-            })
+            setKnownPages(prev => [...new Set([...prev, page].sort((a, b) => a - b))])
         }
     }, [page])
 
     return (
-        <div>
-            <div className={loading ? 'animate-pulse' : ''}>{children}</div>
-            {loading && loader &&
-                <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">{loader}</div>}
-            {!hasMore && endMessage &&
-                <div className="py-8 text-center text-muted-foreground dark:text-neutral-400">{endMessage}</div>}
-            <Pagination>
-                {page > 1 && <PaginationPrevious href={`?page=${page - 1}`}/>}
-                <PaginationList>
-                    {knownPages.length > 6 && (() => {
-                        const first = knownPages[0]
-                        const last = knownPages[knownPages.length - 1]
-                        const current = page
-                        const items = []
+        <div className="space-y-8">
+            <PaginationActions
+                page={page}
+                setSearchParams={setSearchParams}
+                pages={knownPages}
+                hasMore={hasMore}
+            />
 
-                        // Always show first page
+            {children}
+
+            {!hasMore && endMessage && (
+                endMessage
+            )}
+
+            <PaginationActions
+                page={page}
+                setSearchParams={setSearchParams}
+                pages={knownPages}
+                hasMore={hasMore}
+            />
+        </div>
+    )
+}
+
+function PaginationActions({
+                               page,
+                               setSearchParams,
+                               pages,
+                               hasMore,
+                           }: {
+    page: number
+    setSearchParams: (params: Record<string, string>) => void
+    pages?: number[]
+    hasMore?: boolean
+}) {
+    return (
+        <Pagination>
+            {page > 1 && <PaginationPrevious href={`?page=${page - 1}`}/>}
+            <PaginationList>
+                {pages.length > 6 && (() => {
+                    const first = pages[0]
+                    const last = pages[pages.length - 1]
+                    const current = page
+                    const items = []
+
+                    // Always show first page
+                    items.push(
+                        <PaginationPage
+                            href={`?page=${first}`}
+                            key={first}
+                            current={current === first}
+                            onClick={() => setSearchParams({page: first.toString()})}
+                        >
+                            {first}
+                        </PaginationPage>
+                    )
+
+                    // Show gap if current page is far from first
+                    if (current > 4) {
+                        items.push(<PaginationGap key="gap-start"/>)
+                    }
+
+                    // Show up to 3 pages before and after current page, but within bounds
+                    const start = Math.max(current - 2, first + 1)
+                    const end = Math.min(current + 2, last - 1)
+
+                    for (let i = start; i <= end; i++) {
                         items.push(
                             <PaginationPage
-                                href={`?page=${first}`}
-                                key={first}
-                                current={current === first}
-                                onClick={() => setSearchParams({page: first.toString()})}
+                                href={`?page=${i}`}
+                                key={i}
+                                current={current === i}
+                                onClick={() => setSearchParams({page: i.toString()})}
                             >
-                                {first}
+                                {i}
                             </PaginationPage>
                         )
+                    }
 
-                        // Show gap if current page is far from first
-                        if (current > 4) {
-                            items.push(<PaginationGap key="gap-start"/>)
-                        }
+                    // Show gap if current page is far from last
+                    if (current < last - 3) {
+                        items.push(<PaginationGap key="gap-end"/>)
+                    }
 
-                        // Show up to 3 pages before and after current page, but within bounds
-                        const start = Math.max(current - 2, first + 1)
-                        const end = Math.min(current + 2, last - 1)
+                    // Always show last page
+                    if (last !== first) {
+                        items.push(
+                            <PaginationPage
+                                href={`?page=${last}`}
+                                key={last}
+                                current={current === last}
+                                onClick={() => setSearchParams({page: last.toString()})}
+                            >
+                                {last}
+                            </PaginationPage>
+                        )
+                    }
 
-                        for (let i = start; i <= end; i++) {
-                            items.push(
-                                <PaginationPage
-                                    href={`?page=${i}`}
-                                    key={i}
-                                    current={current === i}
-                                    onClick={() => setSearchParams({page: i.toString()})}
-                                >
-                                    {i}
-                                </PaginationPage>
-                            )
-                        }
+                    return items
+                })()}
 
-                        // Show gap if current page is far from last
-                        if (current < last - 3) {
-                            items.push(<PaginationGap key="gap-end"/>)
-                        }
-
-                        // Always show last page
-                        if (last !== first) {
-                            items.push(
-                                <PaginationPage
-                                    href={`?page=${last}`}
-                                    key={last}
-                                    current={current === last}
-                                    onClick={() => setSearchParams({page: last.toString()})}
-                                >
-                                    {last}
-                                </PaginationPage>
-                            )
-                        }
-
-                        return items
-                    })()}
-
-                    {(knownPages.length < 6 && knownPages.length > 1) && knownPages.map(i => (
-                        <PaginationPage
-                            href={`?page=${i}`}
-                            key={i}
-                            current={page === i}
-                            onClick={() => setSearchParams({page: i.toString()})}
-                        >
-                            {i}
-                        </PaginationPage>
-                    ))}
-                </PaginationList>
-                {hasMore && <PaginationNext href={`?page=${page + 1}`}/>}
-            </Pagination>
-        </div>
+                {(pages.length < 6 && pages.length > 1) && pages.map(i => (
+                    <PaginationPage
+                        href={`?page=${i}`}
+                        key={i}
+                        current={page === i}
+                        onClick={() => setSearchParams({page: i.toString()})}
+                    >
+                        {i}
+                    </PaginationPage>
+                ))}
+            </PaginationList>
+            {hasMore && <PaginationNext href={`?page=${page + 1}`}/>}
+        </Pagination>
     )
 }

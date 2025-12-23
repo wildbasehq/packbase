@@ -17,7 +17,6 @@ export interface FeedListProps {
     posts: FeedPostData[]
     pages?: number
     hasMore?: boolean
-    onLoadMore: (page: number) => Promise<void>
     onPostDelete: (postId: string) => void
 }
 

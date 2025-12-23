@@ -3,7 +3,7 @@
  */
 
 // src/components/feed/feed.tsx
-import {useEffect} from 'react'
+import {Activity, useEffect} from 'react'
 import {useSession} from '@clerk/clerk-react'
 import {useResourceStore, useUIStore} from '@/lib/state'
 import {FeedProps} from './types/feed'
@@ -13,6 +13,7 @@ import {useFeedQuery} from './hooks/use-feed-query'
 import {useFeedTitle} from './hooks/use-feed-title'
 import {useFeedHandlers} from './hooks/use-feed-handlers'
 import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
+import {isVisible} from "@/lib";
 
 export default function Feed({
                                  packID,
@@ -41,13 +42,12 @@ export default function Feed({
         currentResourceId: currentResource?.id,
     })
 
-    const {handleDeletePost, handleLoadMore, handleComposeRefresh} = useFeedHandlers({
+    const {handleDeletePost, handleComposeRefresh} = useFeedHandlers({
         queryKey,
         isSearch,
         channelID,
         feedQueryOverride,
-        packID,
-        setPage,
+        packID
     })
 
     useEffect(() => {
@@ -68,16 +68,16 @@ export default function Feed({
     if (error) {
         return <FeedError error={error as Error}/>
     }
-
-    const isFirstPageLoading = isLoading && page === 1
-
+    
     return (
         <div className="pb-20 max-w-3xl space-y-4 mx-auto">
-            {isFirstPageLoading ? (
+            <Activity mode={isVisible(isLoading)}>
                 <FeedLoading isMasonry={false} message="Loading howls..."/>
-            ) : (
-                <FeedList posts={posts} hasMore={hasMore} onLoadMore={handleLoadMore} onPostDelete={handleDeletePost}/>
-            )}
+            </Activity>
+
+            <Activity mode={isVisible(!isLoading)}>
+                <FeedList posts={posts} hasMore={hasMore} onPostDelete={handleDeletePost}/>
+            </Activity>
         </div>
     )
 }

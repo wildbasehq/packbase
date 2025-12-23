@@ -6,30 +6,24 @@
 import {Text} from '@/components/shared/text'
 import {FeedPost} from '@/components/feed'
 import {FeedListProps} from './types/feed'
-import FeedLoading from './feed-loading'
-import PagedContainer, {PagedContentLoadStatus} from '@/components/shared/paged-container.tsx'
+import PagedContainer from '@/components/shared/paged-container.tsx'
+import {useLocation} from "wouter";
 
 /**
  * Renders a linear list of feed posts in thread style
  */
-export default function FeedList({posts, pages, hasMore, onLoadMore, onPostDelete}: FeedListProps) {
+export default function FeedList({posts, pages, hasMore, onPostDelete}: FeedListProps) {
+    const [location] = useLocation()
     return (
         <div className="mx-auto">
             <PagedContainer
                 pages={pages}
                 hasMore={hasMore}
-                onNeedsContent={async function (page: number): Promise<PagedContentLoadStatus> {
-                    try {
-                        await onLoadMore(page)
-                        return PagedContentLoadStatus.SUCCESS
-                    } catch (__1) {
-                        return PagedContentLoadStatus.ERROR
-                    }
-                }}
-                loader={<FeedLoading message="Loading more howls..."/>}
                 endMessage={
-                    <Text className="py-8 text-center text-muted-foreground dark:text-neutral-400">You've reached the
-                        end of howls.</Text>
+                    <Text alt className="py-8 text-center italic">
+                        The distant echoes of howling {location === '/everything' ? 'wolves' : 'packmates'} fade into
+                        silence...
+                    </Text>
                 }
             >
                 <div className="space-y-12">

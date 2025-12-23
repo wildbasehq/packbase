@@ -10,27 +10,21 @@ interface UseFeedHandlersProps {
     channelID?: string
     feedQueryOverride?: string
     packID: string
-    setPage: (page: number) => void
 }
 
 export function useFeedHandlers({
-    queryKey,
-    isSearch,
-    channelID,
-    feedQueryOverride,
-    packID,
-    setPage,
-}: UseFeedHandlersProps) {
+                                    queryKey,
+                                    isSearch,
+                                    channelID,
+                                    feedQueryOverride,
+                                    packID,
+                                }: UseFeedHandlersProps) {
     const queryClient = useQueryClient()
 
     const handleDeletePost = (_postId: string) => {
         queryClient.invalidateQueries({queryKey}).catch(error => {
             console.error(error)
         })
-    }
-
-    const handleLoadMore = async (requestedPage: number): Promise<void> => {
-        setPage(requestedPage)
     }
 
     const handleComposeRefresh = async (): Promise<void> => {
@@ -40,7 +34,6 @@ export function useFeedHandlers({
 
     return {
         handleDeletePost,
-        handleLoadMore,
         handleComposeRefresh,
     }
 }

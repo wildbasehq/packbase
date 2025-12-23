@@ -16,13 +16,15 @@ export function useFeedPagination({packID, channelID}: UseFeedPaginationProps) {
     const prevChannelIDRef = useRef(channelID)
 
     const page = searchParams.get('page') ? parseInt(searchParams.get('page')!, 10) : 1
-    const setPage = (newPage: number) => setSearchParams({page: newPage.toString()})
+    const setPage = (newPage: number) => setSearchParams({page: newPage.toString()}, {
+        replace: page === newPage || page !== newPage,
+    })
 
     // Reset to page 1 when packID or channelID changes
     useEffect(() => {
         const packIDChanged = packID !== prevPackIDRef.current
         const channelIDChanged = channelID !== prevChannelIDRef.current
-        
+
         if (packIDChanged || channelIDChanged) {
             prevPackIDRef.current = packID
             prevChannelIDRef.current = channelID
