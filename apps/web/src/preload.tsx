@@ -104,6 +104,7 @@ function PreloadChild({children}: { children: ReactNode }) {
             setUser(null)
             setResources([])
             setResourceDefault(resourceDefaultPackbase)
+            setCurrentResource(resourceDefaultPackbase)
             proceed()
         }
     }, [session, isSignedIn, userMeLoading, userPacksData, userPacksLoading, server])
