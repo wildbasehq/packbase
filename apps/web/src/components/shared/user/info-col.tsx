@@ -1,20 +1,20 @@
 // @ts-ignore
 import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
-import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak'
+import { BentoGenericUnlockableBadge, BentoStaffBadge } from '@/lib/utils/pak'
 import * as HoverCard from '@radix-ui/react-hover-card'
-import {cn} from '@/lib'
-import {ReactNode} from "react";
-import {Avatar, Text} from "@/src/components";
-import {getAvatar} from "@/lib/api/get-avatar.ts";
+import { cn } from '@/lib'
+import { ReactNode } from "react";
+import { Avatar, Text } from "@/src/components";
+import { getAvatar } from "@/src/lib/api/users/avatar";
 
 export default function UserInfoCol({
-                                        user,
-                                        size,
-                                        tag,
-                                        children,
-                                        className,
-                                    }: {
+    user,
+    size,
+    tag,
+    children,
+    className,
+}: {
     user: any // object
     size?: number
     tag?: ReactNode
@@ -24,17 +24,17 @@ export default function UserInfoCol({
     return (
         <HoverCard.Root>
             <HoverCard.Trigger className={cn('select-none no-underline!', className)}>
-                {children || <UserInfo user={user} size={size} tag={tag}/>}
+                {children || <UserInfo user={user} size={size} tag={tag} />}
             </HoverCard.Trigger>
             <HoverCard.Portal>
                 <HoverCard.Content
                     className="data-[side=right]:animate-slideLeftAndFade data-[side=left]:animate-slideRightAndFade relative w-96 overflow-hidden rounded border bg-card p-5 shadow-sm data-[side=bottom]:animate-slide-up-fade-snapper data-[side=top]:animate-slide-down-fade data-[state=open]:transition-all"
                     sideOffset={5}
-                    collisionPadding={{left: 32}}
+                    collisionPadding={{ left: 32 }}
                 >
-                    <UserHoverCard user={user}/>
+                    <UserHoverCard user={user} />
 
-                    <HoverCard.Arrow className="fill-white"/>
+                    <HoverCard.Arrow className="fill-white" />
                 </HoverCard.Content>
             </HoverCard.Portal>
         </HoverCard.Root>
@@ -42,10 +42,10 @@ export default function UserInfoCol({
 }
 
 export function UserInfo({
-                             user,
-                             size,
-                             tag,
-                         }: {
+    user,
+    size,
+    tag,
+}: {
     user: any // object
     size?: number
     tag?: ReactNode
@@ -55,15 +55,15 @@ export function UserInfo({
             <Avatar initials={user.username.substring(0, 2)} src={getAvatar(user.id)} style={{
                 width: size ?? '2rem',
                 height: size ?? '2rem',
-            }}/>
+            }} />
             <div className="flex flex-col">
                 <Link href={`/@${user.username}`} className="text-foreground text-sm font-semibold">
                     {user.display_name || user.username}
                     {user.type &&
-                        <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20}/>}
+                        <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20} />}
                     {user.badge && (
                         <BentoGenericUnlockableBadge type={user.badge} className="ml-1 inline-flex h-5 w-5" width={20}
-                                                     height={20}/>
+                            height={20} />
                     )}
                 </Link>
                 <Text alt>
@@ -74,7 +74,7 @@ export function UserInfo({
     )
 }
 
-export function UserHoverCard({user}: { user: any }) {
+export function UserHoverCard({ user }: { user: any }) {
     return (
         <>
             {user?.images?.header && (
@@ -91,14 +91,14 @@ export function UserHoverCard({user}: { user: any }) {
             )}
 
             <div className="z-50 flex flex-col gap-[7px]">
-                <Avatar initials={user.username.substring(0, 2)} src={getAvatar(user.id)} className="size-14"/>
+                <Avatar initials={user.username.substring(0, 2)} src={getAvatar(user.id)} className="size-14" />
                 <div className="flex flex-col gap-4">
                     <div>
                         <Text as="div" className="text-md">
                             {user.display_name || user.username}
                             {user.type && (
                                 <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5"
-                                                 width={20} height={20}/>
+                                    width={20} height={20} />
                             )}
                             {user.badge && (
                                 <BentoGenericUnlockableBadge

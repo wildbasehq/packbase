@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { fetchNotifications, markAllNotificationsAsRead, markNotificationAsRead, Notification } from '@/lib/api/inbox'
+import { fetchNotifications, markAllNotificationsAsRead, markNotificationAsRead, Notification } from '@/src/lib/api/users/inbox'
 
 /**
  * Notifications Store

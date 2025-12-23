@@ -1,8 +1,8 @@
-import {useEffect, useState} from 'react'
-import {vg} from '@/lib/api'
-import {Theme} from '@/lib/api/theme'
-import {PackThemeAPI} from '@/lib/api/pack-theme'
-import {useLocalStorage} from "usehooks-ts";
+import { useEffect, useState } from 'react'
+import { vg } from '@/lib/api'
+import { Theme } from '@/src/lib/api/users/theme'
+import { PackThemeAPI } from '@/src/lib/api/packs/theme'
+import { useLocalStorage } from "usehooks-ts";
 
 // Component to render custom theme HTML and CSS for users or packs
 interface CustomThemeProps {
@@ -10,7 +10,7 @@ interface CustomThemeProps {
     packId?: string
 }
 
-export function CustomTheme({userId, packId}: CustomThemeProps) {
+export function CustomTheme({ userId, packId }: CustomThemeProps) {
     const [theme, setTheme] = useState<Theme | null>(null)
     const [loadTheme, setLoadTheme] = useLocalStorage<'true' | 'false' | 'ask'>('load-custom-content-htmlcss', 'ask');
 
@@ -33,9 +33,9 @@ export function CustomTheme({userId, packId}: CustomThemeProps) {
 
         if (userId && !packId) {
             // Fetch user theme
-            vg.user({username: userId})
+            vg.user({ username: userId })
                 .theme.get()
-                .then(({data}) => {
+                .then(({ data }) => {
                     if (data && !data.message) {
                         setTheme(data)
                     } else setTheme(null)
@@ -69,7 +69,7 @@ export function CustomTheme({userId, packId}: CustomThemeProps) {
 
     return (
         <div className="custom-theme-container">
-            <div dangerouslySetInnerHTML={{__html: combinedTheme}}/>
+            <div dangerouslySetInnerHTML={{ __html: combinedTheme }} />
         </div>
     )
 }

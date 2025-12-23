@@ -2,16 +2,16 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {cn} from "@/lib";
-import {getAvatar} from "@/lib/api/get-avatar.ts";
+import { cn } from "@/lib";
+import { getAvatar } from "@/src/lib/api/users/avatar";
 
 export default function UserAvatar({
-                                       user,
-                                       size = 'lg',
-                                       icon,
-                                       showOnlineStatus = false,
-                                       ...props
-                                   }: {
+    user,
+    size = 'lg',
+    icon,
+    showOnlineStatus = false,
+    ...props
+}: {
     user?: any // object - @todo: type this
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | number
     icon?: string
@@ -49,13 +49,13 @@ export default function UserAvatar({
                     {...props}
                     className={cn(props.className, `inline-flex items-center justify-center overflow-hidden rounded-md text-white`)}
                 />
-                {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size}/>}
+                {showOnlineStatus && <OnlineStatus isOnline={isOnline} size={size} />}
             </div>
         </>
     )
 }
 
-function OnlineStatus({isOnline, size}: { isOnline: boolean; size: string | number }) {
+function OnlineStatus({ isOnline, size }: { isOnline: boolean; size: string | number }) {
     return (
         <div
             className={cn(

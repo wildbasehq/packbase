@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useNotificationsStore } from '@/lib/state/notifications';
-import { Notification } from '@/lib/api/inbox';
+import { Notification } from '@/src/lib/api/users/inbox';
 
 // Define the context type
 interface NotificationsContextType {
@@ -11,7 +11,7 @@ interface NotificationsContextType {
   error: string | null;
   hasMore: boolean;
   cursor: string | null;
-  
+
   // Actions
   fetchNotifications: (cursorValue?: string | null, unreadOnly?: boolean) => Promise<void>;
   markAsRead: (id: string) => Promise<void>;
@@ -25,15 +25,15 @@ const NotificationsContext = createContext<NotificationsContextType | undefined>
 // Provider component
 export function NotificationsProvider({ children }: { children: ReactNode }) {
   // Get state and actions from the notifications store
-  const { 
-    notifications, 
-    loading, 
-    loadingMore, 
-    error, 
-    hasMore, 
+  const {
+    notifications,
+    loading,
+    loadingMore,
+    error,
+    hasMore,
     cursor,
-    fetchNotifications, 
-    markAsRead, 
+    fetchNotifications,
+    markAsRead,
     markAllAsRead,
     reset
   } = useNotificationsStore();
@@ -62,10 +62,10 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 // Custom hook to use the notifications context
 export function useNotifications() {
   const context = useContext(NotificationsContext);
-  
+
   if (context === undefined) {
     throw new Error('useNotifications must be used within a NotificationsProvider');
   }
-  
+
   return context;
 }

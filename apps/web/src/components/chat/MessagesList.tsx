@@ -9,7 +9,7 @@ import { API_URL, useUserAccountStore } from '@/lib'
 import { useSession } from '@clerk/clerk-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { HomeModernIcon } from '@heroicons/react/24/solid'
-import { getAvatar } from '@/lib/api/get-avatar.ts'
+import { getAvatar } from '@/src/lib/api/users/avatar'
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 import { Button } from "@/src/components";

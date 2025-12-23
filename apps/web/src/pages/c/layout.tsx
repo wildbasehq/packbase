@@ -2,32 +2,32 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {SidebarPortal} from '@/lib/context/sidebar-context.tsx'
-import {BadgeButton, Button, SidebarDivider, SidebarItem, SidebarLabel, SidebarSection} from '@/src/components'
-import ContentFrame, {useContentFrame, useContentFrameMutation} from '@/lib/hooks/content-frame.tsx'
-import {Avatar} from '@/components/shared/avatar.tsx'
-import {useLocation, useParams} from 'wouter'
-import {ReactNode, useEffect, useMemo} from 'react'
-import {usePerformanceMonitor} from '@/components/chat/usePerformanceMonitor.ts'
-import {useQueryClient} from '@tanstack/react-query'
-import {useUserAccountStore} from '@/lib'
-import {HomeModernIcon} from '@heroicons/react/24/solid'
-import {getAvatar} from "@/lib/api/get-avatar.ts";
+import { SidebarPortal } from '@/lib/context/sidebar-context.tsx'
+import { BadgeButton, Button, SidebarDivider, SidebarItem, SidebarLabel, SidebarSection } from '@/src/components'
+import ContentFrame, { useContentFrame, useContentFrameMutation } from '@/lib/hooks/content-frame.tsx'
+import { Avatar } from '@/components/shared/avatar.tsx'
+import { useLocation, useParams } from 'wouter'
+import { ReactNode, useEffect, useMemo } from 'react'
+import { usePerformanceMonitor } from '@/components/chat/usePerformanceMonitor.ts'
+import { useQueryClient } from '@tanstack/react-query'
+import { useUserAccountStore } from '@/lib'
+import { HomeModernIcon } from '@heroicons/react/24/solid'
+import { getAvatar } from "@/src/lib/api/users/avatar";
 
-export default function ChatLayout({children}: { children: ReactNode }) {
-    const {id} = useParams<{ id: string }>()
+export default function ChatLayout({ children }: { children: ReactNode }) {
+    const { id } = useParams<{ id: string }>()
     const [, setLocation] = useLocation()
     const queryClient = useQueryClient()
 
     const createChannel = useContentFrameMutation('post', 'dm/channels', {
         onSuccess: channel => {
             setLocation(`/${channel.id}`)
-            queryClient.invalidateQueries({queryKey: ['channels']})
+            queryClient.invalidateQueries({ queryKey: ['channels'] })
         },
     })
 
     const startDM = async (userId: string) => {
-        createChannel.mutate({userId})
+        createChannel.mutate({ userId })
     }
 
     useEffect(() => {
@@ -37,7 +37,7 @@ export default function ChatLayout({children}: { children: ReactNode }) {
     return (
         <>
             <SidebarPortal>
-                <ChatSidebarContent/>
+                <ChatSidebarContent />
             </SidebarPortal>
             {children}
         </>
@@ -50,10 +50,10 @@ export function ChatSidebarContent() {
         <>
             <ContentFrame get="dm.channels" refetchInterval={60} id="channels">
                 <SidebarSection>
-                    <NewDMForm/>
-                    <ChannelsList/>
+                    <NewDMForm />
+                    <ChannelsList />
                 </SidebarSection>
-                <SidebarDivider/>
+                <SidebarDivider />
             </ContentFrame>
         </>
     )
@@ -61,7 +61,7 @@ export function ChatSidebarContent() {
 
 function ChannelsList() {
     usePerformanceMonitor('ChannelsList')
-    let {data: channelsFrame, isLoading} = useContentFrame('get', 'dm.channels', undefined, {id: 'channels'})
+    let { data: channelsFrame, isLoading } = useContentFrame('get', 'dm.channels', undefined, { id: 'channels' })
     // sort by last_message.created_at (most recent first)
     const channels = useMemo(() => {
         if (!Array.isArray(channelsFrame)) return channelsFrame
@@ -96,9 +96,9 @@ function ChannelsList() {
     if (isLoading) {
         return (
             <div className="p-2 space-y-2">
-                <div className="h-4 w-32 bg-muted animate-pulse rounded"/>
-                <div className="h-4 w-28 bg-muted animate-pulse rounded"/>
-                <div className="h-4 w-24 bg-muted animate-pulse rounded"/>
+                <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-28 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-24 bg-muted animate-pulse rounded" />
             </div>
         )
     }
@@ -119,7 +119,7 @@ function ChannelsList() {
                         <div className="flex justify-between items-center w-full">
                             <div className="flex items-center gap-2 w-full">
                                 <Avatar src={avatarSrc} alt={name} initials={avatarSrc ? undefined : initials}
-                                        className="size-6"/>
+                                    className="size-6" />
                                 <div className="flex flex-col min-w-0 flex-1 overflow-hidden wrap-break-word w-full">
                                     <SidebarLabel>{name}</SidebarLabel>
                                     {c.last_message?.content ? (
@@ -141,17 +141,17 @@ function ChannelsList() {
 function NewDMForm() {
     const [, setLocation] = useLocation()
     const queryClient = useQueryClient()
-    const {user} = useUserAccountStore()
+    const { user } = useUserAccountStore()
 
     const createChannel = useContentFrameMutation('post', 'dm/channels', {
         onSuccess: channel => {
             setLocation(`/c/${channel.id}`)
-            queryClient.invalidateQueries({queryKey: ['channels']})
+            queryClient.invalidateQueries({ queryKey: ['channels'] })
         },
     })
 
     const startDM = async (userId: string) => {
-        createChannel.mutate({userId})
+        createChannel.mutate({ userId })
     }
 
     const onSelfDM = async () => {
@@ -162,7 +162,7 @@ function NewDMForm() {
     return (
         <div className="mb-3 space-y-2">
             <Button outline className="w-full" type="button" onClick={onSelfDM} disabled={createChannel.isPending}>
-                <HomeModernIcon data-slot="icon"/> Your Basecamp
+                <HomeModernIcon data-slot="icon" /> Your Basecamp
             </Button>
         </div>
     )

@@ -2,8 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {useQuery} from '@tanstack/react-query'
-import {FeedPageResult, fetchFeedPage, fetchSearchPage} from '../fetchers'
+import { useQuery } from '@tanstack/react-query'
+import { FeedPageResult, fetchFeedPage, fetchSearchPage } from '../../../lib/api/feed'
 
 interface UseFeedQueryProps {
     packID: string
@@ -14,24 +14,24 @@ interface UseFeedQueryProps {
 }
 
 export function useFeedQuery({
-                                 packID,
-                                 channelID,
-                                 feedQueryOverride,
-                                 page,
-                                 isSignedIn,
-                             }: UseFeedQueryProps) {
+    packID,
+    channelID,
+    feedQueryOverride,
+    page,
+    isSignedIn,
+}: UseFeedQueryProps) {
     const hasChannelID = Boolean(channelID)
     const hasFeedQuery = Boolean(feedQueryOverride)
     const isSearch = hasChannelID || hasFeedQuery
     const queryKey = isSearch ? ['search', channelID, feedQueryOverride, page] : ['feed', packID, page]
 
-    const {data, error, isLoading, refetch} = useQuery<FeedPageResult>({
+    const { data, error, isLoading, refetch } = useQuery<FeedPageResult>({
         // but this stops that behaviour.
         retryOnMount: false,
         queryKey,
         queryFn: async () => {
             if (isSearch) {
-                console.log('Fetching search page', {channelID, feedQueryOverride, page})
+                console.log('Fetching search page', { channelID, feedQueryOverride, page })
                 return fetchSearchPage({
                     channelID: channelID!,
                     q: feedQueryOverride,
