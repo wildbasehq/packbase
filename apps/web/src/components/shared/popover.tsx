@@ -2,23 +2,23 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { ReactNode } from 'react'
-import * as PopoverPrimitive from '@radix-ui/react-dropdown-menu'
-import { Drawer } from 'vaul'
 import useWindowSize from '@/lib/hooks/use-window-size'
+import * as PopoverPrimitive from '@radix-ui/react-dropdown-menu'
+import {ReactNode} from 'react'
+import {Drawer} from 'vaul'
 
 export default function Popover({
-    children,
-    content,
-    align = 'center',
-    forceMobile = false,
-}: {
+                                    children,
+                                    content,
+                                    align = 'center',
+                                    forceMobile = false,
+                                }: {
     children: ReactNode
     content: ReactNode | string
     align?: 'center' | 'start' | 'end'
     forceMobile?: boolean
 }) {
-    const { isMobile, isDesktop } = useWindowSize()
+    const {isMobile, isDesktop} = useWindowSize()
     if (!isMobile && !isDesktop) return <>{children}</>
     return (
         <>

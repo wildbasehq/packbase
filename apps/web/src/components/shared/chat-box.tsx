@@ -2,24 +2,12 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
-import {Button} from '@/src/components'
-import {Text} from './text'
 import {cn} from '@/lib/utils'
-import {
-    AtSign,
-    Bold,
-    Code,
-    Italic,
-    Link2,
-    List,
-    ListOrdered,
-    Paperclip,
-    Quote,
-    Smile,
-    Strikethrough
-} from 'lucide-react'
+import {Button} from '@/src/components'
 import {PaperAirplaneIcon} from '@heroicons/react/16/solid'
+import {AtSign, Bold, Code, Italic, Link2, List, ListOrdered, Paperclip, Quote, Smile, Strikethrough} from 'lucide-react'
+import {ComponentType, FocusEvent, KeyboardEvent, useEffect, useRef, useState} from 'react'
+import {Text} from './text'
 
 interface ChatBoxProps {
     placeholder?: string
@@ -36,7 +24,7 @@ interface ChatBoxProps {
 }
 
 interface MarkdownButton {
-    icon: React.ComponentType<{ className?: string }>
+    icon: ComponentType<{ className?: string }>
     label: string
     syntax: string
     wrap?: boolean
@@ -147,7 +135,7 @@ export function ChatBox({
         }, 0)
     }
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
             if (e.shiftKey) {
                 // Allow new line with Shift+Enter
@@ -189,7 +177,7 @@ export function ChatBox({
         setShowToolbar(true)
     }
 
-    const handleBlur = (e: React.FocusEvent) => {
+    const handleBlur = (e: FocusEvent) => {
         // Keep toolbar visible if clicking on toolbar buttons
         if (!e.relatedTarget?.closest('.markdown-toolbar')) {
             setShowToolbar(false)

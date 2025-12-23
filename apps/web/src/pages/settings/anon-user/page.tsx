@@ -1,14 +1,14 @@
-import React from 'react'
-import {Input} from '@/components/shared/input/text'
 import {Button} from '@/components/shared'
-import {Heading, Text} from '@/components/shared/text'
+import {Input} from '@/components/shared/input/text'
 import Link from '@/components/shared/link'
-import {EnvelopeIcon} from '@heroicons/react/24/solid'
+import {Heading, Text} from '@/components/shared/text'
 import {vg} from '@/lib/api'
 import WolfoxDrawing from '@/src/images/png/wolfox-drawing.png'
+import {EnvelopeIcon} from '@heroicons/react/24/solid'
+import {FC, FormEvent} from 'react'
 
-const AnonUserSettings: React.FC = () => {
-    const submitInviteCode = (e: React.FormEvent<HTMLFormElement>) => {
+const AnonUserSettings: FC = () => {
+    const submitInviteCode = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const formData = new FormData(e.currentTarget)
         const post = {

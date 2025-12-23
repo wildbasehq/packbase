@@ -1,12 +1,12 @@
 export function queryBuildFromRaw(query: string): string {
-    if (!query) return "";
+    if (!query) return ''
 
-    const parts: string[] = [];
-    let current = "";
-    let inQuotes = false;
+    const parts: string[] = []
+    let current = ''
+    let inQuotes = false
 
     for (let i = 0; i < query.length; i++) {
-        const ch = query[i];
+        const ch = query[i]
 
         if (ch === '"') {
             if (!inQuotes) {
@@ -17,19 +17,19 @@ export function queryBuildFromRaw(query: string): string {
                         .trim()
                         .split(/\s+/)
                         .forEach((w) => {
-                            if (w.length > 0) parts.push(`"~${w}"`);
-                        });
+                            if (w.length > 0) parts.push(`"~${w}"`)
+                        })
                 }
-                current = '"';
-                inQuotes = true;
+                current = '"'
+                inQuotes = true
             } else {
                 // ending a quoted segment
-                current += '"';
+                current += '"'
                 if (current.trim().length > 0) {
-                    parts.push(current.trim());
+                    parts.push(current.trim())
                 }
-                current = "";
-                inQuotes = false;
+                current = ''
+                inQuotes = false
             }
         } else if (/\s/.test(ch) && !inQuotes) {
             // whitespace outside quotes -> word boundary
@@ -38,12 +38,12 @@ export function queryBuildFromRaw(query: string): string {
                     .trim()
                     .split(/\s+/)
                     .forEach((w) => {
-                        if (w.length > 0) parts.push(`"~${w}"`);
-                    });
-                current = "";
+                        if (w.length > 0) parts.push(`"~${w}"`)
+                    })
+                current = ''
             }
         } else {
-            current += ch;
+            current += ch
         }
     }
 
@@ -51,16 +51,16 @@ export function queryBuildFromRaw(query: string): string {
     if (current.trim()) {
         if (inQuotes) {
             // unterminated quote, keep as\-is
-            parts.push(current.trim());
+            parts.push(current.trim())
         } else {
             current
                 .trim()
                 .split(/\s+/)
                 .forEach((w) => {
-                    if (w.length > 0) parts.push(`"~${w}"`);
-                });
+                    if (w.length > 0) parts.push(`"~${w}"`)
+                })
         }
     }
 
-    return parts.join(" ");
+    return parts.join(' ')
 }

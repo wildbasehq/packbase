@@ -1,12 +1,12 @@
-import type React from 'react'
-import {cn} from "@/lib";
-import {Button} from ".";
+import {cn} from '@/lib'
+import {ComponentPropsWithoutRef, PropsWithChildren} from 'react'
+import {Button} from '.'
 
 export function Pagination({
                                'aria-label': ariaLabel = 'Page navigation',
                                className,
                                ...props
-                           }: React.ComponentPropsWithoutRef<'nav'>) {
+                           }: ComponentPropsWithoutRef<'nav'>) {
     return <nav aria-label={ariaLabel} {...props} className={cn(className, 'flex gap-x-2')}/>
 }
 
@@ -15,7 +15,7 @@ export function PaginationPrevious({
                                        className,
                                        children = 'Previous',
                                        replace = false,
-                                   }: React.PropsWithChildren<{
+                                   }: PropsWithChildren<{
     href?: string | null;
     className?: string;
     replace?: boolean
@@ -24,9 +24,9 @@ export function PaginationPrevious({
         <span className={cn(className, 'grow basis-0')}>
             <Button {...(href === null ? {disabled: true} : {href})} plain aria-label="Previous page" onClick={(e) => {
                 if (replace && href !== null) {
-                    e.preventDefault();
-                    window.history.replaceState(null, '', href);
-                    window.dispatchEvent(new PopStateEvent('popstate'));
+                    e.preventDefault()
+                    window.history.replaceState(null, '', href)
+                    window.dispatchEvent(new PopStateEvent('popstate'))
                 }
             }}>
                 <svg className="stroke-current" data-slot="icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -47,7 +47,7 @@ export function PaginationNext({
                                    href = null,
                                    className,
                                    children = 'Next',
-                               }: React.PropsWithChildren<{ href?: string | null; className?: string }>) {
+                               }: PropsWithChildren<{ href?: string | null; className?: string }>) {
     return (
         <span className={cn(className, 'flex grow basis-0 justify-end')}>
             <Button {...(href === null ? {disabled: true} : {href})} plain aria-label="Next page">
@@ -65,7 +65,7 @@ export function PaginationNext({
     )
 }
 
-export function PaginationList({className, ...props}: React.ComponentPropsWithoutRef<'span'>) {
+export function PaginationList({className, ...props}: ComponentPropsWithoutRef<'span'>) {
     return <span {...props} className={cn(className, 'hidden items-baseline gap-x-2 sm:flex')}/>
 }
 
@@ -75,7 +75,7 @@ export function PaginationPage({
                                    current = false,
                                    children,
                                    onClick,
-                               }: React.PropsWithChildren<{
+                               }: PropsWithChildren<{
     href: string;
     className?: string;
     current?: boolean;
@@ -99,7 +99,7 @@ export function PaginationPage({
     )
 }
 
-export function PaginationGap({className, children = <>&hellip;</>, ...props}: React.ComponentPropsWithoutRef<'span'>) {
+export function PaginationGap({className, children = <>&hellip;</>, ...props}: ComponentPropsWithoutRef<'span'>) {
     return (
         <span
             aria-hidden="true"

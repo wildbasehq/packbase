@@ -1,6 +1,6 @@
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
-import type React from 'react'
-import {cn} from "@/lib";
+import {ComponentPropsWithoutRef} from 'react'
 
 export function Fieldset({className, ...props}: {
     className?: string
@@ -19,7 +19,7 @@ export function Legend({className, ...props}: { className?: string } & Omit<Head
     )
 }
 
-export function FieldGroup({className, ...props}: React.ComponentPropsWithoutRef<'div'>) {
+export function FieldGroup({className, ...props}: ComponentPropsWithoutRef<'div'>) {
     return <div data-slot="control" {...props} className={cn(className, 'space-y-8')}/>
 }
 

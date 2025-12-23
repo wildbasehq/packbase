@@ -53,6 +53,14 @@ class Packbase {
 
     private readonly idbSupported = typeof window !== 'undefined' && 'indexedDB' in window
     private dbPromise: Promise<IDBDatabase> | null = null
+    private log = {
+        debug: (msg: string, ...args: any[]) => log.debug('Packbase SDK', msg, ...args),
+        info: (msg: string, ...args: any[]) => log.info('Packbase SDK', msg, ...args),
+        warn: (msg: string, ...args: any[]) => log.warn('Packbase SDK', msg, ...args),
+        error: (msg: string, ...args: any[]) => log.error('Packbase SDK', msg, ...args),
+    }
+
+    // ------------- Event API -------------
 
     constructor() {
         console.log(
@@ -68,7 +76,7 @@ __/\\_| |__   __ _ ___  ___
         )
 
         console.log('')
-        console.log("Welcome. Don't run random scripts people send to you. That'd be fucking stupid as shit.")
+        console.log('Welcome. Don\'t run random scripts people send to you. That\'d be fucking stupid as shit.')
         console.log('')
 
         if (this.idbSupported) {
@@ -80,8 +88,6 @@ __/\\_| |__   __ _ ___  ___
             this.log.info('IndexedDB not supported; running in memory-only mode')
         }
     }
-
-    // ------------- Event API -------------
 
     on(eventName: string, callback: (data: PackbaseEventData) => void): () => void {
         this.log.info(`on(): ${eventName}`)
@@ -110,6 +116,8 @@ __/\\_| |__   __ _ ___  ___
         this.on(eventName, wrapper)
     }
 
+    // ------------- Plugin API -------------
+
     emit(eventName: string, data: any): void {
         const eventData: PackbaseEventData = {
             type: eventName,
@@ -130,8 +138,6 @@ __/\\_| |__   __ _ ___  ___
         }
         this.debugEvent(eventData)
     }
-
-    // ------------- Plugin API -------------
 
     registerPlugin(pluginInfo: PluginInfo, functions?: Record<string, Function>): string {
         const id = this.generatePluginId(pluginInfo)
@@ -200,6 +206,8 @@ __/\\_| |__   __ _ ___  ___
         return out
     }
 
+    // ------------- IndexedDB (private) -------------
+
     async callPluginFunction<T = any>(pluginId: string, functionName: string, ...args: any[]): Promise<T> {
         const map = this.pluginFunctions.get(pluginId)
         if (!map) throw new Error(`No functions registered for plugin ${pluginId}`)
@@ -208,8 +216,6 @@ __/\\_| |__   __ _ ___  ___
         const result = fn(...args)
         return result instanceof Promise ? await result : (result as T)
     }
-
-    // ------------- IndexedDB (private) -------------
 
     private openDB(): Promise<IDBDatabase> {
         if (this.dbPromise) return this.dbPromise
@@ -291,6 +297,8 @@ __/\\_| |__   __ _ ___  ___
         })
     }
 
+    // ------------- Utils (private) -------------
+
     private async restoreFromDB(): Promise<void> {
         const db = await this.openDB()
 
@@ -321,15 +329,6 @@ __/\\_| |__   __ _ ___  ___
 
             return acc
         }, new Map<string, Map<string, Function>>())
-    }
-
-    // ------------- Utils (private) -------------
-
-    private log = {
-        debug: (msg: string, ...args: any[]) => log.debug('Packbase SDK', msg, ...args),
-        info: (msg: string, ...args: any[]) => log.info('Packbase SDK', msg, ...args),
-        warn: (msg: string, ...args: any[]) => log.warn('Packbase SDK', msg, ...args),
-        error: (msg: string, ...args: any[]) => log.error('Packbase SDK', msg, ...args),
     }
 
     private debugEvent(evt: PackbaseEventData) {

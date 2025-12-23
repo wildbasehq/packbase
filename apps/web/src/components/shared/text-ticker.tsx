@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react'
+import {Transition} from 'motion'
 import {AnimatePresence, motion} from 'motion/react'
-import {Transition} from "motion";
+import {useEffect, useState} from 'react'
 
 export default function TextTicker({
                                        texts = [],

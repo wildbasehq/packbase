@@ -2,17 +2,10 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-// src/components/feed/ImageOverlay.tsx
+import {useUIStore} from '@/lib/state'
+import {ArrowLeftIcon, ArrowRightIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, XMarkIcon} from '@heroicons/react/24/outline'
 import {DragEvent, MouseEvent, TouchEvent, useEffect, useRef, useState} from 'react'
 import {createPortal} from 'react-dom'
-import {
-    ArrowLeftIcon,
-    ArrowRightIcon,
-    MagnifyingGlassMinusIcon,
-    MagnifyingGlassPlusIcon,
-    XMarkIcon
-} from '@heroicons/react/24/outline'
-import {useUIStore} from '@/lib/state'
 import {Asset} from './types/post'
 
 interface ImageOverlayProps {

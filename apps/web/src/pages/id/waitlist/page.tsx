@@ -3,11 +3,11 @@
  */
 
 import Link from '@/components/shared/link'
-import {SignUp, Waitlist} from '@clerk/clerk-react'
-import {Text} from '@/components/shared/text.tsx'
+import {Text} from '@/components/shared/text'
+import {isVisible} from '@/lib'
 import {Alert, AlertDescription, AlertTitle} from '@/src/components'
-import {Activity, useState} from "react";
-import {isVisible} from "@/lib";
+import {SignUp, Waitlist} from '@clerk/clerk-react'
+import {Activity, useState} from 'react'
 
 export default function IDWaitlist() {
     // @TODO make this fetch from Clerk. Shitty thing for now.

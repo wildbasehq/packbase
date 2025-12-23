@@ -1,10 +1,10 @@
+import {Button} from '@/components/shared'
 import Markdown from '@/components/shared/markdown'
 import {Heading, Text} from '@/components/shared/text'
-import {Button} from '@/components/shared'
 import {vg} from '@/lib/api'
-import {toast} from 'sonner'
+import {hasPackPermissionBit, PACK_PERMISSIONS} from '@/lib/utils/has-pack-permission-bit'
 import {MinusIcon, PlusIcon} from '@heroicons/react/16/solid'
-import {hasPackPermissionBit, PACK_PERMISSIONS} from "@/lib/utils/has-pack-permission-bit.ts";
+import {toast} from 'sonner'
 
 export default function PackHeader({...props}: any) {
     const pack = props.pack

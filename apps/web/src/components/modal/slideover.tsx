@@ -2,18 +2,18 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React from 'react'
-import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import {Dialog, DialogBackdrop, DialogPanel} from '@headlessui/react'
+import {XMarkIcon} from '@heroicons/react/24/outline'
+import {Dispatch, ReactNode, SetStateAction} from 'react'
 
 export function Slideover({
-    ...props
-}: {
-    open: [boolean, React.Dispatch<React.SetStateAction<boolean>>]
+                              ...props
+                          }: {
+    open: [boolean, Dispatch<SetStateAction<boolean>>]
     expandNatural?: boolean // default: false, expands to largest size possible, up to 1/4 of screen
     className?: string
-    navbar?: React.ReactNode
-    children: React.ReactNode
+    navbar?: ReactNode
+    children: ReactNode
 }) {
     const [open, setOpen] = props.open
 
@@ -39,9 +39,9 @@ export function Slideover({
                                         onClick={() => setOpen(false)}
                                         className="relative bg-n-1 dark:bg-n-9 p-1.5 rounded-md ring-default focus:ring-2 focus:outline-hidden"
                                     >
-                                        <span className="absolute -inset-2.5" />
+                                        <span className="absolute -inset-2.5"/>
                                         <span className="sr-only">Close panel</span>
-                                        <XMarkIcon aria-hidden="true" className="size-4" />
+                                        <XMarkIcon aria-hidden="true" className="size-4"/>
                                     </button>
                                 </div>
                                 <div className="relative my-6 flex-1 px-4 sm:px-6">{props.children}</div>

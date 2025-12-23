@@ -1,10 +1,10 @@
-import {YapockType} from '@/index';
-import {t} from 'elysia';
-import {getUser} from '@/routes/user/[username]/index';
-import {HTTPError} from '@/lib/HTTPError';
-import prisma from '@/db/prisma';
-import {RSSGenerator} from '@/lib/rss';
-import {checkUserBillingPermission} from "@/utils/clerk/check-user-permission";
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import {RSSGenerator} from '@/lib/rss'
+import {getUser} from '@/routes/user/[username]/index'
+import {checkUserBillingPermission} from '@/utils/clerk/check-user-permission'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app.get(
@@ -14,15 +14,15 @@ export default (app: YapockType) =>
             const profile = await getUser({
                 by: 'username',
                 value: params.username,
-            });
+            })
 
             if (!profile) {
                 throw HTTPError.notFound({
                     summary: 'User not found.',
-                });
+                })
             }
 
-            const postLimit = await checkUserBillingPermission(profile.owner_id, 'extended_search') ? 100 : 5;
+            const postLimit = await checkUserBillingPermission(profile.owner_id, 'extended_search') ? 100 : 5
             const posts = await prisma.posts.findMany({
                 where: {
                     user_id: profile.id,
@@ -41,11 +41,11 @@ export default (app: YapockType) =>
                     tenant_id: true,
                     channel_id: true,
                 },
-            });
+            })
 
             // Get base URL from request
-            const url = new URL(request.url);
-            const baseUrl = `${url.protocol}//packbase.app`;
+            const url = new URL(request.url)
+            const baseUrl = `${url.protocol}//packbase.app`
 
             // tenant_id to pack slug mapping
             for (const post of posts) {
@@ -54,7 +54,7 @@ export default (app: YapockType) =>
                         where: {id: post.tenant_id},
                         select: {slug: true},
                     });
-                    (post as any).pack_slug = pack?.slug || null;
+                    (post as any).pack_slug = pack?.slug || null
                 }
             }
 
@@ -68,12 +68,12 @@ export default (app: YapockType) =>
                 },
                 posts,
                 baseUrl
-            );
+            )
 
             // Set proper headers for RSS feed
-            set.headers['Content-Type'] = 'application/rss+xml; charset=utf-8';
+            set.headers['Content-Type'] = 'application/rss+xml; charset=utf-8'
 
-            return rssXml;
+            return rssXml
         },
         {
             params: t.Object({

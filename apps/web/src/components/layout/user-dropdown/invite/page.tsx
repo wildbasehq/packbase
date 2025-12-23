@@ -1,4 +1,3 @@
-import React from 'react'
 import {
     Button,
     Description,
@@ -15,22 +14,23 @@ import {
     TableRow,
     useContentFrame,
 } from '@/components/shared'
-import {PaperAirplaneIcon} from '@heroicons/react/16/solid'
+import {Text} from '@/components/shared/text'
 import {vg} from '@/lib'
-import {toast} from 'sonner'
-import {Text} from '@/components/shared/text.tsx'
-import useSound from 'use-sound'
 import inviteFailureSFX from '@/src/audio/invite-failure.wav'
 import inviteStartSFX from '@/src/audio/invite-success.wav'
+import {PaperAirplaneIcon} from '@heroicons/react/16/solid'
+import {FC, FormEvent, useRef, useState} from 'react'
+import {toast} from 'sonner'
+import useSound from 'use-sound'
 
-const InviteSettings: React.FC = () => {
-    const [celebrate, setCelebrate] = React.useState(false)
-    const [failed, setFailed] = React.useState(false)
+const InviteSettings: FC = () => {
+    const [celebrate, setCelebrate] = useState(false)
+    const [failed, setFailed] = useState(false)
     const [playInviteStartSFX] = useSound(inviteStartSFX, {playbackRate: 0.8})
     const [playInviteFailureSFX] = useSound(inviteFailureSFX, {playbackRate: 0.7})
-    const formRef = React.useRef<HTMLFormElement>(null)
+    const formRef = useRef<HTMLFormElement>(null)
 
-    const onInvite = (e: React.FormEvent<HTMLFormElement>) => {
+    const onInvite = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const formData = new FormData(e.currentTarget)
         const email = formData.get('email')

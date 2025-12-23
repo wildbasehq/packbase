@@ -1,6 +1,6 @@
-import {Button} from "@/src/components";
-import {useResourceStore, vg} from "@/lib";
-import {toast} from "sonner";
+import {useResourceStore, vg} from '@/lib'
+import {Button} from '@/src/components'
+import {toast} from 'sonner'
 
 export default function PackJoinCTA() {
     const {currentResource} = useResourceStore()

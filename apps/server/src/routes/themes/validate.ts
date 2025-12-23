@@ -1,7 +1,7 @@
-import {YapockType} from '@/index';
-import validateThemeContent from '@/lib/themes/validateThemeContent';
-import {t} from 'elysia';
-import requiresAccount from "@/utils/identity/requires-account";
+import {YapockType} from '@/index'
+import validateThemeContent from '@/lib/themes/validateThemeContent'
+import requiresAccount from '@/utils/identity/requires-account'
+import {t} from 'elysia'
 
 // Define the validation response schema
 const ValidationResponse = t.Object({
@@ -10,13 +10,13 @@ const ValidationResponse = t.Object({
     css: t.String(),
     htmlIssue: t.Optional(t.String()),
     cssIssue: t.Optional(t.String()),
-});
+})
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({set, body, user}) => {
-            await requiresAccount({set, user});
+            await requiresAccount({set, user})
 
             // Validate the theme content in dry run mode (no errors thrown)
             return validateThemeContent(
@@ -25,7 +25,7 @@ export default (app: YapockType) =>
                     css: body.css,
                 },
                 true,
-            );
+            )
         },
         {
             detail: {

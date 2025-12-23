@@ -2,11 +2,11 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {useEffect, useState} from 'react'
-import {Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle} from '@/components/shared/dialog'
 import {Button, Text} from '@/components/shared'
-import PackbaseInstance from '@/lib/workers/global-event-emit.ts'
-import {useLocalStorage} from "usehooks-ts";
+import {Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle} from '@/components/shared/dialog'
+import PackbaseInstance from '@/lib/workers/global-event-emit'
+import {useEffect, useState} from 'react'
+import {useLocalStorage} from 'usehooks-ts'
 
 export default function R18ContentWarning() {
     const [isOpen, setIsOpen] = useState(false)

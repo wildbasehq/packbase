@@ -1,8 +1,8 @@
+import {ChannelHeader} from '@/components/chat/ChannelHeader'
+import {MessageComposer} from '@/components/chat/MessageComposer'
+import {MessagesList} from '@/components/chat/MessagesList'
+import ContentFrame from '@/lib/hooks/content-frame'
 import {useParams} from 'wouter'
-import ContentFrame from '@/lib/hooks/content-frame.tsx'
-import {ChannelHeader} from '@/components/chat/ChannelHeader.tsx'
-import {MessagesList} from '@/components/chat/MessagesList.tsx'
-import {MessageComposer} from '@/components/chat/MessageComposer.tsx'
 
 export default function ChatThreadPage() {
     const {id} = useParams<{ id: string }>()

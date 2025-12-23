@@ -2,8 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React from 'react'
 import {cn} from '@/lib'
+import {CSSProperties, ReactNode, RefObject, useCallback, useEffect, useRef, useState} from 'react'
 
 export type FloatingCalloutPlacement = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
@@ -14,14 +14,14 @@ export type FloatingCalloutAnchorSide = 'top' | 'bottom'
 export type FloatingCalloutTrigger =
     | HTMLElement
     | null
-    | React.RefObject<HTMLElement | null | undefined>
+    | RefObject<HTMLElement | null | undefined>
 
 export interface FloatingCalloutProps {
     /** Whether the callout is rendered. */
     open: boolean
 
     /** The callout body (usually an <Alert/> or <Card/>). */
-    children: React.ReactNode
+    children: ReactNode
 
     /** Where on the screen the callout overlay should be aligned. */
     placement?: FloatingCalloutPlacement
@@ -101,17 +101,17 @@ export function FloatingCallout({
         return trigger as HTMLElement
     })()
 
-    const [anchorStyle, setAnchorStyle] = React.useState<React.CSSProperties | null>(null)
-    const [computedPointerLeftPx, setComputedPointerLeftPx] = React.useState<number | null>(null)
+    const [anchorStyle, setAnchorStyle] = useState<CSSProperties | null>(null)
+    const [computedPointerLeftPx, setComputedPointerLeftPx] = useState<number | null>(null)
 
-    const calloutRef = React.useRef<HTMLDivElement | null>(null)
+    const calloutRef = useRef<HTMLDivElement | null>(null)
 
-    const snapToDevicePixel = React.useCallback((valuePx: number) => {
+    const snapToDevicePixel = useCallback((valuePx: number) => {
         const dpr = typeof window !== 'undefined' && window.devicePixelRatio ? window.devicePixelRatio : 1
         return Math.round(valuePx * dpr) / dpr
     }, [])
 
-    const updateAnchoredPosition = React.useCallback(() => {
+    const updateAnchoredPosition = useCallback(() => {
         if (!resolvedTrigger || !calloutRef.current) {
             setAnchorStyle(null)
             setComputedPointerLeftPx(null)
@@ -162,7 +162,7 @@ export function FloatingCallout({
         setComputedPointerLeftPx(snapToDevicePixel(clampedWithin))
     }, [anchorGapPx, anchorSide, resolvedTrigger, snapToDevicePixel, viewportPaddingPx])
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!open || !resolvedTrigger) return undefined
 
         updateAnchoredPosition()
@@ -212,7 +212,7 @@ export function FloatingCallout({
                             left: -99999,
                             top: -99999,
                             visibility: 'hidden',
-                        } satisfies React.CSSProperties)
+                        } satisfies CSSProperties)
                         : anchorStyle ?? undefined
                 }
             >

@@ -2,11 +2,10 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-// src/components/feed/feed-post.tsx
-import {useState} from 'react'
-import {toast} from 'sonner'
 import {vg} from '@/lib/api'
 import {useUserAccountStore} from '@/lib/state'
+import {useState} from 'react'
+import {toast} from 'sonner'
 import type {FeedPostData, FeedPostProps} from '.'
 import {ThreadPost} from '.'
 

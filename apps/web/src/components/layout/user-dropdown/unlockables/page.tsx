@@ -1,23 +1,23 @@
-import React, {useEffect, useState} from 'react'
-import {Container} from '@/components/layout/container.tsx'
-import {motion} from 'motion/react'
-import {Heading, Text} from '@/components/shared/text.tsx'
-import {useUserAccountStore} from '@/lib'
-import {BentoGenericUnlockableBadge} from '@/lib/utils/pak.tsx'
+import {Container} from '@/components/layout/container'
+import {Badge} from '@/components/shared/badge'
+import Card from '@/components/shared/card'
+import {Heading, Text} from '@/components/shared/text'
 import badgeConfig from '@/datasets/bento/pak/badges/pak.json'
-import {CheckCircleIcon, LockClosedIcon, TrophyIcon} from '@heroicons/react/24/solid'
-import {QuestionMarkCircleIcon} from '@heroicons/react/20/solid'
-import {toast} from 'sonner'
+import {useUserAccountStore} from '@/lib'
 import {vg} from '@/lib/api'
-import Card from '@/components/shared/card.tsx'
-import {Badge} from '@/components/shared/badge.tsx'
+import {BentoGenericUnlockableBadge} from '@/lib/utils/pak'
+import {QuestionMarkCircleIcon} from '@heroicons/react/20/solid'
+import {CheckCircleIcon, LockClosedIcon, TrophyIcon} from '@heroicons/react/24/solid'
+import {motion} from 'motion/react'
+import {FC, Suspense, useEffect, useMemo, useState} from 'react'
+import {toast} from 'sonner'
 
 // We'll import the existing component since it's already well-designed for this purpose
 // This is essentially a wrapper to make it fit nicely in our settings dialog
-const UnlockableSettings: React.FC = () => {
+const UnlockableSettings: FC = () => {
     return (
         <div className="h-full overflow-y-auto">
-            <React.Suspense
+            <Suspense
                 fallback={
                     <div className="flex h-96 items-center justify-center">
                         <div
@@ -26,7 +26,7 @@ const UnlockableSettings: React.FC = () => {
                 }
             >
                 <TrophyCaseUnlockables/>
-            </React.Suspense>
+            </Suspense>
         </div>
     )
 }
@@ -200,14 +200,14 @@ function TrophyCaseUnlockables() {
     const invitedCount = user?.metadata?.invited || 0
 
     // Available badges based on user's unlocked content
-    const availableBadges = React.useMemo(() => {
+    const availableBadges = useMemo(() => {
         return (Object.keys(badgeConfig.config.unlockables.tooltip) || [])
             .filter(badge => (user?.metadata?.unlockables || []).includes(badge))
             .map((badge, index) => ({id: index + 1, type: badge}))
     }, [user?.metadata?.unlockables])
 
     // All possible badges to show locked ones
-    const allBadges = React.useMemo(() => {
+    const allBadges = useMemo(() => {
         const unlocked = new Set(user?.metadata?.unlockables || [])
         return (Object.keys(badgeConfig.config.unlockables.tooltip) || []).map((badge, index) => ({
             id: index + 1,

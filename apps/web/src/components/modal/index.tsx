@@ -1,8 +1,8 @@
+import {cn} from '@/lib'
 import useWindowSize from '@/lib/hooks/use-window-size'
 import {AnimatePresence, motion} from 'motion/react'
 import {ReactNode, useCallback, useEffect, useRef} from 'react'
 import Leaflet from './leaflet'
-import {cn} from "@/lib";
 
 export default function Modal({
                                   children,

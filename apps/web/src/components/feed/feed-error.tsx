@@ -1,7 +1,6 @@
-// src/components/feed/FeedError.tsx
-import {ExclamationCircleIcon} from '@heroicons/react/24/outline'
-import {Heading, Text} from '@/components/shared/text'
 import {Button} from '@/components/shared'
+import {Heading, Text} from '@/components/shared/text'
+import {ExclamationCircleIcon} from '@heroicons/react/24/outline'
 import {FeedErrorProps} from './types/feed'
 
 /**

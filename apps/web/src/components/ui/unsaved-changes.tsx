@@ -1,6 +1,6 @@
-import {HandRaisedIcon} from "@heroicons/react/16/solid";
-import {Button, Text} from "@/src/components";
-import {motion} from "motion/react";
+import {Button, Text} from '@/src/components'
+import {HandRaisedIcon} from '@heroicons/react/16/solid'
+import {motion} from 'motion/react'
 
 export default function UnsavedChangesWarning({hasChanges, submitting}: { hasChanges: boolean; submitting: boolean }) {
     return (

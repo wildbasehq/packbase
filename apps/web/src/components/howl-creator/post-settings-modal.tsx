@@ -2,14 +2,13 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-// src/components/howl-creator/post-settings-modal.tsx
-import {useState} from 'react'
-import {Heading, Text} from '@/components/shared/text.tsx'
+import {AvailablePagesType} from '@/components/howl-creator/floating-compose'
 import {Button} from '@/components/shared/button'
-import {TagsInput} from './tags-input'
+import {Heading, Text} from '@/components/shared/text'
+import {useUserAccountStore} from '@/lib'
+import {useState} from 'react'
 import ContentLabelInput from './content-label-input'
-import {AvailablePagesType} from "@/components/howl-creator/floating-compose.tsx";
-import {useUserAccountStore} from "@/lib";
+import {TagsInput} from './tags-input'
 
 export default function PostSettingsModal({
                                               selectedTags,

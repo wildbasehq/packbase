@@ -2,9 +2,9 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {Dispatch, SetStateAction, useEffect, useMemo, useRef, useState} from 'react'
-import {motion, useAnimationControls} from 'motion/react'
 import {TrashIcon} from '@heroicons/react/20/solid'
+import {motion, useAnimationControls} from 'motion/react'
+import {Dispatch, SetStateAction, useEffect, useMemo, useRef, useState} from 'react'
 
 export type Image = {
     id: string

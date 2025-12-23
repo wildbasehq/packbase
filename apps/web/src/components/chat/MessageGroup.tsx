@@ -1,8 +1,8 @@
-import React from 'react'
-import { MessageItem } from './MessageItem'
-import { ChatMessage } from './types'
-import { usePerformanceMonitor } from './usePerformanceMonitor'
-import { toast } from 'sonner'
+import {memo} from 'react'
+import {toast} from 'sonner'
+import {MessageItem} from './MessageItem'
+import {ChatMessage} from './types'
+import {usePerformanceMonitor} from './usePerformanceMonitor'
 
 interface MessageGroupProps {
     group: {
@@ -27,12 +27,12 @@ interface MessageGroupProps {
     onEditContentChange: (content: string) => void
 }
 
-export const MessageGroup = React.memo<MessageGroupProps>(
+export const MessageGroup = memo<MessageGroupProps>(
     ({
-        group,
-        author,
-        currentUserId,
-    }) => {
+         group,
+         author,
+         currentUserId,
+     }) => {
         usePerformanceMonitor('MessageGroup')
         const isOwnMessage = currentUserId ? group.authorId === currentUserId : false
 
@@ -52,7 +52,7 @@ export const MessageGroup = React.memo<MessageGroupProps>(
                             id: group.authorId,
                             display_name: author.name,
                             username: author.name, // Fallback
-                            images: { avatar: author.images_avatar || undefined }
+                            images: {avatar: author.images_avatar || undefined}
                         },
                         metadata: {
                             isPending: item._isPending

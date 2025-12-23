@@ -1,8 +1,8 @@
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
-import type React from 'react'
-import {cn} from "@/lib";
+import {ComponentPropsWithoutRef} from 'react'
 
-export function CheckboxGroup({className, ...props}: React.ComponentPropsWithoutRef<'div'>) {
+export function CheckboxGroup({className, ...props}: ComponentPropsWithoutRef<'div'>) {
     return (
         <div
             data-slot="control"

@@ -4,7 +4,7 @@ const flattenColorPalette = require("tailwindcss/lib/util/flattenColorPalette");
 module.exports = {
     content: ['./components/**/*.{ts,tsx}', './app/**/*.{ts,tsx}'],
     plugins: [
-        plugin(({ addVariant }) => {
+        plugin(({addVariant}) => {
             addVariant('radix-side-top', '&[data-side="top"]')
             addVariant('radix-side-bottom', '&[data-side="bottom"]')
             addVariant('low-fidelity', 'html.low-fidelity &')
@@ -13,10 +13,10 @@ module.exports = {
         require('tailwindcss-animate'),
         // require('@tailwindcss/forms'),
         // require('tailwindcss-inner-border'),
-        function ({ matchUtilities, theme }) {
+        function ({matchUtilities, theme}) {
             matchUtilities(
                 {
-                    highlight: (value) => ({ boxShadow: `inset 0 1px 0 0 ${value}` }),
+                    highlight: (value) => ({boxShadow: `inset 0 1px 0 0 ${value}`}),
                 },
                 {
                     values: flattenColorPalette(theme('backgroundColor')),

@@ -1,2 +1,2 @@
 // Re-export worker functionality
-export * from './workers';
+export * from './workers'

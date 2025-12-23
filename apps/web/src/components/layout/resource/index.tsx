@@ -2,17 +2,17 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import ResourceSettingsMembers from '@/components/layout/resource/pages/members'
+import ResourceSettingsTheme from '@/components/layout/resource/pages/theme'
+import {Avatar} from '@/components/shared/avatar'
+import ServerConfigRender, {decideCategoryDescription} from '@/components/shared/input/server-config-render'
+import PagedModal from '@/components/shared/paged-modal'
 import {Heading, Text} from '@/components/shared/text'
 import {useResourceStore} from '@/lib/state'
-import {ClipboardIcon, Cog6ToothIcon, UserGroupIcon} from '@heroicons/react/20/solid'
-import {Avatar} from '@/components/shared/avatar'
-import ResourceSettingsGeneral from './pages/general'
-import ResourceSettingsMembers from '@/components/layout/resource/pages/members.tsx'
-import PagedModal from '@/components/shared/paged-modal'
-import ResourceSettingsTheme from '@/components/layout/resource/pages/theme.tsx'
-import {SwatchIcon} from '@heroicons/react/16/solid'
 import {useContentFrame} from '@/src/components'
-import ServerConfigRender, {decideCategoryDescription} from '@/components/shared/input/server-config-render.tsx'
+import {SwatchIcon} from '@heroicons/react/16/solid'
+import {ClipboardIcon, Cog6ToothIcon, UserGroupIcon} from '@heroicons/react/20/solid'
+import ResourceSettingsGeneral from './pages/general'
 
 export function ResourceSettingsModal() {
     const {currentResource} = useResourceStore()

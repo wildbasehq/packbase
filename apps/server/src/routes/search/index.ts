@@ -2,40 +2,40 @@
  * Search API routes
  */
 
-import {t} from 'elysia';
-import {YapockType} from '@/index';
-import {parseQuery} from '@/lib/search/parser';
-import {executeQuery} from '@/lib/search/executor';
+import {YapockType} from '@/index'
+import {executeQuery} from '@/lib/search/executor'
+import {parseQuery} from '@/lib/search/parser'
+import {t} from 'elysia'
 
-const log = require('debug')('vg:search');
+const log = require('debug')('vg:search')
 
 const SearchAPI = (app: YapockType) =>
     app.get(
         '',
         async ({query, user, set}) => {
-            const timeStart = Date.now();
+            const timeStart = Date.now()
             try {
-                const {q, allowedTables} = query;
-                const parsed = parseQuery(q, user?.sub);
+                const {q, allowedTables} = query
+                const parsed = parseQuery(q, user?.sub)
                 const {
                     variables,
                     ...result
                 } = await executeQuery(parsed.statements)
 
-                const timeEnd = Date.now() - timeStart;
+                const timeEnd = Date.now() - timeStart
 
                 return {
                     ...result,
                     variables,
                     ms: timeEnd
-                };
+                }
             } catch (error: any) {
-                log(error);
-                set.status = 400;
+                log(error)
+                set.status = 400
                 return {
                     error: 'INVALID_QUERY',
                     message: error?.message ?? 'Failed to process search query',
-                };
+                }
             }
         },
         {
@@ -72,6 +72,6 @@ const SearchAPI = (app: YapockType) =>
                 tags: ['Search'],
             }
         },
-    );
+    )
 
-export default SearchAPI;
+export default SearchAPI

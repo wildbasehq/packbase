@@ -9,7 +9,6 @@
       "description": "Pack value-less currency",
       "category": "server_configuration"
     },
-
     "created_at": {
       "type": "string",
       "userModifiable": false,
@@ -22,7 +21,6 @@
       "category": "server_configuration",
       "db": "packs.owner_id"
     },
-
     "alpha_note": {
       "type": "string",
       "default": "Your pack will soon live in it's own transferable database for better data ownership. Most of these settings aren't accessible right now, but are here for you to see what data we have on your Pack. Yes this note is in the schema. No I do not care.",

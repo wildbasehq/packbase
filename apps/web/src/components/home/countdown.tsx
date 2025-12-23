@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react'
 import {Heading, Text} from '@/components/shared/text'
 import IkikaiServing from '@/src/images/png/ikigai-serving.png'
+import {useEffect, useState} from 'react'
 
 export default function Countdown() {
     // For countdown to 00:00 8th of April 2024 (AEDT)

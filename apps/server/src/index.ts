@@ -1,30 +1,30 @@
 // dirty replace json.stringify to support bigint
-const ogStringify = JSON.stringify;
+const ogStringify = JSON.stringify
 // @ts-ignore
 JSON.stringify = (obj) =>
     ogStringify(obj, (key, value) => {
         if (typeof value === 'bigint') {
-            return value.toString();
+            return value.toString()
         }
-        return value;
-    });
-import prisma from '@/db/prisma';
-import {Elysia} from 'elysia';
-import {cors} from '@elysiajs/cors';
-import Debug from 'debug';
-import verifyToken from '@/utils/identity/verify-token';
-import {swagger} from '@elysiajs/swagger';
-import {autoload} from 'elysia-autoload';
-import deleteNulls from '@/utils/delete-nulls';
-import fs from 'node:fs/promises';
-import posthog, {distinctId} from '@/utils/posthog';
-import './lib/rheo';
-import {HTTPError} from '@/lib/HTTPError';
-import clerkClient from './db/auth';
+        return value
+    })
+import prisma from '@/db/prisma'
+import {HTTPError} from '@/lib/HTTPError'
+import deleteNulls from '@/utils/delete-nulls'
+import verifyToken from '@/utils/identity/verify-token'
+import posthog, {distinctId} from '@/utils/posthog'
+import './lib/rheo'
+import {cors} from '@elysiajs/cors'
+import {swagger} from '@elysiajs/swagger'
+import Debug from 'debug'
+import {Elysia} from 'elysia'
+import {autoload} from 'elysia-autoload'
+import fs from 'node:fs/promises'
+import clerkClient from './db/auth'
 
-const isCluster = process.argv.includes('--cluster');
-const isBuildingSDK = process.argv.includes('--build-sdk');
-const isTestingStartupTime = process.argv.includes('--close-on-success');
+const isCluster = process.argv.includes('--cluster')
+const isBuildingSDK = process.argv.includes('--build-sdk')
+const isTestingStartupTime = process.argv.includes('--close-on-success')
 
 const log = isTestingStartupTime ? {
     info: () => {
@@ -37,9 +37,9 @@ const log = isTestingStartupTime ? {
     info: Debug('vg:init'),
     request: Debug('vg:request'),
     error: Debug('vg:init:error'),
-};
+}
 
-log.info(`Server${isCluster ? ' (cluster)' : ''} \x1b[38;5;244mSTART\x1b[0m: Awake!!`);
+log.info(`Server${isCluster ? ' (cluster)' : ''} \x1b[38;5;244mSTART\x1b[0m: Awake!!`)
 
 declare global {
     interface UserPrivateMetadata {
@@ -59,11 +59,11 @@ const Yapock = new Elysia({})
         }),
     )
     .resolve(async ({request, query}): Promise<any> => {
-        if (request.headers.get('authentication')) request.headers.set('Authorization', request.headers.get('authentication'));
-        if (query.token) request.headers.set('Authorization', `Bearer ${query.token}`);
-        request.headers.set('Authorization', request.headers.get('Authorization')?.replace('Bearer ', ''));
+        if (request.headers.get('authentication')) request.headers.set('Authorization', request.headers.get('authentication'))
+        if (query.token) request.headers.set('Authorization', `Bearer ${query.token}`)
+        request.headers.set('Authorization', request.headers.get('Authorization')?.replace('Bearer ', ''))
 
-        const user = await verifyToken(request);
+        const user = await verifyToken(request)
 
         async function logAudit({action, model_id, model_type, model_object}: {
             action: string;
@@ -73,7 +73,7 @@ const Yapock = new Elysia({})
         }) {
             // Attempt to write audit log, but never block the response on failure
             try {
-                const userId: string = (user && (user.sub as string)) || '00000000-0000-0000-0000-000000000000';
+                const userId: string = (user && (user.sub as string)) || '00000000-0000-0000-0000-000000000000'
                 await prisma.admin_audit_log.create({
                     data: {
                         user_id: userId,
@@ -82,35 +82,35 @@ const Yapock = new Elysia({})
                         model_id,
                         model_object,
                     },
-                });
+                })
             } catch (_) {
                 // Swallow audit failures
             }
         }
 
         // Check admin routes
-        const url = new URL(request.url);
+        const url = new URL(request.url)
         if (url.pathname.startsWith('/admin')) {
             const auditIfAdminSql = async (action: string, model_object: any) => {
-                if (!url.pathname.startsWith('/admin/sql')) return;
+                if (!url.pathname.startsWith('/admin/sql')) return
                 logAudit({
                     action,
                     model_id: 'unknown',
                     model_type: 'admin.sql',
                     model_object,
-                });
-            };
+                })
+            }
 
             // Get private metadata from Clerk
             if (user?.userId) {
-                const privateMetadata = await clerkClient.users.getUser(user?.userId).then((user) => user.privateMetadata);
+                const privateMetadata = await clerkClient.users.getUser(user?.userId).then((user) => user.privateMetadata)
                 if (privateMetadata?.type !== 'admin') {
-                    await auditIfAdminSql('UNAUTHORIZED', {reason: 'Not admin'});
-                    throw HTTPError.notFound({summary: 'NOT_FOUND'});
+                    await auditIfAdminSql('UNAUTHORIZED', {reason: 'Not admin'})
+                    throw HTTPError.notFound({summary: 'NOT_FOUND'})
                 }
             } else {
-                await auditIfAdminSql('UNAUTHENTICATED', {reason: 'No user'});
-                throw HTTPError.notFound({summary: 'NOT_FOUND'});
+                await auditIfAdminSql('UNAUTHENTICATED', {reason: 'No user'})
+                throw HTTPError.notFound({summary: 'NOT_FOUND'})
             }
         }
 
@@ -124,28 +124,28 @@ const Yapock = new Elysia({})
                     last_online: new Date()
                 }
             })
-            return {user, logAudit};
+            return {user, logAudit}
         }
     })
 
     .onAfterHandle(({response, request}) => {
         if (!request.url.includes('/docs')) {
-            return deleteNulls(response);
+            return deleteNulls(response)
         }
     })
 
     .onError(({code, error, request}) => {
-        console.log(code, error);
+        console.log(code, error)
         // Ensure JSON response
         try {
             if (code === 'VALIDATION')
                 return {
                     ...error.validator,
-                };
+                }
 
-            return new HTTPError(error as any).toJSON();
+            return new HTTPError(error as any).toJSON()
         } catch (_) {
-            return error;
+            return error
         }
     })
     // Load routes
@@ -192,18 +192,18 @@ const Yapock = new Elysia({})
             connections: process.env.CLUSTER_WORKERS ? process.env.CLUSTER_WORKERS : 1,
             cpu: process.cpuUsage().system / 1000000000,
             memory: process.memoryUsage().heapUsed / 1000000,
-        };
+        }
     })
 
 Yapock.listen(process.env.PORT || 8000, async () => {
-    const startupMs = performance.now();
+    const startupMs = performance.now()
 
     if (isBuildingSDK) {
-        log.info(`Server \x1b[32mOK\x1b[0m: Heading back to the SDK build process`);
-        process.exit(0);
+        log.info(`Server \x1b[32mOK\x1b[0m: Heading back to the SDK build process`)
+        process.exit(0)
     } else if (isTestingStartupTime) {
-        console.log(startupMs);
-        process.exit(0);
+        console.log(startupMs)
+        process.exit(0)
     }
 
     posthog.capture({
@@ -213,7 +213,7 @@ Yapock.listen(process.env.PORT || 8000, async () => {
             startup: startupMs,
             maintenance: process.env.MAINTENANCE,
         },
-    });
+    })
 
     if (process.env.WEBHOOK_URL) {
         // Call webhook with message
@@ -229,40 +229,40 @@ Yapock.listen(process.env.PORT || 8000, async () => {
             }),
         })
             .then(() => {
-                log.info('Webhook called');
+                log.info('Webhook called')
             })
             .catch((e) => {
-                log.error('Webhook failed', e);
-            });
+                log.error('Webhook failed', e)
+            })
     }
 
     if (startupMs > 150) {
         log.info(
             `Server \x1b[31mSLOW\x1b[0m: Startup took ${startupMs}ms (true ${performance.now()}) (${Math.round(startupMs / 1000)}s${Math.round(startupMs / 1000) > 60 ? `, ${Math.round(startupMs / 1000 / 60)}m` : ''}), Listening on ${process.env.PORT || 8000}\nThis took too long! It will add up the more server instances you have.`,
-        );
+        )
     } else {
-        log.info(`Server \x1b[32mOK\x1b[0m: Startup took ${startupMs}ms (true ${Math.round(performance.now())}), Listening on ${process.env.PORT || 8000}`);
+        log.info(`Server \x1b[32mOK\x1b[0m: Startup took ${startupMs}ms (true ${Math.round(performance.now())}), Listening on ${process.env.PORT || 8000}`)
     }
 
     // Run all files in order inside the migrate folder
     try {
-        const modules = await fs.readdir(`${__dirname}/migrate`);
+        const modules = await fs.readdir(`${__dirname}/migrate`)
         for (const module of modules) {
-            const index = modules.indexOf(module);
+            const index = modules.indexOf(module)
             if (module.endsWith('.ts')) {
-                log.info(`Running migration ${module}`);
-                const {default: func} = await import(`${__dirname}/migrate/${module}`);
-                await func();
+                log.info(`Running migration ${module}`)
+                const {default: func} = await import(`${__dirname}/migrate/${module}`)
+                await func()
 
                 if (index === modules.length - 1) {
-                    log.info('Finished running migrations');
+                    log.info('Finished running migrations')
                 }
             }
         }
     } catch (e) {
-        log.error('Error running migrations', e);
+        log.error('Error running migrations', e)
     }
-});
+})
 
 // process.on('unhandledRejection', (reason, promise) => {
 //     log.error('Unhandled Rejection at:', promise, 'reason:', reason)

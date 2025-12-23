@@ -1,18 +1,18 @@
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
-import type React from 'react'
+import {ComponentPropsWithoutRef, ElementType} from 'react'
 import {Button} from './button'
 import Link from './link'
-import {cn} from "@/lib";
 
 export function Dropdown(props: Headless.MenuProps) {
     return <Headless.Menu {...props} />
 }
 
-export function DropdownButton<T extends React.ElementType = typeof Button>({
-                                                                                // @ts-ignore
-                                                                                as = Button,
-                                                                                ...props
-                                                                            }: {
+export function DropdownButton<T extends ElementType = typeof Button>({
+                                                                          // @ts-ignore
+                                                                          as = Button,
+                                                                          ...props
+                                                                      }: {
     className?: string
 } & Omit<Headless.MenuButtonProps<T>, 'className'>) {
     // @ts-ignore
@@ -58,7 +58,7 @@ export function DropdownItem({
                                  ...props
                              }: {
     className?: string
-} & (Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'> | Omit<React.ComponentPropsWithoutRef<'button'>, 'className'>)) {
+} & (Omit<ComponentPropsWithoutRef<typeof Link>, 'className'> | Omit<ComponentPropsWithoutRef<'button'>, 'className'>)) {
     let classes = cn(
         className,
         // Base styles
@@ -89,7 +89,7 @@ export function DropdownItem({
     )
 }
 
-export function DropdownHeader({className, ...props}: Readonly<React.ComponentPropsWithoutRef<'div'>>) {
+export function DropdownHeader({className, ...props}: Readonly<ComponentPropsWithoutRef<'div'>>) {
     return <div {...props} className={cn(className, 'col-span-5 px-3.5 pb-1 pt-2.5 sm:px-3')}/>
 }
 

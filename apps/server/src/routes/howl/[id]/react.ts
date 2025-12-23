@@ -1,32 +1,32 @@
-import {t} from 'elysia';
-import {YapockType} from '@/index';
-import {ErrorTypebox} from '@/utils/errors';
-import {HTTPError} from '@/lib/HTTPError';
-import prisma from '@/db/prisma';
-import {NotificationManager} from '@/lib/NotificationManager';
-import requiresToken from '@/utils/identity/requires-token';
-import requiresAccount from "@/utils/identity/requires-account";
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import {NotificationManager} from '@/lib/NotificationManager'
+import {ErrorTypebox} from '@/utils/errors'
+import requiresAccount from '@/utils/identity/requires-account'
+import requiresToken from '@/utils/identity/requires-token'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app
         .post(
             '',
             async ({params: {id}, body: {slot = '👍'}, set, user}: any) => {
-                await requiresAccount({set, user});
+                await requiresAccount({set, user})
 
-                let postExists;
+                let postExists
                 try {
-                    postExists = await prisma.posts.findUnique({where: {id}, select: {user_id: true, body: true}});
+                    postExists = await prisma.posts.findUnique({where: {id}, select: {user_id: true, body: true}})
                 } catch (postError) {
-                    set.status = 500;
-                    throw HTTPError.fromError(postError);
+                    set.status = 500
+                    throw HTTPError.fromError(postError)
                 }
                 if (!postExists) {
-                    set.status = 404;
-                    return;
+                    set.status = 404
+                    return
                 }
 
-                let reactionExists;
+                let reactionExists
                 try {
                     reactionExists = await prisma.posts_reactions.findMany({
                         where: {
@@ -38,16 +38,16 @@ export default (app: YapockType) =>
                             created_at: true,
                             slot: true,
                         },
-                    });
+                    })
                 } catch (reactionError) {
-                    set.status = 500;
-                    throw HTTPError.fromError(reactionError);
+                    set.status = 500
+                    throw HTTPError.fromError(reactionError)
                 }
                 if (reactionExists && reactionExists.length > 0) {
-                    set.status = 400;
+                    set.status = 400
                     throw HTTPError.badRequest({
                         summary: 'You have already reacted to this post.',
-                    });
+                    })
                 }
 
                 // Count all reactions for this post
@@ -55,13 +55,13 @@ export default (app: YapockType) =>
                     where: {
                         post_id: id,
                     },
-                });
+                })
 
                 if (reactionCount >= 10) {
-                    set.status = 400;
+                    set.status = 400
                     throw HTTPError.badRequest({
                         summary: 'Too many reactions.',
-                    });
+                    })
                 }
 
                 try {
@@ -71,9 +71,9 @@ export default (app: YapockType) =>
                             slot,
                             actor_id: user.sub,
                         },
-                    });
+                    })
                 } catch (insertError) {
-                    throw HTTPError.fromError(insertError);
+                    throw HTTPError.fromError(insertError)
                 }
 
                 await NotificationManager.createNotification(postExists.user_id, 'howl_react', `${user.sessionClaims.nickname} reacted ${slot}`, postExists.body, {
@@ -83,9 +83,9 @@ export default (app: YapockType) =>
                         username: user.sessionClaims.nickname,
                         images_avatar: `${process.env.HOSTNAME}/user/${user.sub}/avatar`
                     },
-                });
+                })
 
-                set.status = 201;
+                set.status = 201
             },
             {
                 detail: {
@@ -110,7 +110,7 @@ export default (app: YapockType) =>
         .delete(
             '',
             async ({params: {id}, set, user}) => {
-                await requiresToken({set, user});
+                await requiresToken({set, user})
 
                 try {
                     await prisma.posts_reactions.deleteMany({
@@ -118,12 +118,12 @@ export default (app: YapockType) =>
                             post_id: id,
                             actor_id: user.sub,
                         },
-                    });
+                    })
                 } catch (deleteError) {
-                    throw HTTPError.fromError(deleteError);
+                    throw HTTPError.fromError(deleteError)
                 }
 
-                set.status = 204;
+                set.status = 204
             },
             {
                 detail: {

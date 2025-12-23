@@ -1,5 +1,5 @@
-import {t} from 'elysia';
-import emojiRegex from 'emoji-regex';
+import {t} from 'elysia'
+import emojiRegex from 'emoji-regex'
 
 export const UserProfile = t.Object(
     {
@@ -49,7 +49,7 @@ export const UserProfile = t.Object(
     {
         additionalProperties: true,
     },
-);
+)
 
 export const UserProfileWithInviteCode = t.Intersect([
     UserProfile,
@@ -61,7 +61,7 @@ export const UserProfileWithInviteCode = t.Intersect([
             }),
         ),
     }),
-]);
+])
 
 export const UserProfileStatus = t.Object({
     ...UserProfile.props,
@@ -83,7 +83,7 @@ export const UserProfileStatus = t.Object({
             }),
         ]),
     ),
-});
+})
 
 export const PackCreateBody = t.Object({
     display_name: t.String({
@@ -97,7 +97,7 @@ export const PackCreateBody = t.Object({
     description: t.String({
         maxLength: 256,
     }),
-});
+})
 
 export const PackEditBody = t.Object({
     slug: t.Optional(
@@ -131,13 +131,13 @@ export const PackEditBody = t.Object({
             header: t.Optional(t.Any()),
         }),
     ),
-});
+})
 
 export const PackMembership = t.Object({
     id: t.Number(),
     tenant_id: t.String(),
     // created_at: t.String(),
-});
+})
 
 export const PackResponse = t.Object({
     id: t.String(),
@@ -186,7 +186,7 @@ export const PackResponse = t.Object({
             }),
         ),
     ),
-});
+})
 
 export const HowlBody = t.Object({
     tenant_id: t.String(),
@@ -213,7 +213,7 @@ export const HowlBody = t.Object({
             }),
         ),
     ),
-});
+})
 
 export const HowlComment = t.Object({
     user: UserProfile,
@@ -221,7 +221,7 @@ export const HowlComment = t.Object({
     body: t.String({
         maxLength: 4096,
     }),
-});
+})
 
 export const HowlResponse = t.Object({
     id: t.String(),
@@ -287,7 +287,7 @@ export const HowlResponse = t.Object({
     //         },
     //     ),
     // ),
-});
+})
 
 export const PackPageCreateBody = t.Object({
     // title: t.String({
@@ -306,7 +306,7 @@ export const PackPageCreateBody = t.Object({
     // ticker: t.Optional(t.String()),
     // content: t.Optional(t.Any()),
     order: t.Optional(t.Number()),
-});
+})
 
 export const PackPageEditBody = t.Object({
     title: t.Optional(
@@ -331,18 +331,18 @@ export const PackPageEditBody = t.Object({
     ticker: t.Optional(t.String()),
     query: t.Optional(t.Any()),
     order: t.Optional(t.Number()),
-});
+})
 
 export const PackPageReorderBody = t.Object({
     pageId: t.String(),
     newOrder: t.Number(),
-});
+})
 
 export const Pagination = (type: any) =>
     t.Object({
         has_more: t.Boolean(),
         data: t.Array(type),
-    });
+    })
 
 export const NotificationType = t.Object({
     id: t.String(),
@@ -355,16 +355,16 @@ export const NotificationType = t.Object({
     read_at: t.Optional(t.String()),
     metadata: t.Optional(t.Any()),
     related_id: t.Optional(t.String()),
-});
+})
 
 export const NotificationReadBody = t.Object({
     id: t.Optional(t.String()),
     ids: t.Optional(t.Array(t.String())),
     all: t.Optional(t.Boolean()),
-});
+})
 
 export const NotificationFetchQuery = t.Object({
     limit: t.Optional(t.Number({default: 20})),
     cursor: t.Optional(t.String()),
     unread_only: t.Optional(t.Boolean({default: false})),
-});
+})

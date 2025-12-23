@@ -1,6 +1,7 @@
 # Settings Management System
 
-A comprehensive TypeScript settings management system that provides type-safe, validated, and conditional access control for application settings.
+A comprehensive TypeScript settings management system that provides type-safe, validated, and conditional access control
+for application settings.
 
 ## Features
 
@@ -15,21 +16,21 @@ A comprehensive TypeScript settings management system that provides type-safe, v
 ## Quick Start
 
 ```typescript
-import { Settings } from './settings';
+import {Settings} from './settings';
 
 // Initialize settings system
 const settings = new Settings({
-  enableAuditLogging: true,
-  cacheSchemas: true,
-  strictValidation: true
+    enableAuditLogging: true,
+    cacheSchemas: true,
+    strictValidation: true
 });
 
 // Example user object
 const user = {
-  id: 'user123',
-  type: 'user',
-  emailVerified: true,
-  accountStatus: 'active'
+    id: 'user123',
+    type: 'user',
+    emailVerified: true,
+    accountStatus: 'active'
 };
 
 // Get a setting value
@@ -40,8 +41,8 @@ await settings.updateSetting(user, 'theme', 'dark');
 
 // Batch update multiple settings
 await settings.updateSettings(user, {
-  theme: 'light',
-  emailNotifications: true
+    theme: 'light',
+    emailNotifications: true
 });
 
 // Get user-modifiable settings only
@@ -59,7 +60,11 @@ Schemas are defined as JSON files in the `schemas/` directory:
   "settings": {
     "theme": {
       "type": "string",
-      "values": ["light", "dark", "auto"],
+      "values": [
+        "light",
+        "dark",
+        "auto"
+      ],
       "default": "auto",
       "userModifiable": true,
       "description": "UI theme preference"
@@ -102,6 +107,7 @@ Settings can have conditions that determine when they're accessible:
 ```
 
 Supported operators:
+
 - `equals`, `notEquals`
 - `in`, `notIn`
 - `greaterThan`, `lessThan`
@@ -112,7 +118,8 @@ Supported operators:
 ### Settings Class
 
 #### Constructor
-```typescript
+
+```
 new Settings(options?: SettingsOptions)
 ```
 
@@ -129,6 +136,7 @@ new Settings(options?: SettingsOptions)
 ## Testing
 
 Run the test suite:
+
 ```bash
 bun test src/lib/settings/__tests__/settings.test.ts
 ```

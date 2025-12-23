@@ -1,5 +1,5 @@
-import RSS from 'rss';
-import {posts, profiles} from '@prisma/client';
+import {posts, profiles} from '@prisma/client'
+import RSS from 'rss'
 
 export interface RSSPost extends Partial<posts> {
     id: string;
@@ -29,8 +29,8 @@ export class RSSGenerator {
      * @returns RSS XML string
      */
     static generateUserFeed(profile: RSSProfile, posts: RSSPost[], baseUrl: string): string {
-        const feedUrl = `${baseUrl}/user/${profile.username}/rss`;
-        const userUrl = `https://packbase.app/@${profile.username}`;
+        const feedUrl = `${baseUrl}/user/${profile.username}/rss`
+        const userUrl = `https://packbase.app/@${profile.username}`
 
         const feed = new RSS({
             title: `${profile.display_name || profile.username}'s Posts`,
@@ -42,27 +42,27 @@ export class RSSGenerator {
             ttl: 60, // 60 minutes
             copyright: `© ${new Date().getFullYear()} ${profile.display_name} (${profile.username})`,
             generator: 'Packbase',
-        });
+        })
 
         for (const post of posts) {
-            const postUrl = `${baseUrl}/p/${post.pack_slug || 'universe'}/${post.channel_id || 'all'}/${post.id}`;
+            const postUrl = `${baseUrl}/p/${post.pack_slug || 'universe'}/${post.channel_id || 'all'}/${post.id}`
 
             // Prepare description/content
-            let description = post.body || '';
+            let description = post.body || ''
 
             // Add asset information if available
             if (post.assets && Array.isArray(post.assets) && post.assets.length > 0) {
                 const assetInfo = post.assets.map((asset: any) => {
                     if (asset.type === 'image') {
-                        return `<p><img src="${process.env.PROFILES_CDN_URL_PREFIX}/${asset.data.url}" alt="${asset.alt || 'Image'}" /></p>`;
+                        return `<p><img src="${process.env.PROFILES_CDN_URL_PREFIX}/${asset.data.url}" alt="${asset.alt || 'Image'}" /></p>`
                     } else if (asset.type === 'video') {
-                        return `<p><video src="${asset.data.url}" controls></video></p>`;
+                        return `<p><video src="${asset.data.url}" controls></video></p>`
                     }
-                    return '';
-                }).join('\n');
+                    return ''
+                }).join('\n')
 
                 if (assetInfo) {
-                    description = `${description}\n${assetInfo}`;
+                    description = `${description}\n${assetInfo}`
                 }
             }
 
@@ -73,10 +73,10 @@ export class RSSGenerator {
                 guid: post.id,
                 date: post.created_at,
                 author: profile.username,
-            });
+            })
         }
 
-        return feed.xml({indent: true});
+        return feed.xml({indent: true})
     }
 
     /**
@@ -84,16 +84,16 @@ export class RSSGenerator {
      */
     private static generatePostTitle(post: RSSPost): string {
         if (!post.body) {
-            return `Post by user at ${post.created_at.toISOString()}`;
+            return `Post by user at ${post.created_at.toISOString()}`
         }
 
         // Extract first line or first 50 characters
-        const firstLine = post.body.split('\n')[0];
+        const firstLine = post.body.split('\n')[0]
         const title = firstLine.length > 50
             ? firstLine.substring(0, 47) + '...'
-            : firstLine;
+            : firstLine
 
-        return title || `Post at ${post.created_at.toISOString()}`;
+        return title || `Post at ${post.created_at.toISOString()}`
     }
 }
 

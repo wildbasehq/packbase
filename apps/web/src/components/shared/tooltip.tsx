@@ -1,8 +1,8 @@
-import {ReactNode} from 'react'
-import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import {Heading, Text} from '@/components/shared/text'
+import {cn} from '@/lib'
+import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import {motion} from 'motion/react'
-import {cn} from "@/lib";
+import {ReactNode} from 'react'
 
 export default function Tooltip({
                                     children,
@@ -32,8 +32,8 @@ export default function Tooltip({
                         <motion.div
                             className={cn(
                                 // base
-                                "rounded bg-primary-midnight max-w-76 px-4 py-2 z-100 select-none text-white *:text-white! shadow-md relative",
-                                typeof content === 'string' ? "text-xs" : "text-sm",
+                                'rounded bg-primary-midnight max-w-76 px-4 py-2 z-100 select-none text-white *:text-white! shadow-md relative',
+                                typeof content === 'string' ? 'text-xs' : 'text-sm',
                             )}
                             initial={{opacity: 0, [animateDirection]: -5, rotateX: -20}}
                             animate={{opacity: 1, [animateDirection]: 0, rotateX: 0}}

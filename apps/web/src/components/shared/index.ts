@@ -17,7 +17,7 @@ export * from './dialog'
 export * from './divider'
 export * from './dropdown'
 export * from './button'
-export * from './bubble-popover.tsx'
+export * from './bubble-popover'
 export * from './floating-callout'
 export * from './fieldset'
 export * from './gradient'
@@ -62,7 +62,7 @@ export * from './user/header'
 export * from './user/info-col'
 
 // API
-export * from '@/lib/hooks/content-frame.tsx'
+export * from '@/lib/hooks/content-frame'
 
 // Frames
 export * from './frames'

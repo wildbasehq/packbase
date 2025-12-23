@@ -1,4 +1,4 @@
-import PackFeedController from "@/pages/pack/components.tsx";
+import PackFeedController from '@/pages/pack/components'
 
 export default function MeFollowingPage() {
     return (

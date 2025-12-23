@@ -136,11 +136,11 @@ const ALLOWED_PROPERTIES = new Set([
     'object-position',
     'backdrop-filter',
     'filter',
-]);
+])
 
 // Dangerous functions and protocols
-const DANGEROUS_FUNCTIONS = /\b(expression|eval|javascript|behavior|mozbinding)\s*\(/i;
-const DANGEROUS_PROTOCOLS = /(javascript|data|vbscript|file):/i;
+const DANGEROUS_FUNCTIONS = /\b(expression|eval|javascript|behavior|mozbinding)\s*\(/i
+const DANGEROUS_PROTOCOLS = /(javascript|data|vbscript|file):/i
 
 /**
  * Checks if a background URL is unsafe by validating the hostname
@@ -149,25 +149,25 @@ const DANGEROUS_PROTOCOLS = /(javascript|data|vbscript|file):/i;
  */
 const isUnsafeBackgroundUrl = (value: string): boolean => {
     // Check if the value contains a url() function
-    const urlMatch = value.match(/url\(\s*['"]?([^'"]+)['"]?\s*\)/i);
-    if (!urlMatch) return false; // No URL, considered safe
+    const urlMatch = value.match(/url\(\s*['"]?([^'"]+)['"]?\s*\)/i)
+    if (!urlMatch) return false // No URL, considered safe
 
-    const url = urlMatch[1];
+    const url = urlMatch[1]
 
     // If it starts with http:// or https://, check the hostname
     if (/^https?:\/\//i.test(url)) {
         try {
-            const parsedUrl = new URL(url);
-            return parsedUrl.hostname !== 'profiles.cdn.packbase.app';
+            const parsedUrl = new URL(url)
+            return parsedUrl.hostname !== 'profiles.cdn.packbase.app'
         } catch (e) {
             // If parsing fails, consider it dangerous
-            return true;
+            return true
         }
     }
 
     // Allow relative URLs (they're from the same origin)
-    return false;
-};
+    return false
+}
 
 // Map of property names to dangerous values
 const DANGEROUS_VALUES: Record<string, Set<string> | RegExp | ((value: string) => boolean)> = {
@@ -219,7 +219,7 @@ const DANGEROUS_VALUES: Record<string, Set<string> | RegExp | ((value: string) =
     // Width and height extremes
     width: (value: string) => value === '100vw' || parseInt(value, 10) > 5000,
     height: (value: string) => value === '100vh' || parseInt(value, 10) > 5000,
-};
+}
 
 /**
  * Extracts keyframes blocks from CSS using brace counting
@@ -227,50 +227,50 @@ const DANGEROUS_VALUES: Record<string, Set<string> | RegExp | ((value: string) =
  * @returns Object containing array of keyframe blocks and remaining CSS
  */
 function extractKeyframes(css: string): { keyframes: Array<{ full: string; name: string; body: string }>; remainingCSS: string } {
-    const keyframes: Array<{ full: string; name: string; body: string }> = [];
-    let remainingCSS = css;
-    let startIndex = 0;
+    const keyframes: Array<{ full: string; name: string; body: string }> = []
+    let remainingCSS = css
+    let startIndex = 0
 
     while (true) {
-        const keyframeStart = remainingCSS.indexOf('@keyframes', startIndex);
-        if (keyframeStart === -1) break;
+        const keyframeStart = remainingCSS.indexOf('@keyframes', startIndex)
+        if (keyframeStart === -1) break
 
         // Find the opening brace
-        const openBrace = remainingCSS.indexOf('{', keyframeStart);
-        if (openBrace === -1) break;
+        const openBrace = remainingCSS.indexOf('{', keyframeStart)
+        if (openBrace === -1) break
 
         // Extract the keyframe name
-        const declaration = remainingCSS.substring(keyframeStart, openBrace).trim();
+        const declaration = remainingCSS.substring(keyframeStart, openBrace).trim()
 
         // Count braces to find the complete keyframes block
-        let braceCount = 1;
-        let i = openBrace + 1;
+        let braceCount = 1
+        let i = openBrace + 1
 
         while (i < remainingCSS.length && braceCount > 0) {
-            if (remainingCSS[i] === '{') braceCount++;
-            else if (remainingCSS[i] === '}') braceCount--;
-            i++;
+            if (remainingCSS[i] === '{') braceCount++
+            else if (remainingCSS[i] === '}') braceCount--
+            i++
         }
 
         if (braceCount === 0) {
-            const keyframeBlock = remainingCSS.substring(keyframeStart, i);
-            const body = remainingCSS.substring(openBrace + 1, i - 1);
+            const keyframeBlock = remainingCSS.substring(keyframeStart, i)
+            const body = remainingCSS.substring(openBrace + 1, i - 1)
 
             keyframes.push({
                 full: keyframeBlock,
                 name: declaration,
                 body: body,
-            });
+            })
 
             // Remove the keyframe block from remaining CSS
-            remainingCSS = `${remainingCSS.substring(0, keyframeStart)}__KEYFRAME_${keyframes.length - 1}__${remainingCSS.substring(i)}`;
-            startIndex = keyframeStart + ('__KEYFRAME_' + (keyframes.length - 1) + '__').length;
+            remainingCSS = `${remainingCSS.substring(0, keyframeStart)}__KEYFRAME_${keyframes.length - 1}__${remainingCSS.substring(i)}`
+            startIndex = keyframeStart + ('__KEYFRAME_' + (keyframes.length - 1) + '__').length
         } else {
-            break;
+            break
         }
     }
 
-    return { keyframes, remainingCSS };
+    return {keyframes, remainingCSS}
 }
 
 /**
@@ -279,147 +279,147 @@ function extractKeyframes(css: string): { keyframes: Array<{ full: string; name:
  * @returns The sanitized CSS string
  */
 export function sanitizeCSS(css: string): string {
-    if (!css) return '';
+    if (!css) return ''
 
     // Check if the input only contains comments
-    const onlyCommentsRegex = /^(\s*\/\*[\s\S]*?\*\/\s*)*$/;
+    const onlyCommentsRegex = /^(\s*\/\*[\s\S]*?\*\/\s*)*$/
     if (onlyCommentsRegex.test(css)) {
-        return css; // Return comments-only CSS unchanged
+        return css // Return comments-only CSS unchanged
     }
 
     // Extract and preserve comments
-    const comments: string[] = [];
-    const commentRegex = /\/\*[\s\S]*?\*\//g;
+    const comments: string[] = []
+    const commentRegex = /\/\*[\s\S]*?\*\//g
     const cssWithoutComments = css.replace(commentRegex, (match) => {
-        comments.push(match);
-        return `__COMMENT_${comments.length - 1}__`;
-    });
+        comments.push(match)
+        return `__COMMENT_${comments.length - 1}__`
+    })
 
-    let sanitizedCSS = '';
+    let sanitizedCSS = ''
     // Check if the CSS includes structured rules with selectors
     if (cssWithoutComments.includes('{')) {
         // Process structured CSS with selectors
-        const result = [];
+        const result = []
 
         // First extract and handle @keyframes rules
-        const { keyframes, remainingCSS: processedCSS } = extractKeyframes(cssWithoutComments);
+        const {keyframes, remainingCSS: processedCSS} = extractKeyframes(cssWithoutComments)
 
         // Process each keyframe
-        const sanitizedKeyframes: string[] = [];
+        const sanitizedKeyframes: string[] = []
         for (const keyframe of keyframes) {
-            const sanitizedBody = sanitizeKeyframesBody(keyframe.body);
+            const sanitizedBody = sanitizeKeyframesBody(keyframe.body)
             if (sanitizedBody) {
-                sanitizedKeyframes.push(`${keyframe.name} {\n${sanitizedBody}}`);
+                sanitizedKeyframes.push(`${keyframe.name} {\n${sanitizedBody}}`)
             }
         }
 
         // Then handle regular CSS rules
-        const ruleRegex = /([^{]+)\{([\s\S]*?)\}/g;
-        let ruleMatch;
+        const ruleRegex = /([^{]+)\{([\s\S]*?)\}/g
+        let ruleMatch
 
         while ((ruleMatch = ruleRegex.exec(processedCSS)) !== null) {
-            const selector = ruleMatch[1].trim();
+            const selector = ruleMatch[1].trim()
             // Skip empty selectors or keyframe placeholders
-            if (!selector || selector.startsWith('__KEYFRAME_')) continue;
+            if (!selector || selector.startsWith('__KEYFRAME_')) continue
 
             // Pass the raw declaration block to preserve all formatting
-            const declarations = sanitizeDeclarations(ruleMatch[2]);
+            const declarations = sanitizeDeclarations(ruleMatch[2])
 
             if (declarations) {
                 // Preserve the original formatting by not adding extra spaces
-                result.push(`${selector} {\n${declarations}}`);
+                result.push(`${selector} {\n${declarations}}`)
             }
         }
 
         // Add sanitized keyframes back
-        result.unshift(...sanitizedKeyframes);
+        result.unshift(...sanitizedKeyframes)
 
         // Replace keyframe placeholders in any remaining text
-        let finalCSS = processedCSS.replace(ruleRegex, '');
+        let finalCSS = processedCSS.replace(ruleRegex, '')
         for (let i = 0; i < sanitizedKeyframes.length; i++) {
-            finalCSS = finalCSS.replace(`__KEYFRAME_${i}__`, '');
+            finalCSS = finalCSS.replace(`__KEYFRAME_${i}__`, '')
         }
 
         // Determine line ending from original input
-        const lineEnding = css.includes('\r\n') ? '\r\n' : '\n';
-        sanitizedCSS = result.join(lineEnding);
+        const lineEnding = css.includes('\r\n') ? '\r\n' : '\n'
+        sanitizedCSS = result.join(lineEnding)
     } else {
         // Process inline CSS (property:value pairs)
-        sanitizedCSS = sanitizeDeclarations(cssWithoutComments);
+        sanitizedCSS = sanitizeDeclarations(cssWithoutComments)
     }
 
     // If after processing we have an empty result but had comments,
     // return the original to preserve comments
     if (sanitizedCSS.trim() === '' && comments.length > 0) {
-        return css;
+        return css
     }
 
     // Restore comments in the sanitized CSS
-    return sanitizedCSS.replace(/__COMMENT_(\d+)__/g, (_, index) => comments[parseInt(index, 10)]);
+    return sanitizedCSS.replace(/__COMMENT_(\d+)__/g, (_, index) => comments[parseInt(index, 10)])
 }
 
 function sanitizeKeyframesBody(keyframesBody: string): string {
-    const result: string[] = [];
+    const result: string[] = []
     // Match keyframe selectors (0%, 50%, 100%, from, to) and their declaration blocks
-    const keyframeRegex = /([^{]+)\{([\s\S]*?)\}/g;
-    let match;
+    const keyframeRegex = /([^{]+)\{([\s\S]*?)\}/g
+    let match
 
     while ((match = keyframeRegex.exec(keyframesBody)) !== null) {
-        const keyframeSelector = match[1].trim();
-        const declarations = match[2];
+        const keyframeSelector = match[1].trim()
+        const declarations = match[2]
 
         // Validate keyframe selector (should be percentage, 'from', or 'to')
         if (/^(from|to|\d+(\.\d+)?%)$/.test(keyframeSelector)) {
-            const sanitizedDeclarations = sanitizeDeclarations(declarations);
+            const sanitizedDeclarations = sanitizeDeclarations(declarations)
             if (sanitizedDeclarations) {
-                result.push(`  ${keyframeSelector} {\n    ${sanitizedDeclarations.replace(/\n/g, '\n    ').trim()}\n  }\n`);
+                result.push(`  ${keyframeSelector} {\n    ${sanitizedDeclarations.replace(/\n/g, '\n    ').trim()}\n  }\n`)
             }
         }
     }
 
-    return result.join('\n');
+    return result.join('\n')
 }
 
 function sanitizeDeclarations(css: string): string {
-    const declarations: string[] = [];
+    const declarations: string[] = []
     // Use a better regex pattern that properly captures multi-line values
     // This pattern will match property:value pairs even when values contain newlines
-    const rulesRegex = /([^:;]+)\s*:\s*([\s\S]*?)(?:;|$|\n(?=[^:]*:))/gm;
-    let match;
+    const rulesRegex = /([^:;]+)\s*:\s*([\s\S]*?)(?:;|$|\n(?=[^:]*:))/gm
+    let match
 
     while ((match = rulesRegex.exec(css)) !== null) {
-        const property = match[1].trim().toLowerCase();
+        const property = match[1].trim().toLowerCase()
         // Keep the original value with all whitespace and newlines
-        const value = match[2];
+        const value = match[2]
 
         // Only allow whitelisted properties
         if (ALLOWED_PROPERTIES.has(property)) {
             // Check for dangerous patterns in values
             if (!DANGEROUS_FUNCTIONS.test(value) && !DANGEROUS_PROTOCOLS.test(value)) {
                 // Check for property-specific dangerous values
-                const dangerousValue = DANGEROUS_VALUES[property];
-                let isDangerous = false;
+                const dangerousValue = DANGEROUS_VALUES[property]
+                let isDangerous = false
 
                 if (dangerousValue) {
                     if (dangerousValue instanceof Set) {
                         // For set comparison, we need to trim, but preserve original in output
-                        isDangerous = dangerousValue.has(value.toLowerCase().trim());
+                        isDangerous = dangerousValue.has(value.toLowerCase().trim())
                     } else if (dangerousValue instanceof RegExp) {
-                        isDangerous = dangerousValue.test(value);
+                        isDangerous = dangerousValue.test(value)
                     } else if (typeof dangerousValue === 'function') {
-                        isDangerous = dangerousValue(value);
+                        isDangerous = dangerousValue(value)
                     }
                 }
 
                 if (!isDangerous) {
                     // Preserve original formatting including newlines by using the raw value
-                    declarations.push(`${property}: ${value};\n`);
+                    declarations.push(`${property}: ${value};\n`)
                 }
             }
         }
     }
 
-    return declarations.join('');
+    return declarations.join('')
 }
 
-export default sanitizeCSS;
+export default sanitizeCSS

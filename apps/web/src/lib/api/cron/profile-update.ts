@@ -2,8 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {vg} from '@/lib/api'
 import {useResourceStore, useUserAccountStore, WorkerStore} from '@/lib'
+import {vg} from '@/lib/api'
 
 const hasUserChanged = (userBuild: any): boolean => {
     const storedUser = JSON.parse(localStorage.getItem('user-account') || '{}').state?.user

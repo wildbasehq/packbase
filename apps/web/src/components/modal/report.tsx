@@ -1,9 +1,9 @@
+import {LoadingDots} from '@/components/icons'
+import {Button} from '@/components/shared/button'
+import {Input} from '@/components/shared/input/text'
 import {AlertTriangle, XCircleIcon} from 'lucide-react'
 import {FormEvent, useState} from 'react'
 import {toast} from 'sonner'
-import {LoadingDots} from '@/components/icons'
-import {Input} from '@/components/shared/input/text'
-import {Button} from '@/components/shared/button'
 import {useParams} from 'wouter'
 
 export default function ReportAbuse() {

@@ -2,11 +2,10 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-// src/components/feed/MediaGallery.tsx
-import {useState} from 'react'
 import {useUIStore} from '@/lib/state'
-import {Asset} from './types/post'
+import {useState} from 'react'
 import {ImageOverlay} from '.'
+import {Asset} from './types/post'
 
 interface MediaGalleryProps {
     assets: Asset[]

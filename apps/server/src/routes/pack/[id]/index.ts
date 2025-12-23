@@ -1,13 +1,13 @@
-import {YapockType} from '@/index'
-import {t} from 'elysia'
-import packCalculateHeartbeat from '@/lib/packs/calculate-heartbeat'
-import uploadFile from '@/utils/upload-file'
-import {PackEditBody, PackResponse} from '@/models/defs'
-import posthog, {distinctId} from '@/utils/posthog'
-import {HTTPError} from '@/lib/HTTPError'
 import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import packCalculateHeartbeat from '@/lib/packs/calculate-heartbeat'
 import PackMan from '@/lib/packs/PackMan'
-import requiresAccount from "@/utils/identity/requires-account";
+import {PackEditBody, PackResponse} from '@/models/defs'
+import requiresAccount from '@/utils/identity/requires-account'
+import posthog, {distinctId} from '@/utils/posthog'
+import uploadFile from '@/utils/upload-file'
+import {t} from 'elysia'
 
 export const PackCache = new Map<string, any>()
 export const PackMembershipCache = new Map<string, any>()
@@ -44,7 +44,7 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({params: {id}, set, user, body}) => {
-                await requiresAccount({set, user});
+                await requiresAccount({set, user})
 
                 if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.ManagePack))) {
                     set.status = 403

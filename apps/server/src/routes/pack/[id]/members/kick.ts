@@ -1,9 +1,9 @@
-import {t} from 'elysia'
 import {YapockType} from '@/index'
-import {ErrorTypebox} from '@/utils/errors'
 import {HTTPError} from '@/lib/HTTPError'
-import requiresToken from '@/utils/identity/requires-token'
 import PackMan from '@/lib/packs/PackMan'
+import {ErrorTypebox} from '@/utils/errors'
+import requiresToken from '@/utils/identity/requires-token'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app.post(

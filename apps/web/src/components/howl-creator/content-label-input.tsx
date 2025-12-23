@@ -2,7 +2,6 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-// src/components/howl-creator/content-label-input.tsx
 import {Field, Label, Listbox, ListboxLabel, ListboxOption} from '@/src/components'
 
 export default function ContentLabelInput({

@@ -2,9 +2,9 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {useState} from 'react'
-import UserInfoCol from '@/components/shared/user/info-col'
 import {Text} from '@/components/shared/text'
+import UserInfoCol from '@/components/shared/user/info-col'
+import {useState} from 'react'
 
 export default function IDArtistShowcase() {
     const [notice] = useState<any>({

@@ -1,5 +1,5 @@
-import { create } from 'zustand'
-import { fetchNotifications, markAllNotificationsAsRead, markNotificationAsRead, Notification } from '@/src/lib/api/users/inbox'
+import {fetchNotifications, markAllNotificationsAsRead, markNotificationAsRead, Notification} from '@/src/lib/api/users/inbox'
+import {create} from 'zustand'
 
 /**
  * Notifications Store
@@ -33,13 +33,13 @@ export const useNotificationsStore = create<NotificationsStore>(set => ({
     // Actions
     fetchNotifications: async (cursorValue = null, unreadOnly = false) => {
         try {
-            const options: any = { limit: 20 }
+            const options: any = {limit: 20}
 
             if (cursorValue) {
                 options.cursor = cursorValue
-                set({ loadingMore: true })
+                set({loadingMore: true})
             } else {
-                set({ loading: true })
+                set({loading: true})
             }
 
             if (unreadOnly) {
@@ -82,7 +82,7 @@ export const useNotificationsStore = create<NotificationsStore>(set => ({
             // Update the local state to mark the notification as read
             set(state => ({
                 notifications: state.notifications.map(notification =>
-                    notification.id === id ? { ...notification, read: true, read_at: new Date().toISOString() } : notification
+                    notification.id === id ? {...notification, read: true, read_at: new Date().toISOString()} : notification
                 ),
             }))
         } catch (err) {

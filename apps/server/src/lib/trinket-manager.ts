@@ -1,37 +1,35 @@
-import prisma from '../db/prisma';
-
 type CurrencyType = 'trinket';
 
 export type ParentKind = 'user' | 'pack';
 
 export function toParentId(kind: ParentKind, uuid: string): string {
-    if (!uuid || typeof uuid !== 'string') throw new Error('uuid required');
-    if (uuid.includes(':')) throw new Error("uuid must not contain ':'");
-    return `${kind}:${uuid}`;
+    if (!uuid || typeof uuid !== 'string') throw new Error('uuid required')
+    if (uuid.includes(':')) throw new Error('uuid must not contain \':\'')
+    return `${kind}:${uuid}`
 }
 
 export class TrinketManager {
-    private readonly type: CurrencyType = 'trinket';
+    private readonly type: CurrencyType = 'trinket'
 
     async getBalance(parentId: string): Promise<number> {
         const row = await prisma.currency.findUnique({
             where: {parent_id: parentId},
             select: {amount: true},
-        });
-        return row?.amount ?? 0;
+        })
+        return row?.amount ?? 0
     }
 
     async setBalance(parentId: string, amount: number): Promise<number> {
         if (!Number.isInteger(amount) || amount < 0) {
-            throw new Error('amount must be a non-negative integer');
+            throw new Error('amount must be a non-negative integer')
         }
-        const now = new Date();
+        const now = new Date()
         const row = await prisma.currency.upsert({
             where: {parent_id: parentId},
             update: {amount, type: this.type, updated_at: now},
             create: {parent_id: parentId, type: this.type, amount, created_at: now, updated_at: now},
             select: {amount: true},
-        });
+        })
 
         await prisma.admin_audit_log.create({
             data: {
@@ -41,23 +39,23 @@ export class TrinketManager {
                 model_id: parentId,
                 model_object: {amount},
             },
-        });
-        return row.amount;
+        })
+        return row.amount
     }
 
     async increment(parentId: string, delta: number = 1): Promise<number> {
-        if (!Number.isInteger(delta) || delta < 0) throw new Error('delta must be a non-negative integer');
-        if (delta === 0) return this.getBalance(parentId);
-        const now = new Date();
+        if (!Number.isInteger(delta) || delta < 0) throw new Error('delta must be a non-negative integer')
+        if (delta === 0) return this.getBalance(parentId)
+        const now = new Date()
         return await prisma.$transaction(async (tx) => {
-            const existing = await tx.currency.findUnique({where: {parent_id: parentId}, select: {amount: true}});
-            const amount = (existing?.amount ?? 0) + delta;
+            const existing = await tx.currency.findUnique({where: {parent_id: parentId}, select: {amount: true}})
+            const amount = (existing?.amount ?? 0) + delta
             const saved = await tx.currency.upsert({
                 where: {parent_id: parentId},
                 update: {amount, type: this.type, updated_at: now},
                 create: {parent_id: parentId, type: this.type, amount, created_at: now, updated_at: now},
                 select: {amount: true},
-            });
+            })
 
             await prisma.admin_audit_log.create({
                 data: {
@@ -67,25 +65,25 @@ export class TrinketManager {
                     model_id: parentId,
                     model_object: {amount, gained: delta},
                 },
-            });
+            })
 
-            return saved.amount;
-        });
+            return saved.amount
+        })
     }
 
     async decrement(parentId: string, delta: number = 1): Promise<number> {
-        if (!Number.isInteger(delta) || delta < 0) throw new Error('delta must be a non-negative integer');
-        if (delta === 0) return this.getBalance(parentId);
-        const now = new Date();
+        if (!Number.isInteger(delta) || delta < 0) throw new Error('delta must be a non-negative integer')
+        if (delta === 0) return this.getBalance(parentId)
+        const now = new Date()
         return prisma.$transaction(async (tx) => {
-            const existing = await tx.currency.findUnique({where: {parent_id: parentId}, select: {amount: true}});
-            const current = existing?.amount ?? 0;
-            if (current < delta) throw new Error('insufficient trinkets');
+            const existing = await tx.currency.findUnique({where: {parent_id: parentId}, select: {amount: true}})
+            const current = existing?.amount ?? 0
+            if (current < delta) throw new Error('insufficient trinkets')
             const saved = await tx.currency.update({
                 where: {parent_id: parentId},
                 data: {amount: current - delta, updated_at: now},
                 select: {amount: true},
-            });
+            })
 
             await prisma.admin_audit_log.create({
                 data: {
@@ -95,31 +93,31 @@ export class TrinketManager {
                     model_id: parentId,
                     model_object: {amount: saved.amount, spent: delta},
                 },
-            });
+            })
 
-            return saved.amount;
-        });
+            return saved.amount
+        })
     }
 
     async transfer(fromParentId: string, toParentId: string, amount: number): Promise<{ from: number; to: number }> {
-        if (!Number.isInteger(amount) || amount <= 0) throw new Error('amount must be a positive integer');
-        if (fromParentId === toParentId) throw new Error('cannot transfer to same parent');
-        const now = new Date();
+        if (!Number.isInteger(amount) || amount <= 0) throw new Error('amount must be a positive integer')
+        if (fromParentId === toParentId) throw new Error('cannot transfer to same parent')
+        const now = new Date()
         return prisma.$transaction(async (tx) => {
-            const fromRow = await tx.currency.findUnique({where: {parent_id: fromParentId}, select: {amount: true}});
-            const fromBalance = fromRow?.amount ?? 0;
-            if (fromBalance < amount) throw new Error('insufficient trinkets');
+            const fromRow = await tx.currency.findUnique({where: {parent_id: fromParentId}, select: {amount: true}})
+            const fromBalance = fromRow?.amount ?? 0
+            if (fromBalance < amount) throw new Error('insufficient trinkets')
 
-            const newFrom = fromBalance - amount;
-            await tx.currency.update({where: {parent_id: fromParentId}, data: {amount: newFrom, updated_at: now}});
+            const newFrom = fromBalance - amount
+            await tx.currency.update({where: {parent_id: fromParentId}, data: {amount: newFrom, updated_at: now}})
 
-            const toRow = await tx.currency.findUnique({where: {parent_id: toParentId}, select: {amount: true}});
-            const newTo = (toRow?.amount ?? 0) + amount;
+            const toRow = await tx.currency.findUnique({where: {parent_id: toParentId}, select: {amount: true}})
+            const newTo = (toRow?.amount ?? 0) + amount
             await tx.currency.upsert({
                 where: {parent_id: toParentId},
                 update: {amount: newTo, type: this.type, updated_at: now},
                 create: {parent_id: toParentId, type: this.type, amount: newTo, created_at: now, updated_at: now},
-            });
+            })
 
             await prisma.admin_audit_log.create({
                 data: {
@@ -133,11 +131,11 @@ export class TrinketManager {
                         amount,
                     },
                 },
-            });
+            })
 
-            return {from: newFrom, to: newTo};
-        });
+            return {from: newFrom, to: newTo}
+        })
     }
 }
 
-export default new TrinketManager();
+export default new TrinketManager()

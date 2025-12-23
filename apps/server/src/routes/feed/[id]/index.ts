@@ -1,13 +1,13 @@
-import {FeedController} from '@/lib/FeedController';
-import {YapockType} from '@/index';
-import {t} from 'elysia';
-import {HowlResponse} from '@/models/defs';
-import {HTTPError} from '@/lib/HTTPError';
-import requiresToken from '@/utils/identity/requires-token';
-import requiresAccount from "@/utils/identity/requires-account";
+import {YapockType} from '@/index'
+import {FeedController} from '@/lib/FeedController'
+import {HTTPError} from '@/lib/HTTPError'
+import {HowlResponse} from '@/models/defs'
+import requiresAccount from '@/utils/identity/requires-account'
+import requiresToken from '@/utils/identity/requires-token'
+import {t} from 'elysia'
 
 // Initialize a shared instance of controllers
-const feedController = new FeedController();
+const feedController = new FeedController()
 
 export default (app: YapockType) =>
     app.get(
@@ -15,29 +15,29 @@ export default (app: YapockType) =>
         async ({set, params: {id}, query: {page = 1}, user}) => {
             // Check for maintenance mode
             if (process.env.MAINTENANCE) {
-                set.status = 503;
+                set.status = 503
                 return {
                     error: 'Service Unavailable',
                     message: 'The service is currently undergoing maintenance. Please try again later.',
-                };
+                }
             }
 
-            await requiresAccount({set, user});
+            await requiresAccount({set, user})
 
             try {
                 // Special handling for home feed - requires authentication
                 if (id === 'universe:home') {
-                    await requiresToken({set, user});
+                    await requiresToken({set, user})
                 }
 
                 // Get feed data
-                return await feedController.getFeed(id, user?.sub, Number(page));
+                return await feedController.getFeed(id, user?.sub, Number(page))
             } catch (error) {
                 // Handle errors
-                const httpError = error instanceof HTTPError ? error : HTTPError.fromError(error, 'Error fetching feed');
+                const httpError = error instanceof HTTPError ? error : HTTPError.fromError(error, 'Error fetching feed')
 
-                set.status = httpError.status;
-                return httpError.toJSON();
+                set.status = httpError.status
+                return httpError.toJSON()
             }
         },
         {

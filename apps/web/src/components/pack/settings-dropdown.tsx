@@ -1,24 +1,13 @@
-import {
-    DropdownDivider,
-    DropdownHeader,
-    DropdownItem,
-    DropdownMenu,
-    ResourceSettingsModal,
-    SidebarLabel,
-    Text
-} from "@/src/components";
-import {Cog6ToothIcon} from "@heroicons/react/20/solid";
-import {useResourceStore, vg} from "@/lib";
-import {
-    hasPackAnyManagementPermissions,
-    hasPackPermissionBit,
-    PACK_PERMISSIONS
-} from "@/lib/utils/has-pack-permission-bit.ts";
-import LogoutIcon from "@/components/icons/logout.tsx";
-import {toast} from "sonner";
+import LogoutIcon from '@/components/icons/logout'
+import {useResourceStore, vg} from '@/lib'
+import {hasPackAnyManagementPermissions, hasPackPermissionBit, PACK_PERMISSIONS} from '@/lib/utils/has-pack-permission-bit'
+import {DropdownDivider, DropdownHeader, DropdownItem, DropdownMenu, ResourceSettingsModal, SidebarLabel, Text} from '@/src/components'
+import {Cog6ToothIcon} from '@heroicons/react/20/solid'
+import {ReactNode} from 'react'
+import {toast} from 'sonner'
 
 export default function PackSettingsDropdown({show}: {
-    show: (modal: React.ReactNode) => void
+    show: (modal: ReactNode) => void
 }) {
     const {currentResource} = useResourceStore()
 

@@ -2,11 +2,11 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
-import React, {forwardRef} from 'react'
+import {ComponentPropsWithoutRef, ForwardedRef, forwardRef} from 'react'
 import {TouchTarget} from './button'
 import Link from './link'
-import {cn} from "@/lib";
 
 type AvatarProps = {
     src?: string | null
@@ -23,7 +23,7 @@ export function Avatar({
                            alt = '',
                            className,
                            ...props
-                       }: AvatarProps & React.ComponentPropsWithoutRef<'span'>) {
+                       }: AvatarProps & ComponentPropsWithoutRef<'span'>) {
     // Random gradient from initial
     if (!src && initials) {
         const charCode = initials.charCodeAt(0)
@@ -73,8 +73,8 @@ export const AvatarButton = forwardRef(function AvatarButton(
         alt,
         className,
         ...props
-    }: AvatarProps & (Omit<Headless.ButtonProps, 'as' | 'className'> | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'>),
-    ref: React.ForwardedRef<HTMLElement>
+    }: AvatarProps & (Omit<Headless.ButtonProps, 'as' | 'className'> | Omit<ComponentPropsWithoutRef<typeof Link>, 'className'>),
+    ref: ForwardedRef<HTMLElement>
 ) {
     let classes = cn(
         className,
@@ -84,7 +84,7 @@ export const AvatarButton = forwardRef(function AvatarButton(
     )
 
     return 'href' in props ? (
-        <Link {...props} className={classes} ref={ref as React.ForwardedRef<HTMLAnchorElement>}>
+        <Link {...props} className={classes} ref={ref as ForwardedRef<HTMLAnchorElement>}>
             <TouchTarget>
                 <Avatar src={src} square={square} initials={initials} alt={alt}/>
             </TouchTarget>

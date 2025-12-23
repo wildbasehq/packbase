@@ -26,34 +26,34 @@ import PagedModal from '@/components/shared/paged-modal';
 
 ```tsx
 import PagedModal from '@/components/shared/paged-modal';
-import { HomeIcon, CogIcon } from '@heroicons/react/24/outline';
+import {HomeIcon, CogIcon} from '@heroicons/react/24/outline';
 
 const MyComponent = () => {
-  return (
-    <PagedModal>
-      <PagedModal.Page 
-        title="Home" 
-        icon={HomeIcon}
-        description="Dashboard and overview"
-      >
-        <div className="p-6">
-          <h1>Home Page</h1>
-          <p>This is the home page content.</p>
-        </div>
-      </PagedModal.Page>
+    return (
+        <PagedModal>
+            <PagedModal.Page
+                title="Home"
+                icon={HomeIcon}
+                description="Dashboard and overview"
+            >
+                <div className="p-6">
+                    <h1>Home Page</h1>
+                    <p>This is the home page content.</p>
+                </div>
+            </PagedModal.Page>
 
-      <PagedModal.Page 
-        title="Settings" 
-        icon={CogIcon}
-        description="Configure your application settings"
-      >
-        <div className="p-6">
-          <h1>Settings Page</h1>
-          <p>This is the settings page content.</p>
-        </div>
-      </PagedModal.Page>
-    </PagedModal>
-  );
+            <PagedModal.Page
+                title="Settings"
+                icon={CogIcon}
+                description="Configure your application settings"
+            >
+                <div className="p-6">
+                    <h1>Settings Page</h1>
+                    <p>This is the settings page content.</p>
+                </div>
+            </PagedModal.Page>
+        </PagedModal>
+    );
 };
 ```
 
@@ -61,40 +61,40 @@ const MyComponent = () => {
 
 ```tsx
 import PagedModal from '@/components/shared/paged-modal';
-import { Heading } from '@/components/shared/heading';
-import { Text } from '@/components/shared/text';
-import { UserIcon } from '@heroicons/react/24/outline';
+import {Heading} from '@/components/shared/heading';
+import {Text} from '@/components/shared/text';
+import {UserIcon} from '@heroicons/react/24/outline';
 
 const MyComponent = () => {
-  // Custom header component
-  const CustomHeader = (
-    <div>
-      <Heading className="text-lg font-medium">My Application</Heading>
-      <Text className="text-sm text-gray-500 dark:text-gray-400">Configure your settings</Text>
-    </div>
-  );
+    // Custom header component
+    const CustomHeader = (
+        <div>
+            <Heading className="text-lg font-medium">My Application</Heading>
+            <Text className="text-sm text-gray-500 dark:text-gray-400">Configure your settings</Text>
+        </div>
+    );
 
-  // Custom footer component
-  const CustomFooter = (
-    <div className="flex items-center">
-      <div className="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center text-white">
-        <UserIcon className="h-5 w-5" />
-      </div>
-      <div className="ml-2">
-        <Text className="text-sm font-medium">John Doe</Text>
-        <Text className="text-xs" alt>@johndoe</Text>
-      </div>
-    </div>
-  );
+    // Custom footer component
+    const CustomFooter = (
+        <div className="flex items-center">
+            <div className="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center text-white">
+                <UserIcon className="h-5 w-5"/>
+            </div>
+            <div className="ml-2">
+                <Text className="text-sm font-medium">John Doe</Text>
+                <Text className="text-xs" alt>@johndoe</Text>
+            </div>
+        </div>
+    );
 
-  return (
-    <PagedModal
-      header={CustomHeader}
-      footer={CustomFooter}
-    >
-      {/* Pages go here */}
-    </PagedModal>
-  );
+    return (
+        <PagedModal
+            header={CustomHeader}
+            footer={CustomFooter}
+        >
+            {/* Pages go here */}
+        </PagedModal>
+    );
 };
 ```
 
@@ -125,7 +125,7 @@ The component for defining individual pages.
 | `id`          | `string`              | Optional unique identifier for the page (defaults to lowercase title with spaces replaced by hyphens) |
 | `title`       | `string`              | The title of the page, displayed in the sidebar                                                       |
 | `description` | `string \| ReactNode` | Optional description displayed under the title in the sidebar                                         |
-| `icon`        | `React.ElementType`   | Optional icon component to display next to the title                                                  |
+| `icon`        | `ElementType`         | Optional icon component to display next to the title                                                  |
 | `badge`       | `string`              | Optional badge text to display next to the title                                                      |
 
 ## Examples

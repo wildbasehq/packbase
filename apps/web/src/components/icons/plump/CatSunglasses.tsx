@@ -1,4 +1,4 @@
-import { SVGProps } from 'react'
+import {SVGProps} from 'react'
 
 export function CatSunglasses(props: SVGProps<SVGSVGElement>) {
     return (

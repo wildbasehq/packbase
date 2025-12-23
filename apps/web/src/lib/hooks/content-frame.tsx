@@ -1,7 +1,7 @@
-import React, {ReactNode} from 'react'
-import {useSession} from '@clerk/clerk-react'
 import {API_URL, setToken} from '@/lib'
+import {useSession} from '@clerk/clerk-react'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import {FC, ReactNode} from 'react'
 
 interface ContentFrameProps {
     children: ReactNode
@@ -138,18 +138,18 @@ export const useContentFrameMutation = (
     })
 }
 
-export const ContentFrame: React.FC<ContentFrameProps> = ({
-                                                              children,
-                                                              get,
-                                                              post,
-                                                              put,
-                                                              delete: deleteMethod,
-                                                              patch,
-                                                              data: requestData,
-                                                              onError,
-                                                              id,
-                                                              refetchInterval,
-                                                          }) => {
+export const ContentFrame: FC<ContentFrameProps> = ({
+                                                        children,
+                                                        get,
+                                                        post,
+                                                        put,
+                                                        delete: deleteMethod,
+                                                        patch,
+                                                        data: requestData,
+                                                        onError,
+                                                        id,
+                                                        refetchInterval,
+                                                    }) => {
     const method = get ? 'get' : post ? 'post' : put ? 'put' : deleteMethod ? 'delete' : patch ? 'patch' : null
     const path = get || post || put || deleteMethod || patch
 

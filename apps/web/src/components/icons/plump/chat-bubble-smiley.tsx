@@ -1,4 +1,4 @@
-import { SVGProps } from 'react'
+import {SVGProps} from 'react'
 
 export function ChatBubbleSmileyIcon(props: SVGProps<SVGSVGElement>) {
     return (

@@ -1,6 +1,6 @@
-import React from 'react'
-import {ContentBlock} from '@/types/terms'
 import {Heading, Text} from '@/components/shared/text'
+import {ContentBlock} from '@/types/terms'
+import {FC} from 'react'
 
 interface ContentRendererProps {
     block: ContentBlock
@@ -8,7 +8,7 @@ interface ContentRendererProps {
     retentionOrder?: string[]
 }
 
-const ContentRenderer: React.FC<ContentRendererProps> = ({block, dataCollection = [], retentionOrder = []}) => {
+const ContentRenderer: FC<ContentRendererProps> = ({block, dataCollection = [], retentionOrder = []}) => {
     const renderContent = () => {
         switch (block.type) {
             case 'heading':

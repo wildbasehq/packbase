@@ -1,9 +1,9 @@
-import React from 'react'
-import { cn } from '@/lib/utils/cn'
+import {Text} from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
-import { ChatMessage } from './types'
-import { Text } from '@/components/shared/text'
-import { usePerformanceMonitor } from './usePerformanceMonitor'
+import {cn} from '@/lib/utils/cn'
+import {memo} from 'react'
+import {ChatMessage} from './types'
+import {usePerformanceMonitor} from './usePerformanceMonitor'
 
 interface MessageItemProps {
     message: ChatMessage
@@ -12,7 +12,7 @@ interface MessageItemProps {
     showAvatar?: boolean
 }
 
-export const MessageItem = React.memo<MessageItemProps>(({ message, isOwn, onClick, showAvatar = true }) => {
+export const MessageItem = memo<MessageItemProps>(({message, isOwn, onClick, showAvatar = true}) => {
     usePerformanceMonitor('MessageItem')
     if (message.senderType === 'system' || message.senderType === 'assistant') {
         return (
@@ -31,9 +31,9 @@ export const MessageItem = React.memo<MessageItemProps>(({ message, isOwn, onCli
 
     return (
         <div className={cn('flex w-full gap-3 py-2', isOwn ? 'flex-row-reverse' : 'flex-row')}
-            onClick={() => onClick?.(message)}>
+             onClick={() => onClick?.(message)}>
             {showAvatar && (
-                <UserAvatar user={message.user} size={32} className="shrink-0 justify-center self-end" />
+                <UserAvatar user={message.user} size={32} className="shrink-0 justify-center self-end"/>
             )}
             <div className={cn('flex max-w-[75%] flex-col gap-1 rounded bg-muted ring-default ring-1')}>
                 <Text size="xs" alt className="mx-3 mt-1 truncate">

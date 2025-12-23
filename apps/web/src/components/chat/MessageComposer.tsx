@@ -1,16 +1,16 @@
-import { MessageInput } from './MessageInput'
-import { useContentFrameMutation } from '@/lib/hooks/content-frame.tsx'
-import { useUserAccountStore } from '@/lib'
-import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import {useUserAccountStore} from '@/lib'
+import {useContentFrameMutation} from '@/lib/hooks/content-frame'
+import {useQueryClient} from '@tanstack/react-query'
+import {toast} from 'sonner'
+import {MessageInput} from './MessageInput'
 
-export function MessageComposer({ channelId }: { channelId: string }) {
-    const { user: me } = useUserAccountStore()
+export function MessageComposer({channelId}: { channelId: string }) {
+    const {user: me} = useUserAccountStore()
     const queryClient = useQueryClient()
 
     const sendMessage = useContentFrameMutation('post', `dm/channels/${channelId}/messages`, {
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
+            queryClient.invalidateQueries({queryKey: [`messages-${channelId}`]})
         },
         onError: () => {
             toast.error('Failed to send message')
@@ -19,7 +19,7 @@ export function MessageComposer({ channelId }: { channelId: string }) {
 
     const onSend = async (content: string) => {
         if (sendMessage.isPending || !me) return
-        sendMessage.mutate({ content })
+        sendMessage.mutate({content})
     }
 
     return (

@@ -46,7 +46,7 @@ export interface Subscription {
  *   bus.on<'HOWL_CREATE', { someKey: string }>('HOWL_CREATE', data => data);
  */
 export class TriggerBus {
-    private readonly listeners: Map<string, Set<TriggerListener<any>>> = new Map();
+    private readonly listeners: Map<string, Set<TriggerListener<any>>> = new Map()
 
     /**
      * Register a listener for a trigger name.
@@ -58,21 +58,21 @@ export class TriggerBus {
      * @returns A subscription handle to remove the listener.
      */
     on<Name extends string, Payload = unknown>(name: Name, listener: TriggerListener<Payload>): Subscription {
-        let set = this.listeners.get(name);
+        let set = this.listeners.get(name)
         if (!set) {
-            set = new Set();
-            this.listeners.set(name, set);
+            set = new Set()
+            this.listeners.set(name, set)
         }
-        set.add(listener as TriggerListener<any>);
+        set.add(listener as TriggerListener<any>)
         return {
             unsubscribe: () => {
-                const current = this.listeners.get(name);
+                const current = this.listeners.get(name)
                 if (current) {
-                    current.delete(listener as TriggerListener<any>);
-                    if (current.size === 0) this.listeners.delete(name);
+                    current.delete(listener as TriggerListener<any>)
+                    if (current.size === 0) this.listeners.delete(name)
                 }
             },
-        };
+        }
     }
 
     /**
@@ -88,13 +88,13 @@ export class TriggerBus {
     once<Name extends string, Payload = unknown>(name: Name, listener: TriggerListener<Payload>): Subscription {
         const sub = this.on<Name, Payload>(name, async (data: Payload) => {
             try {
-                const result = await listener(data);
-                return (result === undefined ? data : result) as Payload;
+                const result = await listener(data)
+                return (result === undefined ? data : result) as Payload
             } finally {
-                sub.unsubscribe();
+                sub.unsubscribe()
             }
-        });
-        return sub;
+        })
+        return sub
     }
 
     /**
@@ -107,11 +107,11 @@ export class TriggerBus {
      * @returns true if the listener was removed; false otherwise.
      */
     off<Name extends string, Payload = unknown>(name: Name, listener: TriggerListener<Payload>): boolean {
-        const set = this.listeners.get(name);
-        if (!set) return false;
-        const had = set.delete(listener as TriggerListener<any>);
-        if (set.size === 0) this.listeners.delete(name);
-        return had;
+        const set = this.listeners.get(name)
+        if (!set) return false
+        const had = set.delete(listener as TriggerListener<any>)
+        if (set.size === 0) this.listeners.delete(name)
+        return had
     }
 
     /**
@@ -121,8 +121,8 @@ export class TriggerBus {
      * @param name - The trigger name.
      */
     hasListeners<Name extends string>(name: Name): boolean {
-        const set = this.listeners.get(name);
-        return !!set && set.size > 0;
+        const set = this.listeners.get(name)
+        return !!set && set.size > 0
     }
 
     /**
@@ -132,8 +132,8 @@ export class TriggerBus {
      * @param name - The trigger name. If omitted, clears all triggers.
      */
     clear<Name extends string>(name?: Name): void {
-        if (name) this.listeners.delete(name);
-        else this.listeners.clear();
+        if (name) this.listeners.delete(name)
+        else this.listeners.clear()
     }
 
     /**
@@ -151,19 +151,19 @@ export class TriggerBus {
      * @returns The final data after all listeners have run.
      */
     async trigger<Name extends string, Payload = unknown>(name: Name, data: Payload): Promise<Payload> {
-        const set = this.listeners.get(name);
-        if (!set || set.size === 0) return data;
+        const set = this.listeners.get(name)
+        if (!set || set.size === 0) return data
 
-        let current: Payload = data;
+        let current: Payload = data
         // Preserve execution order: use a snapshot to avoid mutation during iteration.
-        const snapshot = Array.from(set);
+        const snapshot = Array.from(set)
         for (const fn of snapshot) {
-            const result = await (fn as TriggerListener<Payload>)(current);
+            const result = await (fn as TriggerListener<Payload>)(current)
             if (result !== undefined) {
-                current = result;
+                current = result
             }
         }
-        return current;
+        return current
     }
 }
 
@@ -172,6 +172,6 @@ export class TriggerBus {
  *
  * Projects may import this for shared triggers (e.g., "HOWL_CREATE", "PACK_UPDATE").
  */
-export const Baozi = new TriggerBus();
+export const Baozi = new TriggerBus()
 
-export default Baozi;
+export default Baozi

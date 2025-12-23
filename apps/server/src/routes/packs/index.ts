@@ -1,24 +1,23 @@
-import { t } from 'elysia';
-import { YapockType } from '@/index';
-import { getPack } from '@/routes/pack/[id]';
-import { ErrorTypebox } from '@/utils/errors';
-import { PackResponse } from '@/models/defs';
-import { HTTPError } from '@/lib/HTTPError';
-import prisma from '@/db/prisma';
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import {getPack} from '@/routes/pack/[id]'
+import {ErrorTypebox} from '@/utils/errors'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({ params, set, user, error }) => {
-            let data;
+        async ({params, set, user, error}) => {
+            let data
             try {
                 data = await prisma.packs.findMany({
-                    select: { id: true },
-                    orderBy: { created_at: 'desc' },
-                });
+                    select: {id: true},
+                    orderBy: {created_at: 'desc'},
+                })
             } catch (selectError) {
-                set.status = 500;
-                throw HTTPError.fromError(selectError);
+                set.status = 500
+                throw HTTPError.fromError(selectError)
             }
 
             if (!data) {
@@ -26,19 +25,19 @@ export default (app: YapockType) =>
                     has_more: false,
                     packs: [],
                     hidden: 0,
-                };
+                }
             }
 
-            let packs = [];
-            let hidden = 0;
+            let packs = []
+            let hidden = 0
             for (let packID of data) {
-                const pack = await getPack(packID.id, undefined, user?.sub);
+                const pack = await getPack(packID.id, undefined, user?.sub)
                 if (pack) {
                     if (!pack.membership) {
                         // @ts-ignore - fails on SDK
-                        packs.push(pack);
+                        packs.push(pack)
                     } else {
-                        hidden++;
+                        hidden++
                     }
                 }
             }
@@ -47,7 +46,7 @@ export default (app: YapockType) =>
                 has_more: false,
                 packs,
                 hidden,
-            };
+            }
         },
         {
             query: t.Optional(

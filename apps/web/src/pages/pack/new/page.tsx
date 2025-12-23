@@ -2,24 +2,24 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {FormEvent, useCallback, useEffect, useState} from 'react'
-import {Heading, Text} from '@/components/shared/text'
+import {ExclamationDiamondIcon} from '@/components/icons/plump/exclamation-diamond'
+import {useModal} from '@/components/modal/provider'
 import {Button, Desktop, Textarea} from '@/components/shared'
-import {vg} from '@/lib/api'
-import {useResourceStore, useUserAccountStore} from '@/lib'
-import {toast} from 'sonner'
-import {MagnifyingGlassIcon} from '@heroicons/react/24/solid'
+import {Description, Field, Label} from '@/components/shared/fieldset'
+import {Input} from '@/components/shared/input'
+import Markdown from '@/components/shared/markdown'
 import PackCard from '@/components/shared/pack/card'
-import {useModal} from '@/components/modal/provider.tsx'
-import {Input} from '@/components/shared/input.tsx'
-import {Description, Field, Label} from '@/components/shared/fieldset.tsx'
-import {useRive} from '@rive-app/react-canvas'
+import {Heading, Text} from '@/components/shared/text'
+import {useResourceStore, useUserAccountStore} from '@/lib'
+import {vg} from '@/lib/api'
+import PackbaseInstance from '@/lib/workers/global-event-emit'
+import {LoadingSpinner} from '@/src/components'
 import {UserGroupIcon} from '@heroicons/react/20/solid'
+import {MagnifyingGlassIcon} from '@heroicons/react/24/solid'
 import {Separator} from '@radix-ui/react-dropdown-menu'
-import Markdown from '@/components/shared/markdown.tsx'
-import {ExclamationDiamondIcon} from "@/components/icons/plump/exclamation-diamond.tsx";
-import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
-import {LoadingSpinner} from "@/src/components";
+import {useRive} from '@rive-app/react-canvas'
+import {ChangeEvent, FormEvent, useCallback, useEffect, useState} from 'react'
+import {toast} from 'sonner'
 
 // Types
 type PrivacyOption = {
@@ -79,7 +79,7 @@ export function CreatePackModal({close, onCreate}: {
 
     document.title = `Create Pack • ${formData.display_name || 'Pack Name'}`
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const {name, value} = e.target
         setFormData(prev => ({
             ...prev,
@@ -105,7 +105,7 @@ export function CreatePackModal({close, onCreate}: {
                     `Whoops! ${error.status}: ${
                         (error.status as unknown as number) === 403
                             ? 'You cannot create Packs at this time.'
-                            : error.value.summary || "Check details and try again"
+                            : error.value.summary || 'Check details and try again'
                     }${error.value.property ? ` (/${error.value.on}${error.value.property})` : ''}`
                 )
                 setSubmitting(false)
@@ -114,9 +114,9 @@ export function CreatePackModal({close, onCreate}: {
 
             toast.success(`Pack "${data.display_name}" created successfully!`)
             if (onCreate) {
-                onCreate(data);
+                onCreate(data)
             } else {
-                window.location.href = `/p/${data.slug}`;
+                window.location.href = `/p/${data.slug}`
             }
         } catch (err) {
             toast.error('Failed to create pack. Please try again.')
@@ -367,8 +367,8 @@ export default function PackAdd() {
     const {show, hide} = useModal()
 
     const {RiveComponent} = useRive({
-        src: "/img/rive/pack-bench.riv",
-        stateMachines: "Animation",
+        src: '/img/rive/pack-bench.riv',
+        stateMachines: 'Animation',
         autoplay: true
     })
 

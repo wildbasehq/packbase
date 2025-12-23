@@ -2,12 +2,11 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-// src/components/feed/feed-list.tsx
-import {Text} from '@/components/shared/text'
 import {FeedPost} from '@/components/feed'
+import PagedContainer from '@/components/shared/paged-container'
+import {Text} from '@/components/shared/text'
+import {useLocation} from 'wouter'
 import {FeedListProps} from './types/feed'
-import PagedContainer from '@/components/shared/paged-container.tsx'
-import {useLocation} from "wouter";
 
 /**
  * Renders a linear list of feed posts in thread style

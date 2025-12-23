@@ -2,17 +2,17 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, { lazy, Suspense, useState } from 'react'
-import { Theme, useThemes } from '@/src/lib/api/users/theme'
-import { Button } from '@/components/shared'
-import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { CheckCircleIcon } from '@heroicons/react/24/solid'
-import { Heading, Text } from '@/components/shared/text.tsx'
+import {Button} from '@/components/shared'
+import {Heading, Text} from '@/components/shared/text'
+import {Theme, useThemes} from '@/src/lib/api/users/theme'
+import {PencilIcon, PlusIcon, TrashIcon} from '@heroicons/react/24/outline'
+import {CheckCircleIcon} from '@heroicons/react/24/solid'
+import {lazy, Suspense, useState} from 'react'
 
-const ThemeEditor = lazy(() => import('@/components/layout/resource/pages/theme-editor.tsx'))
+const ThemeEditor = lazy(() => import('@/components/layout/resource/pages/theme-editor'))
 
 export default function TemplateSettings() {
-    const { themes, loading, error, addTheme, updateTheme, deleteTheme } = useThemes()
+    const {themes, loading, error, addTheme, updateTheme, deleteTheme} = useThemes()
     const [isEditorOpen, setIsEditorOpen] = useState(false)
     const [currentTheme, setCurrentTheme] = useState<Theme | null>(null)
 
@@ -53,7 +53,7 @@ export default function TemplateSettings() {
     // Handle setting a theme as active
     const handleSetActive = async (theme: Theme) => {
         if (theme.id) {
-            await updateTheme(theme.id, { ...theme, is_active: true })
+            await updateTheme(theme.id, {...theme, is_active: true})
         }
     }
 
@@ -62,7 +62,7 @@ export default function TemplateSettings() {
             <div className="border-b flex justify-between items-center pb-4 mb-4 border-n-5/10">
                 <h1 className="font-bold text-[17px]">Themes</h1>
                 <Button plain onClick={handleCreateTheme} className="!py-1 !-mt-1.5 mr-4">
-                    <PlusIcon className="h-5 w-5 mr-2" />
+                    <PlusIcon className="h-5 w-5 mr-2"/>
                     Create New Theme
                 </Button>
             </div>
@@ -91,9 +91,9 @@ export default function TemplateSettings() {
                             <div
                                 key={theme.id}
                                 className={`p-4 rounded-lg border ${theme.is_active
-                                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
-                                        : 'border-gray-200 dark:border-zinc-700'
-                                    }`}
+                                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+                                    : 'border-gray-200 dark:border-zinc-700'
+                                }`}
                             >
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="font-medium">{theme.name}</h3>
@@ -103,26 +103,26 @@ export default function TemplateSettings() {
                                             className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700"
                                             title="Edit theme"
                                         >
-                                            <PencilIcon className="h-4 w-4" />
+                                            <PencilIcon className="h-4 w-4"/>
                                         </button>
                                         <button
                                             onClick={() => handleDeleteTheme(theme.id!)}
                                             className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700"
                                             title="Delete theme"
                                         >
-                                            <TrashIcon className="h-4 w-4" />
+                                            <TrashIcon className="h-4 w-4"/>
                                         </button>
                                     </div>
                                 </div>
 
                                 {theme.is_active ? (
                                     <div className="flex items-center text-sm text-indigo-600 dark:text-indigo-400">
-                                        <CheckCircleIcon className="h-4 w-4 mr-1" />
+                                        <CheckCircleIcon className="h-4 w-4 mr-1"/>
                                         Active
                                     </div>
                                 ) : (
                                     <Button outline={true} onClick={() => handleSetActive(theme)}
-                                        className="text-xs mt-2">
+                                            className="text-xs mt-2">
                                         Set as active
                                     </Button>
                                 )}
@@ -144,7 +144,7 @@ export default function TemplateSettings() {
                             <Suspense fallback={<div className="flex items-center justify-center h-full">Loading
                                 editor...</div>}>
                                 <ThemeEditor theme={currentTheme} onSave={handleSaveTheme}
-                                    onCancel={() => setIsEditorOpen(false)} />
+                                             onCancel={() => setIsEditorOpen(false)}/>
                             </Suspense>
                         </div>
                     </div>

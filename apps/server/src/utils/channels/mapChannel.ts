@@ -1,4 +1,4 @@
-import prisma from '@/db/prisma';
+import prisma from '@/db/prisma'
 
 export default async function mapChannel(channelId: string, currentUserId: string) {
     const [channel, participants, lastMessage, currentUserParticipant] = await Promise.all([
@@ -6,23 +6,23 @@ export default async function mapChannel(channelId: string, currentUserId: strin
         prisma.dm_participants.findMany({where: {channel_id: channelId}}),
         prisma.dm_messages.findFirst({where: {channel_id: channelId}, orderBy: {created_at: 'desc'}}),
         prisma.dm_participants.findFirst({where: {channel_id: channelId, user_id: currentUserId}}),
-    ]);
+    ])
 
-    if (!channel) return undefined;
+    if (!channel) return undefined
 
-    const otherParticipant = participants.find((p) => p.user_id !== currentUserId);
-    let recipientProfile: any | undefined;
+    const otherParticipant = participants.find((p) => p.user_id !== currentUserId)
+    let recipientProfile: any | undefined
     if (otherParticipant) {
-        recipientProfile = await prisma.profiles.findUnique({where: {id: otherParticipant.user_id}});
+        recipientProfile = await prisma.profiles.findUnique({where: {id: otherParticipant.user_id}})
     } else {
         // self-DM: show current user's profile as recipient
-        recipientProfile = await prisma.profiles.findUnique({where: {id: currentUserId}});
+        recipientProfile = await prisma.profiles.findUnique({where: {id: currentUserId}})
     }
 
-    const recipientProfileAvatar = `${process.env.HOSTNAME}/user/${recipientProfile.id}/avatar`;
+    const recipientProfileAvatar = `${process.env.HOSTNAME}/user/${recipientProfile.id}/avatar`
 
     // Compute unread count: messages created after user's last_read_at
-    let unread_count = 0;
+    let unread_count = 0
     if (currentUserParticipant?.last_read_at) {
         unread_count = await prisma.dm_messages.count({
             where: {
@@ -30,7 +30,7 @@ export default async function mapChannel(channelId: string, currentUserId: strin
                 created_at: {gt: currentUserParticipant.last_read_at},
                 deleted_at: null, // Don't count deleted messages
             }
-        });
+        })
     } else {
         // If never read, count all non-deleted messages
         unread_count = await prisma.dm_messages.count({
@@ -38,7 +38,7 @@ export default async function mapChannel(channelId: string, currentUserId: strin
                 channel_id: channelId,
                 deleted_at: null,
             }
-        });
+        })
     }
 
     return {
@@ -68,5 +68,5 @@ export default async function mapChannel(channelId: string, currentUserId: strin
             : null,
         created_at: channel.created_at.toISOString(),
         unread_count,
-    };
+    }
 }

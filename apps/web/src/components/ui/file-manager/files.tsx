@@ -1,6 +1,6 @@
+import {isVisible} from '@/lib'
 import {Activity, MouseEvent, useEffect, useMemo, useRef, useState} from 'react'
 import {useLocation} from 'wouter'
-import {isVisible} from '@/lib'
 import {useFileManager} from './context'
 import type {FileNode, FileSystemNode} from './types'
 
@@ -85,7 +85,7 @@ export function FileManagerFiles() {
         }
     }
 
-    const onMouseDown = (e: React.MouseEvent) => {
+    const onMouseDown = (e: MouseEvent) => {
         if (e.button !== 0) return
         // Ignore drags that start on an interactive item
         if ((e.target as HTMLElement).closest('[data-fm-item]')) return
@@ -97,7 +97,7 @@ export function FileManagerFiles() {
         setSelectedIds(new Set())
     }
 
-    const onMouseMove = (e: React.MouseEvent) => {
+    const onMouseMove = (e: MouseEvent) => {
         if (!dragStart.current) return
         const cur = {x: e.clientX, y: e.clientY}
         const r = rectFromPoints(dragStart.current, cur)

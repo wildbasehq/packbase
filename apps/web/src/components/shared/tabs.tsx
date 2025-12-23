@@ -1,12 +1,12 @@
-import React, {Children, isValidElement, useCallback, useId, useMemo, useState} from 'react'
 import clsx from 'clsx'
+import {Children, ComponentType, isValidElement, KeyboardEvent, ReactElement, ReactNode, useCallback, useId, useMemo, useState} from 'react'
 
-type IconComponent = React.ComponentType<{ className?: string }>
+type IconComponent = ComponentType<{ className?: string }>
 
 export type TabProps = {
     title: string
     icon?: IconComponent
-    children?: React.ReactNode
+    children?: ReactNode
 }
 
 export function Tab(_props: TabProps) {
@@ -14,19 +14,19 @@ export function Tab(_props: TabProps) {
 }
 
 export type TabsLayoutProps = {
-    children: React.ReactNode
+    children: ReactNode
     className?: string
     headerClassName?: string
     contentClassName?: string
     defaultIndex?: number
     selectedIndex?: number
     onChange?: (index: number) => void
-    prefix?: React.ReactNode
-    suffix?: React.ReactNode
+    prefix?: ReactNode
+    suffix?: ReactNode
 }
 
-function getTabsFromChildren(children: React.ReactNode) {
-    return Children.toArray(children).filter(isValidElement) as React.ReactElement<TabProps>[]
+function getTabsFromChildren(children: ReactNode) {
+    return Children.toArray(children).filter(isValidElement) as ReactElement<TabProps>[]
 }
 
 export function TabsLayout({
@@ -55,7 +55,7 @@ export function TabsLayout({
     const listId = useId()
 
     const onKeyDown = useCallback(
-        (event: React.KeyboardEvent<HTMLDivElement>) => {
+        (event: KeyboardEvent<HTMLDivElement>) => {
             if (!tabs.length) return
             let next = activeIndex
             if (event.key === 'ArrowRight') next = (activeIndex + 1) % tabs.length

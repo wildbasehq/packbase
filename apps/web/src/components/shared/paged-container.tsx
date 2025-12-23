@@ -2,15 +2,8 @@
  * Container which shows pagination markers specified. Uses HTML queries for control.
  */
 import {ReactNode, useEffect, useState} from 'react'
-import {
-    Pagination,
-    PaginationGap,
-    PaginationList,
-    PaginationNext,
-    PaginationPage,
-    PaginationPrevious
-} from './pagination'
 import {useSearchParams} from 'wouter'
+import {Pagination, PaginationGap, PaginationList, PaginationNext, PaginationPage, PaginationPrevious} from './pagination'
 
 export enum PagedContentLoadStatus {
     ERROR,

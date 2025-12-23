@@ -1,14 +1,6 @@
-import {
-    DropdownDivider,
-    DropdownHeading,
-    DropdownItem,
-    DropdownLabel,
-    DropdownMenu,
-    DropdownSection
-} from "@/src/components";
-import {Login} from "@/components/icons/plump/Login.tsx";
-import React from "react";
-import {SignedIn, SignedOut} from "@clerk/clerk-react";
+import {Login} from '@/components/icons/plump/Login'
+import {DropdownDivider, DropdownHeading, DropdownItem, DropdownLabel, DropdownMenu, DropdownSection} from '@/src/components'
+import {SignedIn, SignedOut} from '@clerk/clerk-react'
 
 export default function AppDropdownMenu() {
     return (

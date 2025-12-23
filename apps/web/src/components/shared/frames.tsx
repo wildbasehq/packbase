@@ -1,5 +1,5 @@
-import Frame, {useFrame} from 'react-frame-component'
 import {ReactNode, useLayoutEffect} from 'react'
+import Frame, {useFrame} from 'react-frame-component'
 
 export function SafeFrame({children, ...props}: { children: ReactNode; [_: string]: any }) {
     return (

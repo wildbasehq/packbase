@@ -2,35 +2,19 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {useCallback, useEffect, useMemo, useState} from 'react'
-import {vg} from '@/lib/api'
-import Categories from './categories.json'
+import {BubblePopover, Button, Divider, Heading, SidebarDivider, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection} from '@/components/shared'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
-import {
-    BubblePopover,
-    Button,
-    Divider,
-    Heading,
-    SidebarDivider,
-    SidebarHeading,
-    SidebarItem,
-    SidebarLabel,
-    SidebarSection
-} from '@/components/shared'
-import {SidebarPortal} from '@/lib/context/sidebar-context'
 import {Text} from '@/components/shared/text'
-import {BentoGenericUnlockableBadge} from '@/src/lib/utils/pak'
-import {
-    ArrowPathIcon,
-    ArrowTrendingDownIcon,
-    ArrowTrendingUpIcon,
-    QuestionMarkCircleIcon,
-    ShoppingBagIcon,
-} from '@heroicons/react/20/solid'
+import {vg} from '@/lib/api'
+import {SidebarPortal} from '@/lib/context/sidebar-context'
+import StoreItemModal from '@/pages/store/[item]/page'
 import {useResourceStore} from '@/src/lib'
+import {BentoGenericUnlockableBadge} from '@/src/lib/utils/pak'
+import {ArrowPathIcon, ArrowTrendingDownIcon, ArrowTrendingUpIcon, QuestionMarkCircleIcon, ShoppingBagIcon,} from '@heroicons/react/20/solid'
+import {EllipsisHorizontalIcon} from '@heroicons/react/24/solid'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import {toast} from 'sonner'
-import StoreItemModal from "@/pages/store/[item]/page.tsx";
-import {EllipsisHorizontalIcon} from "@heroicons/react/24/solid";
+import Categories from './categories.json'
 
 type StoreItem = {
     id: string

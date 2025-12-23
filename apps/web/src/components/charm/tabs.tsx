@@ -1,14 +1,14 @@
-import {ElementType, Fragment, useEffect, useMemo, useRef, useState} from 'react'
-import {Menu, Transition} from '@headlessui/react'
+import {cn} from '@/lib'
 import {FloatingPortal, shift, useFloating} from '@floating-ui/react'
-import {cn} from "@/lib";
+import {Menu, Transition} from '@headlessui/react'
+import {ElementType, Fragment, useEffect, useMemo, useRef, useState} from 'react'
 
 /**
  * CharmingTabs component
  *
  * @param {object} props
  * @param {object} props.items Array of items with labels and tab props
- * @param {string | React.ElementType} [props.tabComponent='a'] The component to use for tabs
+ * @param {string | ElementType} [props.tabComponent='a'] The component to use for tabs
  * @param {number} props.selectedIndex The selected tab index
  * @param {function} props.onChange Called when the active tab changes
  */

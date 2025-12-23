@@ -1,9 +1,8 @@
 'use client'
 
-import {forwardRef, ReactNode, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react'
-import {AnimationOptions, motion} from 'motion/react'
-
 import {cn} from '@/lib/utils'
+import {AnimationOptions, motion} from 'motion/react'
+import {forwardRef, ReactNode, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react'
 
 interface TextProps {
     children: ReactNode

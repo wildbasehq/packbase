@@ -1,22 +1,22 @@
 {
-    "badges": {
-        "description": "Profile badges you can unlock.",
-        "items": [
-            "cat_badge_1",
-            "cat_badge_2",
-            "cat_badge_3",
-            "cat_badge_4",
-            "cat_badge_5",
-            "cat_badge_6",
-            "cat_badge_7",
-            "cat_badge_8",
-            "cat_badge_9",
-            "cat_badge_10",
-            "cat_badge_11",
-            "cat_badge_12",
-            "cat_badge_13",
-            "cat_badge_14",
-            "cat_badge_15"
-        ]
-    }
+  "badges": {
+    "description": "Profile badges you can unlock.",
+    "items": [
+      "cat_badge_1",
+      "cat_badge_2",
+      "cat_badge_3",
+      "cat_badge_4",
+      "cat_badge_5",
+      "cat_badge_6",
+      "cat_badge_7",
+      "cat_badge_8",
+      "cat_badge_9",
+      "cat_badge_10",
+      "cat_badge_11",
+      "cat_badge_12",
+      "cat_badge_13",
+      "cat_badge_14",
+      "cat_badge_15"
+    ]
+  }
 }

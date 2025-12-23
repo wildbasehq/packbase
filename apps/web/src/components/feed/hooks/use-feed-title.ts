@@ -19,21 +19,21 @@ function getResourceTitle(
     if (titleOverride) {
         return titleOverride
     }
-    
+
     if (displayName) {
         return displayName
     }
-    
+
     const isHomeResource = resourceId?.startsWith('0000')
     return isHomeResource ? 'Home' : 'Packbase'
 }
 
 export function useFeedTitle({
-    page,
-    titleOverride,
-    currentResourceDisplayName,
-    currentResourceId,
-}: UseFeedTitleProps) {
+                                 page,
+                                 titleOverride,
+                                 currentResourceDisplayName,
+                                 currentResourceId,
+                             }: UseFeedTitleProps) {
     useEffect(() => {
         const title = getResourceTitle(titleOverride, currentResourceDisplayName, currentResourceId)
         document.title = `${title} • P${page}`

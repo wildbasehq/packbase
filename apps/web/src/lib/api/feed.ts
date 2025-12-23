@@ -2,8 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { vg } from '@/lib/api'
-import { FeedPostData } from '../../components/feed/types/post'
+import {vg} from '@/lib/api'
+import {FeedPostData} from '@/src/components'
 
 export interface FeedPageResult {
     posts: FeedPostData[]
@@ -21,8 +21,8 @@ export interface SearchPageParams {
     page: number
 }
 
-export async function fetchFeedPage({ packID, page = 1 }: FeedPageParams): Promise<FeedPageResult> {
-    const response = await vg.feed({ id: packID }).get({ query: { page } })
+export async function fetchFeedPage({packID, page = 1}: FeedPageParams): Promise<FeedPageResult> {
+    const response = await vg.feed({id: packID}).get({query: {page}})
 
     return {
         posts: response.data?.data || [],
@@ -30,13 +30,13 @@ export async function fetchFeedPage({ packID, page = 1 }: FeedPageParams): Promi
     }
 }
 
-export async function fetchSearchPage({ channelID, q, page }: SearchPageParams): Promise<FeedPageResult> {
+export async function fetchSearchPage({channelID, q, page}: SearchPageParams): Promise<FeedPageResult> {
     const take = 5
     const skip = (page - 1) * take
     const query = (q || `$posts = @BULKPOSTLOAD(@PAGE({SKIP}, {TAKE}, [Where posts:channel_id ("${channelID}")]))`)
         .replaceAll('{SKIP}', skip.toString())
         .replaceAll('{TAKE}', take.toString())
-    const response = await vg.search.get({ query: { page, q: query } })
+    const response = await vg.search.get({query: {page, q: query}})
 
     return {
         posts: response.data?.posts || [],

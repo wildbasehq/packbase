@@ -1,13 +1,13 @@
-import {YapockType} from "@/index";
-import {HTTPError} from "@/lib/HTTPError";
-import getClerkAvatar from "@/utils/get-clerk-avatar";
-import {fetch} from "bun";
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import getClerkAvatar from '@/utils/get-clerk-avatar'
+import {fetch} from 'bun'
 
 export default (app: YapockType) =>
     app.get(
         '',
         async ({params}) => {
-            let userID = params.username;
+            let userID = params.username
 
             const user = await prisma.profiles.findFirst({
                 where: {
@@ -17,14 +17,14 @@ export default (app: YapockType) =>
             })
 
             if (!user) {
-                throw HTTPError.notFound({summary: "User not found."});
+                throw HTTPError.notFound({summary: 'User not found.'})
             }
 
-            const avatarUrl = await getClerkAvatar(user.owner_id);
+            const avatarUrl = await getClerkAvatar(user.owner_id)
 
             if (!avatarUrl) {
-                throw HTTPError.notFound({summary: "User has no avatar."});
+                throw HTTPError.notFound({summary: 'User has no avatar.'})
             }
-            
-            return await fetch(avatarUrl);
+
+            return await fetch(avatarUrl)
         })

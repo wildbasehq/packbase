@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react'
+import {createContext, ElementType, FC, ReactNode, useContext, useState} from 'react'
 
 type PagedModalContextType = {
     activePage: string
@@ -9,7 +9,7 @@ type PagedModalContextType = {
             id: string
             title: string
             description?: ReactNode | string
-            icon?: React.ElementType
+            icon?: ElementType
             badge?: string
         }
     >
@@ -18,7 +18,7 @@ type PagedModalContextType = {
         pageInfo: {
             title: string
             description?: ReactNode | string
-            icon?: React.ElementType
+            icon?: ElementType
             badge?: string
         }
     ) => void
@@ -26,7 +26,7 @@ type PagedModalContextType = {
 
 const PagedModalContext = createContext<PagedModalContextType | undefined>(undefined)
 
-export const PagedModalProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const PagedModalProvider: FC<{ children: ReactNode }> = ({children}) => {
     const [activePage, setActivePage] = useState<string>('')
     const [pages, setPages] = useState<
         Record<
@@ -35,7 +35,7 @@ export const PagedModalProvider: React.FC<{ children: ReactNode }> = ({ children
                 id: string
                 title: string
                 description?: ReactNode | string
-                icon?: React.ElementType
+                icon?: ElementType
                 badge?: string
             }
         >
@@ -46,7 +46,7 @@ export const PagedModalProvider: React.FC<{ children: ReactNode }> = ({ children
         pageInfo: {
             title: string
             description?: ReactNode | string
-            icon?: React.ElementType
+            icon?: ElementType
             badge?: string
         }
     ) => {
@@ -67,7 +67,7 @@ export const PagedModalProvider: React.FC<{ children: ReactNode }> = ({ children
         })
     }
 
-    return <PagedModalContext.Provider value={{ activePage, setActivePage, pages, registerPage }}>{children}</PagedModalContext.Provider>
+    return <PagedModalContext.Provider value={{activePage, setActivePage, pages, registerPage}}>{children}</PagedModalContext.Provider>
 }
 
 export const usePagedModal = () => {

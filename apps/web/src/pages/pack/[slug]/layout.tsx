@@ -2,20 +2,20 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import Body from '@/components/layout/body'
 import {LoadingDots} from '@/components/icons'
+import Body from '@/components/layout/body'
+import PackJoinCTA from '@/components/pack/pack-join-cta'
 import {Heading} from '@/components/shared/text'
+import {CustomTheme} from '@/components/shared/theme/custom-theme'
+import {isVisible} from '@/lib'
 import {vg} from '@/lib/api'
+import {SidebarPortal} from '@/lib/context/sidebar-context'
 import {useResourceStore, useUIStore} from '@/lib/state'
+import {PackChannels} from '@/src/components'
 import {FaceFrownIcon} from '@heroicons/react/24/solid'
 import {OrbitIcon} from 'lucide-react'
 import {Activity, ReactNode, useEffect, useState} from 'react'
 import {useParams} from 'wouter'
-import {PackChannels} from '@/src/components'
-import {SidebarPortal} from '@/lib/context/sidebar-context.tsx'
-import {CustomTheme} from '@/components/shared/theme/custom-theme'
-import {isVisible} from "@/lib";
-import PackJoinCTA from "@/components/pack/pack-join-cta.tsx";
 
 export default function PackLayout({children}: { children: ReactNode }) {
     const {loading, setLoading, setNavigation} = useUIStore()

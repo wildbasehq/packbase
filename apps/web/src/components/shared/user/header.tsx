@@ -2,15 +2,15 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {Heading} from '@/components/shared/text'
+import {Button} from '@/components/shared'
 import Markdown from '@/components/shared/markdown'
+import {Heading} from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 import {vg} from '@/lib/api'
-import {toast} from 'sonner'
-import {Button} from '@/components/shared'
 import {useUserAccountStore} from '@/lib/state'
-import {useState} from 'react'
 import {ChatBubbleLeftEllipsisIcon} from '@heroicons/react/16/solid'
+import {useState} from 'react'
+import {toast} from 'sonner'
 
 // @TODO: Unify user and pack headers.
 export default function ProfileHeader({...props}: any) {
@@ -21,7 +21,7 @@ export default function ProfileHeader({...props}: any) {
     if (!profile) {
         return null
     }
-    
+
     return (
         <div className="relative" id="profile-header">
             <div id="profile-banner-container">

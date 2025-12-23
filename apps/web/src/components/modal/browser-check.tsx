@@ -1,9 +1,9 @@
+import Link from '@/components/shared/link'
+import {useEffect} from 'react'
 import {useLocalStorage} from 'usehooks-ts'
 import {Button, Divider} from '../shared'
 import {Alert, AlertDescription, AlertTitle} from '../shared/alert'
 import {useModal} from './provider'
-import {useEffect} from 'react'
-import Link from "@/components/shared/link.tsx";
 
 export default function BrowserCheck() {
     const {show, hide} = useModal()

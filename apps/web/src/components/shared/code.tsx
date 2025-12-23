@@ -1,21 +1,10 @@
 'use client'
 
-import {
-    Children,
-    ComponentPropsWithoutRef,
-    createContext,
-    isValidElement,
-    ReactNode,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from 'react'
-import {Tab, TabGroup, TabList, TabPanel, TabPanels} from '@headlessui/react'
-import {create} from 'zustand'
-
 import {Tag} from '@/components/shared/tag'
-import {cn} from "@/lib";
+import {cn} from '@/lib'
+import {Tab, TabGroup, TabList, TabPanel, TabPanels} from '@headlessui/react'
+import {Children, ComponentPropsWithoutRef, createContext, isValidElement, ReactNode, useContext, useEffect, useRef, useState,} from 'react'
+import {create} from 'zustand'
 
 const languageNames: Record<string, string> = {
     js: 'JavaScript',
@@ -65,7 +54,7 @@ function CopyButton({code}: { code: string }) {
     let copied = copyCount > 0
 
     useEffect(() => {
-        let timeout;
+        let timeout
         if (copyCount > 0) {
             timeout = setTimeout(() => setCopyCount(0), 1000)
         }

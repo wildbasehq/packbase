@@ -2,12 +2,10 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import * as React from 'react'
-import {ComponentPropsWithoutRef, ComponentRef, forwardRef} from 'react'
-import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
-
 import {cn} from '@/lib/utils'
 import {CheckIcon} from '@heroicons/react/20/solid'
+import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
+import {ComponentPropsWithoutRef, ComponentRef, forwardRef} from 'react'
 
 const Checkbox = forwardRef<
     ComponentRef<typeof CheckboxPrimitive.Root>,

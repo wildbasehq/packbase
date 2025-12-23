@@ -4,10 +4,9 @@
  * and to support a "dry run" mode for testing content before actual upload
  */
 
-import DOMPurify from 'isomorphic-dompurify';
-import sanitizeCSS from '@/lib/sanitize/css';
-import { HTTPError } from '@/lib/HTTPError';
-import beautifyCSS from '@/lib/sanitize/beautify';
+import {HTTPError} from '@/lib/HTTPError'
+import beautifyCSS from '@/lib/sanitize/beautify'
+import DOMPurify from 'isomorphic-dompurify'
 
 // Constants for validation
 const ALLOWED_HTML_TAGS = [
@@ -33,9 +32,9 @@ const ALLOWED_HTML_TAGS = [
     'main',
     'aside',
     'style',
-];
-const ALLOWED_HTML_ATTRS = ['id', 'class', 'style', 'src', 'alt', 'href', 'target', 'rel'];
-const SIMILARITY_THRESHOLD = 0.7; // 70% similarity required
+]
+const ALLOWED_HTML_ATTRS = ['id', 'class', 'style', 'src', 'alt', 'href', 'target', 'rel']
+const SIMILARITY_THRESHOLD = 0.7 // 70% similarity required
 
 export interface ThemeContent {
     html: string;
@@ -66,14 +65,14 @@ export function validateThemeContent(content: ThemeContent, dryRun: boolean = fa
             isValid: false,
             htmlIssue: !content.html ? 'HTML content is required' : undefined,
             cssIssue: !content.css ? 'CSS content is required' : undefined,
-        };
+        }
     }
 
     const result: ValidatedThemeContent = {
         html: '',
         css: '',
         isValid: true,
-    };
+    }
 
     // Only sanitize HTML if it's provided
     if (content.html) {
@@ -81,20 +80,20 @@ export function validateThemeContent(content: ThemeContent, dryRun: boolean = fa
         const sanitizedHTML = DOMPurify.sanitize(content.html, {
             ALLOWED_TAGS: ALLOWED_HTML_TAGS,
             ALLOWED_ATTR: ALLOWED_HTML_ATTRS,
-        });
+        })
 
         // Store sanitized content
-        result.html = sanitizedHTML;
+        result.html = sanitizedHTML
 
         // Check if sanitized HTML is too different from original (potential attack)
         if (sanitizedHTML.length < content.html.length * SIMILARITY_THRESHOLD) {
-            result.isValid = false;
-            result.htmlIssue = 'HTML contains too many unsafe elements or attributes';
+            result.isValid = false
+            result.htmlIssue = 'HTML contains too many unsafe elements or attributes'
 
             if (!dryRun) {
                 throw HTTPError.badRequest({
                     summary: 'HTML contains too many unsafe elements or attributes.',
-                });
+                })
             }
         }
     }
@@ -119,10 +118,10 @@ export function validateThemeContent(content: ThemeContent, dryRun: boolean = fa
         //     }
         // }
 
-        result.css = beautifyCSS(content.css);
+        result.css = beautifyCSS(content.css)
     }
 
-    return result;
+    return result
 }
 
-export default validateThemeContent;
+export default validateThemeContent

@@ -1,6 +1,6 @@
-import IDArtistShowcase from './artist-showcase'
 import {useUIStore} from '@/lib/state'
 import {ReactNode, useEffect} from 'react'
+import IDArtistShowcase from './artist-showcase'
 
 export default function IDLayout({children}: { children: ReactNode }) {
     const {setHidden} = useUIStore()

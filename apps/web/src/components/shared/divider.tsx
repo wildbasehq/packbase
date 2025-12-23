@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import {ComponentPropsWithoutRef} from "react";
+import {ComponentPropsWithoutRef} from 'react'
 
 export function Divider({
                             soft = false,

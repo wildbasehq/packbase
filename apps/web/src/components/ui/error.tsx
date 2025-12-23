@@ -1,11 +1,10 @@
-import type {ErrorInfo, ReactNode} from 'react';
-import React from 'react';
-import {Alert, AlertTitle, Button, Code, CodeGroup, Heading} from "@/src/components";
-import {Text} from "@/components/shared/text.tsx";
-import SadComputerIcon from "@/components/icons/sad-computer.tsx";
-import Link from "@/components/shared/link.tsx";
-import {ArrowUpRightIcon} from "@heroicons/react/20/solid";
-import Tooltip from "@/components/shared/tooltip.tsx";
+import SadComputerIcon from '@/components/icons/sad-computer'
+import Link from '@/components/shared/link'
+import {Text} from '@/components/shared/text'
+import Tooltip from '@/components/shared/tooltip'
+import {Alert, AlertTitle, Button, Code, CodeGroup, Heading} from '@/src/components'
+import {ArrowUpRightIcon} from '@heroicons/react/20/solid'
+import {Component, ErrorInfo, ReactNode} from 'react'
 
 type ErrorBoundaryProps = {
     children: ReactNode;
@@ -30,39 +29,39 @@ type ErrorBoundaryState = {
     error: unknown | null;
 };
 
-class ErrorBoundaryImpl extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundaryImpl extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     state: ErrorBoundaryState = {
         hasError: false,
         error: null,
-    };
+    }
 
     static getDerivedStateFromError(error: unknown): Partial<ErrorBoundaryState> {
-        return {hasError: true, error};
+        return {hasError: true, error}
     }
 
     componentDidCatch(error: unknown, errorInfo: ErrorInfo) {
         // Allow consumers to handle/log errors
-        this.props.onError?.(error, {componentStack: errorInfo.componentStack});
+        this.props.onError?.(error, {componentStack: errorInfo.componentStack})
         // Basic console output for visibility during development
         // eslint-disable-next-line no-console
-        console.error('ErrorBoundary caught an error:', error, errorInfo);
+        console.error('ErrorBoundary caught an error:', error, errorInfo)
     }
 
     reset = () => {
-        this.setState({hasError: false, error: null});
-        this.props.onReset?.();
-    };
+        this.setState({hasError: false, error: null})
+        this.props.onReset?.()
+    }
 
     render() {
         if (this.state.hasError) {
-            const {fallback} = this.props;
+            const {fallback} = this.props
 
             if (typeof fallback === 'function') {
-                return fallback(this.state.error, this.reset);
+                return fallback(this.state.error, this.reset)
             }
 
             if (fallback) {
-                return <>{fallback}</>;
+                return <>{fallback}</>
             }
 
             // Default fallback UI
@@ -78,8 +77,7 @@ class ErrorBoundaryImpl extends React.Component<ErrorBoundaryProps, ErrorBoundar
                                     Failure: {this.state.error instanceof Error ? this.state.error.message : 'Something went wrong'}
                                 </Heading>
                                 <Text>
-                                    A critical component crashed and can't
-                                    recover. {navigator.appName === 'Packbase' ? "You'll need to restart this software entirely." : "Reload this page to try again."}
+                                    A critical component crashed and can't recover. Reload this page to try again.
                                     <br/>
                                     This shouldn't happen. <Link href="https://discord.gg/StuuK55gYA" target="_blank"
                                                                  className="text-indigo-500">Report it <ArrowUpRightIcon
@@ -110,16 +108,16 @@ class ErrorBoundaryImpl extends React.Component<ErrorBoundaryProps, ErrorBoundar
                         </CodeGroup>
                     </div>
                 </Alert>
-            );
+            )
         }
 
-        return this.props.children;
+        return this.props.children
     }
 }
 
 // @ts-ignore
-ErrorBoundaryImpl.displayName = 'ErrorBoundary';
+ErrorBoundaryImpl.displayName = 'ErrorBoundary'
 
 export default function ErrorBoundary(props: ErrorBoundaryProps) {
-    return <ErrorBoundaryImpl {...props} />;
+    return <ErrorBoundaryImpl {...props} />
 }

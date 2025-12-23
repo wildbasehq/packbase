@@ -2,34 +2,23 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-// src/components/howl-creator/floating-compose.tsx
-import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
-import {useLocation} from 'wouter'
-import {Activity, ReactNode, useEffect, useRef, useState} from 'react'
-import {ArrowDownIcon, PlusIcon} from '@heroicons/react/20/solid'
-import {cn, isVisible, vg} from '@/src/lib'
-import ImageUploadStack, {type Image} from '../feed/image-placeholder-stack'
-import {toast} from 'sonner'
+import PostSettingsModal from '@/components/howl-creator/post-settings-modal'
+import {Camera, HardDisk} from '@/components/icons/plump'
+import {ChatBubbleExclamation} from '@/components/icons/plump/chat-bubble-exclamation'
 import {useModal} from '@/components/modal/provider'
-import PackbaseInstance from '@/lib/workers/global-event-emit.ts'
-import {
-    Avatar,
-    Badge,
-    BubblePopover,
-    Editor,
-    Heading,
-    LoadingCircle,
-    Logo,
-    PopoverHeader,
-    Text
-} from "@/src/components";
-import {ChevronRightIcon} from "@heroicons/react/24/outline";
-import Tooltip from "@/components/shared/tooltip.tsx";
-import {Camera, HardDisk} from "@/components/icons/plump";
-import {HashtagIcon} from "@heroicons/react/16/solid";
-import PostSettingsModal from "@/components/howl-creator/post-settings-modal.tsx";
-import {ChatBubbleExclamation} from "@/components/icons/plump/chat-bubble-exclamation.tsx";
-import getInitials from "@/lib/utils/get-initials.ts";
+import Tooltip from '@/components/shared/tooltip'
+import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
+import getInitials from '@/lib/utils/get-initials'
+import PackbaseInstance from '@/lib/workers/global-event-emit'
+import {Avatar, Badge, BubblePopover, Editor, Heading, LoadingCircle, Logo, PopoverHeader, Text} from '@/src/components'
+import {cn, isVisible, vg} from '@/src/lib'
+import {HashtagIcon} from '@heroicons/react/16/solid'
+import {ArrowDownIcon, PlusIcon} from '@heroicons/react/20/solid'
+import {ChevronRightIcon} from '@heroicons/react/24/outline'
+import {Activity, ReactNode, RefObject, useEffect, useRef, useState} from 'react'
+import {toast} from 'sonner'
+import {useLocation} from 'wouter'
+import ImageUploadStack, {type Image} from '../feed/image-placeholder-stack'
 
 
 export type AvailablePagesType = 'editor' | 'content-labelling' | 'mature-rating-from-sfw-warning'
@@ -92,7 +81,7 @@ export default function FloatingCompose() {
                 setUploading(false)
                 toast('The howl took way too long!', {
                     duration: Infinity,
-                    description: "You can try again, but check in another tab if it worked first - I might've just lost track of it.",
+                    description: 'You can try again, but check in another tab if it worked first - I might\'ve just lost track of it.',
                     action: {
                         label: 'Check',
                         onClick: () => {
@@ -276,10 +265,10 @@ function FloatingComposeContent({
     currentResource: any;
     images: Image[];
     setImages: (images: Image[]) => void;
-    editorRef: React.MutableRefObject<any>;
+    editorRef: RefObject<any>;
     body: string;
     setBody: (body: string) => void;
-    fileInputRef: React.RefObject<HTMLInputElement>;
+    fileInputRef: RefObject<HTMLInputElement>;
     addAttachment: (files: FileList | null) => void;
     submitHowl: () => void;
     setCurrentPage: (value: 'editor' | 'content-labelling') => void;
@@ -399,7 +388,7 @@ function FloatingComposeContent({
                             </ComposeButton>
                         </div>
                         <ComposeButton
-                            className={cn("p-1 rounded-full", uploading && "cursor-not-allowed opacity-80")}
+                            className={cn('p-1 rounded-full', uploading && 'cursor-not-allowed opacity-80')}
                             onClick={() => {
                                 if (uploading) return
                                 submitHowl()

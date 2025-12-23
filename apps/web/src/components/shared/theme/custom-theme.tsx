@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import { vg } from '@/lib/api'
-import { Theme } from '@/src/lib/api/users/theme'
-import { PackThemeAPI } from '@/src/lib/api/packs/theme'
-import { useLocalStorage } from "usehooks-ts";
+import {vg} from '@/lib/api'
+import {PackThemeAPI} from '@/src/lib/api/packs/theme'
+import {Theme} from '@/src/lib/api/users/theme'
+import {useEffect, useState} from 'react'
+import {useLocalStorage} from 'usehooks-ts'
 
 // Component to render custom theme HTML and CSS for users or packs
 interface CustomThemeProps {
@@ -10,9 +10,9 @@ interface CustomThemeProps {
     packId?: string
 }
 
-export function CustomTheme({ userId, packId }: CustomThemeProps) {
+export function CustomTheme({userId, packId}: CustomThemeProps) {
     const [theme, setTheme] = useState<Theme | null>(null)
-    const [loadTheme, setLoadTheme] = useLocalStorage<'true' | 'false' | 'ask'>('load-custom-content-htmlcss', 'ask');
+    const [loadTheme, setLoadTheme] = useLocalStorage<'true' | 'false' | 'ask'>('load-custom-content-htmlcss', 'ask')
 
     useEffect(() => {
         if (loadTheme === 'false') {
@@ -21,7 +21,7 @@ export function CustomTheme({ userId, packId }: CustomThemeProps) {
         }
 
         if (loadTheme === 'ask') {
-            const consent = window.confirm(`This ${userId ? 'profile' : ''}${packId ? 'Pack' : ''} wants to load custom HTML and CSS. Do you allow this? You can change this later in settings.`);
+            const consent = window.confirm(`This ${userId ? 'profile' : ''}${packId ? 'Pack' : ''} wants to load custom HTML and CSS. Do you allow this? You can change this later in settings.`)
             if (!consent) {
                 setLoadTheme('false')
                 setTheme(null)
@@ -33,9 +33,9 @@ export function CustomTheme({ userId, packId }: CustomThemeProps) {
 
         if (userId && !packId) {
             // Fetch user theme
-            vg.user({ username: userId })
+            vg.user({username: userId})
                 .theme.get()
-                .then(({ data }) => {
+                .then(({data}) => {
                     if (data && !data.message) {
                         setTheme(data)
                     } else setTheme(null)
@@ -69,7 +69,7 @@ export function CustomTheme({ userId, packId }: CustomThemeProps) {
 
     return (
         <div className="custom-theme-container">
-            <div dangerouslySetInnerHTML={{ __html: combinedTheme }} />
+            <div dangerouslySetInnerHTML={{__html: combinedTheme}}/>
         </div>
     )
 }

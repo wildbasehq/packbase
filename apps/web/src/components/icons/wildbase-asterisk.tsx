@@ -1,4 +1,4 @@
-import {ComponentPropsWithoutRef} from "react";
+import {ComponentPropsWithoutRef} from 'react'
 
 export default function WildbaseAsteriskIcon(props: ComponentPropsWithoutRef<'svg'>) {
     return (

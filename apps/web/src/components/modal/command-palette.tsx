@@ -1,102 +1,87 @@
-import {useEffect, useMemo, useState} from "react";
-import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOption,
-    ComboboxOptions,
-    Dialog,
-    DialogBackdrop,
-    DialogPanel
-} from "@headlessui/react";
-import {
-    ExclamationTriangleIcon,
-    LifebuoyIcon,
-    MagnifyingGlassIcon,
-    RectangleStackIcon,
-    UserCircleIcon,
-    UserGroupIcon
-} from "@heroicons/react/20/solid";
-import {cn, vg} from "@/lib";
-import PackHeader from "@/components/shared/pack/header";
-import {LoadingSpinner, UserHoverCard} from "@/src/components";
-import UserInfoCol from "@/components/shared/user/info-col.tsx";
-import Markdown from "@/components/shared/markdown.tsx";
-import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
-import {AnimatePresence, motion} from "motion/react";
+import Markdown from '@/components/shared/markdown'
+import PackHeader from '@/components/shared/pack/header'
+import UserInfoCol from '@/components/shared/user/info-col'
+import {cn, vg} from '@/lib'
+import PackbaseInstance from '@/lib/workers/global-event-emit'
+import {LoadingSpinner, UserHoverCard} from '@/src/components'
+import {Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel} from '@headlessui/react'
+import {ExclamationTriangleIcon, LifebuoyIcon, MagnifyingGlassIcon, RectangleStackIcon, UserCircleIcon, UserGroupIcon} from '@heroicons/react/20/solid'
+import {AnimatePresence, motion} from 'motion/react'
+import {ReactNode, useEffect, useMemo, useState} from 'react'
 
 // Simple classNames helper with basic typing
 function classNames(...classes: Array<string | false | null | undefined>) {
-    return classes.filter(Boolean).join(" ");
+    return classes.filter(Boolean).join(' ')
 }
 
 // Custom hook for debounced value
 function useDebouncedValue<T>(value: T, delay: number): T {
-    const [debouncedValue, setDebouncedValue] = useState(value);
+    const [debouncedValue, setDebouncedValue] = useState(value)
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            setDebouncedValue(value);
-        }, delay);
+            setDebouncedValue(value)
+        }, delay)
 
         return () => {
-            clearTimeout(handler);
-        };
-    }, [value, delay]);
+            clearTimeout(handler)
+        }
+    }, [value, delay])
 
-    return debouncedValue;
+    return debouncedValue
 }
 
 // Helper to normalize API response
 const normalizeSearchData = (data) => {
-    if (!data) return {profiles: [], packs: [], posts: []};
+    if (!data) return {profiles: [], packs: [], posts: []}
 
     return {
         profiles: data.profiles || [],
         packs: data.packs || [],
         posts: data.posts || [],
-    };
-};
+    }
+}
 
 // Central helper to determine item type from shape
-const getItemType = (item: any): "profile" | "pack" | "post" | null => {
-    if (!item) return null;
-    if (item.body && item.user) return "post";
-    if (item.username || item.about) return "profile";
-    if (item.display_name && item.slug) return "pack";
-    return null;
-};
+const getItemType = (item: any): 'profile' | 'pack' | 'post' | null => {
+    if (!item) return null
+    if (item.body && item.user) return 'post'
+    if (item.username || item.about) return 'profile'
+    if (item.display_name && item.slug) return 'pack'
+    return null
+}
 
 // Navigation helper kept minimal so it can later be wired to a router
 function navigateFromResult(item: any) {
-    if (!item) return;
-    const type = getItemType(item);
+    if (!item) return
+    const type = getItemType(item)
 
-    if (type === "pack" && item.slug) {
-        window.location.href = `/p/${item.slug}`;
-        return;
+    if (type === 'pack' && item.slug) {
+        window.location.href = `/p/${item.slug}`
+        return
     }
 
-    if (type === "post" && item.id) {
-        window.location.href = `/p/${item.pack?.slug}/all/${item.id}`;
-        return;
+    if (type === 'post' && item.id) {
+        window.location.href = `/p/${item.pack?.slug}/all/${item.id}`
+        return
     }
 
-    if (type === "profile" && (item.username || item.slug)) {
-        const handle = item.slug || item.username;
-        window.location.href = `/@${handle}`;
+    if (type === 'profile' && (item.username || item.slug)) {
+        const handle = item.slug || item.username
+        window.location.href = `/@${handle}`
     }
 }
 
 // Build query string from raw input, not using whskrd
 function queryBuildFromRaw(query: string): string {
-    if (!query) return "";
+    if (!query) return ''
 
-    const parts: string[] = [];
-    let current = "";
-    let inQuotes = false;
+    const parts: string[] = []
+    let current = ''
+    let inQuotes = false
 
     for (let i = 0; i < query.length; i++) {
-        const ch = query[i];
+        const ch = query[i]
 
         if (ch === '"') {
             if (!inQuotes) {
@@ -107,19 +92,19 @@ function queryBuildFromRaw(query: string): string {
                         .trim()
                         .split(/\s+/)
                         .forEach((w) => {
-                            if (w.length > 0) parts.push(`"${w}"`);
-                        });
+                            if (w.length > 0) parts.push(`"${w}"`)
+                        })
                 }
-                current = '"';
-                inQuotes = true;
+                current = '"'
+                inQuotes = true
             } else {
                 // ending a quoted segment
-                current += '"';
+                current += '"'
                 if (current.trim().length > 0) {
-                    parts.push(current.trim());
+                    parts.push(current.trim())
                 }
-                current = "";
-                inQuotes = false;
+                current = ''
+                inQuotes = false
             }
         } else if (/\s/.test(ch) && !inQuotes) {
             // whitespace outside quotes -> word boundary
@@ -128,12 +113,12 @@ function queryBuildFromRaw(query: string): string {
                     .trim()
                     .split(/\s+/)
                     .forEach((w) => {
-                        if (w.length > 0) parts.push(`"${w}"`);
-                    });
-                current = "";
+                        if (w.length > 0) parts.push(`"${w}"`)
+                    })
+                current = ''
             }
         } else {
-            current += ch;
+            current += ch
         }
     }
 
@@ -141,63 +126,63 @@ function queryBuildFromRaw(query: string): string {
     if (current.trim()) {
         if (inQuotes) {
             // unterminated quote, keep as\-is
-            parts.push(current.trim());
+            parts.push(current.trim())
         } else {
             current
                 .trim()
                 .split(/\s+/)
                 .forEach((w) => {
-                    if (w.length > 0) parts.push(`"${w}"`);
-                });
+                    if (w.length > 0) parts.push(`"${w}"`)
+                })
         }
     }
 
-    return parts.join(" ");
+    return parts.join(' ')
 }
 
 // Hook that owns all search + filtering logic so the component tree stays presentational
 function useCommandPaletteSearch() {
-    const [rawQuery, setRawQuery] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
+    const [rawQuery, setRawQuery] = useState('')
+    const [isLoading, setIsLoading] = useState(true)
     const [apiResults, setApiResults] = useState<{
         profiles: any[];
         packs: any[];
         posts: any[];
-    }>({profiles: [], packs: [], posts: []});
+    }>({profiles: [], packs: [], posts: []})
 
-    const debouncedRawQuery = useDebouncedValue(rawQuery, 300);
-    const query = debouncedRawQuery.toLowerCase().replace(/^[#@]/, "");
+    const debouncedRawQuery = useDebouncedValue(rawQuery, 300)
+    const query = debouncedRawQuery.toLowerCase().replace(/^[#@]/, '')
 
     useEffect(() => {
         const fetchResults = async () => {
-            if (!debouncedRawQuery || debouncedRawQuery.trim() === "" || debouncedRawQuery === "?") {
-                setApiResults({profiles: [], packs: [], posts: []});
-                setIsLoading(false);
-                return;
+            if (!debouncedRawQuery || debouncedRawQuery.trim() === '' || debouncedRawQuery === '?') {
+                setApiResults({profiles: [], packs: [], posts: []})
+                setIsLoading(false)
+                return
             }
 
             try {
-                setIsLoading(true);
+                setIsLoading(true)
 
-                let allowedTables: ("profiles" | "packs" | "posts")[] = ["profiles", "packs", "posts"];
-                if (debouncedRawQuery.startsWith("@")) {
-                    allowedTables = ["profiles"];
-                } else if (debouncedRawQuery.startsWith("#")) {
-                    allowedTables = ["packs"];
+                let allowedTables: ('profiles' | 'packs' | 'posts')[] = ['profiles', 'packs', 'posts']
+                if (debouncedRawQuery.startsWith('@')) {
+                    allowedTables = ['profiles']
+                } else if (debouncedRawQuery.startsWith('#')) {
+                    allowedTables = ['packs']
                 }
 
-                let finalQuery = query.trim();
+                let finalQuery = query.trim()
                 if (!finalQuery.startsWith('[') && !finalQuery.startsWith('$')) {
                     finalQuery = `
-                    ${allowedTables.includes("posts") ?
+                    ${allowedTables.includes('posts') ?
                         `
                     $posts = [Where posts (${queryBuildFromRaw(query)})] AS *;
                     $posts:user = [Where profiles ($posts:user_id->ONE)] AS *;
                     $posts:pack = [Where packs ($posts:tenant_id->ONE)] AS *;
                     ` : ''
                     }
-                    ${allowedTables.includes("profiles") ? `$profiles = [Where profiles (${queryBuildFromRaw(query)})] AS *;` : ''}
-                    ${allowedTables.includes("packs") ? `$packs = [Where packs (${queryBuildFromRaw(query)})] AS *;` : ''}
+                    ${allowedTables.includes('profiles') ? `$profiles = [Where profiles (${queryBuildFromRaw(query)})] AS *;` : ''}
+                    ${allowedTables.includes('packs') ? `$packs = [Where packs (${queryBuildFromRaw(query)})] AS *;` : ''}
                     `.trim().replaceAll('                    ', '')
                 }
 
@@ -205,46 +190,46 @@ function useCommandPaletteSearch() {
                     query: {
                         q: finalQuery
                     },
-                });
+                })
 
                 if (searchResults.error) {
-                    console.error("Search error:", searchResults.error);
-                    setApiResults({profiles: [], packs: [], posts: []});
+                    console.error('Search error:', searchResults.error)
+                    setApiResults({profiles: [], packs: [], posts: []})
                 } else {
-                    const normalizedData = normalizeSearchData(searchResults.data);
-                    setApiResults(normalizedData);
+                    const normalizedData = normalizeSearchData(searchResults.data)
+                    setApiResults(normalizedData)
                 }
             } catch (err) {
-                console.error("Error fetching search results:", err);
-                setApiResults({profiles: [], packs: [], posts: []});
+                console.error('Error fetching search results:', err)
+                setApiResults({profiles: [], packs: [], posts: []})
             } finally {
-                setIsLoading(false);
+                setIsLoading(false)
             }
-        };
+        }
 
-        fetchResults();
-    }, [debouncedRawQuery, query]);
+        fetchResults()
+    }, [debouncedRawQuery, query])
 
     const filteredProfiles = useMemo(() => {
-        if (debouncedRawQuery.startsWith("#")) return [];
-        if (query === "") return apiResults.profiles.slice(0, 5);
-        return apiResults.profiles.slice(0, 5);
-    }, [query, debouncedRawQuery, apiResults.profiles]);
+        if (debouncedRawQuery.startsWith('#')) return []
+        if (query === '') return apiResults.profiles.slice(0, 5)
+        return apiResults.profiles.slice(0, 5)
+    }, [query, debouncedRawQuery, apiResults.profiles])
 
     const filteredPacks = useMemo(() => {
-        if (debouncedRawQuery.startsWith("@")) return [];
-        if (query === "") return apiResults.packs.slice(0, 5);
-        return apiResults.packs.slice(0, 5);
-    }, [query, debouncedRawQuery, apiResults.packs]);
+        if (debouncedRawQuery.startsWith('@')) return []
+        if (query === '') return apiResults.packs.slice(0, 5)
+        return apiResults.packs.slice(0, 5)
+    }, [query, debouncedRawQuery, apiResults.packs])
 
     const filteredPosts = useMemo(() => {
-        if (debouncedRawQuery.startsWith("#") || debouncedRawQuery.startsWith("@")) return [];
-        if (query === "") return apiResults.posts.slice(0, 3);
-        return apiResults.posts.slice(0, 3);
-    }, [query, debouncedRawQuery, apiResults.posts]);
+        if (debouncedRawQuery.startsWith('#') || debouncedRawQuery.startsWith('@')) return []
+        if (query === '') return apiResults.posts.slice(0, 3)
+        return apiResults.posts.slice(0, 3)
+    }, [query, debouncedRawQuery, apiResults.posts])
 
     const hasResults =
-        filteredProfiles.length > 0 || filteredPacks.length > 0 || filteredPosts.length > 0;
+        filteredProfiles.length > 0 || filteredPacks.length > 0 || filteredPosts.length > 0
 
     return {
         rawQuery,
@@ -256,7 +241,7 @@ function useCommandPaletteSearch() {
         filteredPacks,
         filteredPosts,
         hasResults,
-    };
+    }
 }
 
 // Presentational: header + input
@@ -286,7 +271,7 @@ function CommandPaletteInput({
                 aria-hidden="true"
             />
         </div>
-    );
+    )
 }
 
 // Individual result sections (Profiles / Packs / Posts)
@@ -295,7 +280,7 @@ function CommandPaletteSection({
                                    children,
                                }: {
     title: string;
-    children: React.ReactNode;
+    children: ReactNode;
 }) {
     return (
         <div className="space-y-1">
@@ -304,29 +289,29 @@ function CommandPaletteSection({
             </h2>
             <div className="space-y-1.5">{children}</div>
         </div>
-    );
+    )
 }
 
 // Right-hand side preview area
 function CommandPalettePreview({activeOption}: { activeOption: any }) {
-    const type = getItemType(activeOption);
+    const type = getItemType(activeOption)
 
-    if (!activeOption || !type) return null;
+    if (!activeOption || !type) return null
 
     return (
         <div
             className="hidden h-96 w-full flex-none flex-col divide-y divide-border overflow-y-auto bg-muted/40 sm:flex">
-            {type === "profile" && (
+            {type === 'profile' && (
                 <div className="p-6">
                     <UserHoverCard user={activeOption}/>
                 </div>
             )}
-            {type === "pack" && (
+            {type === 'pack' && (
                 <div className="px-6">
                     <PackHeader pack={activeOption}/>
                 </div>
             )}
-            {type === "post" && (
+            {type === 'post' && (
                 <div className="p-6 space-y-4">
                     <UserInfoCol user={activeOption.user}/>
                     <div className="mt-2 text-sm text-foreground">
@@ -335,7 +320,7 @@ function CommandPalettePreview({activeOption}: { activeOption: any }) {
                 </div>
             )}
         </div>
-    );
+    )
 }
 
 // Results, loading, help, and empty states
@@ -356,17 +341,17 @@ function CommandPaletteResultsList({
     filteredPacks: any[];
     filteredPosts: any[];
 }) {
-    const showStateShell = isLoading || hasResults || rawQuery === "?" || (query !== "" && !hasResults);
+    const showStateShell = isLoading || hasResults || rawQuery === '?' || (query !== '' && !hasResults)
 
     return (
         <motion.div
-            animate={showStateShell ? "visible" : "hidden"}
+            animate={showStateShell ? 'visible' : 'hidden'}
             variants={{
                 hidden: {
                     height: 1,
                 },
                 visible: {
-                    height: "24rem",
+                    height: '24rem',
                 }
             }}
             transition={{
@@ -385,8 +370,8 @@ function CommandPaletteResultsList({
             >
                 <div
                     className={classNames(
-                        "max-h-96 min-w-0 flex-auto scroll-py-4 overflow-y-auto px-6 py-4",
-                        "text-sm",
+                        'max-h-96 min-w-0 flex-auto scroll-py-4 overflow-y-auto px-6 py-4',
+                        'text-sm',
                     )}
                 >
                     {isLoading && (
@@ -487,7 +472,7 @@ function CommandPaletteResultsList({
                                                 )}
                                                 <p className="truncate text-sm">
                                                     {post.body?.substring(0, 80)}
-                                                    {post.body && post.body.length > 80 ? "…" : ""}
+                                                    {post.body && post.body.length > 80 ? '…' : ''}
                                                 </p>
                                             </div>
                                         </ComboboxOption>
@@ -497,7 +482,7 @@ function CommandPaletteResultsList({
                         </div>
                     )}
 
-                    {rawQuery === "?" && !isLoading && (
+                    {rawQuery === '?' && !isLoading && (
                         <div
                             className="px-6 py-14 text-center text-sm sm:px-14"
                             role="status"
@@ -519,14 +504,14 @@ function CommandPaletteResultsList({
                                     <kbd
                                         className="rounded border border-border bg-card px-1 py-0.5 text-[11px] font-mono">
                                         @
-                                    </kbd>{" "}
+                                    </kbd>{' '}
                                     Search profiles only
                                 </li>
                                 <li>
                                     <kbd
                                         className="rounded border border-border bg-card px-1 py-0.5 text-[11px] font-mono">
                                         #
-                                    </kbd>{" "}
+                                    </kbd>{' '}
                                     Search packs only
                                 </li>
                                 <li>
@@ -541,7 +526,7 @@ function CommandPaletteResultsList({
                         </div>
                     )}
 
-                    {!isLoading && query !== "" && rawQuery !== "?" && !hasResults && (
+                    {!isLoading && query !== '' && rawQuery !== '?' && !hasResults && (
                         <div
                             className="px-6 py-14 text-center text-sm sm:px-14"
                             role="status"
@@ -565,14 +550,14 @@ function CommandPaletteResultsList({
                 <ComboboxOptionsPreviewSlot/>
             </ComboboxOptions>
         </motion.div>
-    );
+    )
 }
 
 // Placeholder component that will be swapped at render time
 // (Headless UI doesn't support direct composition for the split pane,
 //  so we'll render the preview separately in the main component.)
 function ComboboxOptionsPreviewSlot() {
-    return null;
+    return null
 }
 
 // Footer helper with mode hints and shortcut reminder
@@ -584,10 +569,10 @@ function CommandPaletteFooter({rawQuery}: { rawQuery: string }) {
                 <span className="hidden sm:inline">Type</span>
                 <kbd
                     className={classNames(
-                        "flex h-5 w-5 items-center justify-center rounded-sm border bg-card font-mono text-[11px] font-semibold",
-                        rawQuery.startsWith("@")
-                            ? "border-indigo-600 text-indigo-600"
-                            : "border-border text-foreground",
+                        'flex h-5 w-5 items-center justify-center rounded-sm border bg-card font-mono text-[11px] font-semibold',
+                        rawQuery.startsWith('@')
+                            ? 'border-indigo-600 text-indigo-600'
+                            : 'border-border text-foreground',
                     )}
                 >
                     @
@@ -596,10 +581,10 @@ function CommandPaletteFooter({rawQuery}: { rawQuery: string }) {
                 <span className="sm:hidden">profiles,</span>
                 <kbd
                     className={classNames(
-                        "flex h-5 w-5 items-center justify-center rounded-sm border bg-card font-mono text-[11px] font-semibold",
-                        rawQuery.startsWith("#")
-                            ? "border-indigo-600 text-indigo-600"
-                            : "border-border text-foreground",
+                        'flex h-5 w-5 items-center justify-center rounded-sm border bg-card font-mono text-[11px] font-semibold',
+                        rawQuery.startsWith('#')
+                            ? 'border-indigo-600 text-indigo-600'
+                            : 'border-border text-foreground',
                     )}
                 >
                     #
@@ -607,10 +592,10 @@ function CommandPaletteFooter({rawQuery}: { rawQuery: string }) {
                 <span>for packs,</span>
                 <kbd
                     className={classNames(
-                        "flex h-5 w-5 items-center justify-center rounded-sm border bg-card font-mono text-[11px] font-semibold",
-                        rawQuery === "?"
-                            ? "border-indigo-600 text-indigo-600"
-                            : "border-border text-foreground",
+                        'flex h-5 w-5 items-center justify-center rounded-sm border bg-card font-mono text-[11px] font-semibold',
+                        rawQuery === '?'
+                            ? 'border-indigo-600 text-indigo-600'
+                            : 'border-border text-foreground',
                     )}
                 >
                     ?
@@ -635,11 +620,11 @@ function CommandPaletteFooter({rawQuery}: { rawQuery: string }) {
                 </kbd>
             </div>
         </div>
-    );
+    )
 }
 
 export default function CommandPalette() {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const {
         rawQuery,
@@ -651,42 +636,42 @@ export default function CommandPalette() {
         filteredPacks,
         filteredPosts,
         hasResults,
-    } = useCommandPaletteSearch();
+    } = useCommandPaletteSearch()
 
     // Keyboard shortcut handler for Ctrl/CMD + K
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-                e.preventDefault();
-                setOpen((prev) => !prev);
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault()
+                setOpen((prev) => !prev)
             }
-        };
+        }
 
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, []);
+        document.addEventListener('keydown', handleKeyDown)
+        return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [])
 
     // Listen for global Packbase event to open search
     useEffect(() => {
-        const cancelInstance = PackbaseInstance.on("search-open", (event) => {
+        const cancelInstance = PackbaseInstance.on('search-open', (event) => {
             if (event.data?.searchQuery) {
-                setRawQuery(event.data.searchQuery);
+                setRawQuery(event.data.searchQuery)
             }
 
-            setOpen(true);
-        });
+            setOpen(true)
+        })
 
         return () => {
-            cancelInstance();
-        };
-    }, []);
+            cancelInstance()
+        }
+    }, [])
 
     return (
         <Dialog
             className="relative z-50"
             open={open}
             onClose={() => {
-                setOpen(false);
+                setOpen(false)
             }}
             aria-label="Command palette search"
         >
@@ -703,9 +688,9 @@ export default function CommandPalette() {
                         aria-hidden="true"
                         role="presentation"
                         className="pointer-events-none h-full w-full fixed inset-0 -z-1 overflow-hidden"
-                        initial={{y: "-100%"}}
-                        animate={{y: "100%"}}
-                        transition={{duration: 0.65, ease: "linear"}}
+                        initial={{y: '-100%'}}
+                        animate={{y: '100%'}}
+                        transition={{duration: 0.65, ease: 'linear'}}
                     >
                         <div
                             className="absolute inset-x-0 top-0 h-full w-full backdrop-blur-[1px] mask-middle"
@@ -723,7 +708,7 @@ export default function CommandPalette() {
                         className="pointer-events-none fixed -top-full inset-0 -z-1 overflow-hidden"
                         initial={{opacity: 0.2}}
                         animate={{opacity: [0.2, 0.25, 0]}}
-                        transition={{duration: 2, times: [0, 0.15, 1], ease: "easeOut"}}
+                        transition={{duration: 2, times: [0, 0.15, 1], ease: 'easeOut'}}
                     >
                         <div
                             className="absolute animate-hue inset-0 bg-[radial-gradient(circle_at_center,rgba(129,140,248,0.35)_0,rgba(236,72,153,0.25)_15%,rgba(34,197,94,0.18)_45%,rgba(252,211,77,0.12)_70%,transparent_100%)] mask-[linear-gradient(to_bottom,transparent_0,black_18%,black_100%)] mask-size-[100%_100%] mask-no-repeat"
@@ -740,9 +725,9 @@ export default function CommandPalette() {
                     <Combobox
                         onChange={(item: any) => {
                             if (item) {
-                                navigateFromResult(item);
-                                setOpen(false);
-                                setRawQuery("");
+                                navigateFromResult(item)
+                                setOpen(false)
+                                setRawQuery('')
                             }
                         }}
                     >
@@ -752,8 +737,8 @@ export default function CommandPalette() {
 
                                 <div
                                     className={cn(
-                                        "grid grid-cols-1 grid-rows-2 overflow-hidden divide-x divide-border sm:grid-cols-2 sm:grid-rows-1",
-                                        (!hasResults || isLoading) && "sm:grid-cols-1",
+                                        'grid grid-cols-1 grid-rows-2 overflow-hidden divide-x divide-border sm:grid-cols-2 sm:grid-rows-1',
+                                        (!hasResults || isLoading) && 'sm:grid-cols-1',
                                     )}>
                                     <CommandPaletteResultsList
                                         isLoading={isLoading}
@@ -776,7 +761,7 @@ export default function CommandPalette() {
                 </DialogPanel>
             </div>
         </Dialog>
-    );
+    )
 }
 
 // Tailwind arbitrary keyframes for the shimmer effect

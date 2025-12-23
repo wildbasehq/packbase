@@ -1,6 +1,6 @@
 import {YapockType} from '@/index'
-import fetchRoute from './fetch'
 import idRoute from './[id]'
+import fetchRoute from './fetch'
 import readRoute from './read'
 
 export default (app: YapockType) => {

@@ -2,15 +2,13 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import {WorkerStore} from '@/lib/workers'
 // export const API_URL = (typeof window !== 'undefined' ? (
 //     window.location.hostname === 'localhost'
 //         ? 'http://localhost/api/'
 //         : `${window.location.protocol}//api.${window.location.hostname.replace('www.', '')}/api/`) : '/api/') + 'v2/';
 import VoyageSDK from 'voyagesdk-ts'
-
-// import './cron/check-update.ts'
-import {WorkerStore} from '@/lib/workers'
-import {formatRelativeTime} from '../utils/date.ts'
+import {formatRelativeTime} from '../utils/date'
 
 /**
  * The name of the project. All Wildbase projects should have a name

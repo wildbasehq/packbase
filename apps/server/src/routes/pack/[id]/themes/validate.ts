@@ -1,8 +1,8 @@
 import {YapockType} from '@/index'
 import {HTTPError} from '@/lib/HTTPError'
+import PackMan from '@/lib/packs/PackMan'
 import validateThemeContent from '@/lib/themes/validateThemeContent'
 import {t} from 'elysia'
-import PackMan from '@/lib/packs/PackMan'
 
 export default (app: YapockType) =>
     app.post(

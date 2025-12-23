@@ -1,7 +1,7 @@
 import {cn} from '@/lib/utils'
-import React from 'react'
+import {SVGAttributes} from 'react'
 
-export interface IconProps extends React.SVGAttributes<SVGElement> {
+export interface IconProps extends SVGAttributes<SVGElement> {
     className?: string
     size?: number | string
     dark?: boolean

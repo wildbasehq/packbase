@@ -1,21 +1,21 @@
-import {YapockType} from '@/index';
-import {t} from 'elysia';
-import {HTTPError} from '@/lib/HTTPError';
-import prisma from '@/db/prisma';
-import {getPack} from './index';
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import {t} from 'elysia'
+import {getPack} from './index'
 
 export default (app: YapockType) =>
     app.get(
         '',
         async ({params, set}) => {
             // Get pack by ID or slug
-            const pack = await getPack(params.id);
+            const pack = await getPack(params.id)
 
             if (!pack) {
-                set.status = 404;
+                set.status = 404
                 throw HTTPError.notFound({
                     summary: 'Pack not found.',
-                });
+                })
             }
 
             // Find the active theme for the pack
@@ -24,16 +24,16 @@ export default (app: YapockType) =>
                     pack_id: pack.id,
                     is_active: true,
                 },
-            });
+            })
 
             if (!themeData) {
-                set.status = 404;
+                set.status = 404
                 throw HTTPError.notFound({
                     summary: 'No active theme found for this pack.',
-                });
+                })
             }
 
-            return themeData;
+            return themeData
         },
         {
             params: t.Object({

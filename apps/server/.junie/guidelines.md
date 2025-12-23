@@ -1,6 +1,7 @@
 # Yapock Development Guidelines
 
-This document provides essential information for developers working on the Yapock project. It covers build/configuration instructions, testing procedures, and other development guidelines specific to this project.
+This document provides essential information for developers working on the Yapock project. It covers build/configuration
+instructions, testing procedures, and other development guidelines specific to this project.
 
 ## Build and Configuration
 
@@ -14,12 +15,12 @@ This document provides essential information for developers working on the Yapoc
 
 1. Clone the repository
 2. Copy `.env.example` to `.env` (if not already present) and configure the following variables:
-   - `DATABASE_URL`: PostgreSQL connection string with pgbouncer (for connection pooling)
-   - `DIRECT_URL`: Direct PostgreSQL connection string (for migrations)
-   - `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`: Authentication keys from Clerk
-   - `SUPABASE_URL` and `SUPABASE_KEY`: Supabase connection details
-   - `PDS_HOST`: The host where the server will be accessible
-   - `POSTHOG_KEY`: Analytics key (if using PostHog)
+    - `DATABASE_URL`: PostgreSQL connection string with pgbouncer (for connection pooling)
+    - `DIRECT_URL`: Direct PostgreSQL connection string (for migrations)
+    - `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`: Authentication keys from Clerk
+    - `SUPABASE_URL` and `SUPABASE_KEY`: Supabase connection details
+    - `PDS_HOST`: The host where the server will be accessible
+    - `POSTHOG_KEY`: Analytics key (if using PostHog)
 
 ### Database Setup
 
@@ -28,7 +29,8 @@ This document provides essential information for developers working on the Yapoc
    bun prisma migrate dev
    ```
 
-2. The schema uses multiple PostgreSQL schemas (auth, public) and includes row-level security, which requires proper setup for migrations.
+2. The schema uses multiple PostgreSQL schemas (auth, public) and includes row-level security, which requires proper
+   setup for migrations.
 
 ### Running the Application
 
@@ -74,6 +76,7 @@ The application supports several startup flags:
 ### Test Framework
 
 The project uses Bun's built-in test runner. Test files should follow these naming conventions:
+
 - `.test.ts` (e.g., `component.test.ts`)
 - `_test_.ts`
 - `.spec.ts`
@@ -120,7 +123,8 @@ export { add };
 
 ### Self-Diagnostic Tests
 
-The application includes a self-diagnostic system that tests all routes. This runs automatically on startup unless the `--skip-self-diag` flag is used.
+The application includes a self-diagnostic system that tests all routes. This runs automatically on startup unless the
+`--skip-self-diag` flag is used.
 
 To manually run the self-diagnostic tests:
 
@@ -134,17 +138,18 @@ await selfTest(app);
 ### Key Directories
 
 - `src/`: Source code
-  - `routes/`: API routes (automatically loaded)
-  - `utils/`: Utility functions
-  - `db/`: Database connections and utilities
-  - `migrate/`: Migration scripts
-  - `scripts/`: Utility scripts
+    - `routes/`: API routes (automatically loaded)
+    - `utils/`: Utility functions
+    - `db/`: Database connections and utilities
+    - `migrate/`: Migration scripts
+    - `scripts/`: Utility scripts
 - `prisma/`: Database schema and migrations
 - `tests/`: Test files
 
 ### API Structure
 
-The API is built with Elysia and uses automatic route loading. Routes are organized in directories that match the URL structure:
+The API is built with Elysia and uses automatic route loading. Routes are organized in directories that match the URL
+structure:
 
 - `src/routes/user/[username]/`: User-specific routes
 - `src/routes/themes/`: Theme-related routes
@@ -184,6 +189,7 @@ DEBUG=vg* bun run dev
 ```
 
 Different log levels are available:
+
 - `vg:init`: Initialization logs
 - `vg:request`: Request logs
 - `vg:init:error`: Error logs
@@ -196,4 +202,5 @@ Different log levels are available:
 
 ## Documentation
 
-API documentation is available at the `/docs` endpoint using Swagger. When adding new routes, ensure they are properly documented for Swagger.
+API documentation is available at the `/docs` endpoint using Swagger. When adding new routes, ensure they are properly
+documented for Swagger.

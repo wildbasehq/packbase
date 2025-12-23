@@ -2,8 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import {ReactNode} from 'react'
 import {FeedPostData} from './post'
-import {ReactNode} from "react";
 
 export interface FeedProps {
     packID?: string

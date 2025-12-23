@@ -1,43 +1,43 @@
-import {YapockType} from '@/index';
-import {t} from 'elysia';
-import {getUser} from '@/routes/user/[username]/index';
-import {ErrorTypebox} from '@/utils/errors';
-import {FeedController} from '@/lib/FeedController';
-import {HTTPError} from '@/lib/HTTPError';
-import prisma from '@/db/prisma';
-import requiresToken from '@/utils/identity/requires-token';
-import requiresAccount from "@/utils/identity/requires-account";
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {FeedController} from '@/lib/FeedController'
+import {HTTPError} from '@/lib/HTTPError'
+import {getUser} from '@/routes/user/[username]/index'
+import {ErrorTypebox} from '@/utils/errors'
+import requiresAccount from '@/utils/identity/requires-account'
+import requiresToken from '@/utils/identity/requires-token'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app
         .post(
             '',
             async ({user, params, set}) => {
-                await requiresAccount({set, user});
+                await requiresAccount({set, user})
 
                 const followUser = await getUser({
                     by: 'username',
                     value: params.username,
                     user,
-                });
+                })
 
                 if (!followUser) {
-                    set.status = 404;
-                    return;
+                    set.status = 404
+                    return
                 }
 
                 if (followUser.id === user.sub) {
-                    set.status = 400;
+                    set.status = 400
                     throw HTTPError.badRequest({
                         summary: 'You cannot follow yourself.',
-                    });
+                    })
                 }
 
                 if (followUser.following) {
-                    set.status = 400;
+                    set.status = 400
                     throw HTTPError.badRequest({
                         summary: 'You are already following this user.',
-                    });
+                    })
                 }
 
                 try {
@@ -46,13 +46,13 @@ export default (app: YapockType) =>
                             user_id: user.sub,
                             following_id: followUser.id,
                         },
-                    });
+                    })
                 } catch (insertError) {
-                    set.status = 400;
-                    throw HTTPError.fromError(insertError);
+                    set.status = 400
+                    throw HTTPError.fromError(insertError)
                 }
 
-                FeedController.clearUserCache(user.sub);
+                FeedController.clearUserCache(user.sub)
             },
             {
                 params: t.Object({
@@ -74,30 +74,30 @@ export default (app: YapockType) =>
         .delete(
             '',
             async ({params, set, user}) => {
-                await requiresToken({set, user});
+                await requiresToken({set, user})
                 const followUser = await getUser({
                     by: 'username',
                     value: params.username,
                     user,
-                });
+                })
 
                 if (!followUser) {
-                    set.status = 404;
-                    return;
+                    set.status = 404
+                    return
                 }
 
                 if (followUser.id === user.sub) {
-                    set.status = 400;
+                    set.status = 400
                     throw HTTPError.badRequest({
                         summary: 'You cannot unfollow yourself.',
-                    });
+                    })
                 }
 
                 if (!followUser.following) {
-                    set.status = 400;
+                    set.status = 400
                     throw HTTPError.badRequest({
                         summary: 'You are not following this user.',
-                    });
+                    })
                 }
 
                 try {
@@ -106,15 +106,15 @@ export default (app: YapockType) =>
                             user_id: user.sub,
                             following_id: followUser.id,
                         },
-                    });
+                    })
                 } catch (deleteError) {
-                    set.status = 400;
+                    set.status = 400
                     throw HTTPError.badRequest({
                         summary: deleteError.message || 'unknown',
-                    });
+                    })
                 }
 
-                FeedController.clearUserCache(user.sub);
+                FeedController.clearUserCache(user.sub)
             },
             {
                 params: t.Object({

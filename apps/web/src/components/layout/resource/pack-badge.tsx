@@ -1,17 +1,17 @@
-import React from 'react'
+import {CheckBadgeIcon} from '@heroicons/react/20/solid'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import {motion} from 'motion/react'
-import {CheckBadgeIcon} from '@heroicons/react/20/solid'
+import {FC} from 'react'
 
 interface VerifiedBadgeProps {
     className?: string
     tooltipText?: string
 }
 
-export const VerifiedBadge: React.FC<VerifiedBadgeProps> = ({
-                                                                className = '',
-                                                                tooltipText = 'Verified pack - This pack has been reviewed and approved by our team',
-                                                            }) => {
+export const VerifiedBadge: FC<VerifiedBadgeProps> = ({
+                                                          className = '',
+                                                          tooltipText = 'Verified pack - This pack has been reviewed and approved by our team',
+                                                      }) => {
     return (
         <Tooltip.Provider>
             <Tooltip.Root delayDuration={0}>

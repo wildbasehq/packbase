@@ -1,37 +1,37 @@
-import {SignedIn, SignedOut} from "@clerk/clerk-react"
-import {lazy, Suspense} from "react"
-import {Redirect, Route, Switch, useLocation} from "wouter"
-import {LogoSpinner} from "@/src/components";
-import Body from "@/components/layout/body.tsx";
-import PackChannelThread from "@/pages/pack/[slug]/[channel]/[thread]/page.tsx";
-import ChatLayout from "@/pages/c/layout.tsx";
-import NotSelected from "@/pages/c/not-selected.tsx";
-import UserLayout from "@/pages/user/[...slug]/layout.tsx";
-import UserFolderPage from "@/pages/user/[...slug]/folders/[id]/page.tsx";
-import {useResourceStore, useUserAccountStore} from "@/lib";
+import Body from '@/components/layout/body'
+import {useResourceStore, useUserAccountStore} from '@/lib'
+import ChatLayout from '@/pages/c/layout'
+import NotSelected from '@/pages/c/not-selected'
+import PackChannelThread from '@/pages/pack/[slug]/[channel]/[thread]/page'
+import UserFolderPage from '@/pages/user/[...slug]/folders/[id]/page'
+import UserLayout from '@/pages/user/[...slug]/layout'
+import {LogoSpinner} from '@/src/components'
+import {SignedIn, SignedOut} from '@clerk/clerk-react'
+import {lazy, ReactNode, Suspense} from 'react'
+import {Redirect, Route, Switch, useLocation} from 'wouter'
 
 // Lazy load all pages
-const IDLayout = lazy(() => import('@/pages/id/layout.tsx'))
-const IDLogin = lazy(() => import('@/pages/id/login/page.tsx'))
-const IDWaitlist = lazy(() => import('@/pages/id/waitlist/page.tsx'))
-const PackChannel = lazy(() => import('@/pages/pack/[slug]/[channel]/page.tsx'))
-const PackLayout = lazy(() => import('@/pages/pack/[slug]/layout.tsx'))
-const PackHome = lazy(() => import('@/pages/pack/[slug]/page.tsx'))
-const NotFound = lazy(() => import('@/src/not-found.tsx'))
-const PackAdd = lazy(() => import('@/pages/pack/new/page.tsx'))
-const TermsPage = lazy(() => import('@/pages/terms/page.tsx'))
-const UserProfile = lazy(() => import('@/pages/user/[...slug]/page.tsx'))
-const ChatThreadPage = lazy(() => import('@/pages/c/[id]/page.tsx'))
-const GuestLanding = lazy(() => import('@/components/home/guestlanding.tsx'))
-const SetupAccountPage = lazy(() => import('@/pages/me/setup/page.tsx'))
+const IDLayout = lazy(() => import('@/pages/id/layout'))
+const IDLogin = lazy(() => import('@/pages/id/login/page'))
+const IDWaitlist = lazy(() => import('@/pages/id/waitlist/page'))
+const PackChannel = lazy(() => import('@/pages/pack/[slug]/[channel]/page'))
+const PackLayout = lazy(() => import('@/pages/pack/[slug]/layout'))
+const PackHome = lazy(() => import('@/pages/pack/[slug]/page'))
+const NotFound = lazy(() => import('@/src/not-found'))
+const PackAdd = lazy(() => import('@/pages/pack/new/page'))
+const TermsPage = lazy(() => import('@/pages/terms/page'))
+const UserProfile = lazy(() => import('@/pages/user/[...slug]/page'))
+const ChatThreadPage = lazy(() => import('@/pages/c/[id]/page'))
+const GuestLanding = lazy(() => import('@/components/home/guestlanding'))
+const SetupAccountPage = lazy(() => import('@/pages/me/setup/page'))
 
 // Me
-const MeEverythingPage = lazy(() => import('@/pages/me/everything/page.tsx'))
-const MeFollowingPage = lazy(() => import('@/pages/me/following/page.tsx'))
+const MeEverythingPage = lazy(() => import('@/pages/me/everything/page'))
+const MeFollowingPage = lazy(() => import('@/pages/me/following/page'))
 
 // Store
-const StoreLayout = lazy(() => import('@/pages/store/layout.tsx'))
-const StorePage = lazy(() => import('@/pages/store/page.tsx'))
+const StoreLayout = lazy(() => import('@/pages/store/layout'))
+const StorePage = lazy(() => import('@/pages/store/page'))
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -210,7 +210,7 @@ export default function Routes() {
     )
 }
 
-function RequiresAccount({children}: { children?: React.ReactNode }) {
+function RequiresAccount({children}: { children?: ReactNode }) {
     const {user} = useUserAccountStore()
     const [location] = useLocation()
 
@@ -219,7 +219,7 @@ function RequiresAccount({children}: { children?: React.ReactNode }) {
     }
 
     if (user?.requires_setup && !location.startsWith('/setup')) {
-        return <Redirect to={"~/me/setup"}/>
+        return <Redirect to={'~/me/setup'}/>
     }
 
     return children

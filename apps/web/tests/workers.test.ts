@@ -1,6 +1,6 @@
 // @ts-ignore
-import {afterEach, beforeEach, describe, expect, mock, test} from 'bun:test'
 import {shutdownWorker, WorkerStore} from '@/lib/workers'
+import {afterEach, beforeEach, describe, expect, test} from 'bun:test'
 import '@/lib/utils'
 
 describe('WorkerStore', () => {

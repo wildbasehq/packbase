@@ -1,6 +1,6 @@
-import React, {Activity} from "react";
-import {isVisible} from "@/lib";
-import ProgressBar from "@/components/shared/progress-bar.tsx";
+import ProgressBar from '@/components/shared/progress-bar'
+import {isVisible} from '@/lib'
+import {Activity} from 'react'
 
 export default function UserSettingsHeader({title, description, loading}: {
     title: string,

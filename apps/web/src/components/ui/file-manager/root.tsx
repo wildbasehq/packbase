@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useState} from 'react'
 import {useLocation} from 'wouter'
-import type {FileManagerRootProps, FileSystemNode} from './types'
 import {FileManagerContext} from './context'
+import type {FileManagerRootProps, FileSystemNode} from './types'
 
 function normalizePath(pathname: string, baseHref: string) {
     const cleaned = pathname.replace(/\/+$/, '')

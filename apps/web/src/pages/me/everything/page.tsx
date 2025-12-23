@@ -1,6 +1,6 @@
-import {Protect} from "@clerk/clerk-react";
-import {Alert, AlertDescription} from "@/src/components";
-import PackFeedController from "@/pages/pack/components.tsx";
+import PackFeedController from '@/pages/pack/components'
+import {Alert, AlertDescription} from '@/src/components'
+import {Protect} from '@clerk/clerk-react'
 
 export default function EverythingPage() {
     return (

@@ -1,25 +1,25 @@
-import {similarity} from '@/utils/similarity';
-import {YapockType} from '@/index';
-import {PackCreateBody} from '@/models/defs';
-import {HTTPError} from '@/lib/HTTPError';
-import PackMan from "@/lib/packs/PackMan";
-import requiresAccount from "@/utils/identity/requires-account";
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import PackMan from '@/lib/packs/PackMan'
+import {PackCreateBody} from '@/models/defs'
+import requiresAccount from '@/utils/identity/requires-account'
+import {similarity} from '@/utils/similarity'
 
-const banned = ['universe', 'new', 'settings'];
+const banned = ['universe', 'new', 'settings']
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({body: {display_name, slug, description}, set, user}) => {
-            await requiresAccount({set, user});
+            await requiresAccount({set, user})
 
-            slug = slug.toLowerCase();
+            slug = slug.toLowerCase()
             for (const route of banned) {
                 if (similarity(route, slug) > 0.8) {
-                    set.status = 403;
+                    set.status = 403
                     throw HTTPError.forbidden({
                         summary: 'You cannot use that slug',
-                    });
+                    })
                 }
             }
 

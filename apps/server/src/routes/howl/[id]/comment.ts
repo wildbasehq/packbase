@@ -1,40 +1,40 @@
-import {YapockType} from '@/index';
-import {t} from 'elysia';
-import {ErrorTypebox} from '@/utils/errors';
-import {HTTPError} from '@/lib/HTTPError';
-import prisma from '@/db/prisma';
-import {NotificationManager} from '@/lib/NotificationManager';
-import requiresAccount from "@/utils/identity/requires-account";
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import {NotificationManager} from '@/lib/NotificationManager'
+import {ErrorTypebox} from '@/utils/errors'
+import requiresAccount from '@/utils/identity/requires-account'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({params: {id}, body: {body}, set, user, error}) => {
-            await requiresAccount({set, user});
+            await requiresAccount({set, user})
 
-            body = body.trim();
+            body = body.trim()
             if (body.length === 0) {
-                set.status = 400;
-                return;
+                set.status = 400
+                return
             }
 
-            let postExists;
+            let postExists
             try {
                 postExists = await prisma.posts.findUnique({
                     where: {id},
                     select: {user_id: true, id: true, tenant_id: true},
-                });
+                })
             } catch (postError) {
-                set.status = 500;
-                throw HTTPError.fromError(postError);
+                set.status = 500
+                throw HTTPError.fromError(postError)
             }
 
             if (!postExists) {
-                set.status = 404;
-                return;
+                set.status = 404
+                return
             }
 
-            let data;
+            let data
             try {
                 data = await prisma.posts.create({
                     data: {
@@ -47,7 +47,7 @@ export default (app: YapockType) =>
                     select: {
                         id: true,
                     },
-                });
+                })
 
                 await NotificationManager.createNotification(postExists.user_id, 'howl_comment', `${user.sessionClaims.nickname} replied`, body, {
                     post_id: id,
@@ -56,21 +56,21 @@ export default (app: YapockType) =>
                         username: user.sessionClaims.nickname,
                         images_avatar: `${process.env.HOSTNAME}/user/${user.sub}/avatar`,
                     },
-                });
+                })
             } catch (insertError) {
-                set.status = 500;
-                throw HTTPError.fromError(insertError);
+                set.status = 500
+                throw HTTPError.fromError(insertError)
             }
 
             if (!data) {
-                set.status = 400;
-                return;
+                set.status = 400
+                return
             }
 
-            set.status = 201;
+            set.status = 201
             return {
                 id: data.id,
-            };
+            }
         },
         {
             detail: {

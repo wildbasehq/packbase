@@ -1,7 +1,7 @@
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
-import type React from 'react'
+import {ComponentPropsWithoutRef, ReactNode} from 'react'
 import {Text} from './text'
-import {cn} from "@/lib";
 
 const sizes = {
     xs: 'sm:max-w-xs',
@@ -26,14 +26,14 @@ export function Dialog({
     size?: keyof typeof sizes;
     className?: string;
     blurBackground?: boolean;
-    children: React.ReactNode
+    children: ReactNode
 } & Omit<Headless.DialogProps, 'as' | 'className'>) {
     return (
         <Headless.Dialog {...props}>
             <Headless.DialogBackdrop
                 transition
                 className={cn(
-                    "fixed inset-0 flex w-screen z-50 justify-center overflow-y-auto px-2 py-2 transition duration-100 focus:outline-0 data-closed:opacity-0 data-enter:ease-out data-leave:ease-in sm:px-6 sm:py-8 lg:px-8 lg:py-16",
+                    'fixed inset-0 flex w-screen z-50 justify-center overflow-y-auto px-2 py-2 transition duration-100 focus:outline-0 data-closed:opacity-0 data-enter:ease-out data-leave:ease-in sm:px-6 sm:py-8 lg:px-8 lg:py-16',
                     blurBackground ? 'backdrop-blur-xl bg-muted/90' : 'bg-muted/50'
                 )}
             />
@@ -78,11 +78,11 @@ export function DialogDescription({
     return <Headless.Description as={Text} {...props} className={cn(className, 'mt-2 text-pretty')}/>
 }
 
-export function DialogBody({className, ...props}: React.ComponentPropsWithoutRef<'div'>) {
+export function DialogBody({className, ...props}: ComponentPropsWithoutRef<'div'>) {
     return <div {...props} className={cn(className, 'mt-6')}/>
 }
 
-export function DialogActions({className, ...props}: React.ComponentPropsWithoutRef<'div'>) {
+export function DialogActions({className, ...props}: ComponentPropsWithoutRef<'div'>) {
     return (
         <div
             {...props}

@@ -1,5 +1,5 @@
-import {cn} from "@/lib";
-import {ComponentPropsWithoutRef} from "react";
+import {cn} from '@/lib'
+import {ComponentPropsWithoutRef} from 'react'
 
 export function DescriptionList({className, ...props}: ComponentPropsWithoutRef<'dl'>) {
     return (

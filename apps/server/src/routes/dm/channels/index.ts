@@ -1,10 +1,10 @@
-import {t} from 'elysia';
-import {YapockType} from '@/index';
-import prisma from '@/db/prisma';
-import {HTTPError} from '@/lib/HTTPError';
-import mapChannel from '@/utils/channels/mapChannel';
-import {CommonErrorResponses, DM_ERROR_CODES} from '@/utils/dm/errors';
-import requiresAccount from "@/utils/identity/requires-account";
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import mapChannel from '@/utils/channels/mapChannel'
+import {CommonErrorResponses, DM_ERROR_CODES} from '@/utils/dm/errors'
+import requiresAccount from '@/utils/identity/requires-account'
+import {t} from 'elysia'
 
 // Channel response schemas
 const RecipientResponse = t.Object({
@@ -12,7 +12,7 @@ const RecipientResponse = t.Object({
     username: t.String(),
     display_name: t.Union([t.String(), t.Null()]),
     images_avatar: t.Union([t.String(), t.Null()]),
-});
+})
 
 const MessageResponse = t.Object({
     id: t.String(),
@@ -22,7 +22,7 @@ const MessageResponse = t.Object({
     created_at: t.String(),
     edited_at: t.Optional(t.String()),
     deleted_at: t.Optional(t.String()),
-});
+})
 
 const ChannelResponse = t.Object({
     id: t.String(),
@@ -32,7 +32,7 @@ const ChannelResponse = t.Object({
     last_message: t.Optional(MessageResponse),
     created_at: t.String(),
     unread_count: t.Number(),
-});
+})
 
 export default (app: YapockType) =>
     app
@@ -40,20 +40,20 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user}) => {
-                await requiresAccount({set, user});
+                await requiresAccount({set, user})
 
                 const links = await prisma.dm_participants.findMany({
                     where: {user_id: user.sub},
                     select: {channel_id: true},
-                });
+                })
 
-                const result: any[] = [];
+                const result: any[] = []
                 for (const link of links) {
-                    const payload = await mapChannel(link.channel_id, user.sub);
-                    if (payload) result.push(payload);
+                    const payload = await mapChannel(link.channel_id, user.sub)
+                    if (payload) result.push(payload)
                 }
 
-                return result;
+                return result
             },
             {
                 detail: {
@@ -71,24 +71,24 @@ export default (app: YapockType) =>
             '',
             async ({set, user, body}) => {
                 if (!user?.sub) {
-                    set.status = 401;
+                    set.status = 401
                     throw HTTPError.unauthorized({
                         summary: 'Authentication required to create DM channels',
                         code: DM_ERROR_CODES.UNAUTHORIZED,
-                    });
+                    })
                 }
 
-                const {userId} = body as { userId?: string };
+                const {userId} = body as { userId?: string }
                 if (!userId) {
-                    set.status = 400;
+                    set.status = 400
                     throw HTTPError.badRequest({
                         summary: 'User ID is required to create a DM channel',
                         code: DM_ERROR_CODES.USER_ID_REQUIRED,
-                    });
+                    })
                 }
 
                 // Support self-DM: if userId is self, find or create a solo channel
-                let channelId: string;
+                let channelId: string
                 if (userId === user.sub) {
                     const selfExisting = await prisma.dm_channels.findFirst({
                         where: {
@@ -97,43 +97,43 @@ export default (app: YapockType) =>
                                 every: {user_id: user.sub}, // ensures only self is a participant
                             },
                         },
-                    });
+                    })
 
                     if (selfExisting) {
-                        channelId = selfExisting.id;
+                        channelId = selfExisting.id
                     } else {
-                        const created = await prisma.dm_channels.create({data: {}});
-                        channelId = created.id;
-                        await prisma.dm_participants.create({data: {channel_id: channelId, user_id: user.sub}});
+                        const created = await prisma.dm_channels.create({data: {}})
+                        channelId = created.id
+                        await prisma.dm_participants.create({data: {channel_id: channelId, user_id: user.sub}})
                     }
                 } else {
                     // Find existing channel shared by both users
                     const myLinks = await prisma.dm_participants.findMany({
                         where: {user_id: user.sub},
                         select: {channel_id: true}
-                    });
-                    const myChannelIds = myLinks.map((l) => l.channel_id);
+                    })
+                    const myChannelIds = myLinks.map((l) => l.channel_id)
 
                     const existing = await prisma.dm_participants.findFirst({
                         where: {user_id: userId, channel_id: {in: myChannelIds}},
                         select: {channel_id: true},
-                    });
+                    })
 
                     if (existing?.channel_id) {
-                        channelId = existing.channel_id;
+                        channelId = existing.channel_id
                     } else {
-                        const created = await prisma.dm_channels.create({data: {}});
-                        channelId = created.id;
+                        const created = await prisma.dm_channels.create({data: {}})
+                        channelId = created.id
                         await prisma.dm_participants.createMany({
                             data: [
                                 {channel_id: channelId, user_id: user.sub},
                                 {channel_id: channelId, user_id: userId},
                             ],
-                        });
+                        })
                     }
                 }
 
-                return await mapChannel(channelId, user.sub);
+                return await mapChannel(channelId, user.sub)
             },
             {
                 detail: {

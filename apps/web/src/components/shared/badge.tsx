@@ -1,8 +1,8 @@
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
-import React, {forwardRef} from 'react'
+import {ComponentPropsWithoutRef, ForwardedRef, forwardRef, ReactNode} from 'react'
 import {TouchTarget} from './button'
 import Link from './link'
-import {cn} from "@/lib";
 
 const colors = {
     red: 'bg-red-500/15 text-red-700 group-data-hover:bg-red-500/25 dark:bg-red-500/10 dark:text-red-400 dark:group-data-hover:bg-red-500/20',
@@ -36,7 +36,7 @@ const colors = {
 
 type BadgeProps = { color?: keyof typeof colors }
 
-export function Badge({color = 'zinc', className, ...props}: BadgeProps & React.ComponentPropsWithoutRef<'span'>) {
+export function Badge({color = 'zinc', className, ...props}: BadgeProps & ComponentPropsWithoutRef<'span'>) {
     return (
         <span
             {...props}
@@ -55,11 +55,11 @@ export const BadgeButton = forwardRef(function BadgeButton(
         className,
         children,
         ...props
-    }: BadgeProps & { className?: string; children: React.ReactNode } & (
+    }: BadgeProps & { className?: string; children: ReactNode } & (
         | Omit<Headless.ButtonProps, 'as' | 'className'>
-        | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'>
+        | Omit<ComponentPropsWithoutRef<typeof Link>, 'className'>
         ),
-    ref: React.ForwardedRef<HTMLElement>
+    ref: ForwardedRef<HTMLElement>
 ) {
     let classes = cn(
         className,
@@ -67,7 +67,7 @@ export const BadgeButton = forwardRef(function BadgeButton(
     )
 
     return 'href' in props ? (
-        <Link {...props} className={classes} ref={ref as React.ForwardedRef<HTMLAnchorElement>}>
+        <Link {...props} className={classes} ref={ref as ForwardedRef<HTMLAnchorElement>}>
             <TouchTarget>
                 <Badge color={color}>{children}</Badge>
             </TouchTarget>

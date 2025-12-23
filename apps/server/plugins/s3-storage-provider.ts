@@ -1,18 +1,12 @@
-import {
-    DeleteObjectCommand,
-    GetObjectCommand,
-    paginateListObjectsV2,
-    PutObjectCommand,
-    S3Client
-} from '@aws-sdk/client-s3';
-import {StorageProvider} from './storage-interface';
+import {DeleteObjectCommand, GetObjectCommand, paginateListObjectsV2, PutObjectCommand, S3Client} from '@aws-sdk/client-s3'
+import {StorageProvider} from './storage-interface'
 
 /**
  * AWS S3 implementation of the StorageProvider interface
  */
 export class S3StorageProvider implements StorageProvider {
-    private client: S3Client;
-    private readonly bucket: string;
+    private readonly client: S3Client
+    private readonly bucket: string
 
     /**
      * Create a new S3StorageProvider instance
@@ -36,8 +30,27 @@ export class S3StorageProvider implements StorageProvider {
                 secretAccessKey: config.credentials.secretAccessKey,
             },
             forcePathStyle: config.forcePathStyle ?? true, // Required for some S3-compatible services
-        });
-        this.bucket = bucket;
+        })
+        this.bucket = bucket
+    }
+
+    /**
+     * Create a new S3StorageProvider with default configuration from environment variables
+     * @param bucket The bucket name to use
+     * @returns A configured S3StorageProvider instance
+     */
+    static createFromEnv(bucket: string): S3StorageProvider {
+        const config = {
+            endpoint: process.env.S3_ENDPOINT || 'https://s3.amazonaws.com',
+            region: process.env.S3_REGION || 'us-east-1',
+            credentials: {
+                accessKeyId: process.env.S3_ACCESS_KEY || '',
+                secretAccessKey: process.env.S3_SECRET_KEY || '',
+            },
+            forcePathStyle: process.env.S3_FORCE_PATH_STYLE !== 'false'
+        }
+
+        return new S3StorageProvider(config, bucket)
     }
 
     /**
@@ -56,11 +69,11 @@ export class S3StorageProvider implements StorageProvider {
                     Body: data,
                     ContentType: contentType,
                 })
-            );
-            return true;
+            )
+            return true
         } catch (error) {
-            console.error('Error uploading file to S3:', error);
-            return false;
+            console.error('Error uploading file to S3:', error)
+            return false
         }
     }
 
@@ -76,11 +89,11 @@ export class S3StorageProvider implements StorageProvider {
                     Bucket: this.bucket,
                     Key: key,
                 })
-            );
-            return true;
+            )
+            return true
         } catch (error) {
-            console.error('Error deleting file from S3:', error);
-            return false;
+            console.error('Error deleting file from S3:', error)
+            return false
         }
     }
 
@@ -104,14 +117,14 @@ export class S3StorageProvider implements StorageProvider {
                     Prefix: prefix,
                     Delimiter: delimiter
                 }
-            );
+            )
 
             const allFiles: Array<{
                 name: string;
                 path: string;
                 lastModified: Date;
                 size: number;
-            }> = [];
+            }> = []
 
             for await (const page of paginator) {
                 // Handle files in Contents
@@ -121,8 +134,8 @@ export class S3StorageProvider implements StorageProvider {
                         path: item.Key || '',
                         lastModified: item.LastModified || new Date(),
                         size: item.Size || 0
-                    }));
-                    allFiles.push(...files);
+                    }))
+                    allFiles.push(...files)
                 }
 
                 // Handle subfolders in CommonPrefixes (when delimiter is used)
@@ -130,18 +143,18 @@ export class S3StorageProvider implements StorageProvider {
                     for (const commonPrefix of page.CommonPrefixes) {
                         if (commonPrefix.Prefix) {
                             // Recursively list files in each subfolder
-                            const subFiles = await this.listFiles(commonPrefix.Prefix, delimiter);
-                            allFiles.push(...subFiles);
+                            const subFiles = await this.listFiles(commonPrefix.Prefix, delimiter)
+                            allFiles.push(...subFiles)
                         }
                     }
                 }
             }
 
-            console.log(`S3 listed ${allFiles.length} files with prefix: ${prefix}`);
-            return allFiles;
+            console.log(`S3 listed ${allFiles.length} files with prefix: ${prefix}`)
+            return allFiles
         } catch (error) {
-            console.error('Error listing files from S3:', error);
-            return [];
+            console.error('Error listing files from S3:', error)
+            return []
         }
     }
 
@@ -160,52 +173,33 @@ export class S3StorageProvider implements StorageProvider {
                     Bucket: this.bucket,
                     Key: key,
                 })
-            );
+            )
 
             // Convert the stream to a buffer
-            const chunks: Uint8Array[] = [];
-            const stream = response.Body as any;
+            const chunks: Uint8Array[] = []
+            const stream = response.Body as any
 
             if (stream) {
                 for await (const chunk of stream) {
-                    chunks.push(chunk);
+                    chunks.push(chunk)
                 }
             }
 
-            const buffer = Buffer.concat(chunks);
+            const buffer = Buffer.concat(chunks)
 
             return {
                 data: buffer,
                 contentType: response.ContentType
-            };
+            }
         } catch (error) {
             // If the file doesn't exist, return null
             if ((error as any).name === 'NoSuchKey') {
-                return null;
+                return null
             }
-            console.error('Error getting file from S3:', error);
-            return null;
+            console.error('Error getting file from S3:', error)
+            return null
         }
-    }
-
-    /**
-     * Create a new S3StorageProvider with default configuration from environment variables
-     * @param bucket The bucket name to use
-     * @returns A configured S3StorageProvider instance
-     */
-    static createFromEnv(bucket: string): S3StorageProvider {
-        const config = {
-            endpoint: process.env.S3_ENDPOINT || 'https://s3.amazonaws.com',
-            region: process.env.S3_REGION || 'us-east-1',
-            credentials: {
-                accessKeyId: process.env.S3_ACCESS_KEY || '',
-                secretAccessKey: process.env.S3_SECRET_KEY || '',
-            },
-            forcePathStyle: process.env.S3_FORCE_PATH_STYLE !== 'false'
-        };
-
-        return new S3StorageProvider(config, bucket);
     }
 }
 
-export default S3StorageProvider;
+export default S3StorageProvider

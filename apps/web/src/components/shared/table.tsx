@@ -1,7 +1,6 @@
-import type React from 'react'
-import {createContext, useContext, useState} from 'react'
 import Link from '@/components/shared/link'
-import {cn} from "@/lib";
+import {cn} from '@/lib'
+import {ComponentPropsWithoutRef, ContextType, createContext, useContext, useState} from 'react'
 
 const TableContext = createContext<{ bleed: boolean; dense: boolean; grid: boolean; striped: boolean }>({
     bleed: false,
@@ -23,9 +22,9 @@ export function Table({
     dense?: boolean;
     grid?: boolean;
     striped?: boolean
-} & React.ComponentPropsWithoutRef<'div'>) {
+} & ComponentPropsWithoutRef<'div'>) {
     return (
-        <TableContext.Provider value={{bleed, dense, grid, striped} as React.ContextType<typeof TableContext>}>
+        <TableContext.Provider value={{bleed, dense, grid, striped} as ContextType<typeof TableContext>}>
             <div className="flow-root">
                 <div {...props} className={cn(className, '-mx-(--gutter) overflow-x-auto whitespace-nowrap')}>
                     <div className={cn('inline-block min-w-full align-middle', !bleed && 'sm:px-(--gutter)')}>
@@ -37,11 +36,11 @@ export function Table({
     )
 }
 
-export function TableHead({className, ...props}: React.ComponentPropsWithoutRef<'thead'>) {
+export function TableHead({className, ...props}: ComponentPropsWithoutRef<'thead'>) {
     return <thead {...props} className={cn(className, 'text-muted-foreground')}/>
 }
 
-export function TableBody(props: React.ComponentPropsWithoutRef<'tbody'>) {
+export function TableBody(props: ComponentPropsWithoutRef<'tbody'>) {
     return <tbody {...props} />
 }
 
@@ -57,11 +56,11 @@ export function TableRow({
                              title,
                              className,
                              ...props
-                         }: { href?: string; target?: string; title?: string } & React.ComponentPropsWithoutRef<'tr'>) {
+                         }: { href?: string; target?: string; title?: string } & ComponentPropsWithoutRef<'tr'>) {
     let {striped} = useContext(TableContext)
 
     return (
-        <TableRowContext.Provider value={{href, target, title} as React.ContextType<typeof TableRowContext>}>
+        <TableRowContext.Provider value={{href, target, title} as ContextType<typeof TableRowContext>}>
             <tr
                 {...props}
                 className={cn(
@@ -77,7 +76,7 @@ export function TableRow({
     )
 }
 
-export function TableHeader({className, ...props}: React.ComponentPropsWithoutRef<'th'>) {
+export function TableHeader({className, ...props}: ComponentPropsWithoutRef<'th'>) {
     let {bleed, grid} = useContext(TableContext)
 
     return (
@@ -93,7 +92,7 @@ export function TableHeader({className, ...props}: React.ComponentPropsWithoutRe
     )
 }
 
-export function TableCell({className, children, ...props}: React.ComponentPropsWithoutRef<'td'>) {
+export function TableCell({className, children, ...props}: ComponentPropsWithoutRef<'td'>) {
     let {bleed, dense, grid, striped} = useContext(TableContext)
     let {href, target, title} = useContext(TableRowContext)
     let [cellRef, setCellRef] = useState<HTMLElement | null>(null)

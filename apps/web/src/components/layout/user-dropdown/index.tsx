@@ -2,31 +2,20 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React from 'react'
+import LogoutIcon from '@/components/icons/logout'
+import {HardDisk} from '@/components/icons/plump'
+import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk'
+import ProfileSettings from '@/components/layout/user-dropdown/general/page'
+import InviteSettings from '@/components/layout/user-dropdown/invite/page'
+import UserStoragePage from '@/components/layout/user-dropdown/storage/page'
+import {useModal} from '@/components/modal/provider'
+import PagedModal from '@/components/shared/paged-modal'
+import {useUserAccountStore} from '@/lib'
+import {Button, Dropdown, DropdownButton, DropdownHeader, DropdownMenu, Heading, Logo, PopoverHeader, Text} from '@/src/components'
 import {SignedIn, useAuth, UserAvatar, UserProfile} from '@clerk/clerk-react'
+import {EnvelopeOpenIcon} from '@heroicons/react/16/solid'
+import {Cog6ToothIcon} from '@heroicons/react/20/solid'
 import {useLocation} from 'wouter'
-import {
-    Button,
-    Dropdown,
-    DropdownButton,
-    DropdownHeader,
-    DropdownMenu,
-    Heading,
-    Logo,
-    PopoverHeader,
-    Text
-} from "@/src/components";
-import {Cog6ToothIcon} from "@heroicons/react/20/solid";
-import {useModal} from "@/components/modal/provider.tsx";
-import {useUserAccountStore} from "@/lib";
-import LogoutIcon from "@/components/icons/logout.tsx";
-import PagedModal from "@/components/shared/paged-modal";
-import ProfileSettings from "@/components/layout/user-dropdown/general/page.tsx";
-import UserStoragePage from "@/components/layout/user-dropdown/storage/page.tsx";
-import WildbaseAsteriskIcon from "@/components/icons/wildbase-asterisk.tsx";
-import {HardDisk} from "@/components/icons/plump";
-import InviteSettings from "@/components/layout/user-dropdown/invite/page.tsx";
-import {EnvelopeOpenIcon} from "@heroicons/react/16/solid";
 
 function UserMenu() {
     const {user} = useUserAccountStore()

@@ -2,53 +2,23 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React from 'react'
-import {useSession} from "@clerk/clerk-react";
+import {useSession} from '@clerk/clerk-react'
 
 /**
  * Generate a RGB color based on the user ID
  * @param userID
  */
 function userIDColorSeed(userID: string) {
-    let hash = 0;
+    let hash = 0
     for (let i = 0; i < userID.length; i++) {
-        hash = userID.charCodeAt(i) + ((hash << 5) - hash);
+        hash = userID.charCodeAt(i) + ((hash << 5) - hash)
     }
 
-    const r = Math.abs((hash & 0xFF0000) >> 16);
-    const g = Math.abs((hash & 0x00FF00) >> 8);
-    const b = Math.abs(hash & 0x0000FF);
+    const r = Math.abs((hash & 0xFF0000) >> 16)
+    const g = Math.abs((hash & 0x00FF00) >> 8)
+    const b = Math.abs(hash & 0x0000FF)
 
-    return `rgb(${r}, ${g}, ${b})`;
-}
-
-/**
- * Gets `navigator.userAgentData` and stringifies the entire object, including nested objects.
- */
-function fingerThem() {
-    const userAgentData = {
-        acn: navigator.appCodeName,
-        ait: navigator.appVersion,
-        an: navigator.appName,
-        // @ts-ignore
-        dm: navigator.deviceMemory,
-        av: navigator.vendor,
-        ap: navigator.platform,
-        apt: navigator.product,
-        apts: navigator.productSub,
-        c: navigator.cookieEnabled,
-        dpr: window.devicePixelRatio,
-        do: navigator.doNotTrack,
-        dl: navigator.language,
-    }
-    return JSON.stringify(userAgentData, (_key, value) => {
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
-            return Object.fromEntries(
-                Object.entries(value).map(([k, v]) => [k, v === undefined ? 'undefined' : v])
-            );
-        }
-        return value;
-    }, 2);
+    return `rgb(${r}, ${g}, ${b})`
 }
 
 export function ConfidentialOverlay() {

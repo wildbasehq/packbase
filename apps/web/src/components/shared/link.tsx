@@ -2,10 +2,10 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
 import {ComponentPropsWithoutRef, ForwardedRef, forwardRef} from 'react'
 import {Link as RouterLink} from 'wouter'
-import {cn} from "@/lib";
 
 const Link = forwardRef(function Link(
     props: Omit<ComponentPropsWithoutRef<'a'>, 'href'> & {

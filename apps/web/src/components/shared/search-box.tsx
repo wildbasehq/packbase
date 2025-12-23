@@ -1,9 +1,8 @@
 'use client'
 
-import * as React from 'react'
+import {cn} from '@/lib'
 import {FormEvent, useEffect, useRef, useState} from 'react'
 import {Input} from './input/text'
-import {cn} from '@/lib'
 
 interface SearchBoxProps {
     className?: string
@@ -14,7 +13,7 @@ interface SearchBoxProps {
 }
 
 export function SearchBox({placeholder = 'Search...', onSearch, autoFocus = true, inAppTab}: SearchBoxProps) {
-    const inputRef = React.useRef<HTMLInputElement>(null)
+    const inputRef = useRef<HTMLInputElement>(null)
     const [query, setQuery] = useState('')
 
     // Inside your component before the return statement, add:

@@ -1,4 +1,4 @@
-import prisma from '@/db/prisma';
+import prisma from '@/db/prisma'
 
 /**
  * BulkPostLoader - Efficiently loads multiple posts with a single query
@@ -15,10 +15,10 @@ export class BulkPostLoader {
      * @returns Object mapping post IDs to their complete data
      */
     async loadPosts(postIds: string[], currentUserId?: string): Promise<Record<string, any>> {
-        if (!postIds.length) return {};
+        if (!postIds.length) return {}
 
         // Don't load more than 25 posts at once
-        postIds = postIds.slice(0, 25);
+        postIds = postIds.slice(0, 25)
 
         try {
             // First, fetch the posts with minimal related data
@@ -38,40 +38,40 @@ export class BulkPostLoader {
                     parent: true,
                     tags: true
                 },
-            });
+            })
 
-            if (!posts?.length) return {};
+            if (!posts?.length) return {}
 
             // Create a map of post IDs to their data
-            const postsMap: Record<string, any> = {};
+            const postsMap: Record<string, any> = {}
             posts.forEach((post) => {
                 postsMap[post.id] = {
                     ...post,
                     created_at: post.created_at.toISOString(),
                     reactions: [],
                     comments: [],
-                };
-            });
+                }
+            })
 
             // Collect all user_ids, tenant_ids, and channel_ids
-            const userIds = [...new Set(posts.map((post) => post.user_id).filter(Boolean))];
-            const tenantIds = [...new Set(posts.map((post) => post.tenant_id).filter(Boolean))];
-            const channelds = [...new Set(posts.map((post) => post.channel_id).filter(Boolean))];
+            const userIds = [...new Set(posts.map((post) => post.user_id).filter(Boolean))]
+            const tenantIds = [...new Set(posts.map((post) => post.tenant_id).filter(Boolean))]
+            const channelds = [...new Set(posts.map((post) => post.channel_id).filter(Boolean))]
 
             // Fetch profiles for post authors in parallel
-            const profilesPromise = this.fetchProfiles(userIds);
+            const profilesPromise = this.fetchProfiles(userIds)
 
             // Fetch reactions for posts in parallel
-            const reactionsPromise = this.fetchReactions(postIds);
+            const reactionsPromise = this.fetchReactions(postIds)
 
             // Fetch comments for posts in parallel
-            const commentsPromise = this.fetchComments(postIds);
+            const commentsPromise = this.fetchComments(postIds)
 
             // Fetch packs for posts in parallel
-            const packsPromise = this.fetchPacks(tenantIds);
+            const packsPromise = this.fetchPacks(tenantIds)
 
             // Fetch pages for posts in parallel
-            const channelPromise = this.fetchPages(channelds);
+            const channelPromise = this.fetchPages(channelds)
 
             // Wait for all data to be fetched
             const [profiles, reactions, comments, packs, channels] = await Promise.all([
@@ -80,10 +80,10 @@ export class BulkPostLoader {
                 commentsPromise,
                 packsPromise,
                 channelPromise,
-            ]);
+            ])
 
             // Process user profiles
-            const userMap: Record<string, any> = {};
+            const userMap: Record<string, any> = {}
             profiles.forEach((profile) => {
                 userMap[profile.id] = {
                     id: profile.id,
@@ -98,20 +98,20 @@ export class BulkPostLoader {
                         avatar: `${process.env.HOSTNAME}/user/${profile.id}/avatar`,
                         header: profile.images_header,
                     },
-                };
-            });
+                }
+            })
 
             // Process pack data
-            const packMap: Record<string, any> = {};
+            const packMap: Record<string, any> = {}
             packs.forEach((pack) => {
                 packMap[pack.id] = {
                     ...pack,
                     created_at: pack.created_at.toISOString(),
-                };
-            });
+                }
+            })
 
             // Process page data
-            const channelMap: Record<string, any> = {};
+            const channelMap: Record<string, any> = {}
             channels.forEach((channel) => {
                 channelMap[channel.id] = {
                     id: channel.id,
@@ -119,49 +119,49 @@ export class BulkPostLoader {
                     slug: channel.slug,
                     description: channel.description,
                     icon: channel.icon,
-                };
-            });
+                }
+            })
 
             // Transform reactions into the new Reaction type structure
-            const reactionsByPost: Record<string, Record<string, { emoji: string; users: string[] }>> = {};
+            const reactionsByPost: Record<string, Record<string, { emoji: string; users: string[] }>> = {}
 
             // First, organize reactions by post ID and slot
             reactions.forEach((reaction) => {
-                const postId = reaction.post_id;
-                const slot = reaction.slot;
+                const postId = reaction.post_id
+                const slot = reaction.slot
 
                 if (!reactionsByPost[postId]) {
-                    reactionsByPost[postId] = {};
+                    reactionsByPost[postId] = {}
                 }
 
                 if (!reactionsByPost[postId][slot]) {
                     reactionsByPost[postId][slot] = {
                         emoji: slot, // Use slot as emoji for now, could be enhanced later
                         users: [],
-                    };
+                    }
                 }
 
-                reactionsByPost[postId][slot].users.push(reaction.actor_id);
-            });
+                reactionsByPost[postId][slot].users.push(reaction.actor_id)
+            })
 
             // Transform into Reaction type structure
             Object.keys(reactionsByPost).forEach((postId) => {
-                const post = postsMap[postId];
+                const post = postsMap[postId]
                 if (post) {
                     post.reactions = Object.entries(reactionsByPost[postId]).map(([key, data]) => ({
                         key,
                         emoji: data.emoji,
                         count: data.users.length,
                         reactedByMe: currentUserId ? data.users.includes(currentUserId) : false,
-                    }));
+                    }))
                 }
-            });
+            })
 
             // Organize comments by post ID
             for (const comment of comments) {
-                const post = postsMap[comment.parent];
+                const post = postsMap[comment.parent]
                 if (post) {
-                    let userProfile = userMap[comment.user_id] || (await this.fetchProfiles([comment.user_id]))[0] || this.createDeletedUserProfile(comment.user_id);
+                    let userProfile = userMap[comment.user_id] || (await this.fetchProfiles([comment.user_id]))[0] || this.createDeletedUserProfile(comment.user_id)
                     if (!userMap[userProfile.id]) {
                         userProfile = {
                             id: userProfile.id,
@@ -174,20 +174,20 @@ export class BulkPostLoader {
                                 avatar: `${process.env.HOSTNAME}/user/${userProfile.id}/avatar`,
                                 header: userProfile.images_header,
                             },
-                        };
+                        }
 
-                        userMap[userProfile.id] = userProfile;
+                        userMap[userProfile.id] = userProfile
                     }
 
                     // Reactions fetched forcefully
-                    const userReactions = await this.fetchReactions([comment.id]);
-                    const reactionSlots = userReactions.filter(r => r.post_id === comment.id).map(r => r.slot);
+                    const userReactions = await this.fetchReactions([comment.id])
+                    const reactionSlots = userReactions.filter(r => r.post_id === comment.id).map(r => r.slot)
                     comment.reactions = reactionSlots.map(slot => ({
                         key: slot,
                         emoji: slot,
                         count: 1,
                         reactedByMe: currentUserId === comment.user_id,
-                    }));
+                    }))
 
                     post.comments.push({
                         id: comment.id,
@@ -195,46 +195,46 @@ export class BulkPostLoader {
                         reactions: comment.reactions,
                         created_at: comment.created_at.toISOString(),
                         user: userProfile,
-                    });
+                    })
                 }
             }
 
             // Finalize post data
             Object.values(postsMap).forEach((post: any) => {
                 // Add user data
-                post.user = userMap[post.user_id] || this.createDeletedUserProfile(post.user_id);
-                delete post.user_id;
+                post.user = userMap[post.user_id] || this.createDeletedUserProfile(post.user_id)
+                delete post.user_id
 
                 // Add pack data
                 if (post.tenant_id && packMap[post.tenant_id]) {
-                    post.pack = packMap[post.tenant_id];
+                    post.pack = packMap[post.tenant_id]
                     post.pack.images = {
                         avatar: post.pack.images_avatar,
                         header: post.pack.images_header,
-                    };
+                    }
                 }
-                delete post.tenant_id;
+                delete post.tenant_id
 
                 // Add page data
                 if (post.channel_id && channelMap[post.channel_id]) {
-                    post.page = channelMap[post.channel_id];
+                    post.page = channelMap[post.channel_id]
                 }
-                delete post.channel_id;
+                delete post.channel_id
 
                 // Clean up empty collections
                 if (post.reactions.length === 0) {
-                    delete post.reactions;
+                    delete post.reactions
                 }
 
                 if (post.comments.length === 0) {
-                    delete post.comments;
+                    delete post.comments
                 }
-            });
+            })
 
-            return postsMap;
+            return postsMap
         } catch (error) {
-            console.error('Error loading posts in bulk:', error);
-            return {};
+            console.error('Error loading posts in bulk:', error)
+            return {}
         }
     }
 
@@ -242,15 +242,15 @@ export class BulkPostLoader {
      * Fetch user profiles by IDs
      */
     private async fetchProfiles(userIds: string[]): Promise<any[]> {
-        if (!userIds.length) return [];
+        if (!userIds.length) return []
         try {
             const data = await prisma.profiles.findMany({
                 where: {
                     id: {in: userIds},
                 },
-            });
+            })
 
-            let profilesMap: Record<string, any> = {};
+            let profilesMap: Record<string, any> = {}
 
             // Get user badges & avatar too
             for (const profile of data) {
@@ -258,7 +258,7 @@ export class BulkPostLoader {
                     badge?: string;
                 } = {
                     ...profile,
-                };
+                }
 
                 // Metadata
                 const userBadges = await prisma.inventory.findFirst({
@@ -267,21 +267,21 @@ export class BulkPostLoader {
                         type: 'badge',
                         is_set: true,
                     },
-                });
+                })
 
                 if (userBadges) {
-                    profileBuild.badge = userBadges.item_id;
+                    profileBuild.badge = userBadges.item_id
                 }
 
-                profileBuild.images_avatar = `${process.env.HOSTNAME}/user/${profileBuild.id}/avatar`;
+                profileBuild.images_avatar = `${process.env.HOSTNAME}/user/${profileBuild.id}/avatar`
 
-                profilesMap[profile.id] = profileBuild;
+                profilesMap[profile.id] = profileBuild
             }
 
-            return Object.values(profilesMap) || [];
+            return Object.values(profilesMap) || []
         } catch (error) {
-            console.error('Error fetching profiles:', error);
-            return [];
+            console.error('Error fetching profiles:', error)
+            return []
         }
     }
 
@@ -291,7 +291,7 @@ export class BulkPostLoader {
     private async fetchReactions(postIds: string[]): Promise<{
         post_id: string; actor_id: string; slot: string
     }[]> {
-        if (!postIds.length) return [];
+        if (!postIds.length) return []
 
         try {
             const data = await prisma.posts_reactions.findMany({
@@ -303,12 +303,12 @@ export class BulkPostLoader {
                     actor_id: true,
                     slot: true,
                 },
-            });
+            })
 
-            return data || [];
+            return data || []
         } catch (error) {
-            console.error('Error fetching reactions:', error);
-            return [];
+            console.error('Error fetching reactions:', error)
+            return []
         }
     }
 
@@ -316,7 +316,7 @@ export class BulkPostLoader {
      * Fetch comments for posts
      */
     private async fetchComments(postIds: string[]): Promise<any[]> {
-        if (!postIds.length) return [];
+        if (!postIds.length) return []
 
         try {
             const data = await prisma.posts.findMany({
@@ -330,12 +330,12 @@ export class BulkPostLoader {
                     user_id: true,
                     parent: true,
                 },
-            });
+            })
 
-            return data || [];
+            return data || []
         } catch (error) {
-            console.error('Error fetching comments:', error);
-            return [];
+            console.error('Error fetching comments:', error)
+            return []
         }
     }
 
@@ -343,19 +343,19 @@ export class BulkPostLoader {
      * Fetch packs by IDs
      */
     private async fetchPacks(packIds: string[]): Promise<any[]> {
-        if (!packIds.length) return [];
+        if (!packIds.length) return []
 
         try {
             const data = await prisma.packs.findMany({
                 where: {
                     id: {in: packIds},
                 },
-            });
+            })
 
-            return data || [];
+            return data || []
         } catch (error) {
-            console.error('Error fetching packs:', error);
-            return [];
+            console.error('Error fetching packs:', error)
+            return []
         }
     }
 
@@ -363,7 +363,7 @@ export class BulkPostLoader {
      * Fetch pages by IDs
      */
     private async fetchPages(channelds: string[]): Promise<any[]> {
-        if (!channelds.length) return [];
+        if (!channelds.length) return []
 
         try {
             const data = await prisma.packs_pages.findMany({
@@ -378,12 +378,12 @@ export class BulkPostLoader {
                     icon: true,
                     tenant_id: true,
                 },
-            });
+            })
 
-            return data || [];
+            return data || []
         } catch (error) {
-            console.error('Error fetching pages:', error);
-            return [];
+            console.error('Error fetching pages:', error)
+            return []
         }
     }
 
@@ -402,6 +402,6 @@ export class BulkPostLoader {
                 avatar: `https://www.gravatar.com/avatar/${userId}?d=mp`,
                 header: null,
             },
-        };
+        }
     }
 }

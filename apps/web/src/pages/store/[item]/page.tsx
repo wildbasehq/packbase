@@ -2,11 +2,11 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {useState} from 'react'
-import {vg} from '@/lib/api'
-import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import {Button} from '@/components/shared'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import {Text} from '@/components/shared/text'
+import {vg} from '@/lib/api'
+import {useState} from 'react'
 
 type StoreItem = {
     id: string
@@ -54,7 +54,7 @@ export default function StoreItemModal({
         if (res.error) {
             throw new Error(res.error.summary || 'Purchase failed')
         }
-        
+
         setOwned(res.inventory?.amount || owned + finalQuantity)
         setSuccess('Purchased successfully!')
         onPurchaseSuccess()

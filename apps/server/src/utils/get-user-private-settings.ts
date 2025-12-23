@@ -1,5 +1,5 @@
-import prisma from "@/db/prisma";
-import type {Prisma} from "@prisma/client";
+import prisma from '@/db/prisma'
+import type {Prisma} from '@prisma/client'
 
 type ProfileSettings = Prisma.profiles_settingsGetPayload<{}>;
 
@@ -26,14 +26,14 @@ export default async function getUserPrivateSettings<K extends keyof ProfileSett
     let settings = await prisma.profiles_settings.findUnique({
         where: {id: userId},
         select: select,
-    });
+    })
 
     if (!settings) {
         settings = await prisma.profiles_settings.create({
             data: {id: userId},
             select: select,
-        });
+        })
     }
 
-    return (key ? settings[key] : settings) as any;
+    return (key ? settings[key] : settings) as any
 }

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { API_URL } from '@/lib/api'
-import { Theme } from '@/src/lib/api/users/theme'
+import {API_URL} from '@/lib/api'
+import {Theme} from '@/src/lib/api/users/theme'
+import {useEffect, useState} from 'react'
 
 // Pack theme API service
 export const PackThemeAPI = {
@@ -52,7 +52,7 @@ export const PackThemeAPI = {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${globalThis.TOKEN || ''}`,
             },
-            body: JSON.stringify({ ...theme, pack_id: packId }),
+            body: JSON.stringify({...theme, pack_id: packId}),
         })
         if (!response.ok) {
             throw new Error('Failed to create pack theme')
@@ -118,7 +118,7 @@ export const PackThemeAPI = {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${globalThis.TOKEN || ''}`,
             },
-            body: JSON.stringify({ html, css }),
+            body: JSON.stringify({html, css}),
         })
         if (!response.ok) {
             throw new Error('Failed to validate pack theme')

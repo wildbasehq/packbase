@@ -2,15 +2,15 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {Activity, useEffect, useState} from 'react'
-import {useParams} from 'wouter'
-import {useContentFrame} from '@/lib/hooks/content-frame.tsx'
-import Body from '@/components/layout/body'
 import {Feed, FeedError, FeedLoading} from '@/components/feed'
+import Body from '@/components/layout/body'
 import {Heading, Text} from '@/components/shared/text'
+import UserInfoCol from '@/components/shared/user/info-col'
+import {isVisible} from '@/lib'
 import {vg} from '@/lib/api'
-import {isVisible} from "@/lib";
-import UserInfoCol from "@/components/shared/user/info-col.tsx";
+import {useContentFrame} from '@/lib/hooks/content-frame'
+import {Activity, useEffect, useState} from 'react'
+import {useParams} from 'wouter'
 
 export default function UserFolderPage() {
     const {id} = useParams<{ id: string }>()

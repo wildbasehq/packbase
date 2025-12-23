@@ -1,6 +1,6 @@
+import Tooltip from '@/components/shared/tooltip'
 import bentoConfig from '@/datasets/bento/conf.json'
 import badgeConfig from '@/datasets/bento/pak/badges/pak.json'
-import Tooltip from '@/components/shared/tooltip'
 import {cn} from './cn'
 
 export const rootDir = bentoConfig._rootDir

@@ -1,10 +1,10 @@
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
-import React, {forwardRef} from 'react'
-import {cn} from "@/lib";
+import {ForwardedRef, forwardRef} from 'react'
 
 export const Select = forwardRef(function Select(
     {className, multiple, ...props}: { className?: string } & Omit<Headless.SelectProps, 'as' | 'className'>,
-    ref: React.ForwardedRef<HTMLSelectElement>
+    ref: ForwardedRef<HTMLSelectElement>
 ) {
     return (
         <span

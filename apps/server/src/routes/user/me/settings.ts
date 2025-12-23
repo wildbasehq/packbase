@@ -1,20 +1,20 @@
-import {Settings} from "@/lib/settings";
-import {t} from "elysia";
-import {YapockType} from '@/index';
-import requiresAccount from "@/utils/identity/requires-account";
+import {YapockType} from '@/index'
+import {Settings} from '@/lib/settings'
+import requiresAccount from '@/utils/identity/requires-account'
+import {t} from 'elysia'
 
 
 export default (app: YapockType) =>
     app.get(
         '',
         async ({set, user}) => {
-            await requiresAccount({set, user});
-            const settings = new Settings();
+            await requiresAccount({set, user})
+            const settings = new Settings()
             const userObj = await prisma.profiles.findUnique({
                 where: {
                     id: user.sub,
                 },
-            });
+            })
 
             delete userObj.type
 
@@ -24,9 +24,9 @@ export default (app: YapockType) =>
                     ...userObj,
                 })
             ).map((setting) => {
-                delete setting.definition.db;
-                return setting;
-            });
+                delete setting.definition.db
+                return setting
+            })
         },
         {
             response: {
@@ -37,12 +37,12 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({user, body}) => {
-                const settings = new Settings();
+                const settings = new Settings()
                 const userObj = await prisma.profiles.findUnique({
                     where: {
                         id: user.sub,
                     },
-                });
+                })
 
                 return await settings.updateSettings({
                     model: 'user',

@@ -1,6 +1,6 @@
+import {FileManagerFiles} from './files'
 import {FileManagerRoot} from './root'
 import {FileManagerSidebar} from './sidebar'
-import {FileManagerFiles} from './files'
 
 export {FileManagerRoot as Root} from './root'
 export {FileManagerSidebar as Sidebar} from './sidebar'

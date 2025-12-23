@@ -2,17 +2,17 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {Activity, useMemo, useState} from 'react'
-import {Heading, Text} from '@/components/shared/text'
-import {PencilSquareIcon, PlusIcon, TrashIcon} from '@heroicons/react/24/solid'
-import {useContentFrame, useContentFrameMutation} from '@/lib/hooks/content-frame.tsx'
-import {isVisible, useUserAccountStore} from '@/lib'
-import {Input} from '@/components/shared/input'
+import {TagsInput} from '@/components/howl-creator/tags-input'
+import {useModal} from '@/components/modal/provider'
 import {Button} from '@/components/shared/button'
-import {Field, SidebarItem} from "@/src/components";
-import {useModal} from "@/components/modal/provider.tsx";
-import {TagsInput} from "@/components/howl-creator/tags-input";
-import {queryBuildFromRaw} from "@/lib/utils/query-build-from-raw.ts";
+import {Input} from '@/components/shared/input'
+import {Heading, Text} from '@/components/shared/text'
+import {isVisible, useUserAccountStore} from '@/lib'
+import {useContentFrame, useContentFrameMutation} from '@/lib/hooks/content-frame'
+import {queryBuildFromRaw} from '@/lib/utils/query-build-from-raw'
+import {Field, SidebarItem} from '@/src/components'
+import {PencilSquareIcon, PlusIcon, TrashIcon} from '@heroicons/react/24/solid'
+import {Activity, useMemo, useState} from 'react'
 
 export type Folder = {
     id: string
@@ -32,7 +32,7 @@ function FolderForm({
     const [name, setName] = useState(initial?.name || '')
     const [description, setDescription] = useState(initial?.description || '')
     const [emoji, setEmoji] = useState(initial?.emoji || '📁')
-    const [query, setQuery] = useState((initial?.query?.match(/\[Where posts:tags \((.*?)\) AND posts:user_id \(".*?"\)\] AS \*/)?.[1] || '').trim().replaceAll("\"", "").replaceAll("~", "") || '')
+    const [query, setQuery] = useState((initial?.query?.match(/\[Where posts:tags \((.*?)\) AND posts:user_id \(".*?"\)\] AS \*/)?.[1] || '').trim().replaceAll('"', '').replaceAll('~', '') || '')
 
     const canSave = useMemo(() => {
         if (!name.trim()) return false

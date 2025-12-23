@@ -2,24 +2,16 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import useWindowSize from '@/src/lib/hooks/use-window-size'
-import React, {
-    Activity,
-    MouseEvent as ReactMouseEvent,
-    TouchEvent as ReactTouchEvent,
-    useCallback,
-    useEffect,
-    useRef,
-    useState
-} from 'react'
-import {Heading, Text} from '@/components/shared/text.tsx'
-import Link from '@/components/shared/link.tsx'
-import {isVisible, useResourceStore} from '@/lib'
-import {Code, CodeGroup, Desktop, Tab, TabsLayout, useContentFrame} from '@/src/components'
-import {useInterval, useLocalStorage} from 'usehooks-ts'
-import UserAvatar from '@/components/shared/user/avatar.tsx'
 import {InboxContent, UserMultipleAccounts} from '@/components/icons/plump'
+import Link from '@/components/shared/link'
+import {Heading, Text} from '@/components/shared/text'
+import UserAvatar from '@/components/shared/user/avatar'
+import {isVisible, useResourceStore} from '@/lib'
 import InboxPage from '@/pages/inbox/page'
+import {Code, CodeGroup, Desktop, Tab, TabsLayout, useContentFrame} from '@/src/components'
+import useWindowSize from '@/src/lib/hooks/use-window-size'
+import {Activity, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent, useCallback, useEffect, useRef, useState} from 'react'
+import {useInterval, useLocalStorage} from 'usehooks-ts'
 
 export default function UserSidebar() {
     const {

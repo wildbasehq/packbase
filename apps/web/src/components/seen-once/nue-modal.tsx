@@ -2,17 +2,17 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {Heading} from '@/components/shared/text.tsx'
-import {Activity, ChangeEvent, ReactNode, useEffect, useState} from 'react'
 import {Button} from '@/components/shared'
-import Markdown from '@/components/shared/markdown.tsx'
 import {AnimatedCharacter, Expressions} from '@/components/shared/animated-character'
-import SelectPills from '@/components/shared/input/select-pills.tsx'
+import SelectPills from '@/components/shared/input/select-pills'
+import Markdown from '@/components/shared/markdown'
+import {Heading} from '@/components/shared/text'
+import {cn, isVisible, vg} from '@/lib'
 import {Alert, AlertDescription, Checkbox, CheckboxField, Field, Input, InputGroup, Textarea} from '@/src/components'
 import {Label} from '@headlessui/react'
-import {cn, isVisible, vg} from '@/lib'
-import {toast} from 'sonner'
 import {AnimatePresence, motion} from 'motion/react'
+import {Activity, ChangeEvent, ReactNode, useEffect, useState} from 'react'
+import {toast} from 'sonner'
 
 /**
  * Character Text Box Modal for user guidance and onboarding
@@ -383,9 +383,9 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                 title: `Welcome home~!`,
                 content: [
                     'Welcome to Packbase!',
-                    "I'm here to help you get started with your new Packbase account.",
+                    'I\'m here to help you get started with your new Packbase account.',
                     'As we still need some critical information, you cannot skip this.',
-                    "{img src:'noai_created'}{/img}",
+                    '{img src:\'noai_created\'}{/img}',
                 ],
                 expression: Expressions.DEFAULT,
             },
@@ -409,7 +409,7 @@ export function createNUEFlow(): CharacterTextBoxConfig {
             {
                 id: 'profile',
                 title: 'About You',
-                content: ["don't be shy now~", '*ok, maybe a little shy, this is public.*'],
+                content: ['don\'t be shy now~', '*ok, maybe a little shy, this is public.*'],
                 expression: Expressions.AMAZED,
                 form: {
                     fields: [
@@ -438,11 +438,11 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                 title: 'readme-or-get-banned-uwu.txt.docx.md',
                 content: [
                     'We are currently in alpha, so you will not be able to use all the features of Packbase yet, and we are still working on some of the core stuff.',
-                    "Please, be kind to one another - **we won't hesitate to ban you for life with no appeals**. We appreciate you taking the time to join and help us make something truly great, but we ask you to be respectful of our time as well.",
-                    "Your access here is considered a privilege. Breaking any rules may result in immediate account termination.",
-                    "***Remember***: We're far from a company - we're just a bunch of passionate people who want to make a great community. No one working on (or using) Packbase deserves to be harassed.",
-                    "***Double Remember: IT'S AN ALPHA. THINGS BREAK. YOU WOULDN'T GO TO A CONSTRUCTION SITE AND COMPLAIN YOU CAN'T TAKE A SHIT. ALSO; OUR EMAILS AREN'T FOR BUG REPORTS. DO NOT POST ABOUT PACKBASE ON HYPER-CRITICAL FORUMS BECAUSE SOMETHING \"FUNCTIONS LIKE SHIT\". THIS REMINDER IS TARGETED. YOU KNOW WHO YOU ARE.***",
-                    "__**BY CLICKING \"Next\", YOU AGREE TO EVERY SINGLE STATEMENT MADE ABOVE.**__"
+                    'Please, be kind to one another - **we won\'t hesitate to ban you for life with no appeals**. We appreciate you taking the time to join and help us make something truly great, but we ask you to be respectful of our time as well.',
+                    'Your access here is considered a privilege. Breaking any rules may result in immediate account termination.',
+                    '***Remember***: We\'re far from a company - we\'re just a bunch of passionate people who want to make a great community. No one working on (or using) Packbase deserves to be harassed.',
+                    '***Double Remember: IT\'S AN ALPHA. THINGS BREAK. YOU WOULDN\'T GO TO A CONSTRUCTION SITE AND COMPLAIN YOU CAN\'T TAKE A SHIT. ALSO; OUR EMAILS AREN\'T FOR BUG REPORTS. DO NOT POST ABOUT PACKBASE ON HYPER-CRITICAL FORUMS BECAUSE SOMETHING "FUNCTIONS LIKE SHIT". THIS REMINDER IS TARGETED. YOU KNOW WHO YOU ARE.***',
+                    '__**BY CLICKING "Next", YOU AGREE TO EVERY SINGLE STATEMENT MADE ABOVE.**__'
                 ],
                 expression: Expressions.UNIMPRESSED,
                 onComplete: async formData => {
@@ -462,7 +462,7 @@ export function createNUEFlow(): CharacterTextBoxConfig {
                             console.log('User data:', data)
                             if (!data || error) {
                                 toast.error(
-                                    "Couldn't save: " +
+                                    'Couldn\'t save: ' +
                                     (error.value
                                         ? `${error.status}: ${error.value.summary || error.value.error}`
                                         : 'Something went wrong')
@@ -484,7 +484,7 @@ export function createDebugNUEFlow(): CharacterTextBoxConfig {
             {
                 id: 'welcome',
                 title: `Welcome home~`,
-                content: ['Woa...!!!', "Let's go and *render* **some** __markdown__!.", 'I feel so [sigma](https://ifeelsosigma.com)!'],
+                content: ['Woa...!!!', 'Let\'s go and *render* **some** __markdown__!.', 'I feel so [sigma](https://ifeelsosigma.com)!'],
                 expression: Expressions.AMAZED,
                 customComponent: (
                     <Alert variant="info">

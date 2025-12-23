@@ -1,10 +1,12 @@
 # Packbase Plugin Development
 
-This document provides guidelines and API documentation for developing plugins for Packbase. Similar to platforms like BetterDiscord or BetterTTV, Packbase allows for customization and extension through plugins.
+This document provides guidelines and API documentation for developing plugins for Packbase. Similar to platforms like
+BetterDiscord or BetterTTV, Packbase allows for customization and extension through plugins.
 
 ## Getting Started
 
-Plugins for Packbase are JavaScript or TypeScript modules that interact with the application through the global `window.packbase` API.
+Plugins for Packbase are JavaScript or TypeScript modules that interact with the application through the global
+`window.packbase` API.
 
 ### Plugin Registration
 
@@ -172,8 +174,10 @@ window.plugins.keywordHighlighter = { cleanup };
 
 ## Submitting Plugins
 
-If you develop a plugin that you think others would find useful, consider submitting it to the Packbase plugin directory. Ensure your plugin follows all guidelines and includes proper documentation.
+If you develop a plugin that you think others would find useful, consider submitting it to the Packbase plugin
+directory. Ensure your plugin follows all guidelines and includes proper documentation.
 
 ---
 
-Happy coding! If you have questions or need assistance, join our developer community or open an issue on our GitHub repository.
+Happy coding! If you have questions or need assistance, join our developer community or open an issue on our GitHub
+repository.

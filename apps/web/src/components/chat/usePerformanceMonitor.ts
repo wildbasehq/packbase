@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import {useEffect, useRef} from 'react'
 
 interface PerformanceMetrics {
     renderCount: number
@@ -63,7 +63,7 @@ export const useWhyDidYouUpdate = (name: string, props: Record<string, any>) => 
 
     useEffect(() => {
         if (previousProps.current) {
-            const allKeys = Object.keys({ ...previousProps.current, ...props })
+            const allKeys = Object.keys({...previousProps.current, ...props})
             const changedProps: Record<string, { from: any; to: any }> = {}
 
             allKeys.forEach(key => {

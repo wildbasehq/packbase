@@ -1,13 +1,10 @@
-'use client'
-
-import * as React from 'react'
-import {useEffect, useState} from 'react'
-import {cn} from '@/lib/utils'
 import {Card} from '@/components/ui/card'
 import useWindowSize from '@/lib/hooks/use-window-size'
-import Link from '../shared/link'
-import {useLocalStorage} from 'usehooks-ts'
+import {cn} from '@/lib/utils'
 import {vg} from '@/src/lib/api'
+import {CSSProperties, PointerEvent, useEffect, useRef, useState} from 'react'
+import {useLocalStorage} from 'usehooks-ts'
+import Link from '../shared/link'
 
 export interface NewsArticle {
     href: string
@@ -68,7 +65,7 @@ export function News({articles: initialArticles, toggleUnread}: {
                                 '--y': `-${(cardCount - (idx + 1)) * OFFSET_FACTOR}%`,
                                 '--scale': 1 - (cardCount - (idx + 1)) * SCALE_FACTOR,
                                 '--opacity': cardCount - (idx + 1) >= 6 ? 0 : 1 - (cardCount - (idx + 1)) * OPACITY_FACTOR,
-                            } as React.CSSProperties
+                            } as CSSProperties
                         }
                         aria-hidden={idx !== cardCount - 1}
                     >
@@ -110,8 +107,8 @@ function NewsCard({
 }) {
     const {isMobile} = useWindowSize()
 
-    const ref = React.useRef<HTMLDivElement>(null)
-    const drag = React.useRef<{
+    const ref = useRef<HTMLDivElement>(null)
+    const drag = useRef<{
         start: number
         delta: number
         startTime: number
@@ -122,10 +119,10 @@ function NewsCard({
         startTime: 0,
         maxDelta: 0,
     })
-    const animation = React.useRef<Animation>(null)
-    const [dragging, setDragging] = React.useState(false)
+    const animation = useRef<Animation>(null)
+    const [dragging, setDragging] = useState(false)
 
-    const onDragMove = (e: PointerEvent) => {
+    const onDragMove = (e) => {
         if (!ref.current) return
         const {clientX} = e
         const dx = clientX - drag.current.start
@@ -169,7 +166,7 @@ function NewsCard({
     const onDragEnd = () => stopDragging(false)
     const onDragCancel = () => stopDragging(true)
 
-    const onPointerDown = (e: React.PointerEvent) => {
+    const onPointerDown = (e: PointerEvent) => {
         if (!active || !ref.current || animation.current?.playState === 'running') return
 
         bindListeners()

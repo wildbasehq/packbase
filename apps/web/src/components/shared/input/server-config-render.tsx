@@ -1,10 +1,10 @@
 /**
  * Renders JSON Schema configs from server as user-configurable options
  */
-import {Button, Description, Field, Input, Label, Select, useContentFrameMutation} from '..'
-import {Heading, Text} from '@/components/shared/text.tsx'
-import React, {Activity} from 'react'
+import {Heading, Text} from '@/components/shared/text'
 import {cn, isVisible} from '@/lib'
+import {Activity, FormEvent, memo, useState} from 'react'
+import {Button, Description, Field, Input, Label, Select, useContentFrameMutation} from '..'
 
 interface ConfigItem {
     key: string
@@ -22,11 +22,11 @@ interface ConfigItem {
 }
 
 export function decideCategoryDescription(category: string) {
-    if (category === 'server_configuration') return "Change this Pack's internal server configs"
+    if (category === 'server_configuration') return 'Change this Pack\'s internal server configs'
 }
 
 function ServerConfigRenderComponent({config, updateEndpoint}: { config: ConfigItem[]; updateEndpoint: string }) {
-    const [loading, setLoading] = React.useState(false)
+    const [loading, setLoading] = useState(false)
 
     const submit = useContentFrameMutation('post', updateEndpoint, {
         onSuccess: () => {
@@ -37,7 +37,7 @@ function ServerConfigRenderComponent({config, updateEndpoint}: { config: ConfigI
         },
     })
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
         setLoading(true)
         const formData = new FormData(e.target as HTMLFormElement)
@@ -100,6 +100,6 @@ function ServerConfigRenderComponent({config, updateEndpoint}: { config: ConfigI
     )
 }
 
-const ServerConfigRender = React.memo(ServerConfigRenderComponent)
+const ServerConfigRender = memo(ServerConfigRenderComponent)
 
 export default ServerConfigRender

@@ -1,6 +1,6 @@
-import {YapockType} from '@/index';
-import {t} from 'elysia';
-import requiresAccount from "@/utils/identity/requires-account";
+import {YapockType} from '@/index'
+import requiresAccount from '@/utils/identity/requires-account'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app.post(
@@ -10,7 +10,7 @@ export default (app: YapockType) =>
                    body,
                    user,
                }) => {
-            await requiresAccount({set, user});
+            await requiresAccount({set, user})
 
             const userBadge = await prisma.inventory.findFirst({
                 where: {
@@ -18,11 +18,11 @@ export default (app: YapockType) =>
                     item_id: body.badge,
                     type: 'badge',
                 },
-            });
+            })
 
             if (!userBadge) {
-                set.status = 400;
-                return;
+                set.status = 400
+                return
             }
 
             // Set any `is_set` to false, set body.badge (badge_id) as true.
@@ -34,7 +34,7 @@ export default (app: YapockType) =>
                 data: {
                     is_set: false,
                 },
-            });
+            })
 
             await prisma.inventory.updateMany({
                 where: {
@@ -45,7 +45,7 @@ export default (app: YapockType) =>
                 data: {
                     is_set: true,
                 },
-            });
+            })
         },
         {
             detail: {

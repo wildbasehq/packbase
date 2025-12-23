@@ -1,13 +1,13 @@
-import {Heading, Text} from '@/components/shared/text.tsx'
-import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert.tsx'
-import {UserCircleIcon} from '@heroicons/react/24/solid'
-import UserAvatar from '@/components/shared/user/avatar.tsx'
 import {Button, Field, Input, Label, Textarea} from '@/components/shared'
-import {vg} from '@/lib/api'
-import {toast} from 'sonner'
-import {Activity, createRef, FormEvent, useEffect, useState} from 'react'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
+import {Heading, Text} from '@/components/shared/text'
+import UserAvatar from '@/components/shared/user/avatar'
+import UnsavedChangesWarning from '@/components/ui/unsaved-changes'
 import {isVisible, useResourceStore} from '@/lib'
-import UnsavedChangesWarning from "@/components/ui/unsaved-changes.tsx";
+import {vg} from '@/lib/api'
+import {UserCircleIcon} from '@heroicons/react/24/solid'
+import {Activity, createRef, FormEvent, useEffect, useState} from 'react'
+import {toast} from 'sonner'
 
 export default function ResourceSettingsGeneral() {
     const {currentResource, setCurrentResource, resources, setResources} = useResourceStore()

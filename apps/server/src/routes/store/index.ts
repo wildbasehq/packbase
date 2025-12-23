@@ -1,20 +1,20 @@
-import {t} from 'elysia';
-import {YapockType} from '@/index';
-import StoreManager from '@/lib/StoreManager';
-import Items from '@/lib/store/items.json';
-import trinketManager from '@/lib/trinket-manager';
-import requiresAccount from "@/utils/identity/requires-account";
+import {YapockType} from '@/index'
+import Items from '@/lib/store/items.json'
+import StoreManager from '@/lib/StoreManager'
+import trinketManager from '@/lib/trinket-manager'
+import requiresAccount from '@/utils/identity/requires-account'
+import {t} from 'elysia'
 
-const store = new StoreManager();
+const store = new StoreManager()
 
 export default (app: YapockType) =>
     app
         .get(
             '',
             async ({user, set}) => {
-                await requiresAccount({set, user});
-                const items = await store.listWithOwnership(user.sub);
-                const trinketCount = await trinketManager.getBalance(`user:${user.sub}`);
+                await requiresAccount({set, user})
+                const items = await store.listWithOwnership(user.sub)
+                const trinketCount = await trinketManager.getBalance(`user:${user.sub}`)
                 const history = await prisma.admin_audit_log.findMany({
                     where: {
                         user_id: user.sub,
@@ -22,13 +22,13 @@ export default (app: YapockType) =>
                             in: ['TRINKET_PURCHASE_OK', 'TRINKET_BALANCE_CHANGED_OK', 'TRINKET_BALANCE_TRANSFER_OK'],
                         },
                     },
-                });
+                })
 
                 return {
                     items,
                     trinketCount,
                     history,
-                };
+                }
             },
             {
                 detail: {
@@ -62,7 +62,7 @@ export default (app: YapockType) =>
         .get(
             '/catalog',
             async () => {
-                return {items: Object.values(Items)};
+                return {items: Object.values(Items)}
             },
             {
                 detail: {

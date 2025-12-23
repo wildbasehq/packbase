@@ -1,5 +1,5 @@
-import {t} from 'elysia'
 import {YapockType} from '@/index'
+import {t} from 'elysia'
 
 export default (app: YapockType) => app
     .get('', async ({set, query}) => {

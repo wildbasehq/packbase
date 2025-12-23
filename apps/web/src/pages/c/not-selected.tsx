@@ -2,8 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {ArrowLeft} from 'lucide-react'
 import {Alert, AlertDescription, AlertTitle} from '@/src/components'
+import {ArrowLeft} from 'lucide-react'
 import {motion} from 'motion/react'
 
 /**

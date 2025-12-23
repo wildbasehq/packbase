@@ -2,15 +2,15 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
-import {useRef} from 'react'
+import {ChatBubbleSmileyIcon} from '@/components/icons/plump'
+import Popover from '@/components/shared/popover'
 import {SidebarDivider, SidebarHeading, SidebarItem, SidebarLabel, SidebarSection} from '@/components/shared/sidebar'
-import {HashtagIcon, HomeIcon, MicrophoneIcon, PaperAirplaneIcon, PlusIcon} from '@heroicons/react/16/solid'
-import Popover from '@/components/shared/popover.tsx'
 import {vg} from '@/lib'
-import {hasPackPermissionBit, PACK_PERMISSIONS} from "@/lib/utils/has-pack-permission-bit.ts";
-import {ChatBubbleSmileyIcon} from "@/components/icons/plump";
-import {SparklesIcon} from "@heroicons/react/20/solid";
+import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
+import {hasPackPermissionBit, PACK_PERMISSIONS} from '@/lib/utils/has-pack-permission-bit'
+import {HashtagIcon, HomeIcon, MicrophoneIcon, PaperAirplaneIcon, PlusIcon} from '@heroicons/react/16/solid'
+import {SparklesIcon} from '@heroicons/react/20/solid'
+import {useRef} from 'react'
 
 export function PackChannels() {
     const {navigation} = useUIStore()

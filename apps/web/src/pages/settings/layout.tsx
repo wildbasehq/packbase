@@ -2,22 +2,22 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React from 'react'
-import {useUserAccountStore} from '@/lib'
-import {EnvelopeOpenIcon, IdentificationIcon, SwatchIcon, TrophyIcon} from '@heroicons/react/16/solid'
+import SettingsDeleteAccount from '@/components/layout/user-dropdown/delete/page'
 
 // Import all settings pages
 import ProfileSettings from '@/components/layout/user-dropdown/general/page'
-import TemplateSettings from '@/components/layout/user-dropdown/template/page'
 import InviteSettings from '@/components/layout/user-dropdown/invite/page'
+import TemplateSettings from '@/components/layout/user-dropdown/template/page'
 import UnlockableSettings from '@/components/layout/user-dropdown/unlockables/page'
+import PagedModal from '@/components/shared/paged-modal'
 import {Text} from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
+import {useUserAccountStore} from '@/lib'
+import {EnvelopeOpenIcon, IdentificationIcon, SwatchIcon, TrophyIcon} from '@heroicons/react/16/solid'
 import {TrashIcon} from '@heroicons/react/20/solid'
-import SettingsDeleteAccount from '@/components/layout/user-dropdown/delete/page'
-import PagedModal from '@/components/shared/paged-modal'
+import {FC} from 'react'
 
-const SettingsDialog: React.FC = () => {
+const SettingsDialog: FC = () => {
     const {user} = useUserAccountStore()
 
     // Create the user profile footer component

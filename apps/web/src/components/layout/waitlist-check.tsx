@@ -1,10 +1,10 @@
 import './waitlist-check.component.scss'
-import {useUserAccountStore} from '@/lib/state'
-import {Activity, useEffect, useState} from 'react'
-import {HandHeartIcon, LucideIcon, MailQuestionIcon, MailWarningIcon} from 'lucide-react'
 import {LoadingCircle} from '@/components/icons'
+import {useUserAccountStore} from '@/lib/state'
 import {cn, isVisible} from '@/lib/utils'
 import Dog from '@/src/images/svg/illustrate/dog.svg'
+import {HandHeartIcon, LucideIcon, MailQuestionIcon, MailWarningIcon} from 'lucide-react'
+import {Activity, useEffect, useState} from 'react'
 import {useLocation} from 'wouter'
 
 const ServiceStates: {
@@ -31,7 +31,7 @@ const ServiceStates: {
         icon: MailQuestionIcon,
         color: 'text-orange-500',
         status: 'Waiting',
-        text: "You're on the waitlist. You'll need an invite code from someone, or wait for us to open.",
+        text: 'You\'re on the waitlist. You\'ll need an invite code from someone, or wait for us to open.',
     },
     dummy: {
         icon: LoadingCircle,

@@ -1,14 +1,14 @@
-import React, {Activity, ReactNode, useEffect} from 'react'
-import {PagedModalProvider, usePagedModal} from './context'
-import clsx from 'clsx'
 import {Text} from '@/components/shared/text'
-import {cn} from "@/lib";
+import {cn} from '@/lib'
+import clsx from 'clsx'
+import {Activity, ElementType, FC, ReactNode, useEffect} from 'react'
+import {PagedModalProvider, usePagedModal} from './context'
 
 export interface PageProps {
     id?: string
     title: string
-    description?: string | React.ReactNode
-    icon?: React.ElementType
+    description?: string | ReactNode
+    icon?: ElementType
     badge?: string
     children: ReactNode
 }
@@ -21,7 +21,7 @@ export interface PagedModalProps {
 }
 
 // The Page component that represents each tab/page in the modal
-const Page: React.FC<PageProps> = ({id: providedId, title, description, icon: Icon, badge, children}) => {
+const Page: FC<PageProps> = ({id: providedId, title, description, icon: Icon, badge, children}) => {
     const {registerPage, activePage} = usePagedModal()
     const id = providedId || title.toLowerCase().replace(/\s+/g, '-')
 
@@ -34,17 +34,17 @@ const Page: React.FC<PageProps> = ({id: providedId, title, description, icon: Ic
     return <>{children}</>
 }
 
-const PageBody: React.FC<{ children: ReactNode; className?: string; }> = ({children, className}) => {
-    return <div className={cn("h-full w-full overflow-y-auto p-6 relative", className)}>{children}</div>
+const PageBody: FC<{ children: ReactNode; className?: string; }> = ({children, className}) => {
+    return <div className={cn('h-full w-full overflow-y-auto p-6 relative', className)}>{children}</div>
 }
 
 // The main PagedModal component
-const PagedModal: React.FC<PagedModalProps> & { Page: typeof Page; Body: typeof PageBody } = ({
-                                                                                                  children,
-                                                                                                  className,
-                                                                                                  header,
-                                                                                                  footer
-                                                                                              }) => {
+const PagedModal: FC<PagedModalProps> & { Page: typeof Page; Body: typeof PageBody } = ({
+                                                                                            children,
+                                                                                            className,
+                                                                                            header,
+                                                                                            footer
+                                                                                        }) => {
     return (
         <PagedModalProvider>
             <PagedModalContent className={className} header={header} footer={footer}>
@@ -55,7 +55,7 @@ const PagedModal: React.FC<PagedModalProps> & { Page: typeof Page; Body: typeof 
 }
 
 // The internal content component that uses the context
-const PagedModalContent: React.FC<PagedModalProps> = ({children, className, header, footer}) => {
+const PagedModalContent: FC<PagedModalProps> = ({children, className, header, footer}) => {
     const {activePage, setActivePage, pages} = usePagedModal()
 
     return (

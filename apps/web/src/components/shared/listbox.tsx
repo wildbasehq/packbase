@@ -1,6 +1,6 @@
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
 import {ComponentPropsWithoutRef, Fragment, ReactNode} from 'react'
-import {cn} from "@/lib";
 
 export function Listbox<T>({
                                className,

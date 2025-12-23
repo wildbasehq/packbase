@@ -1,27 +1,27 @@
-import {t} from 'elysia';
-import {YapockType} from '@/index';
-import prisma from '@/db/prisma';
-import requiresAccount from "@/utils/identity/requires-account";
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import requiresAccount from '@/utils/identity/requires-account'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app.get(
         '',
         async ({set, user}) => {
-            await requiresAccount({set, user});
+            await requiresAccount({set, user})
 
             // 'id' as 'invite_code'
             let invites = await prisma.invites.findMany({
                 where: {invited_by: user.sub},
                 select: {id: true, invite_id: true, created_at: true},
-            });
-            if (!invites) invites = [];
+            })
+            if (!invites) invites = []
 
             return invites.map((invite: any) => {
                 return {
                     invite_id: invite.invite_id,
                     created_at: invite.created_at.toISOString(),
-                };
-            });
+                }
+            })
         },
         {
             detail: {

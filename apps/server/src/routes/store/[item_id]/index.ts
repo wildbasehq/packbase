@@ -1,26 +1,26 @@
-import {t} from 'elysia';
-import {YapockType} from '@/index';
-import StoreManager from '@/lib/StoreManager';
-import Items from '@/lib/store/items.json';
-import {HTTPError} from '@/lib/HTTPError';
-import requiresAccount from "@/utils/identity/requires-account";
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import Items from '@/lib/store/items.json'
+import StoreManager from '@/lib/StoreManager'
+import requiresAccount from '@/utils/identity/requires-account'
+import {t} from 'elysia'
 
-const store = new StoreManager();
+const store = new StoreManager()
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({user, set, params, body}) => {
-            await requiresAccount({set, user});
-            const itemId = params.item_id;
+            await requiresAccount({set, user})
+            const itemId = params.item_id
 
             if (!(itemId in Items)) {
-                set.status = 404;
-                throw HTTPError.notFound({summary: 'ITEM_NOT_FOUND'});
+                set.status = 404
+                throw HTTPError.notFound({summary: 'ITEM_NOT_FOUND'})
             }
 
-            const quantity = body?.quantity ?? 1;
-            return await store.purchase(user.sub, itemId, quantity);
+            const quantity = body?.quantity ?? 1
+            return await store.purchase(user.sub, itemId, quantity)
         },
         {
             params: t.Object({

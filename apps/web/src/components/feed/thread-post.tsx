@@ -2,26 +2,25 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-// src/components/feed/thread-post.tsx
-import {Activity, FormEvent, useCallback, useState} from 'react'
-import {ChatBubbleLeftIcon, TrashIcon} from '@heroicons/react/24/outline'
-import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
-import {toast} from 'sonner'
-import {vg} from '@/lib/api'
-import UserAvatar from '@/components/shared/user/avatar'
+import {Button} from '@/components/shared'
+import Card from '@/components/shared/card'
 import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
-import {MediaGallery} from '.'
+import {Text} from '@/components/shared/text'
+import UserAvatar from '@/components/shared/user/avatar'
+import UserInfoCol from '@/components/shared/user/info-col'
+import {isVisible, useUserAccountStore} from '@/lib'
+import {vg} from '@/lib/api'
 import {UserProfileBasic} from '@/lib/defs/user'
 import {formatRelativeTime} from '@/lib/utils/date'
-import {Text} from '@/components/shared/text.tsx'
+import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak'
 import {AvatarButton, BubblePopover, FeedPostData, LoadingCircle, PopoverHeader} from '@/src/components'
-import {Button} from '@/components/shared'
-import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak.tsx'
-import Card from '@/components/shared/card.tsx'
-import UserInfoCol from '@/components/shared/user/info-col.tsx'
+import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
+import {ChatBubbleLeftIcon, TrashIcon} from '@heroicons/react/24/outline'
+import {Activity, FormEvent, useCallback, useState} from 'react'
+import {toast} from 'sonner'
+import {MediaGallery} from '.'
 import {ServerReactionStack} from '../ui/reaction-stack'
-import {isVisible, useUserAccountStore} from '@/lib'
 
 const MAX_THREAD_DEPTH = 4
 

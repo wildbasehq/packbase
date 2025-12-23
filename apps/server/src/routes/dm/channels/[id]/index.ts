@@ -1,10 +1,10 @@
-import {t} from 'elysia';
-import {YapockType} from '@/index';
-import prisma from '@/db/prisma';
-import {HTTPError} from '@/lib/HTTPError';
-import mapChannel from '@/utils/channels/mapChannel';
-import {CommonErrorResponses, DM_ERROR_CODES} from '@/utils/dm/errors';
-import requiresAccount from "@/utils/identity/requires-account";
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import mapChannel from '@/utils/channels/mapChannel'
+import {CommonErrorResponses, DM_ERROR_CODES} from '@/utils/dm/errors'
+import requiresAccount from '@/utils/identity/requires-account'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app
@@ -12,9 +12,9 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user, params}) => {
-                await requiresAccount({set, user});
+                await requiresAccount({set, user})
 
-                const {id} = params as { id: string };
+                const {id} = params as { id: string }
 
                 // Ensure the user participates in the channel
                 const isParticipant = await prisma.dm_participants.findFirst({
@@ -22,13 +22,13 @@ export default (app: YapockType) =>
                         channel_id: id,
                         user_id: user.sub
                     }
-                });
+                })
                 if (!isParticipant) {
-                    set.status = 403;
+                    set.status = 403
                     throw HTTPError.forbidden({
                         summary: 'You are not a participant in this DM channel',
                         code: DM_ERROR_CODES.NOT_PARTICIPANT,
-                    });
+                    })
                 }
 
                 // Mark channel as read by updating last_read_at
@@ -42,18 +42,18 @@ export default (app: YapockType) =>
                     data: {
                         last_read_at: new Date(),
                     },
-                });
+                })
 
-                const payload = await mapChannel(id, user.sub);
+                const payload = await mapChannel(id, user.sub)
                 if (!payload) {
-                    set.status = 404;
+                    set.status = 404
                     throw HTTPError.notFound({
                         summary: 'DM channel not found or no longer accessible',
                         code: DM_ERROR_CODES.CHANNEL_NOT_FOUND,
-                    });
+                    })
                 }
 
-                return payload;
+                return payload
             },
             {
                 detail: {description: 'Get a DM channel by id', tags: ['DM']},

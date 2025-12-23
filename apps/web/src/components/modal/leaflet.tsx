@@ -1,6 +1,6 @@
-import {Dispatch, ReactNode, SetStateAction, useEffect, useRef} from 'react'
+import {Transition} from 'motion'
 import {AnimatePresence, motion, useAnimation} from 'motion/react'
-import {Transition} from "motion";
+import {Dispatch, ReactNode, SetStateAction, useEffect, useRef} from 'react'
 
 export default function Leaflet({
                                     setShow,
@@ -9,28 +9,28 @@ export default function Leaflet({
     setShow: Dispatch<SetStateAction<boolean>>;
     children: ReactNode;
 }) {
-    const leafletRef = useRef<HTMLDivElement>(null);
-    const controls = useAnimation();
-    const transitionProps: Transition = {type: "spring", stiffness: 500, damping: 30};
+    const leafletRef = useRef<HTMLDivElement>(null)
+    const controls = useAnimation()
+    const transitionProps: Transition = {type: 'spring', stiffness: 500, damping: 30}
     useEffect(() => {
         controls.start({
             y: 20,
             transition: transitionProps,
-        });
+        })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [])
 
     async function handleDragEnd(_ignored: any, info: any) {
-        const offset = info.offset.y;
-        const velocity = info.velocity.y;
-        const height = leafletRef.current?.getBoundingClientRect().height || 0;
+        const offset = info.offset.y
+        const velocity = info.velocity.y
+        const height = leafletRef.current?.getBoundingClientRect().height || 0
         const velocityThreshold = 800
-        
+
         if (offset > height / 2 || velocity > velocityThreshold) {
-            await controls.start({y: "100%", transition: transitionProps});
-            setShow(false);
+            await controls.start({y: '100%', transition: transitionProps})
+            setShow(false)
         } else {
-            await controls.start({y: 0, transition: transitionProps});
+            await controls.start({y: 0, transition: transitionProps})
         }
     }
 
@@ -40,9 +40,9 @@ export default function Leaflet({
                 ref={leafletRef}
                 key="leaflet"
                 className="group fixed inset-x-0 bottom-0 z-50 w-screen cursor-grab active:cursor-grabbing sm:hidden"
-                initial={{y: "100%"}}
+                initial={{y: '100%'}}
                 animate={controls}
-                exit={{y: "100%"}}
+                exit={{y: '100%'}}
                 transition={transitionProps}
                 drag="y"
                 dragDirectionLock
@@ -67,5 +67,5 @@ export default function Leaflet({
                 onClick={() => setShow(false)}
             />
         </AnimatePresence>
-    );
+    )
 }

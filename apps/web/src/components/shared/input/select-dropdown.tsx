@@ -1,7 +1,7 @@
 import {Listbox, Transition} from '@headlessui/react'
 import {ArrowDownIcon, CheckBadgeIcon, CheckIcon} from '@heroicons/react/20/solid'
-import {Fragment, ReactNode} from 'react'
 import {clsx} from 'clsx'
+import {Fragment, ReactNode} from 'react'
 
 export declare interface SelectMenuType {
     title: string

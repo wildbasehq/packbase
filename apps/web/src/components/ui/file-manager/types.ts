@@ -1,3 +1,5 @@
+import {ReactNode} from 'react'
+
 export type FileKind = 'file' | 'folder'
 
 export interface BaseNode {
@@ -32,7 +34,7 @@ export interface FileManagerRootProps {
     onChange?: (selected: FileSystemNode[]) => void
     onOpenFile?: (file: FileNode) => void
     baseHref?: string
-    children?: React.ReactNode
+    children?: ReactNode
 }
 
 export interface FileManagerContextValue {

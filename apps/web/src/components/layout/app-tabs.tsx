@@ -2,13 +2,13 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {useEffect, useMemo, useState} from 'react'
-import {AnimatePresence, motion, useMotionValue, useTransform} from 'motion/react'
-import {animate} from 'motion'
 import {cn, useResourceStore} from '@/lib'
-import {Avatar} from "@/src/components";
-import {Cog6ToothIcon} from "@heroicons/react/20/solid";
-import {navigate} from "wouter/use-browser-location";
+import {Avatar} from '@/src/components'
+import {Cog6ToothIcon} from '@heroicons/react/20/solid'
+import {animate} from 'motion'
+import {AnimatePresence, motion, useMotionValue, useTransform} from 'motion/react'
+import {useEffect, useMemo, useState} from 'react'
+import {navigate} from 'wouter/use-browser-location'
 
 const SYSTEM_TABS: any = [
     {

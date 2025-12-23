@@ -1,5 +1,5 @@
-import Debug from 'debug'
 import prisma from '@/db/prisma'
+import Debug from 'debug'
 
 const log = {
     info: Debug('vg:packs:heartbeat'),
@@ -14,8 +14,8 @@ export default async function packCalculateHeartbeat(packID: string): Promise<nu
     if (packID === 'server_startup_init') {
         // Recursively calculate all packs
         const packs = await prisma.packs.findMany({
-            select: { id: true }
-        });
+            select: {id: true}
+        })
         if (!packs) return -1
         for (const pack of packs) {
             await packCalculateHeartbeat(pack.id)
@@ -55,9 +55,9 @@ export default async function packCalculateHeartbeat(packID: string): Promise<nu
 
     let totalCount = 0
     const members = await prisma.packs_memberships.findMany({
-        where: { tenant_id: packID },
-        select: { user_id: true }
-    });
+        where: {tenant_id: packID},
+        select: {user_id: true}
+    })
     if (!members) return -1
     const recentPosts = await prisma.posts.findMany({
         where: {
@@ -66,16 +66,16 @@ export default async function packCalculateHeartbeat(packID: string): Promise<nu
                 gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
             }
         },
-        select: { id: true }
-    });
+        select: {id: true}
+    })
     if (!recentPosts) return 0
     // Count all accounts older than 30 days
     // @TODO: Should become last seen instead of created_at
     for (const user of members) {
         const userAccount = await prisma.profiles.findUnique({
-            where: { id: user.user_id },
-            select: { created_at: true }
-        });
+            where: {id: user.user_id},
+            select: {created_at: true}
+        })
         // Check if the account is older than 30 days
         const accountAge = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         if (userAccount && userAccount.created_at < accountAge) {

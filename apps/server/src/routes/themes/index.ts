@@ -1,10 +1,10 @@
-import {YapockType} from '@/index';
-import {HTTPError} from '@/lib/HTTPError';
-import validateThemeContent from '@/lib/themes/validateThemeContent';
-import {Theme, ThemesList} from '@/models/themes.model';
-import {t} from 'elysia';
-import prisma from '@/db/prisma';
-import requiresAccount from "@/utils/identity/requires-account";
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import validateThemeContent from '@/lib/themes/validateThemeContent'
+import {Theme, ThemesList} from '@/models/themes.model'
+import requiresAccount from '@/utils/identity/requires-account'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app
@@ -12,20 +12,20 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user}) => {
-                await requiresAccount({set, user});
+                await requiresAccount({set, user})
 
                 try {
                     return await prisma.user_themes.findMany({
                         where: {
                             user_id: user.sub,
                         },
-                    });
+                    })
                 } catch (error: any) {
-                    set.status = 500;
+                    set.status = 500
                     throw HTTPError.serverError({
                         summary: 'Failed to fetch themes.',
                         detail: error.message,
-                    });
+                    })
                 }
             },
             {
@@ -44,15 +44,15 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({set, body, user}) => {
-                await requiresAccount({set, user});
+                await requiresAccount({set, user})
 
                 // Validate and sanitize HTML and CSS
                 const {html: sanitizedHTML, css: sanitizedCSS} = validateThemeContent({
                     html: body.html,
                     css: body.css,
-                });
+                })
 
-                let data;
+                let data
                 try {
                     data = await prisma.user_themes.create({
                         data: {
@@ -62,13 +62,13 @@ export default (app: YapockType) =>
                             css: sanitizedCSS,
                             is_active: body.is_active || false,
                         },
-                    });
+                    })
                 } catch (error: any) {
-                    set.status = 500;
+                    set.status = 500
                     throw HTTPError.serverError({
                         summary: 'Failed to create theme.',
                         detail: error.message,
-                    });
+                    })
                 }
 
                 // If this theme is set as active, deactivate all other themes
@@ -82,14 +82,14 @@ export default (app: YapockType) =>
                             data: {
                                 is_active: false,
                             },
-                        });
+                        })
                     } catch (error) {
                         // If there's an error deactivating other themes, we'll just continue
-                        console.error('Failed to deactivate other themes:', error);
+                        console.error('Failed to deactivate other themes:', error)
                     }
                 }
 
-                return data;
+                return data
             },
             {
                 detail: {

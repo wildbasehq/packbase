@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react'
 import {API_URL} from '@/lib/api'
+import {useEffect, useState} from 'react'
 
 // Theme model based on the API documentation
 export interface Theme {

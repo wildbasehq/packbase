@@ -576,11 +576,11 @@ export const termsConfig: TermsConfig = {
                 {
                     type: 'text',
                     content:
-                        "A usage of a VPN is allowed, as long as it's not for circumventing these terms. We are not liable of any damages caused by you utilising any kind of VPN.",
+                        'A usage of a VPN is allowed, as long as it\'s not for circumventing these terms. We are not liable of any damages caused by you utilising any kind of VPN.',
                 },
                 {
                     type: 'heading',
-                    content: "Children's Privacy (COPPA Compliance)",
+                    content: 'Children\'s Privacy (COPPA Compliance)',
                     level: 2,
                 },
                 {
@@ -681,7 +681,7 @@ export const termsConfig: TermsConfig = {
                 {
                     type: 'text',
                     content:
-                        "If Packbase is sold to a merger, you'll be asked whether or not you want your data to be owned by the specified merger. If we get no response from you, or you disagree, your data will be permanently erased before the merge begins.",
+                        'If Packbase is sold to a merger, you\'ll be asked whether or not you want your data to be owned by the specified merger. If we get no response from you, or you disagree, your data will be permanently erased before the merge begins.',
                 },
                 {
                     type: 'heading',

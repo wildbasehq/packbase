@@ -1,7 +1,7 @@
-import sharp from 'sharp';
-import {v4 as uuidv4} from 'uuid';
-import path from 'path';
-import {StorageProvider} from '../../../plugins/storage-interface';
+import path from 'path'
+import sharp from 'sharp'
+import {v4 as uuidv4} from 'uuid'
+import {StorageProvider} from '../../../plugins/storage-interface'
 
 /**
  * Storage class for managing S3 compatible buckets
@@ -16,14 +16,14 @@ import {StorageProvider} from '../../../plugins/storage-interface';
  * - Get specific file version
  */
 export class Storage {
-    private storageProvider: StorageProvider;
+    private storageProvider: StorageProvider
 
     /**
      * Create a new Storage instance
      * @param storageProvider The storage provider to use
      */
     constructor(storageProvider: StorageProvider) {
-        this.storageProvider = storageProvider;
+        this.storageProvider = storageProvider
     }
 
     /**
@@ -47,64 +47,64 @@ export class Storage {
     }> {
         try {
             // Process the image with sharp
-            let imageBuffer = Buffer.from(base64.split(';base64,').pop() || '', 'base64');
-            let sharpQuery = sharp(imageBuffer, {animated});
+            let imageBuffer = Buffer.from(base64.split(';base64,').pop() || '', 'base64')
+            let sharpQuery = sharp(imageBuffer, {animated})
 
             // Determine content type and extension
-            let contentType = base64.substring('data:'.length, base64.indexOf(';base64'));
-            let ext = base64.substring('data:image/'.length, base64.indexOf(';base64'));
+            let contentType = base64.substring('data:'.length, base64.indexOf(';base64'))
+            let ext = base64.substring('data:image/'.length, base64.indexOf(';base64'))
 
             // Validate that this is an image
             if (!contentType.startsWith('image/')) {
                 return {
                     success: false,
                     error: new Error('Only images are supported'),
-                };
+                }
             }
 
             // Convert to PNG or keep as GIF if animated
             if (ext === 'gif' && animated) {
-                sharpQuery.toFormat('gif');
-                ext = 'gif';
-                contentType = 'image/gif';
+                sharpQuery.toFormat('gif')
+                ext = 'gif'
+                contentType = 'image/gif'
             } else {
-                sharpQuery.toFormat('png');
-                ext = 'png';
-                contentType = 'image/png';
+                sharpQuery.toFormat('png')
+                ext = 'png'
+                contentType = 'image/png'
             }
 
             // Process the image
-            const processedImage = await sharpQuery.toBuffer();
+            const processedImage = await sharpQuery.toBuffer()
 
             // Generate a version ID
-            const versionId = uuidv4();
+            const versionId = uuidv4()
 
             // Create the full path
-            const fullPath = `${userId}/${filePath.replace('{ext}', ext)}`;
+            const fullPath = `${userId}/${filePath.replace('{ext}', ext)}`
 
             // Upload the file using the storage provider
-            const uploadSuccess = await this.storageProvider.uploadFile(fullPath, processedImage, contentType);
+            const uploadSuccess = await this.storageProvider.uploadFile(fullPath, processedImage, contentType)
 
             if (!uploadSuccess) {
                 return {
                     success: false,
                     error: new Error('Failed to upload file to storage'),
-                };
+                }
             }
 
             // Update version control
-            await this.updateVersionControl(userId, fullPath, versionId, processedImage);
+            await this.updateVersionControl(userId, fullPath, versionId, processedImage)
 
             return {
                 success: true,
                 path: fullPath,
                 version: versionId,
-            };
+            }
         } catch (error) {
             return {
                 success: false,
                 error: error instanceof Error ? error : new Error(String(error)),
-            };
+            }
         }
     }
 
@@ -122,27 +122,27 @@ export class Storage {
         error?: Error;
     }> {
         try {
-            const fullPath = `${userId}/${filePath}`;
+            const fullPath = `${userId}/${filePath}`
 
             // Delete the file using the storage provider
-            const deleteSuccess = await this.storageProvider.deleteFile(fullPath);
+            const deleteSuccess = await this.storageProvider.deleteFile(fullPath)
 
             if (!deleteSuccess) {
                 return {
                     success: false,
                     error: new Error('Failed to delete file from storage'),
-                };
+                }
             }
 
             // Update version control to mark as deleted
-            await this.updateVersionControl(userId, fullPath, uuidv4(), null, true);
+            await this.updateVersionControl(userId, fullPath, uuidv4(), null, true)
 
-            return {success: true};
+            return {success: true}
         } catch (error) {
             return {
                 success: false,
                 error: error instanceof Error ? error : new Error(String(error)),
-            };
+            }
         }
     }
 
@@ -166,20 +166,20 @@ export class Storage {
         }>;
     }> {
         try {
-            const fullPrefix = prefix ? `${userId}/${prefix}` : `${userId}/`;
+            const fullPrefix = prefix ? `${userId}/${prefix}` : `${userId}/`
 
             // List files using the storage provider
-            const files = await this.storageProvider.listFiles(fullPrefix, '/');
+            const files = await this.storageProvider.listFiles(fullPrefix, '/')
 
             return {
                 success: true,
                 files,
-            };
+            }
         } catch (error) {
             return {
                 success: false,
                 error: error instanceof Error ? error : new Error(String(error)),
-            };
+            }
         }
     }
 
@@ -202,47 +202,47 @@ export class Storage {
         }>;
     }> {
         try {
-            const vcPath = `${userId}/vc/${path.basename(filePath)}.vc.json`;
+            const vcPath = `${userId}/vc/${path.basename(filePath)}.vc.json`
 
             try {
                 // Get the version control file using the storage provider
-                const fileResult = await this.storageProvider.getFile(vcPath);
+                const fileResult = await this.storageProvider.getFile(vcPath)
 
                 if (!fileResult) {
                     return {
                         success: true,
                         versions: [],
-                    };
+                    }
                 }
 
-                const vcData = fileResult.data.toString('utf-8');
+                const vcData = fileResult.data.toString('utf-8')
                 if (!vcData) {
                     return {
                         success: true,
                         versions: [],
-                    };
+                    }
                 }
 
-                const versions = JSON.parse(vcData);
+                const versions = JSON.parse(vcData)
                 return {
                     success: true,
                     versions,
-                };
+                }
             } catch (error) {
                 // If the file doesn't exist, return an empty array
                 if ((error as any).name === 'NoSuchKey') {
                     return {
                         success: true,
                         versions: [],
-                    };
+                    }
                 }
-                throw error;
+                throw error
             }
         } catch (error) {
             return {
                 success: false,
                 error: error instanceof Error ? error : new Error(String(error)),
-            };
+            }
         }
     }
 
@@ -265,21 +265,21 @@ export class Storage {
     }> {
         try {
             // Get version control data
-            const vcResult = await this.getVersionControl(userId, filePath);
+            const vcResult = await this.getVersionControl(userId, filePath)
             if (!vcResult.success || !vcResult.versions) {
                 return {
                     success: false,
                     error: vcResult.error || new Error('Failed to get version control data'),
-                };
+                }
             }
 
             // Find the requested version
-            const version = vcResult.versions.find((v) => v.id === versionId);
+            const version = vcResult.versions.find((v) => v.id === versionId)
             if (!version) {
                 return {
                     success: false,
                     error: new Error('Version not found'),
-                };
+                }
             }
 
             // If the version is marked as deleted, return an error
@@ -287,32 +287,32 @@ export class Storage {
                 return {
                     success: false,
                     error: new Error('This version was deleted'),
-                };
+                }
             }
 
             // Get the version file
-            const versionPath = `${userId}/vc/${path.basename(filePath)}.${versionId}`;
+            const versionPath = `${userId}/vc/${path.basename(filePath)}.${versionId}`
 
             // Get the file using the storage provider
-            const fileResult = await this.storageProvider.getFile(versionPath);
+            const fileResult = await this.storageProvider.getFile(versionPath)
 
             if (!fileResult) {
                 return {
                     success: false,
                     error: new Error('Failed to get file version'),
-                };
+                }
             }
 
             return {
                 success: true,
                 data: fileResult.data,
                 contentType: fileResult.contentType,
-            };
+            }
         } catch (error) {
             return {
                 success: false,
                 error: error instanceof Error ? error : new Error(String(error)),
-            };
+            }
         }
     }
 
@@ -327,28 +327,28 @@ export class Storage {
      */
     private async updateVersionControl(userId: string, filePath: string, versionId: string, data: Buffer | null, deleted: boolean = false): Promise<void> {
         // Get current version control data
-        const vcResult = await this.getVersionControl(userId, filePath);
-        const versions = vcResult.success && vcResult.versions ? vcResult.versions : [];
+        const vcResult = await this.getVersionControl(userId, filePath)
+        const versions = vcResult.success && vcResult.versions ? vcResult.versions : []
 
         // Add the new version
         versions.push({
             id: versionId,
             timestamp: new Date().toISOString(),
             deleted,
-        });
+        })
 
         // Save the version control file
-        const vcPath = `${userId}/vc/${path.basename(filePath)}.vc.json`;
+        const vcPath = `${userId}/vc/${path.basename(filePath)}.vc.json`
 
         // Upload the version control file using the storage provider
-        await this.storageProvider.uploadFile(vcPath, Buffer.from(JSON.stringify(versions)), 'application/json');
+        await this.storageProvider.uploadFile(vcPath, Buffer.from(JSON.stringify(versions)), 'application/json')
 
         // If we have data, save the version file
         if (data) {
-            const versionPath = `${userId}/vc/${path.basename(filePath)}.${versionId}`;
+            const versionPath = `${userId}/vc/${path.basename(filePath)}.${versionId}`
 
             // Upload the version file using the storage provider
-            await this.storageProvider.uploadFile(versionPath, data, 'application/octet-stream');
+            await this.storageProvider.uploadFile(versionPath, data, 'application/octet-stream')
         }
     }
 }
@@ -360,13 +360,13 @@ export class Storage {
  */
 export function createStorage(bucket: string): Storage {
     // Import the S3StorageProvider dynamically to avoid circular dependencies
-    const {S3StorageProvider} = require('../../../plugins/s3-storage-provider');
+    const {S3StorageProvider} = require('../../../plugins/s3-storage-provider')
 
     // Create a new S3StorageProvider with default configuration
-    const storageProvider = S3StorageProvider.createFromEnv(bucket);
+    const storageProvider = S3StorageProvider.createFromEnv(bucket)
 
     // Create a new Storage instance with the S3StorageProvider
-    return new Storage(storageProvider);
+    return new Storage(storageProvider)
 }
 
-export default createStorage;
+export default createStorage

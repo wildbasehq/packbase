@@ -1,4 +1,4 @@
-export default function PlaceholderNotification({ rounded = 24, ...props }) {
+export default function PlaceholderNotification({rounded = 24, ...props}) {
     const frameRadius = Math.max(0, rounded)
     const frameStrokeRadius = Math.max(0, rounded - 0.5)
     const barRadius = Math.max(0, Math.round((rounded / 8) * 2))
@@ -25,11 +25,11 @@ export default function PlaceholderNotification({ rounded = 24, ...props }) {
                 strokeOpacity="0.2"
             />
             <g clipPath="url(#clip0_1_73)">
-                <rect x="7.97875" y="30.0639" width="42" height="42" rx="21" transform="rotate(-1 7.97875 30.0639)" fill="#EFEFF0" />
-                <rect x="7.84206" y="30.6942" width="43" height="40" fill="url(#pattern0_1_73)" />
+                <rect x="7.97875" y="30.0639" width="42" height="42" rx="21" transform="rotate(-1 7.97875 30.0639)" fill="#EFEFF0"/>
+                <rect x="7.84206" y="30.6942" width="43" height="40" fill="url(#pattern0_1_73)"/>
             </g>
-            <rect x="8.4874" y="30.5551" width="41" height="41" rx="20.5" transform="rotate(-1 8.4874 30.5551)" stroke="#D6D8DB" />
-            <rect x="60.093" y="36.1553" width="154" height="12" rx={barRadius} transform="rotate(-1 60.093 36.1553)" fill="#D9D9D9" />
+            <rect x="8.4874" y="30.5551" width="41" height="41" rx="20.5" transform="rotate(-1 8.4874 30.5551)" stroke="#D6D8DB"/>
+            <rect x="60.093" y="36.1553" width="154" height="12" rx={barRadius} transform="rotate(-1 60.093 36.1553)" fill="#D9D9D9"/>
             <rect
                 x="60.3722"
                 y="52.1528"
@@ -61,11 +61,11 @@ export default function PlaceholderNotification({ rounded = 24, ...props }) {
                 strokeOpacity="0.2"
             />
             <g clipPath="url(#clip1_1_73)">
-                <rect x="38.5959" y="45.0701" width="42" height="42" rx="21" transform="rotate(1.5 38.5959 45.0701)" fill="#EFEFF0" />
-                <rect x="38.4319" y="45.6938" width="43" height="40" transform="rotate(2.5 38.4319 45.6938)" fill="url(#pattern1_1_73)" />
+                <rect x="38.5959" y="45.0701" width="42" height="42" rx="21" transform="rotate(1.5 38.5959 45.0701)" fill="#EFEFF0"/>
+                <rect x="38.4319" y="45.6938" width="43" height="40" transform="rotate(2.5 38.4319 45.6938)" fill="url(#pattern1_1_73)"/>
             </g>
-            <rect x="39.0827" y="45.583" width="41" height="41" rx="20.5" transform="rotate(1.5 39.0827 45.583)" stroke="#D6D8DB" />
-            <rect x="90.3949" y="53.4288" width="154" height="12" rx={barRadius} transform="rotate(1.5 90.3949 53.4288)" fill="#D9D9D9" />
+            <rect x="39.0827" y="45.583" width="41" height="41" rx="20.5" transform="rotate(1.5 39.0827 45.583)" stroke="#D6D8DB"/>
+            <rect x="90.3949" y="53.4288" width="154" height="12" rx={barRadius} transform="rotate(1.5 90.3949 53.4288)" fill="#D9D9D9"/>
             <rect
                 x="89.976"
                 y="69.4234"
@@ -88,19 +88,19 @@ export default function PlaceholderNotification({ rounded = 24, ...props }) {
             />
             <defs>
                 <pattern id="pattern0_1_73" patternContentUnits="objectBoundingBox" width="1" height="1">
-                    <use xlinkHref="#image0_1_73" transform="scale(0.00173611 0.00186632)" />
+                    <use xlinkHref="#image0_1_73" transform="scale(0.00173611 0.00186632)"/>
                 </pattern>
                 <pattern id="pattern1_1_73" patternContentUnits="objectBoundingBox" width="1" height="1">
-                    <use xlinkHref="#image0_1_73" transform="scale(0.00173611 0.00186632)" />
+                    <use xlinkHref="#image0_1_73" transform="scale(0.00173611 0.00186632)"/>
                 </pattern>
                 <clipPath id="clip0_1_73">
-                    <rect x="7.97875" y="30.0639" width="42" height="42" rx="21" transform="rotate(-1 7.97875 30.0639)" fill="white" />
+                    <rect x="7.97875" y="30.0639" width="42" height="42" rx="21" transform="rotate(-1 7.97875 30.0639)" fill="white"/>
                 </clipPath>
                 <clipPath id="clip1_1_73">
-                    <rect x="38.5959" y="45.0701" width="42" height="42" rx="21" transform="rotate(1.5 38.5959 45.0701)" fill="white" />
+                    <rect x="38.5959" y="45.0701" width="42" height="42" rx="21" transform="rotate(1.5 38.5959 45.0701)" fill="white"/>
                 </clipPath>
                 <clipPath id="clip2_1_73">
-                    <rect width="24.987" height="24.987" fill="white" transform="translate(307 4.28401) rotate(-9.8721)" />
+                    <rect width="24.987" height="24.987" fill="white" transform="translate(307 4.28401) rotate(-9.8721)"/>
                 </clipPath>
             </defs>
         </svg>

@@ -5,15 +5,12 @@
  * It is used in components that have an API /react endpoint (i.e. Howls).
  */
 
-'use client'
-
-import * as React from 'react'
-import {CSSProperties} from 'react'
-import {cn} from '@/src/lib/utils'
+import Popover from '@/components/shared/popover'
 import {EmojiPicker, EmojiPickerContent, EmojiPickerFooter, EmojiPickerSearch} from '@/src/components/ui/emoji-picker'
 import {vg} from '@/src/lib'
-import Popover from "@/components/shared/popover.tsx";
-import {FaceSmileIcon} from "@heroicons/react/20/solid";
+import {cn} from '@/src/lib/utils'
+import {FaceSmileIcon} from '@heroicons/react/20/solid'
+import {CSSProperties, ReactNode, useCallback, useState} from 'react'
 
 /**
  * Represents a single reaction with its metadata
@@ -39,7 +36,7 @@ export type ClientReactionStackProps = {
     size?: 'sm' | 'md'
     disabled?: boolean
     className?: string
-    renderPill?: (reaction: Reaction) => React.ReactNode // optional custom rendering
+    renderPill?: (reaction: Reaction) => ReactNode // optional custom rendering
 }
 
 /**
@@ -73,8 +70,8 @@ export function ClientReactionStack({
                                         className,
                                         renderPill,
                                     }: ClientReactionStackProps) {
-    const [internalShowPicker, setInternalShowPicker] = React.useState(defaultShowPicker)
-    const [expanded, setExpanded] = React.useState(false)
+    const [internalShowPicker, setInternalShowPicker] = useState(defaultShowPicker)
+    const [expanded, setExpanded] = useState(false)
 
     const isPickerVisible = showPicker !== undefined ? showPicker : internalShowPicker
 
@@ -86,7 +83,7 @@ export function ClientReactionStack({
     const visibleReactions = expanded ? reactions : reactions.slice(0, maxVisible)
     const hasOverflow = reactions.length > maxVisible
 
-    const handleToggle = React.useCallback(
+    const handleToggle = useCallback(
         async (reaction: Reaction) => {
             if (disabled || !onToggle) return
 
@@ -99,7 +96,7 @@ export function ClientReactionStack({
         [disabled, onToggle]
     )
 
-    const handleAddEmoji = React.useCallback(
+    const handleAddEmoji = useCallback(
         async (emoji: { emoji: string; label?: string } | string) => {
             if (disabled || !onAdd) return
 
@@ -113,12 +110,12 @@ export function ClientReactionStack({
         [disabled, onAdd]
     )
 
-    const togglePicker = React.useCallback(() => {
+    const togglePicker = useCallback(() => {
         if (disabled) return
         setInternalShowPicker(!isPickerVisible)
     }, [disabled, isPickerVisible])
 
-    const defaultRenderPill = React.useCallback(
+    const defaultRenderPill = useCallback(
         (reaction: Reaction) => (
             <button
                 key={reaction.key}
@@ -234,10 +231,10 @@ export function ServerReactionStack({
                                         max,
                                         ...clientProps
                                     }: ServerReactionStackProps) {
-    const [reactions, setReactions] = React.useState<Reaction[]>(initialReactions)
-    const [loading, setLoading] = React.useState(false)
+    const [reactions, setReactions] = useState<Reaction[]>(initialReactions)
+    const [loading, setLoading] = useState(false)
 
-    const handleToggle = React.useCallback(
+    const handleToggle = useCallback(
         async (key: string, nextReacted: boolean) => {
             setLoading(true)
 
@@ -285,7 +282,7 @@ export function ServerReactionStack({
         [entityId, endpoint]
     )
 
-    const handleAdd = React.useCallback(
+    const handleAdd = useCallback(
         async (emoji: { emoji: string; label?: string } | string) => {
             setLoading(true)
 

@@ -2,13 +2,13 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {Activity, ReactNode, useEffect} from 'react'
-import {SidebarPortal} from '@/lib/context/sidebar-context'
 import UserFolders from '@/components/layout/user-folders'
-import {useParams} from "wouter";
-import {useContentFrame} from "@/src/components";
-import {isVisible, useUserAccountStore} from "@/lib";
-import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
+import {isVisible, useUserAccountStore} from '@/lib'
+import {SidebarPortal} from '@/lib/context/sidebar-context'
+import PackbaseInstance from '@/lib/workers/global-event-emit'
+import {useContentFrame} from '@/src/components'
+import {Activity, ReactNode, useEffect} from 'react'
+import {useParams} from 'wouter'
 
 export default function UserLayout({children}: { children: ReactNode }) {
     const {slug} = useParams<{ slug: string }>()
@@ -23,7 +23,7 @@ export default function UserLayout({children}: { children: ReactNode }) {
                 r18_tags: user.r18_tags || []
             })
         }
-    }, [user, isLoading]);
+    }, [user, isLoading])
 
     return (
         <Activity mode={isVisible(!!user)}>

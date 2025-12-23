@@ -1,7 +1,6 @@
-import {useEffect, useMemo, useState} from 'react'
-import {Activity} from 'react'
+import Link from '@/components/shared/link'
 import {isVisible} from '@/lib'
-import Link from '@/components/shared/link.tsx'
+import {Activity, useEffect, useMemo, useState} from 'react'
 import {useFileManager} from './context'
 import type {FolderNode} from './types'
 

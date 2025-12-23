@@ -2,15 +2,15 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {forwardRef} from 'react'
 import {cn} from '@/lib/utils'
+import {forwardRef, InputHTMLAttributes, ReactNode} from 'react'
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     description?: string
     label?: string
     combined?: boolean
     prefix?: string
-    button?: React.ReactNode
+    button?: ReactNode
     rows?: number
     inputClassName?: string
 }

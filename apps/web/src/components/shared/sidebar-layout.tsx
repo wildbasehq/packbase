@@ -2,12 +2,23 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import * as Headless from '@headlessui/react'
-import React, {Activity, useState} from 'react'
-import {useResourceStore, useUserAccountStore} from '@/lib/state'
+import {AlignLeft} from '@/components/icons/plump/AlignLeft'
+import {SupportHeadIcon} from '@/components/icons/plump/suppot-head'
+import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk'
 import {Navbar, NavbarDivider, NavbarItem, NavbarLabel, NavbarSection, NavbarSpacer} from '@/components/layout'
-import UserSidebar from '@/components/layout/user-sidebar.tsx'
+import {VerifiedBadge} from '@/components/layout/resource/pack-badge'
+import PackSwitcher from '@/components/layout/resource/pack-switcher'
+import UserDropdown from '@/components/layout/user-dropdown'
+import UserSidebar from '@/components/layout/user-sidebar'
+import {useModal} from '@/components/modal/provider'
+import PackSettingsDropdown from '@/components/pack/settings-dropdown'
+import ResizablePanel from '@/components/shared/resizable'
+import TextTicker from '@/components/shared/text-ticker'
+import {cn, isVisible, WorkerSpinner} from '@/lib'
 import {useSidebar} from '@/lib/context/sidebar-context'
+import useWindowSize from '@/lib/hooks/use-window-size'
+import {useResourceStore, useUserAccountStore} from '@/lib/state'
+import PackbaseInstance from '@/lib/workers/global-event-emit'
 import {
     Alert,
     AlertDescription,
@@ -28,32 +39,21 @@ import {
     SidebarLabel,
     SidebarSpacer,
 } from '@/src/components'
-import {ChevronDownIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
-import {FaceSmileIcon, HomeIcon} from '@heroicons/react/16/solid'
-import {SiDiscord} from 'react-icons/si'
-import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk.tsx'
 import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
-import {cn, isVisible, WorkerSpinner} from '@/lib'
-import useWindowSize from '@/lib/hooks/use-window-size.ts'
-import ResizablePanel from '@/components/shared/resizable'
+import * as Headless from '@headlessui/react'
+import {FaceSmileIcon, HomeIcon} from '@heroicons/react/16/solid'
+import {ChevronDownIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
+import {EllipsisHorizontalIcon} from '@heroicons/react/24/solid'
+import {motion} from 'motion/react'
+import {Activity, ComponentType, PropsWithChildren, ReactNode, useState} from 'react'
+import {SiDiscord} from 'react-icons/si'
+import {TbFaceId} from 'react-icons/tb'
+import {useLocalStorage} from 'usehooks-ts'
+import {useLocation} from 'wouter'
 import {News} from '../ui/sidebar-news'
-import {useLocation} from "wouter";
-import {useLocalStorage} from "usehooks-ts";
-import UserDropdown from "@/components/layout/user-dropdown";
-import {AlignLeft} from "@/components/icons/plump/AlignLeft.tsx";
-import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
-import {motion} from "motion/react"
-import PackSwitcher from "@/components/layout/resource/pack-switcher.tsx";
-import TextTicker from "@/components/shared/text-ticker.tsx";
-import {SupportHeadIcon} from "@/components/icons/plump/suppot-head.tsx";
-import {EllipsisHorizontalIcon} from "@heroicons/react/24/solid";
-import PackSettingsDropdown from "@/components/pack/settings-dropdown.tsx";
-import {TbFaceId} from "react-icons/tb";
-import {VerifiedBadge} from "@/components/layout/resource/pack-badge.tsx";
-import {useModal} from "@/components/modal/provider.tsx";
 
 const NavbarItems: {
-    icon?: React.ComponentType<{ className?: string; 'data-slot'?: string }>;
+    icon?: ComponentType<{ className?: string; 'data-slot'?: string }>;
 
     // Prefix with ! to indicate no label, only icon
     label: string;
@@ -86,7 +86,7 @@ function CloseMenuIcon() {
     )
 }
 
-function MobileSidebar({open, close, children}: React.PropsWithChildren<{ open: boolean; close: () => void }>) {
+function MobileSidebar({open, close, children}: PropsWithChildren<{ open: boolean; close: () => void }>) {
     return (
         <Headless.Dialog open={open} onClose={close} className="lg:hidden">
             <Headless.DialogBackdrop
@@ -111,7 +111,7 @@ function MobileSidebar({open, close, children}: React.PropsWithChildren<{ open: 
     )
 }
 
-export function SidebarLayout({children}: React.PropsWithChildren) {
+export function SidebarLayout({children}: PropsWithChildren) {
     let [showSidebar, setShowSidebar] = useState(false)
     const {isSignedIn} = useSession()
     const {user} = useUserAccountStore()
@@ -167,7 +167,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                             alt={`${currentResource?.display_name} banner`}
                             initial={{opacity: 0.5}}
                             animate={{opacity: [0.5, 1, 0.85]}}
-                            transition={{duration: 0.5, times: [0, 0.35, 1], ease: "easeOut"}}
+                            transition={{duration: 0.5, times: [0, 0.35, 1], ease: 'easeOut'}}
                         />
 
                         <div
@@ -178,7 +178,7 @@ export function SidebarLayout({children}: React.PropsWithChildren) {
                         <Activity mode={isVisible(((isSignedIn && !user?.requires_setup) || !isSignedIn))}>
                             <NavbarItem
                                 className={cn(
-                                    "flex rounded w-full md:w-2xs h-8 *:w-full",
+                                    'flex rounded w-full md:w-2xs h-8 *:w-full',
                                     shouldSeePackTour && 'md:animate-shadow-pulse'
                                 )}
                                 onClick={() => {
@@ -430,7 +430,7 @@ function WhatsHappeningDropdown({close}: { close: () => void }) {
     )
 }
 
-function SidebarContentContainer({children}: { children: React.ReactNode }) {
+function SidebarContentContainer({children}: { children: ReactNode }) {
     const [articlesUnread, setArticlesUnread] = useState(false)
     const [sidebarWidth, setSidebarWidth] = useState<number>(320)
 

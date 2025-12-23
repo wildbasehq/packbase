@@ -1,4 +1,4 @@
-export default function SmileIcon({ style = 'solid', ...props }: any) {
+export default function SmileIcon({style = 'solid', ...props}: any) {
     switch (style) {
         case 'outline':
             return (

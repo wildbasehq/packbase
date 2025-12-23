@@ -1,12 +1,10 @@
-import React from 'react'
-
 interface MessageActionsProps {
     onEdit: () => void
     onDelete: () => void
     className?: string
 }
 
-export function MessageActions({ onEdit, onDelete, className }: MessageActionsProps) {
+export function MessageActions({onEdit, onDelete, className}: MessageActionsProps) {
     return (
         <div
             className={`

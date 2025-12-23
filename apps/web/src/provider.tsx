@@ -2,10 +2,10 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {Toaster} from 'sonner'
 import {ModalProvider} from '@/components/modal/provider'
 import {NotificationsProvider} from '@/lib/providers/notifications-provider'
-import {ReactNode} from "react";
+import {ReactNode} from 'react'
+import {Toaster} from 'sonner'
 
 export function Providers({children}: { children: ReactNode }) {
     return (

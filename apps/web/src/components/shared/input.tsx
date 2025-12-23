@@ -1,8 +1,8 @@
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
-import React, {forwardRef} from 'react'
-import {cn} from "@/lib";
+import {ComponentPropsWithoutRef, ForwardedRef, forwardRef} from 'react'
 
-export function InputGroup({children}: React.ComponentPropsWithoutRef<'span'>) {
+export function InputGroup({children}: ComponentPropsWithoutRef<'span'>) {
     return (
         <span
             data-slot="control"
@@ -48,7 +48,7 @@ export const Input = forwardRef(function Input(
         className?: string
         type?: 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url' | DateType
     } & Omit<Headless.InputProps, 'as' | 'className'>,
-    ref: React.ForwardedRef<HTMLInputElement>
+    ref: ForwardedRef<HTMLInputElement>
 ) {
     return (
         <span

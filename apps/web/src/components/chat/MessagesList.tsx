@@ -1,37 +1,37 @@
-import { Avatar } from '@/components/shared/avatar.tsx'
-import { Heading, Text } from '@/components/shared/text.tsx'
-import { MessageGroup } from '@/components/chat/MessageGroup.tsx'
-import { useNormalizedMessages } from '@/components/chat/useNormalizedMessages.ts'
-import { useEditingState, useLoadingState, useScrollState } from '@/components/chat/useChatContext.ts'
-import { usePerformanceMonitor } from '@/components/chat/usePerformanceMonitor.ts'
-import { useContentFrame } from '@/lib/hooks/content-frame.tsx'
-import { API_URL, useUserAccountStore } from '@/lib'
-import { useSession } from '@clerk/clerk-react'
-import { useQueryClient } from '@tanstack/react-query'
-import { HomeModernIcon } from '@heroicons/react/24/solid'
-import { getAvatar } from '@/src/lib/api/users/avatar'
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
-import { toast } from 'sonner'
-import { Button } from "@/src/components";
-import { ArrowDownIcon } from "@heroicons/react/20/solid";
+import {MessageGroup} from '@/components/chat/MessageGroup'
+import {useEditingState, useLoadingState, useScrollState} from '@/components/chat/useChatContext'
+import {useNormalizedMessages} from '@/components/chat/useNormalizedMessages'
+import {usePerformanceMonitor} from '@/components/chat/usePerformanceMonitor'
+import {Avatar} from '@/components/shared/avatar'
+import {Heading, Text} from '@/components/shared/text'
+import {API_URL, useUserAccountStore} from '@/lib'
+import {useContentFrame} from '@/lib/hooks/content-frame'
+import {Button} from '@/src/components'
+import {getAvatar} from '@/src/lib/api/users/avatar'
+import {useSession} from '@clerk/clerk-react'
+import {ArrowDownIcon} from '@heroicons/react/20/solid'
+import {HomeModernIcon} from '@heroicons/react/24/solid'
+import {useQueryClient} from '@tanstack/react-query'
+import {useCallback, useEffect, useMemo, useRef} from 'react'
+import {toast} from 'sonner'
 
-export function MessagesList({ channelId }: { channelId: string }) {
+export function MessagesList({channelId}: { channelId: string }) {
     usePerformanceMonitor('MessagesList')
 
-    const { data: messages, isLoading } = useContentFrame('get', `dm.channels.${channelId}.messages`, undefined, {
+    const {data: messages, isLoading} = useContentFrame('get', `dm.channels.${channelId}.messages`, undefined, {
         id: `messages-${channelId}`,
         refetchInterval: 5,
     })
-    const { data: channel } = useContentFrame('get', `dm.channels.${channelId}`, undefined, { id: `channel-${channelId}` })
+    const {data: channel} = useContentFrame('get', `dm.channels.${channelId}`, undefined, {id: `channel-${channelId}`})
 
     const messageArray = useMemo(() => (Array.isArray(messages) ? messages : []), [messages])
     const normalizedMessages = useNormalizedMessages(messageArray)
-    const { user: me } = useUserAccountStore()
-    const { session } = useSession()
+    const {user: me} = useUserAccountStore()
+    const {session} = useSession()
 
-    const { editingMessageId, editContent, setEditingMessage, setEditContent, cancelEdit } = useEditingState()
-    const { isUserScrolled, setUserScrolled } = useScrollState()
-    const { loadingOlder, hasMoreMessages, setLoadingOlder, setHasMoreMessages } = useLoadingState()
+    const {editingMessageId, editContent, setEditingMessage, setEditContent, cancelEdit} = useEditingState()
+    const {isUserScrolled, setUserScrolled} = useScrollState()
+    const {loadingOlder, hasMoreMessages, setLoadingOlder, setHasMoreMessages} = useLoadingState()
 
     const queryClient = useQueryClient()
 
@@ -39,7 +39,7 @@ export function MessagesList({ channelId }: { channelId: string }) {
     const scrollBottomRef = useRef<HTMLDivElement>(null)
 
     const scrollToBottom = useCallback((behavior: 'smooth' | 'auto' = 'smooth') => {
-        scrollBottomRef.current?.scrollIntoView({ behavior })
+        scrollBottomRef.current?.scrollIntoView({behavior})
     }, [])
 
     const checkIfScrolledToBottom = useCallback(() => {
@@ -63,7 +63,7 @@ export function MessagesList({ channelId }: { channelId: string }) {
                     headers: {
                         'Content-Type': 'application/json',
                         Accept: 'application/json',
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                        ...(token ? {Authorization: `Bearer ${token}`} : {}),
                     },
                 }
             )
@@ -73,7 +73,7 @@ export function MessagesList({ channelId }: { channelId: string }) {
                 if (olderMessages.length === 0) {
                     setHasMoreMessages(false)
                 } else {
-                    await queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
+                    await queryClient.invalidateQueries({queryKey: [`messages-${channelId}`]})
                 }
             } else {
                 toast.error('Failed to load older messages')
@@ -123,13 +123,13 @@ export function MessagesList({ channelId }: { channelId: string }) {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                        ...(token ? {Authorization: `Bearer ${token}`} : {}),
                     },
-                    body: JSON.stringify({ content: editContent.trim() }),
+                    body: JSON.stringify({content: editContent.trim()}),
                 })
 
                 if (res.ok) {
-                    await queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
+                    await queryClient.invalidateQueries({queryKey: [`messages-${channelId}`]})
                 } else {
                     toast.error('Failed to save changes')
                 }
@@ -148,12 +148,12 @@ export function MessagesList({ channelId }: { channelId: string }) {
                 const res = await fetch(`${API_URL}/dm/messages/${messageId}`, {
                     method: 'DELETE',
                     headers: {
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                        ...(token ? {Authorization: `Bearer ${token}`} : {}),
                     },
                 })
 
                 if (res.ok) {
-                    await queryClient.invalidateQueries({ queryKey: [`messages-${channelId}`] })
+                    await queryClient.invalidateQueries({queryKey: [`messages-${channelId}`]})
                 } else {
                     toast.error('Failed to delete message')
                 }
@@ -195,18 +195,18 @@ export function MessagesList({ channelId }: { channelId: string }) {
             <div className="flex-1 overflow-y-auto" ref={scrollContainerRef}>
                 <div className="mx-auto w-full max-w-3xl px-4 py-6 space-y-4">
                     <div className="flex items-start gap-3">
-                        <div className="size-8 rounded-full bg-muted animate-pulse" />
+                        <div className="size-8 rounded-full bg-muted animate-pulse"/>
                         <div className="space-y-2 flex-1">
-                            <div className="h-3 w-40 bg-muted animate-pulse rounded" />
-                            <div className="h-4 w-2/3 bg-muted/70 animate-pulse rounded-lg" />
-                            <div className="h-4 w-1/2 bg-muted/60 animate-pulse rounded-lg" />
+                            <div className="h-3 w-40 bg-muted animate-pulse rounded"/>
+                            <div className="h-4 w-2/3 bg-muted/70 animate-pulse rounded-lg"/>
+                            <div className="h-4 w-1/2 bg-muted/60 animate-pulse rounded-lg"/>
                         </div>
                     </div>
                     <div className="flex items-start gap-3">
-                        <div className="size-8 rounded-full bg-muted animate-pulse" />
+                        <div className="size-8 rounded-full bg-muted animate-pulse"/>
                         <div className="space-y-2 flex-1">
-                            <div className="h-3 w-28 bg-muted animate-pulse rounded" />
-                            <div className="h-4 w-1/2 bg-muted/70 animate-pulse rounded-lg" />
+                            <div className="h-3 w-28 bg-muted animate-pulse rounded"/>
+                            <div className="h-4 w-1/2 bg-muted/70 animate-pulse rounded-lg"/>
                         </div>
                     </div>
                 </div>
@@ -223,7 +223,7 @@ export function MessagesList({ channelId }: { channelId: string }) {
                         {isSelf ? (
                             <div className="flex flex-col gap-3">
                                 <Heading>
-                                    <HomeModernIcon className="inline-flex -mt-1 mr-1 h-5 w-5" />
+                                    <HomeModernIcon className="inline-flex -mt-1 mr-1 h-5 w-5"/>
                                     Welcome to your basecamp
                                 </Heading>
                                 <Text alt>
@@ -284,7 +284,7 @@ export function MessagesList({ channelId }: { channelId: string }) {
                         if (g.type === 'day') {
                             return (
                                 <div key={`day-${idx}`} className="relative flex items-center justify-center py-2">
-                                    <div className="absolute inset-x-0 h-px bg-border/70" />
+                                    <div className="absolute inset-x-0 h-px bg-border/70"/>
                                     <span
                                         className="relative z-10 rounded-full border bg-background/80 backdrop-blur px-3 py-1 text-xs text-muted-foreground shadow-sm"
                                     >
@@ -297,7 +297,7 @@ export function MessagesList({ channelId }: { channelId: string }) {
                         const author = getAuthorInfo(g.authorId)
                         return (
                             <div key={`grp-${idx}`}
-                                className="rounded-xl px-2 py-1 hover:bg-muted/30 transition-colors">
+                                 className="rounded-xl px-2 py-1 hover:bg-muted/30 transition-colors">
                                 <MessageGroup
                                     group={g}
                                     author={author}
@@ -314,7 +314,7 @@ export function MessagesList({ channelId }: { channelId: string }) {
                         )
                     })}
 
-                    <div ref={scrollBottomRef} />
+                    <div ref={scrollBottomRef}/>
                 </div>
             </div>
 
@@ -328,7 +328,7 @@ export function MessagesList({ channelId }: { channelId: string }) {
                         }}
                         className="pointer-events-auto inline-flex"
                     >
-                        <ArrowDownIcon />
+                        <ArrowDownIcon/>
                         Jump to latest
                     </Button>
                 </div>

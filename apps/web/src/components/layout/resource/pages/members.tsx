@@ -1,14 +1,14 @@
-import {Heading, Text} from '@/components/shared/text.tsx'
-import {useEffect, useState} from 'react'
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/shared/table.tsx'
-import {vg} from '@/lib/api'
-import {UserInfo} from '@/components/shared/user/info-col.tsx'
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/shared/table'
+import {Heading, Text} from '@/components/shared/text'
+import {UserInfo} from '@/components/shared/user/info-col'
 import {useResourceStore} from '@/lib'
-import {hasPackPermissionBit, PACK_PERMISSIONS} from "@/lib/utils/has-pack-permission-bit.ts";
-import {Dropdown, DropdownButton, DropdownItem, DropdownMenu} from "@/src/components";
-import {EllipsisHorizontalIcon} from "@heroicons/react/24/solid";
-import {GiBootKick} from "react-icons/gi";
-import {toast} from "sonner";
+import {vg} from '@/lib/api'
+import {hasPackPermissionBit, PACK_PERMISSIONS} from '@/lib/utils/has-pack-permission-bit'
+import {Dropdown, DropdownButton, DropdownItem, DropdownMenu} from '@/src/components'
+import {EllipsisHorizontalIcon} from '@heroicons/react/24/solid'
+import {useEffect, useState} from 'react'
+import {GiBootKick} from 'react-icons/gi'
+import {toast} from 'sonner'
 
 export default function ResourceSettingsMembers() {
     const {
@@ -37,7 +37,7 @@ export default function ResourceSettingsMembers() {
             .kick.post({user_id: memberId})
             .then(({status, error}) => {
                 if (status === 200) {
-                    toast.success("Member kicked successfully")
+                    toast.success('Member kicked successfully')
                     // Refresh members list
                     vg.pack({id})
                         .members.get()

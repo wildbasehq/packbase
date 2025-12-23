@@ -2,14 +2,13 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-// src/components/howl-creator/tags-input.tsx
-import {Activity, useEffect, useRef, useState} from 'react'
-import {InputFieldClasses, Textarea} from '@/src/components'
-import {QuestionMarkCircleIcon} from '@heroicons/react/20/solid'
-import {cn, isVisible, vg} from '@/src/lib'
-import Tooltip from '@/components/shared/tooltip.tsx'
 import {HardDisk} from '@/components/icons/plump'
 import {Button} from '@/components/shared/button'
+import Tooltip from '@/components/shared/tooltip'
+import {InputFieldClasses, Textarea} from '@/src/components'
+import {cn, isVisible, vg} from '@/src/lib'
+import {QuestionMarkCircleIcon} from '@heroicons/react/20/solid'
+import {Activity, KeyboardEvent, useEffect, useRef, useState} from 'react'
 
 export function TagsInput({
                               forcedTag,
@@ -133,7 +132,7 @@ export function TagsInput({
 
     // Backspace handler: if deleting the space after a comma, remove the comma too.
     const handleBackspaceCommaSpace = (
-        e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
+        e: KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>,
         currentValue: string,
         setter: (v: string) => void
     ) => {
@@ -203,7 +202,7 @@ export function TagsInput({
         }, 1000)
     }
 
-    const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleTagInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
             e.preventDefault()
             if (e.shiftKey) {
@@ -347,7 +346,7 @@ export function TagsInput({
 
             <Activity mode={isVisible(!usePlainEditor)}>
                 <div
-                    className={cn("flex! flex-wrap gap-2 p-2 border rounded-xl min-h-[2.5rem] items-center relative", InputFieldClasses)}>
+                    className={cn('flex! flex-wrap gap-2 p-2 border rounded-xl min-h-[2.5rem] items-center relative', InputFieldClasses)}>
                     <Activity mode={isVisible(!!forcedTag)}>
                         <Tooltip content={(
                             <div className="flex flex-col gap-1">

@@ -3,13 +3,13 @@
  */
 
 import Tooltip from '@/components/shared/tooltip'
+import {cn} from '@/lib'
 import {useResourceStore, useUIStore} from '@/lib/state'
+import {NavbarItem, NavbarLabel} from '@/src/components'
+import {SignedIn} from '@clerk/clerk-react'
 import {GlobeAsiaAustraliaIcon, MagnifyingGlassIcon, StarIcon} from '@heroicons/react/20/solid'
+import {useCallback, useEffect, useRef, useState, WheelEvent} from 'react'
 import {useLocation} from 'wouter'
-import {useCallback, useEffect, useRef, useState} from "react"
-import {NavbarItem, NavbarLabel} from "@/src/components";
-import {SignedIn} from "@clerk/clerk-react";
-import {cn} from "@/lib";
 
 export default function PackSwitcher({onChange}: {
     onChange: (resource: any) => void
@@ -42,11 +42,12 @@ export default function PackSwitcher({onChange}: {
         setHasRightOverflow(scrollLeft < maxScrollLeft - epsilon)
     }, [])
 
-    const handleHorizontalWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+    const handleHorizontalWheel = (event: WheelEvent<HTMLDivElement>) => {
         // If the user scrolls vertically with the wheel, move horizontally instead.
         if (event.deltaY !== 0) {
             event.preventDefault()
             const el = event.currentTarget
+            // noinspection JSSuspiciousNameCombination
             el.scrollLeft += event.deltaY
             // After adjusting scrollLeft manually, update shadows
             window.requestAnimationFrame(updateOverflowShadows)
@@ -77,7 +78,7 @@ export default function PackSwitcher({onChange}: {
                     {[...resources].map((pack, colIdx) => (
                         <NavbarItem
                             key={colIdx}
-                            className={cn("relative overflow-hidden flex w-2xs rounded *:w-full", currentResource.id === pack.id && "ring-1 ring-default bg-card")}
+                            className={cn('relative overflow-hidden flex w-2xs rounded *:w-full', currentResource.id === pack.id && 'ring-1 ring-default bg-card')}
                             onClick={() => switchResource(pack)}
                         >
                             {pack?.images?.header && (

@@ -2,8 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {useResourceStore} from '@/lib/state'
 import {Feed} from '@/components/feed'
+import {useResourceStore} from '@/lib/state'
 import {Protect} from '@clerk/clerk-react'
 
 interface PackFeedControllerProps {

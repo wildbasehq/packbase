@@ -1,33 +1,33 @@
-import {YapockType} from '@/index';
-import requiresToken from '@/utils/identity/requires-token';
-import {HTTPError} from "@/lib/HTTPError";
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import requiresToken from '@/utils/identity/requires-token'
 
 export default (app: YapockType) =>
     app.post(
         '',
         async ({set, user}) => {
             // Ensure the request is authenticated / authorized
-            requiresToken({set, user});
+            requiresToken({set, user})
 
-            const userId = user.sub as string;
+            const userId = user.sub as string
 
             const hasPostsInUniverse = await prisma.posts.findFirst({
                 where: {
                     user_id: userId,
                     tenant_id: '00000000-0000-0000-0000-000000000000'
                 }
-            });
+            })
 
-            if (!hasPostsInUniverse) throw HTTPError.forbidden({summary: "No howls in Universe."});
+            if (!hasPostsInUniverse) throw HTTPError.forbidden({summary: 'No howls in Universe.'})
 
             await prisma.$transaction(async (tx) => {
                 // 1. Find all posts authored by this user in Universe
                 const userPosts = await tx.posts.findMany({
                     where: {user_id: userId, tenant_id: '00000000-0000-0000-0000-000000000000'},
                     select: {id: true},
-                });
+                })
 
-                const userPostIds = userPosts.map((p) => p.id);
+                const userPostIds = userPosts.map((p) => p.id)
 
                 if (userPostIds.length === 0) return
 
@@ -46,8 +46,8 @@ export default (app: YapockType) =>
                             },
                         ],
                     },
-                });
-            });
+                })
+            })
 
             return
         },

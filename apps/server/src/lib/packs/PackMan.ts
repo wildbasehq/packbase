@@ -1,8 +1,8 @@
-import {packs, packs_memberships} from '@prisma/client'
-import debug from "debug";
 import prisma from '@/db/prisma'
 import {FeedController} from '@/lib/FeedController'
 import {PackMembershipCache} from '@/routes/pack/[id]'
+import {packs, packs_memberships} from '@prisma/client'
+import debug from 'debug'
 
 const log = {
     info: debug('vg:packman:info'),
@@ -11,8 +11,6 @@ const log = {
 }
 
 export default class PackMan {
-    private _pack: packs
-    private _user: packs_memberships | null
     public static PERMISSIONS = {
         Owner: 1,
         Administrator: 2,
@@ -25,6 +23,8 @@ export default class PackMan {
         CreateHowls: 256,
         ManagePack: 512,
     }
+    private _pack: packs
+    private readonly _user: packs_memberships | null
 
     private constructor(pack: packs, user?: packs_memberships) {
         log.info('PackMan.constructor called %s', pack?.id)
@@ -153,6 +153,44 @@ export default class PackMan {
                 success: false,
                 error: (error as any)?.message ?? String(error),
             }
+        }
+    }
+
+    // Ditto, but static public
+    static async hasPermission(user_id: string, tenant_id: string, permission: number) {
+        // Get user
+        log.info('PackMan.hasPermission (static) called', {tenant_id, user_id, permission})
+        try {
+            const user = await prisma.packs_memberships.findFirst({
+                where: {
+                    tenant_id,
+                    user_id,
+                }
+            })
+
+            if (!user) {
+                log.warn('PackMan.hasPermission (static): membership not found', {tenant_id, user_id})
+                return false
+            }
+
+            const bitAnd = (user.permissions & permission)
+            const result = bitAnd === permission
+            log.info('PackMan.hasPermission (static): permission check', {
+                tenant_id,
+                user_id,
+                userPermissions: user.permissions,
+                permission,
+                bitAnd,
+                result
+            })
+            return result
+        } catch (error) {
+            log.error('PackMan.hasPermission (static): error during check', {
+                tenant_id,
+                user_id,
+                error: (error as any)?.message ?? error
+            })
+            return false
         }
     }
 
@@ -372,43 +410,5 @@ export default class PackMan {
             result
         })
         return result
-    }
-
-    // Ditto, but static public
-    static async hasPermission(user_id: string, tenant_id: string, permission: number) {
-        // Get user
-        log.info('PackMan.hasPermission (static) called', {tenant_id, user_id, permission})
-        try {
-            const user = await prisma.packs_memberships.findFirst({
-                where: {
-                    tenant_id,
-                    user_id,
-                }
-            })
-
-            if (!user) {
-                log.warn('PackMan.hasPermission (static): membership not found', {tenant_id, user_id})
-                return false
-            }
-
-            const bitAnd = (user.permissions & permission)
-            const result = bitAnd === permission
-            log.info('PackMan.hasPermission (static): permission check', {
-                tenant_id,
-                user_id,
-                userPermissions: user.permissions,
-                permission,
-                bitAnd,
-                result
-            })
-            return result
-        } catch (error) {
-            log.error('PackMan.hasPermission (static): error during check', {
-                tenant_id,
-                user_id,
-                error: (error as any)?.message ?? error
-            })
-            return false
-        }
     }
 }

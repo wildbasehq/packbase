@@ -2,11 +2,11 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {useCallback, useEffect, useRef} from 'react'
-import {cn} from "@/lib";
+import {cn} from '@/lib'
+import {ReactNode, useCallback, useEffect, useRef} from 'react'
 
 type ResizablePanelProps = {
-    children: React.ReactNode
+    children: ReactNode
     width: number
     onResize: (nextWidth: number) => void
     minWidth?: number
@@ -51,7 +51,7 @@ export function ResizablePanel({
         document.body.style.userSelect = ''
     }, [])
 
-    const startDragging = useCallback((e: React.MouseEvent) => {
+    const startDragging = useCallback((e: { preventDefault: () => void }) => {
         draggingRef.current = true
         document.body.style.cursor = 'col-resize'
         document.body.style.userSelect = 'none'

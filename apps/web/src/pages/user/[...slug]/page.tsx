@@ -2,16 +2,16 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {useEffect, useState} from 'react'
-import {vg} from '@/lib/api'
-import ProfileHeader from '@/components/shared/user/header'
-import {LoadingCircle} from '@/components/icons'
-import NotFound from '@/src/not-found'
-import Body from '@/components/layout/body'
-import {useParams} from 'wouter'
 import {Feed} from '@/components/feed'
+import {LoadingCircle} from '@/components/icons'
+import Body from '@/components/layout/body'
 import {CustomTheme} from '@/components/shared/theme/custom-theme'
+import ProfileHeader from '@/components/shared/user/header'
 import {useUserAccountStore} from '@/lib'
+import {vg} from '@/lib/api'
+import NotFound from '@/src/not-found'
+import {useEffect, useState} from 'react'
+import {useParams} from 'wouter'
 
 export default function UserProfile() {
     const [user, setUser] = useState<any>(null)

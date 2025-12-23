@@ -1,7 +1,7 @@
-import {YapockType} from '@/index';
-import {t} from 'elysia';
-import {ErrorTypebox} from '@/utils/errors';
-import {deletePost, getPost} from '@/lib/api/post';
+import {YapockType} from '@/index'
+import {deletePost, getPost} from '@/lib/api/post'
+import {ErrorTypebox} from '@/utils/errors'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app
@@ -9,14 +9,14 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({params, set}) => {
-                const {id} = params;
-                const post = await getPost(id);
+                const {id} = params
+                const post = await getPost(id)
                 if (!post) {
-                    set.status = 400;
-                    return;
+                    set.status = 400
+                    return
                 }
 
-                return post;
+                return post
             },
             {
                 detail: {

@@ -1,7 +1,7 @@
-import React, {useState} from 'react'
-import FolderCollectionIcon from '@/components/icons/folder-collection.tsx'
-import {Heading, Text} from '@/components/shared/text.tsx'
-import FilesPage from "@/pages/files/page.tsx";
+import FolderCollectionIcon from '@/components/icons/folder-collection'
+import {Heading, Text} from '@/components/shared/text'
+import FilesPage from '@/pages/files/page'
+import {useState} from 'react'
 
 function EmptyState() {
     return (

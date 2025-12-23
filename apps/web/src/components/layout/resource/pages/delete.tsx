@@ -3,7 +3,6 @@
  */
 
 import {Button, Heading, Text} from '@/components/shared'
-import React from 'react'
 
 export default function ResourceDeletePage() {
     return (

@@ -1,8 +1,8 @@
-import UserSettingsHeader from "@/components/layout/user-dropdown/user-settings-header.tsx";
-import {Activity, useEffect, useState} from "react";
-import {Heading} from "@/src/components";
-import {isVisible, vg} from "@/lib";
-import {Text} from "@/components/shared/text.tsx";
+import UserSettingsHeader from '@/components/layout/user-dropdown/user-settings-header'
+import {Text} from '@/components/shared/text'
+import {isVisible, vg} from '@/lib'
+import {Heading} from '@/src/components'
+import {Activity, useEffect, useState} from 'react'
 
 
 export default function UserStoragePage() {

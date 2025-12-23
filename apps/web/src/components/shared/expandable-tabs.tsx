@@ -1,12 +1,11 @@
 'use client'
 
-import * as React from 'react'
-import {Activity, useEffect, useRef, useState} from 'react'
-import {AnimatePresence, motion} from 'motion/react'
+import {SearchBox} from '@/components/shared/search-box'
 import {cn, isVisible} from '@/lib/utils'
 import {LucideIcon} from 'lucide-react'
+import {AnimatePresence, motion} from 'motion/react'
+import {Activity, useEffect, useRef, useState} from 'react'
 import {useLocation} from 'wouter'
-import {SearchBox} from '@/components/shared/search-box.tsx'
 
 interface TabInterface {
     title?: string
@@ -67,14 +66,14 @@ export function ExpandableTabs({
                                    onChange,
                                    activeTab
                                }: ExpandableTabsProps) {
-    const [selected, setSelected] = React.useState<number | null>(null)
+    const [selected, setSelected] = useState<number | null>(null)
     const [, setLocation] = useLocation()
 
     // Inside your component before the return statement, add:
     const prevQueryStartsWithBracket = useRef(false)
     const [gradientDirection, setGradientDirection] = useState('forward')
 
-    const query = "[Test]"
+    const query = '[Test]'
     // Add this effect to track query changes
     useEffect(() => {
         const currentStartsWithBracket = query?.startsWith('[')

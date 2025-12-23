@@ -2,13 +2,13 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import SadComputerIcon from '@/components/icons/sad-computer'
 import Body from '@/components/layout/body'
 import {isVisible, resourceDefaultPackbase, useResourceStore, useUIStore, useUserAccountStore} from '@/lib'
-import React, {Activity, ReactNode, useEffect, useState} from 'react'
-import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
+import {useContentFrame} from '@/lib/hooks/content-frame'
 import {Button, Heading, LogoSpinner, Text} from '@/src/components'
-import {useContentFrame} from '@/lib/hooks/content-frame.tsx'
-import SadComputerIcon from "@/components/icons/sad-computer.tsx";
+import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
+import {Activity, ReactNode, useEffect, useState} from 'react'
 
 export default function Preload({children}: { children: ReactNode }) {
     return (

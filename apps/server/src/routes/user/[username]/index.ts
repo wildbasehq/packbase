@@ -1,17 +1,17 @@
-import {YapockType} from '@/index';
-import {t} from 'elysia';
-import {UserProfile} from '@/models/defs';
-import posthog, {distinctId} from '@/utils/posthog';
-import {HTTPError} from '@/lib/HTTPError';
-import prisma from '@/db/prisma';
-import clerkClient from '@/db/auth';
+import clerkClient from '@/db/auth'
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import {UserProfile} from '@/models/defs'
+import posthog, {distinctId} from '@/utils/posthog'
+import {t} from 'elysia'
 
 export const UserCache = new Map<
     string,
     typeof UserProfile & {
     expires_after: number;
 }
->();
+>()
 
 export default (app: YapockType) =>
     app.get(
@@ -21,16 +21,16 @@ export default (app: YapockType) =>
                 by: 'username',
                 value: params.username,
                 user,
-            });
+            })
 
             if (!userRes) {
-                set.status = 404;
+                set.status = 404
                 throw HTTPError.notFound({
                     summary: 'The user was not found.',
-                });
+                })
             }
 
-            return userRes;
+            return userRes
         },
         {
             params: t.Object({
@@ -50,23 +50,23 @@ export default (app: YapockType) =>
     );
 
 export async function getUser({by, value, user, scope}: { by: string; value: string; user?: any; scope?: string }) {
-    const timer = new Date().getTime();
+    const timer = new Date().getTime()
 
-    let data;
-    let clerkUser;
+    let data
+    let clerkUser
 
     try {
         // Create a dynamic where condition based on the 'by' parameter
-        const whereCondition = {[by]: value};
+        const whereCondition = {[by]: value}
 
         if (by === 'username') {
             const userFind = await clerkClient.users.getUserList({
                 username: [value],
-            });
+            })
 
-            clerkUser = userFind.data?.find((u) => u.username === value);
+            clerkUser = userFind.data?.find((u) => u.username === value)
 
-            whereCondition.owner_id = clerkUser?.id;
+            whereCondition.owner_id = clerkUser?.id
         }
 
         const userData = await prisma.profiles.findFirst({
@@ -81,37 +81,37 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
                     },
                 }
                 : {}),
-        });
+        })
 
         if (!userData) {
-            return null;
+            return null
         }
 
         if (by !== 'username') {
-            clerkUser = await clerkClient.users.getUser(userData.owner_id);
+            clerkUser = await clerkClient.users.getUser(userData.owner_id)
         }
 
-        data = userData;
-        data.username = clerkUser.username;
+        data = userData
+        data.username = clerkUser.username
     } catch (error: any) {
         // Handle specific Prisma errors if needed
-        throw error;
+        throw error
     }
 
-    if (!data) return;
+    if (!data) return
 
     data.about = {
         bio: data.bio,
-    };
-    delete data.bio;
+    }
+    delete data.bio
 
     data.images = {
         avatar: `${process.env.HOSTNAME}/user/${data.id}/avatar`,
         header: data.images_header,
-    };
+    }
 
-    delete data.images_avatar;
-    delete data.images_header;
+    delete data.images_avatar
+    delete data.images_header
 
     if (user) {
         // Check if following
@@ -121,25 +121,25 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
                     user_id: user.sub,
                     following_id: data.id,
                 },
-            });
+            })
 
             if (followingData) {
-                data.following = true;
+                data.following = true
             }
 
             // Set online status
             if (scope === 'pack_member') {
-                data.online = data.last_online && Date.now() - new Date(data.last_online).getTime() < 5 * 60 * 1000;
+                data.online = data.last_online && Date.now() - new Date(data.last_online).getTime() < 5 * 60 * 1000
                 if (!data.online) {
-                    const timeDiff = Date.now() - new Date(data.last_online).getTime();
-                    const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60));
+                    const timeDiff = Date.now() - new Date(data.last_online).getTime()
+                    const hoursAgo = Math.floor(timeDiff / (1000 * 60 * 60))
 
                     if (hoursAgo < 24) {
                         if (hoursAgo === 0) {
-                            const minutesAgo = Math.floor(timeDiff / (1000 * 60));
-                            user.status = `seen ${minutesAgo} minute${minutesAgo === 1 ? '' : 's'} ago`;
+                            const minutesAgo = Math.floor(timeDiff / (1000 * 60))
+                            user.status = `seen ${minutesAgo} minute${minutesAgo === 1 ? '' : 's'} ago`
                         } else {
-                            user.status = `seen ${hoursAgo} hour${hoursAgo === 1 ? '' : 's'} ago`;
+                            user.status = `seen ${hoursAgo} hour${hoursAgo === 1 ? '' : 's'} ago`
                         }
                     }
                 }
@@ -155,10 +155,10 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
             type: 'badge',
             is_set: true,
         },
-    });
+    })
 
     if (userBadges) {
-        data.badge = userBadges.item_id;
+        data.badge = userBadges.item_id
     }
 
     if (data.is_r18) {
@@ -173,14 +173,14 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
             select: {
                 tags: true,
             },
-        });
+        })
 
-        const uniqueTags = new Set<string>();
+        const uniqueTags = new Set<string>()
         adultTags.forEach((post) => {
             post.tags.forEach(tag => uniqueTags.add(tag))
-        });
+        })
 
-        data.r18_tags = Array.from(uniqueTags);
+        data.r18_tags = Array.from(uniqueTags)
     }
 
     posthog.capture({
@@ -192,7 +192,7 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
             username: data.username,
             user_id: data.id,
         },
-    });
+    })
 
-    return data;
+    return data
 }

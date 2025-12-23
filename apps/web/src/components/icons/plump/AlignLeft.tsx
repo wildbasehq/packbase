@@ -1,5 +1,5 @@
-import {SVGProps} from 'react'
 import {motion, useAnimationControls} from 'motion/react'
+import {SVGProps} from 'react'
 import {useLocalStorage} from 'usehooks-ts'
 
 export function AlignLeft({onClick, ...props}: SVGProps<SVGSVGElement> & { onClick?: () => void }) {

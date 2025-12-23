@@ -1,20 +1,20 @@
-import {t} from 'elysia'
-import {getPack, getPackMembership, PackMembershipCache} from './index'
+import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {ErrorTypebox} from '@/utils/errors'
 import {FeedController} from '@/lib/FeedController'
 import {HTTPError} from '@/lib/HTTPError'
-import prisma from '@/db/prisma'
-import requiresToken from '@/utils/identity/requires-token'
 import PackMan from '@/lib/packs/PackMan'
-import requiresAccount from "@/utils/identity/requires-account";
+import {ErrorTypebox} from '@/utils/errors'
+import requiresAccount from '@/utils/identity/requires-account'
+import requiresToken from '@/utils/identity/requires-token'
+import {t} from 'elysia'
+import {getPack, getPackMembership, PackMembershipCache} from './index'
 
 export default (app: YapockType) =>
     app
         .post(
             '',
             async ({params: {id}, set, user}) => {
-                await requiresAccount({set, user});
+                await requiresAccount({set, user})
 
                 const packExists = await getPack(id, 'id')
                 if (!packExists || id === '00000000-0000-0000-0000-000000000000') {
@@ -48,7 +48,7 @@ export default (app: YapockType) =>
                                 data: {default_pack: id},
                             })
                         }
-                        
+
                     } catch (insertError) {
                         set.status = 400
                         throw HTTPError.badRequest({

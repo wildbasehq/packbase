@@ -1,9 +1,8 @@
-// src/components/feed/FeedMaintenance.tsx
-import {WrenchScrewdriverIcon} from '@heroicons/react/20/solid'
-import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import {Button} from '@/components/shared'
-import {FeedMaintenanceProps} from './types/feed'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import WrenchCharacter from '@/src/images/svg/wrench-character.svg'
+import {WrenchScrewdriverIcon} from '@heroicons/react/20/solid'
+import {FeedMaintenanceProps} from './types/feed'
 
 /**
  * Displays a maintenance notice when the feed is unavailable

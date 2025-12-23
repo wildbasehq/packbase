@@ -1,9 +1,9 @@
-import {YapockType} from '@/index';
-import {t} from 'elysia';
-import requiresToken from '@/utils/identity/requires-token';
-import prisma from '@/db/prisma';
-import requiresAccount from "@/utils/identity/requires-account";
-import {HTTPError} from "@/lib/HTTPError";
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
+import requiresAccount from '@/utils/identity/requires-account'
+import requiresToken from '@/utils/identity/requires-token'
+import {t} from 'elysia'
 
 // Shared types
 export const FolderSchema = t.Object({
@@ -14,7 +14,7 @@ export const FolderSchema = t.Object({
     query: t.Optional(t.String()),
     // created_at: t.String(),
     // updated_at: t.String(),
-});
+})
 
 export type Folder = {
     id: string;
@@ -30,9 +30,9 @@ export async function readUserFolders(userId: string): Promise<Folder[]> {
     const rows = await prisma.folders.findMany({
         where: {user_id: userId},
         orderBy: {created_at: 'asc'},
-    });
+    })
     // Prisma will serialize Date to ISO strings via JSON.stringify
-    return rows as unknown as Folder[];
+    return rows as unknown as Folder[]
 }
 
 export default (app: YapockType) =>
@@ -41,9 +41,9 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({query, set, user}) => {
-                await requiresAccount({set, user});
-                const folders = await readUserFolders(query.user);
-                return {folders};
+                await requiresAccount({set, user})
+                const folders = await readUserFolders(query.user)
+                return {folders}
             },
             {
                 detail: {
@@ -62,8 +62,8 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({set, user, body}) => {
-                requiresToken({set, user});
-                const payload = body as Partial<Folder> & { name: string; };
+                requiresToken({set, user})
+                const payload = body as Partial<Folder> & { name: string; }
 
                 if (!payload.name) {
                     throw HTTPError.badRequest({
@@ -80,7 +80,7 @@ export default (app: YapockType) =>
                 // Count existing folders
                 const existingCount = await prisma.folders.count({
                     where: {user_id: user.sub},
-                });
+                })
 
                 if (existingCount >= 10) {
                     throw HTTPError.forbidden({
@@ -97,9 +97,9 @@ export default (app: YapockType) =>
                         mode: 'dynamic',
                         query: payload.query,
                     },
-                });
+                })
 
-                return {folder: created as unknown as Folder};
+                return {folder: created as unknown as Folder}
             },
             {
                 detail: {

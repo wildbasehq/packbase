@@ -3,9 +3,9 @@
  */
 
 export default async function migrateToggleR18UserStatus() {
-    console.log('Starting migration: Toggle R18 user status based on howl ratings...');
+    console.log('Starting migration: Toggle R18 user status based on howl ratings...')
 
-    const startTime = Date.now();
+    const startTime = Date.now()
 
     try {
         // Fetch all users
@@ -20,7 +20,7 @@ export default async function migrateToggleR18UserStatus() {
             },
             distinct: ['user_id'],
         })
-        const userIds = howls.map((howl) => howl.user_id);
+        const userIds = howls.map((howl) => howl.user_id)
 
         // Update users to set is_r18 to true
         const updateResult = await prisma.profiles.updateMany({
@@ -32,14 +32,14 @@ export default async function migrateToggleR18UserStatus() {
             data: {
                 is_r18: true,
             },
-        });
+        })
 
-        console.log(`Migration successful: Updated ${updateResult.count} users to set is_r18 to true.`);
+        console.log(`Migration successful: Updated ${updateResult.count} users to set is_r18 to true.`)
     } catch (error) {
-        console.error('Migration failed:', error);
-        return;
+        console.error('Migration failed:', error)
+        return
     }
 
-    const endTime = Date.now();
-    console.log(`Migration completed in ${(endTime - startTime) / 1000} seconds.`);
+    const endTime = Date.now()
+    console.log(`Migration completed in ${(endTime - startTime) / 1000} seconds.`)
 }

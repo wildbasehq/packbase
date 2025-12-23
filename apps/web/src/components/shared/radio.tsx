@@ -1,5 +1,5 @@
+import {cn} from '@/lib'
 import * as Headless from '@headlessui/react'
-import {cn} from "@/lib";
 
 export function RadioGroup({
                                className,

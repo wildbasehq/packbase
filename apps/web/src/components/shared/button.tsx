@@ -2,12 +2,12 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import {LoadingSpinner} from '@/src/components'
 import * as Headless from '@headlessui/react'
 import clsx from 'clsx'
-import React, {forwardRef} from 'react'
+import {AnimatePresence, motion} from 'motion/react'
+import {ComponentPropsWithoutRef, ForwardedRef, forwardRef, ReactNode} from 'react'
 import Link from './link'
-import {LoadingSpinner} from "@/src/components";
-import {AnimatePresence, motion} from "motion/react";
 
 const styles = {
     base: [
@@ -173,14 +173,14 @@ type ButtonProps = (
     | { color?: keyof typeof styles.colors; outline?: never; plain?: never }
     | { color?: never; outline: true; plain?: never }
     | { color?: never; outline?: never; plain: true }
-    ) & { className?: string; children: React.ReactNode, submissionState?: 'idle' | 'pending' | 'success' } & (
+    ) & { className?: string; children: ReactNode, submissionState?: 'idle' | 'pending' | 'success' } & (
     | Omit<Headless.ButtonProps, 'as' | 'className'>
-    | Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className'>
+    | Omit<ComponentPropsWithoutRef<typeof Link>, 'className'>
     )
 
 export const Button = forwardRef(function Button(
     {color, outline, plain, className, children, submissionState, ...props}: ButtonProps,
-    ref: React.ForwardedRef<HTMLElement>
+    ref: ForwardedRef<HTMLElement>
 ) {
     let classes = clsx(
         className,
@@ -189,7 +189,7 @@ export const Button = forwardRef(function Button(
     )
 
     return 'href' in props ? (
-        <Link {...props} className={classes} ref={ref as React.ForwardedRef<HTMLAnchorElement>}>
+        <Link {...props} className={classes} ref={ref as ForwardedRef<HTMLAnchorElement>}>
             <TouchTarget>{children}</TouchTarget>
         </Link>
     ) : (
@@ -233,7 +233,7 @@ export const Button = forwardRef(function Button(
 /**
  * Expand the hit area to at least 44×44px on touch devices
  */
-export function TouchTarget({children}: { children: React.ReactNode }) {
+export function TouchTarget({children}: { children: ReactNode }) {
     return (
         <>
             <span

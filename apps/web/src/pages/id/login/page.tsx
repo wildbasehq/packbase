@@ -2,12 +2,12 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { useUserAccountStore } from '@/lib/state'
-import { SignIn } from '@clerk/clerk-react'
-import { Alert, AlertDescription, AlertTitle } from '@/src/components'
+import {useUserAccountStore} from '@/lib/state'
+import {Alert, AlertDescription, AlertTitle} from '@/src/components'
+import {SignIn} from '@clerk/clerk-react'
 
 export default function IDLogin() {
-    const { user } = useUserAccountStore()
+    const {user} = useUserAccountStore()
 
     if (user) return (window.location.href = '/')
 

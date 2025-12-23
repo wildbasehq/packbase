@@ -1,11 +1,11 @@
-import { Avatar } from '@/components/shared/avatar.tsx'
-import { Heading, Text } from '@/components/shared/text.tsx'
-import { useContentFrame } from '@/lib/hooks/content-frame.tsx'
-import { MoreVertical, Search } from 'lucide-react'
-import { motion } from 'motion/react'
+import {Avatar} from '@/components/shared/avatar'
+import {Heading, Text} from '@/components/shared/text'
+import {useContentFrame} from '@/lib/hooks/content-frame'
+import {MoreVertical, Search} from 'lucide-react'
+import {motion} from 'motion/react'
 
-export function ChannelHeader({ channelId }: { channelId: string }) {
-    const { data: channel, isLoading } = useContentFrame('get', `dm.channels.${channelId}`, undefined, {
+export function ChannelHeader({channelId}: { channelId: string }) {
+    const {data: channel, isLoading} = useContentFrame('get', `dm.channels.${channelId}`, undefined, {
         id: `channel-${channelId}`,
     })
 
@@ -17,18 +17,18 @@ export function ChannelHeader({ channelId }: { channelId: string }) {
 
     return (
         <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            initial={{y: -20, opacity: 0}}
+            animate={{y: 0, opacity: 1}}
             className="sticky top-0 z-40 shrink-0 border-b"
             role="banner"
         >
             <div className="flex items-center gap-4 px-6 py-3 h-[72px]">
                 {isLoading && (
                     <div className="flex items-center gap-3 w-full animate-pulse">
-                        <div className="size-10 rounded-full bg-muted/60" />
+                        <div className="size-10 rounded-full bg-muted/60"/>
                         <div className="flex-1 space-y-2">
-                            <div className="h-4 w-32 bg-muted/60 rounded" />
-                            <div className="h-3 w-20 bg-muted/60 rounded" />
+                            <div className="h-4 w-32 bg-muted/60 rounded"/>
+                            <div className="h-3 w-20 bg-muted/60 rounded"/>
                         </div>
                     </div>
                 )}
@@ -37,8 +37,8 @@ export function ChannelHeader({ channelId }: { channelId: string }) {
                     <>
                         <div className="relative">
                             <Avatar src={avatarSrc} alt={name} initials={avatarSrc ? undefined : initials}
-                                className="size-10 ring-2 ring-background shadow-sm" />
-                            <span className="absolute bottom-0 right-0 size-3 rounded-full bg-green-500 ring-2 ring-background" />
+                                    className="size-10 ring-2 ring-background shadow-sm"/>
+                            <span className="absolute bottom-0 right-0 size-3 rounded-full bg-green-500 ring-2 ring-background"/>
                         </div>
 
                         <div className="min-w-0 flex-1">
@@ -56,14 +56,14 @@ export function ChannelHeader({ channelId }: { channelId: string }) {
                                 className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200"
                                 title="Search"
                             >
-                                <Search className="size-5 opacity-70" />
+                                <Search className="size-5 opacity-70"/>
                             </button>
                             <button
                                 type="button"
                                 className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200"
                                 title="More"
                             >
-                                <MoreVertical className="size-5 opacity-70" />
+                                <MoreVertical className="size-5 opacity-70"/>
                             </button>
                         </div>
                     </>

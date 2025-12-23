@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react'
-import { Breakpoint, useBreakpoint } from '@/lib/utils/responsive'
+import {Breakpoint, useBreakpoint} from '@/lib/utils/responsive'
+import {ReactNode} from 'react'
 
 interface ResponsiveProps {
     children: ReactNode
@@ -13,7 +13,7 @@ interface ResponsiveProps {
  * @param breakpoint - Breakpoint to check
  * @param mode - Mode of comparison ('up', 'down', or 'only')
  */
-export function Responsive({ children, breakpoint, mode }: ResponsiveProps) {
+export function Responsive({children, breakpoint, mode}: ResponsiveProps) {
     const isAtLeastBreakpoint = useBreakpoint(breakpoint)
 
     // For 'only' mode, we need to check if we're at this breakpoint but not the next one up
@@ -39,7 +39,7 @@ export function Responsive({ children, breakpoint, mode }: ResponsiveProps) {
  * Component for rendering content only on mobile devices
  * @param children - Content to render
  */
-export function Mobile({ children }: { children: ReactNode }) {
+export function Mobile({children}: { children: ReactNode }) {
     return (
         <Responsive breakpoint="md" mode="down">
             {children}
@@ -51,7 +51,7 @@ export function Mobile({ children }: { children: ReactNode }) {
  * Component for rendering content only on desktop devices
  * @param children - Content to render
  */
-export function Desktop({ children }: { children: ReactNode }) {
+export function Desktop({children}: { children: ReactNode }) {
     return (
         <Responsive breakpoint="md" mode="up">
             {children}
@@ -64,7 +64,7 @@ export function Desktop({ children }: { children: ReactNode }) {
  * @param mobile - Content to render on mobile
  * @param desktop - Content to render on desktop
  */
-export function ResponsiveSwitch({ mobile, desktop }: { mobile: ReactNode; desktop: ReactNode }) {
+export function ResponsiveSwitch({mobile, desktop}: { mobile: ReactNode; desktop: ReactNode }) {
     return (
         <>
             <Mobile>{mobile}</Mobile>

@@ -1,5 +1,5 @@
-import React, {useEffect, useRef} from 'react'
 import {Button, Textarea} from '@/components/shared'
+import {KeyboardEvent, useEffect, useRef} from 'react'
 
 interface MessageEditorProps {
     content: string
@@ -20,7 +20,7 @@ export function MessageEditor({content, onContentChange, onSave, onCancel, class
         }
     }, [])
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Escape') {
             e.preventDefault()
             onCancel()

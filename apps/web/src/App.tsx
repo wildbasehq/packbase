@@ -2,23 +2,23 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {lazy, useEffect} from 'react'
-import {SidebarLayout} from '@/components/shared/sidebar-layout.tsx'
-import {Providers} from './provider.tsx'
-import {SidebarProvider} from '@/lib/context/sidebar-context'
-import {AppTabs, FloatingCompose, LogoSpinner} from '@/src/components'
-import Body from '@/components/layout/body.tsx'
-import {ClerkFailed, ClerkLoaded, ClerkLoading, SignedIn} from '@clerk/clerk-react'
-import Preload from '@/src/preload.tsx'
+import Body from '@/components/layout/body'
+import BrowserCheck from '@/components/modal/browser-check'
+import CommandPalette from '@/components/modal/command-palette'
+import {SidebarLayout} from '@/components/shared/sidebar-layout'
 import {resourceDefaultPackbase, useResourceStore} from '@/lib'
-import BrowserCheck from '@/components/modal/browser-check.tsx'
-import Routes from '@/src/Routes.tsx'
-import CommandPalette from '@/components/modal/command-palette.tsx'
-import {ExclamationTriangleIcon} from "@heroicons/react/20/solid";
-import DefaultPackSunset from "@/pages/pack/universe/default-pack-sunset.tsx";
+import {SidebarProvider} from '@/lib/context/sidebar-context'
+import DefaultPackSunset from '@/pages/pack/universe/default-pack-sunset'
+import {AppTabs, FloatingCompose, LogoSpinner} from '@/src/components'
+import Preload from '@/src/preload'
+import Routes from '@/src/Routes'
+import {ClerkFailed, ClerkLoaded, ClerkLoading, SignedIn} from '@clerk/clerk-react'
+import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
+import {lazy, useEffect} from 'react'
+import {Providers} from './provider'
 
 // Lazy load components
-const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check.tsx'))
+const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check'))
 
 function App() {
     const {currentResource, setCurrentResource, resourceDefault} = useResourceStore()
@@ -33,7 +33,7 @@ function App() {
         ) {
             setCurrentResource(resourceDefault || resourceDefaultPackbase)
         }
-    }, [currentResource]);
+    }, [currentResource])
 
     return (
         <Providers>

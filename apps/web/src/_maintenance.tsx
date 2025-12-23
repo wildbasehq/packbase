@@ -1,8 +1,8 @@
-import {WrenchScrewdriverIcon} from '@heroicons/react/20/solid'
-import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
 import {Button} from '@/components/shared'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
+import {ProjectSafeName} from '@/lib'
 import WrenchCharacter from '@/src/images/svg/wrench-character.svg'
-import {ProjectSafeName} from "@/lib";
+import {WrenchScrewdriverIcon} from '@heroicons/react/20/solid'
 
 /**
  * Full-page maintenance screen used when the app is in maintenance mode.

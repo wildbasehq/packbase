@@ -2,25 +2,25 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {isVisible} from "@/lib";
-import React, {Activity, StrictMode} from 'react'
-import {createRoot} from 'react-dom/client'
-import App from './App.tsx'
-import MaintenancePage from './_maintenance.tsx'
+import R18ContentWarning from '@/components/seen-once/r18-content-warning'
+import {ConfidentialOverlay} from '@/components/shared/confidential-overlay'
+import ErrorBoundary from '@/components/ui/error'
+import {isVisible} from '@/lib'
 import {ClerkProvider} from '@clerk/clerk-react'
 import {dark} from '@clerk/themes'
+import * as Sentry from '@sentry/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {ConfidentialOverlay} from "@/components/shared/confidential-overlay.tsx";
-import ErrorBoundary from "@/components/ui/error.tsx";
-import * as Sentry from "@sentry/react";
-import R18ContentWarning from "@/components/seen-once/r18-content-warning.tsx";
+import {Activity, StrictMode} from 'react'
+import {createRoot} from 'react-dom/client'
+import MaintenancePage from './_maintenance'
+import App from './App'
 
 Sentry.init({
-    dsn: "https://e8e3f611b91d18bfe786729b71514d2c@o275804.ingest.us.sentry.io/4510555338637312",
+    dsn: 'https://e8e3f611b91d18bfe786729b71514d2c@o275804.ingest.us.sentry.io/4510555338637312',
     // Setting this option to true will send default PII data to Sentry.
     // For example, automatic IP address collection on events
     sendDefaultPii: false
-});
+})
 
 declare global {
     interface String {

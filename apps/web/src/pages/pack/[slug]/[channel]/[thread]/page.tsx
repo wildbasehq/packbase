@@ -2,20 +2,20 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {useParams} from 'wouter'
-import {useEffect, useState} from 'react'
-import {Text} from '@/components/shared/text.tsx'
-import {Avatar} from '@/components/shared/avatar.tsx'
-import {Divider} from '@/components/shared/divider.tsx'
-import {ChatBox} from '@/components/shared/chat-box.tsx'
-import {Hash, MessageSquare, Reply} from 'lucide-react'
-import {formatRelativeTime} from '@/lib/utils/date.ts'
-import {useUIStore, vg} from '@/lib'
-import {FeedPostData, LogoSpinner} from '@/src/components'
-import {toast} from 'sonner'
-import Markdown from '@/components/shared/markdown.tsx'
-import {SignedIn} from '@clerk/clerk-react'
+import {Avatar} from '@/components/shared/avatar'
+import {ChatBox} from '@/components/shared/chat-box'
+import {Divider} from '@/components/shared/divider'
+import Markdown from '@/components/shared/markdown'
+import {Text} from '@/components/shared/text'
 import {ServerReactionStack} from '@/components/ui/reaction-stack'
+import {useUIStore, vg} from '@/lib'
+import {formatRelativeTime} from '@/lib/utils/date'
+import {FeedPostData, LogoSpinner} from '@/src/components'
+import {SignedIn} from '@clerk/clerk-react'
+import {Hash, MessageSquare, Reply} from 'lucide-react'
+import {useEffect, useState} from 'react'
+import {toast} from 'sonner'
+import {useParams} from 'wouter'
 
 function ThreadMessage({message, isOriginalPost = false}: {
     message: FeedPostData;

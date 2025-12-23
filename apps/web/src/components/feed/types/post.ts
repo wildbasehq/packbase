@@ -1,7 +1,7 @@
 // src/components/feed/types.ts
-import {UserProfileBasic} from '@/lib/defs/user'
 import {Reaction} from '@/components/ui/reaction-stack'
-import {Dispatch, SetStateAction} from "react";
+import {UserProfileBasic} from '@/lib/defs/user'
+import {Dispatch, SetStateAction} from 'react'
 
 export interface Asset {
     type: 'image' | 'video'

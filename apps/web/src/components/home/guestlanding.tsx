@@ -2,28 +2,19 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {Heading, Text} from '@/components/shared/text'
-import {Button} from '@/components/shared'
 import {Container} from '@/components/layout/container'
-import VerticalCutReveal from '../shared/text/vertical-cut-text'
-import {AnimatePresence, motion} from 'motion/react'
-import Tooltip from '../shared/tooltip'
-import {
-    ArrowUpRightIcon,
-    BoltIcon,
-    CheckIcon,
-    CubeTransparentIcon,
-    GlobeAltIcon,
-    HeartIcon,
-    ShieldCheckIcon,
-    SparklesIcon,
-} from '@heroicons/react/20/solid'
-import {ReactNode, useMemo, useState} from 'react'
-import {QuestionMarkCircleIcon} from '@heroicons/react/16/solid'
-import Link from '../shared/link'
+import {Button} from '@/components/shared'
+import {Heading, Text} from '@/components/shared/text'
 import {Badge, Logo} from '@/src/components'
 import LandingBackground from '@/src/images/png/prjkorat-heading-proposed.png'
 import NoAIBadge from '@/src/images/svg/noai/created.svg'
+import {QuestionMarkCircleIcon} from '@heroicons/react/16/solid'
+import {ArrowUpRightIcon, BoltIcon, CheckIcon, CubeTransparentIcon, GlobeAltIcon, HeartIcon, ShieldCheckIcon, SparklesIcon,} from '@heroicons/react/20/solid'
+import {AnimatePresence, motion} from 'motion/react'
+import {ReactNode, useMemo, useState} from 'react'
+import Link from '../shared/link'
+import VerticalCutReveal from '../shared/text/vertical-cut-text'
+import Tooltip from '../shared/tooltip'
 
 // Animation configuration
 const animConfig = {
@@ -298,24 +289,24 @@ function FakePost({
 function HighlightedText({children, width = '100%'}: { children: ReactNode; width?: string }) {
     // Generate random wavy SVG path for highlight using a more efficient approach
     const svgPath = useMemo(() => {
-        const segments = 10;
+        const segments = 10
         const points = {
             top: Array.from({length: segments + 1}, () => Math.floor(Math.random() * 16) + 2),
             bottom: Array.from({length: segments + 1}, () => Math.floor(Math.random() * 15) + 80)
-        };
+        }
 
         // Build path using array methods instead of loops
         const topEdge = points.top
             .map((y, i) => `L ${(i * 100) / segments},${y}`)
-            .join(' ');
+            .join(' ')
 
         const bottomEdge = points.bottom
             .reverse()
             .map((y, i) => `L ${((segments - i) * 100) / segments},${y}`)
-            .join(' ');
+            .join(' ')
 
-        return `M 0,${points.top[0]} ${topEdge} L 100,${points.bottom[0]} ${bottomEdge} Z`;
-    }, []);
+        return `M 0,${points.top[0]} ${topEdge} L 100,${points.bottom[0]} ${bottomEdge} Z`
+    }, [])
 
     return (
         <span className="relative z-10 font-instrument-serif-italic text-default">
@@ -350,7 +341,7 @@ function HighlightedText({children, width = '100%'}: { children: ReactNode; widt
             </span>
             {children}
         </span>
-    );
+    )
 }
 
 // Replace the existing BlurFadeIn component with this new version
@@ -405,7 +396,7 @@ function FeaturePromiseGrid() {
         {
             icon: 'ShieldCheckIcon',
             title: 'Privacy Focused',
-            description: "No ads, no selling your data. We promise to keep your information secure - we're using it too, y'know!",
+            description: 'No ads, no selling your data. We promise to keep your information secure - we\'re using it too, y\'know!',
         },
         {
             icon: 'CubeTransparentIcon',
@@ -422,14 +413,14 @@ function FeaturePromiseGrid() {
         {
             icon: 'GlobeAltIcon',
             title: 'Transparent & Open',
-            description: "By the end of the alpha, we'll make our spending and income public, plus open-source key components.",
+            description: 'By the end of the alpha, we\'ll make our spending and income public, plus open-source key components.',
         },
         {
             icon: 'HeartIcon',
             title: 'Forever Free',
             description: 'Core features always free. 15GB free storage, or bring your own.',
             accordion:
-                "Packbase gives everyone 15GB of free object storage, but if that's not enough, you can link a Pixeldrain account to have full custody over the data you upload. If you need more and don't want to host it yourself, we can give you more free of charge, just ask.",
+                'Packbase gives everyone 15GB of free object storage, but if that\'s not enough, you can link a Pixeldrain account to have full custody over the data you upload. If you need more and don\'t want to host it yourself, we can give you more free of charge, just ask.',
         },
     ]
 

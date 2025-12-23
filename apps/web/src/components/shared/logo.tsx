@@ -2,9 +2,9 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import React, {SVGProps} from 'react'
 import {cn} from '@/lib/utils'
 import {LoadingSpinner} from '@/src/components'
+import {ComponentProps, SVGProps, useEffect, useState} from 'react'
 
 export const Logo = (props: SVGProps<SVGSVGElement>) => {
     return (
@@ -29,12 +29,12 @@ export const LogoSpinner = ({
                             }: {
     delay?: number
     spinnerClassName?: string
-    logoProps?: React.ComponentProps<typeof Logo>
+    logoProps?: ComponentProps<typeof Logo>
     showSpinner?: boolean
 }) => {
-    const [isLoading, setIsLoading] = React.useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
-    React.useEffect(() => {
+    useEffect(() => {
         const timer = setTimeout(() => {
             setIsLoading(true)
         }, delay)

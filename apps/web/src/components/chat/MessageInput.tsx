@@ -1,9 +1,9 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
-import { cn } from '@/lib/utils/cn'
-import { ChatEvents } from './types'
-import { Button } from '@/components/shared'
-import { motion } from 'motion/react'
-import { Paperclip, Send, Smile } from 'lucide-react'
+import {Button} from '@/components/shared'
+import {cn} from '@/lib/utils/cn'
+import {Paperclip, Send, Smile} from 'lucide-react'
+import {motion} from 'motion/react'
+import {forwardRef, KeyboardEventHandler, useImperativeHandle, useRef, useState} from 'react'
+import {ChatEvents} from './types'
 
 interface MessageInputProps extends ChatEvents {
     placeholder?: string
@@ -12,7 +12,7 @@ interface MessageInputProps extends ChatEvents {
 }
 
 export const MessageInput = forwardRef<HTMLTextAreaElement, MessageInputProps>(
-    ({ onChatSend, placeholder = 'Type a message...', disabled, className }, ref) => {
+    ({onChatSend, placeholder = 'Type a message...', disabled, className}, ref) => {
         const [value, setValue] = useState('')
         const [isFocused, setIsFocused] = useState(false)
         const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -32,7 +32,7 @@ export const MessageInput = forwardRef<HTMLTextAreaElement, MessageInputProps>(
             }, 0)
         }
 
-        const onKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = e => {
+        const onKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = e => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()
                 send()
@@ -55,7 +55,7 @@ export const MessageInput = forwardRef<HTMLTextAreaElement, MessageInputProps>(
                         type="button"
                         className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
                     >
-                        <Paperclip size={18} />
+                        <Paperclip size={18}/>
                     </button>
 
                     <textarea
@@ -82,7 +82,7 @@ export const MessageInput = forwardRef<HTMLTextAreaElement, MessageInputProps>(
                         type="button"
                         className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
                     >
-                        <Smile size={18} />
+                        <Smile size={18}/>
                     </button>
 
                     <Button
@@ -90,11 +90,11 @@ export const MessageInput = forwardRef<HTMLTextAreaElement, MessageInputProps>(
                         onClick={send}
                         disabled={disabled || !value.trim()}
                         className={cn(
-                            "rounded-xl h-9 w-9 shrink-0 p-0 flex items-center justify-center transition-all duration-200",
-                            value.trim() ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/90" : "bg-muted text-muted-foreground hover:bg-muted/80 shadow-none"
+                            'rounded-xl h-9 w-9 shrink-0 p-0 flex items-center justify-center transition-all duration-200',
+                            value.trim() ? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/90' : 'bg-muted text-muted-foreground hover:bg-muted/80 shadow-none'
                         )}
                     >
-                        <Send size={16} className={value.trim() ? "ml-0.5" : ""} />
+                        <Send size={16} className={value.trim() ? 'ml-0.5' : ''}/>
                     </Button>
                 </div>
             </motion.div>

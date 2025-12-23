@@ -1,4 +1,4 @@
-import {TableColumn, TableSchema} from './schema';
+import {TableColumn, TableSchema} from './schema'
 
 /**
  * Supported literal/variable value shapes the parser can emit for WHERE clauses.

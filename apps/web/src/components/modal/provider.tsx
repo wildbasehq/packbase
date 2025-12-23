@@ -1,5 +1,5 @@
-import {createContext, ReactNode, useContext, useState} from 'react'
 import {Dialog} from '@/components/shared/dialog'
+import {createContext, ReactNode, useContext, useState} from 'react'
 
 interface ModalContextProps {
     show: (content: ReactNode) => void

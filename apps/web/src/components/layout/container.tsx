@@ -1,5 +1,5 @@
-import {cn} from "@/lib";
-import {ReactNode} from "react";
+import {cn} from '@/lib'
+import {ReactNode} from 'react'
 
 export function Container({
                               className,

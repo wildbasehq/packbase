@@ -2,15 +2,15 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import {cn, isVisible} from '@/lib'
+import {Button, Desktop, Mobile} from '@/src/components'
+import {CheckCircleIcon, ExclamationCircleIcon, QuestionMarkCircleIcon} from '@heroicons/react/24/outline'
+import {ExclamationTriangleIcon} from '@heroicons/react/24/solid'
+import {XIcon} from 'lucide-react'
+import {AnimatePresence, LayoutGroup, motion} from 'motion/react'
 import {Activity, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react'
 import {createPortal} from 'react-dom'
-import {AnimatePresence, LayoutGroup, motion} from 'motion/react'
-import {XIcon} from 'lucide-react'
-import {CheckCircleIcon, ExclamationCircleIcon, QuestionMarkCircleIcon} from "@heroicons/react/24/outline";
-import {Button, Desktop, Mobile} from "@/src/components";
-import {Drawer} from "vaul"
-import {cn, isVisible} from "@/lib";
-import {ExclamationTriangleIcon} from "@heroicons/react/24/solid";
+import {Drawer} from 'vaul'
 
 export interface BubblePopoverProps {
     /** Unique id for Framer Motion layoutId grouping */
@@ -142,7 +142,7 @@ export function BubblePopover({
                             {open && (
                                 isCentered ? (
                                     <div
-                                        className={cn("fixed inset-0 z-[101] flex items-center justify-center pointer-events-none", className)}>
+                                        className={cn('fixed inset-0 z-[101] flex items-center justify-center pointer-events-none', className)}>
                                         <motion.div
                                             className="w-sm overflow-hidden border bg-card p-6 drop-shadow-sm pointer-events-auto"
                                             layoutId={`${id}-root-container`}
@@ -175,7 +175,7 @@ export function BubblePopover({
                                     </div>
                                 ) : (
                                     <motion.div
-                                        className={cn("absolute z-[101] w-sm overflow-hidden border bg-card p-6 drop-shadow-sm", cornerClasses, className)}
+                                        className={cn('absolute z-[101] w-sm overflow-hidden border bg-card p-6 drop-shadow-sm', cornerClasses, className)}
                                         layoutId={`${id}-root-container`}
                                         layout
                                         style={{borderRadius: 24}}
@@ -309,27 +309,27 @@ export function PopoverHeader({
                                   cancelButtonText,
                                   primaryButtonText
                               }: PopoverHeaderProps) {
-    const prevVariant = useRef(variant);
+    const prevVariant = useRef(variant)
 
     const Icon = useMemo(() => {
         if (prevVariant.current !== variant && prevVariant.current !== undefined) {
-            throw new Error('Variant cannot change after initial render and indicates a poor design choice.');
+            throw new Error('Variant cannot change after initial render and indicates a poor design choice.')
         }
-        prevVariant.current = variant;
+        prevVariant.current = variant
 
         switch (variant) {
             case 'info':
-                return <QuestionMarkCircleIcon className="w-12 h-12 text-indigo-500"/>;
+                return <QuestionMarkCircleIcon className="w-12 h-12 text-indigo-500"/>
             case 'warning':
-                return <ExclamationCircleIcon className="w-12 h-12 text-amber-500"/>;
+                return <ExclamationCircleIcon className="w-12 h-12 text-amber-500"/>
             case 'destructive':
-                return <ExclamationTriangleIcon className="w-12 h-12 text-red-500"/>;
+                return <ExclamationTriangleIcon className="w-12 h-12 text-red-500"/>
             case 'success':
-                return <CheckCircleIcon className="w-12 h-12 text-green-500"/>;
+                return <CheckCircleIcon className="w-12 h-12 text-green-500"/>
             default:
-                return <QuestionMarkCircleIcon className="w-12 h-12 text-amber-500"/>;
+                return <QuestionMarkCircleIcon className="w-12 h-12 text-amber-500"/>
         }
-    }, []);
+    }, [])
 
     return (
         <motion.header>

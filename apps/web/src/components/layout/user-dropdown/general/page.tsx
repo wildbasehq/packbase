@@ -2,25 +2,14 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {
-    Button,
-    Description,
-    Field,
-    FieldGroup,
-    Input,
-    Label,
-    Switch,
-    SwitchField,
-    SwitchGroup,
-    Textarea
-} from '@/components/shared'
-import React, {createRef, useEffect, useMemo, useState} from 'react'
+import {Button, Description, Field, FieldGroup, Input, Label, Switch, SwitchField, SwitchGroup, Textarea} from '@/components/shared'
+import UnsavedChangesWarning from '@/components/ui/unsaved-changes'
 import {useUserAccountStore, vg} from '@/lib'
-import {toast} from 'sonner'
 import {PhotoIcon} from '@heroicons/react/24/solid'
-import UnsavedChangesWarning from "@/components/ui/unsaved-changes.tsx";
+import {createRef, FC, memo, useEffect, useMemo, useState} from 'react'
+import {toast} from 'sonner'
 
-const ProfileSettingsComponent: React.FC = ({noHeader}: { noHeader?: boolean }) => {
+const ProfileSettingsComponent: FC = ({noHeader}: { noHeader?: boolean }) => {
     const {user} = useUserAccountStore()
 
     // Text
@@ -87,14 +76,14 @@ const ProfileSettingsComponent: React.FC = ({noHeader}: { noHeader?: boolean }) 
                 } else {
                     setSubmitting(false)
                     toast.error(
-                        "Couldn't save: " +
+                        'Couldn\'t save: ' +
                         (error.value ? `${error.status}: ${error.value.summary || error.value.error}` : 'Something went wrong')
                     )
                 }
             })
             .catch(err => {
                 setSubmitting(false)
-                toast.error("Couldn't save: " + (err.message ? `${err.cause}: ${err}` : 'Something went wrong'))
+                toast.error('Couldn\'t save: ' + (err.message ? `${err.cause}: ${err}` : 'Something went wrong'))
             })
     }
 
@@ -205,6 +194,6 @@ const ProfileSettingsComponent: React.FC = ({noHeader}: { noHeader?: boolean }) 
     )
 }
 
-const ProfileSettings = React.memo(ProfileSettingsComponent)
+const ProfileSettings = memo(ProfileSettingsComponent)
 
 export default ProfileSettings

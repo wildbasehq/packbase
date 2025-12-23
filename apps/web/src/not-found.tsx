@@ -1,5 +1,5 @@
-import {Heading} from '@/components/shared/text'
 import Body from '@/components/layout/body'
+import {Heading} from '@/components/shared/text'
 
 export default function NotFound() {
     return (

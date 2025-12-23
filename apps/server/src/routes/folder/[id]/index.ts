@@ -1,9 +1,9 @@
-import {YapockType} from '@/index';
-import {t} from 'elysia';
-import requiresToken from '@/utils/identity/requires-token';
-import {type Folder, FolderSchema} from '@/routes/folders';
-import prisma from '@/db/prisma';
-import requiresAccount from "@/utils/identity/requires-account";
+import prisma from '@/db/prisma'
+import {YapockType} from '@/index'
+import {type Folder, FolderSchema} from '@/routes/folders'
+import requiresAccount from '@/utils/identity/requires-account'
+import requiresToken from '@/utils/identity/requires-token'
+import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app
@@ -11,15 +11,15 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user, params}) => {
-                await requiresAccount({set, user});
-                const {id} = params as { id: string };
-                const folder = await prisma.folders.findFirst({where: {id}});
+                await requiresAccount({set, user})
+                const {id} = params as { id: string }
+                const folder = await prisma.folders.findFirst({where: {id}})
                 if (!folder) {
-                    set.status = 404;
-                    return {error: 'Folder not found'};
+                    set.status = 404
+                    return {error: 'Folder not found'}
                 }
 
-                const profile = await prisma.profiles.findUnique({where: {id: folder.user_id}});
+                const profile = await prisma.profiles.findUnique({where: {id: folder.user_id}})
                 return {
                     folder: folder as unknown as Folder,
                     profile: {
@@ -28,7 +28,7 @@ export default (app: YapockType) =>
                         username: profile.username,
                         images_avatar: `${process.env.HOSTNAME}/user/${profile.id}/avatar`
                     }
-                };
+                }
             },
             {
                 params: t.Object({id: t.String()}),
@@ -54,14 +54,14 @@ export default (app: YapockType) =>
         .patch(
             '',
             async ({set, user, params, body}) => {
-                requiresToken({set, user});
-                const {id} = params as { id: string };
-                const payload = body as Partial<Folder>;
+                requiresToken({set, user})
+                const {id} = params as { id: string }
+                const payload = body as Partial<Folder>
 
-                const current = await prisma.folders.findFirst({where: {id, user_id: user.sub}});
+                const current = await prisma.folders.findFirst({where: {id, user_id: user.sub}})
                 if (!current) {
-                    set.status = 404;
-                    return {error: 'Folder not found'};
+                    set.status = 404
+                    return {error: 'Folder not found'}
                 }
 
                 const updated = await prisma.folders.update({
@@ -73,9 +73,9 @@ export default (app: YapockType) =>
                         query: payload.query ?? current.query ?? undefined,
                         updated_at: new Date(),
                     },
-                });
+                })
 
-                return {folder: updated as unknown as Folder};
+                return {folder: updated as unknown as Folder}
             },
             {
                 params: t.Object({id: t.String()}),
@@ -94,14 +94,14 @@ export default (app: YapockType) =>
         .delete(
             '',
             async ({set, user, params}) => {
-                requiresToken({set, user});
-                const {id} = params as { id: string };
-                const result = await prisma.folders.deleteMany({where: {id, user_id: user.sub}});
+                requiresToken({set, user})
+                const {id} = params as { id: string }
+                const result = await prisma.folders.deleteMany({where: {id, user_id: user.sub}})
                 if (result.count === 0) {
-                    set.status = 404;
-                    return {error: 'Folder not found'};
+                    set.status = 404
+                    return {error: 'Folder not found'}
                 }
-                return {success: true};
+                return {success: true}
             },
             {
                 params: t.Object({id: t.String()}),

@@ -1,7 +1,7 @@
-import {ContentBlock} from "@/src/types/terms";
-import {Heading} from "@/components/shared/text";
-import ContentRenderer from "@/components/layout/terms-content-renderer";
-import {FC} from "react";
+import ContentRenderer from '@/components/layout/terms-content-renderer'
+import {Heading} from '@/components/shared/text'
+import {ContentBlock} from '@/src/types/terms'
+import {FC} from 'react'
 
 interface SectionProps {
     section: {
@@ -33,7 +33,7 @@ const Section: FC<SectionProps> = ({section, dataCollection, retentionOrder}) =>
                 ))}
             </div>
         </section>
-    );
-};
+    )
+}
 
-export default Section;
+export default Section

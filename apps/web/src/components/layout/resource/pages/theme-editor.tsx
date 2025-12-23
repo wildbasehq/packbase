@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react'
+import {Button} from '@/components/shared'
+import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert'
+import {Tabs} from '@/src/components'
+import {PackThemeAPI} from '@/src/lib/api/packs/theme'
+import {Theme, ThemeAPI} from '@/src/lib/api/users/theme'
+import {CheckCircleIcon, XCircleIcon} from '@heroicons/react/20/solid'
+import {EyeIcon, EyeSlashIcon} from '@heroicons/react/24/solid'
 import * as monaco from 'monaco-editor'
-import { Button } from '@/components/shared'
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/alert.tsx'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
-import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
+import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import HTMLMonacoLinter from 'monaco-html-linter'
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid'
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/20/solid'
-import { PackThemeAPI } from '@/src/lib/api/packs/theme'
-import { Tabs } from '@/src/components'
-import { Theme, ThemeAPI } from '@/src/lib/api/users/theme'
-import ShowLightbulbIconMode = monaco.editor.ShowLightbulbIconMode;
+import {useEffect, useRef, useState} from 'react'
+import ShowLightbulbIconMode = monaco.editor.ShowLightbulbIconMode
 
 // HTML linter configuration for themes
 const linterConfig = {
@@ -121,7 +121,7 @@ monaco.languages.html.htmlDefaults.setModeConfiguration({
 })
 
 // Create a wrapper component for Monaco
-const MonacoEditorWrapper = ({ language, defaultValue, onChange }) => {
+const MonacoEditorWrapper = ({language, defaultValue, onChange}) => {
     const [isEditorReady, setIsEditorReady] = useState(false)
     const containerRef = useRef(null)
     const editorRef = useRef(null)
@@ -138,7 +138,7 @@ const MonacoEditorWrapper = ({ language, defaultValue, onChange }) => {
                         value: defaultValue,
                         language: language,
                         theme: 'vs-dark',
-                        minimap: { enabled: true },
+                        minimap: {enabled: true},
                         fontSize: 14,
                         lineNumbers: 'on',
                         roundedSelection: true,
@@ -147,7 +147,7 @@ const MonacoEditorWrapper = ({ language, defaultValue, onChange }) => {
                         autoIndent: 'full',
                         insertSpaces: false,
                         tabSize: 4,
-                        padding: { top: 16 },
+                        padding: {top: 16},
                         formatOnPaste: true,
                         formatOnType: true,
                         wordWrap: 'on',
@@ -243,7 +243,7 @@ const MonacoEditorWrapper = ({ language, defaultValue, onChange }) => {
         <div
             ref={containerRef}
             className="h-full w-full rounded-lg border border-slate-700"
-            style={{ visibility: isEditorReady ? 'visible' : 'hidden' }}
+            style={{visibility: isEditorReady ? 'visible' : 'hidden'}}
         />
     )
 }
@@ -254,7 +254,7 @@ interface ThemeEditorProps {
     onCancel: () => void
 }
 
-export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProps) {
+export default function ThemeEditor({theme, onSave, onCancel}: ThemeEditorProps) {
     const [currentTheme, setCurrentTheme] = useState<Theme>(theme)
     const [isPreviewVisible, setIsPreviewVisible] = useState(true)
     const [validationResult, setValidationResult] = useState<any>(null)
@@ -307,7 +307,7 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
             const blockedError = checkForBlockedElements(htmlRef.current)
             if (blockedError) {
                 setError(blockedError)
-                setValidationResult({ valid: false, error: blockedError })
+                setValidationResult({valid: false, error: blockedError})
                 return false
             }
 
@@ -335,12 +335,12 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
             }
 
             setError('')
-            setValidationResult({ valid: true })
+            setValidationResult({valid: true})
             return true
         } catch (e) {
             console.error('Validation error:', e)
             setError('Failed to validate theme content')
-            setValidationResult({ valid: false, error: 'Validation failed' })
+            setValidationResult({valid: false, error: 'Validation failed'})
             return false
         } finally {
             setIsValidating(false)
@@ -349,7 +349,7 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
 
     // Handle HTML editor changes
     const handleHtmlChange = newValue => {
-        setCurrentTheme(prev => ({ ...prev, html: newValue }))
+        setCurrentTheme(prev => ({...prev, html: newValue}))
         htmlRef.current = newValue
 
         // Debounce validation
@@ -363,7 +363,7 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
 
     // Handle CSS editor changes
     const handleCssChange = newValue => {
-        setCurrentTheme(prev => ({ ...prev, css: newValue }))
+        setCurrentTheme(prev => ({...prev, css: newValue}))
         cssRef.current = newValue
 
         // Debounce validation
@@ -388,12 +388,12 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
 
     // Handle name change
     const handleNameChange = (name: string) => {
-        setCurrentTheme(prev => ({ ...prev, name }))
+        setCurrentTheme(prev => ({...prev, name}))
     }
 
     // Handle active toggle
     const handleActiveToggle = (is_active: boolean) => {
-        setCurrentTheme(prev => ({ ...prev, is_active }))
+        setCurrentTheme(prev => ({...prev, is_active}))
     }
 
     // Generate preview HTML
@@ -427,7 +427,7 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
         </html>
     `
 
-    const tabs = [{ label: 'HTML' }, { label: 'CSS' }]
+    const tabs = [{label: 'HTML'}, {label: 'CSS'}]
 
     return (
         <div className="h-full flex flex-col">
@@ -461,8 +461,8 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
 
                 <div className="flex items-center space-x-2">
                     <Button onClick={() => setIsPreviewVisible(!isPreviewVisible)} outline={true}
-                        className="flex items-center space-x-2">
-                        {isPreviewVisible ? <EyeSlashIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+                            className="flex items-center space-x-2">
+                        {isPreviewVisible ? <EyeSlashIcon className="h-4 w-4"/> : <EyeIcon className="h-4 w-4"/>}
                         <span>{isPreviewVisible ? 'Hide' : 'Show'} Preview</span>
                     </Button>
                     <Button onClick={validateTheme} outline={true} disabled={isValidating}>
@@ -480,13 +480,13 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
                 <div className="mb-4">
                     {validationResult.valid ? (
                         <Alert>
-                            <CheckCircleIcon className="h-4 w-4" />
+                            <CheckCircleIcon className="h-4 w-4"/>
                             <AlertTitle>Theme validation passed</AlertTitle>
                             <AlertDescription>Your theme looks good and is safe to use.</AlertDescription>
                         </Alert>
                     ) : (
                         <Alert variant="destructive">
-                            <XCircleIcon className="h-4 w-4" />
+                            <XCircleIcon className="h-4 w-4"/>
                             <AlertTitle>Theme validation failed</AlertTitle>
                             <AlertDescription>
                                 {validationResult.error || 'Your theme contains potentially unsafe content that will be sanitized.'}
@@ -500,7 +500,7 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
             {error && (
                 <div className="mb-4">
                     <Alert variant="destructive">
-                        <XCircleIcon className="h-4 w-4" />
+                        <XCircleIcon className="h-4 w-4"/>
                         <AlertTitle>Validation Error</AlertTitle>
                         <AlertDescription>
                             {error.split('\n').map((line, index) => (
@@ -515,16 +515,16 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
             <div className="flex-1 flex space-x-4 overflow-hidden">
                 {/* Editor Panel */}
                 <div className="flex-1 flex flex-col">
-                    <Tabs items={tabs} selectedIndex={activeTabIndex} onChange={setActiveTabIndex} />
+                    <Tabs items={tabs} selectedIndex={activeTabIndex} onChange={setActiveTabIndex}/>
 
                     <div className="flex-1 border rounded-lg overflow-hidden mt-4">
                         {activeTabIndex === 0 && (
                             <MonacoEditorWrapper language="html" defaultValue={currentTheme.html}
-                                onChange={handleHtmlChange} />
+                                                 onChange={handleHtmlChange}/>
                         )}
                         {activeTabIndex === 1 && (
                             <MonacoEditorWrapper language="css" defaultValue={currentTheme.css}
-                                onChange={handleCssChange} />
+                                                 onChange={handleCssChange}/>
                         )}
                     </div>
                 </div>
@@ -537,7 +537,7 @@ export default function ThemeEditor({ theme, onSave, onCancel }: ThemeEditorProp
                         </div>
                         <div className="flex-1 border rounded-lg overflow-hidden bg-white">
                             <iframe className="w-full h-full" srcDoc={previewHtml} sandbox="allow-same-origin"
-                                title="Theme Preview" />
+                                    title="Theme Preview"/>
                         </div>
                     </div>
                 )}

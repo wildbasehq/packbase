@@ -2,18 +2,17 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-// src/components/feed/feed.tsx
-import {Activity, useEffect} from 'react'
-import {useSession} from '@clerk/clerk-react'
+import {isVisible} from '@/lib'
 import {useResourceStore, useUIStore} from '@/lib/state'
-import {FeedProps} from './types/feed'
+import PackbaseInstance from '@/lib/workers/global-event-emit'
+import {useSession} from '@clerk/clerk-react'
+import {Activity, useEffect} from 'react'
 import {FeedError, FeedList, FeedLoading, FeedMaintenance} from '.'
+import {useFeedHandlers} from './hooks/use-feed-handlers'
 import {useFeedPagination} from './hooks/use-feed-pagination'
 import {useFeedQuery} from './hooks/use-feed-query'
 import {useFeedTitle} from './hooks/use-feed-title'
-import {useFeedHandlers} from './hooks/use-feed-handlers'
-import PackbaseInstance from "@/lib/workers/global-event-emit.ts";
-import {isVisible} from "@/lib";
+import {FeedProps} from './types/feed'
 
 export default function Feed({
                                  packID,
@@ -68,7 +67,7 @@ export default function Feed({
     if (error) {
         return <FeedError error={error as Error}/>
     }
-    
+
     return (
         <div className="pb-20 max-w-3xl space-y-4 mx-auto">
             <Activity mode={isVisible(isLoading)}>

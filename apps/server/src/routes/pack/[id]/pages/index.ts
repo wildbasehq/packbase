@@ -1,10 +1,10 @@
-import {YapockType} from '@/index'
-import {PackPageCreateBody, PackPageEditBody, PackPageReorderBody} from '@/models/defs'
-import {HTTPError} from '@/lib/HTTPError'
 import prisma from '@/db/prisma'
-import {PackCache} from '../index'
-import requiresToken from '@/utils/identity/requires-token'
+import {YapockType} from '@/index'
+import {HTTPError} from '@/lib/HTTPError'
 import PackMan from '@/lib/packs/PackMan'
+import {PackPageCreateBody, PackPageEditBody, PackPageReorderBody} from '@/models/defs'
+import {PackCache} from '@/routes/pack/[id]'
+import requiresToken from '@/utils/identity/requires-token'
 
 export default (app: YapockType) =>
     app.group('', (app) =>
