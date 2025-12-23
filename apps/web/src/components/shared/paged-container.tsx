@@ -79,14 +79,14 @@ export default function PagedContainer({
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        if (!!pages && page > pages) {
-            setSearchParams({page: '1'})
+        if ((!!pages && page > pages) || page <= 1) {
+            setSearchParams({page: '1'}, {replace: true})
             return
         }
         setLoading(true)
         onNeedsContent(page).then(status => {
             setLoading(false)
-            if (status === PagedContentLoadStatus.ERROR) setSearchParams({page: '1'})
+            if (status === PagedContentLoadStatus.ERROR) setSearchParams({page: '1'}, {replace: true})
         })
 
         if (pages) {
