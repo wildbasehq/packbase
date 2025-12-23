@@ -118,12 +118,12 @@ export default function Routes() {
                                     <MeEverythingPage/>
                                 </Suspense>
                             </Route>
-                        </PackLayout>
 
-                        {/* Fallback */}
-                        <Route>
-                            <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}` : '~/@me'}/>
-                        </Route>
+                            {/* Fallback */}
+                            <Route>
+                                <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}` : '~/@me'}/>
+                            </Route>
+                        </PackLayout>
                     </Switch>
                 </RequiresAccount>
             </Route>
