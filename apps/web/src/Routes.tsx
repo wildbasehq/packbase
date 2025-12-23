@@ -107,6 +107,11 @@ export default function Routes() {
                         </Route>
 
                         <PackLayout>
+                            {/* Fallback */}
+                            <Route path="/">
+                                <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}` : '~/@me'}/>
+                            </Route>
+
                             <Route path="/following">
                                 <Suspense fallback={<LoadingFallback/>}>
                                     <MeFollowingPage/>
@@ -117,11 +122,6 @@ export default function Routes() {
                                 <Suspense fallback={<LoadingFallback/>}>
                                     <MeEverythingPage/>
                                 </Suspense>
-                            </Route>
-
-                            {/* Fallback */}
-                            <Route>
-                                <Redirect to={resourceDefault ? `~/p/${resourceDefault.slug}` : '~/@me'}/>
                             </Route>
                         </PackLayout>
                     </Switch>
