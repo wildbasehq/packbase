@@ -86,12 +86,17 @@ const RetentionOrders = {
 export const termsConfig: TermsConfig = {
     header: {
         title: 'Packbase Usage Policy and Data Handling',
-        lastUpdated: 'October 16, 2025',
+        lastUpdated: 'December 27, 2025',
     },
     retentionOrder: Object.values(RetentionOrders),
     dataCollection: [
         {
-            type: 'Email address',
+            type: 'Verified Email address',
+            purpose: 'Account identification and communication',
+            retention: RetentionOrders.UNTIL_WID_DEL,
+        },
+        {
+            type: 'Verified Phone Number',
             purpose: 'Account identification and communication',
             retention: RetentionOrders.UNTIL_WID_DEL,
         },
@@ -365,13 +370,13 @@ export const termsConfig: TermsConfig = {
                     content: [
                         {
                             type: 'text',
-                            content: 'All accounts must maintain PG-13 appropriate content (unless explicitly stated in "Afterdark" section). The following are prohibited:',
+                            content: 'All accounts must maintain PG-13 appropriate content (unless explicitly stated in "R18 Account" section). The following are prohibited:',
                         },
                         {
                             type: 'list',
                             listType: 'unordered',
                             items: [
-                                'Adult or sexually explicit content outside of an Afterdark Account',
+                                'Adult or sexually explicit content outside of an R18 Account',
                                 'Extreme violence or gore',
                                 'Harassment or bullying, as defined by the eSafety Commissioner Australia.',
                                 'Condoning, advocating, or displaying the use of illegal substances or activities',
@@ -390,11 +395,11 @@ export const termsConfig: TermsConfig = {
                 {
                     type: 'card',
                     style: 'warning',
-                    title: 'Afterdark (18+) Account Guidelines',
+                    title: 'R18 Account Guidelines',
                     content: [
                         {
                             type: 'text',
-                            content: 'Afterdark accounts gain permission to use R18 content labels, and may post adult artwork content under strict rules:',
+                            content: 'R18 Accounts gain permission to use R18 content labels, and may post adult artwork content under strict rules:',
                         },
                         {
                             type: 'list',
@@ -404,7 +409,7 @@ export const termsConfig: TermsConfig = {
                                 'All adult or sexually explicit artwork MUST be tagged with their respective "Content Label", and must tag anything within the content, based on "what you see". Some tags may be allowed under "What you know", but cannot be used to evade Packbase\'s terms.',
                                 'No minors or youthful-looking characters; all depictions must be clearly 18+.',
                                 'Cross-posting adult content to Standard accounts is prohibited.',
-                                'Depending on your region, you may need to complete age verification to enable Afterdark to publish or view adult content.',
+                                'Depending on your region, you may need to complete age verification to enable R18 to publish or view adult content.',
                             ],
                         },
                         {
