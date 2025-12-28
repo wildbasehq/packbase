@@ -48,7 +48,6 @@ export default (app: YapockType) =>
                                 data: {default_pack: id},
                             })
                         }
-
                     } catch (insertError) {
                         set.status = 400
                         throw HTTPError.badRequest({
