@@ -35,20 +35,16 @@ export default (app: YapockType) =>
                             },
                         })
 
-                        // First membership? Set their default_pack
-                        const userMemberships = await prisma.packs_memberships.count({
+                        await prisma.profiles.updateMany({
                             where: {
-                                user_id: user.sub,
+                                id: user.sub,
+                                default_pack: null
                             },
+                            data: {
+                                default_pack: id
+                            }
                         })
-
-                        if (userMemberships === 1) {
-                            await prisma.profiles.update({
-                                where: {id: user.sub},
-                                data: {default_pack: id},
-                            })
-                        }
-
+                        
                     } catch (insertError) {
                         set.status = 400
                         throw HTTPError.badRequest({
