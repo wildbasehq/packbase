@@ -128,7 +128,7 @@ model posts {
 
   pack      packs             @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
   channel   packs_pages?      @relation(fields: [channel_id], references: [id], onDelete: SetNull)
-  author    profiles          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user      profiles          @relation(fields: [user_id], references: [id], onDelete: Cascade)
   reactions posts_reactions[]
 
   tags           String[]

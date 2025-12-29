@@ -10,8 +10,8 @@ import {Heading, Text} from '@/components/shared/text'
 import {isVisible, useUserAccountStore} from '@/lib'
 import {useContentFrame, useContentFrameMutation} from '@/lib/hooks/content-frame'
 import {queryBuildFromRaw} from '@/lib/utils/query-build-from-raw'
-import {Field, SidebarItem} from '@/src/components'
-import {PencilSquareIcon, PlusIcon, TrashIcon} from '@heroicons/react/24/solid'
+import {Dropdown, DropdownButton, DropdownItem, DropdownMenu, Field, SidebarItem} from '@/src/components'
+import {EllipsisHorizontalIcon, PencilSquareIcon, PlusIcon, TrashIcon} from '@heroicons/react/24/solid'
 import {Activity, useMemo, useState} from 'react'
 
 export type Folder = {
@@ -32,7 +32,7 @@ function FolderForm({
     const [name, setName] = useState(initial?.name || '')
     const [description, setDescription] = useState(initial?.description || '')
     const [emoji, setEmoji] = useState(initial?.emoji || '📁')
-    const [query, setQuery] = useState((initial?.query?.match(/\[Where posts:tags \((.*?)\) AND posts:user_id \(".*?"\)\] AS \*/)?.[1] || '').trim().replaceAll('"', '').replaceAll('~', '') || '')
+    const [query, setQuery] = useState(initial?.query)
 
     const canSave = useMemo(() => {
         if (!name.trim()) return false
@@ -163,10 +163,6 @@ function Folder({folder, user, refetch}: {
     const deleteMutation = useContentFrameMutation('delete', `folder.${folder.id}`, {onSuccess: () => refetch()})
 
     const onUpdate = async (input: Partial<Folder>) => {
-        if (input.query && !input.query.startsWith('[')) {
-            input.query = `$posts = [Where posts:tags (${queryBuildFromRaw(input.query)}) AND posts:user_id ("${user.id}")] AS *;\n$posts:user = [Where profiles:id ("${user.id}")] AS *;`
-        }
-
         await updateMutation.mutateAsync(input)
         hide()
     }
@@ -178,8 +174,8 @@ function Folder({folder, user, refetch}: {
     return (
         <SidebarItem key={folder.id} className="group"
                      href={`/@${user.username}/folders/${folder.id}`}>
-            <div className="flex items-start justify-between gap-2">
-                <div className="flex flex-1 w-full">
+            <div className="flex items-center w-full">
+                <div className="flex w-full grow">
                     <span className="text-xl" aria-hidden>{folder.emoji || '📁'}</span>
                     <div className="flex flex-col gap-1 ml-2" aria-hidden="true">
                         <div
@@ -192,18 +188,26 @@ function Folder({folder, user, refetch}: {
                 </div>
 
                 {user.id === currentUser?.id && (
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
-                        <div onClick={() => show(<FolderForm
-                            initial={folder}
-                            onCancel={() => hide()}
-                            onSave={(input) => onUpdate(input)}
-                        />)}>
-                            <PencilSquareIcon className="h-4 w-4"/>
-                        </div>
-                        <div onClick={() => onDelete()}>
-                            <TrashIcon className="h-4 w-4"/>
-                        </div>
-                    </div>
+                    <Dropdown>
+                        <DropdownButton as="div">
+                            <div className="ml-2 cursor-pointer opacity-0 group-hover:opacity-100 rounded-full p-1 transition ring-ring hover:ring-2">
+                                <EllipsisHorizontalIcon className="h-5 w-5"/>
+                            </div>
+                        </DropdownButton>
+                        <DropdownMenu>
+                            <DropdownItem onClick={() => show(<FolderForm
+                                initial={folder}
+                                onCancel={() => hide()}
+                                onSave={(input) => onUpdate(input)}
+                            />)}>
+                                <PencilSquareIcon/> Edit
+                            </DropdownItem>
+
+                            <DropdownItem onClick={() => onDelete()} className="hover:bg-red-600! *:data-[slot=icon]:fill-red-500! hover:*:data-[slot=icon]:fill-white!">
+                                <TrashIcon/> Delete
+                            </DropdownItem>
+                        </DropdownMenu>
+                    </Dropdown>
                 )}
             </div>
         </SidebarItem>

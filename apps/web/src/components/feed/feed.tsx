@@ -19,6 +19,7 @@ export default function Feed({
                                  channelID,
                                  feedQueryOverride,
                                  titleOverride,
+                                 folderID,
                              }: FeedProps) {
     const {maintenance} = useUIStore()
     const {currentResource} = useResourceStore()
@@ -29,6 +30,7 @@ export default function Feed({
     const {posts, hasMore, isLoading, error, isSearch, queryKey} = useFeedQuery({
         packID,
         channelID,
+        folderID,
         feedQueryOverride,
         page,
         isSignedIn,

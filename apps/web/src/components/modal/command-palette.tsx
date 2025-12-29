@@ -169,6 +169,8 @@ function useCommandPaletteSearch() {
                     allowedTables = ['profiles']
                 } else if (debouncedRawQuery.startsWith('#')) {
                     allowedTables = ['packs']
+                } else if (debouncedRawQuery.startsWith('tags:')) {
+                    allowedTables = ['posts']
                 }
 
                 let finalQuery = query.trim()
@@ -484,12 +486,12 @@ function CommandPaletteResultsList({
 
                     {rawQuery === '?' && !isLoading && (
                         <div
-                            className="px-6 py-14 text-center text-sm sm:px-14"
+                            className="px-6 py-14 text-sm sm:px-14"
                             role="status"
                             aria-live="polite"
                         >
                             <LifebuoyIcon
-                                className="mx-auto size-6 text-muted-foreground"
+                                className="size-6 text-muted-foreground"
                                 aria-hidden="true"
                             />
                             <p className="mt-4 text-sm font-semibold text-foreground">
@@ -513,6 +515,27 @@ function CommandPaletteResultsList({
                                         #
                                     </kbd>{' '}
                                     Search packs only
+                                </li>
+                                <li>
+                                    Prefix your search with `tags:` to begin a tag-based search:
+                                    <ul className="ml-4 my-2 space-y-1 text-xs text-muted-foreground">
+                                        <li>
+                                            ↳ Tags prefixed with{' '}
+                                            <kbd
+                                                className="rounded border border-border bg-card px-1 py-0.5 text-[11px] font-mono">
+                                                ~
+                                            </kbd>{' '}
+                                            will search for ANY matching tags prefixed with that.
+                                        </li>
+                                        <li>
+                                            ↳ Tags prefixed with{' '}
+                                            <kbd
+                                                className="rounded border border-border bg-card px-1 py-0.5 text-[11px] font-mono">
+                                                -
+                                            </kbd>{' '}
+                                            will exclude results with that tag.
+                                        </li>
+                                    </ul>
                                 </li>
                                 <li>
                                     Type anything else to search across everything.
@@ -600,7 +623,7 @@ function CommandPaletteFooter({rawQuery}: { rawQuery: string }) {
                 >
                     ?
                 </kbd>
-                <span>for help.</span>
+                <span>for more.</span>
             </div>
             <div className="flex items-center gap-1 text-[10px] text-muted-foreground sm:text-[11px]">
                 <span className="hidden sm:inline">Shortcut</span>

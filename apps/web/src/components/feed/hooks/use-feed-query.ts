@@ -2,12 +2,13 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {FeedPageResult, fetchFeedPage, fetchSearchPage} from '@/lib/api/feed'
+import {FeedPageResult, fetchFeedPage, fetchFolderPage, fetchSearchPage} from '@/lib/api/feed'
 import {useQuery} from '@tanstack/react-query'
 
 interface UseFeedQueryProps {
     packID: string
     channelID?: string
+    folderID?: string
     feedQueryOverride?: string
     page: number
     isSignedIn?: boolean
@@ -16,14 +17,16 @@ interface UseFeedQueryProps {
 export function useFeedQuery({
                                  packID,
                                  channelID,
+                                 folderID,
                                  feedQueryOverride,
                                  page,
                                  isSignedIn,
                              }: UseFeedQueryProps) {
     const hasChannelID = Boolean(channelID)
     const hasFeedQuery = Boolean(feedQueryOverride)
+    const isFolder = Boolean(folderID)
     const isSearch = hasChannelID || hasFeedQuery
-    const queryKey = isSearch ? ['search', channelID, feedQueryOverride, page] : ['feed', packID, page]
+    const queryKey = isSearch ? ['search', channelID, feedQueryOverride, page] : isFolder ? ['folder', folderID, page] : ['feed', packID, page]
 
     const {data, error, isLoading, refetch} = useQuery<FeedPageResult>({
         // but this stops that behaviour.
@@ -35,6 +38,12 @@ export function useFeedQuery({
                 return fetchSearchPage({
                     channelID: channelID!,
                     q: feedQueryOverride,
+                    page,
+                })
+            } else if (isFolder) {
+                console.log('Fetching folder page', {folderID, page})
+                return fetchFolderPage({
+                    folderID: folderID!,
                     page,
                 })
             } else {
