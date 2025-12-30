@@ -1,20 +1,15 @@
-import StarterKit from '@tiptap/starter-kit'
+import {InputRule} from '@tiptap/core'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Placeholder from '@tiptap/extension-placeholder'
+import {TextStyle} from '@tiptap/extension-text-style'
 import TiptapUnderline from '@tiptap/extension-underline'
-import TextStyle from '@tiptap/extension-text-style'
+import StarterKit from '@tiptap/starter-kit'
 import {Markdown} from 'tiptap-markdown'
-import SlashCommand from './slash-command'
-import {InputRule} from '@tiptap/core'
-import UpdatedImage from './updated-image'
 import CustomKeymap from './custom-keymap'
+import SlashCommand from './slash-command'
 
 export const defaultExtensions = [
     StarterKit.configure({
-        history: {
-            depth: 100,
-            newGroupDelay: 500,
-        },
         heading: {
             levels: [1, 2, 3],
             HTMLAttributes: {
@@ -97,7 +92,7 @@ export const defaultExtensions = [
             if (node.type.name === 'heading') {
                 return `Heading ${node.attrs.level}`
             }
-            return "What's on your mind?"
+            return 'What\'s on your mind?'
         },
         includeChildren: true,
     }),
@@ -121,7 +116,7 @@ export const defaultExtensions = [
     //     nested: true,
     // }),
     Markdown.configure({
-        html: false,
+        html: true,
         transformCopiedText: true,
         transformPastedText: true,
     }),

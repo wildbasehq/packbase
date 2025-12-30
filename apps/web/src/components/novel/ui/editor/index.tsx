@@ -1,28 +1,29 @@
-import {useEffect, useState} from 'react'
-import {EditorContent, JSONContent, useEditor} from '@tiptap/react'
-import {defaultEditorProps} from './props'
-import {defaultExtensions} from './extensions'
 import useLocalStorage from '@/components/novel/lib/hooks/use-local-storage'
-import {useDebouncedCallback} from 'use-debounce'
-import {EditorBubbleMenu} from './bubble-menu'
-import {EditorProps} from '@tiptap/pm/view'
-import {Editor as EditorClass, Extensions} from '@tiptap/core'
-import {NovelContext} from './provider'
+import { Editor as EditorClass, Extensions } from '@tiptap/core'
+import { EditorProps } from '@tiptap/pm/view'
+import { EditorContent, JSONContent, useEditor } from '@tiptap/react'
+import { useEffect, useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
+import { EditorBubbleMenu } from './bubble-menu'
+import { defaultExtensions } from './extensions'
+import { defaultEditorProps } from './props'
+import { NovelContext } from './provider'
 
 export default function Editor({
-                                   completionApi = '/api/kukiko/generate',
-                                   className = 'relative w-full',
-                                   defaultValue = '',
-                                   extensions = [],
-                                   editorProps = {},
-                                   onUpdate = () => {
-                                   },
-                                   onDebouncedUpdate = () => {
-                                   },
-                                   debounceDuration = 750,
-                                   storageKey = 'novel__content',
-                                   disableLocalStorage = true,
-                               }: {
+    completionApi = '/api/kukiko/generate',
+    className = 'relative w-full',
+    defaultValue = '',
+    extensions = [],
+    editorProps = {},
+    onUpdate = () => {
+    },
+    onDebouncedUpdate = () => {
+    },
+    debounceDuration = 750,
+    storageKey = 'novel__content',
+    disableLocalStorage = true,
+    readOnly = false,
+}: {
     /**
      * The API route to use for the OpenAI completion API.
      * Defaults to "/api/generate".
@@ -75,12 +76,16 @@ export default function Editor({
      * Defaults to false.
      */
     disableLocalStorage?: boolean
+    /**
+     * Whether to make the editor read-only.
+     */
+    readOnly?: boolean
 }) {
     const [content, setContent] = useLocalStorage(storageKey, defaultValue)
 
     const [hydrated, setHydrated] = useState(false)
 
-    const debouncedUpdates = useDebouncedCallback(async ({editor}) => {
+    const debouncedUpdates = useDebouncedCallback(async ({ editor }) => {
         const json = editor.getJSON()
         onDebouncedUpdate(editor)
 
@@ -95,6 +100,7 @@ export default function Editor({
             ...defaultEditorProps,
             ...editorProps,
         },
+        editable: !readOnly,
         onUpdate: (e) => {
             // const selection = e.editor.state.selection
             // const lastTwo = getPrevText(e.editor, {
@@ -127,14 +133,16 @@ export default function Editor({
         >
             <div
                 onClick={() => {
-                    editor?.chain().focus().run()
+                    if (!readOnly) {
+                        editor?.chain().focus().run()
+                    }
                 }}
                 className={className}
             >
-                {editor && <EditorBubbleMenu editor={editor}/>}
+                {editor && !readOnly && <EditorBubbleMenu editor={editor} />}
                 {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
                 <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full">
-                    <EditorContent editor={editor}/>
+                    <EditorContent editor={editor} />
                 </div>
             </div>
         </NovelContext.Provider>

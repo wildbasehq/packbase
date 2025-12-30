@@ -5,7 +5,8 @@
 import {EyeMovingIcon} from '@/components/home/eye-moving'
 import {HeroCardMarquee} from '@/components/home/hero-card-marquee'
 import {Heading} from '@/components/shared/text'
-import {Logo} from '@/src/components'
+import {UserProfileBasic} from '@/lib'
+import {FeedPostData, Logo, ThreadPost} from '@/src/components'
 import NoAIBadge from '@/src/images/svg/noai/created.svg'
 import {BanknotesIcon} from '@heroicons/react/24/solid'
 import {motion} from 'motion/react'
@@ -61,7 +62,7 @@ function Hero() {
                         <span className="inline-flex w-3 sm:w-4 md:w-6"/>
                     </motion.span>
 
-                    <span className="flex flex-wrap max-w-full">
+                    <span className="flex flex-wrap max-w-full font-new-spirit-bold">
                         {'The Internet you were promised'.split(' ').map((word, i) => (
                             <motion.span
                                 key={`${word}-${i}`}
@@ -83,6 +84,124 @@ function Hero() {
                     No tracking, no ads, no lies, just pure unleashed social owned by you.
                 </motion.p>
             </motion.div>
+        </div>
+    )
+}
+
+const USERPROFILES: UserProfileBasic[] = [
+    {
+        id: '3e133370-0ec2-4825-b546-77de3804c8b1',
+        username: 'rek',
+        slug: 'rek',
+        display_name: 'Rekki',
+        type: '2'
+    },
+    {
+        id: 'user2',
+        username: 'staff',
+        display_name: 'Packbase Staff',
+        slug: 'packbase',
+        images: {
+            avatar: '/avatars/packbase.png',
+            header: '/headers/packbase-header.png',
+        },
+        type: '1',
+    }
+]
+
+function FeatureThreads() {
+    const THREAD_POSTS: FeedPostData[] = [
+        {
+            id: 'post1',
+            user: USERPROFILES[1],
+            body: {
+                type: 'doc',
+                content: [
+                    {
+                        type: 'paragraph',
+                        content: [
+                            {
+                                type: 'text',
+                                text: '"Community" sites on the WWW is flawed.',
+                            }
+                        ],
+                    },
+                    {
+                        type: 'paragraph',
+                        content: []
+                    },
+                    {
+                        type: 'paragraph',
+                        content: [
+                            {
+                                type: 'text',
+                                text: `There's no sense of ownership, no respect for data, rampant misinformation, and where the f##k did custom HTML/CSS themes go???\n`
+                            }
+                        ],
+                    },
+                    {
+                        type: 'paragraph',
+                        content: [
+                            {
+                                type: 'text',
+                                text: `Now you have to give your ID to just to message someone! Riveting...`
+                            }
+                        ],
+                    }
+                ],
+            },
+            created_at: new Date().toISOString(),
+            comments: [{
+                id: 'comment1',
+                user: USERPROFILES[0],
+                body: {
+                    type: 'doc',
+                    content: [
+                        {
+                            type: 'paragraph',
+                            content: [
+                                {
+                                    type: 'text',
+                                    text: 'apparently I\'m a minor according to Epic Games\' own "KWS", even with a Gov\'t ID. sure...',
+                                    marks: [
+                                        {
+                                            type: 'italic'
+                                        }
+                                    ]
+                                }
+                            ],
+                        }
+                    ]
+                },
+                created_at: new Date().toISOString(),
+            }]
+        },
+        {
+            id: 'post2',
+            user: USERPROFILES[0],
+            body: {
+                type: 'doc',
+                content: [
+                    {
+                        type: 'paragraph',
+                        content: [
+                            {
+                                type: 'text',
+                                text: `It doesn't have to be like this, though. I'm saying something here\n\nany maybe down here that catches your attention! woah!`,
+                            }
+                        ],
+                    }
+                ]
+            },
+            created_at: new Date().toISOString(),
+        },
+    ]
+
+    return (
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 mt-32 pb-16 space-y-12">
+            {THREAD_POSTS.map(post => (
+                <ThreadPost key={post.id} post={post}/>
+            ))}
         </div>
     )
 }
@@ -120,6 +239,8 @@ export default function GuestLanding() {
             <div
                 className="relative overflow-hidden z-10 bg-neutral-900">
                 <Hero/>
+
+                <FeatureThreads/>
             </div>
 
             {/* Minimal footer */}

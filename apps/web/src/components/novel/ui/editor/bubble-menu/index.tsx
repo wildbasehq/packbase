@@ -1,8 +1,9 @@
-import { BubbleMenu, BubbleMenuProps, isNodeSelection } from '@tiptap/react'
-import { FC, useState } from 'react'
-import { BoldIcon, CodeIcon, ItalicIcon, StrikethroughIcon, UnderlineIcon } from 'lucide-react'
-import { NodeSelector } from './node-selector'
-import { cn } from '@/lib/utils'
+import {cn} from '@/lib/utils'
+import {isNodeSelection} from '@tiptap/react'
+import {BubbleMenu, BubbleMenuProps} from '@tiptap/react/menus'
+import {BoldIcon, CodeIcon, ItalicIcon, StrikethroughIcon, UnderlineIcon} from 'lucide-react'
+import {FC, useState} from 'react'
+import {NodeSelector} from './node-selector'
 
 export interface BubbleMenuItem {
     name: string
@@ -60,24 +61,16 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = props => {
 
     const bubbleMenuProps: EditorBubbleMenuProps = {
         ...props,
-        shouldShow: ({ state, editor }) => {
-            const { selection } = state
-            const { empty } = selection
+        shouldShow: ({state, editor}) => {
+            const {selection} = state
+            const {empty} = selection
 
             // don't show bubble menu if:
             // - the selected node is an image
             // - the selection is empty
             // - the selection is a node selection (for drag handles)
             return !(editor.isActive('image') || empty || isNodeSelection(selection))
-        },
-        tippyOptions: {
-            moveTransition: 'transform 0.15s ease-out',
-            onHidden: () => {
-                setIsNodeSelectorOpen(false)
-                setIsColorSelectorOpen(false)
-                setIsLinkSelectorOpen(false)
-            },
-        },
+        }
     }
 
     const [isNodeSelectorOpen, setIsNodeSelectorOpen] = useState(false)
