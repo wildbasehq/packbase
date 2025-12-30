@@ -57,7 +57,8 @@ export default (app: YapockType) =>
                         },
                         user,
                         offset: parseInt(offset),
-                        howlIDs: folder.howl_ids
+                        howlIDs: folder.howl_ids,
+                        user_id: folder.user_id
                     })
                 }
             },

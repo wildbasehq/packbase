@@ -53,11 +53,12 @@ const SearchEndpoint = (app: YapockType) =>
         },
     )
 
-export async function SearchAPI({query, user, howlIDs, offset}: {
+export async function SearchAPI({query, user, howlIDs, offset, user_id}: {
     query: Record<string, any>
     user?: { sub: string; id: string }
     howlIDs?: string[]
     offset?: number
+    user_id?: string
 }) {
     const timeStart = Date.now()
     try {
@@ -86,6 +87,11 @@ export async function SearchAPI({query, user, howlIDs, offset}: {
             if (hasEvery.length) where.tags = {...(where.tags ?? {}), hasEvery}
             if (hasSome.length) where.tags = {...(where.tags ?? {}), hasSome}
             if (exclude.length) where.NOT = {tags: {hasSome: exclude}}
+
+            // user_id filter
+            if (user_id) {
+                where.user_id = user_id
+            }
 
             // Check howl_ids, if present, make sure they're included regardless of tags
             if (howlIDs && howlIDs.length > 0) {
