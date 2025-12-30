@@ -6,6 +6,7 @@ import PostSettingsModal from '@/components/howl-creator/post-settings-modal'
 import {Camera, HardDisk} from '@/components/icons/plump'
 import {ChatBubbleExclamation} from '@/components/icons/plump/chat-bubble-exclamation'
 import {useModal} from '@/components/modal/provider'
+import {markdownExtensions} from '@/components/novel/ui/editor/extensions'
 import Tooltip from '@/components/shared/tooltip'
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
 import getInitials from '@/lib/utils/get-initials'
@@ -340,6 +341,7 @@ function FloatingComposeContent({
 
                 {!user?.requires_setup && (
                     <Editor
+                        extensions={markdownExtensions}
                         defaultValue={body}
                         onUpdate={e => {
                             editorRef.current = e

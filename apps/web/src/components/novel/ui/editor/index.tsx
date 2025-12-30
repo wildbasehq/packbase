@@ -1,16 +1,14 @@
-import {useEffect, useState} from 'react'
-import {EditorContent, JSONContent, useEditor} from '@tiptap/react'
-import {defaultEditorProps} from './props'
-import {defaultExtensions} from './extensions'
-import useLocalStorage from '@/components/novel/lib/hooks/use-local-storage'
-import {useDebouncedCallback} from 'use-debounce'
-import {EditorBubbleMenu} from './bubble-menu'
-import {EditorProps} from '@tiptap/pm/view'
+import {EditorBubbleMenu} from '@/components/novel/ui/editor/bubble-menu'
 import {Editor as EditorClass, Extensions} from '@tiptap/core'
-import {NovelContext} from './provider'
+import {EditorProps} from '@tiptap/pm/view'
+import {EditorContent, JSONContent, useEditor} from '@tiptap/react'
+import {useEffect, useState} from 'react'
+import {useDebouncedCallback} from 'use-debounce'
+import {useLocalStorage} from 'usehooks-ts'
+import {defaultExtensions} from './extensions'
+import {defaultEditorProps} from './props'
 
 export default function Editor({
-                                   completionApi = '/api/kukiko/generate',
                                    className = 'relative w-full',
                                    defaultValue = '',
                                    extensions = [],
@@ -22,12 +20,8 @@ export default function Editor({
                                    debounceDuration = 750,
                                    storageKey = 'novel__content',
                                    disableLocalStorage = true,
+                                   showBubble = false,
                                }: {
-    /**
-     * The API route to use for the OpenAI completion API.
-     * Defaults to "/api/generate".
-     */
-    completionApi?: string
     /**
      * Additional classes to add to the editor container.
      * Defaults to "relative min-h-[500px] w-full max-w-(--breakpoint-lg) border-stone-200 bg-white sm:mb-[calc(20vh)] sm:rounded-lg sm:border sm:shadow-lg".
@@ -75,6 +69,11 @@ export default function Editor({
      * Defaults to false.
      */
     disableLocalStorage?: boolean
+    /**
+     * Whether to show the bubble menu.
+     * Defaults to true.
+     */
+    showBubble?: boolean
 }) {
     const [content, setContent] = useLocalStorage(storageKey, defaultValue)
 
@@ -120,23 +119,17 @@ export default function Editor({
     }, [editor, defaultValue, content, hydrated, disableLocalStorage])
 
     return (
-        <NovelContext.Provider
-            value={{
-                completionApi,
+        <div
+            onClick={() => {
+                editor?.chain().focus().run()
             }}
+            className={className}
         >
-            <div
-                onClick={() => {
-                    editor?.chain().focus().run()
-                }}
-                className={className}
-            >
-                {editor && <EditorBubbleMenu editor={editor}/>}
-                {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
-                <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full">
-                    <EditorContent editor={editor}/>
-                </div>
+            {editor && showBubble && <EditorBubbleMenu editor={editor}/>}
+            {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
+            <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full">
+                <EditorContent editor={editor}/>
             </div>
-        </NovelContext.Provider>
+        </div>
     )
 }

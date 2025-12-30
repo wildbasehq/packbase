@@ -33,6 +33,11 @@ const MeFollowingPage = lazy(() => import('@/pages/me/following/page'))
 const StoreLayout = lazy(() => import('@/pages/store/layout'))
 const StorePage = lazy(() => import('@/pages/store/page'))
 
+// Books
+const BooksLayout = lazy(() => import('@/pages/books/layout'))
+const BookList = lazy(() => import('@/pages/books/page'))
+const BookEditor = lazy(() => import('@/pages/books/editor'))
+
 // Loading fallback component
 const LoadingFallback = () => (
     <Body bodyClassName="h-full" className="h-full! items-center justify-center">
@@ -184,6 +189,24 @@ export default function Routes() {
                         </Route>
                     </Switch>
                 </RequiresAccount>
+            </Route>
+
+            {/* Books */}
+            <Route path="/books" nest>
+                <BooksLayout>
+                    <Switch>
+                        <Route path="/">
+                            <Suspense fallback={<LoadingFallback/>}>
+                                <BookList/>
+                            </Suspense>
+                        </Route>
+                        <Route path="/:id">
+                            <Suspense fallback={<LoadingFallback/>}>
+                                <BookEditor/>
+                            </Suspense>
+                        </Route>
+                    </Switch>
+                </BooksLayout>
             </Route>
 
             {/* jank */}

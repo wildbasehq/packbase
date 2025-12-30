@@ -1,13 +1,12 @@
-import StarterKit from '@tiptap/starter-kit'
+import {InputRule} from '@tiptap/core'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Placeholder from '@tiptap/extension-placeholder'
-import TiptapUnderline from '@tiptap/extension-underline'
 import TextStyle from '@tiptap/extension-text-style'
+import TiptapUnderline from '@tiptap/extension-underline'
+import StarterKit from '@tiptap/starter-kit'
 import {Markdown} from 'tiptap-markdown'
-import SlashCommand from './slash-command'
-import {InputRule} from '@tiptap/core'
-import UpdatedImage from './updated-image'
 import CustomKeymap from './custom-keymap'
+import SlashCommand from './slash-command'
 
 export const defaultExtensions = [
     StarterKit.configure({
@@ -82,11 +81,6 @@ export const defaultExtensions = [
             class: 'mt-4 mb-6 border-t border-stone-300',
         },
     }),
-    // TiptapLink.configure({
-    //     HTMLAttributes: {
-    //         class: 'text-stone-400 underline underline-offset-[3px] hover:text-stone-600 transition-colors cursor-pointer',
-    //     },
-    // }),
     // UpdatedImage.configure({
     //     HTMLAttributes: {
     //         class: 'rounded-lg border border-stone-200',
@@ -97,34 +91,25 @@ export const defaultExtensions = [
             if (node.type.name === 'heading') {
                 return `Heading ${node.attrs.level}`
             }
-            return "What's on your mind?"
+            if (window.location.pathname.startsWith('/books/')) {
+                return 'HTML Mode. Hit "/" for commands, select text for formatting...'
+            }
+
+            return 'What\'s on your mind?'
         },
         includeChildren: true,
     }),
     SlashCommand,
     TiptapUnderline,
     TextStyle,
-    // Color,
-    // Highlight.configure({
-    //     multicolor: true,
-    // }),
-    // TaskList and TaskItem are not used in the markdown renderer, so we'll keep them commented out
-    // TaskList.configure({
-    //     HTMLAttributes: {
-    //         class: "not-prose pl-2",
-    //     },
-    // }),
-    // TaskItem.configure({
-    //     HTMLAttributes: {
-    //         class: "flex items-start my-4",
-    //     },
-    //     nested: true,
-    // }),
+    CustomKeymap,
+    // DragAndDrop,
+]
+
+export const markdownExtensions = [
     Markdown.configure({
         html: false,
         transformCopiedText: true,
         transformPastedText: true,
-    }),
-    CustomKeymap,
-    // DragAndDrop,
+    })
 ]

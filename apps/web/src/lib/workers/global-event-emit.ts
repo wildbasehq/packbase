@@ -2,6 +2,8 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import {WorkerLinter} from 'harper.js'
+
 /**
  * Packbase SDK (v2): Class-based global event bus with IndexedDB persistence for plugins and their functions.
  * Not backwards compatible with previous API.
@@ -41,6 +43,7 @@ interface StoredFunctionRecord {
 declare global {
     interface Window {
         Packbase: Packbase
+        harper: WorkerLinter
     }
 }
 
