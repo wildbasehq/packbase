@@ -405,7 +405,7 @@ export function SidebarLayout({children}: PropsWithChildren) {
                     )}
 
                     <div
-                        className={`mx-auto h-full w-full overflow-y-auto ${(isSignedIn && !location.includes('/c/')) ? 'max-w-6xl' : ''}`}>
+                        className={`mx-auto h-full w-full overflow-y-auto ${(isSignedIn && !location.includes('/c/') && !location.includes('/books')) ? 'max-w-6xl' : ''}`}>
                         {children}
                     </div>
                 </motion.div>

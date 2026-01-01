@@ -30,6 +30,15 @@ export async function fetchFeedPage({packID, page = 1}: FeedPageParams): Promise
     }
 }
 
+export async function fetchFolderPage({folderID, page = 1}: { folderID: string; page: number }): Promise<FeedPageResult> {
+    const response = await vg.folder({id: folderID}).query.get({query: {page}})
+
+    return {
+        posts: response.data?.results || [],
+        hasMore: response.data?.has_more || false,
+    }
+}
+
 export async function fetchSearchPage({channelID, q, page}: SearchPageParams): Promise<FeedPageResult> {
     const take = 5
     const skip = (page - 1) * take

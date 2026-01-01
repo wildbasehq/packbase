@@ -77,11 +77,6 @@ export const defaultExtensions = [
             class: 'mt-4 mb-6 border-t border-stone-300',
         },
     }),
-    // TiptapLink.configure({
-    //     HTMLAttributes: {
-    //         class: 'text-stone-400 underline underline-offset-[3px] hover:text-stone-600 transition-colors cursor-pointer',
-    //     },
-    // }),
     // UpdatedImage.configure({
     //     HTMLAttributes: {
     //         class: 'rounded-lg border border-stone-200',
@@ -92,6 +87,10 @@ export const defaultExtensions = [
             if (node.type.name === 'heading') {
                 return `Heading ${node.attrs.level}`
             }
+            if (window.location.pathname.startsWith('/books/')) {
+                return 'HTML Mode. Hit "/" for commands, select text for formatting...'
+            }
+
             return 'What\'s on your mind?'
         },
         includeChildren: true,
@@ -99,27 +98,14 @@ export const defaultExtensions = [
     SlashCommand,
     TiptapUnderline,
     TextStyle,
-    // Color,
-    // Highlight.configure({
-    //     multicolor: true,
-    // }),
-    // TaskList and TaskItem are not used in the markdown renderer, so we'll keep them commented out
-    // TaskList.configure({
-    //     HTMLAttributes: {
-    //         class: "not-prose pl-2",
-    //     },
-    // }),
-    // TaskItem.configure({
-    //     HTMLAttributes: {
-    //         class: "flex items-start my-4",
-    //     },
-    //     nested: true,
-    // }),
+    CustomKeymap,
+    // DragAndDrop,
+]
+
+export const markdownExtensions = [
     Markdown.configure({
         html: true,
         transformCopiedText: true,
         transformPastedText: true,
-    }),
-    CustomKeymap,
-    // DragAndDrop,
+    })
 ]

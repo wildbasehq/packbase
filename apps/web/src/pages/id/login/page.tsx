@@ -22,6 +22,7 @@ export default function IDLogin() {
             </Alert>
             <div className="shadow-xs ring-1 ring-n-5/10 rounded overflow-clip">
                 <SignIn
+                    signUpUrl="/id/create"
                     waitlistUrl="/id/create"
                     appearance={{
                         elements: {

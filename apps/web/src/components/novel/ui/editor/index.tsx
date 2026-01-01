@@ -23,12 +23,8 @@ export default function Editor({
     storageKey = 'novel__content',
     disableLocalStorage = true,
     readOnly = false,
+    showBubble = false
 }: {
-    /**
-     * The API route to use for the OpenAI completion API.
-     * Defaults to "/api/generate".
-     */
-    completionApi?: string
     /**
      * Additional classes to add to the editor container.
      * Defaults to "relative min-h-[500px] w-full max-w-(--breakpoint-lg) border-stone-200 bg-white sm:mb-[calc(20vh)] sm:rounded-lg sm:border sm:shadow-lg".
@@ -80,6 +76,11 @@ export default function Editor({
      * Whether to make the editor read-only.
      */
     readOnly?: boolean
+    /**
+     * Whether to show the bubble menu.
+     * Defaults to true.
+     */
+    showBubble?: boolean
 }) {
     const [content, setContent] = useLocalStorage(storageKey, defaultValue)
 
@@ -126,10 +127,11 @@ export default function Editor({
     }, [editor, defaultValue, content, hydrated, disableLocalStorage])
 
     return (
-        <NovelContext.Provider
-            value={{
-                completionApi,
+        <div
+            onClick={() => {
+                editor?.chain().focus().run()
             }}
+            className={className}
         >
             <div
                 onClick={() => {
@@ -139,12 +141,12 @@ export default function Editor({
                 }}
                 className={className}
             >
-                {editor && !readOnly && <EditorBubbleMenu editor={editor} />}
+                {editor && !readOnly && showBubble && <EditorBubbleMenu editor={editor} />}
                 {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
                 <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full">
                     <EditorContent editor={editor} />
                 </div>
             </div>
-        </NovelContext.Provider>
+        </div>
     )
 }

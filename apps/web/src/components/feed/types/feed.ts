@@ -10,6 +10,7 @@ export interface FeedProps {
     channelID?: string
     feedQueryOverride?: string
     titleOverride?: string
+    folderID?: string
     dontShowCompose?: boolean
 }
 
