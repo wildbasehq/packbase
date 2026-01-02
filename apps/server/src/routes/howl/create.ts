@@ -4,6 +4,7 @@ import Baozi from '@/lib/events'
 import {FeedController} from '@/lib/FeedController'
 import {HTTPError} from '@/lib/HTTPError'
 import {clearQueryCache} from '@/lib/search/cache'
+import createStorage from '@/lib/storage'
 import {HowlBody} from '@/models/defs'
 import requiresAccount from '@/utils/identity/requires-account'
 import sanitizeTags from '@/utils/sanitize-tags'
@@ -122,44 +123,49 @@ export default (app: YapockType) =>
             // @TODO move this into a utils function
             if (asset_ids && asset_ids.length > 0) {
                 const UPLOAD_ROOT = path.join(process.cwd(), 'temp', 'uploads', 'pending')
-                for (const assetId of asset_ids) {
-                    const jsonPath = path.join(UPLOAD_ROOT, `${assetId}.json`)
-                    const binPath = path.join(UPLOAD_ROOT, `${assetId}.bin`)
+                const uploadedS3Paths: string[] = []
 
-                    if (!existsSync(jsonPath)) {
-                        await handleUploadFailure({message: `Asset ID ${assetId} not found`})
-                    }
+                try {
+                    for (const assetId of asset_ids) {
+                        const jsonPath = path.join(UPLOAD_ROOT, `${assetId}.json`)
+                        const binPath = path.join(UPLOAD_ROOT, `${assetId}.bin`)
 
-                    const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
-                    if (meta.user_id !== user.sub) {
-                        await handleUploadFailure({message: `Asset ID ${assetId} unauthorized`})
-                    }
-                    if (meta.state !== 'succeeded') {
-                        await handleUploadFailure({message: `Asset ID ${assetId} not finalized`})
-                    }
-
-                    let processingPath = binPath
-                    let contentType = meta.asset_type
-                    let isVideo = meta.asset_type.startsWith('video/')
-                    let tempVideoPath: string | null = null
-
-                    if (isVideo) {
-                        try {
-                            tempVideoPath = await convertToAv1(binPath)
-                            processingPath = tempVideoPath
-                            contentType = 'video/webm'
-                        } catch (e) {
-                            console.error('Video conversion failed:', e)
-                            await handleUploadFailure({message: `Video conversion failed for ${assetId}`})
+                        if (!existsSync(jsonPath)) {
+                            throw new Error(`Asset ID ${assetId} not found`)
                         }
-                    }
 
-                    const stream = createReadStream(processingPath)
-                    const upload = await uploadFileStream(process.env.S3_PROFILES_BUCKET!, `${user.sub}/${uuid}/${i}.{ext}`, stream, contentType)
+                        const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
+                        if (meta.user_id !== user.sub) {
+                            throw new Error(`Asset ID ${assetId} unauthorized`)
+                        }
+                        if (meta.state !== 'succeeded') {
+                            throw new Error(`Asset ID ${assetId} not finalized`)
+                        }
 
-                    if (upload.error) {
-                        await handleUploadFailure(upload.error)
-                    } else {
+                        let processingPath = binPath
+                        let contentType = meta.asset_type
+                        let isVideo = meta.asset_type.startsWith('video/')
+                        let tempVideoPath: string | null = null
+
+                        if (isVideo) {
+                            try {
+                                tempVideoPath = await convertToAv1(binPath)
+                                processingPath = tempVideoPath
+                                contentType = 'video/webm'
+                            } catch (e) {
+                                console.error('Video conversion failed:', e)
+                                throw new Error(`Video conversion failed for ${assetId}`)
+                            }
+                        }
+
+                        const stream = createReadStream(processingPath)
+                        const upload = await uploadFileStream(process.env.S3_PROFILES_BUCKET!, `${user.sub}/${uuid}/${i}.{ext}`, stream, contentType)
+
+                        if (upload.error) {
+                            throw upload.error
+                        }
+
+                        uploadedS3Paths.push(upload.data.path)
                         uploadedAssets.push({
                             type: isVideo ? 'video' : 'image',
                             data: {
@@ -167,17 +173,24 @@ export default (app: YapockType) =>
                                 name: `${i}`,
                             },
                         })
-                    }
-                    i++
+                        i++
 
-                    // Clean up
-                    if (tempVideoPath) {
-                        await cleanupTempVideo(tempVideoPath)
+                        // Clean up
+                        if (tempVideoPath) {
+                            await cleanupTempVideo(tempVideoPath)
+                        }
+                        await unlink(jsonPath).catch(() => {
+                        })
+                        await unlink(binPath).catch(() => {
+                        })
                     }
-                    await unlink(jsonPath).catch(() => {
-                    })
-                    await unlink(binPath).catch(() => {
-                    })
+                } catch (error) {
+                    // Cleanup uploaded S3 files
+                    const storage = createStorage(process.env.S3_PROFILES_BUCKET!)
+                    for (const s3Path of uploadedS3Paths) {
+                        await storage.deleteFile(user.sub, s3Path.replace(`${user.sub}/`, ''))
+                    }
+                    await handleUploadFailure(error)
                 }
             }
 

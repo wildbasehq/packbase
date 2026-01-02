@@ -120,7 +120,6 @@ export default (app: YapockType) =>
                 meta.error = {message: 'Size mismatch'}
                 await writeFile(jsonPath, JSON.stringify(meta))
 
-                set.status = 400
                 throw HTTPError.badRequest({summary: 'Uploaded size does not match total_bytes'})
             }
 
