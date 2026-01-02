@@ -40,7 +40,7 @@ export default (app: YapockType) =>
                 user_id: user.sub,
                 state: 'pending',
                 created_at: Date.now(),
-                expires: Date.now() + 60000 // default expiry
+                expires: Date.now() + 5 * 60 * 1000, // 5 minutes from now
             }
 
             const jsonPath = path.join(UPLOAD_ROOT, `${asset_id}.json`)
