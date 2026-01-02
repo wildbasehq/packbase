@@ -83,13 +83,19 @@ export default (app: YapockType) =>
                 throw HTTPError.forbidden({summary: 'Unauthorized'})
             }
 
+            // Validate segment ordering
+            const expectedSegment = meta.segments_uploaded || 0
+            if (Number(segment_index) !== expectedSegment) {
+                throw HTTPError.badRequest({summary: `Expected segment ${expectedSegment}, got ${segment_index}`})
+            }
+
             // Append chunk
-            // asset is a Blob/File
             const buffer = Buffer.from(await asset.arrayBuffer())
             await appendFile(binPath, buffer)
 
-            // Update state if needed (e.g. current size)
-            // For now, we trust consecutive appends.
+            // Update segments count
+            meta.segments_uploaded = expectedSegment + 1
+            await writeFile(jsonPath, JSON.stringify(meta))
 
             return {
                 success: true
@@ -194,9 +200,16 @@ async function existsMeta(jsonPath: string, user: any) {
     }
 
     const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
+    
+    // Check expiry first
+    if (meta.expires && Date.now() > meta.expires) {
+        throw HTTPError.badRequest({summary: 'Upload session has expired'})
+    }
+    
     if (meta.user_id !== user.sub) {
         throw HTTPError.forbidden({summary: 'Unauthorized'})
     }
 
     return meta
+}
 }
