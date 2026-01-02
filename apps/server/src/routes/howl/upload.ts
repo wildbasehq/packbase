@@ -80,10 +80,6 @@ export default (app: YapockType) =>
                 throw HTTPError.badRequest({summary: 'Upload session is not in pending state'})
             }
 
-            if (meta.user_id !== user.sub) {
-                throw HTTPError.forbidden({summary: 'Unauthorized'})
-            }
-
             // Validate segment ordering
             const expectedSegment = meta.segments_uploaded || 0
             if (Number(segment_index) !== expectedSegment) {
