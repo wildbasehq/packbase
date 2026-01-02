@@ -1,42 +1,41 @@
 import prisma from '@/db/prisma'
-import { YapockType } from '@/index'
+import {YapockType} from '@/index'
 import Baozi from '@/lib/events'
-import { FeedController } from '@/lib/FeedController'
-import { HTTPError } from '@/lib/HTTPError'
-import { clearQueryCache } from '@/lib/search/cache'
-import createStorage from '@/lib/storage'
-import { HowlBody } from '@/models/defs'
+import {FeedController} from '@/lib/FeedController'
+import {HTTPError} from '@/lib/HTTPError'
+import {clearQueryCache} from '@/lib/search/cache'
+import {HowlBody} from '@/models/defs'
 import requiresAccount from '@/utils/identity/requires-account'
 import sanitizeTags from '@/utils/sanitize-tags'
 import uploadFile from '@/utils/upload-file'
-import { t } from 'elysia'
-import { readFile, unlink } from 'fs/promises'
+import {randomUUID} from 'crypto'
+import {t} from 'elysia'
+import {existsSync} from 'fs'
+import {readFile, unlink} from 'fs/promises'
 import path from 'path'
-import { existsSync } from 'fs'
-import { randomUUID } from 'crypto'
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ body: { tenant_id, channel_id, assets, asset_ids, body, content_type, tags }, set, user }) => {
-            await requiresAccount({ set, user })
+        async ({body: {tenant_id, channel_id, asset_ids, body, content_type, tags}, set, user}) => {
+            await requiresAccount({set, user})
 
             body = body?.trim() || ''
-            if (body.length === 0 && (!assets || assets.length === 0)) {
+            if (body.length === 0 && (!asset_ids || asset_ids.length === 0)) {
                 set.status = 400
                 throw HTTPError.badRequest({
                     summary: 'You need to specify a valid body.',
                 })
             }
 
-            if (assets?.length! > 20) {
+            if (asset_ids?.length! > 20) {
                 set.status = 400
                 throw HTTPError.badRequest({
                     summary: 'You can only upload up to 20 assets.',
                 })
             }
 
-            const tenant = await prisma.packs.findUnique({ where: { id: tenant_id } })
+            const tenant = await prisma.packs.findUnique({where: {id: tenant_id}})
 
             if (!tenant) {
                 set.status = 404
@@ -48,8 +47,8 @@ export default (app: YapockType) =>
             // If channel_id is provided, verify it exists and belongs to the specified tenant
             if (channel_id) {
                 const page = await prisma.packs_pages.findUnique({
-                    where: { id: channel_id },
-                    select: { tenant_id: true },
+                    where: {id: channel_id},
+                    select: {tenant_id: true},
                 })
 
                 if (!page) {
@@ -127,15 +126,15 @@ export default (app: YapockType) =>
                     const binPath = path.join(UPLOAD_ROOT, `${assetId}.bin`)
 
                     if (!existsSync(jsonPath)) {
-                        await handleUploadFailure({ message: `Asset ID ${assetId} not found` })
+                        await handleUploadFailure({message: `Asset ID ${assetId} not found`})
                     }
 
                     const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
                     if (meta.user_id !== user.sub) {
-                        await handleUploadFailure({ message: `Asset ID ${assetId} unauthorized` })
+                        await handleUploadFailure({message: `Asset ID ${assetId} unauthorized`})
                     }
                     if (meta.state !== 'succeeded') {
-                        await handleUploadFailure({ message: `Asset ID ${assetId} not finalized` })
+                        await handleUploadFailure({message: `Asset ID ${assetId} not finalized`})
                     }
 
                     const buffer = await readFile(binPath)
@@ -156,8 +155,10 @@ export default (app: YapockType) =>
                         })
 
                         // Clean up
-                        await unlink(jsonPath).catch(() => { })
-                        await unlink(binPath).catch(() => { })
+                        await unlink(jsonPath).catch(() => {
+                        })
+                        await unlink(binPath).catch(() => {
+                        })
                     }
                     i++
                 }
@@ -176,7 +177,7 @@ export default (app: YapockType) =>
 
             let data
             try {
-                data = await prisma.posts.create({ data: dbCreate })
+                data = await prisma.posts.create({data: dbCreate})
             } catch (error) {
                 throw HTTPError.fromError(error)
             }
@@ -184,8 +185,8 @@ export default (app: YapockType) =>
             // Set profile r18 status if necessary
             if (sanitisedTags.includes('rating_suggestive') || sanitisedTags.includes('rating_explicit')) {
                 await prisma.profiles.update({
-                    where: { id: user.sub },
-                    data: { is_r18: true },
+                    where: {id: user.sub},
+                    data: {is_r18: true},
                 })
             }
 
@@ -196,7 +197,7 @@ export default (app: YapockType) =>
             FeedController.homeFeedCache.forEach((value, key) => {
                 if (key.includes(user.sub)) {
                     // Soft update
-                    const { data: post } = value
+                    const {data: post} = value
                     post.unshift(data)
                     value.data = post
                     FeedController.homeFeedCache.set(key, value)
