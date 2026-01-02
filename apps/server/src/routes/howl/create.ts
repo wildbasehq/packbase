@@ -150,6 +150,11 @@ export default (app: YapockType) =>
 
                         const stream = createReadStream(processingPath)
                         const upload = await uploadFileStream(process.env.S3_PROFILES_BUCKET!, `${user.sub}/${uuid}/${i}.{ext}`, stream, contentType, meta.total_bytes)
+                        stream.destroy() // Clean up stream
+
+                        if (upload.error) {
+                            throw upload.error
+                        }
 
                         if (upload.error) {
                             throw upload.error
