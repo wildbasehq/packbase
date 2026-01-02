@@ -50,6 +50,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "elysia": "^1.2.10",
+    "esbuild": "^0.27.2",
     "frimousse": "^0.3.0",
     "fuse.js": "^7.1.0",
     "harper.js": "^1.2.0",
