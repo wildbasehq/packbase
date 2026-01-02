@@ -1,4 +1,5 @@
 import { DeleteObjectCommand, GetObjectCommand, paginateListObjectsV2, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { Readable } from 'stream'
 import { StorageProvider } from './storage-interface'
 
 /**
@@ -60,7 +61,7 @@ export class S3StorageProvider implements StorageProvider {
      * @param contentType The content type of the file
      * @returns Promise resolving to success status
      */
-    async uploadFile(key: string, data: Buffer, contentType: string): Promise<boolean> {
+    async uploadFile(key: string, data: Buffer | Readable, contentType: string): Promise<boolean> {
         try {
             await this.client.send(
                 new PutObjectCommand({

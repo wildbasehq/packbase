@@ -12,7 +12,7 @@ import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
 import getInitials from '@/lib/utils/get-initials'
 import PackbaseInstance from '@/lib/workers/global-event-emit'
 import {Avatar, Badge, BubblePopover, Editor, Heading, LoadingCircle, Logo, PopoverHeader, Text} from '@/src/components'
-import {cn, isVisible, vg} from '@/src/lib'
+import {API_URL, cn, isVisible, vg} from '@/src/lib'
 import {HashtagIcon} from '@heroicons/react/16/solid'
 import {ArrowDownIcon, PlusIcon} from '@heroicons/react/20/solid'
 import {ChevronRightIcon} from '@heroicons/react/24/outline'
@@ -20,7 +20,6 @@ import {Activity, ReactNode, RefObject, useEffect, useRef, useState} from 'react
 import {toast} from 'sonner'
 import {useLocation} from 'wouter'
 import ImageUploadStack, {type Image} from '../feed/image-placeholder-stack'
-
 
 export type AvailablePagesType = 'editor' | 'content-labelling' | 'mature-rating-from-sfw-warning'
 
@@ -99,52 +98,105 @@ export default function FloatingCompose() {
         }
     }, [uploading])
 
-    const addAttachment = (files: FileList | null) => {
+    const addAttachment = async (files: FileList | null) => {
         if (files) {
-            const newImages = []
             for (let i = 0; i < files.length; i++) {
                 const file = files[i]
                 if (!file) {
                     toast.error(`File ${i + 1} failed to process!!!`)
                     continue
                 }
+
+                // Create placeholder image
+                const id = `${file.name}-${crypto.randomUUID()}`
                 const reader = new FileReader()
-                reader.onloadend = () => {
-                    newImages?.push({id: `${file.name}-${crypto.randomUUID()}`, src: reader.result as string})
-
-                    if (i === files.length - 1) {
-                        setImages([...images, ...newImages])
-                        fileInputRef.current!.value = null
-                    }
+                reader.onloadend = async () => {
+                    setImages(prev => [...prev, {id, src: reader.result as string, uploading: true}])
                 }
-
                 reader.readAsDataURL(file)
+
+                // Start chunked upload
+                try {
+                    const assetId = await uploadFileChunked(file)
+                    setImages(prev => prev.map(img => img.id === id ? {...img, assetId, uploading: false} : img))
+                } catch (e: any) {
+                    console.error(e)
+                    toast.error(`Failed to upload ${file.name}: ${e.message || 'Unknown error'}`)
+                    // Remove failed image
+                    setImages(prev => prev.filter(img => img.id !== id))
+                }
             }
+            if (fileInputRef.current) fileInputRef.current.value = null
         }
     }
 
+    const uploadFileChunked = async (file: File): Promise<string> => {
+        const CHUNK_SIZE = 1 * 1024 * 1024 // 1MB
+
+        // 1. INIT
+        // @ts-ignore
+        const initRes = await vg.howl.upload.init.post({
+            command: 'INIT',
+            total_bytes: file.size,
+            asset_type: file.type
+        })
+        if (initRes.error) throw initRes.error
+        const {asset_id} = initRes.data as { asset_id: string }
+
+        // 2. APPEND
+        const chunks = Math.ceil(file.size / CHUNK_SIZE)
+        for (let i = 0; i < chunks; i++) {
+            const start = i * CHUNK_SIZE
+            const end = Math.min(file.size, start + CHUNK_SIZE)
+            const chunk = file.slice(start, end)
+
+            const formData = new FormData()
+            formData.append('command', 'APPEND')
+            formData.append('asset_id', asset_id)
+            formData.append('segment_index', i.toString())
+            formData.append('asset', chunk, file.name)
+
+            // @ts-ignore
+            const appendRes = await fetch(`${API_URL}/howl/upload/append`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    // @ts-ignore
+                    Authorization: `Bearer ${await window.Clerk?.session.getToken()}`
+                }
+            })
+            const appendData = await appendRes.json()
+            if (appendData.error) throw appendData.error
+        }
+
+        // 3. FINALIZE
+        // @ts-ignore
+        const finalizeRes = await vg.howl.upload.finalize.post({
+            command: 'FINALIZE',
+            asset_id: asset_id
+        })
+        if (finalizeRes.error) throw finalizeRes.error
+
+        return asset_id
+    }
+
     const submitHowl = () => {
+        const uploadingImages = images.filter(img => img.uploading)
+        if (uploadingImages.length > 0) {
+            toast.error('Please wait for images to finish uploading.')
+            return
+        }
+
         const post: {
             body: string
             content_type: string
-            assets?: any[]
+            asset_ids?: string[]
             tags?: string[]
         } = {
             body: body || null,
             content_type: 'markdown',
             tags: [selectedContentLabel, ...selectedTags.split(',').map(t => t.trim()).filter(Boolean)],
-        }
-
-        // @ts-ignore
-        const assets = images?.map(attachment => {
-            return {
-                name: 'e',
-                data: attachment.src,
-            }
-        })
-
-        if (assets) {
-            post.assets = assets
+            asset_ids: images.map(img => img.assetId).filter(Boolean) as string[],
         }
 
         uploadHowl(post)
@@ -305,12 +357,12 @@ function FloatingComposeContent({
                 <Tooltip
                     content={
                         <div className="flex flex-col gap-1">
-                                <span className="gap-2">
-                                    Jump into Deep Compose
-                                </span>
+                            <span className="gap-2">
+                                Jump into Deep Compose
+                            </span>
                             <span className="text-xs">
-                                    Create or Draft multiple Howls and Stories quickly on a dedicated page.
-                                </span>
+                                Create or Draft multiple Howls and Stories quickly on a dedicated page.
+                            </span>
                             <div>
                                 <Badge color="red">
                                     Experimental - may be unstable
@@ -345,6 +397,7 @@ function FloatingComposeContent({
                         defaultValue={body}
                         onUpdate={e => {
                             editorRef.current = e
+                            // @ts-ignore
                             setBody(e?.storage.markdown.getMarkdown())
                         }}
                     />

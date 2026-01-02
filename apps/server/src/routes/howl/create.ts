@@ -1,24 +1,24 @@
 import prisma from '@/db/prisma'
-import {YapockType} from '@/index'
+import { YapockType } from '@/index'
 import Baozi from '@/lib/events'
-import {FeedController} from '@/lib/FeedController'
-import {HTTPError} from '@/lib/HTTPError'
-import {clearQueryCache} from '@/lib/search/cache'
-import {HowlBody} from '@/models/defs'
+import { FeedController } from '@/lib/FeedController'
+import { HTTPError } from '@/lib/HTTPError'
+import { clearQueryCache } from '@/lib/search/cache'
+import { HowlBody } from '@/models/defs'
 import requiresAccount from '@/utils/identity/requires-account'
 import sanitizeTags from '@/utils/sanitize-tags'
-import uploadFile from '@/utils/upload-file'
-import {randomUUID} from 'crypto'
-import {t} from 'elysia'
-import {existsSync} from 'fs'
-import {readFile, unlink} from 'fs/promises'
+import uploadFile, { uploadFileStream } from '@/utils/upload-file'
+import { randomUUID } from 'crypto'
+import { t } from 'elysia'
+import { createReadStream, existsSync } from 'fs'
+import { readFile, unlink } from 'fs/promises'
 import path from 'path'
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({body: {tenant_id, channel_id, asset_ids, body, content_type, tags}, set, user}) => {
-            await requiresAccount({set, user})
+        async ({ body: { tenant_id, channel_id, asset_ids, body, content_type, tags }, set, user }) => {
+            await requiresAccount({ set, user })
 
             body = body?.trim() || ''
             if (body.length === 0 && (!asset_ids || asset_ids.length === 0)) {
@@ -35,7 +35,7 @@ export default (app: YapockType) =>
                 })
             }
 
-            const tenant = await prisma.packs.findUnique({where: {id: tenant_id}})
+            const tenant = await prisma.packs.findUnique({ where: { id: tenant_id } })
 
             if (!tenant) {
                 set.status = 404
@@ -47,8 +47,8 @@ export default (app: YapockType) =>
             // If channel_id is provided, verify it exists and belongs to the specified tenant
             if (channel_id) {
                 const page = await prisma.packs_pages.findUnique({
-                    where: {id: channel_id},
-                    select: {tenant_id: true},
+                    where: { id: channel_id },
+                    select: { tenant_id: true },
                 })
 
                 if (!page) {
@@ -126,22 +126,19 @@ export default (app: YapockType) =>
                     const binPath = path.join(UPLOAD_ROOT, `${assetId}.bin`)
 
                     if (!existsSync(jsonPath)) {
-                        await handleUploadFailure({message: `Asset ID ${assetId} not found`})
+                        await handleUploadFailure({ message: `Asset ID ${assetId} not found` })
                     }
 
                     const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
                     if (meta.user_id !== user.sub) {
-                        await handleUploadFailure({message: `Asset ID ${assetId} unauthorized`})
+                        await handleUploadFailure({ message: `Asset ID ${assetId} unauthorized` })
                     }
                     if (meta.state !== 'succeeded') {
-                        await handleUploadFailure({message: `Asset ID ${assetId} not finalized`})
+                        await handleUploadFailure({ message: `Asset ID ${assetId} not finalized` })
                     }
 
-                    const buffer = await readFile(binPath)
-                    const base64 = buffer.toString('base64')
-                    const dataUri = `data:${meta.asset_type};base64,${base64}`
-
-                    const upload = await uploadFile(process.env.S3_PROFILES_BUCKET, `${user.sub}/${uuid}/${i}.{ext}`, dataUri)
+                    const stream = createReadStream(binPath)
+                    const upload = await uploadFileStream(process.env.S3_PROFILES_BUCKET!, `${user.sub}/${uuid}/${i}.{ext}`, stream, meta.asset_type)
 
                     if (upload.error) {
                         await handleUploadFailure(upload.error)
@@ -153,14 +150,14 @@ export default (app: YapockType) =>
                                 name: `${i}`,
                             },
                         })
-
-                        // Clean up
-                        await unlink(jsonPath).catch(() => {
-                        })
-                        await unlink(binPath).catch(() => {
-                        })
                     }
                     i++
+
+                    // Clean up
+                    await unlink(jsonPath).catch(() => {
+                    })
+                    await unlink(binPath).catch(() => {
+                    })
                 }
             }
 
@@ -177,7 +174,7 @@ export default (app: YapockType) =>
 
             let data
             try {
-                data = await prisma.posts.create({data: dbCreate})
+                data = await prisma.posts.create({ data: dbCreate })
             } catch (error) {
                 throw HTTPError.fromError(error)
             }
@@ -185,8 +182,8 @@ export default (app: YapockType) =>
             // Set profile r18 status if necessary
             if (sanitisedTags.includes('rating_suggestive') || sanitisedTags.includes('rating_explicit')) {
                 await prisma.profiles.update({
-                    where: {id: user.sub},
-                    data: {is_r18: true},
+                    where: { id: user.sub },
+                    data: { is_r18: true },
                 })
             }
 
@@ -197,7 +194,7 @@ export default (app: YapockType) =>
             FeedController.homeFeedCache.forEach((value, key) => {
                 if (key.includes(user.sub)) {
                     // Soft update
-                    const {data: post} = value
+                    const { data: post } = value
                     post.unshift(data)
                     value.data = post
                     FeedController.homeFeedCache.set(key, value)

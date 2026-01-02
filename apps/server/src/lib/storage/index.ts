@@ -1,7 +1,8 @@
+import { Readable } from 'stream'
 import path from 'path'
 import sharp from 'sharp'
-import {v4 as uuidv4} from 'uuid'
-import {StorageProvider} from '../../../plugins/storage-interface'
+import { v4 as uuidv4 } from 'uuid'
+import { StorageProvider } from '../../../plugins/storage-interface'
 
 /**
  * Storage class for managing S3 compatible buckets
@@ -48,7 +49,7 @@ export class Storage {
         try {
             // Process the image with sharp
             let imageBuffer = Buffer.from(base64.split(';base64,').pop() || '', 'base64')
-            let sharpQuery = sharp(imageBuffer, {animated})
+            let sharpQuery = sharp(imageBuffer, { animated })
 
             // Determine content type and extension
             let contentType = base64.substring('data:'.length, base64.indexOf(';base64'))
@@ -109,6 +110,65 @@ export class Storage {
     }
 
     /**
+     * Upload a stream to the bucket
+     * @param userId The user ID (used for folder structure)
+     * @param filePath The path within the user's folder
+     * @param stream The file stream
+     * @param contentType The content type
+     * @returns Object with success status, path, and version info
+     */
+    async uploadStream(
+        userId: string,
+        filePath: string,
+        stream: Readable,
+        contentType: string,
+    ): Promise<{
+        success: boolean;
+        error?: Error;
+        path?: string;
+        version?: string;
+    }> {
+        try {
+            // Generate a version ID
+            const versionId = uuidv4()
+
+            // Determine extension from content type if {ext} is present
+            let ext = contentType.split('/').pop() || ''
+            if (ext === 'jpeg') ext = 'jpg'
+
+            // Create the full path
+            const fullPath = `${userId}/${filePath.replace('{ext}', ext)}`
+
+            // Upload the file using the storage provider
+            const uploadSuccess = await this.storageProvider.uploadFile(fullPath, stream, contentType)
+
+            if (!uploadSuccess) {
+                return {
+                    success: false,
+                    error: new Error('Failed to upload file to storage'),
+                }
+            }
+
+            // Update version control
+            // Note: We don't save the full file content in VC for streams as they might be large
+            // We just mark the version existence
+            await this.updateVersionControl(userId, fullPath, versionId, null)
+
+            return {
+                success: true,
+                path: fullPath,
+                version: versionId,
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: error instanceof Error ? error : new Error(String(error)),
+            }
+        }
+    }
+
+
+    /**
      * Delete a file from the bucket
      * @param userId The user ID
      * @param filePath The path to the file within the user's folder
@@ -137,7 +197,7 @@ export class Storage {
             // Update version control to mark as deleted
             await this.updateVersionControl(userId, fullPath, uuidv4(), null, true)
 
-            return {success: true}
+            return { success: true }
         } catch (error) {
             return {
                 success: false,
@@ -360,7 +420,7 @@ export class Storage {
  */
 export function createStorage(bucket: string): Storage {
     // Import the S3StorageProvider dynamically to avoid circular dependencies
-    const {S3StorageProvider} = require('../../../plugins/s3-storage-provider')
+    const { S3StorageProvider } = require('../../../plugins/s3-storage-provider')
 
     // Create a new S3StorageProvider with default configuration
     const storageProvider = S3StorageProvider.createFromEnv(bucket)

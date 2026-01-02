@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 /**
  * Abstract interface for storage providers
  * This interface defines the operations that any storage provider must implement
@@ -10,7 +11,7 @@ export interface StorageProvider {
      * @param contentType The content type of the file
      * @returns Promise resolving to success status
      */
-    uploadFile(key: string, data: Buffer, contentType: string): Promise<boolean>;
+    uploadFile(key: string, data: Buffer | Readable, contentType: string): Promise<boolean>;
 
     /**
      * Delete a file from the storage
