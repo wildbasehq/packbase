@@ -1,6 +1,6 @@
-import { DeleteObjectCommand, GetObjectCommand, paginateListObjectsV2, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
-import { Readable } from 'stream'
-import { StorageProvider } from './storage-interface'
+import {DeleteObjectCommand, GetObjectCommand, paginateListObjectsV2, PutObjectCommand, S3Client} from '@aws-sdk/client-s3'
+import {Readable} from 'stream'
+import {StorageProvider} from './storage-interface'
 
 /**
  * AWS S3 implementation of the StorageProvider interface
@@ -61,7 +61,7 @@ export class S3StorageProvider implements StorageProvider {
      * @param contentType The content type of the file
      * @returns Promise resolving to success status
      */
-    async uploadFile(key: string, data: Buffer | Readable, contentType: string): Promise<boolean> {
+    async uploadFile(key: string, data: Buffer | Readable, contentType: string, contentLength?: number): Promise<boolean> {
         try {
             await this.client.send(
                 new PutObjectCommand({
@@ -69,6 +69,7 @@ export class S3StorageProvider implements StorageProvider {
                     Key: key,
                     Body: data,
                     ContentType: contentType,
+                    ContentLength: contentLength,
                 })
             )
             return true
@@ -112,7 +113,7 @@ export class S3StorageProvider implements StorageProvider {
     }>> {
         try {
             const paginator = paginateListObjectsV2(
-                { client: this.client, pageSize: 1000 },
+                {client: this.client, pageSize: 1000},
                 {
                     Bucket: this.bucket,
                     Prefix: prefix,

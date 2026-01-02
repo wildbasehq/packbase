@@ -40,7 +40,7 @@ export default async function uploadFile(bucket: string, path: string, base64: s
     }
 }
 
-export async function uploadFileStream(bucket: string, path: string, stream: Readable, contentType: string) {
+export async function uploadFileStream(bucket: string, path: string, stream: Readable, contentType: string, contentLength?: number) {
     // Extract user ID from the path (assuming format: userId/...)
     const userId = path.split('/')[0]
     const filePath = path.substring(userId.length + 1)
@@ -48,10 +48,8 @@ export async function uploadFileStream(bucket: string, path: string, stream: Rea
     // Create storage instance
     const storage = createStorage(bucket)
 
-    console.log('Uploading file stream to storage:', {userId, filePath, contentType})
-
     // Process the image with our storage class
-    const result = await storage.uploadStream(userId, filePath, stream, contentType)
+    const result = await storage.uploadStream(userId, filePath, stream, contentType, contentLength)
 
     if (!result.success) {
         return {error: result.error}

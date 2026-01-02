@@ -149,7 +149,7 @@ export default (app: YapockType) =>
                         let isVideo = meta.asset_type === 'video/webm' || meta.asset_type.startsWith('video/')
 
                         const stream = createReadStream(processingPath)
-                        const upload = await uploadFileStream(process.env.S3_PROFILES_BUCKET!, `${user.sub}/${uuid}/${i}.{ext}`, stream, contentType)
+                        const upload = await uploadFileStream(process.env.S3_PROFILES_BUCKET!, `${user.sub}/${uuid}/${i}.{ext}`, stream, contentType, meta.total_bytes)
 
                         if (upload.error) {
                             throw upload.error

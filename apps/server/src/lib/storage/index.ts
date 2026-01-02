@@ -1,8 +1,8 @@
-import { Readable } from 'stream'
 import path from 'path'
 import sharp from 'sharp'
-import { v4 as uuidv4 } from 'uuid'
-import { StorageProvider } from '../../../plugins/storage-interface'
+import {Readable} from 'stream'
+import {v4 as uuidv4} from 'uuid'
+import {StorageProvider} from '../../../plugins/storage-interface'
 
 /**
  * Storage class for managing S3 compatible buckets
@@ -49,7 +49,7 @@ export class Storage {
         try {
             // Process the image with sharp
             let imageBuffer = Buffer.from(base64.split(';base64,').pop() || '', 'base64')
-            let sharpQuery = sharp(imageBuffer, { animated })
+            let sharpQuery = sharp(imageBuffer, {animated})
 
             // Determine content type and extension
             let contentType = base64.substring('data:'.length, base64.indexOf(';base64'))
@@ -122,6 +122,7 @@ export class Storage {
         filePath: string,
         stream: Readable,
         contentType: string,
+        contentLength?: number,
     ): Promise<{
         success: boolean;
         error?: Error;
@@ -140,7 +141,7 @@ export class Storage {
             const fullPath = `${userId}/${filePath.replace('{ext}', ext)}`
 
             // Upload the file using the storage provider
-            const uploadSuccess = await this.storageProvider.uploadFile(fullPath, stream, contentType)
+            const uploadSuccess = await this.storageProvider.uploadFile(fullPath, stream, contentType, contentLength)
 
             if (!uploadSuccess) {
                 return {
@@ -197,7 +198,7 @@ export class Storage {
             // Update version control to mark as deleted
             await this.updateVersionControl(userId, fullPath, uuidv4(), null, true)
 
-            return { success: true }
+            return {success: true}
         } catch (error) {
             return {
                 success: false,
@@ -420,7 +421,7 @@ export class Storage {
  */
 export function createStorage(bucket: string): Storage {
     // Import the S3StorageProvider dynamically to avoid circular dependencies
-    const { S3StorageProvider } = require('../../../plugins/s3-storage-provider')
+    const {S3StorageProvider} = require('../../../plugins/s3-storage-provider')
 
     // Create a new S3StorageProvider with default configuration
     const storageProvider = S3StorageProvider.createFromEnv(bucket)
