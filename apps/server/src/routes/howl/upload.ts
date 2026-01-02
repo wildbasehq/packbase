@@ -125,7 +125,8 @@ export default (app: YapockType) =>
 
             meta.state = 'succeeded'
             // Update expiry to giving them time to post
-            const expires = Date.now() + 60000 // 1 minute to use it
+            // Update expiry to giving them time to post
+            const expires = Date.now() + 5 * 60 * 1000 // 5 minutes to use it
             meta.expires = expires
 
             await writeFile(jsonPath, JSON.stringify(meta))

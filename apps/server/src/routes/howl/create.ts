@@ -136,10 +136,13 @@ export default (app: YapockType) =>
 
                         const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
                         if (meta.user_id !== user.sub) {
-                            throw new Error(`Asset ID ${assetId} unauthorized`)
+                            await handleUploadFailure({message: `Asset ID ${assetId} unauthorized`})
                         }
                         if (meta.state !== 'succeeded') {
-                            throw new Error(`Asset ID ${assetId} not finalized`)
+                            await handleUploadFailure({message: `Asset ID ${assetId} not finalized`})
+                        }
+                        if (meta.expires && Date.now() > meta.expires) {
+                            await handleUploadFailure({message: `Asset ID ${assetId} has expired`})
                         }
 
                         let processingPath = binPath
