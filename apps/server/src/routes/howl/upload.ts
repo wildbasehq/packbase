@@ -7,7 +7,7 @@ import {existsSync} from 'fs'
 import {appendFile, mkdir, readFile, stat, writeFile} from 'fs/promises'
 import path from 'path'
 
-const UPLOAD_ROOT = path.join(process.cwd(), 'uploads', 'pending')
+const UPLOAD_ROOT = path.join(process.cwd(), 'temp', 'uploads', 'pending')
 
 // Ensure upload root exists (lazy check in handler is safer for startup files, but we can try here)
 // mkdir(UPLOAD_ROOT, { recursive: true }).catch(() => {})
@@ -22,6 +22,13 @@ export default (app: YapockType) =>
 
             // @ts-ignore
             const {total_bytes, asset_type} = body
+
+            // Check asset type
+            const allowedTypes = ['image/*', 'video/*']
+            if (!allowedTypes.some(type => asset_type.startsWith(type.replace('*', '')))) {
+                throw HTTPError.badRequest({summary: 'Unsupported asset type'})
+            }
+
             const asset_id = randomUUID()
 
             await mkdir(UPLOAD_ROOT, {recursive: true})

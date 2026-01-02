@@ -3,27 +3,27 @@
  */
 
 import PostSettingsModal from '@/components/howl-creator/post-settings-modal'
-import {Camera, HardDisk} from '@/components/icons/plump'
-import {ChatBubbleExclamation} from '@/components/icons/plump/chat-bubble-exclamation'
-import {useModal} from '@/components/modal/provider'
-import {markdownExtensions} from '@/components/novel/ui/editor/extensions'
+import { Camera, HardDisk } from '@/components/icons/plump'
+import { ChatBubbleExclamation } from '@/components/icons/plump/chat-bubble-exclamation'
+import { useModal } from '@/components/modal/provider'
+import { markdownExtensions } from '@/components/novel/ui/editor/extensions'
 import Tooltip from '@/components/shared/tooltip'
-import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
+import { useResourceStore, useUIStore, useUserAccountStore } from '@/lib/state'
 import getInitials from '@/lib/utils/get-initials'
 import PackbaseInstance from '@/lib/workers/global-event-emit'
-import {Avatar, Badge, BubblePopover, Editor, Heading, LoadingCircle, Logo, PopoverHeader, Text} from '@/src/components'
-import {API_URL, cn, isVisible, vg} from '@/src/lib'
-import {HashtagIcon} from '@heroicons/react/16/solid'
-import {ArrowDownIcon, PlusIcon} from '@heroicons/react/20/solid'
-import {ChevronRightIcon} from '@heroicons/react/24/outline'
-import {Activity, ReactNode, RefObject, useEffect, useRef, useState} from 'react'
-import {toast} from 'sonner'
-import {useLocation} from 'wouter'
-import ImageUploadStack, {type Image} from '../feed/image-placeholder-stack'
+import { Avatar, Badge, BubblePopover, Editor, Heading, LoadingCircle, Logo, PopoverHeader, Text } from '@/src/components'
+import { API_URL, cn, isVisible, vg } from '@/src/lib'
+import { HashtagIcon } from '@heroicons/react/16/solid'
+import { ArrowDownIcon, PlusIcon } from '@heroicons/react/20/solid'
+import { ChevronRightIcon } from '@heroicons/react/24/outline'
+import { Activity, ReactNode, RefObject, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { useLocation } from 'wouter'
+import AssetUploadStack, { type Asset } from '../feed/image-placeholder-stack'
 
 export type AvailablePagesType = 'editor' | 'content-labelling' | 'mature-rating-from-sfw-warning'
 
-function ComposeButton({onClick, children, className}: {
+function ComposeButton({ onClick, children, className }: {
     onClick?: () => void;
     children: ReactNode;
     className?: string
@@ -42,9 +42,9 @@ function ComposeButton({onClick, children, className}: {
 }
 
 export default function FloatingCompose() {
-    const {user} = useUserAccountStore()
-    const {navigation} = useUIStore()
-    const {currentResource} = useResourceStore()
+    const { user } = useUserAccountStore()
+    const { navigation } = useUIStore()
+    const { currentResource } = useResourceStore()
     const modal = useModal()
 
     // Get channel ID from url, i.e. /p/pack/channel/
@@ -57,7 +57,7 @@ export default function FloatingCompose() {
 
     const [channelName, setChannelName] = useState<string | null>(null)
     const [body, setBody] = useState<string>('')
-    const [images, setImages] = useState<Image[]>([])
+    const [assets, setAssets] = useState<Asset[]>([])
     const [uploading, setUploading] = useState<boolean>(false)
     const [selectedTags, setSelectedTags] = useState<string>('')
     const [selectedContentLabel, setSelectedContentLabel] = useState<string>('rating_safe')
@@ -107,23 +107,44 @@ export default function FloatingCompose() {
                     continue
                 }
 
-                // Create placeholder image
                 const id = `${file.name}-${crypto.randomUUID()}`
-                const reader = new FileReader()
-                reader.onloadend = async () => {
-                    setImages(prev => [...prev, {id, src: reader.result as string, uploading: true}])
+                const type = file.type.startsWith('video/') ? 'video' : 'image'
+
+                if (type === 'image') {
+                    const reader = new FileReader()
+                    reader.onloadend = async () => {
+                        setAssets(prev => [...prev, { id, src: reader.result as string, type: 'image', uploading: true }])
+                    }
+                    reader.readAsDataURL(file)
+                } else {
+                    // Video first frame capture
+                    const video = document.createElement('video')
+                    video.src = URL.createObjectURL(file)
+                    video.load()
+                    video.onloadeddata = () => {
+                        video.currentTime = 0.1 // Seek a bit to get a frame
+                    }
+                    video.onseeked = () => {
+                        const canvas = document.createElement('canvas')
+                        canvas.width = video.videoWidth
+                        canvas.height = video.videoHeight
+                        const ctx = canvas.getContext('2d')
+                        ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
+                        const src = canvas.toDataURL('image/jpeg')
+                        setAssets(prev => [...prev, { id, src, type: 'video', uploading: true }])
+                        URL.revokeObjectURL(video.src)
+                    }
                 }
-                reader.readAsDataURL(file)
 
                 // Start chunked upload
                 try {
                     const assetId = await uploadFileChunked(file)
-                    setImages(prev => prev.map(img => img.id === id ? {...img, assetId, uploading: false} : img))
+                    setAssets(prev => prev.map(img => img.id === id ? { ...img, assetId, uploading: false } : img))
                 } catch (e: any) {
                     console.error(e)
                     toast.error(`Failed to upload ${file.name}: ${e.message || 'Unknown error'}`)
                     // Remove failed image
-                    setImages(prev => prev.filter(img => img.id !== id))
+                    setAssets(prev => prev.filter(img => img.id !== id))
                 }
             }
             if (fileInputRef.current) fileInputRef.current.value = null
@@ -141,7 +162,7 @@ export default function FloatingCompose() {
             asset_type: file.type
         })
         if (initRes.error) throw initRes.error
-        const {asset_id} = initRes.data as { asset_id: string }
+        const { asset_id } = initRes.data as { asset_id: string }
 
         // 2. APPEND
         const chunks = Math.ceil(file.size / CHUNK_SIZE)
@@ -181,9 +202,9 @@ export default function FloatingCompose() {
     }
 
     const submitHowl = () => {
-        const uploadingImages = images.filter(img => img.uploading)
-        if (uploadingImages.length > 0) {
-            toast.error('Please wait for images to finish uploading.')
+        const uploadingAssets = assets.filter(img => img.uploading)
+        if (uploadingAssets.length > 0) {
+            toast.error('Please wait for assets to finish uploading.')
             return
         }
 
@@ -196,7 +217,7 @@ export default function FloatingCompose() {
             body: body || null,
             content_type: 'markdown',
             tags: [selectedContentLabel, ...selectedTags.split(',').map(t => t.trim()).filter(Boolean)],
-            asset_ids: images.map(img => img.assetId).filter(Boolean) as string[],
+            asset_ids: assets.map(img => img.assetId).filter(Boolean) as string[],
         }
 
         uploadHowl(post)
@@ -209,7 +230,7 @@ export default function FloatingCompose() {
         setUploading(true)
         vg.howl.create
             .post(post)
-            .then(({error}) => {
+            .then(({ error }) => {
                 if (error) {
                     setUploading(false)
                     toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'A network error happened...')
@@ -217,7 +238,7 @@ export default function FloatingCompose() {
                     PackbaseInstance.emit('feed-reload', {})
                     setUploading(false)
                     setBody('')
-                    setImages([])
+                    setAssets([])
                     setSelectedContentLabel('rating_safe')
                     setSelectedTags('')
                     editorRef.current?.destroy()
@@ -238,29 +259,29 @@ export default function FloatingCompose() {
     return (
         <div className="flex z-40 fixed bottom-24 sm:bottom-8 right-8">
             <BubblePopover id="howl-creator"
-                           className="p-0 w-lg max-h-[calc(100vh-3.75rem)]"
-                           custom={currentPage}
-                           animateKey={currentPage}
-                           corner="bottom-right" trigger={
-                ({setOpen}) => (
-                    <div
-                        className="pointer-events-auto z-40 flex shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)] h-14 w-14 items-center justify-center rounded-full border bg-indigo-500 transition-transform hover:bg-indigo-400 active:scale-[1.02] md:active:scale-[0.98]"
-                        onClick={() => {
-                            if (uploading) return
-                            setOpen(true)
-                        }}
-                    >
-                        <PlusIcon className="h-6 w-6 text-white"/>
-                    </div>
-                )
-            } isCentered={false}>
+                className="p-0 w-lg max-h-[calc(100vh-3.75rem)]"
+                custom={currentPage}
+                animateKey={currentPage}
+                corner="bottom-right" trigger={
+                    ({ setOpen }) => (
+                        <div
+                            className="pointer-events-auto z-40 flex shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)] h-14 w-14 items-center justify-center rounded-full border bg-indigo-500 transition-transform hover:bg-indigo-400 active:scale-[1.02] md:active:scale-[0.98]"
+                            onClick={() => {
+                                if (uploading) return
+                                setOpen(true)
+                            }}
+                        >
+                            <PlusIcon className="h-6 w-6 text-white" />
+                        </div>
+                    )
+                } isCentered={false}>
                 <Activity mode={isVisible(currentPage === 'editor')}>
                     <FloatingComposeContent
                         channel={channel}
                         channelName={channelName}
                         currentResource={currentResource}
-                        images={images}
-                        setImages={setImages}
+                        assets={assets}
+                        setAssets={setAssets}
                         editorRef={editorRef}
                         body={body}
                         setBody={setBody}
@@ -274,12 +295,12 @@ export default function FloatingCompose() {
 
                 <Activity mode={isVisible(currentPage === 'content-labelling')}>
                     <PostSettingsModal selectedTags={selectedTags}
-                                       selectedContentLabel={selectedContentLabel}
-                                       onClose={({tags, contentLabel, toPage = 'editor'}) => {
-                                           setSelectedTags(tags)
-                                           setSelectedContentLabel(contentLabel)
-                                           setCurrentPage(toPage)
-                                       }}/>
+                        selectedContentLabel={selectedContentLabel}
+                        onClose={({ tags, contentLabel, toPage = 'editor' }) => {
+                            setSelectedTags(tags)
+                            setSelectedContentLabel(contentLabel)
+                            setCurrentPage(toPage)
+                        }} />
                 </Activity>
 
                 <Activity mode={isVisible(currentPage === 'mature-rating-from-sfw-warning')}>
@@ -299,25 +320,25 @@ export default function FloatingCompose() {
 }
 
 function FloatingComposeContent({
-                                    channel,
-                                    channelName,
-                                    currentResource,
-                                    images,
-                                    setImages,
-                                    editorRef,
-                                    body,
-                                    setBody,
-                                    fileInputRef,
-                                    addAttachment,
-                                    submitHowl,
-                                    setCurrentPage,
-                                    uploading
-                                }: {
+    channel,
+    channelName,
+    currentResource,
+    assets,
+    setAssets,
+    editorRef,
+    body,
+    setBody,
+    fileInputRef,
+    addAttachment,
+    submitHowl,
+    setCurrentPage,
+    uploading
+}: {
     channel?: string;
     channelName: string | null;
     currentResource: any;
-    images: Image[];
-    setImages: (images: Image[]) => void;
+    assets: Asset[];
+    setAssets: (assets: Asset[]) => void;
     editorRef: RefObject<any>;
     body: string;
     setBody: (body: string) => void;
@@ -327,24 +348,24 @@ function FloatingComposeContent({
     setCurrentPage: (value: 'editor' | 'content-labelling') => void;
     uploading: boolean;
 }) {
-    const {user} = useUserAccountStore()
+    const { user } = useUserAccountStore()
 
     return (
         <>
             {/* Top small bar */}
             <div className="min-h-12 border-b flex items-center justify-between px-4">
-                <Logo className="fill-muted-foreground h-5 w-5"/>
+                <Logo className="fill-muted-foreground h-5 w-5" />
                 <div className="flex items-center gap-2">
                     <Avatar square
-                            src={currentResource?.images?.avatar || '/img/default-avatar.png'}
-                            initials={getInitials(currentResource?.display_name || 'Dummy')}
-                            className="size-6"
+                        src={currentResource?.images?.avatar || '/img/default-avatar.png'}
+                        initials={getInitials(currentResource?.display_name || 'Dummy')}
+                        className="size-6"
                     />
                     <Activity mode={isVisible(!!channel)}>
                         <div className="flex items-center gap-1">
-                            <ChevronRightIcon className="w-5 h-5 text-muted-foreground"/>
+                            <ChevronRightIcon className="w-5 h-5 text-muted-foreground" />
                             <Heading size="sm" className="flex justify-center items-center">
-                                <HashtagIcon className="w-4 h-4 inline-flex fill-muted-foreground"/>
+                                <HashtagIcon className="w-4 h-4 inline-flex fill-muted-foreground" />
                                 {channelName}
                             </Heading>
                         </div>
@@ -379,7 +400,7 @@ function FloatingComposeContent({
                             toast.error('"Your Stuff" is disabled by the instance owner.')
                         }}
                     >
-                        <HardDisk className="fill-muted-foreground w-full h-full"/>
+                        <HardDisk className="fill-muted-foreground w-full h-full" />
                     </div>
                 </Tooltip>
             </div>
@@ -406,9 +427,9 @@ function FloatingComposeContent({
 
             {!user?.requires_setup && (
                 <>
-                    {images?.length > 0 && (
+                    {assets?.length > 0 && (
                         <div className="px-4 pb-2">
-                            <ImageUploadStack images={images} setImages={setImages}/>
+                            <AssetUploadStack assets={assets} setAssets={setAssets} />
                         </div>
                     )}
 
@@ -426,10 +447,10 @@ function FloatingComposeContent({
                                     type="file"
                                     ref={fileInputRef}
                                     multiple
-                                    accept="image/*"
+                                    accept="image/*,video/*"
                                     onChange={e => addAttachment(e.target.files)}
                                 />
-                                <Camera className="w-5 h-5 fill-primary-light p-0.5"/>
+                                <Camera className="w-5 h-5 fill-primary-light p-0.5" />
                             </ComposeButton>
 
                             {/* Post Settings Button */}
@@ -439,7 +460,7 @@ function FloatingComposeContent({
                                     setCurrentPage('content-labelling')
                                 }}
                             >
-                                <ChatBubbleExclamation className="h-5 fill-primary-light"/>
+                                <ChatBubbleExclamation className="h-5 fill-primary-light" />
                             </ComposeButton>
                         </div>
                         <ComposeButton
@@ -450,11 +471,11 @@ function FloatingComposeContent({
                             }}
                         >
                             <Activity mode={isVisible(!uploading)}>
-                                <ArrowDownIcon className="w-5 h-5 fill-muted-foreground"/>
+                                <ArrowDownIcon className="w-5 h-5 fill-muted-foreground" />
                             </Activity>
 
                             <Activity mode={isVisible(uploading)}>
-                                <LoadingCircle/>
+                                <LoadingCircle />
                             </Activity>
                         </ComposeButton>
                     </div>
