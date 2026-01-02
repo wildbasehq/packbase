@@ -64,8 +64,6 @@ export default (app: YapockType) =>
 
         /**
          * APPEND: Uploads file data in consecutive chunks
-         * Note: In a real twitter-like flow, this is often multipart/form-data.
-         * We use t.File() for the asset.
          */
         .post('/append', async ({body, set, user}) => {
             await requiresAccount({set, user})
@@ -77,6 +75,13 @@ export default (app: YapockType) =>
             const binPath = path.join(UPLOAD_ROOT, `${asset_id}.bin`)
 
             const meta = await existsMeta(jsonPath, user)
+            if (meta.state !== 'pending') {
+                throw HTTPError.badRequest({summary: 'Upload session is not in pending state'})
+            }
+
+            if (meta.user_id !== user.sub) {
+                throw HTTPError.forbidden({summary: 'Unauthorized'})
+            }
 
             // Append chunk
             // asset is a Blob/File
@@ -159,11 +164,12 @@ export default (app: YapockType) =>
 
             const meta = await existsMeta(jsonPath, user)
 
-            let currentSize = 0
+            let currentSize: number
             try {
                 const stats = await stat(binPath)
                 currentSize = stats.size
             } catch (e) {
+                currentSize = 0
             }
 
             const percent = meta.total_bytes > 0 ? Math.round((currentSize / meta.total_bytes) * 100) : 0
