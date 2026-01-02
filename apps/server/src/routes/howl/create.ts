@@ -137,6 +137,9 @@ export default (app: YapockType) =>
                     if (meta.state !== 'succeeded') {
                         await handleUploadFailure({message: `Asset ID ${assetId} not finalized`})
                     }
+                    if (meta.expires && Date.now() > meta.expires) {
+                        await handleUploadFailure({message: `Asset ID ${assetId} has expired`})
+                    }
 
                     let processingPath = binPath
                     let contentType = meta.asset_type
