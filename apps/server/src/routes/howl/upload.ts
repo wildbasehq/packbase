@@ -1,10 +1,11 @@
 import {YapockType} from '@/index'
 import {HTTPError} from '@/lib/HTTPError'
 import requiresAccount from '@/utils/identity/requires-account'
+import {cleanupTempVideo, convertToAv1} from '@/utils/video-processor'
 import {randomUUID} from 'crypto'
 import {t} from 'elysia'
 import {existsSync} from 'fs'
-import {appendFile, mkdir, readFile, stat, writeFile} from 'fs/promises'
+import {appendFile, mkdir, readFile, rename, stat, writeFile} from 'fs/promises'
 import path from 'path'
 
 const UPLOAD_ROOT = path.join(process.cwd(), 'temp', 'uploads', 'pending')
@@ -134,8 +135,34 @@ export default (app: YapockType) =>
                 throw HTTPError.badRequest({summary: 'Uploaded size does not match total_bytes'})
             }
 
+            // Video Conversion (AV1 WebM)
+            if (meta.asset_type.startsWith('video/')) {
+                let tempVideoPath: string | null = null
+                try {
+                    tempVideoPath = await convertToAv1(binPath)
+
+                    // Replace the original binary with the converted one
+                    await rename(tempVideoPath, binPath)
+
+                    // Update metadata
+                    const newStats = await stat(binPath)
+                    meta.asset_type = 'video/webm'
+                    meta.total_bytes = newStats.size
+                } catch (e) {
+                    console.error('Video conversion failed during finalize:', e)
+                    meta.state = 'failed'
+                    meta.error = {message: 'Video conversion failed'}
+                    await writeFile(jsonPath, JSON.stringify(meta))
+
+                    if (tempVideoPath) {
+                        await cleanupTempVideo(tempVideoPath)
+                    }
+
+                    throw HTTPError.badRequest({summary: 'Video conversion failed'})
+                }
+            }
+
             meta.state = 'succeeded'
-            // Update expiry to giving them time to post
             // Update expiry to giving them time to post
             const expires = Date.now() + 5 * 60 * 1000 // 5 minutes to use it
             meta.expires = expires

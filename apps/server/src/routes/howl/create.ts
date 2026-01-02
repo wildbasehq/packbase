@@ -9,7 +9,6 @@ import {HowlBody} from '@/models/defs'
 import requiresAccount from '@/utils/identity/requires-account'
 import sanitizeTags from '@/utils/sanitize-tags'
 import {uploadFileStream} from '@/utils/upload-file'
-import {cleanupTempVideo, convertToAv1} from '@/utils/video-processor'
 import {randomUUID} from 'crypto'
 import {t} from 'elysia'
 import {createReadStream, existsSync} from 'fs'
@@ -147,25 +146,7 @@ export default (app: YapockType) =>
 
                         let processingPath = binPath
                         let contentType = meta.asset_type
-                        let isVideo = meta.asset_type.startsWith('video/')
-                        let tempVideoPath: string | null = null
-
-                        if (isVideo) {
-                            try {
-                                tempVideoPath = await convertToAv1(binPath)
-                                processingPath = tempVideoPath
-                                contentType = 'video/webm'
-                            } catch (e) {
-                                console.error('Video conversion failed:', e)
-
-                                // Clean up
-                                if (tempVideoPath) {
-                                    await cleanupTempVideo(tempVideoPath)
-                                }
-
-                                throw new Error(`Video conversion failed for ${assetId}`)
-                            }
-                        }
+                        let isVideo = meta.asset_type === 'video/webm' || meta.asset_type.startsWith('video/')
 
                         const stream = createReadStream(processingPath)
                         const upload = await uploadFileStream(process.env.S3_PROFILES_BUCKET!, `${user.sub}/${uuid}/${i}.{ext}`, stream, contentType)
@@ -173,6 +154,8 @@ export default (app: YapockType) =>
                         if (upload.error) {
                             throw upload.error
                         }
+
+                        console.log(`Upload to S3 succeeded for asset ${assetId} at path ${upload.data.path}`)
 
                         uploadedS3Paths.push(upload.data.path)
                         uploadedAssets.push({
@@ -184,14 +167,12 @@ export default (app: YapockType) =>
                         })
                         i++
 
-                        // Clean up
-                        if (tempVideoPath) {
-                            await cleanupTempVideo(tempVideoPath)
-                        }
                         await unlink(jsonPath).catch(() => {
                         })
                         await unlink(binPath).catch(() => {
                         })
+
+                        console.log(`Uploaded asset ${assetId} to S3 at ${upload.data.path}`)
                     }
                 } catch (error) {
                     // Cleanup uploaded S3 files

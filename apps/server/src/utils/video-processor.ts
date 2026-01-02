@@ -57,6 +57,7 @@ export async function convertToAv1(inputPath: string): Promise<string> {
 
 export async function cleanupTempVideo(filePath: string) {
     try {
+        console.log('Cleaning up temp video file:', filePath)
         if (existsSync(filePath)) {
             await unlink(filePath)
         }
