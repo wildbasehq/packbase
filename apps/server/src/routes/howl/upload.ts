@@ -76,17 +76,7 @@ export default (app: YapockType) =>
             const jsonPath = path.join(UPLOAD_ROOT, `${asset_id}.json`)
             const binPath = path.join(UPLOAD_ROOT, `${asset_id}.bin`)
 
-            if (!existsSync(jsonPath)) {
-                set.status = 404
-                throw HTTPError.notFound({summary: 'Upload session not found'})
-            }
-
-            // Verify ownership
-            const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
-            if (meta.user_id !== user.sub) {
-                set.status = 403
-                throw HTTPError.forbidden({summary: 'Unauthorized'})
-            }
+            const meta = await existsMeta(jsonPath, user)
 
             // Append chunk
             // asset is a Blob/File
@@ -120,16 +110,7 @@ export default (app: YapockType) =>
             const jsonPath = path.join(UPLOAD_ROOT, `${asset_id}.json`)
             const binPath = path.join(UPLOAD_ROOT, `${asset_id}.bin`)
 
-            if (!existsSync(jsonPath)) {
-                set.status = 404
-                throw HTTPError.notFound({summary: 'Upload session not found'})
-            }
-
-            const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
-            if (meta.user_id !== user.sub) {
-                set.status = 403
-                throw HTTPError.forbidden({summary: 'Unauthorized'})
-            }
+            const meta = await existsMeta(jsonPath, user)
 
             const stats = await stat(binPath)
             if (stats.size !== meta.total_bytes) {
@@ -176,16 +157,7 @@ export default (app: YapockType) =>
             const jsonPath = path.join(UPLOAD_ROOT, `${asset_id}.json`)
             const binPath = path.join(UPLOAD_ROOT, `${asset_id}.bin`)
 
-            if (!existsSync(jsonPath)) {
-                set.status = 404
-                throw HTTPError.notFound({summary: 'Upload session not found'})
-            }
-
-            const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
-            if (meta.user_id !== user.sub) {
-                set.status = 403
-                throw HTTPError.forbidden({summary: 'Unauthorized'})
-            }
+            const meta = await existsMeta(jsonPath, user)
 
             let currentSize = 0
             try {
@@ -208,3 +180,17 @@ export default (app: YapockType) =>
                 command: t.Optional(t.String()) // Optional command param if they send it
             })
         })
+
+async function existsMeta(jsonPath: string, user: any) {
+
+    if (!existsSync(jsonPath)) {
+        throw HTTPError.notFound({summary: 'Upload session not found'})
+    }
+
+    const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
+    if (meta.user_id !== user.sub) {
+        throw HTTPError.forbidden({summary: 'Unauthorized'})
+    }
+
+    return meta
+}
