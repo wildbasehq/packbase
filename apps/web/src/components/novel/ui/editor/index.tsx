@@ -1,27 +1,30 @@
-import {EditorBubbleMenu} from '@/components/novel/ui/editor/bubble-menu'
-import {Editor as EditorClass, Extensions} from '@tiptap/core'
-import {EditorProps} from '@tiptap/pm/view'
-import {EditorContent, JSONContent, useEditor} from '@tiptap/react'
-import {useEffect, useState} from 'react'
-import {useDebouncedCallback} from 'use-debounce'
-import {useLocalStorage} from 'usehooks-ts'
-import {defaultExtensions} from './extensions'
-import {defaultEditorProps} from './props'
+import useLocalStorage from '@/components/novel/lib/hooks/use-local-storage'
+import { Editor as EditorClass, Extensions } from '@tiptap/core'
+import { EditorProps } from '@tiptap/pm/view'
+import { EditorContent, JSONContent, useEditor } from '@tiptap/react'
+import { useEffect, useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
+import { EditorBubbleMenu } from './bubble-menu'
+import { defaultExtensions } from './extensions'
+import { defaultEditorProps } from './props'
+import { NovelContext } from './provider'
 
 export default function Editor({
-                                   className = 'relative w-full',
-                                   defaultValue = '',
-                                   extensions = [],
-                                   editorProps = {},
-                                   onUpdate = () => {
-                                   },
-                                   onDebouncedUpdate = () => {
-                                   },
-                                   debounceDuration = 750,
-                                   storageKey = 'novel__content',
-                                   disableLocalStorage = true,
-                                   showBubble = false,
-                               }: {
+    completionApi = '/api/kukiko/generate',
+    className = 'relative w-full',
+    defaultValue = '',
+    extensions = [],
+    editorProps = {},
+    onUpdate = () => {
+    },
+    onDebouncedUpdate = () => {
+    },
+    debounceDuration = 750,
+    storageKey = 'novel__content',
+    disableLocalStorage = true,
+    readOnly = false,
+    showBubble = false
+}: {
     /**
      * Additional classes to add to the editor container.
      * Defaults to "relative min-h-[500px] w-full max-w-(--breakpoint-lg) border-stone-200 bg-white sm:mb-[calc(20vh)] sm:rounded-lg sm:border sm:shadow-lg".
@@ -70,6 +73,10 @@ export default function Editor({
      */
     disableLocalStorage?: boolean
     /**
+     * Whether to make the editor read-only.
+     */
+    readOnly?: boolean
+    /**
      * Whether to show the bubble menu.
      * Defaults to true.
      */
@@ -79,7 +86,7 @@ export default function Editor({
 
     const [hydrated, setHydrated] = useState(false)
 
-    const debouncedUpdates = useDebouncedCallback(async ({editor}) => {
+    const debouncedUpdates = useDebouncedCallback(async ({ editor }) => {
         const json = editor.getJSON()
         onDebouncedUpdate(editor)
 
@@ -94,6 +101,7 @@ export default function Editor({
             ...defaultEditorProps,
             ...editorProps,
         },
+        editable: !readOnly,
         onUpdate: (e) => {
             // const selection = e.editor.state.selection
             // const lastTwo = getPrevText(e.editor, {
@@ -125,10 +133,19 @@ export default function Editor({
             }}
             className={className}
         >
-            {editor && showBubble && <EditorBubbleMenu editor={editor}/>}
-            {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
-            <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full">
-                <EditorContent editor={editor}/>
+            <div
+                onClick={() => {
+                    if (!readOnly) {
+                        editor?.chain().focus().run()
+                    }
+                }}
+                className={className}
+            >
+                {editor && !readOnly && showBubble && <EditorBubbleMenu editor={editor} />}
+                {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
+                <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full">
+                    <EditorContent editor={editor} />
+                </div>
             </div>
         </div>
     )

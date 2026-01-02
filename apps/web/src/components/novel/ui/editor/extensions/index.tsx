@@ -1,7 +1,7 @@
 import {InputRule} from '@tiptap/core'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Placeholder from '@tiptap/extension-placeholder'
-import TextStyle from '@tiptap/extension-text-style'
+import {TextStyle} from '@tiptap/extension-text-style'
 import TiptapUnderline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
 import {Markdown} from 'tiptap-markdown'
@@ -10,10 +10,6 @@ import SlashCommand from './slash-command'
 
 export const defaultExtensions = [
     StarterKit.configure({
-        history: {
-            depth: 100,
-            newGroupDelay: 500,
-        },
         heading: {
             levels: [1, 2, 3],
             HTMLAttributes: {
@@ -108,7 +104,7 @@ export const defaultExtensions = [
 
 export const markdownExtensions = [
     Markdown.configure({
-        html: false,
+        html: true,
         transformCopiedText: true,
         transformPastedText: true,
     })

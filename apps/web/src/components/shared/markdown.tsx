@@ -2,13 +2,14 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {Pre} from '@/components/shared/code'
 import {Heading, Text} from '@/components/shared/text'
 import {cn} from '@/lib'
+import {Pre} from '@/src/components'
 import CreatedByHumans from '@/src/images/svg/noai/created.svg'
 import {Children, createElement, FC, isValidElement, ReactElement} from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeSanitize from 'rehype-sanitize'
+
 
 // Safe sanitization schema for Markdown
 const sanitizeSchema = {
