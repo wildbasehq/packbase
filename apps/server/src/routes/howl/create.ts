@@ -156,10 +156,6 @@ export default (app: YapockType) =>
                             throw upload.error
                         }
 
-                        if (upload.error) {
-                            throw upload.error
-                        }
-
                         console.log(`Upload to S3 succeeded for asset ${assetId} at path ${upload.data.path}`)
 
                         uploadedS3Paths.push(upload.data.path)
