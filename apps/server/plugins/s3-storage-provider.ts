@@ -1,5 +1,5 @@
-import {DeleteObjectCommand, GetObjectCommand, paginateListObjectsV2, PutObjectCommand, S3Client} from '@aws-sdk/client-s3'
-import {StorageProvider} from './storage-interface'
+import { DeleteObjectCommand, GetObjectCommand, paginateListObjectsV2, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { StorageProvider } from './storage-interface'
 
 /**
  * AWS S3 implementation of the StorageProvider interface
@@ -111,7 +111,7 @@ export class S3StorageProvider implements StorageProvider {
     }>> {
         try {
             const paginator = paginateListObjectsV2(
-                {client: this.client, pageSize: 1000},
+                { client: this.client, pageSize: 1000 },
                 {
                     Bucket: this.bucket,
                     Prefix: prefix,

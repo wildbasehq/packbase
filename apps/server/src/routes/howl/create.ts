@@ -10,11 +10,15 @@ import requiresAccount from '@/utils/identity/requires-account'
 import sanitizeTags from '@/utils/sanitize-tags'
 import uploadFile from '@/utils/upload-file'
 import { t } from 'elysia'
+import { readFile, unlink } from 'fs/promises'
+import path from 'path'
+import { existsSync } from 'fs'
+import { randomUUID } from 'crypto'
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({ body: { tenant_id, channel_id, assets, body, content_type, tags }, set, user }) => {
+        async ({ body: { tenant_id, channel_id, assets, asset_ids, body, content_type, tags }, set, user }) => {
             await requiresAccount({ set, user })
 
             body = body?.trim() || ''
@@ -94,20 +98,86 @@ export default (app: YapockType) =>
                 })
             }
 
+            // Howl Asset Uploading
+            // @ts-ignore
+            let uploadedAssets: {
+                type: 'image';
+                data: {
+                    url: string;
+                    name: string;
+                };
+            }[] = []
+            let i = 0
+
+            const handleUploadFailure = async (error: any) => {
+                throw HTTPError.badRequest({
+                    ...error,
+                    summary: error.message || 'Upload failed',
+                })
+            }
+
+            // Generate UUID
+            const uuid = randomUUID()
+
+            // @TODO move this into a utils function
+            if (asset_ids && asset_ids.length > 0) {
+                const UPLOAD_ROOT = path.join(process.cwd(), 'uploads', 'pending')
+                for (const assetId of asset_ids) {
+                    const jsonPath = path.join(UPLOAD_ROOT, `${assetId}.json`)
+                    const binPath = path.join(UPLOAD_ROOT, `${assetId}.bin`)
+
+                    if (!existsSync(jsonPath)) {
+                        await handleUploadFailure({ message: `Asset ID ${assetId} not found` })
+                    }
+
+                    const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
+                    if (meta.user_id !== user.sub) {
+                        await handleUploadFailure({ message: `Asset ID ${assetId} unauthorized` })
+                    }
+                    if (meta.state !== 'succeeded') {
+                        await handleUploadFailure({ message: `Asset ID ${assetId} not finalized` })
+                    }
+
+                    const buffer = await readFile(binPath)
+                    const base64 = buffer.toString('base64')
+                    const dataUri = `data:${meta.asset_type};base64,${base64}`
+
+                    const upload = await uploadFile(process.env.S3_PROFILES_BUCKET, `${user.sub}/${uuid}/${i}.{ext}`, dataUri)
+
+                    if (upload.error) {
+                        await handleUploadFailure(upload.error)
+                    } else {
+                        uploadedAssets.push({
+                            type: 'image',
+                            data: {
+                                url: upload.data.path,
+                                name: `${i}`,
+                            },
+                        })
+
+                        // Clean up
+                        await unlink(jsonPath).catch(() => { })
+                        await unlink(binPath).catch(() => { })
+                    }
+                    i++
+                }
+            }
+
             const dbCreate = await Baozi.trigger('HOWL_CREATE', {
+                id: uuid,
                 tenant_id,
                 channel_id,
                 content_type,
                 body,
                 user_id: user.sub,
                 tags: sanitisedTags,
+                assets: uploadedAssets,
             })
 
             let data
             try {
                 data = await prisma.posts.create({ data: dbCreate })
             } catch (error) {
-                set.status = 400
                 throw HTTPError.fromError(error)
             }
 
@@ -123,54 +193,6 @@ export default (app: YapockType) =>
             clearQueryCache(`~${dbCreate.channel_id}`)
             clearQueryCache(`~${dbCreate.user_id}`)
 
-            // Howl Asset Uploading
-            if (assets && assets.length > 0) {
-                // @ts-ignore
-                let uploadedAssets: {
-                    type: 'image';
-                    data: {
-                        url: string;
-                        name: string;
-                    };
-                }[] = []
-                let i = 0
-                for (const asset of assets) {
-                    const upload = await uploadFile(process.env.S3_PROFILES_BUCKET, `${user.sub}/${data.id}/${i}.{ext}`, asset.data)
-                    if (upload.error) {
-                        // delete post
-                        await prisma.posts.delete({ where: { id: data.id } })
-
-                        // also delete uploaded assets
-                        const storage = createStorage(process.env.S3_PROFILES_BUCKET)
-                        for (const asset of uploadedAssets) {
-                            await storage.deleteFile(user.sub, `${data.id}/${asset.data.name}`)
-                        }
-
-                        set.status = 400
-                        throw HTTPError.badRequest({
-                            ...upload.error,
-                            summary: upload.error.message,
-                        })
-                    } else {
-                        uploadedAssets.push({
-                            type: 'image',
-                            data: {
-                                url: upload.data.path,
-                                name: asset.name,
-                            },
-                        })
-                    }
-                    i++
-                }
-
-                await prisma.posts.update({
-                    where: { id: data.id },
-                    data: {
-                        assets: uploadedAssets,
-                    },
-                })
-            }
-
             FeedController.homeFeedCache.forEach((value, key) => {
                 if (key.includes(user.sub)) {
                     // Soft update
@@ -181,7 +203,6 @@ export default (app: YapockType) =>
                 }
             })
 
-            set.status = 201
             return {
                 id: data.id,
             }

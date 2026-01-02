@@ -1,4 +1,4 @@
-import {t} from 'elysia'
+import { t } from 'elysia'
 import emojiRegex from 'emoji-regex'
 
 export const UserProfile = t.Object(
@@ -205,6 +205,7 @@ export const HowlBody = t.Object({
             }),
         ),
     ),
+    asset_ids: t.Optional(t.Array(t.String())),
     tags: t.Optional(
         t.Array(
             t.String({
@@ -364,7 +365,7 @@ export const NotificationReadBody = t.Object({
 })
 
 export const NotificationFetchQuery = t.Object({
-    limit: t.Optional(t.Number({default: 20})),
+    limit: t.Optional(t.Number({ default: 20 })),
     cursor: t.Optional(t.String()),
-    unread_only: t.Optional(t.Boolean({default: false})),
+    unread_only: t.Optional(t.Boolean({ default: false })),
 })
