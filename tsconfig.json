@@ -13,25 +13,31 @@
     "baseUrl": ".",
     "paths": {
       "@/components/*": [
-        "components/*"
+        "./src/components/*"
       ],
       "@/pages/*": [
-        "pages/*"
+        "./src/pages/*"
       ],
       "@/src/*": [
-        "src/*"
+        "./src/*"
+      ],
+      "@/lib": [
+        "./src/lib"
       ],
       "@/lib/*": [
-        "lib/*"
+        "./src/lib/*"
       ],
       "@/styles/*": [
-        "styles/*"
+        "./src/styles/*"
       ],
       "@/public/*": [
         "public/*"
       ],
       "@/datasets/*": [
         "datasets/*"
+      ],
+      "@/types/*": [
+        "./src/types/*"
       ]
     },
     /* Bundler mode */

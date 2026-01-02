@@ -3,7 +3,6 @@ import React, {useEffect, useRef, useState} from 'react'
 import * as monaco from 'monaco-editor'
 import {Button} from '@/components/shared/experimental-button-rework.tsx'
 import {Alert, AlertDescription, AlertTitle} from '@/components/shared/alert.tsx'
-import Card from '@/components/shared/card.tsx'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import HTMLMonacoLinter, {HTMLMonacoMarks} from 'monaco-html-linter'
@@ -37,7 +36,7 @@ const linterConfig = {
     'tag-pair': true,                   // Tag must be paired
     'tag-self-close': true,             // Empty tags must be self closed
     'tagname-lowercase': true,          // All html element names must be in lowercase
-    'empty-tag-not-self-closed': true,  // Empty tags must not use self-closing syntax
+    'empty-tag-not-self-closed': false,  // Empty tags must not use self-closing syntax
     'src-not-empty': true,              // The src attribute of an img(script,link) must have a value
     'href-abs-or-rel': false,           // An href attribute must be either absolute or relative
 
@@ -203,37 +202,70 @@ const MonacoEditorWrapper = ({defaultValue, onChange}) => {
 const HTMLProfileEditor = () => {
     const [showPreview, setShowPreview] = useState(false)
     const [error, setError] = useState('')
-    const [code, setCode] = useState(`<div class="profile">
+    const [code, setCode] = useState(`<!--
+  * These show between your header and posts on your profile.
+  * More customisation will be added in the near future!
+  * Your profile will soon be able to be fully replaced
+  * with your own HTML and CSS.
+  * 
+  * Hit the "Show Preview" button to see your changes.
+  * Hit the "Save Changes" button to save your changes.
+  * 
+  * !! NOTE !! This is a work in progress and will be improved
+  * in the future.
+  * 
+  * You may lose access to using this feature if you add
+  * code in a way we don't anticipate. AI or "vibe coding"
+  * is not endorsed, and you will lose access.
+  * Trust us, **we'll know**.
+  * 
+  * BY USING AND INTERACTING WITH THE "TEMPLATE" FEATURE, YOU AGREE
+  * THAT WILDBASE ("WE") CAN TERMINATE YOUR ACCESS TO THIS FEATURE
+  * AT ANY TIME FOR ANY REASON, AND ARE SOLELY LIABLE FOR ANY DAMAGE
+  * CAUSED TO YOUR ACCOUNT AS A RESULT FROM THE USE OF THIS FEATURE.
+  * 
+  * THIS FEATURE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+  * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  * 
+  * This comment can be safely removed. Have fun!
+-->
+
+<div class="p-2 ring-1 ring-default rounded-lg">
   <h1>My Profile</h1>
   <p>Welcome to my page!</p>
 </div>`)
 
     // List of blocked HTML elements for security
     const BLOCKED_ELEMENTS = [
-        'script',        // Prevents JavaScript injection
-        'iframe',        // Prevents iframe embedding
-        'object',        // Prevents embedding of external objects
-        'embed',         // Prevents embedding of external content
-        'form',          // Prevents form submission
-        'input',         // Prevents form inputs
-        'button',        // Prevents button elements
-        'link',          // Prevents external stylesheet loading
-        'meta',          // Prevents metadata manipulation
-        'video',         // Prevents video embedding
-        'audio',         // Prevents audio embedding
-        'canvas',        // Prevents canvas manipulation
-        'svg',           // Prevents SVG (which can contain scripts)
+        'script', // Prevents JavaScript injection
+        'iframe', // Prevents iframe embedding
+        'object', // Prevents embedding of external objects
+        'embed', // Prevents embedding of external content
+        'form', // Prevents form submission
+        'input', // Prevents form inputs
+        'button', // Prevents button elements
+        'link', // Prevents external stylesheet loading
+        'meta', // Prevents metadata manipulation
+        'video', // Prevents video embedding
+        'audio', // Prevents audio embedding
+        'canvas', // Prevents canvas manipulation
+        'svg', // Prevents SVG (which can contain scripts)
     ]
 
     // Check for blocked elements in HTML
-    const checkForBlockedElements = (htmlContent) => {
+    const checkForBlockedElements = htmlContent => {
         const parser = new DOMParser()
         const doc = parser.parseFromString(htmlContent, 'text/html')
 
         for (const element of BLOCKED_ELEMENTS) {
             const found = doc.getElementsByTagName(element)
             if (found.length > 0) {
-                return `The use of <${element}> tags is not allowed for security reasons.`
+                return `The use of <${element}> tags is reserved for verified developers with high trust.`
             }
         }
 
@@ -243,7 +275,7 @@ const HTMLProfileEditor = () => {
             const attributes = el.attributes
             for (const attr of attributes) {
                 if (attr.name.toLowerCase().startsWith('on')) {
-                    return `Event handlers (like ${attr.name}) are not allowed for security reasons.`
+                    return `Event handlers (like ${attr.name}) are reserved for verified developers with high trust.`
                 }
             }
         }
@@ -254,27 +286,25 @@ const HTMLProfileEditor = () => {
     // Debounce validation to prevent too frequent updates
     const validateTimeoutRef = useRef(null)
 
-    const validateHTML = (htmlContent) => {
+    const validateHTML = htmlContent => {
         try {
             const parser = new DOMParser()
             const doc = parser.parseFromString(htmlContent, 'text/html')
-            const errors = doc.getElementsByTagName('parsererror')
-            const warnings = doc.getElementsByTagName('warning')
 
-            const report = (new HTMLMonacoMarks(htmlContent, linterConfig)).getLinterResponse()
-
-            for (const error of report) {
-                if (['error', 'warning'].includes(error.type)) {
-                    setError(error.message)
-                    return false
-                }
-            }
+            const report = new HTMLMonacoMarks(htmlContent, linterConfig).getLinterResponse()
 
             // First check for blocked elements
             const blockedError = checkForBlockedElements(htmlContent)
             if (blockedError) {
                 setError(blockedError)
                 return false
+            }
+
+            for (const error of report) {
+                if (['error', 'warning'].includes(error.type)) {
+                    setError(error.message)
+                    return false
+                }
             }
 
             // Warning if using <style> tag
@@ -287,7 +317,9 @@ const HTMLProfileEditor = () => {
                     return false
                 }
 
-                setError('The use of <style> tags is discouraged.\nWhile it\'s allowed (and in some places encouraged), modifying the page too much may result in you losing access to ever using it again!')
+                setError(
+                    "The use of <style> tags is discouraged.\nWhile it's allowed (and in some places encouraged), modifying the page too much may result in you losing access to ever using it again!"
+                )
                 setCode(htmlContent)
                 return true
             }
@@ -301,7 +333,7 @@ const HTMLProfileEditor = () => {
         }
     }
 
-    const handleEditorChange = (newValue) => {
+    const handleEditorChange = newValue => {
         // Debounce validation
         if (validateTimeoutRef.current) {
             clearTimeout(validateTimeoutRef.current)
@@ -331,30 +363,27 @@ const HTMLProfileEditor = () => {
         <div className="space-y-4">
             {/* Editor Controls */}
             <div className="flex justify-between items-center">
-                <Button
-                    outline
-                    onClick={() => setShowPreview(!showPreview)}
-                >
-                    {showPreview ? <EyeIcon className="mr-2 inline-flex"/> : <EyeSlashIcon className="mr-2 inline-flex"/>}
+                <Button outline onClick={() => setShowPreview(!showPreview)}>
+                    {showPreview ? <EyeIcon className="mr-2 inline-flex" /> : <EyeSlashIcon className="mr-2 inline-flex" />}
                     {showPreview ? 'Hide Preview' : 'Show Preview'}
                 </Button>
 
                 <div className="text-sm text-alt">
-                    {error ?
+                    {error ? (
                         <span className="flex items-center text-tertiary">
-                            <XCircleIcon className="mr-1 h-4 w-4 inline-flex"/>
+                            <XCircleIcon className="mr-1 h-4 w-4 inline-flex" />
                             Can't upload this code
                         </span>
-                        :
+                    ) : (
                         <span className="flex items-center text-green-500">
-                            <CheckCircleIcon className="mr-1 h-4 w-4 inline-flex"/>
+                            <CheckCircleIcon className="mr-1 h-4 w-4 inline-flex" />
                             Allowed
                         </span>
-                    }
+                    )}
                 </div>
 
                 <Button onClick={handleSave} disabled={!!error}>
-                    <CheckCircleIcon className="mr-2 inline-flex"/>
+                    <CheckCircleIcon className="mr-2 inline-flex" />
                     Save Changes
                 </Button>
             </div>
@@ -362,29 +391,20 @@ const HTMLProfileEditor = () => {
             {/* Error Alert */}
             {error && (
                 <Alert variant="destructive">
-                    {error.split('\n').map((line, index) => index === 0 ? (
-                        <AlertTitle key={index}>{line}</AlertTitle>
-                    ) : (
-                        <AlertDescription key={index}>{line}</AlertDescription>
-                    ))}
+                    {error.split('\n').map((line, index) => {
+                        if (index === 0) {
+                            return <AlertTitle key={index}>{line}</AlertTitle>;
+                        }
+                        return <AlertDescription key={index}>{line}</AlertDescription>;
+                    })}
                 </Alert>
             )}
 
             {/* Monaco Editor */}
-            <MonacoEditorWrapper
-                defaultValue={code}
-                onChange={handleEditorChange}
-            />
+            <MonacoEditorWrapper defaultValue={code} onChange={handleEditorChange} />
 
             {/* Preview Panel */}
-            {showPreview && (
-                <Card className="mt-4">
-                    <div
-                        className="preview-container"
-                        dangerouslySetInnerHTML={{__html: code}}
-                    />
-                </Card>
-            )}
+            {showPreview && <div className="preview-container mt-4" dangerouslySetInnerHTML={{ __html: code }} />}
         </div>
     )
 }

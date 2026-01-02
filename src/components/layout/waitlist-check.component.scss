@@ -1,0 +1,14 @@
+.elastic-bounce {
+  animation: elasticBounce 15s cubic-bezier(.75, 0, .05, 1.25) infinite;
+}
+
+// Y
+// "pause" at the end
+@keyframes elasticBounce {
+  0%, 15%, 22% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(-10px);
+  }
+}

@@ -1,0 +1,138 @@
+import StarterKit from '@tiptap/starter-kit'
+import HorizontalRule from '@tiptap/extension-horizontal-rule'
+import TiptapImage from '@tiptap/extension-image'
+import Placeholder from '@tiptap/extension-placeholder'
+import TiptapUnderline from '@tiptap/extension-underline'
+import TextStyle from '@tiptap/extension-text-style'
+import { Markdown } from 'tiptap-markdown'
+import SlashCommand from './slash-command'
+import { InputRule } from '@tiptap/core'
+import UploadImagesPlugin from '@/components/novel/ui/editor/plugins/upload-images'
+import UpdatedImage from './updated-image'
+import CustomKeymap from './custom-keymap'
+
+export const defaultExtensions = [
+    StarterKit.configure({
+        heading: {
+            levels: [1, 2, 3],
+            HTMLAttributes: {
+                class: 'enforce-proper-heading-size',
+            },
+        },
+        bulletList: {
+            HTMLAttributes: {
+                class: 'list-disc pl-4',
+            },
+        },
+        orderedList: {
+            HTMLAttributes: {
+                class: 'list-decimal pl-4',
+            },
+        },
+        listItem: {
+            HTMLAttributes: {
+                class: 'leading-normal',
+            },
+        },
+        blockquote: {
+            HTMLAttributes: {
+                class: 'border-l-4 border-stone-700',
+            },
+        },
+        codeBlock: {
+            HTMLAttributes: {
+                class: 'rounded-md bg-stone-200 p-4 font-mono font-medium text-stone-900',
+            },
+        },
+        code: {
+            HTMLAttributes: {
+                class: 'rounded-md bg-stone-200 px-1.5 py-1 font-mono font-medium text-stone-900',
+                spellcheck: 'false',
+            },
+        },
+        horizontalRule: false,
+        dropcursor: {
+            color: '#DBEAFE',
+            width: 4,
+        },
+        gapcursor: false,
+    }),
+    // patch to fix horizontal rule bug: https://github.com/ueberdosis/tiptap/pull/3859#issuecomment-1536799740
+    HorizontalRule.extend({
+        addInputRules() {
+            return [
+                new InputRule({
+                    find: /^(?:---|—-|___\s|\*\*\*\s)$/,
+                    handler: ({ state, range }) => {
+                        const attributes = {}
+
+                        const { tr } = state
+                        const start = range.from
+                        let end = range.to
+
+                        tr.insert(start - 1, this.type.create(attributes)).delete(tr.mapping.map(start), tr.mapping.map(end))
+                    },
+                }),
+            ]
+        },
+    }).configure({
+        HTMLAttributes: {
+            class: 'mt-4 mb-6 border-t border-stone-300',
+        },
+    }),
+    // TiptapLink.configure({
+    //     HTMLAttributes: {
+    //         class: 'text-stone-400 underline underline-offset-[3px] hover:text-stone-600 transition-colors cursor-pointer',
+    //     },
+    // }),
+    TiptapImage.extend({
+        addProseMirrorPlugins() {
+            return [UploadImagesPlugin()]
+        },
+    }).configure({
+        allowBase64: true,
+        HTMLAttributes: {
+            class: 'rounded-lg border border-stone-200',
+        },
+    }),
+    UpdatedImage.configure({
+        HTMLAttributes: {
+            class: 'rounded-lg border border-stone-200',
+        },
+    }),
+    Placeholder.configure({
+        placeholder: ({ node }) => {
+            if (node.type.name === 'heading') {
+                return `Heading ${node.attrs.level}`
+            }
+            return "'/' to add stuff, or just start writing..."
+        },
+        includeChildren: true,
+    }),
+    SlashCommand,
+    TiptapUnderline,
+    TextStyle,
+    // Color,
+    // Highlight.configure({
+    //     multicolor: true,
+    // }),
+    // TaskList and TaskItem are not used in the markdown renderer, so we'll keep them commented out
+    // TaskList.configure({
+    //     HTMLAttributes: {
+    //         class: "not-prose pl-2",
+    //     },
+    // }),
+    // TaskItem.configure({
+    //     HTMLAttributes: {
+    //         class: "flex items-start my-4",
+    //     },
+    //     nested: true,
+    // }),
+    Markdown.configure({
+        html: false,
+        transformCopiedText: true,
+        transformPastedText: true,
+    }),
+    CustomKeymap,
+    // DragAndDrop,
+]

@@ -6,6 +6,92 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <meta content="Packbase" name="description"/>
     <meta content="%CF_PAGES_COMMIT_SHA%" name="commit-sha"/>
+    <link rel="prefetch" href="/img/n-bg.jpg" as="image" />
+    <script>
+        (function () {
+            var _0x1a2b = ['dark', 'head', 'createElement', 'style', 'appendChild', 'classList', 'add', 'remove', 'includes', 'search', 'location', 'matchMedia', '(prefers-color-scheme: dark)', 'matches', 'documentElement', 'innerHTML'];
+
+            var _0x3c4d = function (_0x5a6b7c) {
+                return _0x1a2b[_0x5a6b7c];
+            };
+
+            var _0xcs1 = "QGZvbnQtZmFjZXtmb250LWZhbWlseToi";
+            var _0xcs2 = "RmFrZSBGb250Ijtzb3JjOnVybCgnQC9zcm";
+            var _0xcs3 = "MvZm9udHMvZmFrZS5vdGYnKSBmb3JtYXQo";
+            var _0xcs4 = "J3RydWV0eXBlJyk7fTsqe2ZvbnQtZmFtaW";
+            var _0xcs5 = "x5OidGYWtlIEZvbnQnLCdXaWxkYmFzZSBN";
+            var _0xcs6 = "ZWRpdW0nLHNhbnMtc2VyaWYhaW1wb3J0YW";
+            var _0xcs7 = "50O30=";
+
+            function _0xA() {
+                if (window[_0x3c4d(11)](_0x3c4d(12))[_0x3c4d(13)]) {
+                    document[_0x3c4d(14)][_0x3c4d(5)][_0x3c4d(6)](_0x3c4d(0));
+                } else {
+                    document[_0x3c4d(14)][_0x3c4d(5)][_0x3c4d(7)](_0x3c4d(0));
+                }
+            }
+
+            function _0xB() {
+                if (window[_0x3c4d(10)][_0x3c4d(9)][_0x3c4d(8)]('dm=1')) {
+                    var _0xcss = _0xcs1 + _0xcs2 + _0xcs3 + _0xcs4 + _0xcs5 + _0xcs6 + _0xcs7;
+                    var _0xstyle = document[_0x3c4d(2)](_0x3c4d(3));
+                    _0xstyle[_0x3c4d(15)] = _0xdecode(_0xcss).replace('sorc', 'src').replace('@/', '/').replace('};', '}');
+                    document[_0x3c4d(1)][_0x3c4d(4)](_0xstyle);
+                }
+            }
+
+            function _0xdecode(_0xstr) {
+                var _0xchars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+                var _0xout = '';
+                var _0xc1, _0xc2, _0xc3, _0xe1, _0xe2, _0xe3, _0xe4;
+                var _0xi = 0;
+
+                function _0xpart1() {
+                    _0xstr = _0xstr.replace(/[^A-Za-z0-9\+\/\=]/g, '');
+                }
+
+                function _0xpart2() {
+                    while (_0xi < _0xstr.length) {
+                        _0xe1 = _0xchars.indexOf(_0xstr.charAt(_0xi++));
+                        _0xe2 = _0xchars.indexOf(_0xstr.charAt(_0xi++));
+                        _0xe3 = _0xchars.indexOf(_0xstr.charAt(_0xi++));
+                        _0xe4 = _0xchars.indexOf(_0xstr.charAt(_0xi++));
+
+                        _0xc1 = (_0xe1 << 2) | (_0xe2 >> 4);
+                        _0xc2 = ((_0xe2 & 15) << 4) | (_0xe3 >> 2);
+                        _0xc3 = ((_0xe3 & 3) << 6) | _0xe4;
+
+                        _0xout = _0xout + String.fromCharCode(_0xc1);
+
+                        if (_0xe3 != 64) {
+                            _0xout = _0xout + String.fromCharCode(_0xc2);
+                        }
+
+                        if (_0xe4 != 64) {
+                            _0xout = _0xout + String.fromCharCode(_0xc3);
+                        }
+                    }
+                }
+
+                if (Math.random() > 0.5) {
+                    _0xpart1();
+                    _0xpart2();
+                } else {
+                    _0xpart1();
+                    _0xpart2();
+                }
+
+                return _0xout;
+            }
+
+            setTimeout(function () {
+                if (("" + Math.random()).length > 0) {
+                    _0xA();
+                    _0xB();
+                }
+            }, 0);
+        })();
+    </script>
 
     <style>
         @font-face {
@@ -13,8 +99,63 @@
             src: url('@/src/fonts/lexend-variable.ttf') format('truetype');
         }
 
+        @font-face {
+            font-family: "New Spirit Bold";
+            src: url('@/src/fonts/new-spirit-bold.otf') format('truetype');
+        }
+
+        /* Instrument Serif, Regular and Italic  */
+        @font-face {
+            font-family: "Instrument Serif";
+            src: url('@/src/fonts/instrument-serif-regular.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: "Instrument Serif Italic";
+            src: url('@/src/fonts/instrument-serif-italic.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: "Wildbase Regular";
+            src: url('@/src/fonts/wildbase-regular.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: "Wildbase Medium";
+            src: url('@/src/fonts/wildbase-medium.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: "Wildbase Bold";
+            src: url('@/src/fonts/wildbase-bold.woff2') format('woff2');
+        }
+
         :root {
             font-family: 'Lexend', sans-serif;
+        }
+
+        .font-new-spirit-bold {
+            font-family: 'New Spirit Bold', sans-serif;
+        }
+
+        .font-instrument-serif-regular {
+            font-family: 'Instrument Serif', sans-serif;
+        }
+
+        .font-instrument-serif-italic {
+            font-family: 'Instrument Serif Italic', sans-serif;
+        }
+
+        .font-wildbase-regular {
+            font-family: 'Wildbase Regular', sans-serif;
+        }
+
+        .font-wildbase-medium {
+            font-family: 'Wildbase Medium', sans-serif;
+        }
+
+        .font-wildbase-bold {
+            font-family: 'Wildbase Bold', sans-serif;
         }
     </style>
 

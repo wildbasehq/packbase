@@ -1,5 +1,5 @@
 import IDArtistShowcase from './artist-showcase'
-import {useUIStore} from '@/lib/states'
+import {useUIStore} from '@/lib/state'
 import {ReactNode, useEffect} from 'react'
 
 export default function IDLayout({children}: { children: ReactNode }) {
