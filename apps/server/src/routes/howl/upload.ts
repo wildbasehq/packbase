@@ -200,16 +200,15 @@ async function existsMeta(jsonPath: string, user: any) {
     }
 
     const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
-    
+
     // Check expiry first
     if (meta.expires && Date.now() > meta.expires) {
         throw HTTPError.badRequest({summary: 'Upload session has expired'})
     }
-    
+
     if (meta.user_id !== user.sub) {
         throw HTTPError.forbidden({summary: 'Unauthorized'})
     }
 
     return meta
-}
 }
