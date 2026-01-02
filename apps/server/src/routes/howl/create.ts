@@ -157,6 +157,12 @@ export default (app: YapockType) =>
                                 contentType = 'video/webm'
                             } catch (e) {
                                 console.error('Video conversion failed:', e)
+
+                                // Clean up
+                                if (tempVideoPath) {
+                                    await cleanupTempVideo(tempVideoPath)
+                                }
+
                                 throw new Error(`Video conversion failed for ${assetId}`)
                             }
                         }
