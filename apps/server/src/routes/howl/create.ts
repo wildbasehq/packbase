@@ -1,21 +1,21 @@
 import prisma from '@/db/prisma'
-import {YapockType} from '@/index'
+import { YapockType } from '@/index'
 import Baozi from '@/lib/events'
-import {FeedController} from '@/lib/FeedController'
-import {HTTPError} from '@/lib/HTTPError'
-import {clearQueryCache} from '@/lib/search/cache'
+import { FeedController } from '@/lib/FeedController'
+import { HTTPError } from '@/lib/HTTPError'
+import { clearQueryCache } from '@/lib/search/cache'
 import createStorage from '@/lib/storage'
-import {HowlBody} from '@/models/defs'
+import { HowlBody } from '@/models/defs'
 import requiresAccount from '@/utils/identity/requires-account'
 import sanitizeTags from '@/utils/sanitize-tags'
 import uploadFile from '@/utils/upload-file'
-import {t} from 'elysia'
+import { t } from 'elysia'
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({body: {tenant_id, channel_id, assets, body, content_type, tags}, set, user}) => {
-            await requiresAccount({set, user})
+        async ({ body: { tenant_id, channel_id, assets, body, content_type, tags }, set, user }) => {
+            await requiresAccount({ set, user })
 
             body = body?.trim() || ''
             if (body.length === 0 && (!assets || assets.length === 0)) {
@@ -32,7 +32,7 @@ export default (app: YapockType) =>
                 })
             }
 
-            const tenant = await prisma.packs.findUnique({where: {id: tenant_id}})
+            const tenant = await prisma.packs.findUnique({ where: { id: tenant_id } })
 
             if (!tenant) {
                 set.status = 404
@@ -44,8 +44,8 @@ export default (app: YapockType) =>
             // If channel_id is provided, verify it exists and belongs to the specified tenant
             if (channel_id) {
                 const page = await prisma.packs_pages.findUnique({
-                    where: {id: channel_id},
-                    select: {tenant_id: true},
+                    where: { id: channel_id },
+                    select: { tenant_id: true },
                 })
 
                 if (!page) {
@@ -105,7 +105,7 @@ export default (app: YapockType) =>
 
             let data
             try {
-                data = await prisma.posts.create({data: dbCreate})
+                data = await prisma.posts.create({ data: dbCreate })
             } catch (error) {
                 set.status = 400
                 throw HTTPError.fromError(error)
@@ -114,8 +114,8 @@ export default (app: YapockType) =>
             // Set profile r18 status if necessary
             if (sanitisedTags.includes('rating_suggestive') || sanitisedTags.includes('rating_explicit')) {
                 await prisma.profiles.update({
-                    where: {id: user.sub},
-                    data: {is_r18: true},
+                    where: { id: user.sub },
+                    data: { is_r18: true },
                 })
             }
 
@@ -123,6 +123,7 @@ export default (app: YapockType) =>
             clearQueryCache(`~${dbCreate.channel_id}`)
             clearQueryCache(`~${dbCreate.user_id}`)
 
+            // Howl Asset Uploading
             if (assets && assets.length > 0) {
                 // @ts-ignore
                 let uploadedAssets: {
@@ -137,7 +138,7 @@ export default (app: YapockType) =>
                     const upload = await uploadFile(process.env.S3_PROFILES_BUCKET, `${user.sub}/${data.id}/${i}.{ext}`, asset.data)
                     if (upload.error) {
                         // delete post
-                        await prisma.posts.delete({where: {id: data.id}})
+                        await prisma.posts.delete({ where: { id: data.id } })
 
                         // also delete uploaded assets
                         const storage = createStorage(process.env.S3_PROFILES_BUCKET)
@@ -163,7 +164,7 @@ export default (app: YapockType) =>
                 }
 
                 await prisma.posts.update({
-                    where: {id: data.id},
+                    where: { id: data.id },
                     data: {
                         assets: uploadedAssets,
                     },
@@ -173,7 +174,7 @@ export default (app: YapockType) =>
             FeedController.homeFeedCache.forEach((value, key) => {
                 if (key.includes(user.sub)) {
                     // Soft update
-                    const {data: post} = value
+                    const { data: post } = value
                     post.unshift(data)
                     value.data = post
                     FeedController.homeFeedCache.set(key, value)
