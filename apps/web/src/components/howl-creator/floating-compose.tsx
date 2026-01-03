@@ -3,15 +3,14 @@
  */
 
 import PostSettingsModal from '@/components/howl-creator/post-settings-modal'
-import {Camera, HardDisk} from '@/components/icons/plump'
+import {Camera} from '@/components/icons/plump'
 import {ChatBubbleExclamation} from '@/components/icons/plump/chat-bubble-exclamation'
 import {useModal} from '@/components/modal/provider'
 import {markdownExtensions} from '@/components/novel/ui/editor/extensions'
-import Tooltip from '@/components/shared/tooltip'
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
 import getInitials from '@/lib/utils/get-initials'
 import PackbaseInstance from '@/lib/workers/global-event-emit'
-import {Avatar, Badge, BubblePopover, Editor, Heading, LoadingCircle, Logo, PopoverHeader, Text} from '@/src/components'
+import {Avatar, BubblePopover, Editor, Heading, LoadingCircle, Logo, PopoverHeader, Text} from '@/src/components'
 import {API_URL, cn, isVisible, vg} from '@/src/lib'
 import {HashtagIcon} from '@heroicons/react/16/solid'
 import {ArrowDownIcon, PlusIcon} from '@heroicons/react/20/solid'
@@ -136,16 +135,17 @@ export default function FloatingCompose() {
                     }
                 }
 
-                // Start chunked upload
-                try {
-                    const assetId = await uploadFileChunked(file)
-                    setAssets(prev => prev.map(img => img.id === id ? {...img, assetId, uploading: false} : img))
-                } catch (e: any) {
-                    console.error(e)
-                    toast.error(`Failed to upload ${file.name}: ${e.message || 'Unknown error'}`)
-                    // Remove failed image
-                    setAssets(prev => prev.filter(img => img.id !== id))
-                }
+                // Start chunked upload (non-blocking - all uploads happen in parallel)
+                uploadFileChunked(file)
+                    .then(assetId => {
+                        setAssets(prev => prev.map(img => img.id === id ? {...img, assetId, uploading: false} : img))
+                    })
+                    .catch((e: any) => {
+                        console.error(e)
+                        toast.error(`Failed to upload ${file.name}: ${e.message || 'Unknown error'}`)
+                        // Remove failed image
+                        setAssets(prev => prev.filter(img => img.id !== id))
+                    })
             }
             if (fileInputRef.current) fileInputRef.current.value = null
         }
@@ -387,34 +387,37 @@ function FloatingComposeContent({
                         <Heading size="sm">{currentResource?.display_name}</Heading>
                     </Activity>
                 </div>
-                <Tooltip
-                    content={
-                        <div className="flex flex-col gap-1">
-                            <span className="gap-2">
-                                Jump into Deep Compose
-                            </span>
-                            <span className="text-xs">
-                                Create or Draft multiple Howls and Stories quickly on a dedicated page.
-                            </span>
-                            <div>
-                                <Badge color="red">
-                                    Experimental - may be unstable
-                                </Badge>
-                            </div>
-                        </div>
-                    }
-                    side="bottom"
-                >
-                    <div
-                        className="bg-muted rounded-full w-7 h-7 p-1.5 text-indigo-500"
-                        onClick={e => {
-                            e.stopPropagation()
-                            toast.error('"Your Stuff" is disabled by the instance owner.')
-                        }}
-                    >
-                        <HardDisk className="fill-muted-foreground w-full h-full"/>
-                    </div>
-                </Tooltip>
+                {/*<Tooltip*/}
+                {/*    content={*/}
+                {/*        <div className="flex flex-col gap-1">*/}
+                {/*            <span className="gap-2">*/}
+                {/*                Jump into Deep Compose*/}
+                {/*            </span>*/}
+                {/*            <span className="text-xs">*/}
+                {/*                Create or Draft multiple Howls and Stories quickly on a dedicated page.*/}
+                {/*            </span>*/}
+                {/*            <div>*/}
+                {/*                <Badge color="red">*/}
+                {/*                    Experimental - may be unstable*/}
+                {/*                </Badge>*/}
+                {/*            </div>*/}
+                {/*        </div>*/}
+                {/*    }*/}
+                {/*    side="bottom"*/}
+                {/*>*/}
+                {/*    <div*/}
+                {/*        className="bg-muted rounded-full w-7 h-7 p-1.5 text-indigo-500"*/}
+                {/*        onClick={e => {*/}
+                {/*            e.stopPropagation()*/}
+                {/*            toast.error('"Your Stuff" is disabled by the instance owner.')*/}
+                {/*        }}*/}
+                {/*    >*/}
+                {/*        <HardDisk className="fill-muted-foreground w-full h-full"/>*/}
+                {/*    </div>*/}
+                {/*</Tooltip>*/}
+
+                {/* Dummy for now */}
+                <div className="flex w-8 h-8"/>
             </div>
 
             <div className="grow p-4 overflow-y-auto max-h-[calc(100vh-11rem)]">
@@ -459,7 +462,7 @@ function FloatingComposeContent({
                                     type="file"
                                     ref={fileInputRef}
                                     multiple
-                                    accept="image/*,video/*"
+                                    accept="image/*,video/*,.mov"
                                     onChange={e => addAttachment(e.target.files)}
                                 />
                                 <Camera className="w-5 h-5 fill-primary-light p-0.5"/>

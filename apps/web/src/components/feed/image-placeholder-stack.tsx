@@ -2,9 +2,10 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import { TrashIcon } from '@heroicons/react/20/solid'
-import { motion, useAnimationControls } from 'motion/react'
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
+import {cn} from '@/lib'
+import {TrashIcon} from '@heroicons/react/20/solid'
+import {motion, useAnimationControls} from 'motion/react'
+import {Dispatch, SetStateAction, useEffect, useMemo, useRef, useState} from 'react'
 
 export type Asset = {
     id: string
@@ -14,7 +15,7 @@ export type Asset = {
     uploading?: boolean
 }
 
-export default function AssetUploadStack({ assets, setAssets }: {
+export default function AssetUploadStack({assets, setAssets}: {
     assets: Asset[];
     setAssets: Dispatch<SetStateAction<Asset[]>>
 }) {
@@ -55,6 +56,7 @@ export default function AssetUploadStack({ assets, setAssets }: {
                         src={asset.src}
                         containerWidth={containerWidth}
                         total={assets?.length || 0}
+                        uploading={asset.uploading}
                         onReorder={handleReorder}
                         onRemove={handleRemove}
                     />
@@ -65,19 +67,21 @@ export default function AssetUploadStack({ assets, setAssets }: {
 }
 
 function DraggableCard({
-    id,
-    index,
-    src,
-    containerWidth,
-    total,
-    onReorder,
-    onRemove,
-}: {
+                           id,
+                           index,
+                           src,
+                           containerWidth,
+                           total,
+                           uploading,
+                           onReorder,
+                           onRemove,
+                       }: {
     id: string
     index: number
     src: string
     containerWidth: number
     total: number
+    uploading?: boolean
     onReorder: (id: string, toIndex: number) => void
     onRemove?: (id: string) => void
 }) {
@@ -110,17 +114,17 @@ function DraggableCard({
             })
         } else {
             // controls.stop()
-            controls.start({ rotate: baseRotate })
+            controls.start({rotate: baseRotate})
         }
     }, [overThreshold, baseRotate, controls])
 
     return (
         <motion.div
-            className="absolute top-2 h-20 w-24 rounded-lg border ring-1 ring-default shadow-sm bg-muted/50 overflow-hidden"
-            style={{ zIndex: isDragging ? 999 : z, left, willChange: 'transform' }}
-            initial={{ rotate: baseRotate, y: 0 }}
-            whileHover={{ y: -6, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            className={cn('absolute top-2 h-20 w-24 rounded-lg border ring-1 ring-default shadow-sm bg-muted/50 overflow-hidden', uploading && 'animate-pulse')}
+            style={{zIndex: isDragging ? 999 : z, left, willChange: 'transform'}}
+            initial={{rotate: baseRotate, y: 0}}
+            whileHover={{y: -6, rotate: 0}}
+            transition={{type: 'spring', stiffness: 400, damping: 30}}
             layout
             drag
             dragMomentum={false}
@@ -148,19 +152,19 @@ function DraggableCard({
                 if (clampedIndex !== index) {
                     onReorder(id, clampedIndex)
                 }
-                controls.start({ y: 0, x: 0, transition: { type: 'spring', stiffness: 700, damping: 40 } })
+                controls.start({y: 0, x: 0, transition: {type: 'spring', stiffness: 700, damping: 40}})
             }}
             animate={controls}
         >
             {overThreshold && (
                 <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-red-500/50">
-                    <TrashIcon className="w-6 h-6 text-white" />
+                    <TrashIcon className="w-6 h-6 text-white"/>
                 </div>
             )}
             <div className="h-full w-full bg-sidebar">
-                <img src={src} alt="Image" className="h-full w-full object-cover pointer-events-none" />
+                <img src={src} alt="Image" className="h-full w-full object-cover pointer-events-none"/>
                 <div className="h-full w-full grid place-items-center">
-                    <div className="h-8 w-14 rounded-md bg-white/50 dark:bg-white/10" />
+                    <div className="h-8 w-14 rounded-md bg-white/50 dark:bg-white/10"/>
                 </div>
             </div>
         </motion.div>
