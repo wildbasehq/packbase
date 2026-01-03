@@ -27,11 +27,17 @@ export async function convertToAv1(inputPath: string): Promise<string> {
         ffmpeg(inputPath)
             .outputOptions([
                 '-c:v libvpx-vp9',
-                '-crf 40', // raise a bit for speed/size tradeoff (optional)
+                '-crf 0', // lossless quality
                 '-b:v 0',
-                '-cpu-used 10', // 0=best/slowest, 8..10=faster/worse
-                '-row-mt 1', // enable row multithreading (if supported by the build)
-                '-threads 0', // let ffmpeg choose
+                '-cpu-used 8', // fastest for libvpx-vp9
+                '-deadline realtime', // prioritize speed over quality
+                '-row-mt 1', // row-level multithreading
+                '-tile-columns 2', // enable tiles for more parallelism (2^n columns)
+                '-tile-rows 1',
+                '-lag-in-frames 0', // disable lookahead to reduce latency
+                '-auto-alt-ref 0', // disable alt-ref frames for speed
+                '-frame-parallel 1', // additional parallelism
+                '-threads 0', // let ffmpeg pick optimal threads
 
                 // Audio
                 '-c:a libopus',
