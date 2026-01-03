@@ -115,6 +115,7 @@ export class Storage {
      * @param filePath The path within the user's folder
      * @param stream The file stream
      * @param contentType The content type
+     * @param contentLength
      * @returns Object with success status, path, and version info
      */
     async uploadStream(
@@ -184,6 +185,8 @@ export class Storage {
     }> {
         try {
             const fullPath = `${userId}/${filePath}`
+
+            console.log('Deleting file:', fullPath)
 
             // Delete the file using the storage provider
             const deleteSuccess = await this.storageProvider.deleteFile(fullPath)

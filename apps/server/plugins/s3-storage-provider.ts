@@ -57,21 +57,48 @@ export class S3StorageProvider implements StorageProvider {
     /**
      * Upload a file to the S3 bucket
      * @param key The key/path where the file should be stored
-     * @param data The file data as a Buffer
+     * @param data The file data as a Buffer or Readable stream
      * @param contentType The content type of the file
+     * @param contentLength The content length (required for streams)
      * @returns Promise resolving to success status
      */
     async uploadFile(key: string, data: Buffer | Readable, contentType: string, contentLength?: number): Promise<boolean> {
         try {
+            const lengthInfo = contentLength ? `~${(contentLength / 1024).toFixed(2)} KB` : 'unknown size'
+            console.log(`Uploading file to S3 at key: ${key}. Size ${lengthInfo}. Type of data: ${data instanceof Buffer ? 'Buffer' : 'Stream'}`)
+
+            // If data is a stream, convert it to a buffer first to avoid hanging issues
+            // This is especially important for small files where buffering is not a problem
+            // God forbid a lot of people upload chunky files at once though. RIP our memory
+            let uploadData: Buffer
+            let finalContentLength: number | undefined
+
+            if (data instanceof Buffer) {
+                uploadData = data
+                finalContentLength = data.length
+            } else {
+                // Convert stream to buffer
+                console.log(`Converting stream to buffer for reliable upload...`)
+                const chunks: Buffer[] = []
+                for await (const chunk of data) {
+                    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+                }
+                uploadData = Buffer.concat(chunks)
+                finalContentLength = uploadData.length
+                console.log(`Stream converted to buffer: ${(uploadData.length / 1024).toFixed(2)} KB`)
+            }
+
             await this.client.send(
                 new PutObjectCommand({
                     Bucket: this.bucket,
                     Key: key,
-                    Body: data,
+                    Body: uploadData,
                     ContentType: contentType,
-                    ContentLength: contentLength,
+                    ContentLength: finalContentLength,
                 })
             )
+
+            console.log(`Successfully uploaded file to S3 at key: ${key}`)
             return true
         } catch (error) {
             console.error('Error uploading file to S3:', error)
