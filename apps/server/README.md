@@ -4,16 +4,12 @@
 
 ## Install
 
-1. **Clone the repository:**
-
-   ```bash
-   git clone <url>
-   ```
+1. **Clone the repository.**
 
 2. **Navigate to the project directory:**
 
    ```bash
-   cd korat-hb
+   cd packbase
    ```
 
 3. **Install dependencies:**
@@ -36,9 +32,8 @@
 
 6. **Create a Clerk Account:**
 
-    - Sign up at [Clerk](https://clerk.com/) and create a new application.
-    - In **Configure** > **User & Authentication**, ensure that "Email" and "Username" are enabled as sign-up and
-      sign-in methods.
+    - Sign up at [Clerk](https://clerk.com/) and create a new application. Ensure that "Email" and "Username" are
+      enabled as sign-up and sign-in methods.
     - Obtain your Clerk API keys from the `development` environment and update the `.env` file with these keys (usually
       found in **Configure** > **API Keys**).
     - (Optionally) Go to **Configure** > **Settings** and enable Test Mode for easier testing during development. If
@@ -56,16 +51,25 @@
 
 8. **Setup an R2 Bucket:**
 
-    - Create an R2 bucket using Cloudflare [In your R2 Dashboard](https://dash.cloudflare.com/?to=/:account/r2/overview)
+    - Create an R2 bucket using
+      Cloudflare [In your R2 Dashboard > "Create bucket"](https://dash.cloudflare.com/?to=/:account/r2/overview)
       or another S3-compatible service.
-    - Select `Create bucket`.
-    - Enter a name for the bucket and select `Create bucket`.
+    - Enter a name for the **[profiles | packs]** bucket and select `Create bucket`.
     - Go to **Settings** > **General** and enable "Public Development URL".
-    - Obtain your R2 credentials (Access Key ID, Secret Access Key, and Account ID).
-    - Update the `.env` file with your R2 credentials and bucket information.
+    - Obtain your R2 credentials as per [Cloudflare's Documentation](https://developers.cloudflare.com/r2/api/tokens/).
+    - Update the `.env` file with your R2 credentials and bucket information, with `PROFILES_CDN_URL_PREFIX` or
+      `PACKS_CDN_URL_PREFIX` set to their respective public URLs.
+    - Repeat for the **packs** bucket.
+        - Your S3 credentials stay the same for both buckets; only the bucket name and URL prefix change.
 
-9. **Run the development server:**
+9. **Set your hostname**:
+
+    - In the `.env` file, set the `HOSTNAME` variable to the URL where your server will be accessible (e.g.,
+      `http://localhost:8000` for local development).
+
+10. **Run the development server:**
    ```bash
-   cd ../.. && bunx turbo dev
-   # or, if same directory: bun dev
+   bun dev
+   # or, if running the UI as well, from the project root:
+   # bunx turbo dev
    ```
