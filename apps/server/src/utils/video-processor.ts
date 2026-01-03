@@ -27,7 +27,8 @@ export async function convertToAv1(inputPath: string): Promise<string> {
         ffmpeg(inputPath)
             .outputOptions([
                 // Video: AV1 (libaom) but faster
-                '-c:v libaom-av1',
+                '-c:v libsvtav1',
+                '-preset 8',
                 '-crf 34', // raise a bit for speed/size tradeoff (optional)
                 '-b:v 0',
                 '-cpu-used 8', // 0=best/slowest, 8..10=faster/worse
