@@ -198,13 +198,7 @@ export const HowlBody = t.Object({
             maxLength: 4096,
         }),
     ),
-    assets: t.Optional(
-        t.Array(
-            t.Object({
-                data: t.String(),
-            }),
-        ),
-    ),
+    asset_ids: t.Optional(t.Array(t.String())),
     tags: t.Optional(
         t.Array(
             t.String({
@@ -237,7 +231,7 @@ export const HowlResponse = t.Object({
     assets: t.Optional(
         t.Array(
             t.Object({
-                type: t.Literal('image'),
+                type: t.Union([t.Literal('image'), t.Literal('video'), t.Literal('audio'), t.Literal('file')]),
                 data: t.Object({
                     name: t.Optional(t.String()),
                     url: t.String(),

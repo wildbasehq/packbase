@@ -5,6 +5,7 @@
 import {useUIStore} from '@/lib/state'
 import {useState} from 'react'
 import {ImageOverlay} from '.'
+import {LazyVideoPlayer} from './lazy-video-player'
 import {Asset} from './types/post'
 
 interface MediaGalleryProps {
@@ -71,8 +72,11 @@ export default function MediaGallery({assets, truncate = true}: MediaGalleryProp
                                     )}
                                 </>
                             ) : (
-                                <video src={assetUrl} className="h-full w-full object-cover" controls
-                                       onClick={e => e.stopPropagation()}/>
+                                <LazyVideoPlayer
+                                    src={assetUrl}
+                                    className="h-full w-full object-cover"
+                                    onClick={e => e.stopPropagation()}
+                                />
                             )}
                         </div>
                     )

@@ -2,18 +2,22 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import {cn} from '@/lib'
 import {TrashIcon} from '@heroicons/react/20/solid'
 import {motion, useAnimationControls} from 'motion/react'
 import {Dispatch, SetStateAction, useEffect, useMemo, useRef, useState} from 'react'
 
-export type Image = {
+export type Asset = {
     id: string
     src: string
+    type: 'image' | 'video'
+    assetId?: string
+    uploading?: boolean
 }
 
-export default function ImageUploadStack({images, setImages}: {
-    images: Image[];
-    setImages: Dispatch<SetStateAction<Image[]>>
+export default function AssetUploadStack({assets, setAssets}: {
+    assets: Asset[];
+    setAssets: Dispatch<SetStateAction<Asset[]>>
 }) {
     const containerRef = useRef<HTMLDivElement>(null)
     const [containerWidth, setContainerWidth] = useState<number>(0)
@@ -27,7 +31,7 @@ export default function ImageUploadStack({images, setImages}: {
     }, [])
 
     const handleReorder = (id: string, toIndex: number) => {
-        setImages(prev => {
+        setAssets(prev => {
             const fromIndex = prev.findIndex(p => p.id === id)
             if (fromIndex === -1 || fromIndex === toIndex) return prev
             const next = prev.slice()
@@ -38,20 +42,21 @@ export default function ImageUploadStack({images, setImages}: {
     }
 
     const handleRemove = (id: string) => {
-        setImages(prev => prev.filter(p => p.id !== id))
+        setAssets(prev => prev.filter(p => p.id !== id))
     }
 
     return (
         <div ref={containerRef} className="relative w-full select-none">
             <div className="relative h-24">
-                {images?.map((img, index) => (
+                {assets?.map((asset, index) => (
                     <DraggableCard
-                        key={img.id}
-                        id={img.id}
+                        key={asset.id}
+                        id={asset.id}
                         index={index}
-                        src={img.src}
+                        src={asset.src}
                         containerWidth={containerWidth}
-                        total={images?.length || 0}
+                        total={assets?.length || 0}
+                        uploading={asset.uploading}
                         onReorder={handleReorder}
                         onRemove={handleRemove}
                     />
@@ -67,6 +72,7 @@ function DraggableCard({
                            src,
                            containerWidth,
                            total,
+                           uploading,
                            onReorder,
                            onRemove,
                        }: {
@@ -75,6 +81,7 @@ function DraggableCard({
     src: string
     containerWidth: number
     total: number
+    uploading?: boolean
     onReorder: (id: string, toIndex: number) => void
     onRemove?: (id: string) => void
 }) {
@@ -113,7 +120,7 @@ function DraggableCard({
 
     return (
         <motion.div
-            className="absolute top-2 h-20 w-24 rounded-lg border ring-1 ring-default shadow-sm bg-muted/50 overflow-hidden"
+            className={cn('absolute top-2 h-20 w-24 rounded-lg border ring-1 ring-default shadow-sm bg-muted/50 overflow-hidden', uploading && 'animate-pulse')}
             style={{zIndex: isDragging ? 999 : z, left, willChange: 'transform'}}
             initial={{rotate: baseRotate, y: 0}}
             whileHover={{y: -6, rotate: 0}}

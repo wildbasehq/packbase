@@ -1,6 +1,7 @@
 // src/components/feed/types.ts
 import {Reaction} from '@/components/ui/reaction-stack'
 import {UserProfileBasic} from '@/lib/defs/user'
+import {JSONContent} from '@tiptap/react'
 import {Dispatch, SetStateAction} from 'react'
 
 export interface Asset {
@@ -16,7 +17,7 @@ export interface Asset {
 export interface FeedPostData {
     id: string
     user: UserProfileBasic
-    body: string
+    body: string | JSONContent
     created_at: string
     pack?: {
         id: string

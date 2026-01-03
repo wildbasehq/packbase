@@ -1,10 +1,10 @@
-import {EditorBubbleMenu} from '@/components/novel/ui/editor/bubble-menu'
+import useLocalStorage from '@/components/novel/lib/hooks/use-local-storage'
 import {Editor as EditorClass, Extensions} from '@tiptap/core'
 import {EditorProps} from '@tiptap/pm/view'
 import {EditorContent, JSONContent, useEditor} from '@tiptap/react'
 import {useEffect, useState} from 'react'
 import {useDebouncedCallback} from 'use-debounce'
-import {useLocalStorage} from 'usehooks-ts'
+import {EditorBubbleMenu} from './bubble-menu'
 import {defaultExtensions} from './extensions'
 import {defaultEditorProps} from './props'
 
@@ -20,7 +20,8 @@ export default function Editor({
                                    debounceDuration = 750,
                                    storageKey = 'novel__content',
                                    disableLocalStorage = true,
-                                   showBubble = false,
+                                   readOnly = false,
+                                   showBubble = false
                                }: {
     /**
      * Additional classes to add to the editor container.
@@ -70,6 +71,10 @@ export default function Editor({
      */
     disableLocalStorage?: boolean
     /**
+     * Whether to make the editor read-only.
+     */
+    readOnly?: boolean
+    /**
      * Whether to show the bubble menu.
      * Defaults to true.
      */
@@ -94,6 +99,7 @@ export default function Editor({
             ...defaultEditorProps,
             ...editorProps,
         },
+        editable: !readOnly,
         onUpdate: (e) => {
             // const selection = e.editor.state.selection
             // const lastTwo = getPrevText(e.editor, {
@@ -125,10 +131,19 @@ export default function Editor({
             }}
             className={className}
         >
-            {editor && showBubble && <EditorBubbleMenu editor={editor}/>}
-            {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
-            <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full">
-                <EditorContent editor={editor}/>
+            <div
+                onClick={() => {
+                    if (!readOnly) {
+                        editor?.chain().focus().run()
+                    }
+                }}
+                className={className}
+            >
+                {editor && !readOnly && showBubble && <EditorBubbleMenu editor={editor}/>}
+                {/*{editor?.isActive('image') && <imgResizer editor={editor}/>}*/}
+                <div className="prose-sm dark:prose-invert prose-headings:font-title font-default max-w-full">
+                    <EditorContent editor={editor}/>
+                </div>
             </div>
         </div>
     )

@@ -14,9 +14,10 @@ import {vg} from '@/lib/api'
 import {UserProfileBasic} from '@/lib/defs/user'
 import {formatRelativeTime} from '@/lib/utils/date'
 import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak'
-import {AvatarButton, BubblePopover, FeedPostData, LoadingCircle, PopoverHeader} from '@/src/components'
+import {AvatarButton, BubblePopover, Editor, FeedPostData, LoadingCircle, PopoverHeader} from '@/src/components'
 import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
 import {ChatBubbleLeftIcon, TrashIcon} from '@heroicons/react/24/outline'
+import {JSONContent} from '@tiptap/react'
 import {Activity, FormEvent, useCallback, useState} from 'react'
 import {toast} from 'sonner'
 import {MediaGallery} from '.'
@@ -38,9 +39,9 @@ interface ThreadPostProps {
     /** Currently signed in user, if any */
     signedInUser?: UserProfileBasic | null
     /** Callback when this post is deleted */
-    onDelete: () => void
+    onDelete?: () => void
     /** Callback when a new comment is created under this post */
-    onComment: (comment: FeedPostData) => void
+    onComment?: (comment: FeedPostData) => void
     /** Whether this post is the root of a thread */
     isRoot?: boolean
     /** Current nesting depth (0-based). Controlled by parent recursion. */
@@ -134,10 +135,20 @@ function ThreadPostHeader({post, isAuthor, onDelete}: ThreadPostHeaderProps) {
 }
 
 interface ThreadPostBodyProps {
-    body: string
+    body: string | JSONContent
 }
 
 function ThreadPostBody({body}: ThreadPostBodyProps) {
+    const useTipTap = typeof body === 'object'
+
+    if (useTipTap) {
+        return (
+            <div className="whitespace-normal wrap-break-word text-sm leading-relaxed">
+                <Editor readOnly defaultValue={body}/>
+            </div>
+        )
+    }
+
     return (
         <>
             {/* Post body */}

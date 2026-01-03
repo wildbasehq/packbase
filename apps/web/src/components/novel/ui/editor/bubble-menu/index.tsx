@@ -1,6 +1,7 @@
-import {ColorSelector} from '@/components/novel/ui/editor/bubble-menu/color-selector'
 import {cn} from '@/lib/utils'
-import {BubbleMenu, BubbleMenuProps, isNodeSelection} from '@tiptap/react'
+import {isNodeSelection} from '@tiptap/react'
+import {BubbleMenu, BubbleMenuProps} from '@tiptap/react/menus'
+import {ColorSelector} from '@/components/novel/ui/editor/bubble-menu/color-selector'
 import {BoldIcon, CodeIcon, ItalicIcon, StrikethroughIcon, UnderlineIcon} from 'lucide-react'
 import {FC, useState} from 'react'
 import {NodeSelector} from './node-selector'
@@ -70,15 +71,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = props => {
             // - the selection is empty
             // - the selection is a node selection (for drag handles)
             return !(editor.isActive('image') || empty || isNodeSelection(selection))
-        },
-        tippyOptions: {
-            moveTransition: 'transform 0.15s ease-out',
-            onHidden: () => {
-                setIsNodeSelectorOpen(false)
-                setIsColorSelectorOpen(false)
-                setIsLinkSelectorOpen(false)
-            },
-        },
+        }
     }
 
     const [isNodeSelectorOpen, setIsNodeSelectorOpen] = useState(false)

@@ -3,24 +3,22 @@
  */
 
 import PostSettingsModal from '@/components/howl-creator/post-settings-modal'
-import {Camera, HardDisk} from '@/components/icons/plump'
+import {Camera} from '@/components/icons/plump'
 import {ChatBubbleExclamation} from '@/components/icons/plump/chat-bubble-exclamation'
 import {useModal} from '@/components/modal/provider'
 import {markdownExtensions} from '@/components/novel/ui/editor/extensions'
-import Tooltip from '@/components/shared/tooltip'
 import {useResourceStore, useUIStore, useUserAccountStore} from '@/lib/state'
 import getInitials from '@/lib/utils/get-initials'
 import PackbaseInstance from '@/lib/workers/global-event-emit'
-import {Avatar, Badge, BubblePopover, Editor, Heading, LoadingCircle, Logo, PopoverHeader, Text} from '@/src/components'
-import {cn, isVisible, vg} from '@/src/lib'
+import {Avatar, BubblePopover, Editor, Heading, LoadingCircle, Logo, PopoverHeader, Text} from '@/src/components'
+import {API_URL, cn, isVisible, vg} from '@/src/lib'
 import {HashtagIcon} from '@heroicons/react/16/solid'
 import {ArrowDownIcon, PlusIcon} from '@heroicons/react/20/solid'
 import {ChevronRightIcon} from '@heroicons/react/24/outline'
 import {Activity, ReactNode, RefObject, useEffect, useRef, useState} from 'react'
 import {toast} from 'sonner'
 import {useLocation} from 'wouter'
-import ImageUploadStack, {type Image} from '../feed/image-placeholder-stack'
-
+import AssetUploadStack, {type Asset} from '../feed/image-placeholder-stack'
 
 export type AvailablePagesType = 'editor' | 'content-labelling' | 'mature-rating-from-sfw-warning'
 
@@ -58,7 +56,7 @@ export default function FloatingCompose() {
 
     const [channelName, setChannelName] = useState<string | null>(null)
     const [body, setBody] = useState<string>('')
-    const [images, setImages] = useState<Image[]>([])
+    const [assets, setAssets] = useState<Asset[]>([])
     const [uploading, setUploading] = useState<boolean>(false)
     const [selectedTags, setSelectedTags] = useState<string>('')
     const [selectedContentLabel, setSelectedContentLabel] = useState<string>('rating_safe')
@@ -99,52 +97,139 @@ export default function FloatingCompose() {
         }
     }, [uploading])
 
-    const addAttachment = (files: FileList | null) => {
+    const addAttachment = async (files: FileList | null) => {
         if (files) {
-            const newImages = []
             for (let i = 0; i < files.length; i++) {
                 const file = files[i]
                 if (!file) {
                     toast.error(`File ${i + 1} failed to process!!!`)
                     continue
                 }
-                const reader = new FileReader()
-                reader.onloadend = () => {
-                    newImages?.push({id: `${file.name}-${crypto.randomUUID()}`, src: reader.result as string})
 
-                    if (i === files.length - 1) {
-                        setImages([...images, ...newImages])
-                        fileInputRef.current!.value = null
+                const id = `${file.name}-${crypto.randomUUID()}`
+                const type = file.type.startsWith('video/') ? 'video' : 'image'
+
+                if (type === 'image') {
+                    const reader = new FileReader()
+                    reader.onloadend = async () => {
+                        setAssets(prev => [...prev, {id, src: reader.result as string, type: 'image', uploading: true}])
+                    }
+                    reader.readAsDataURL(file)
+                } else {
+                    // Video first frame capture
+                    const video = document.createElement('video')
+                    video.src = URL.createObjectURL(file)
+                    video.load()
+                    video.onloadeddata = () => {
+                        video.currentTime = 0.1 // Seek a bit to get a frame
+                    }
+                    video.onseeked = () => {
+                        const canvas = document.createElement('canvas')
+                        canvas.width = video.videoWidth
+                        canvas.height = video.videoHeight
+                        const ctx = canvas.getContext('2d')
+                        ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
+                        const src = canvas.toDataURL('image/jpeg')
+                        setAssets(prev => [...prev, {id, src, type: 'video', uploading: true}])
+                        URL.revokeObjectURL(video.src)
                     }
                 }
 
-                reader.readAsDataURL(file)
+                // Start chunked upload (non-blocking - all uploads happen in parallel)
+                uploadFileChunked(file)
+                    .then(assetId => {
+                        setAssets(prev => prev.map(img => img.id === id ? {...img, assetId, uploading: false} : img))
+                    })
+                    .catch((e: any) => {
+                        console.error(e)
+                        toast.error(`Failed to upload ${file.name}: ${e.message || 'Unknown error'}`)
+                        // Remove failed image
+                        setAssets(prev => prev.filter(img => img.id !== id))
+                    })
             }
+            if (fileInputRef.current) fileInputRef.current.value = null
         }
     }
 
+    const uploadFileChunked = async (file: File): Promise<string> => {
+        const CHUNK_SIZE = 1 * 1024 * 1024 // 1MB
+
+        // 1. INIT
+        // @ts-ignore
+        const initRes = await vg.howl.upload.init.post({
+            command: 'INIT',
+            total_bytes: file.size,
+            asset_type: file.type
+        })
+        if (initRes.error) throw initRes.error
+        const {asset_id} = initRes.data as { asset_id: string }
+
+        // 2. APPEND
+        const chunks = Math.ceil(file.size / CHUNK_SIZE)
+        for (let i = 0; i < chunks; i++) {
+            const start = i * CHUNK_SIZE
+            const end = Math.min(file.size, start + CHUNK_SIZE)
+            const chunk = file.slice(start, end)
+
+            const formData = new FormData()
+            formData.append('command', 'APPEND')
+            formData.append('asset_id', asset_id)
+            formData.append('segment_index', i.toString())
+            formData.append('asset', chunk, file.name)
+
+            // Retry logic for chunk upload
+            let retries = 3
+            let appendData
+            while (retries > 0) {
+                try {
+                    // @ts-ignore
+                    const appendRes = await fetch(`${API_URL}/howl/upload/append`, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            // @ts-ignore
+                            Authorization: `Bearer ${await window.Clerk?.session.getToken()}`
+                        }
+                    })
+                    appendData = await appendRes.json()
+                    if (appendData.error) throw appendData.error
+                    break // Success, exit retry loop
+                } catch (error) {
+                    retries--
+                    if (retries === 0) throw error
+                    await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1s before retry
+                }
+            }
+        }
+
+        // 3. FINALIZE
+        // @ts-ignore
+        const finalizeRes = await vg.howl.upload.finalize.post({
+            command: 'FINALIZE',
+            asset_id: asset_id
+        })
+        if (finalizeRes.error) throw finalizeRes.error
+
+        return asset_id
+    }
+
     const submitHowl = () => {
+        const uploadingAssets = assets.filter(img => img.uploading)
+        if (uploadingAssets.length > 0) {
+            toast.error('Please wait for assets to finish uploading.')
+            return
+        }
+
         const post: {
             body: string
             content_type: string
-            assets?: any[]
+            asset_ids?: string[]
             tags?: string[]
         } = {
             body: body || null,
             content_type: 'markdown',
             tags: [selectedContentLabel, ...selectedTags.split(',').map(t => t.trim()).filter(Boolean)],
-        }
-
-        // @ts-ignore
-        const assets = images?.map(attachment => {
-            return {
-                name: 'e',
-                data: attachment.src,
-            }
-        })
-
-        if (assets) {
-            post.assets = assets
+            asset_ids: assets.map(img => img.assetId).filter(Boolean) as string[],
         }
 
         uploadHowl(post)
@@ -165,7 +250,7 @@ export default function FloatingCompose() {
                     PackbaseInstance.emit('feed-reload', {})
                     setUploading(false)
                     setBody('')
-                    setImages([])
+                    setAssets([])
                     setSelectedContentLabel('rating_safe')
                     setSelectedTags('')
                     editorRef.current?.destroy()
@@ -207,8 +292,8 @@ export default function FloatingCompose() {
                         channel={channel}
                         channelName={channelName}
                         currentResource={currentResource}
-                        images={images}
-                        setImages={setImages}
+                        assets={assets}
+                        setAssets={setAssets}
                         editorRef={editorRef}
                         body={body}
                         setBody={setBody}
@@ -250,8 +335,8 @@ function FloatingComposeContent({
                                     channel,
                                     channelName,
                                     currentResource,
-                                    images,
-                                    setImages,
+                                    assets,
+                                    setAssets,
                                     editorRef,
                                     body,
                                     setBody,
@@ -264,8 +349,8 @@ function FloatingComposeContent({
     channel?: string;
     channelName: string | null;
     currentResource: any;
-    images: Image[];
-    setImages: (images: Image[]) => void;
+    assets: Asset[];
+    setAssets: (assets: Asset[]) => void;
     editorRef: RefObject<any>;
     body: string;
     setBody: (body: string) => void;
@@ -302,34 +387,37 @@ function FloatingComposeContent({
                         <Heading size="sm">{currentResource?.display_name}</Heading>
                     </Activity>
                 </div>
-                <Tooltip
-                    content={
-                        <div className="flex flex-col gap-1">
-                                <span className="gap-2">
-                                    Jump into Deep Compose
-                                </span>
-                            <span className="text-xs">
-                                    Create or Draft multiple Howls and Stories quickly on a dedicated page.
-                                </span>
-                            <div>
-                                <Badge color="red">
-                                    Experimental - may be unstable
-                                </Badge>
-                            </div>
-                        </div>
-                    }
-                    side="bottom"
-                >
-                    <div
-                        className="bg-muted rounded-full w-7 h-7 p-1.5 text-indigo-500"
-                        onClick={e => {
-                            e.stopPropagation()
-                            toast.error('"Your Stuff" is disabled by the instance owner.')
-                        }}
-                    >
-                        <HardDisk className="fill-muted-foreground w-full h-full"/>
-                    </div>
-                </Tooltip>
+                {/*<Tooltip*/}
+                {/*    content={*/}
+                {/*        <div className="flex flex-col gap-1">*/}
+                {/*            <span className="gap-2">*/}
+                {/*                Jump into Deep Compose*/}
+                {/*            </span>*/}
+                {/*            <span className="text-xs">*/}
+                {/*                Create or Draft multiple Howls and Stories quickly on a dedicated page.*/}
+                {/*            </span>*/}
+                {/*            <div>*/}
+                {/*                <Badge color="red">*/}
+                {/*                    Experimental - may be unstable*/}
+                {/*                </Badge>*/}
+                {/*            </div>*/}
+                {/*        </div>*/}
+                {/*    }*/}
+                {/*    side="bottom"*/}
+                {/*>*/}
+                {/*    <div*/}
+                {/*        className="bg-muted rounded-full w-7 h-7 p-1.5 text-indigo-500"*/}
+                {/*        onClick={e => {*/}
+                {/*            e.stopPropagation()*/}
+                {/*            toast.error('"Your Stuff" is disabled by the instance owner.')*/}
+                {/*        }}*/}
+                {/*    >*/}
+                {/*        <HardDisk className="fill-muted-foreground w-full h-full"/>*/}
+                {/*    </div>*/}
+                {/*</Tooltip>*/}
+
+                {/* Dummy for now */}
+                <div className="flex w-8 h-8"/>
             </div>
 
             <div className="grow p-4 overflow-y-auto max-h-[calc(100vh-11rem)]">
@@ -345,6 +433,7 @@ function FloatingComposeContent({
                         defaultValue={body}
                         onUpdate={e => {
                             editorRef.current = e
+                            // @ts-ignore
                             setBody(e?.storage.markdown.getMarkdown())
                         }}
                     />
@@ -353,9 +442,9 @@ function FloatingComposeContent({
 
             {!user?.requires_setup && (
                 <>
-                    {images?.length > 0 && (
+                    {assets?.length > 0 && (
                         <div className="px-4 pb-2">
-                            <ImageUploadStack images={images} setImages={setImages}/>
+                            <AssetUploadStack assets={assets} setAssets={setAssets}/>
                         </div>
                     )}
 
@@ -373,7 +462,7 @@ function FloatingComposeContent({
                                     type="file"
                                     ref={fileInputRef}
                                     multiple
-                                    accept="image/*"
+                                    accept="image/*,video/*,.mov"
                                     onChange={e => addAttachment(e.target.files)}
                                 />
                                 <Camera className="w-5 h-5 fill-primary-light p-0.5"/>

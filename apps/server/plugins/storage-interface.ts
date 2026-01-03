@@ -1,3 +1,5 @@
+import {Readable} from 'stream'
+
 /**
  * Abstract interface for storage providers
  * This interface defines the operations that any storage provider must implement
@@ -8,9 +10,10 @@ export interface StorageProvider {
      * @param key The key/path where the file should be stored
      * @param data The file data as a Buffer
      * @param contentType The content type of the file
+     * @param contentLength
      * @returns Promise resolving to success status
      */
-    uploadFile(key: string, data: Buffer, contentType: string): Promise<boolean>;
+    uploadFile(key: string, data: Buffer | Readable, contentType: string, contentLength?: number): Promise<boolean>;
 
     /**
      * Delete a file from the storage

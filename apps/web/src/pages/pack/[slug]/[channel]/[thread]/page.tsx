@@ -46,7 +46,7 @@ function ThreadMessage({message, isOriginalPost = false}: {
                         </Text>
                     </div>
                     <div className="mt-1">
-                        <Markdown className="leading-relaxed whitespace-normal">{message.body}</Markdown>
+                        <Markdown className="leading-relaxed whitespace-normal" children={message.body as string}/>
                     </div>
 
                     {/* Reactions */}

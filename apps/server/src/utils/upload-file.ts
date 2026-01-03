@@ -1,4 +1,5 @@
 import createStorage from '@/lib/storage'
+import {Readable} from 'stream'
 
 export default async function uploadFile(bucket: string, path: string, base64: string, upsert: boolean = false, animated: boolean = true) {
     // Extract user ID from the path (assuming format: userId/...)
@@ -27,6 +28,28 @@ export default async function uploadFile(bucket: string, path: string, base64: s
 
     // Process the image with our storage class
     const result = await storage.uploadBase64Image(userId, filePath, base64, animated)
+
+    if (!result.success) {
+        return {error: result.error}
+    }
+
+    return {
+        data: {
+            path: result.path,
+        },
+    }
+}
+
+export async function uploadFileStream(bucket: string, path: string, stream: Readable, contentType: string, contentLength?: number) {
+    // Extract user ID from the path (assuming format: userId/...)
+    const userId = path.split('/')[0]
+    const filePath = path.substring(userId.length + 1)
+
+    // Create storage instance
+    const storage = createStorage(bucket)
+
+    // Process the image with our storage class
+    const result = await storage.uploadStream(userId, filePath, stream, contentType, contentLength)
 
     if (!result.success) {
         return {error: result.error}

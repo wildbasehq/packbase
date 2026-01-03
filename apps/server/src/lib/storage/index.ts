@@ -1,5 +1,6 @@
 import path from 'path'
 import sharp from 'sharp'
+import {Readable} from 'stream'
 import {v4 as uuidv4} from 'uuid'
 import {StorageProvider} from '../../../plugins/storage-interface'
 
@@ -109,6 +110,67 @@ export class Storage {
     }
 
     /**
+     * Upload a stream to the bucket
+     * @param userId The user ID (used for folder structure)
+     * @param filePath The path within the user's folder
+     * @param stream The file stream
+     * @param contentType The content type
+     * @param contentLength
+     * @returns Object with success status, path, and version info
+     */
+    async uploadStream(
+        userId: string,
+        filePath: string,
+        stream: Readable,
+        contentType: string,
+        contentLength?: number,
+    ): Promise<{
+        success: boolean;
+        error?: Error;
+        path?: string;
+        version?: string;
+    }> {
+        try {
+            // Generate a version ID
+            const versionId = uuidv4()
+
+            // Determine extension from content type if {ext} is present
+            let ext = contentType.split('/').pop() || ''
+            if (ext === 'jpeg') ext = 'jpg'
+
+            // Create the full path
+            const fullPath = `${userId}/${filePath.replace('{ext}', ext)}`
+
+            // Upload the file using the storage provider
+            const uploadSuccess = await this.storageProvider.uploadFile(fullPath, stream, contentType, contentLength)
+
+            if (!uploadSuccess) {
+                return {
+                    success: false,
+                    error: new Error('Failed to upload file to storage'),
+                }
+            }
+
+            // Update version control
+            // Note: We don't save the full file content in VC for streams as they might be large
+            // We just mark the version existence
+            await this.updateVersionControl(userId, fullPath, versionId, null)
+
+            return {
+                success: true,
+                path: fullPath,
+                version: versionId,
+            }
+        } catch (error) {
+            return {
+                success: false,
+                error: error instanceof Error ? error : new Error(String(error)),
+            }
+        }
+    }
+
+
+    /**
      * Delete a file from the bucket
      * @param userId The user ID
      * @param filePath The path to the file within the user's folder
@@ -123,6 +185,8 @@ export class Storage {
     }> {
         try {
             const fullPath = `${userId}/${filePath}`
+
+            console.log('Deleting file:', fullPath)
 
             // Delete the file using the storage provider
             const deleteSuccess = await this.storageProvider.deleteFile(fullPath)
