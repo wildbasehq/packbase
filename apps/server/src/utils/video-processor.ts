@@ -26,14 +26,12 @@ export async function convertToAv1(inputPath: string): Promise<string> {
     return new Promise((resolve, reject) => {
         ffmpeg(inputPath)
             .outputOptions([
-                // Video: AV1 (libaom) but faster
                 '-c:v libvpx-vp9',
-                '-crf 34', // raise a bit for speed/size tradeoff (optional)
+                '-crf 40', // raise a bit for speed/size tradeoff (optional)
                 '-b:v 0',
-                '-cpu-used 8', // 0=best/slowest, 8..10=faster/worse
+                '-cpu-used 10', // 0=best/slowest, 8..10=faster/worse
                 '-row-mt 1', // enable row multithreading (if supported by the build)
                 '-threads 0', // let ffmpeg choose
-                '-vf scale=-2:1080:force_original_aspect_ratio=decrease',
 
                 // Audio
                 '-c:a libopus',
