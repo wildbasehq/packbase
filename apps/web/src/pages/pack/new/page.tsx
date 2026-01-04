@@ -447,6 +447,11 @@ export default function PackAdd() {
                                 always change your default Pack later, and can howl into any pack as long as you're a
                                 member!
                             </Text>
+                            <div className="mt-6">
+                                <Button onClick={handleCreatePack} color="indigo">
+                                    Create a Pack
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </>
