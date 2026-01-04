@@ -256,6 +256,7 @@ function generateServerEnv(config: SetupConfig): string {
   const env: string[] = [
     "# Database Configuration",
     "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres",
+    "DIRECT_URL=postgresql://postgres:postgres@localhost:5432/postgres",
     "",
     "# Clerk Authentication",
     `CLERK_PUBLISHABLE_KEY=${config.clerkPublishableKey}`,
@@ -277,6 +278,8 @@ function generateServerEnv(config: SetupConfig): string {
       `S3_SECRET_KEY=${config.s3SecretKey}`,
       `S3_BUCKET_PROFILES=${config.s3BucketProfiles}`,
       `S3_BUCKET_PACKS=${config.s3BucketPacks}`,
+      `PROFILES_CDN_URL_PREFIX=${config.s3Endpoint}/${config.s3BucketProfiles}`,
+      `PACKS_CDN_URL_PREFIX=${config.s3Endpoint}/${config.s3BucketPacks}`,
       "",
     );
   } else {
@@ -306,7 +309,7 @@ function generateWebEnv(config: SetupConfig): string {
     `VITE_CLERK_PUBLISHABLE_KEY=${config.clerkPublishableKey}`,
     "",
     "# API Configuration",
-    `VITE_API_URL=${config.hostname}`,
+    `VITE_YAPOCK_URL=${config.hostname}`,
     "",
   ];
 
