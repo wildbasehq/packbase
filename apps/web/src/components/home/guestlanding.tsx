@@ -240,7 +240,7 @@ export default function GuestLanding() {
                 className="relative overflow-hidden z-10 bg-neutral-900">
                 <Hero/>
 
-                <FeatureThreads/>
+                {/* <FeatureThreads/> */}
             </div>
 
             {/* Minimal footer */}
