@@ -1,7 +1,10 @@
 {
   "name": "korat-hb",
   "devDependencies": {
+    "@inquirer/prompts": "^8.1.0",
     "@types/bun": "latest",
+    "open": "^11.0.0",
+    "tasuku": "^2.0.5",
     "turbo": "^2.5.5"
   },
   "peerDependencies": {
@@ -11,7 +14,8 @@
   "private": true,
   "scripts": {
     "build:web": "cd apps/web && turbo run build",
-    "migrate": "cd apps/server && bunx prisma db push"
+    "migrate": "cd apps/server && bunx prisma db push",
+    "setup": "bun cli/setup.ts"
   },
   "workspaces": [
     "apps/*",
