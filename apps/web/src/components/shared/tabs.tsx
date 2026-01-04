@@ -74,9 +74,9 @@ export function TabsLayout({
 
     return (
         <div className={clsx('flex flex-col', className)}>
-            <div className={clsx('inline-flex items-center gap-1 text-sm/6 -mb-px', headerClassName)}>
+            <div className={clsx('inline-flex items-center gap-1 text-sm/6', headerClassName)}>
                 {prefix ? <div>{prefix}</div> : null}
-                <div role="tablist" aria-orientation="horizontal" className="inline-flex items-center gap-1"
+                <div role="tablist" aria-orientation="horizontal" className="flex items-center gap-2"
                      onKeyDown={onKeyDown}>
                     {tabs.map((tab, index) => {
                         const selected = index === activeIndex
@@ -92,10 +92,10 @@ export function TabsLayout({
                                 tabIndex={selected ? 0 : -1}
                                 onClick={() => setActiveIndex(index)}
                                 className={clsx(
-                                    'group relative inline-flex items-center border-t-[0.1rem] border-x-[0.1rem] gap-2 rounded-t-2xl px-4 py-3 font-medium transition',
+                                    'group relative inline-flex items-center border-t-[0.1rem] border-x-[0.1rem] gap-2 rounded-t-2xl px-4 py-3 font-medium transition-all',
                                     selected
-                                        ? `bg-white !z-20 dark:bg-n-8 ${index === 0 ? 'rounded-out-br-xl' : 'rounded-out-b-xl'}`
-                                        : 'text-muted-foreground bg-neutral-100/80 dark:bg-n-9 hover:bg-neutral-50 dark:hover:bg-neutral-800'
+                                        ? `bg-white !z-20 dark:bg-n-8`
+                                        : 'text-muted-foreground  hover:bg-card'
                                 )}
                             >
                                 {Icon ? (
@@ -113,11 +113,13 @@ export function TabsLayout({
                 </div>
                 {suffix ? <div className="ml-auto">{suffix}</div> : null}
             </div>
+
+            {/* Content */}
             <div
                 id={`${listId}-panel-${activeIndex}`}
                 role="tabpanel"
                 aria-labelledby={`${listId}-tab-${activeIndex}`}
-                className={clsx('min-w-0', contentClassName)}
+                className={clsx('min-w-0 -mt-[1.5px]', contentClassName)}
             >
                 {tabs[activeIndex]?.props.children}
             </div>

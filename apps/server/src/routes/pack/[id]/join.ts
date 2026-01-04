@@ -96,7 +96,7 @@ export default (app: YapockType) =>
                     return
                 }
 
-                if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.Owner))) {
+                if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.Owner)) && user.default_pack !== id) {
                     try {
                         await prisma.packs_memberships.deleteMany({
                             where: {

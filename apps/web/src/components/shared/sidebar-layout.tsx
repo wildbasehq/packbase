@@ -45,37 +45,12 @@ import {FaceSmileIcon, HomeIcon} from '@heroicons/react/16/solid'
 import {ChevronDownIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
 import {EllipsisHorizontalIcon} from '@heroicons/react/24/solid'
 import {motion} from 'motion/react'
-import {Activity, ComponentType, PropsWithChildren, ReactNode, useState} from 'react'
+import {Activity, ComponentType, PropsWithChildren, ReactNode, useEffect, useState} from 'react'
 import {SiDiscord} from 'react-icons/si'
 import {TbFaceId} from 'react-icons/tb'
 import {useLocalStorage} from 'usehooks-ts'
 import {useLocation} from 'wouter'
 import {News} from '../ui/sidebar-news'
-
-const NavbarItems: {
-    icon?: ComponentType<{ className?: string; 'data-slot'?: string }>;
-
-    // Prefix with ! to indicate no label, only icon
-    label: string;
-
-    href: string;
-    currentHref?: string;
-    limitedEvent?: boolean;
-    onlySignedIn?: boolean;
-}[] = [
-    {
-        icon: HomeIcon,
-        label: '!Home',
-        currentHref: '/',
-        href: '/'
-    },
-    {
-        label: 'Badges',
-        limitedEvent: true,
-        href: '/store',
-        onlySignedIn: true
-    }
-]
 
 function CloseMenuIcon() {
     return (
@@ -113,6 +88,18 @@ function MobileSidebar({open, close, children}: PropsWithChildren<{ open: boolea
 
 export function SidebarLayout({children}: PropsWithChildren) {
     let [showSidebar, setShowSidebar] = useState(false)
+    const [navbarItems, setNavbarItems] = useState<{
+        icon?: ComponentType<{ className?: string; 'data-slot'?: string }>;
+
+        // Prefix with ! to indicate no label, only icon
+        label: string;
+
+        href: string;
+        currentHref: string[];
+        limitedEvent?: boolean;
+        onlySignedIn?: boolean;
+    }[]>()
+    
     const {isSignedIn} = useSession()
     const {user} = useUserAccountStore()
     const {sidebarContent} = useSidebar()
@@ -123,11 +110,29 @@ export function SidebarLayout({children}: PropsWithChildren) {
     const [seenPackOptionsTour, setSeenPackOptionsTour] = useLocalStorage('seen-pack-options-tour', false)
     const [userSidebarCollapsed, setUserSidebarCollapsed] = useLocalStorage<any>('user-sidebar-collapsed', false)
     const [isWHOpen, setIsWHOpen] = useLocalStorage<any>('wh-open', false)
-    const {currentResource} = useResourceStore()
+    const {currentResource, resourceDefault} = useResourceStore()
     const {show} = useModal()
 
     const shouldSeePackTour = user && !user?.requires_setup && !seenPackTour
     const shouldSeePackOptionsTour = seenPackTour && !seenPackOptionsTour
+
+    useEffect(() => {
+        setNavbarItems([
+            {
+                icon: HomeIcon,
+                label: '!Home',
+                currentHref: ['/me', `/p/${resourceDefault.slug}`],
+                href: '/'
+            },
+            {
+                label: 'Badges',
+                limitedEvent: true,
+                href: '/store',
+                currentHref: ['/store'],
+                onlySignedIn: true
+            }
+        ])
+    }, [resourceDefault]);
 
     return (
         <div className="flex min-h-svh h-screen w-full relative bg-muted">
@@ -151,9 +156,9 @@ export function SidebarLayout({children}: PropsWithChildren) {
                     </Desktop>
                 </SignedIn>
 
-                {/* Content */}
+                {/* Top navbar contents */}
                 <div
-                    className="min-w-0 bg-sidebar px-4">
+                    className="min-w-0 bg-sidebar px-5">
                     {user?.images?.header && (
                         <img src={user?.images.header} alt="Header image"
                              className="absolute inset-0 h-18 w-full object-cover opacity-25 mask-b-to-95% mask-r-from-80% pointer-events-none select-none"/>
@@ -178,7 +183,7 @@ export function SidebarLayout({children}: PropsWithChildren) {
                         <Activity mode={isVisible(((isSignedIn && !user?.requires_setup) || !isSignedIn))}>
                             <NavbarItem
                                 className={cn(
-                                    'flex rounded w-full md:w-2xs h-8 *:w-full',
+                                    'flex rounded w-full md:w-2xs h-9 *:w-full',
                                     shouldSeePackTour && 'md:animate-shadow-pulse'
                                 )}
                                 onClick={() => {
@@ -282,11 +287,10 @@ export function SidebarLayout({children}: PropsWithChildren) {
 
                         <Desktop>
                             <NavbarSection>
-                                {NavbarItems
-                                    .filter(item => !item.onlySignedIn || (item.onlySignedIn && isSignedIn))
+                                {navbarItems?.filter(item => !item.onlySignedIn || (item.onlySignedIn && isSignedIn))
                                     .map((item) => (
                                         <NavbarItem href={item.href}
-                                                    current={location.startsWith(item.currentHref || item.href)}
+                                                    current={item.currentHref?.some(href => location.startsWith(href))}
                                                     key={item.href}>
                                             {item.icon && (
                                                 <item.icon className="w-4 h-4 inline-flex" data-slot="icon"/>
@@ -367,15 +371,16 @@ export function SidebarLayout({children}: PropsWithChildren) {
                     <WhatsHappeningDropdown close={() => setIsWHOpen(false)}/>
                 </Activity>
 
-                {/* Content */}
+                {/* Main Content */}
                 <motion.div
                     initial={true}
                     animate={isWHOpen ? 'open' : 'closed'}
                     variants={{
                         open: {
                             marginTop: '12rem',
-                            opacity: 0.85,
-                            filter: 'blur(1px)'
+                            opacity: navigator.userAgent.toLowerCase().includes('firefox') ? 0.5 : 0.85,
+                            // @ts-ignore
+                            filter: navigator.userAgent.toLowerCase().includes('firefox') ? '' : 'blur(1px)'
                         },
                         closed: {
                             marginTop: 0,
@@ -443,7 +448,7 @@ function SidebarContentContainer({children}: { children: ReactNode }) {
                 minWidth={240}
                 maxWidth={560}
             >
-                <div className="pt-4 flex flex-col" style={{width: sidebarWidth ?? 320}}>
+                <div className="flex flex-col" style={{width: sidebarWidth ?? 320}}>
                     <Sidebar className="w-full">
                         <SidebarBody>
                             {children}

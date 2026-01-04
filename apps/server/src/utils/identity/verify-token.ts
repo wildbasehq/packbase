@@ -21,7 +21,7 @@ type AuthUser = SignedInAuthObject & {
     }
 };
 
-const authorizedParties = ['https://packbase.app', 'http://localhost:5173', 'http://localhost:4173', 'http://localhost:8000']
+const authorizedParties = ['https://packbase.app', 'http://localhost:5173', 'http://localhost:4173', 'http://localhost:8000', 'http://127.0.0.1:5173', 'http://127.0.0.1:8000']
 
 type Credentials =
     | { kind: 'none' }
@@ -130,7 +130,6 @@ async function ensureProfileId(user: AuthUser): Promise<void> {
 
     const existing = await prisma.profiles.findFirst({
         where: {owner_id: userId},
-        select: {id: true},
     })
 
     if (existing?.id) {
@@ -145,8 +144,7 @@ async function ensureProfileId(user: AuthUser): Promise<void> {
     await withUserLock(userId, async () => {
         // Re-check inside the lock.
         const nowExisting = await prisma.profiles.findFirst({
-            where: {owner_id: userId},
-            select: {id: true},
+            where: {owner_id: userId}
         })
 
         if (nowExisting?.id) {
@@ -177,8 +175,7 @@ async function ensureProfileId(user: AuthUser): Promise<void> {
                     owner_id: userId,
                     username: nickname,
                     invited_by: isInvited?.invited_by || null,
-                },
-                select: {id: true},
+                }
             })
 
             user.sub = newProfile.id
@@ -186,8 +183,7 @@ async function ensureProfileId(user: AuthUser): Promise<void> {
         } catch (e: any) {
             // If we raced with another request/process, attempt to re-fetch.
             const raced = await prisma.profiles.findFirst({
-                where: {owner_id: userId},
-                select: {id: true},
+                where: {owner_id: userId}
             })
             if (raced?.id) {
                 user.sub = raced.id

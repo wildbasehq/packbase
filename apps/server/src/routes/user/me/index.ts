@@ -119,7 +119,20 @@ export default (app: YapockType) =>
 
                 // Default pack
                 if (userProfile.default_pack && userProfile.default_pack !== '00000000-0000-0000-0000-000000000000') {
-                    const defaultPackMan = await PackMan.init(userProfile.default_pack, user.sub)
+                    let defaultPackMan;
+
+                    try {
+                        defaultPackMan = await PackMan.init(userProfile.default_pack, user.sub)
+                    } catch (_) {
+                        await prisma.packs_memberships.create({
+                            data: {
+                                tenant_id: userProfile.default_pack,
+                                user_id: user.sub,
+                            },
+                        })
+
+                        defaultPackMan = await PackMan.init(userProfile.default_pack, user.sub)
+                    }
 
                     if (!defaultPackMan) {
                         throw HTTPError.serverError({

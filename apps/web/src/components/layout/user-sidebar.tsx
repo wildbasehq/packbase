@@ -12,6 +12,7 @@ import {Code, CodeGroup, Desktop, Tab, TabsLayout, useContentFrame} from '@/src/
 import useWindowSize from '@/src/lib/hooks/use-window-size'
 import {Activity, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent, useCallback, useEffect, useRef, useState} from 'react'
 import {useInterval, useLocalStorage} from 'usehooks-ts'
+import {PlusIcon} from "@heroicons/react/20/solid";
 
 export default function UserSidebar() {
     const {
@@ -82,8 +83,8 @@ export default function UserSidebar() {
         <div
             ref={containerRef}
             className={`h-fill relative transition-all md:flex ${
-                collapsed ? 'translate-x-full p-0 hidden' : 'p-1'
-            } ${isResizing ? 'select-none cursor-col-resize !transition-none' : ''}`}
+                collapsed ? 'translate-x-full p-0 hidden' : 'py-1 pr-1'
+            } ${isResizing ? 'select-none cursor-col-resize transition-none!' : ''}`}
             style={{
                 minWidth: collapsed ? 0 : (sidebarWidth ?? minExpandedPx),
                 maxWidth: collapsed ? 0 : (sidebarWidth ?? maxExpandedPx),
@@ -97,9 +98,8 @@ export default function UserSidebar() {
                     <div className="flex flex-col w-full">
                         <TabsLayout
                             defaultIndex={0}
-                            suffix={<UserActionsContainer/>}
                             className="h-full"
-                            contentClassName="relative pt-8 bg-white border-[0.1rem] shadow-xs dark:bg-n-8 rounded-tr-2xl rounded-b-2xl flex flex-col overflow-y-auto px-4 pb-8 h-full"
+                            contentClassName="relative pt-4 bg-white border-[0.1rem] shadow-xs dark:bg-n-8 rounded-tr-2xl rounded-b-2xl flex flex-col overflow-y-auto px-4 pb-4 h-full"
                             headerClassName="rounded-tr-2xl rounded-out-lt-2xl"
                         >
                             <Tab title="People" icon={UserMultipleAccounts}>
@@ -130,7 +130,7 @@ export function UserActionsContainer() {
         <>
             {/* + New */}
             <div className="flex mr-2 items-center animate-scale-in">
-                {/*<PlusIcon className="h-5 w-5 text-muted-foreground dark:text-muted-foreground"/>*/}
+                <PlusIcon className="h-5 w-5 text-white"/>
             </div>
         </>
     )

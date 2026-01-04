@@ -8,6 +8,7 @@ import {sentryVitePlugin} from "@sentry/vite-plugin";
 export default function viteConfig(sourceDir) {
     return defineConfig({
         server: {
+            host: true,
             port: parseInt(process.env.PORT || '5173'),
             strictPort: false
         },
