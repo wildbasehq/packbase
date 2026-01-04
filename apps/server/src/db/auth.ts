@@ -17,7 +17,7 @@ export default clerkClient
 async function clientTest() {
     const clientTest = await clerkClient.users.getUserList({limit: 1})
 
-    if (clientTest.data?.length > 0) {
+    if (!!clientTest.data) {
         log.info('Clerk client connected')
     } else {
         log.error('Clerk client failed to connect')
