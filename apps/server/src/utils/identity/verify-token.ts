@@ -236,6 +236,19 @@ export default async function verifyToken(req: any): Promise<AuthUser | undefine
 
     try {
         result.user = await ensureProfileId(result.user)
+
+        // Is username different?
+        if (result.user.sessionClaims?.nickname !== result.user?.username && result.user.sub) {
+            // If so, change it on the DB.
+            await prisma.profiles.update({
+                where: {
+                    username: result.user.username
+                },
+                data: {
+                    username: result.user.sessionClaims.nickname
+                }
+            })
+        }
     } catch (e) {
         log.error('Profile resolution error:', e)
     }
