@@ -1,6 +1,14 @@
 import {DeleteObjectCommand, GetObjectCommand, paginateListObjectsV2, PutObjectCommand, S3Client} from '@aws-sdk/client-s3'
+import {Upload} from '@aws-sdk/lib-storage'
 import {Readable} from 'stream'
 import {StorageProvider} from './storage-interface'
+
+// Threshold for using multipart upload (5MB - S3's minimum part size)
+const MULTIPART_THRESHOLD = 5 * 1024 * 1024
+// Part size for multipart uploads (5MB)
+const PART_SIZE = 5 * 1024 * 1024
+// Maximum concurrent uploads
+const QUEUE_SIZE = 4
 
 /**
  * AWS S3 implementation of the StorageProvider interface
@@ -67,36 +75,50 @@ export class S3StorageProvider implements StorageProvider {
             const lengthInfo = contentLength ? `~${(contentLength / 1024).toFixed(2)} KB` : 'unknown size'
             console.log(`Uploading file to S3 at key: ${key}. Size ${lengthInfo}. Type of data: ${data instanceof Buffer ? 'Buffer' : 'Stream'}`)
 
-            // If data is a stream, convert it to a buffer first to avoid hanging issues
-            // This is especially important for small files where buffering is not a problem
-            // God forbid a lot of people upload chunky files at once though. RIP our memory
-            let uploadData: Buffer
-            let finalContentLength: number | undefined
-
-            if (data instanceof Buffer) {
-                uploadData = data
-                finalContentLength = data.length
-            } else {
-                // Convert stream to buffer
-                console.log(`Converting stream to buffer for reliable upload...`)
-                const chunks: Buffer[] = []
-                for await (const chunk of data) {
-                    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
-                }
-                uploadData = Buffer.concat(chunks)
-                finalContentLength = uploadData.length
-                console.log(`Stream converted to buffer: ${(uploadData.length / 1024).toFixed(2)} KB`)
+            // For small buffers, use simple PutObject (faster and simpler)
+            if (data instanceof Buffer && data.length < MULTIPART_THRESHOLD) {
+                await this.client.send(
+                    new PutObjectCommand({
+                        Bucket: this.bucket,
+                        Key: key,
+                        Body: data,
+                        ContentType: contentType,
+                        ContentLength: data.length,
+                    })
+                )
+                console.log(`Successfully uploaded small file to S3 at key: ${key}`)
+                return true
             }
 
-            await this.client.send(
-                new PutObjectCommand({
+            // For large files or streams, use multipart upload
+            // This streams data in chunks without loading the entire file into memory
+            console.log(`Using multipart upload for large file/stream...`)
+            
+            const upload = new Upload({
+                client: this.client,
+                params: {
                     Bucket: this.bucket,
                     Key: key,
-                    Body: uploadData,
+                    Body: data,
                     ContentType: contentType,
-                    ContentLength: finalContentLength,
-                })
-            )
+                },
+                // Configure multipart upload settings
+                queueSize: QUEUE_SIZE, // Number of concurrent uploads
+                partSize: PART_SIZE, // Size of each part (5MB minimum for S3)
+                leavePartsOnError: false, // Clean up parts on failure
+            })
+
+            // Optional: Track upload progress
+            upload.on('httpUploadProgress', (progress) => {
+                if (progress.loaded && progress.total) {
+                    const percent = ((progress.loaded / progress.total) * 100).toFixed(1)
+                    console.log(`Upload progress for ${key}: ${percent}% (${(progress.loaded / 1024 / 1024).toFixed(2)} MB / ${(progress.total / 1024 / 1024).toFixed(2)} MB)`)
+                } else if (progress.loaded) {
+                    console.log(`Upload progress for ${key}: ${(progress.loaded / 1024 / 1024).toFixed(2)} MB uploaded`)
+                }
+            })
+
+            await upload.done()
 
             console.log(`Successfully uploaded file to S3 at key: ${key}`)
             return true
