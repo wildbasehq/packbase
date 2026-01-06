@@ -88,7 +88,7 @@ export default function FloatingCompose() {
                         },
                     },
                 })
-            }, 30000)
+            }, 60000)
         }
         return () => {
             clearTimeout(uploadingTimeout)
