@@ -124,6 +124,7 @@ export class Storage {
         stream: Readable,
         contentType: string,
         contentLength?: number,
+        progressCallback?: (uploadedBytes: number, totalBytes?: number) => void,
     ): Promise<{
         success: boolean;
         error?: Error;
@@ -142,7 +143,7 @@ export class Storage {
             const fullPath = `${userId}/${filePath.replace('{ext}', ext)}`
 
             // Upload the file using the storage provider
-            const uploadSuccess = await this.storageProvider.uploadFile(fullPath, stream, contentType, contentLength)
+            const uploadSuccess = await this.storageProvider.uploadFile(fullPath, stream, contentType, contentLength, progressCallback)
 
             if (!uploadSuccess) {
                 return {

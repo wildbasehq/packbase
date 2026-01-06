@@ -10,6 +10,14 @@ const PART_SIZE = 5 * 1024 * 1024
 // Maximum concurrent uploads
 const QUEUE_SIZE = 4
 
+export const QUEUE: {
+    [key: string]: {
+        loaded: number;
+        total?: number;
+        percent?: string;
+    }
+}[] = []
+
 /**
  * AWS S3 implementation of the StorageProvider interface
  */
@@ -70,7 +78,7 @@ export class S3StorageProvider implements StorageProvider {
      * @param contentLength The content length (required for streams)
      * @returns Promise resolving to success status
      */
-    async uploadFile(key: string, data: Buffer | Readable, contentType: string, contentLength?: number): Promise<boolean> {
+    async uploadFile(key: string, data: Buffer | Readable, contentType: string, contentLength?: number, progressCallback?: (uploadedBytes: number, totalBytes?: number) => void,): Promise<boolean> {
         try {
             const lengthInfo = contentLength ? `~${(contentLength / 1024).toFixed(2)} KB` : 'unknown size'
             console.log(`Uploading file to S3 at key: ${key}. Size ${lengthInfo}. Type of data: ${data instanceof Buffer ? 'Buffer' : 'Stream'}`)
@@ -112,6 +120,11 @@ export class S3StorageProvider implements StorageProvider {
             upload.on('httpUploadProgress', (progress) => {
                 if (progress.loaded && progress.total) {
                     const percent = ((progress.loaded / progress.total) * 100).toFixed(1)
+                    
+                    if (progressCallback) {
+                        progressCallback(progress.loaded, progress.total)
+                    }
+                    
                     console.log(`Upload progress for ${key}: ${percent}% (${(progress.loaded / 1024 / 1024).toFixed(2)} MB / ${(progress.total / 1024 / 1024).toFixed(2)} MB)`)
                 } else if (progress.loaded) {
                     console.log(`Upload progress for ${key}: ${(progress.loaded / 1024 / 1024).toFixed(2)} MB uploaded`)

@@ -13,7 +13,7 @@ export interface StorageProvider {
      * @param contentLength
      * @returns Promise resolving to success status
      */
-    uploadFile(key: string, data: Buffer | Readable, contentType: string, contentLength?: number): Promise<boolean>;
+    uploadFile(key: string, data: Buffer | Readable, contentType: string, contentLength?: number, progressCallback?: (uploadedBytes: number, totalBytes?: number) => void): Promise<boolean>;
 
     /**
      * Delete a file from the storage

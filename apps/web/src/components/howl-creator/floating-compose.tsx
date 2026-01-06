@@ -19,6 +19,7 @@ import {Activity, ReactNode, RefObject, useEffect, useRef, useState} from 'react
 import {toast} from 'sonner'
 import {useLocation} from 'wouter'
 import AssetUploadStack, {type Asset} from '../feed/image-placeholder-stack'
+import ProgressBar from '../shared/progress-bar'
 
 export type AvailablePagesType = 'editor' | 'content-labelling' | 'mature-rating-from-sfw-warning'
 
@@ -61,8 +62,12 @@ export default function FloatingCompose() {
     const [selectedTags, setSelectedTags] = useState<string>('')
     const [selectedContentLabel, setSelectedContentLabel] = useState<string>('rating_safe')
 
+    const [howlID, setHowlID] = useState<string | null>(null)
+    const [uploadStatus, setUploadStatus] = useState<string | null>(null) // 'pending' | 'uploading' | 'processing' | 'completed' | 'failed'
+    const [uploadProgress, setUploadProgress] = useState<{currentAsset: number; totalAssets: number; currentAssetProgress: number;} | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const editorRef = useRef<any>(null)
+    const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
     useEffect(() => {
         console.log(channel, location.split('/'))
@@ -99,6 +104,11 @@ export default function FloatingCompose() {
 
     const addAttachment = async (files: FileList | null) => {
         if (files) {
+            setUploading(true)
+            setUploadStatus('uploading')
+            const totalAssets = files.length
+            const uploadPromises: Promise<void>[] = []
+
             for (let i = 0; i < files.length; i++) {
                 const file = files[i]
                 if (!file) {
@@ -135,8 +145,11 @@ export default function FloatingCompose() {
                     }
                 }
 
+                // Set initial progress for this file
+                setUploadProgress({currentAsset: i + 1, totalAssets, currentAssetProgress: 0})
+
                 // Start chunked upload (non-blocking - all uploads happen in parallel)
-                uploadFileChunked(file)
+                const p = uploadFileChunked(file, i + 1, totalAssets)
                     .then(assetId => {
                         setAssets(prev => prev.map(img => img.id === id ? {...img, assetId, uploading: false} : img))
                     })
@@ -146,12 +159,26 @@ export default function FloatingCompose() {
                         // Remove failed image
                         setAssets(prev => prev.filter(img => img.id !== id))
                     })
+
+                uploadPromises.push(p)
             }
+
             if (fileInputRef.current) fileInputRef.current.value = null
+
+            try {
+                await Promise.all(uploadPromises)
+            } finally {
+                // Only clear the overall uploading state if we're not in the howl creation flow
+                if (uploadStatus !== 'pending') {
+                    setUploading(false)
+                    setUploadStatus(null)
+                    setUploadProgress(null)
+                }
+            }
         }
     }
 
-    const uploadFileChunked = async (file: File): Promise<string> => {
+    const uploadFileChunked = async (file: File, assetIndex?: number, totalAssets?: number): Promise<string> => {
         const CHUNK_SIZE = 1 * 1024 * 1024 // 1MB
 
         // 1. INIT
@@ -193,6 +220,16 @@ export default function FloatingCompose() {
                     })
                     appendData = await appendRes.json()
                     if (appendData.error) throw appendData.error
+
+                    // Update per-asset progress
+                    const percent = Math.round(((i + 1) / chunks) * 100)
+                    setUploadStatus('uploading')
+                    setUploadProgress(prev => ({
+                        currentAsset: assetIndex || (prev?.currentAsset || 1),
+                        totalAssets: totalAssets || (prev?.totalAssets || 1),
+                        currentAssetProgress: percent
+                    }))
+
                     break // Success, exit retry loop
                 } catch (error) {
                     retries--
@@ -240,28 +277,94 @@ export default function FloatingCompose() {
         post.channel_id = channel
 
         setUploading(true)
+        setUploadStatus('pending')
+        setUploadProgress(null)
+        
         vg.howl.create
             .post(post)
-            .then(({error}) => {
+            .then(({data, error}) => {
                 if (error) {
                     setUploading(false)
+                    setUploadStatus(null)
                     toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'A network error happened...')
-                } else {
-                    PackbaseInstance.emit('feed-reload', {})
-                    setUploading(false)
-                    setBody('')
-                    setAssets([])
-                    setSelectedContentLabel('rating_safe')
-                    setSelectedTags('')
-                    editorRef.current?.destroy()
+                    return
                 }
+                
+                // Got howl ID - now poll for status
+                const howlId = (data as {id: string}).id
+                setHowlID(howlId)
+                
+                // Start polling for status
+                const pollStatus = async () => {
+                    try {
+                        const statusRes = await vg.howl.create.status({id: howlId}).get()
+                        
+                        if (statusRes.error) {
+                            console.error('Status poll error:', statusRes.error)
+                            return
+                        }
+                        
+                        const status = statusRes.data as {
+                            id: string
+                            status: 'pending' | 'uploading' | 'processing' | 'completed' | 'failed'
+                            progress: {currentAsset: number; totalAssets: number; currentAssetProgress: number;}
+                            error?: string
+                        }
+                        
+                        setUploadStatus(status.status)
+                        setUploadProgress(status.progress)
+                        
+                        if (status.status === 'completed') {
+                            // Success - clean up
+                            if (pollingRef.current) {
+                                clearInterval(pollingRef.current)
+                                pollingRef.current = null
+                            }
+                            PackbaseInstance.emit('feed-reload', {})
+                            setUploading(false)
+                            setUploadStatus(null)
+                            setUploadProgress(null)
+                            setHowlID(null)
+                            setBody('')
+                            setAssets([])
+                            setSelectedContentLabel('rating_safe')
+                            setSelectedTags('')
+                            editorRef.current?.destroy()
+                            toast.success('Howl posted!')
+                        } else if (status.status === 'failed') {
+                            // Failed - show error
+                            if (pollingRef.current) {
+                                clearInterval(pollingRef.current)
+                                pollingRef.current = null
+                            }
+                            setUploading(false)
+                            toast.error(`Howl failed: ${status.error || 'Unknown error'}`)
+                        }
+                    } catch (e) {
+                        console.error('Status poll exception:', e)
+                    }
+                }
+                
+                // Poll immediately, then every 2 seconds
+                pollStatus()
+                pollingRef.current = setInterval(pollStatus, 1000)
             })
             .catch(error => {
                 console.log(error)
                 setUploading(false)
+                setUploadStatus(null)
                 toast.error('Something went wrong')
             })
     }
+    
+    // Cleanup polling on unmount
+    useEffect(() => {
+        return () => {
+            if (pollingRef.current) {
+                clearInterval(pollingRef.current)
+            }
+        }
+    }, [])
 
     // Don't show if user is not logged in
     if (!user || user.anonUser) {
@@ -302,6 +405,8 @@ export default function FloatingCompose() {
                         submitHowl={submitHowl}
                         setCurrentPage={setCurrentPage}
                         uploading={uploading}
+                        uploadStatus={uploadStatus}
+                        uploadProgress={uploadProgress}
                     />
                 </Activity>
 
@@ -344,7 +449,9 @@ function FloatingComposeContent({
                                     addAttachment,
                                     submitHowl,
                                     setCurrentPage,
-                                    uploading
+                                    uploading,
+                                    uploadStatus,
+                                    uploadProgress
                                 }: {
     channel?: string;
     channelName: string | null;
@@ -359,6 +466,8 @@ function FloatingComposeContent({
     submitHowl: () => void;
     setCurrentPage: (value: 'editor' | 'content-labelling') => void;
     uploading: boolean;
+    uploadStatus: string | null;
+    uploadProgress: {currentAsset: number; totalAssets: number; currentAssetProgress: number;} | null;
 }) {
     const {user} = useUserAccountStore()
 
@@ -445,6 +554,27 @@ function FloatingComposeContent({
                     {assets?.length > 0 && (
                         <div className="px-4 pb-2">
                             <AssetUploadStack assets={assets} setAssets={setAssets}/>
+                        </div>
+                    )}
+
+                    {/* Upload Status Indicator */}
+                    {uploading && uploadStatus && (
+                        <div className="relative px-4 py-2 bg-muted/50 border-t">
+                            <div className="flex items-center gap-2">
+                                <LoadingCircle />
+                                <Text className="text-sm text-muted-foreground">
+                                    {uploadStatus === 'pending' && 'Preparing...'}
+                                    {uploadStatus === 'uploading' && uploadProgress && (
+                                        <>Uploading asset {uploadProgress.currentAsset} of {uploadProgress.totalAssets}</>
+                                    )}
+                                    {uploadStatus === 'uploading' && !uploadProgress && 'Uploading...'}
+                                    {uploadStatus === 'processing' && 'Processing...'}
+                                </Text>
+                            </div>
+
+                            {uploadProgress && (
+                                <ProgressBar indeterminate={uploadProgress.currentAssetProgress === 0} value={uploadProgress.currentAssetProgress || 0} className="mt-2 w-full"/>
+                            )}
                         </div>
                     )}
 

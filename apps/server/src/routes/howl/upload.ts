@@ -41,7 +41,7 @@ export default (app: YapockType) =>
                 user_id: user.sub,
                 state: 'pending',
                 created_at: Date.now(),
-                expires: Date.now() + 5 * 60 * 1000, // 5 minutes from now
+                expires: Date.now() + 30 * 60 * 1000, // 30 minutes from now (extended for async processing)
             }
 
             const jsonPath = path.join(UPLOAD_ROOT, `${asset_id}.json`)
@@ -159,8 +159,8 @@ export default (app: YapockType) =>
             }
 
             meta.state = 'succeeded'
-            // Update expiry to giving them time to post
-            const expires = Date.now() + 5 * 60 * 1000 // 5 minutes to use it
+            // Update expiry to giving them time to post (extended for async processing)
+            const expires = Date.now() + 30 * 60 * 1000 // 30 minutes to use it
             meta.expires = expires
 
             await writeFile(jsonPath, JSON.stringify(meta))

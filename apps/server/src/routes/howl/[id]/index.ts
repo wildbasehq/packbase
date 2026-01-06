@@ -1,15 +1,15 @@
-import {YapockType} from '@/index'
-import {deletePost, getPost} from '@/lib/api/post'
-import {ErrorTypebox} from '@/utils/errors'
-import {t} from 'elysia'
+import { YapockType } from '@/index'
+import { deletePost, getPost } from '@/lib/api/post'
+import { ErrorTypebox } from '@/utils/errors'
+import { t } from 'elysia'
 
 export default (app: YapockType) =>
     app
         // @ts-ignore - Not sure what's going on here
         .get(
             '',
-            async ({params, set}) => {
-                const {id} = params
+            async ({ params, set }) => {
+                const { id } = params
                 const post = await getPost(id)
                 if (!post) {
                     set.status = 400
