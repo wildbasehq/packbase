@@ -10,16 +10,7 @@ const log = {
     error: Debug('vg:verify-token:error'),
 }
 
-type AuthUser = SignedInAuthObject & {
-    /**
-     * Internal profile id (prisma.profiles.id).
-     * Kept for backwards compatibility with existing routes.
-     */
-    sub?: string;
-    sessionClaims: {
-        nickname?: string;
-    }
-};
+type AuthUser = SignedInAuthObject & any
 
 const authorizedParties = ['https://packbase.app', 'http://localhost:5173', 'http://localhost:4173', 'http://localhost:8000', 'http://127.0.0.1:5173', 'http://127.0.0.1:8000']
 
@@ -121,7 +112,7 @@ async function authenticate(req: RequestLike): Promise<
     }
 }
 
-async function ensureProfileId(user: AuthUser): Promise<void> {
+async function ensureProfileId(user: AuthUser): Promise<AuthUser | void> {
     // If we already resolved the profile id, do nothing.
     if (user.sub) return
 
@@ -133,11 +124,16 @@ async function ensureProfileId(user: AuthUser): Promise<void> {
     })
 
     if (existing?.id) {
-        user.sub = existing.id
-        return
+        user = {
+            ...user,
+            ...existing,
+            sub: existing.id
+        }
+
+        return user
     }
 
-    // Only auto-provision when we have a nickname; preserves prior behavior.
+    // Only auto-provision when we have a nickname
     const nickname = user.sessionClaims?.nickname
     if (!nickname) return
 
@@ -148,8 +144,12 @@ async function ensureProfileId(user: AuthUser): Promise<void> {
         })
 
         if (nowExisting?.id) {
-            user.sub = nowExisting.id
-            return
+            user = {
+                ...user,
+                ...nowExisting,
+                sub: nowExisting.id
+            }
+            return user
         }
 
         const email = (await clerkClient.users.getUser(userId))?.emailAddresses?.[0]?.emailAddress
@@ -178,7 +178,12 @@ async function ensureProfileId(user: AuthUser): Promise<void> {
                 }
             })
 
-            user.sub = newProfile.id
+            user = {
+                ...user,
+                ...newProfile,
+                sub: newProfile.id
+            }
+
             log.info(`Created profile ${newProfile.id} for user ${userId}`)
         } catch (e: any) {
             // If we raced with another request/process, attempt to re-fetch.
@@ -186,8 +191,13 @@ async function ensureProfileId(user: AuthUser): Promise<void> {
                 where: {owner_id: userId}
             })
             if (raced?.id) {
-                user.sub = raced.id
-                return
+                user = {
+                    ...user,
+                    ...raced,
+                    sub: raced.id
+                }
+
+                return user
             }
 
             log.error('Error creating profile:', e)
@@ -210,6 +220,8 @@ async function ensureProfileId(user: AuthUser): Promise<void> {
                 log.error('Error processing invite side-effects:', e)
             }
         }
+
+        return user
     })
 }
 
@@ -223,7 +235,7 @@ export default async function verifyToken(req: any): Promise<AuthUser | undefine
     if (!result.ok) return undefined
 
     try {
-        await ensureProfileId(result.user)
+        result.user = await ensureProfileId(result.user)
     } catch (e) {
         log.error('Profile resolution error:', e)
     }
