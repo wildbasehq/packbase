@@ -77,32 +77,6 @@ export default function FloatingCompose() {
         }
     }, [location, channel])
 
-    useEffect(() => {
-        let uploadingTimeout
-        let heavyDelayTimeout
-        let assumeWentWrongTimeout
-        if (uploading) {
-            assumeWentWrongTimeout = setTimeout(() => {
-                setUploading(false)
-                toast('The howl took way too long!', {
-                    duration: Infinity,
-                    description: 'You can try again, but check in another tab if it worked first - I might\'ve just lost track of it.',
-                    action: {
-                        label: 'Check',
-                        onClick: () => {
-                            window.open(window.location.href, '_blank')
-                        },
-                    },
-                })
-            }, 60000)
-        }
-        return () => {
-            clearTimeout(uploadingTimeout)
-            clearTimeout(heavyDelayTimeout)
-            clearTimeout(assumeWentWrongTimeout)
-        }
-    }, [uploading])
-
     const addAttachment = async (files: FileList | null) => {
         if (files) {
             setUploading(true)
