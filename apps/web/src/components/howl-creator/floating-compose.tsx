@@ -64,10 +64,11 @@ export default function FloatingCompose() {
 
     const [howlID, setHowlID] = useState<string | null>(null)
     const [uploadStatus, setUploadStatus] = useState<string | null>(null) // 'pending' | 'uploading' | 'processing' | 'completed' | 'failed'
-    const [uploadProgress, setUploadProgress] = useState<{currentAsset: number; totalAssets: number; currentAssetProgress: number;} | null>(null)
+    const [uploadProgress, setUploadProgress] = useState<{totalAssets: number; totalProgress: number;} | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const editorRef = useRef<any>(null)
     const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+    const assetProgressRef = useRef<Map<number, number>>(new Map())
 
     useEffect(() => {
         console.log(channel, location.split('/'))
@@ -108,6 +109,7 @@ export default function FloatingCompose() {
             setUploadStatus('uploading')
             const totalAssets = files.length
             const uploadPromises: Promise<void>[] = []
+            assetProgressRef.current.clear()
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i]
@@ -144,9 +146,6 @@ export default function FloatingCompose() {
                         URL.revokeObjectURL(video.src)
                     }
                 }
-
-                // Set initial progress for this file
-                setUploadProgress({currentAsset: i + 1, totalAssets, currentAssetProgress: 0})
 
                 // Start chunked upload (non-blocking - all uploads happen in parallel)
                 const p = uploadFileChunked(file, i + 1, totalAssets)
@@ -221,14 +220,22 @@ export default function FloatingCompose() {
                     appendData = await appendRes.json()
                     if (appendData.error) throw appendData.error
 
-                    // Update per-asset progress
-                    const percent = Math.round(((i + 1) / chunks) * 100)
+                    // Track progress for this specific asset
+                    const assetPercent = ((i + 1) / chunks) * 100
+                    assetProgressRef.current.set(assetIndex || 1, assetPercent)
+                    
+                    // Calculate total progress from all assets
+                    let totalProgress = 0
+                    for (const progress of assetProgressRef.current.values()) {
+                        totalProgress += progress
+                    }
+                    totalProgress = Math.round(totalProgress / (totalAssets || 1))
+                    
                     setUploadStatus('uploading')
-                    setUploadProgress(prev => ({
-                        currentAsset: assetIndex || (prev?.currentAsset || 1),
-                        totalAssets: totalAssets || (prev?.totalAssets || 1),
-                        currentAssetProgress: percent
-                    }))
+                    setUploadProgress({
+                        totalAssets: totalAssets || 1,
+                        totalProgress
+                    })
 
                     break // Success, exit retry loop
                 } catch (error) {
@@ -307,7 +314,7 @@ export default function FloatingCompose() {
                         const status = statusRes.data as {
                             id: string
                             status: 'pending' | 'uploading' | 'processing' | 'completed' | 'failed'
-                            progress: {currentAsset: number; totalAssets: number; currentAssetProgress: number;}
+                            progress: {totalAssets: number; totalProgress: number;}
                             error?: string
                         }
                         
@@ -467,7 +474,7 @@ function FloatingComposeContent({
     setCurrentPage: (value: 'editor' | 'content-labelling') => void;
     uploading: boolean;
     uploadStatus: string | null;
-    uploadProgress: {currentAsset: number; totalAssets: number; currentAssetProgress: number;} | null;
+    uploadProgress: {currentAssetProgress?: number; totalAssets: number; totalProgress: number;} | null;
 }) {
     const {user} = useUserAccountStore()
 
@@ -565,7 +572,7 @@ function FloatingComposeContent({
                                 <Text className="text-sm text-muted-foreground">
                                     {uploadStatus === 'pending' && 'Preparing...'}
                                     {uploadStatus === 'uploading' && uploadProgress && (
-                                        <>Uploading asset {uploadProgress.currentAsset} of {uploadProgress.totalAssets}</>
+                                        <>Uploading {uploadProgress.totalAssets} {uploadProgress.totalAssets === 1 ? 'asset' : 'assets'}... {uploadProgress.totalProgress || uploadProgress.currentAssetProgress}%</>
                                     )}
                                     {uploadStatus === 'uploading' && !uploadProgress && 'Uploading...'}
                                     {uploadStatus === 'processing' && 'Processing...'}
@@ -573,7 +580,7 @@ function FloatingComposeContent({
                             </div>
 
                             {uploadProgress && (
-                                <ProgressBar indeterminate={uploadProgress.currentAssetProgress === 0} value={uploadProgress.currentAssetProgress || 0} className="mt-2 w-full"/>
+                                <ProgressBar indeterminate={!uploadProgress.totalProgress && !uploadProgress.currentAssetProgress} value={uploadProgress.totalProgress || uploadProgress.currentAssetProgress || 0} className="mt-2 w-full"/>
                             )}
                         </div>
                     )}

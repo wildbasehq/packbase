@@ -109,6 +109,11 @@ export class S3StorageProvider implements StorageProvider {
                     Key: key,
                     Body: data,
                     ContentType: contentType,
+                    // Provide ContentLength to avoid Infinity-part calculations on streams
+                    ContentLength:
+                        data instanceof Buffer
+                            ? data.length
+                            : (typeof contentLength === 'number' ? contentLength : undefined),
                 },
                 // Configure multipart upload settings
                 queueSize: QUEUE_SIZE, // Number of concurrent uploads
