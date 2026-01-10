@@ -41,6 +41,8 @@ function ComposeButton({onClick, children, className}: {
     )
 }
 
+const MAX_ASSET_SIZE = import.meta.env.VITE_MAX_ASSET_SIZE ? parseInt(import.meta.env.VITE_MAX_ASSET_SIZE) : 1024 * 1024 * 1024
+
 export default function FloatingCompose() {
     const {user} = useUserAccountStore()
     const {navigation} = useUIStore()
@@ -64,7 +66,7 @@ export default function FloatingCompose() {
 
     const [howlID, setHowlID] = useState<string | null>(null)
     const [uploadStatus, setUploadStatus] = useState<string | null>(null) // 'pending' | 'uploading' | 'processing' | 'completed' | 'failed'
-    const [uploadProgress, setUploadProgress] = useState<{totalAssets: number; totalProgress: number;} | null>(null)
+    const [uploadProgress, setUploadProgress] = useState<{ totalAssets: number; totalProgress: number; } | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const editorRef = useRef<any>(null)
     const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -79,6 +81,14 @@ export default function FloatingCompose() {
 
     const addAttachment = async (files: FileList | null) => {
         if (files) {
+            // Check for file size limits
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].size > MAX_ASSET_SIZE) {
+                    toast.error(`File "${files[i].name}" is too large. Maximum size is ${Math.round(MAX_ASSET_SIZE / 1024 / 1024 / 1024)}GB.`)
+                    return
+                }
+            }
+
             setUploading(true)
             setUploadStatus('uploading')
             const totalAssets = files.length
@@ -197,14 +207,14 @@ export default function FloatingCompose() {
                     // Track progress for this specific asset
                     const assetPercent = ((i + 1) / chunks) * 100
                     assetProgressRef.current.set(assetIndex || 1, assetPercent)
-                    
+
                     // Calculate total progress from all assets
                     let totalProgress = 0
                     for (const progress of assetProgressRef.current.values()) {
                         totalProgress += progress
                     }
                     totalProgress = Math.round(totalProgress / (totalAssets || 1))
-                    
+
                     setUploadStatus('uploading')
                     setUploadProgress({
                         totalAssets: totalAssets || 1,
@@ -260,7 +270,7 @@ export default function FloatingCompose() {
         setUploading(true)
         setUploadStatus('pending')
         setUploadProgress(null)
-        
+
         vg.howl.create
             .post(post)
             .then(({data, error}) => {
@@ -270,31 +280,31 @@ export default function FloatingCompose() {
                     toast.error(error.value ? `${error.status}: ${error.value.summary}` : 'A network error happened...')
                     return
                 }
-                
+
                 // Got howl ID - now poll for status
-                const howlId = (data as {id: string}).id
+                const howlId = (data as { id: string }).id
                 setHowlID(howlId)
-                
+
                 // Start polling for status
                 const pollStatus = async () => {
                     try {
                         const statusRes = await vg.howl.create.status({id: howlId}).get()
-                        
+
                         if (statusRes.error) {
                             console.error('Status poll error:', statusRes.error)
                             return
                         }
-                        
+
                         const status = statusRes.data as {
                             id: string
                             status: 'pending' | 'uploading' | 'processing' | 'completed' | 'failed'
-                            progress: {totalAssets: number; totalProgress: number;}
+                            progress: { totalAssets: number; totalProgress: number; }
                             error?: string
                         }
-                        
+
                         setUploadStatus(status.status)
                         setUploadProgress(status.progress)
-                        
+
                         if (status.status === 'completed') {
                             // Success - clean up
                             if (pollingRef.current) {
@@ -325,7 +335,7 @@ export default function FloatingCompose() {
                         console.error('Status poll exception:', e)
                     }
                 }
-                
+
                 // Poll immediately, then every 2 seconds
                 pollStatus()
                 pollingRef.current = setInterval(pollStatus, 1000)
@@ -337,7 +347,7 @@ export default function FloatingCompose() {
                 toast.error('Something went wrong')
             })
     }
-    
+
     // Cleanup polling on unmount
     useEffect(() => {
         return () => {
@@ -448,7 +458,7 @@ function FloatingComposeContent({
     setCurrentPage: (value: 'editor' | 'content-labelling') => void;
     uploading: boolean;
     uploadStatus: string | null;
-    uploadProgress: {currentAssetProgress?: number; totalAssets: number; totalProgress: number;} | null;
+    uploadProgress: { currentAssetProgress?: number; totalAssets: number; totalProgress: number; } | null;
 }) {
     const {user} = useUserAccountStore()
 
@@ -542,7 +552,7 @@ function FloatingComposeContent({
                     {uploading && uploadStatus && (
                         <div className="relative px-4 py-2 bg-muted/50 border-t">
                             <div className="flex items-center gap-2">
-                                <LoadingCircle />
+                                <LoadingCircle/>
                                 <Text className="text-sm text-muted-foreground">
                                     {uploadStatus === 'pending' && 'Preparing...'}
                                     {uploadStatus === 'uploading' && uploadProgress && (
@@ -554,7 +564,8 @@ function FloatingComposeContent({
                             </div>
 
                             {uploadProgress && (
-                                <ProgressBar indeterminate={!uploadProgress.totalProgress && !uploadProgress.currentAssetProgress} value={uploadProgress.totalProgress || uploadProgress.currentAssetProgress || 0} className="mt-2 w-full"/>
+                                <ProgressBar indeterminate={!uploadProgress.totalProgress && !uploadProgress.currentAssetProgress}
+                                             value={uploadProgress.totalProgress || uploadProgress.currentAssetProgress || 0} className="mt-2 w-full"/>
                             )}
                         </div>
                     )}

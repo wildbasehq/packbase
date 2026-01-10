@@ -1,7 +1,7 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
 import {createHowlJob, enqueueHowlJob, getHowlJobStatus} from '@/lib/howl-job-queue'
+import {HTTPError} from '@/lib/HTTPError'
 import {HowlBody} from '@/models/defs'
 import requiresAccount from '@/utils/identity/requires-account'
 import sanitizeTags from '@/utils/sanitize-tags'
@@ -37,11 +37,11 @@ export default (app: YapockType) =>
                 })
             }
 
-            if (asset_ids?.length! > 20) {
+            if (asset_ids?.length! > 100) {
                 console.log('[HOWL_CREATE] Validation failed: too many assets', {asset_count: asset_ids?.length})
                 set.status = 400
                 throw HTTPError.badRequest({
-                    summary: 'You can only upload up to 20 assets.',
+                    summary: 'You can only upload up to 100 assets.',
                 })
             }
 
@@ -137,16 +137,16 @@ export default (app: YapockType) =>
 
             // Validate assets exist before creating job
             const UPLOAD_ROOT = path.join(process.cwd(), 'temp', 'uploads', 'pending')
-            
+
             if (asset_ids && asset_ids.length > 0) {
                 console.log('[HOWL_CREATE] Validating assets exist', {
                     asset_ids,
                     count: asset_ids.length,
                 })
-                
+
                 for (const assetId of asset_ids) {
                     const jsonPath = path.join(UPLOAD_ROOT, `${assetId}.json`)
-                    
+
                     if (!existsSync(jsonPath)) {
                         console.log('[HOWL_CREATE] Asset not found', {assetId, jsonPath})
                         set.status = 400
@@ -154,9 +154,9 @@ export default (app: YapockType) =>
                             summary: `Asset ID ${assetId} not found`,
                         })
                     }
-                    
+
                     const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
-                    
+
                     if (meta.user_id !== user.sub) {
                         console.log('[HOWL_CREATE] Asset unauthorized', {assetId, expected: user.sub, actual: meta.user_id})
                         set.status = 403
@@ -164,7 +164,7 @@ export default (app: YapockType) =>
                             summary: `Asset ID ${assetId} unauthorized`,
                         })
                     }
-                    
+
                     if (meta.state !== 'succeeded') {
                         console.log('[HOWL_CREATE] Asset not finalized', {assetId, state: meta.state})
                         set.status = 400
@@ -172,7 +172,7 @@ export default (app: YapockType) =>
                             summary: `Asset ID ${assetId} not finalized`,
                         })
                     }
-                    
+
                     if (meta.expires && Date.now() > meta.expires) {
                         console.log('[HOWL_CREATE] Asset expired', {assetId, expires: meta.expires})
                         set.status = 400
@@ -181,7 +181,7 @@ export default (app: YapockType) =>
                         })
                     }
                 }
-                
+
                 console.log('[HOWL_CREATE] All assets validated successfully')
             }
 
@@ -231,48 +231,48 @@ export default (app: YapockType) =>
             },
         },
     )
-    /**
-     * Get status of howl creation job
-     * @returns Current job status including progress and any errors
-     */
-    .get('/status/:id', async ({params, set}) => {
-        const status = getHowlJobStatus(params.id)
-        
-        if (!status) {
-            // Check if the howl exists in the database (already completed and job cleaned up)
-            const existingPost = await prisma.posts.findUnique({
-                where: {id: params.id},
-                select: {id: true},
-            })
-            
-            if (existingPost) {
-                return {
-                    id: params.id,
-                    status: 'completed' as const,
-                    progress: {
-                        currentAsset: 0,
-                        totalAssets: 0,
-                    },
-                    createdAt: 0,
-                    updatedAt: 0,
+        /**
+         * Get status of howl creation job
+         * @returns Current job status including progress and any errors
+         */
+        .get('/status/:id', async ({params, set}) => {
+            const status = getHowlJobStatus(params.id)
+
+            if (!status) {
+                // Check if the howl exists in the database (already completed and job cleaned up)
+                const existingPost = await prisma.posts.findUnique({
+                    where: {id: params.id},
+                    select: {id: true},
+                })
+
+                if (existingPost) {
+                    return {
+                        id: params.id,
+                        status: 'completed' as const,
+                        progress: {
+                            currentAsset: 0,
+                            totalAssets: 0,
+                        },
+                        createdAt: 0,
+                        updatedAt: 0,
+                    }
                 }
+
+                set.status = 404
+                throw HTTPError.notFound({
+                    summary: 'Job not found',
+                })
             }
-            
-            set.status = 404
-            throw HTTPError.notFound({
-                summary: 'Job not found',
-            })
-        }
-        
-        return status
-    }, {
-        detail: {
-            description: 'Get creation status for a specific howl',
-            tags: ['Howl'],
-        },
-        params: t.Object({
-            id: t.String({
-                description: 'Howl ID',
+
+            return status
+        }, {
+            detail: {
+                description: 'Get creation status for a specific howl',
+                tags: ['Howl'],
+            },
+            params: t.Object({
+                id: t.String({
+                    description: 'Howl ID',
+                }),
             }),
-        }),
-    })
+        })

@@ -9,6 +9,7 @@ import {appendFile, mkdir, readFile, rename, stat, writeFile} from 'fs/promises'
 import path from 'path'
 
 const UPLOAD_ROOT = path.join(process.cwd(), 'temp', 'uploads', 'pending')
+const MAX_ASSET_SIZE = process.env.MAX_ASSET_SIZE ? parseInt(process.env.MAX_ASSET_SIZE) : 1024 * 1024 * 1024 // 1GB default
 
 // Ensure upload root exists (lazy check in handler is safer for startup files, but we can try here)
 // mkdir(UPLOAD_ROOT, { recursive: true }).catch(() => {})
@@ -23,6 +24,10 @@ export default (app: YapockType) =>
 
             // @ts-ignore
             const {total_bytes, asset_type} = body
+
+            if (total_bytes > MAX_ASSET_SIZE) {
+                throw HTTPError.badRequest({summary: `Asset size exceeds maximum limit of ${MAX_ASSET_SIZE} bytes`})
+            }
 
             // Check asset type
             const allowedTypes = ['image/*', 'video/*']
@@ -58,7 +63,7 @@ export default (app: YapockType) =>
         }, {
             body: t.Object({
                 command: t.Literal('INIT'),
-                total_bytes: t.Number(),
+                total_bytes: t.Number({maximum: MAX_ASSET_SIZE}),
                 asset_type: t.String(),
             })
         })
@@ -88,6 +93,18 @@ export default (app: YapockType) =>
 
             // Append chunk
             const buffer = Buffer.from(await asset.arrayBuffer())
+
+            // Check if adding this buffer would exceed the limit
+            const currentStats = await stat(binPath)
+            // buggy?
+            // if (currentStats.size + buffer.length > meta.total_bytes) {
+            //     throw HTTPError.badRequest({summary: 'Upload exceeds declared total_bytes'})
+            // }
+
+            if (currentStats.size + buffer.length > MAX_ASSET_SIZE) {
+                throw HTTPError.badRequest({summary: 'Upload exceeds maximum asset size limit'})
+            }
+
             await appendFile(binPath, buffer)
 
             // Update segments count
