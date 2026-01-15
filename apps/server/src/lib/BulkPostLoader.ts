@@ -55,7 +55,7 @@ export class BulkPostLoader {
                 await settings.waitForInit()
                 postsMap[post.id] = {
                     ...post,
-                    allow_rehowl: settings.get('allow_rehowl'),
+                    allow_rehowl: settings.get('allow_rehowl', true),
                     created_at: post.created_at.toISOString(),
                     reactions: [],
                     comments: [],

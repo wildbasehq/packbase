@@ -14,7 +14,9 @@ export default (app: YapockType) =>
             })
             await settings.waitForInit()
 
-            const allSettings = settings.getAll()
+            const allSettings = settings.getAll({
+                allow_rehowl: true
+            })
             const schema = settings.getSchema()
 
             return {

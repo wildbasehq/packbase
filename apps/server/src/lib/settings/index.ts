@@ -248,13 +248,15 @@ export class Settings<SchemaName extends string = string> {
      * Get all settings as an object
      * @returns Object with all settings and their values
      */
-    getAll(): Record<string, any> {
+    getAll(defaults?: {
+        [key in keyof SchemaDefinition['settings']]?: SchemaDefinition['settings'][key]['default']
+    }): Record<string, any> {
         this.ensureInitialized()
 
         const result: Record<string, any> = {}
 
         for (const key in this.schema.settings) {
-            result[key] = this.get(key)
+            result[key] = this.get(key, defaults?.[key] ?? this.schema.settings[key].default ?? undefined)
         }
 
         return result
