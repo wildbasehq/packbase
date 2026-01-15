@@ -24,11 +24,11 @@ RUN apt-get update -qq && \
 COPY package.json ./
 RUN bun install --ci
 
-# Generate Prisma Client
-RUN bun run prisma:generate
-
 # Copy application code
 COPY . .
+
+# Generate Prisma Client
+RUN bun run prisma:generate
 
 
 # Final stage for app image
