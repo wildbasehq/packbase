@@ -1,6 +1,6 @@
 import {PrismaPg} from '@prisma/adapter-pg'
 import Debug from 'debug'
-import {PrismaClient} from '.prisma/client/client'
+import {PrismaClient} from '../../prisma/generated/client'
 
 const log = {
     info: Debug('vg:prisma'),
