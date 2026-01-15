@@ -25,8 +25,7 @@ COPY package.json ./
 RUN bun install --ci
 
 # Generate Prisma Client
-COPY prisma .
-RUN bun run prisma:push && bun run prisma:generate
+RUN bun run prisma:generate
 
 # Copy application code
 COPY . .
