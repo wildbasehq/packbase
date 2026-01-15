@@ -26,7 +26,7 @@ RUN bun install --ci
 
 # Generate Prisma Client
 COPY prisma .
-RUN bunx prisma generate
+RUN bun run prisma:push && bun run prisma:generate
 
 # Copy application code
 COPY . .
