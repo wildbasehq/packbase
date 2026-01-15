@@ -1,4 +1,5 @@
 import prisma from '@/db/prisma'
+import {Settings} from '@/lib/settings'
 
 /**
  * BulkPostLoader - Efficiently loads multiple posts with a single query
@@ -36,7 +37,8 @@ export class BulkPostLoader {
                     body: true,
                     assets: true,
                     parent: true,
-                    tags: true
+                    tags: true,
+                    warning: true
                 },
             })
 
@@ -44,22 +46,55 @@ export class BulkPostLoader {
 
             // Create a map of post IDs to their data
             const postsMap: Record<string, any> = {}
-            posts.forEach((post) => {
+            for (const post of posts) {
+                const settings = new Settings('user', {
+                    modelId: post.user_id,
+                    currentUserId
+                })
+
+                await settings.waitForInit()
                 postsMap[post.id] = {
                     ...post,
+                    allow_rehowl: settings.get('allow_rehowl'),
                     created_at: post.created_at.toISOString(),
                     reactions: [],
                     comments: [],
                 }
-            })
+            }
 
             // Collect all user_ids, tenant_ids, and channel_ids
             const userIds = [...new Set(posts.map((post) => post.user_id).filter(Boolean))]
             const tenantIds = [...new Set(posts.map((post) => post.tenant_id).filter(Boolean))]
             const channelds = [...new Set(posts.map((post) => post.channel_id).filter(Boolean))]
 
+            // Handle HOWLING_ECHO posts (rehowls)
+            const rehowls = posts.filter(post => post.content_type.toLowerCase() === 'howling_echo' && post.parent)
+            const parentIds = [...new Set(rehowls.map(post => post.parent as string))]
+
+            // Fetch parent posts if they are not already in our current batch
+            const missingParentIds = parentIds.filter(id => !postIds.includes(id))
+            let parentPostsMap: Record<string, any> = {}
+
+            if (missingParentIds.length > 0) {
+                // Recursively call loadPosts to get parent posts and their data
+                // We use a new loader instance to avoid any potential state issues, 
+                // though currently the loader is stateless.
+                const parentLoader = new BulkPostLoader()
+                parentPostsMap = await parentLoader.loadPosts(missingParentIds, currentUserId)
+            }
+
+            // Collect user IDs from parent posts that were already in our batch
+            parentIds.filter(id => postIds.includes(id)).forEach(parentId => {
+                const parentPost = postsMap[parentId]
+                if (parentPost && parentPost.user_id) {
+                    userIds.push(parentPost.user_id)
+                }
+            })
+
+            const finalUserIds = [...new Set(userIds)]
+
             // Fetch profiles for post authors in parallel
-            const profilesPromise = this.fetchProfiles(userIds)
+            const profilesPromise = this.fetchProfiles(finalUserIds)
 
             // Fetch reactions for posts in parallel
             const reactionsPromise = this.fetchReactions(postIds)
@@ -195,14 +230,57 @@ export class BulkPostLoader {
                         reactions: comment.reactions,
                         created_at: comment.created_at.toISOString(),
                         user: userProfile,
+                        content_type: comment.content_type,
                     })
                 }
             }
 
             // Finalize post data
             Object.values(postsMap).forEach((post: any) => {
+                // Handle HOWLING_ECHO: replace with parent post and add rehowled_by
+                if (post.content_type.toLowerCase() === 'howling_echo' && post.parent) {
+                    const parentId = post.parent
+                    const parentPost = postsMap[parentId] || parentPostsMap[parentId]
+
+                    if (parentPost) {
+                        const rehowlerUserId = post.user_id
+                        const rehowlerProfile = userMap[rehowlerUserId] || this.createDeletedUserProfile(rehowlerUserId)
+
+                        // Replace post data with parent post data
+                        const originalId = post.id
+                        const rehowled_by = {
+                            id: rehowlerUserId,
+                            username: rehowlerProfile.username,
+                            display_name: rehowlerProfile.display_name,
+                        }
+
+                        // Use the already fetched user data from parentPost if available
+                        const parentUser = parentPost.user
+
+                        Object.keys(post).forEach(key => delete post[key])
+                        Object.assign(post, JSON.parse(JSON.stringify(parentPost)))
+
+                        // Restore the original ID of the rehowl post so the feed maintains order and unique IDs
+                        post.id = originalId
+                        post.rehowled_by = rehowled_by
+
+                        // If the parent post already has user data (from parentLoader), preserve it
+                        if (parentUser) {
+                            post.user = parentUser
+                        } else if (userMap[post.user_id]) {
+                            // If user data is available in our own userMap (e.g. parent was in same batch), use it
+                            post.user = userMap[post.user_id]
+                        }
+                    } else {
+                        // Missing parent, assume orphan and delete
+                        delete postsMap[post.id]
+                    }
+                }
+
                 // Add user data
-                post.user = userMap[post.user_id] || this.createDeletedUserProfile(post.user_id)
+                if (!post.user) {
+                    post.user = userMap[post.user_id] || this.createDeletedUserProfile(post.user_id)
+                }
                 delete post.user_id
 
                 // Add pack data
@@ -222,11 +300,11 @@ export class BulkPostLoader {
                 delete post.channel_id
 
                 // Clean up empty collections
-                if (post.reactions.length === 0) {
+                if (post.reactions?.length === 0) {
                     delete post.reactions
                 }
 
-                if (post.comments.length === 0) {
+                if (post.comments?.length === 0) {
                     delete post.comments
                 }
             })
@@ -329,6 +407,7 @@ export class BulkPostLoader {
                     created_at: true,
                     user_id: true,
                     parent: true,
+                    content_type: true,
                 },
             })
 

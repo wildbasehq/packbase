@@ -2,7 +2,6 @@ import {YapockType} from '@/index'
 import {FeedController} from '@/lib/FeedController'
 import {HTTPError} from '@/lib/HTTPError'
 import {HowlResponse} from '@/models/defs'
-import requiresAccount from '@/utils/identity/requires-account'
 import requiresToken from '@/utils/identity/requires-token'
 import {t} from 'elysia'
 
@@ -22,16 +21,16 @@ export default (app: YapockType) =>
                 }
             }
 
-            await requiresAccount({set, user})
-
             try {
                 // Special handling for home feed - requires authentication
-                if (id === 'universe:home') {
-                    await requiresToken({set, user})
-                }
+                if (id === 'universe:home') requiresToken({set, user})
 
+                const feed = await feedController.getFeed(id, user?.sub, Number(page))
+                feed.data.forEach((post) => {
+                    if (!post.user) console.log(post)
+                })
                 // Get feed data
-                return await feedController.getFeed(id, user?.sub, Number(page))
+                return feed
             } catch (error) {
                 // Handle errors
                 const httpError = error instanceof HTTPError ? error : HTTPError.fromError(error, 'Error fetching feed')

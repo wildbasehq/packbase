@@ -1,158 +1,207 @@
-# Settings Management System
+# Settings Manager
 
-A comprehensive TypeScript settings management system that provides type-safe, validated, and conditional access control
-for application settings.
+A type-safe settings manager for handling getters and setters for settings stored in the Prisma database.
 
 ## Features
 
-- **Schema-based**: Define settings using JSON schemas with validation rules
-- **Conditional access**: Settings can be conditionally available based on model properties
-- **Type safety**: Full TypeScript support with generics
-- **Validation**: Automatic value validation and sanitization
-- **Audit logging**: Track all setting changes with timestamps
-- **Permission control**: Distinguish between user-modifiable and internal-only settings
-- **Schema inheritance**: Support for extending schemas from parent models
+- ✅ **Type-safe**: Full TypeScript support with inferred types from schemas
+- ✅ **Schema-based**: Settings defined in JSON schema files
+- ✅ **Database-backed**: Automatically syncs with Prisma database
+- ✅ **Audit logging**: Optional audit trail for setting changes
+- ✅ **Caching**: Built-in caching for performance
+- ✅ **Validation**: Automatic value validation based on schema
 
-## Quick Start
+## Usage
+
+### Basic Usage
 
 ```typescript
-import {Settings} from './settings';
+import {Settings} from './lib/settings';
 
-// Initialize settings system
-const settings = new Settings({
-    enableAuditLogging: true,
-    cacheSchemas: true,
-    strictValidation: true
+// Create a settings instance for user settings
+const userSettings = new Settings('user', {
+    modelId: 'user-123',
+    cache: true,
 });
 
-// Example user object
-const user = {
-    id: 'user123',
-    type: 'user',
-    emailVerified: true,
-    accountStatus: 'active'
-};
+// Wait for initialization (started in constructor)
+await userSettings.waitForInit();
 
-// Get a setting value
-const theme = await settings.getSetting(user, 'theme');
+// Get a setting (synchronous)
+const privacy = userSettings.get('post_privacy');
+console.log(privacy); // 'everyone'
 
-// Update a setting
-await settings.updateSetting(user, 'theme', 'dark');
+// Set a setting (async)
+await userSettings.set('post_privacy', 'friends');
 
-// Batch update multiple settings
-await settings.updateSettings(user, {
-    theme: 'light',
-    emailNotifications: true
-});
-
-// Get user-modifiable settings only
-const userSettings = await settings.getUserSettings(user);
+// Get all settings (synchronous)
+const allSettings = userSettings.getAll();
+console.log(allSettings);
+// { post_privacy: 'friends', show_nsfw: false }
 ```
 
-## Schema Structure
+### With Audit Logging
 
-Schemas are defined as JSON files in the `schemas/` directory:
+```typescript
+const settings = new Settings('user', {
+    auditLog: true,
+    userId: 'admin-123',
+    internal: false,
+});
+
+await settings.init('profile-id');
+await settings.set('show_nsfw', true);
+
+// View audit logs
+const logs = settings.getAuditLogs();
+console.log(logs);
+```
+
+### Bulk Operations
+
+```typescript
+// Set multiple settings at once
+await settings.setMany({
+    post_privacy: 'followers',
+    show_nsfw: true,
+});
+
+// Reset a setting to default
+await settings.reset('post_privacy');
+
+// Reset all settings
+await settings.resetAll();
+```
+
+### Schema Information
+
+```typescript
+// Get definition for a specific setting
+const def = settings.getDefinition('post_privacy');
+console.log(def);
+// {
+//   type: 'string',
+//   values: ['everyone', 'followers', 'friends'],
+//   default: 'everyone',
+//   ...
+// }
+
+// Get the entire schema
+const schema = settings.getSchema();
+```
+
+### Factory Function
+
+```typescript
+import {createSettings} from './lib/settings';
+
+const settings = createSettings('user', {
+    userId: 'user-123',
+});
+```
+
+## Creating Schemas
+
+Schemas are JSON files in `./schemas/` that define the settings structure.
+
+### Schema Format
 
 ```json
 {
-  "model": "user",
+  "model": "profiles",
   "version": "1.0.0",
   "settings": {
-    "theme": {
+    "setting_key": {
       "type": "string",
       "values": [
-        "light",
-        "dark",
-        "auto"
+        "option1",
+        "option2"
       ],
-      "default": "auto",
+      "default": "option1",
       "userModifiable": true,
-      "description": "UI theme preference"
-    },
-    "emailNotifications": {
-      "type": "boolean",
-      "default": true,
-      "userModifiable": true,
-      "condition": {
-        "field": "emailVerified",
-        "operator": "equals",
-        "value": true
-      }
+      "description": "Description of the setting",
+      "category": "category_name",
+      "db": "model_name.field_name"
     }
   }
 }
 ```
 
-## Conditional Access
+### Field Descriptions
 
-Settings can have conditions that determine when they're accessible:
+- **model**: The Prisma model name this schema relates to
+- **version**: Schema version for migration tracking
+- **settings**: Object containing all setting definitions
+    - **type**: Data type (`string`, `boolean`, `number`, `object`, `array`)
+    - **values**: Array of allowed values (for string enums)
+    - **default**: Default value if not set in database
+    - **userModifiable**: Whether users can modify this setting
+    - **description**: Human-readable description
+    - **category**: Grouping category
+    - **db**: Database location in format `model.field`
 
-```json
-{
-  "condition": {
-    "and": [
-      {
-        "field": "accountStatus",
-        "operator": "equals",
-        "value": "active"
-      },
-      {
-        "field": "premiumUser",
-        "operator": "equals",
-        "value": true
-      }
-    ]
-  }
+### Example Schema
+
+See [schemas/user.json](./schemas/user.json) for a complete example.
+
+## Options
+
+### SettingsOptions
+
+```typescript
+interface SettingsOptions {
+    /** Enable audit logging for setting changes */
+    auditLog?: boolean;
+    /** User ID for audit trail (optional) */
+    userId?: string;
+    /** Whether changes are internal (not user-initiated) */
+    internal?: boolean;
+    /** Cache settings in memory (default: true) */
+    cache?: boolean;
 }
 ```
 
-Supported operators:
-
-- `equals`, `notEquals`
-- `in`, `notIn`
-- `greaterThan`, `lessThan`
-- `exists`, `notExists`
-
 ## API Reference
 
-### Settings Class
+### Constructor
 
-#### Constructor
-
-```
-new Settings(options?: SettingsOptions)
-```
-
-#### Methods
-
-**loadSettings(modelObject)** - Load all accessible settings for a model
-**getSetting(modelObject, key)** - Get a specific setting value
-**updateSetting(modelObject, key, value, internal?)** - Update a single setting
-**updateSettings(modelObject, updates, internal?)** - Batch update settings
-**getUserSettings(modelObject)** - Get only user-modifiable settings
-**setInternalSetting(modelObject, key, value)** - Internal-only setting update
-**getAuditLogs(modelType?, modelId?)** - Retrieve audit logs
-
-## Testing
-
-Run the test suite:
-
-```bash
-bun test src/lib/settings/__tests__/settings.test.ts
+```typescript
+new Settings<SchemaName>(schemaName
+:
+string, options ? : SettingsOptions
+)
 ```
 
-## Directory Structure
+### Methods
 
-```
-settings/
-├── index.ts           # Main Settings class
-├── types.ts           # TypeScript interfaces
-├── validators.ts      # Value validation logic
-├── conditions.ts      # Conditional access evaluator
-├── schemas/           # JSON schema files
-│   ├── user.json
-│   ├── organization.json
-│   └── project.json
-└── __tests__/
-    └── settings.test.ts
+- `async waitForInit(): Promise<void>` - Wait for initialization to complete (started in constructor)
+- `async init(modelId: string): Promise<void>` - Initialize or re-initialize with a model instance ID
+- `get<K>(key: K): any` - Get a setting value (synchronous)
+- `async set<K>(key: K, value: any): Promise<void>` - Set a setting value
+- `getAll(): Record<string, any>` - Get all settings (synchronous)
+- `async setMany(settings: Partial<Record<string, any>>): Promise<void>` - Set multiple settings
+- `async reset<K>(key: K): Promise<void>` - Reset setting to default
+- `async resetAll(): Promise<void>` - Reset all settings to defaults
+- `getDefinition<K>(key: K): SettingDefinition` - Get schema definition for a setting
+- `getSchema(): SchemaDefinition` - Get the complete schema
+- `getAuditLogs(): AuditLog[]` - Get audit logs (if enabled)
+- `clearCache(): void` - Clear the internal cache
+
+## Error Handling
+
+The Settings class throws errors for:
+
+- Invalid schema files
+- Unknown setting keys
+- Type mismatches
+- Invalid enum values
+- Uninitialized usage (calling methods before `init()`)
+
+```typescript
+try {
+    await settings.set('post_privacy', 'invalid_value');
+} catch (error) {
+    console.error(error.message);
+    // "Invalid value for setting 'post_privacy': must be one of [everyone, followers, friends]"
+}
 ```

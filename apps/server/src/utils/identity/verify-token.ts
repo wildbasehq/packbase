@@ -235,8 +235,16 @@ export default async function verifyToken(req: any): Promise<AuthUser | undefine
     if (!result.ok) return undefined
 
     try {
-        result.user = await ensureProfileId(result.user)
+        const clerkUser = await clerkClient.users.getUser(result.user.userId)
+        const privateMeta = (clerkUser?.privateMetadata ?? {}) as any
 
+        result.user = {
+            ...result.user,
+            ...privateMeta
+        }
+
+        result.user = await ensureProfileId(result.user)
+        
         // Is username different?
         if (result.user.sessionClaims?.nickname !== result.user?.username && result.user.sub) {
             // If so, change it on the DB.

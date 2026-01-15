@@ -11,7 +11,8 @@
     "build": "bun run ./build.ts",
     "db-dev-container": "cd prisma/devcontainer && docker compose up -d",
     "create-route": "bun run src/scripts/create-route.tsx",
-    "prisma:generate": "prisma generate"
+    "prisma:push": "bunx --bun prisma@latest db push",
+    "prisma:generate": "bunx --bun prisma@latest generate"
   },
   "devDependencies": {
     "@types/rss": "^0.0.32",
@@ -26,7 +27,8 @@
     "@elysiajs/cors": "^1.2.0",
     "@elysiajs/swagger": "^1.1.5",
     "@faker-js/faker": "^10.1.0",
-    "@prisma/client": "^6.4.1",
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "7",
     "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.49.1",
     "@types/debug": "^4.1.7",
@@ -52,8 +54,9 @@
     "lru-cache": "^11.0.2",
     "node-gzip": "^1.1.2",
     "p-limit": "^6.2.0",
+    "pg": "^8.16.3",
     "posthog-node": "^4.7.0",
-    "prisma": "^6.6.0",
+    "prisma": "7",
     "rss": "^1.2.2",
     "sharp": "^0.33.0",
     "ts-node": "^10.9.2",

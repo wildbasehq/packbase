@@ -27,15 +27,15 @@ export interface FeedPostData {
             avatar?: string
         }
     }
-    howling?: 'echo' | 'alongside'
+    content_type?: 'markdown' | 'rich' | 'howling_alongside' | 'howling_echo'
+    allow_rehowl?: boolean
+    rehowled_by?: UserProfileBasic
     actor?: UserProfileBasic
     reactions?: Reaction[]
     assets?: Asset[]
     comments?: FeedPostData[]
-    classification?: {
-        label: string
-        rheoAgrees: boolean
-        rationale: string
+    warning?: {
+        reason: string
     }
     tags?: string[]
 }

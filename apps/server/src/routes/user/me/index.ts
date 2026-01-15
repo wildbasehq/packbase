@@ -1,4 +1,3 @@
-import clerkClient from '@/db/auth'
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
 import {HTTPError} from '@/lib/HTTPError'
@@ -62,14 +61,11 @@ export default (app: YapockType) =>
 
                     if (user?.userId) {
                         try {
-                            const clerkUser = await clerkClient.users.getUser(user.userId)
-                            const privateMeta = (clerkUser?.privateMetadata ?? {}) as any
-
-                            username = clerkUser?.username || null
+                            username = user?.username || null
 
                             // allow a couple of key spellings to avoid tight coupling
-                            const staffValue = privateMeta.is_staff
-                            const contentModerationValue = privateMeta.is_content_moderator
+                            const staffValue = user.is_staff
+                            const contentModerationValue = user.is_content_moderator
                             const dxValue = await checkUserBillingPermission(user.userId)
 
                             is_staff = Boolean(staffValue)
@@ -119,7 +115,7 @@ export default (app: YapockType) =>
 
                 // Default pack
                 if (userProfile.default_pack && userProfile.default_pack !== '00000000-0000-0000-0000-000000000000') {
-                    let defaultPackMan;
+                    let defaultPackMan
 
                     try {
                         defaultPackMan = await PackMan.init(userProfile.default_pack, user.sub)
@@ -161,6 +157,7 @@ export default (app: YapockType) =>
                 const defaultPackSetup = await checkDefaultPackSetup(user.sub)
 
                 return {
+                    ...user,
                     ...userProfile,
                     requires_setup: defaultPackSetup.requires_setup,
                     requires_switch: defaultPackSetup.requires_switch,

@@ -44,7 +44,7 @@ export default function UserAvatar({
                 <img
                     width={1024}
                     height={1024}
-                    src={getAvatar(user?.id) || icon}
+                    src={getAvatar(user?.id || user?.username) || icon}
                     alt={`${user?.username || props.display_name}'s avatar`}
                     {...props}
                     className={cn(props.className, `inline-flex items-center justify-center overflow-hidden rounded-md text-white`)}

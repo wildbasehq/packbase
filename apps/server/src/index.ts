@@ -10,6 +10,7 @@ JSON.stringify = (obj) =>
     })
 import prisma from '@/db/prisma'
 import {HTTPError} from '@/lib/HTTPError'
+import {Inchat} from '@/lib/inchat'
 import deleteNulls from '@/utils/delete-nulls'
 import verifyToken from '@/utils/identity/verify-token'
 import posthog, {distinctId} from '@/utils/posthog'
@@ -20,7 +21,6 @@ import Debug from 'debug'
 import {Elysia} from 'elysia'
 import {autoload} from 'elysia-autoload'
 import fs from 'node:fs/promises'
-import clerkClient from './db/auth'
 
 const isCluster = process.argv.includes('--cluster')
 const isBuildingSDK = process.argv.includes('--build-sdk')
@@ -74,7 +74,8 @@ const Yapock = new Elysia({})
             // Attempt to write audit log, but never block the response on failure
             try {
                 const userId: string = (user && (user.sub as string)) || '00000000-0000-0000-0000-000000000000'
-                await prisma.admin_audit_log.create({
+                await Inchat.processAuditLog({user, action, model_type, model_id, model_object})
+                return await prisma.admin_audit_log.create({
                     data: {
                         user_id: userId,
                         action,
@@ -85,32 +86,6 @@ const Yapock = new Elysia({})
                 })
             } catch (_) {
                 // Swallow audit failures
-            }
-        }
-
-        // Check admin routes
-        const url = new URL(request.url)
-        if (url.pathname.startsWith('/admin')) {
-            const auditIfAdminSql = async (action: string, model_object: any) => {
-                if (!url.pathname.startsWith('/admin/sql')) return
-                logAudit({
-                    action,
-                    model_id: 'unknown',
-                    model_type: 'admin.sql',
-                    model_object,
-                })
-            }
-
-            // Get private metadata from Clerk
-            if (user?.userId) {
-                const privateMetadata = await clerkClient.users.getUser(user?.userId).then((user) => user.privateMetadata)
-                if (privateMetadata?.type !== 'admin') {
-                    await auditIfAdminSql('UNAUTHORIZED', {reason: 'Not admin'})
-                    throw HTTPError.notFound({summary: 'NOT_FOUND'})
-                }
-            } else {
-                await auditIfAdminSql('UNAUTHENTICATED', {reason: 'No user'})
-                throw HTTPError.notFound({summary: 'NOT_FOUND'})
             }
         }
 

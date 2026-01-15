@@ -123,13 +123,15 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
     return data
 }
 
-export async function deletePost({params: {id}, set, user}) {
-    await requiresToken({set, user})
+export async function deletePost({params: {id}, body, set, user, logAudit}) {
+    requiresToken({set, user})
+
+    const reason: string | undefined = body?.reason
 
     // Check user ID against post user ID
     const post = await prisma.posts.findUnique({
         where: {id},
-        select: {user_id: true, assets: true},
+        select: {id: true, user_id: true, assets: true},
     })
 
     if (!post) {
@@ -137,7 +139,7 @@ export async function deletePost({params: {id}, set, user}) {
         return
     }
 
-    if (post?.user_id !== user?.sub) {
+    if (post?.user_id !== user?.sub && (!user.is_content_moderator && !reason)) {
         set.status = 403
         throw HTTPError.forbidden({
             summary: 'You are not the author of this post',
@@ -148,6 +150,19 @@ export async function deletePost({params: {id}, set, user}) {
         await prisma.posts.delete({
             where: {id},
         })
+
+        if (user.is_content_moderator && reason) {
+            logAudit({
+                action: 'HOWL_DELETED',
+                model_id: post.user_id,
+                model_type: 'profiles',
+                model_object: {
+                    howl_id: post.id,
+                    author_id: post.user_id,
+                    reason
+                },
+            })
+        }
     } catch (error: any) {
         set.status = 400
         throw HTTPError.badRequest({

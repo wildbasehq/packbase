@@ -13,9 +13,11 @@ export default function FeedPost({post, onDelete, postState}: FeedPostProps) {
     const [postContent, setPostContent] = useState<FeedPostData>(post)
     const {user: signedInUser} = useUserAccountStore()
 
-    const handleDelete = async () => {
+    const handleDelete = async (reason?: string) => {
         try {
-            const {error} = await vg.howl({id: postContent.id}).delete()
+            const {error} = await vg.howl({id: postContent.id}).delete({
+                reason: typeof reason === 'string' ? reason : undefined
+            })
 
             if (error) {
                 const errorMessage = error.value ? `${error.status}: ${error.value.summary}` : 'Something went wrong'

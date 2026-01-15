@@ -12,16 +12,20 @@
       "default": "everyone",
       "userModifiable": true,
       "description": "Profile visibility setting",
-      "category": "privacy",
-      "db": "profiles.post_privacy"
+      "category": "privacy"
     },
     "show_nsfw": {
       "type": "boolean",
       "default": false,
       "userModifiable": true,
       "description": "Show NSFW content",
-      "category": "content",
-      "db": "profiles.show_nsfw"
+      "category": "content"
+    },
+    "allow_rehowl": {
+      "type": "boolean",
+      "default": true,
+      "userModifiable": true,
+      "description": "Allow others to rehowl your howls"
     }
   }
 }

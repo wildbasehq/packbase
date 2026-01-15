@@ -12,9 +12,7 @@ export default function UserSettingsHeader({title, description, loading}: {
             <div className="border-b pb-4 mb-4 border-n-5/10">
                 <h1 className="font-bold text-[17px]">{title}</h1>
 
-                <Activity mode={isVisible(loading)}>
-                    <ProgressBar mask indeterminate/>
-                </Activity>
+                <ProgressBar mask indeterminate={loading} value={0}/>
             </div>
 
             <Activity mode={isVisible(!!description)}>

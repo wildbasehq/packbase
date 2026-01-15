@@ -212,22 +212,25 @@ export const HowlBody = t.Object({
 export const HowlComment = t.Object({
     user: UserProfile,
     created_at: t.String(),
-    body: t.String({
+    body: t.Optional(t.String({
         maxLength: 4096,
-    }),
+    })),
+    content_type: t.String(),
 })
 
 export const HowlResponse = t.Object({
     id: t.String(),
     tenant_id: t.Optional(t.String()),
     channel_id: t.Optional(t.String()),
-    content_type: t.Union([t.Literal('markdown'), t.Literal('rich'), t.Literal('asset'), t.Literal('howling_alongside')]),
+    content_type: t.Union([t.Literal('markdown'), t.Literal('rich'), t.Literal('asset'), t.Literal('howling_alongside'), t.Literal('howling_echo')]),
     created_at: t.String(),
     body: t.Optional(
         t.String({
             maxLength: 4096,
         }),
     ),
+    allow_rehowl: t.Optional(t.Boolean()),
+    rehowled_by: t.Optional(UserProfile),
     assets: t.Optional(
         t.Array(
             t.Object({
@@ -269,6 +272,11 @@ export const HowlResponse = t.Object({
             icon: t.Optional(t.String()),
         }),
     ),
+    warning: t.Optional(
+        t.Object({
+            reason: t.String()
+        })
+    )
     // classification: t.Optional(
     //     t.Object(
     //         {

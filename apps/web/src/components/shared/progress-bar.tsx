@@ -15,7 +15,7 @@ export default function ProgressBar({value, indeterminate, mask = false, classNa
             aria-valuemax={100}
             aria-valuenow={indeterminate ? undefined : clamped}
             aria-busy={indeterminate || undefined}
-            className={cn('w-full h-2 rounded-full overflow-hidden relative', indeterminate ? '' : 'bg-muted', className)}
+            className={cn('w-full h-2 rounded-full overflow-hidden relative', (indeterminate || clamped === 0) ? '' : 'bg-muted', className)}
             style={mask ? {
                 WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%)',
                 maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%)',

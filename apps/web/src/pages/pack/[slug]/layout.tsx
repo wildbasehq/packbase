@@ -3,16 +3,16 @@
  */
 
 import {LoadingDots} from '@/components/icons'
+import SadComputerIcon from '@/components/icons/sad-computer'
 import Body from '@/components/layout/body'
 import PackJoinCTA from '@/components/pack/pack-join-cta'
-import {Heading} from '@/components/shared/text'
+import {Heading, Text} from '@/components/shared/text'
 import {CustomTheme} from '@/components/shared/theme/custom-theme'
 import {isVisible} from '@/lib'
 import {vg} from '@/lib/api'
 import {SidebarPortal} from '@/lib/context/sidebar-context'
 import {useResourceStore, useUIStore} from '@/lib/state'
 import {PackChannels} from '@/src/components'
-import {FaceFrownIcon} from '@heroicons/react/24/solid'
 import {OrbitIcon} from 'lucide-react'
 import {Activity, ReactNode, useEffect, useState} from 'react'
 import {useParams} from 'wouter'
@@ -111,23 +111,29 @@ export default function PackLayout({children}: { children: ReactNode }) {
 
                     {error && (
                         <>
-                            <Heading className="items-center">
-                                <FaceFrownIcon className="text-default mr-1 inline-block h-6 w-6"/>
-                                {error.cause === 404 ? `The Cosmos can't find ${slug}` : `Packbase can\'t continue`}
-                            </Heading>
-                            <p className="text-muted-foreground mt-1 text-sm leading-6">
-                                {error.cause === 404 ? (
-                                    <span>
-                                        This pack may no longer exist as it isn't in our database.
-                                        <br/>
-                                        <br/>
-                                        If you came here from your pack list, please reload to update it &mdash; they
-                                        might've changed their @name.
-                                    </span>
-                                ) : (
-                                    `${error.cause || 'Something went wrong'}: ${error.message || error.stack}`
-                                )}
-                            </p>
+                            <Body bodyClassName="h-full" className="h-full! items-center justify-center">
+                                <div className="max-w-md flex items-center justify-center gap-2">
+                                    <SadComputerIcon className="h-16 -mt-2 w-fit self-start mx-auto"/>
+                                    <div>
+                                        <Heading className="text-2xl/6">
+                                            {error.cause === 404 ? `The Cosmos can't find ${slug}` : `Packbase can\'t continue`}
+                                        </Heading>
+                                        <Text className="mb-4">
+                                            {error.cause === 404 ? (
+                                                <span>
+                                                    This pack may no longer exist as it isn't in our database.
+                                                    <br/>
+                                                    <br/>
+                                                    If you came here from your pack list, please reload to update it &mdash; they
+                                                    might've changed their @name.
+                                                </span>
+                                            ) : (
+                                                `${error.cause || 'Something went wrong'}: ${error.message || error.stack}`
+                                            )}
+                                        </Text>
+                                    </div>
+                                </div>
+                            </Body>
                         </>
                     )}
                 </div>

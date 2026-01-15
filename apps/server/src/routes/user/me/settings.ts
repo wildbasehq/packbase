@@ -9,45 +9,37 @@ export default (app: YapockType) =>
         '',
         async ({set, user}) => {
             await requiresAccount({set, user})
-            const settings = new Settings()
-            const userObj = await prisma.profiles.findUnique({
-                where: {
-                    id: user.sub,
-                },
+            const settings = new Settings('user', {
+                modelId: user.sub
             })
+            await settings.waitForInit()
 
-            delete userObj.type
+            const allSettings = settings.getAll()
+            const schema = settings.getSchema()
 
-            return (
-                await settings.getSettingValues({
-                    model: 'user',
-                    ...userObj,
-                })
-            ).map((setting) => {
-                delete setting.definition.db
-                return setting
-            })
+            return {
+                ...allSettings,
+                definitions: schema.settings
+            }
         },
         {
             response: {
-                200: t.Any(),
+                200: t.Object({}, {
+                    additionalProperties: t.Any()
+                })
             },
         },
     )
         .post(
             '',
             async ({user, body}) => {
-                const settings = new Settings()
-                const userObj = await prisma.profiles.findUnique({
-                    where: {
-                        id: user.sub,
-                    },
+                const settings = new Settings('user', {
+                    modelId: user.sub
                 })
+                await settings.waitForInit()
 
-                return await settings.updateSettings({
-                    model: 'user',
-                    ...userObj,
-                }, body as Record<string, any>)
+                await settings.setMany(body)
+                return {success: true}
             },
             {
                 body: t.Record(t.String(), t.Any()),

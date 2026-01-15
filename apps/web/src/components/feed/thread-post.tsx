@@ -2,23 +2,28 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import {Button} from '@/components/shared'
+import {DeleteHowl} from '@/components/feed/content-moderation/delete-howl'
+import {IssueWarning} from '@/components/feed/content-moderation/issue-warning'
+import {RehowlIcon} from '@/components/icons/rehowl'
+import {Alert, AlertDescription, Button, Divider} from '@/components/shared'
 import Card from '@/components/shared/card'
 import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
 import {Text} from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 import UserInfoCol from '@/components/shared/user/info-col'
-import {isVisible, useUserAccountStore} from '@/lib'
+import {cn, isVisible, useUserAccountStore} from '@/lib'
 import {vg} from '@/lib/api'
 import {UserProfileBasic} from '@/lib/defs/user'
+import {canContentModerate} from '@/lib/utils/can-content-moderate'
 import {formatRelativeTime} from '@/lib/utils/date'
 import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak'
-import {AvatarButton, BubblePopover, Editor, FeedPostData, LoadingCircle, PopoverHeader} from '@/src/components'
+import {AvatarButton, Editor, FeedPostData, LoadingCircle} from '@/src/components'
 import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
-import {ChatBubbleLeftIcon, TrashIcon} from '@heroicons/react/24/outline'
+import {ChatBubbleLeftIcon} from '@heroicons/react/24/outline'
 import {JSONContent} from '@tiptap/react'
 import {Activity, FormEvent, useCallback, useState} from 'react'
+import {TbLineDotted} from 'react-icons/tb'
 import {toast} from 'sonner'
 import {MediaGallery} from '.'
 import {ServerReactionStack} from '../ui/reaction-stack'
@@ -56,80 +61,93 @@ interface ThreadPostHeaderProps {
     onDelete: () => void
 }
 
+function ThreadPostUserInfoCol({user, post, showAvatar}: {
+    user: UserProfileBasic,
+    showAvatar?: boolean,
+    post?: FeedPostData,
+}) {
+    return (
+        <UserInfoCol user={user} className="flex min-w-0 gap-0.5">
+            {showAvatar && (
+                <div className="size-7">
+                    <UserAvatar size="sm" user={user} className="rounded-full!"/>
+                </div>
+            )}
+            <div className="flex items-center gap-1.5 min-w-0">
+                <Link
+                    href={`/@${user?.username}/`}
+                    className="truncate font-semibold text-sm text-foreground"
+                >
+                    {user?.display_name || user?.username}
+                </Link>
+                {user?.type && (
+                    <BentoStaffBadge
+                        type={user?.type}
+                        className="relative inline-flex h-4 w-4 shrink-0"
+                        width={16}
+                        height={16}
+                    />
+                )}
+                {user?.badge && (
+                    <BentoGenericUnlockableBadge
+                        type={user?.badge}
+                        className="relative inline-flex h-4 w-4 shrink-0"
+                        width={16}
+                        height={16}
+                    />
+                )}
+            </div>
+
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Text size="xs" className="truncate ml-0.5" alt>
+                    • @{user?.username}
+                </Text>
+                {post?.pack && (
+                    <>
+                        <span className="text-[0.6rem]">•</span>
+                        <Link href={`/p/${post.pack?.slug || 'universe'}/all/${post.id}`}
+                              className="text-muted-foreground hover:underline">
+                            <time suppressHydrationWarning>{formatRelativeTime(post.created_at)}</time>
+                        </Link>
+                    </>
+                )}
+            </div>
+        </UserInfoCol>
+    )
+}
+
 function ThreadPostHeader({post, isAuthor, onDelete}: ThreadPostHeaderProps) {
+    const {user} = useUserAccountStore()
+
     return (
         <div
             className="flex items-start justify-between px-4 pt-1 -mb-4 mr-4 bg-linear-to-b from-body to-neutral-100 dark:to-n-7 rounded-t-xl h-12 bg-gradient-neutral-200 dark:bg-gradient-n-7">
             <div className="flex min-w-0 items-center gap-2">
                 {/* Name + badges */}
-                <UserInfoCol user={post.user} className="flex min-w-0 gap-0.5">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                        <Link
-                            href={`/@${post.user?.username}/`}
-                            className="truncate font-semibold text-sm text-foreground"
-                        >
-                            {post.user?.display_name || post.user?.username}
-                        </Link>
-                        {post.user?.type && (
-                            <BentoStaffBadge
-                                type={post.user?.type}
-                                className="relative inline-flex h-4 w-4 shrink-0"
-                                width={16}
-                                height={16}
-                            />
-                        )}
-                        {post.user?.badge && (
-                            <BentoGenericUnlockableBadge
-                                type={post.user?.badge}
-                                className="relative inline-flex h-4 w-4 shrink-0"
-                                width={16}
-                                height={16}
-                            />
-                        )}
-                    </div>
-
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Text className="truncate" alt>
-                            • @{post.user?.username}
-                        </Text>
-                        {post.pack && (
-                            <>
-                                <span className="text-[0.6rem]">•</span>
-                                <Link href={`/p/${post.pack?.slug || 'universe'}/all/${post.id}`}
-                                      className="text-muted-foreground hover:underline">
-                                    <time suppressHydrationWarning>{formatRelativeTime(post.created_at)}</time>
-                                </Link>
-                            </>
-                        )}
-                    </div>
-                </UserInfoCol>
+                <ThreadPostUserInfoCol user={post.user} post={post}/>
             </div>
 
-            {/* Delete button for author */}
-            {isAuthor && (
-                <BubblePopover
-                    isCentered
-                    corner="top-right"
-                    id={`delete-howl-${post.id}`}
-                    trigger={({setOpen}) => (
-                        <button
-                            type="button"
-                            onClick={() => setOpen(true)}
-                            className="inline-flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-500/5 transition-colors"
-                            aria-label="Delete howl"
-                        >
-                            <TrashIcon className="w-4 h-4"/>
-                        </button>
-                    )}
-                >
-                    <PopoverHeader
-                        title="Delete Howl?"
-                        description="Deleting a howl is permanent and cannot be undone."
-                        onPrimaryAction={onDelete}
-                        variant="destructive"
-                    />
-                </BubblePopover>
-            )}
+
+            {/* Actions */}
+            <div className="flex gap-2">
+                {/* Issue Tag Replacement */}
+                {canContentModerate(user) && (
+                    <>
+                        {/*<IssueTagReplacement post={post}/>*/}
+
+                        <IssueWarning post={post}/>
+                    </>
+                )}
+
+                {/*
+                Delete button. Not in it's own component as I'm not sure where to classify it.
+                (content moderation? but regular usrs can use this dialog.)
+                */}
+
+                {(isAuthor || (post.user.id !== user.id && canContentModerate(user))) && (
+                    <DeleteHowl post={post} onAction={onDelete}/>
+                )}
+            </div>
         </div>
     )
 }
@@ -178,6 +196,7 @@ interface ThreadPostActionsProps {
     reactions?: FeedPostData['reactions']
     commentCount?: number
     canInteract: boolean
+    canRehowl?: boolean
     showReplyForm?: boolean
     onToggleReply?: () => void
 }
@@ -187,10 +206,32 @@ function ThreadPostActions({
                                reactions,
                                commentCount,
                                canInteract,
+                               canRehowl,
                                showReplyForm,
                                onToggleReply,
                            }: ThreadPostActionsProps) {
     if (!canInteract) return null
+
+    const rehowl = () => {
+        vg.howl({id: postId}).rehowl.post().then(({status, error}) => {
+            if (status === 404) {
+                toast.error('Failed to rehowl: Howl not found')
+                return
+            }
+
+            if (error) {
+                toast.error(error.value.summary)
+                return
+            }
+
+            toast.success('Rehowled! But you\'ll need to reload to see it!', {
+                dismissible: false,
+                duration: Infinity
+            })
+        }).catch((err) => {
+            toast.error('Failed to rehowl: ' + err.message)
+        })
+    }
 
     return (
         <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
@@ -204,18 +245,32 @@ function ThreadPostActions({
                 />
             </div>
 
-            {showReplyForm !== undefined && onToggleReply && (
-                <button
-                    type="button"
-                    onClick={onToggleReply}
-                    className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-600 transition-colors"
-                    aria-expanded={showReplyForm}
-                >
-                    <ChatBubbleLeftIcon className="h-4 w-4"/>
-                    <span>{showReplyForm ? 'Cancel' : 'Reply'}</span>
-                    <span className="text-[0.7rem] text-muted-foreground">• {commentCount}</span>
-                </button>
-            )}
+            <div>
+                {canRehowl && (
+                    <button
+                        type="button"
+                        onClick={() => rehowl()}
+                        className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-600 transition-colors"
+                        aria-expanded={showReplyForm}
+                    >
+                        <RehowlIcon className="h-4 w-4"/>
+                        <span>{showReplyForm ? 'Cancel' : 'Rehowl'}</span>
+                    </button>
+                )}
+
+                {showReplyForm !== undefined && onToggleReply && (
+                    <button
+                        type="button"
+                        onClick={onToggleReply}
+                        className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-600 transition-colors"
+                        aria-expanded={showReplyForm}
+                    >
+                        <ChatBubbleLeftIcon className="h-4 w-4"/>
+                        <span>{showReplyForm ? 'Cancel' : 'Reply'}</span>
+                        <span className="text-[0.7rem] text-muted-foreground">• {commentCount}</span>
+                    </button>
+                )}
+            </div>
         </div>
     )
 }
@@ -389,6 +444,22 @@ export default function ThreadPost({
 
             {/* Right column: card content */}
             <div className="flex-1 min-w-0">
+                {post.rehowled_by && (
+                    <div className="flex items-center ml-4 mr-8 gap-1.5 text-xs text-muted-foreground mb-2">
+                        <RehowlIcon className="h-4 w-4"/>{' '}
+                        rehowled by{' '}
+                        <ThreadPostUserInfoCol user={post.rehowled_by} post={post}/>
+                        <div className="grow"/>
+                        {post.rehowled_by.id === signedInUser?.id && (
+                            // @ts-ignore
+                            <DeleteHowl post={{
+                                id: post.id + 'rehowl',
+                                user: post.rehowled_by
+                            }} onAction={onDelete}/>
+                        )}
+                    </div>
+                )}
+
                 <ThreadPostHeader post={post} isAuthor={isAuthor} onDelete={onDelete}/>
                 <Card
                     className={`relative group max-w-full! overflow-hidden rounded-xl! border border-border/60 ${depthTintClass} transition-shadow hover:shadow-sm`}
@@ -406,12 +477,12 @@ export default function ThreadPost({
                                             <span className="font-medium">Heads up</span>
                                         </div>
                                         <span>
-                                This howl contains adult content that may not be suitable for everyone.
-                            </span>
+                                            This howl contains adult content that may not be suitable for everyone.
+                                        </span>
                                         {tags && tags.length > 0 && (
                                             <span className="mt-1 block text-[0.7rem] font-medium">
-                                    Contains: {tags.join(', ')}
-                                </span>
+                                                Contains: {tags.join(', ')}
+                                            </span>
                                         )}
                                     </div>
                                     <div className="flex flex-col items-end gap-1">
@@ -444,6 +515,30 @@ export default function ThreadPost({
                         <Activity mode={isVisible(!containsMature || !showUnsavouryNotice)}>
                             {/* Body and media (with mature gating) */}
                             <ThreadPostBody body={post.body}/>
+
+                            {/* User received a warning? */}
+                            {post.warning && (
+                                <Alert className="p-2 rounded mb-2" variant="destructive">
+                                    <div className="flex gap-2 items-center">
+                                        <ThreadPostUserInfoCol showAvatar user={{
+                                            id: '549329ff-74dd-4ac9-85b1-d33f5c73d8ac',
+                                            username: 'packbase',
+                                            slug: 'packbase',
+                                            display_name: 'Packbase Staff',
+                                            type: '2'
+                                        }}/>
+                                    </div>
+                                    <Divider className="my-2"/>
+                                    <AlertDescription>
+                                        @{post.user?.username} received a warning for the contents of this Howl.
+                                    </AlertDescription>
+
+                                    <AlertDescription className="text-foreground">
+                                        {post.warning.reason}
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+
                             <ThreadPostMedia assets={post.assets}/>
                         </Activity>
 
@@ -453,6 +548,7 @@ export default function ThreadPost({
                             reactions={post.reactions}
                             commentCount={commentCount}
                             canInteract={Boolean(isRoot && signedInUser)}
+                            canRehowl={Boolean(post.allow_rehowl)}
                             showReplyForm={showReplyForm}
                             onToggleReply={handleToggleReply}
                         />
@@ -489,10 +585,20 @@ function ThreadComments({comments, handleNestedDelete}: {
         <div className="flex flex-col bg-card ring ring-muted mx-4 rounded-b-xl p-2 gap-2">
             {comments?.map((comment) => (
                 <>
-                    <div className="flex group px-2 py-1 gap-2 hover:bg-muted rounded-xl" key={comment.id}>
-                        <UserAvatar size="sm" user={comment.user} className="mt-1.5 rounded-full!"/>
+                    <div className={cn('flex group px-2 py-1 gap-2 rounded-xl', comment.content_type === 'howling_echo' ? 'hover:bg-muted/50' : 'hover:bg-muted')}
+                         key={comment.id}>
+                        {comment.content_type === 'howling_echo' && (
+                            <div className="flex shrink text-muted-foreground items-center gap-1">
+                                <TbLineDotted className="h-4 w-4"/>
+                                <RehowlIcon className="h-4 w-4"/>
+                            </div>
+                        )}
 
-                        <div className="flex flex-col w-full">
+                        <div className="size-7">
+                            <UserAvatar size="sm" user={comment.user} className="rounded-full!"/>
+                        </div>
+
+                        <div className="flex flex-col w-full justify-center">
                             <UserInfoCol user={comment.user} className="flex">
                                 <div className="flex items-center gap-1.5 min-w-0">
                                     <Link
@@ -520,42 +626,51 @@ function ThreadComments({comments, handleNestedDelete}: {
                                 </div>
 
                                 <div className="flex items-center ml-1 gap-1 flex-1 text-xs text-muted-foreground">
-                                    <Text className="truncate" alt>
-                                        @{comment.user?.username}
-                                    </Text>
-                                    <span className="text-[0.6rem]">•</span>
-                                    <Link href={`/p/${comment.pack?.slug || 'universe'}/all/${comment.id}`}
-                                          className="text-muted-foreground hover:underline">
-                                        <time suppressHydrationWarning>{formatRelativeTime(comment.created_at)}</time>
-                                    </Link>
+                                    {comment.content_type === 'howling_echo' && (
+                                        <Text alt size="xs">
+                                            rehowled{' '}
+                                            <time suppressHydrationWarning>{formatRelativeTime(comment.created_at)}</time>
+                                            {' '}
+                                            ago
+                                        </Text>
+                                    )}
 
-                                    {comment.user?.id === signedInUser?.id && (
+                                    {comment.content_type !== 'howling_echo' && (
                                         <>
+                                            <Text className="truncate" alt>
+                                                @{comment.user?.username}
+                                            </Text>
                                             <span className="text-[0.6rem]">•</span>
-                                            <span className="text-red-500 font-medium">You</span>
+                                            <Link href={`/p/${comment.pack?.slug || 'universe'}/all/${comment.id}`}
+                                                  className="text-muted-foreground hover:underline">
+                                                <time suppressHydrationWarning>{formatRelativeTime(comment.created_at)}</time>
+                                            </Link>
 
-                                            <div className="grow flex-1"/>
+                                            {comment.user?.id === signedInUser?.id && (
+                                                <>
+                                                    <span className="text-[0.6rem]">•</span>
+                                                    <span className="text-red-500 font-medium">You</span>
 
-                                            <Button
-                                                plain
-                                                type="button"
-                                                onClick={() => handleNestedDelete && handleNestedDelete(comment.id)}
-                                                className="inline-flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-500/5 transition-colors p-0"
-                                                aria-label="Delete comment"
-                                            >
-                                                <TrashIcon className="w-4 h-4"/>
-                                            </Button>
+                                                    <div className="grow flex-1"/>
+
+                                                    <DeleteHowl post={comment} onAction={() => handleNestedDelete && handleNestedDelete(comment.id)}/>
+                                                </>
+                                            )}
                                         </>
                                     )}
                                 </div>
                             </UserInfoCol>
 
-                            <ThreadPostBody body={comment.body}/>
-                            <ThreadPostActions
-                                postId={comment.id}
-                                reactions={comment.reactions}
-                                canInteract={Boolean(signedInUser)}
-                            />
+                            {comment.content_type !== 'howling_echo' && (
+                                <>
+                                    <ThreadPostBody body={comment.body}/>
+                                    <ThreadPostActions
+                                        postId={comment.id}
+                                        reactions={comment.reactions}
+                                        canInteract={Boolean(signedInUser)}
+                                    />
+                                </>
+                            )}
                         </div>
                     </div>
                 </>

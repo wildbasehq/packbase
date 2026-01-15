@@ -1,13 +1,11 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
+  provider = "prisma-client"
+  output   = "./generated/prisma"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-  schemas   = ["auth", "public"]
+  provider = "postgresql"
+  schemas  = ["auth", "public"]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -133,6 +131,7 @@ model posts {
 
   tags           String[]
   classification Json?
+  warning        Json?
 
   @@index([parent], type: Hash)
   @@index([tenant_id], type: Hash)
@@ -486,6 +485,13 @@ model admin_audit_log {
   model_id     String
   model_object Json
   created_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@schema("public")
+}
+
+model settings {
+  user_id String @id @db.Uuid
+  data    Json   @default("{}")
 
   @@schema("public")
 }

@@ -2,6 +2,7 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import UserSettingsHeader from '@/components/layout/user-dropdown/user-settings-header'
 import {Button, Description, Field, FieldGroup, Input, Label, Switch, SwitchField, SwitchGroup, Textarea} from '@/components/shared'
 import UnsavedChangesWarning from '@/components/ui/unsaved-changes'
 import {useUserAccountStore, vg} from '@/lib'
@@ -91,13 +92,13 @@ const ProfileSettingsComponent: FC = ({noHeader}: { noHeader?: boolean }) => {
         <form className="relative space-y-8" onSubmit={saveProfile} onChangeCapture={() => setHasChanges(true)}>
             {!noHeader && (
                 <>
-                    <div className="border-b pb-4 mb-4 border-n-5/10">
-                        <h1 className="font-bold text-[17px]">Profile Settings</h1>
-                    </div>
+                    <UserSettingsHeader title="Your Profile" loading={submitting}/>
 
                     <div className="mb-4">
-                        <p className="text-sm text-muted-foreground">Username and your Avatar can be changed in your
-                            "Account" tab.</p>
+                        <p className="text-sm text-muted-foreground">
+                            Username and your Avatar can be changed in your Wild ID
+                            settings.
+                        </p>
                     </div>
                 </>
             )}

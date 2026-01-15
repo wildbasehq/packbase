@@ -67,7 +67,16 @@ const styles = {
         // Icon
         '[--btn-icon:var(--color-zinc-500)] data-active:[--btn-icon:var(--color-zinc-700)] data-hover:[--btn-icon:var(--color-zinc-700)] dark:[--btn-icon:var(--color-zinc-500)] dark:data-active:[--btn-icon:var(--color-zinc-400)] dark:data-hover:[--btn-icon:var(--color-zinc-400)]',
     ],
+    icon: [
+        'inline-flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-colors'
+    ],
     colors: {
+        'icon/amber': [
+            'hover:text-amber-500 hover:bg-amber-500/5'
+        ],
+        'icon/red': [
+            'hover:text-red-500 hover:bg-red-500/5'
+        ],
         'dark/zinc': [
             'text-white [--btn-bg:var(--color-zinc-900)] [--btn-border:var(--color-zinc-950)]/90 [--btn-hover-overlay:var(--color-white)]/10',
             'dark:text-white dark:[--btn-bg:var(--color-zinc-600)] dark:[--btn-hover-overlay:var(--color-white)]/5',
@@ -170,22 +179,27 @@ const styles = {
 }
 
 type ButtonProps = (
-    | { color?: keyof typeof styles.colors; outline?: never; plain?: never }
-    | { color?: never; outline: true; plain?: never }
-    | { color?: never; outline?: never; plain: true }
+    | { color?: keyof typeof styles.colors; outline?: never; plain?: never; icon?: never }
+    | { color?: never; outline: true; plain?: never; icon?: never }
+    | { color?: never; outline?: never; plain: true; icon?: never }
+    | { color?: keyof typeof styles.colors; outline?: never; plain?: never; icon?: true }
     ) & { className?: string; children: ReactNode, submissionState?: 'idle' | 'pending' | 'success' } & (
     | Omit<Headless.ButtonProps, 'as' | 'className'>
     | Omit<ComponentPropsWithoutRef<typeof Link>, 'className'>
     )
 
 export const Button = forwardRef(function Button(
-    {color, outline, plain, className, children, submissionState, ...props}: ButtonProps,
+    {color, outline, plain, icon, className, children, submissionState, ...props}: ButtonProps,
     ref: ForwardedRef<HTMLElement>
 ) {
     let classes = clsx(
         className,
-        styles.base,
-        outline ? styles.outline : plain ? styles.plain : clsx(styles.solid, styles.colors[color ?? 'indigo'])
+        outline && styles.outline,
+        plain && styles.plain,
+        icon && styles.icon,
+        (!icon) && styles.base,
+        (!outline && !plain) && styles.colors[color ?? 'indigo'],
+        (!outline && !plain && !icon) && styles.solid
     )
 
     return 'href' in props ? (

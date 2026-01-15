@@ -7,19 +7,25 @@ import {HardDisk} from '@/components/icons/plump'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk'
 import ProfileSettings from '@/components/layout/user-dropdown/general/page'
 import InviteSettings from '@/components/layout/user-dropdown/invite/page'
+import PrivacySettings from '@/components/layout/user-dropdown/privacy/page'
 import UserStoragePage from '@/components/layout/user-dropdown/storage/page'
 import {useModal} from '@/components/modal/provider'
 import PagedModal from '@/components/shared/paged-modal'
+import {RingButton} from '@/components/ui/RingButton'
 import {useUserAccountStore} from '@/lib'
-import {Button, Dropdown, DropdownButton, DropdownHeader, DropdownMenu, Heading, Logo, PopoverHeader, Text} from '@/src/components'
+import {BubblePopover, Button, DropdownHeader, Heading, Logo, PopoverHeader, Text} from '@/src/components'
 import {SignedIn, useAuth, UserAvatar, UserProfile} from '@clerk/clerk-react'
 import {EnvelopeOpenIcon} from '@heroicons/react/16/solid'
-import {Cog6ToothIcon} from '@heroicons/react/20/solid'
+import {Cog6ToothIcon, UserIcon} from '@heroicons/react/20/solid'
+import {EyeIcon} from '@heroicons/react/24/solid'
 import {useLocation} from 'wouter'
 
-function UserMenu() {
+function UserMenu({close}: {
+    close: () => void
+}) {
     const {user} = useUserAccountStore()
     const {show} = useModal()
+    const [, navigate] = useLocation()
 
     const {signOut} = useAuth()
 
@@ -30,11 +36,14 @@ function UserMenu() {
     return (
         <DropdownHeader className="flex w-96 flex-col p-0!">
             <div
-                className="h-fit w-full rounded-xl bg-muted border shadow-sm transition-all ring-default hover:bg-muted/50 hover:ring-2">
+                className="h-fit w-full rounded-2xl bg-muted border shadow-sm transition-all ring-default hover:bg-muted/50 hover:ring-2">
                 <div className="p-1">
                     <div
                         className="flex items-center rounded-lg px-4 py-4"
-                        onClick={() => show(<UserSettingsOption/>)}
+                        onClick={() => {
+                            show(<UserSettingsOption/>)
+                            close()
+                        }}
                     >
                         <UserAvatar/>
                         <div className="ml-3 grow">
@@ -48,34 +57,36 @@ function UserMenu() {
             </div>
 
             <div className="inline-flex w-full flex-col gap-2 px-3 py-2">
-                <div
-                    className="group inline-flex w-full cursor-pointer items-center justify-start gap-4 rounded px-4 py-3 ring-destructive/25 transition-all hover:bg-destructive/75 hover:ring-2"
+                <RingButton
+                    icon={UserIcon}
+                    href={`/@${user.username}`}
+                    label="My Profile"
+                    onClick={close}
+                />
+
+                <RingButton
+                    icon={LogoutIcon}
                     onClick={() => signOut()}
-                >
-                    <LogoutIcon className="fill-muted-foreground h-4 w-4 group-hover:fill-white!"/>{' '}
-                    <Text alt className="group-hover:text-white!">
-                        Sign out of all accounts
-                    </Text>
-                </div>
+                    label="Sign out of all accounts"
+                    variant="destructive"
+                />
             </div>
         </DropdownHeader>
     )
 }
 
 export default function UserDropdown() {
-    const [, setLocation] = useLocation()
-
     return (
         <SignedIn>
-            <Dropdown>
-                <DropdownButton as="div" className="cursor-pointer">
+            <BubblePopover corner="top-right" id="user-dropdown-action" className="p-0 w-fit" trigger={
+                ({setOpen}) => <div onClick={() => setOpen(true)}>
                     <UserAvatar/>
-                </DropdownButton>
-
-                <DropdownMenu>
-                    <UserMenu/>
-                </DropdownMenu>
-            </Dropdown>
+                </div>
+            }>
+                {({setOpen}) =>
+                    <UserMenu close={() => setOpen(false)}/>
+                }
+            </BubblePopover>
         </SignedIn>
     )
 }
@@ -99,7 +110,7 @@ function UserSettingsOption() {
                 onClick={() => show(<UserProfile/>)}
             >
                 <WildbaseAsteriskIcon data-slot="icon"/>
-                Username, Avatar, Security, API Keys, etc.
+                Wild ID; Username, Avatar, Security, API Keys, etc.
             </Button>
 
             <Button
@@ -116,17 +127,29 @@ function UserSettingsOption() {
 function UserSettings() {
     return (
         <PagedModal>
-            <PagedModal.Page id="profile" title="Profile Settings" description="Manage your profile settings"
-                             icon={Cog6ToothIcon}>
+            <PagedModal.Page
+                id="profile"
+                title="Profile"
+                icon={Cog6ToothIcon}
+            >
                 <PagedModal.Body>
                     <ProfileSettings/>
                 </PagedModal.Body>
             </PagedModal.Page>
 
             <PagedModal.Page
+                id="privacy"
+                title="Privacy"
+                icon={EyeIcon}
+            >
+                <PagedModal.Body>
+                    <PrivacySettings/>
+                </PagedModal.Body>
+            </PagedModal.Page>
+
+            <PagedModal.Page
                 id="storage"
-                title="Storage Settings"
-                description="Manage your storage settings"
+                title="Storage"
                 icon={HardDisk}
             >
                 <PagedModal.Body>
@@ -136,8 +159,7 @@ function UserSettings() {
 
             <PagedModal.Page
                 id="invite"
-                title="Invite Settings"
-                description="Manage your invite settings"
+                title="Invite"
                 icon={EnvelopeOpenIcon}
             >
                 <PagedModal.Body>
