@@ -178,13 +178,11 @@ function useCommandPaletteSearch() {
                     finalQuery = `
                     ${allowedTables.includes('posts') ?
                         `
-                    $posts = [Where posts (${queryBuildFromRaw(query)})] AS *;
-                    $posts:user = [Where profiles ($posts:user_id->ONE)] AS *;
-                    $posts:pack = [Where packs ($posts:tenant_id->ONE)] AS *;
+                    $posts = [Where posts:body (${queryBuildFromRaw(query)})] | BULKPOSTLOAD() | PAGE(0, 25) AS *;
                     ` : ''
                     }
-                    ${allowedTables.includes('profiles') ? `$profiles = [Where profiles (${queryBuildFromRaw(query)})] AS *;` : ''}
-                    ${allowedTables.includes('packs') ? `$packs = [Where packs (${queryBuildFromRaw(query)})] AS *;` : ''}
+                    ${allowedTables.includes('profiles') ? `$profiles = [Where profiles:username,bio,display_name (${queryBuildFromRaw(query)})] AS *;` : ''}
+                    ${allowedTables.includes('packs') ? `$packs = [Where packs:slug,display_name,description (${queryBuildFromRaw(query)})] AS *;` : ''}
                     `.trim().replaceAll('                    ', '')
                 }
 

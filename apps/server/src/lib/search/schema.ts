@@ -88,7 +88,6 @@ const buildSchemas = (): Record<string, TableSchema> => {
                 isID: field.isId || field.nativeType?.includes('Uuid') || field.name === 'owner_id',
                 isOptional: field.isRequired === false,
             }
-            logSchema('Processed field for schema %s: %O', model.name, columns[field.name])
         }
         schemas[model.name] = {
             name: model.name,
@@ -153,4 +152,101 @@ export const getDefaultIdColumn = (table: string): TableColumn | undefined => {
         isID: true,
         isOptional: false,
     }
+}
+
+// ============================================================================
+// Table Extension System
+// ============================================================================
+
+import {z} from 'zod'
+
+/**
+ * Extension configuration for a table to customize search behavior.
+ * Defined here to avoid circular imports with types.ts
+ */
+export interface TableExtension {
+    /** Name of the table this extension applies to */
+    tableName: string;
+    
+    /** Search weights for ranking results by column */
+    searchWeights?: Record<string, number>;
+    
+    /** Column name aliases for convenience */
+    aliases?: Record<string, string>;
+    
+    /** Custom validators for column values */
+    validators?: Record<string, z.ZodSchema>;
+    
+    /** Default sort order */
+    defaultSort?: {
+        column: string;
+        direction: 'asc' | 'desc';
+    };
+    
+    /** Columns to exclude from wildcard selection */
+    excludeFromSelect?: string[];
+}
+
+/** Cached table extensions keyed by table name */
+const tableExtensions: Map<string, TableExtension> = new Map()
+
+/**
+ * Register a table extension.
+ */
+export const registerTableExtension = (extension: TableExtension): void => {
+    tableExtensions.set(extension.tableName, extension)
+    logSchema('Registered table extension for %s', extension.tableName)
+}
+
+/**
+ * Get the table extension for a specific table.
+ */
+export const getTableExtension = (tableName: string): TableExtension | undefined => {
+    return tableExtensions.get(tableName)
+}
+
+/**
+ * Get all registered table extensions.
+ */
+export const getAllTableExtensions = (): TableExtension[] => {
+    return Array.from(tableExtensions.values())
+}
+
+/**
+ * Resolve a column alias to the actual column name.
+ */
+export const resolveColumnAlias = (table: string, column: string): string => {
+    const extension = tableExtensions.get(table)
+    if (extension?.aliases?.[column]) {
+        return extension.aliases[column]
+    }
+    return column
+}
+
+/**
+ * Get search weight for a column (defaults to 1.0).
+ */
+export const getSearchWeight = (table: string, column: string): number => {
+    const extension = tableExtensions.get(table)
+    return extension?.searchWeights?.[column] ?? 1.0
+}
+
+/**
+ * Load table extensions from the tables/ directory.
+ * This function dynamically imports all extension files.
+ */
+export const loadTableExtensions = async (): Promise<void> => {
+    // Import all extensions from the tables directory
+    const extensions = await import('./tables')
+    
+    for (const [key, value] of Object.entries(extensions)) {
+        if (key === 'default') continue
+        
+        const extension = value as TableExtension
+        if (extension && typeof extension === 'object' && 'tableName' in extension) {
+            registerTableExtension(extension)
+        }
+    }
+    
+    logSchema('Loaded %d table extensions', tableExtensions.size)
 }

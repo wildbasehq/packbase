@@ -42,7 +42,7 @@ export async function fetchFolderPage({folderID, page = 1}: { folderID: string; 
 export async function fetchSearchPage({channelID, q, page}: SearchPageParams): Promise<FeedPageResult> {
     const take = 5
     const skip = (page - 1) * take
-    const query = (q || `$posts = @BULKPOSTLOAD(@PAGE({SKIP}, {TAKE}, [Where posts:channel_id ("${channelID}")]))`)
+    const query = (q || `$posts = [Where posts:channel_id ("${channelID}")] | PAGE({SKIP}, {TAKE}) | BULKPOSTLOAD() AS *;`)
         .replaceAll('{SKIP}', skip.toString())
         .replaceAll('{TAKE}', take.toString())
     const response = await vg.search.get({query: {page, q: query}})

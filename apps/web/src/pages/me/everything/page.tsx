@@ -16,7 +16,7 @@ export default function EverythingPage() {
                 </Alert>
                 <PackFeedController
                     channelID="0A000000000000"
-                    feedQueryOverride='$posts = @BULKPOSTLOAD(@PAGE({SKIP}, {TAKE}, [Where posts:content_type ("markdown")]))'
+                    feedQueryOverride='$posts = [Where posts:content_type ("markdown")] | PAGE({SKIP}, {TAKE}) | BULKPOSTLOAD() AS *;'
                 />
             </Protect>
         </>
