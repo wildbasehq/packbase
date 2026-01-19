@@ -3,6 +3,7 @@ import {vg} from '@/lib/api'
 import {PackThemeAPI} from '@/src/lib/api/packs/theme'
 import {Theme} from '@/src/lib/api/users/theme'
 import {useEffect, useState} from 'react'
+import {useSessionStorage} from 'usehooks-ts'
 
 // Component to render custom theme HTML and CSS for users or packs
 interface CustomThemeProps {
@@ -13,7 +14,9 @@ interface CustomThemeProps {
 export function CustomTheme({userId, packId}: CustomThemeProps) {
     const [theme, setTheme] = useState<Theme | null>(null)
     const {settings} = useUserAccountStore()
-    const loadTheme = settings.ask_load_themes
+    const [doNotAsk, setDoNotAsk] = useSessionStorage<boolean>(`do-not-ask-load-theme-${userId || packId || 'unknown'}-${packId ? 'pack' : 'user'}`, false)
+
+    const loadTheme = doNotAsk ? 'always' : settings.ask_load_themes
 
     useEffect(() => {
         if (userId && !packId) {
@@ -32,6 +35,8 @@ export function CustomTheme({userId, packId}: CustomThemeProps) {
                             if (!consent) {
                                 setTheme(null)
                                 return
+                            } else {
+                                setDoNotAsk(true)
                             }
                         }
 
@@ -57,6 +62,8 @@ export function CustomTheme({userId, packId}: CustomThemeProps) {
                             if (!consent) {
                                 setTheme(null)
                                 return
+                            } else {
+                                setDoNotAsk(true)
                             }
                         }
 

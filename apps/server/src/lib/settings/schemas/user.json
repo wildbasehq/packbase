@@ -9,7 +9,7 @@
       "display_name": "Allow other users to rehowl your content",
       "category": "privacy"
     },
-    "allow_robots": {
+    "disallow_robots": {
       "type": "boolean",
       "default": false,
       "userModifiable": true,
