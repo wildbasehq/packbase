@@ -2,30 +2,48 @@
   "model": "user",
   "version": "1.0.0",
   "settings": {
-    "post_privacy": {
-      "type": "string",
-      "values": [
-        "everyone",
-        "followers",
-        "friends"
-      ],
-      "default": "everyone",
+    "allow_rehowl": {
+      "type": "boolean",
+      "default": true,
       "userModifiable": true,
-      "description": "Profile visibility setting",
+      "display_name": "Allow other users to rehowl your content",
+      "category": "privacy"
+    },
+    "allow_robots": {
+      "type": "boolean",
+      "default": false,
+      "userModifiable": true,
+      "display_name": "Allow robots to access my content",
+      "description": "This prevents LLMs from parsing (and, possibly, use for training) your content. However, \"safe\" robots will be unable to read your content (e.g. Search indexing, unverified community bots, etc.).",
       "category": "privacy"
     },
     "show_nsfw": {
       "type": "boolean",
       "default": false,
       "userModifiable": true,
-      "description": "Show NSFW content",
+      "display_name": "Show NSFW content",
+      "description": "Hides the warning on potentially NSFW content and immediately shows it",
       "category": "content"
     },
-    "allow_rehowl": {
+    "search_start_as_tags": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "userModifiable": true,
-      "description": "Allow others to rehowl your howls"
+      "display_name": "When searching, immediately start with the tags prefix",
+      "category": "content"
+    },
+    "ask_load_themes": {
+      "type": "string",
+      "default": "ask",
+      "values": [
+        "ask",
+        "always",
+        "never"
+      ],
+      "userModifiable": true,
+      "display_name": "Load custom Pack and Profile themes",
+      "description": "Will constantly tell you if a pack or profile you're navigating to has a custom theme, and if you want to load it. Community themes are not verified by staff.",
+      "category": "appearance"
     }
   }
 }

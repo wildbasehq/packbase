@@ -27,13 +27,18 @@ function PreloadChild({children}: { children: ReactNode }) {
     const [serviceLoading, setServiceLoading] = useState<string>(`auth`)
     const [error, setError] = useState<any | null>(null)
 
-    const {setUser} = useUserAccountStore()
+    const {setUser, setSettings} = useUserAccountStore()
     const {setLoading, setConnecting, setBucketRoot, setMaintenance, setServerCapabilities} = useUIStore()
     const {setResources, setCurrentResource, setResourceDefault} = useResourceStore()
     const {session, isSignedIn, isLoaded} = useSession()
 
     const {data: userMeData, isLoading: userMeLoading} = useContentFrame('get', 'user.me', undefined, {
         id: 'user.me',
+        enabled: isSignedIn,
+    })
+
+    const {data: userMeSettingsData, isLoading: userMeSettingsLoading} = useContentFrame('get', 'user.me.settings', undefined, {
+        id: 'user.me.settings',
         enabled: isSignedIn,
     })
 
@@ -52,7 +57,7 @@ function PreloadChild({children}: { children: ReactNode }) {
         }
 
         if (!isLoaded || !server) return
-        if (isSignedIn && (userMeLoading || userPacksLoading)) return
+        if (isSignedIn && (userMeLoading || userPacksLoading || userMeSettingsLoading)) return
         // if (!serviceLoading.startsWith('auth')) return
 
         setBucketRoot(server.bucketRoot)
@@ -92,6 +97,7 @@ function PreloadChild({children}: { children: ReactNode }) {
             }
 
             setUser(userMeData)
+            setSettings(userMeSettingsData)
             setResourceDefault(userMeData.default_pack || resourceDefaultPackbase)
 
             if (!window.location.pathname.startsWith('/p/')) {
@@ -102,12 +108,13 @@ function PreloadChild({children}: { children: ReactNode }) {
             proceed()
         } else {
             setUser(null)
+            setSettings(null)
             setResources([])
             setResourceDefault(resourceDefaultPackbase)
             setCurrentResource(resourceDefaultPackbase)
             proceed()
         }
-    }, [session, isSignedIn, userMeLoading, userPacksData, userPacksLoading, server])
+    }, [session, isSignedIn, userMeLoading, userMeSettingsLoading, userPacksData, userPacksLoading, server])
 
     const setStatus = (status: string) => {
         setServiceLoading(prev => {

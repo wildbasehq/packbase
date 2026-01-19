@@ -1,8 +1,8 @@
+import {useUserAccountStore} from '@/lib'
 import {vg} from '@/lib/api'
 import {PackThemeAPI} from '@/src/lib/api/packs/theme'
 import {Theme} from '@/src/lib/api/users/theme'
 import {useEffect, useState} from 'react'
-import {useLocalStorage} from 'usehooks-ts'
 
 // Component to render custom theme HTML and CSS for users or packs
 interface CustomThemeProps {
@@ -12,31 +12,29 @@ interface CustomThemeProps {
 
 export function CustomTheme({userId, packId}: CustomThemeProps) {
     const [theme, setTheme] = useState<Theme | null>(null)
-    const [loadTheme, setLoadTheme] = useLocalStorage<'true' | 'false' | 'ask'>('load-custom-content-htmlcss', 'ask')
+    const {settings} = useUserAccountStore()
+    const loadTheme = settings.ask_load_themes
 
     useEffect(() => {
-        if (loadTheme === 'false') {
-            setTheme(null)
-            return
-        }
-
-        if (loadTheme === 'ask') {
-            const consent = window.confirm(`This ${userId ? 'profile' : ''}${packId ? 'Pack' : ''} wants to load custom HTML and CSS. Do you allow this? You can change this later in settings.`)
-            if (!consent) {
-                setLoadTheme('false')
-                setTheme(null)
-                return
-            } else {
-                setLoadTheme('true')
-            }
-        }
-
         if (userId && !packId) {
             // Fetch user theme
             vg.user({username: userId})
                 .theme.get()
                 .then(({data}) => {
                     if (data && !data.message) {
+                        if (loadTheme === 'never') {
+                            setTheme(null)
+                            return
+                        }
+
+                        if (loadTheme === 'ask') {
+                            const consent = window.confirm(`This ${userId ? 'profile' : ''}${packId ? 'Pack' : ''} wants to load custom HTML and CSS. Do you allow this? You can change this later in settings.`)
+                            if (!consent) {
+                                setTheme(null)
+                                return
+                            }
+                        }
+
                         setTheme(data)
                     } else setTheme(null)
                 })
@@ -49,6 +47,19 @@ export function CustomTheme({userId, packId}: CustomThemeProps) {
             PackThemeAPI.getActive(packId)
                 .then(data => {
                     if (data) {
+                        if (loadTheme === 'never') {
+                            setTheme(null)
+                            return
+                        }
+
+                        if (loadTheme === 'ask') {
+                            const consent = window.confirm(`This ${userId ? 'profile' : ''}${packId ? 'Pack' : ''} wants to load custom HTML and CSS. Do you allow this? You can change this later in settings.`)
+                            if (!consent) {
+                                setTheme(null)
+                                return
+                            }
+                        }
+
                         setTheme(data)
                     } else setTheme(null)
                 })

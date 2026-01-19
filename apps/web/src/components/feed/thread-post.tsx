@@ -58,6 +58,7 @@ interface ThreadPostProps {
 interface ThreadPostHeaderProps {
     post: FeedPostData
     isAuthor: boolean
+    isMature?: boolean
     onDelete: () => void
 }
 
@@ -116,12 +117,14 @@ function ThreadPostUserInfoCol({user, post, showAvatar}: {
     )
 }
 
-function ThreadPostHeader({post, isAuthor, onDelete}: ThreadPostHeaderProps) {
+function ThreadPostHeader({post, isAuthor, isMature, onDelete}: ThreadPostHeaderProps) {
     const {user} = useUserAccountStore()
 
     return (
         <div
-            className="flex items-start justify-between px-4 pt-1 -mb-4 mr-4 bg-linear-to-b from-body to-neutral-100 dark:to-n-7 rounded-t-xl h-12 bg-gradient-neutral-200 dark:bg-gradient-n-7">
+            className={cn('flex items-start justify-between px-4 pt-1 -mb-4 mr-4 bg-linear-to-b from-body to-neutral-100 dark:to-n-7 rounded-t-xl h-12 bg-gradient-neutral-200 dark:bg-gradient-n-7',
+                isMature && 'from-amber-100 to-amber-200 dark:from-amber-500/50 dark:bg-gradient-amber-700/50'
+            )}>
             <div className="flex min-w-0 items-center gap-2">
                 {/* Name + badges */}
                 <ThreadPostUserInfoCol user={post.user} post={post}/>
@@ -330,6 +333,8 @@ export default function ThreadPost({
     const [replyText, setReplyText] = useState('')
     const [isSubmittingReply, setIsSubmittingReply] = useState(false)
 
+    const {settings} = useUserAccountStore()
+
     const tags = post?.tags
     const containsMature = hasMatureTags(tags)
     const [showUnsavouryNotice, setShowUnsavouryNotice] = useState<boolean>(containsMature)
@@ -460,13 +465,37 @@ export default function ThreadPost({
                     </div>
                 )}
 
-                <ThreadPostHeader post={post} isAuthor={isAuthor} onDelete={onDelete}/>
+                <ThreadPostHeader post={post} isAuthor={isAuthor} isMature={containsMature} onDelete={onDelete}/>
+
                 <Card
                     className={`relative group max-w-full! overflow-hidden rounded-xl! border border-border/60 ${depthTintClass} transition-shadow hover:shadow-sm`}
                 >
                     <div className={innerPaddingClass}>
+                        {/* User received a warning? */}
+                        {post.warning && (
+                            <Alert className="p-2 rounded mb-2" variant="destructive">
+                                <div className="flex gap-2 items-center">
+                                    <ThreadPostUserInfoCol showAvatar user={{
+                                        id: '549329ff-74dd-4ac9-85b1-d33f5c73d8ac',
+                                        username: 'packbase',
+                                        slug: 'packbase',
+                                        display_name: 'Packbase Staff',
+                                        type: '2'
+                                    }}/>
+                                </div>
+                                <Divider className="my-2"/>
+                                <AlertDescription>
+                                    @{post.user?.username} received a warning for the contents of this Howl.
+                                </AlertDescription>
+
+                                <AlertDescription className="text-foreground">
+                                    {post.warning.reason}
+                                </AlertDescription>
+                            </Alert>
+                        )}
+                        
                         {/* Unsavoury content notice */}
-                        {containsMature && (
+                        {(containsMature && !settings?.show_nsfw) && (
                             <Activity mode={isVisible(containsMature)}>
                                 <div
                                     className="flex items-start justify-between mb-2 gap-3 rounded-xl border border-amber-300/70 bg-amber-50/80 px-3 py-2 text-xs text-amber-900 shadow-sm dark:border-amber-500/40 dark:bg-amber-950/40 dark:text-amber-100"
@@ -512,32 +541,9 @@ export default function ThreadPost({
                             </Activity>
                         )}
 
-                        <Activity mode={isVisible(!containsMature || !showUnsavouryNotice)}>
+                        <Activity mode={isVisible(!containsMature || !showUnsavouryNotice || settings?.show_nsfw)}>
                             {/* Body and media (with mature gating) */}
                             <ThreadPostBody body={post.body}/>
-
-                            {/* User received a warning? */}
-                            {post.warning && (
-                                <Alert className="p-2 rounded mb-2" variant="destructive">
-                                    <div className="flex gap-2 items-center">
-                                        <ThreadPostUserInfoCol showAvatar user={{
-                                            id: '549329ff-74dd-4ac9-85b1-d33f5c73d8ac',
-                                            username: 'packbase',
-                                            slug: 'packbase',
-                                            display_name: 'Packbase Staff',
-                                            type: '2'
-                                        }}/>
-                                    </div>
-                                    <Divider className="my-2"/>
-                                    <AlertDescription>
-                                        @{post.user?.username} received a warning for the contents of this Howl.
-                                    </AlertDescription>
-
-                                    <AlertDescription className="text-foreground">
-                                        {post.warning.reason}
-                                    </AlertDescription>
-                                </Alert>
-                            )}
 
                             <ThreadPostMedia assets={post.assets}/>
                         </Activity>

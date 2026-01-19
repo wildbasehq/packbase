@@ -1,7 +1,7 @@
 import Markdown from '@/components/shared/markdown'
 import PackHeader from '@/components/shared/pack/header'
 import UserInfoCol from '@/components/shared/user/info-col'
-import {cn, vg} from '@/lib'
+import {cn, useUserAccountStore, vg} from '@/lib'
 import PackbaseInstance from '@/lib/workers/global-event-emit'
 import {LoadingSpinner, UserHoverCard} from '@/src/components'
 import {Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Dialog, DialogBackdrop, DialogPanel} from '@headlessui/react'
@@ -153,6 +153,7 @@ function useCommandPaletteSearch() {
     const debouncedRawQuery = useDebouncedValue(rawQuery, 300)
     const query = debouncedRawQuery.toLowerCase().replace(/^[#@]/, '')
 
+
     useEffect(() => {
         const fetchResults = async () => {
             if (!debouncedRawQuery || debouncedRawQuery.trim() === '' || debouncedRawQuery === '?') {
@@ -254,6 +255,14 @@ function CommandPaletteInput({
     rawQuery: string;
     setRawQuery: (value: string) => void;
 }) {
+    const {settings} = useUserAccountStore()
+    // On mount, see if `tags:` should be prefixed
+    useEffect(() => {
+        if (rawQuery.length === 0 && settings.search_start_as_tags) {
+            setRawQuery(`tags: `)
+        }
+    }, [])
+
     return (
         <div className="grid grid-cols-1">
             <label htmlFor="command-palette-input" className="sr-only">

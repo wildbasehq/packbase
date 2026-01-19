@@ -8,8 +8,10 @@ import {persist} from 'zustand/middleware'
 interface UserAccountStore {
     accessToken: string
     user: any
+    settings: any
     setAccessToken: (accessToken: string) => void
     setUser: (user: any) => void
+    setSettings: (settings: any) => void
 }
 
 export const useUserAccountStore = create(
@@ -17,6 +19,7 @@ export const useUserAccountStore = create(
         set => ({
             accessToken: '',
             user: null,
+            settings: null,
 
             setAccessToken: accessToken =>
                 set(state => ({
@@ -27,6 +30,11 @@ export const useUserAccountStore = create(
                 set(state => ({
                     ...state,
                     user,
+                })),
+            setSettings: (settings: any) =>
+                set(state => ({
+                    ...state,
+                    settings,
                 })),
         }),
         {

@@ -7,7 +7,6 @@ import {HardDisk} from '@/components/icons/plump'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk'
 import ProfileSettings from '@/components/layout/user-dropdown/general/page'
 import InviteSettings from '@/components/layout/user-dropdown/invite/page'
-import PrivacySettings from '@/components/layout/user-dropdown/privacy/page'
 import UserStoragePage from '@/components/layout/user-dropdown/storage/page'
 import {useModal} from '@/components/modal/provider'
 import PagedModal from '@/components/shared/paged-modal'
@@ -17,8 +16,8 @@ import {BubblePopover, Button, DropdownHeader, Heading, Logo, PopoverHeader, Tex
 import {SignedIn, useAuth, UserAvatar, UserProfile} from '@clerk/clerk-react'
 import {EnvelopeOpenIcon} from '@heroicons/react/16/solid'
 import {Cog6ToothIcon, UserIcon} from '@heroicons/react/20/solid'
-import {EyeIcon} from '@heroicons/react/24/solid'
 import {useLocation} from 'wouter'
+import UserSettingsFromServer from './from-server'
 
 function UserMenu({close}: {
     close: () => void
@@ -138,16 +137,6 @@ function UserSettings() {
             </PagedModal.Page>
 
             <PagedModal.Page
-                id="privacy"
-                title="Privacy"
-                icon={EyeIcon}
-            >
-                <PagedModal.Body>
-                    <PrivacySettings/>
-                </PagedModal.Body>
-            </PagedModal.Page>
-
-            <PagedModal.Page
                 id="storage"
                 title="Storage"
                 icon={HardDisk}
@@ -156,6 +145,8 @@ function UserSettings() {
                     <UserStoragePage/>
                 </PagedModal.Body>
             </PagedModal.Page>
+
+            <UserSettingsFromServer/>
 
             <PagedModal.Page
                 id="invite"
