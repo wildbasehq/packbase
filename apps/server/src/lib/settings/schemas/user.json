@@ -13,7 +13,7 @@
       "type": "boolean",
       "default": false,
       "userModifiable": true,
-      "display_name": "Allow robots to access my content",
+      "display_name": "Prevent robots from accessing my content",
       "description": "This prevents LLMs from parsing (and, possibly, use for training) your content. However, \"safe\" robots will be unable to read your content (e.g. Search indexing, unverified community bots, etc.).",
       "category": "privacy"
     },
