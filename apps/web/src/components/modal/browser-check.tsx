@@ -9,8 +9,11 @@ export default function BrowserCheck() {
     const {show, hide} = useModal()
     const [hasSeenWarningModal, setHasSeenWarningModal] = useLocalStorage('has-seen-browser-warning-modal', false)
     // Search navigator.userAgentData for Chromium.
-    const browserEngine = // @ts-ignore
+    const isChrome = // @ts-ignore
         navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase().includes('chrom'))
+
+    const isZen = // @ts-ignore
+        navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase().includes('zen'))
 
     const isOpera = // @ts-ignore
         navigator.userAgentData?.brands?.find(brand => brand.brand.toLowerCase().includes('opera'))
@@ -71,10 +74,6 @@ export default function BrowserCheck() {
                                 </Link>
                             </li>
                         </ul>
-                        <br/>
-                        <br/>
-                        This is what you're supporting. But they have a vtuber model and their marketing is funny,
-                        right? Where in god's name do you think they're getting money to sponsor so much content?
                     </AlertDescription>
                     <Divider className="my-2"/>
                     <AlertDescription>
@@ -89,17 +88,16 @@ export default function BrowserCheck() {
                 </Alert>
             )
             // @ts-ignore
-        } else if (!browserEngine || !navigator.userAgentData) {
+        } else if ((!isZen && !isChrome) || !navigator.userAgentData) {
             show(
-                <Alert variant="destructive" className="max-w-md !rounded-2xl">
+                <Alert variant="destructive" className="max-w-md rounded-2xl!">
                     <AlertTitle>Your browser is not supported.</AlertTitle>
                     <AlertDescription>
-                        Due to a multitude of quirks, we cannot support Gecko-based and WebKit-based browsers. For the
-                        best experience,
-                        please use a Chromium-based browser instead.
+                        Due to a multitude of visual quirks, we cannot support Gecko-based and WebKit-based browsers (excluding Zen). For the
+                        best experience, please use a Chromium-based (or Zen) browser instead.
                     </AlertDescription>
                     <Divider className="my-2"/>
-                    <AlertDescription>You're free to continue, but some bug reports may be rejected.</AlertDescription>
+                    <AlertDescription>You're free to continue, but some specific bug reports may be rejected.</AlertDescription>
                     <Button className="w-full mt-2" color="orange" onClick={dismiss}>
                         Okay &mdash; Don't show again
                     </Button>
