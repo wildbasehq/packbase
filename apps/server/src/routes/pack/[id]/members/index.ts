@@ -53,7 +53,7 @@ export default (app: YapockType) =>
         }
 
         // Sort by online, then last online, then joined_at
-        members.sort((a, b) => {
+        return members.sort((a, b) => {
             if (a.online && !b.online) return -1
             if (!a.online && b.online) return 1
             if (a.last_online && b.last_online) {
@@ -61,6 +61,4 @@ export default (app: YapockType) =>
             }
             return b.joined_at.getTime() - a.joined_at.getTime()
         })
-
-        return members
     });
