@@ -10,7 +10,7 @@ import {isVisible, useResourceStore} from '@/lib'
 import InboxPage from '@/pages/inbox/page'
 import {Desktop, LoadingSpinner, Tab, TabsLayout, useContentFrame} from '@/src/components'
 import useWindowSize from '@/src/lib/hooks/use-window-size'
-import {PlusIcon} from '@heroicons/react/20/solid'
+import {PlusIcon, UserIcon} from '@heroicons/react/20/solid'
 import {Activity, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent, useCallback, useEffect, useRef, useState} from 'react'
 import {useInterval, useLocalStorage} from 'usehooks-ts'
 
@@ -157,20 +157,9 @@ function PackMembersContainer() {
         return {
             ...member,
             ...(friend ? {
-                is_friend: true,
-                status: friend.status,
-                isOnline: friend.isOnline,
+                is_friend: true
             } : {}),
         }
-    })
-    const friendIds = new Set(friends.map((f: any) => f.id))
-
-    const sortedMembersByFriends = [...members].sort((a: any, b: any) => {
-        const aIsFriend = friendIds.has(a.id)
-        const bIsFriend = friendIds.has(b.id)
-
-        if (aIsFriend === bIsFriend) return 0
-        return aIsFriend ? -1 : 1
     })
 
     useInterval(() => {
@@ -198,7 +187,7 @@ function PackMembersContainer() {
 
             {/* Avatar with display name */}
             <div className="flex flex-col space-y-2">
-                {sortedMembersByFriends?.map(member => (
+                {members?.map(member => (
                     <Link
                         href={`/@${member.username}`}
                         key={member.id}
@@ -214,6 +203,12 @@ function PackMembersContainer() {
                                     </Text>
                                 )}
                             </div>
+
+                            {member.is_friend && (
+                                <div className="flex items-center gap-1">
+                                    <UserIcon className="h-4 w-4 text-green-500/50"/>
+                                </div>
+                            )}
                         </div>
                     </Link>
                 ))}
