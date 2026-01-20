@@ -13,6 +13,7 @@ const categoryIcons: Record<string, any> = {
 }
 
 export default function UserSettingsFromServer() {
+    const {settings} = useUserAccountStore()
     const {
         data,
         isLoading,
@@ -21,6 +22,7 @@ export default function UserSettingsFromServer() {
     } = useContentFrame('get', 'user.me.settings', undefined, {
         enabled: true,
         refetchOnMount: true,
+        initialData: settings,
     })
 
     const {setSettings} = useUserAccountStore()

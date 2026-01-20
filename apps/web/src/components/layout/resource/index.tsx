@@ -5,31 +5,15 @@
 import ResourceSettingsMembers from '@/components/layout/resource/pages/members'
 import ResourceSettingsTheme from '@/components/layout/resource/pages/theme'
 import {Avatar} from '@/components/shared/avatar'
-import ServerConfigRender, {decideCategoryDescription} from '@/components/shared/input/server-config-render'
 import PagedModal from '@/components/shared/paged-modal'
 import {Heading, Text} from '@/components/shared/text'
 import {useResourceStore} from '@/lib/state'
-import {useContentFrame} from '@/src/components'
 import {SwatchIcon} from '@heroicons/react/16/solid'
-import {ClipboardIcon, Cog6ToothIcon, UserGroupIcon} from '@heroicons/react/20/solid'
+import {ClipboardIcon, UserGroupIcon} from '@heroicons/react/20/solid'
 import ResourceSettingsGeneral from './pages/general'
 
 export function ResourceSettingsModal() {
     const {currentResource} = useResourceStore()
-    const {data} = useContentFrame('get', `pack/${currentResource.id}/settings`)
-    // Get unique categories that are ONLY strings.
-    const packSettingsCategories =
-        data?.reduce(
-            (acc, obj) => {
-                const category = obj.definition.category
-                if (category) {
-                    if (!acc[category]) acc[category] = []
-                    acc[category].push(obj)
-                }
-                return acc
-            },
-            {} as Record<string, any[]>
-        ) ?? {}
 
     // Create the resource profile footer component
     const ResourceProfileFooter = (
@@ -68,20 +52,6 @@ export function ResourceSettingsModal() {
                     <ResourceSettingsTheme/>
                 </PagedModal.Body>
             </PagedModal.Page>
-
-            {Object.keys(packSettingsCategories || {})?.map(category => (
-                <PagedModal.Page
-                    id={category}
-                    title={category.toTitleCase()}
-                    description={decideCategoryDescription(category)}
-                    icon={Cog6ToothIcon}
-                >
-                    <PagedModal.Body>
-                        <ServerConfigRender config={packSettingsCategories[category]}
-                                            updateEndpoint={`pack/${currentResource.id}/settings`}/>
-                    </PagedModal.Body>
-                </PagedModal.Page>
-            ))}
 
             {/*<PagedModal.Page id="delete" title="Delete This Pack" description="Delete the pack and all data" icon={TrashIcon}>*/}
             {/*    <PagedModal.Body>*/}

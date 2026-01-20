@@ -30,6 +30,7 @@ import {
     DropdownButton,
     DropdownItem,
     DropdownMenu,
+    ExpandingArrow,
     FloatingCallout,
     Logo,
     Sidebar,
@@ -42,7 +43,7 @@ import {
 import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
 import * as Headless from '@headlessui/react'
 import {FaceSmileIcon, HomeIcon} from '@heroicons/react/16/solid'
-import {ChevronDownIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
+import {MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
 import {EllipsisHorizontalIcon} from '@heroicons/react/24/solid'
 import {motion} from 'motion/react'
 import {Activity, ComponentType, PropsWithChildren, ReactNode, useEffect, useState} from 'react'
@@ -99,7 +100,7 @@ export function SidebarLayout({children}: PropsWithChildren) {
         limitedEvent?: boolean;
         onlySignedIn?: boolean;
     }[]>()
-    
+
     const {isSignedIn} = useSession()
     const {user} = useUserAccountStore()
     const {sidebarContent} = useSidebar()
@@ -132,7 +133,7 @@ export function SidebarLayout({children}: PropsWithChildren) {
                 onlySignedIn: true
             }
         ])
-    }, [resourceDefault]);
+    }, [resourceDefault])
 
     return (
         <div className="flex min-h-svh h-screen w-full relative bg-muted">
@@ -183,7 +184,7 @@ export function SidebarLayout({children}: PropsWithChildren) {
                         <Activity mode={isVisible(((isSignedIn && !user?.requires_setup) || !isSignedIn))}>
                             <NavbarItem
                                 className={cn(
-                                    'flex rounded w-full md:w-2xs h-9 *:w-full',
+                                    'relative flex rounded w-full md:w-2xs h-9 *:w-full',
                                     shouldSeePackTour && 'md:animate-shadow-pulse'
                                 )}
                                 onClick={() => {
@@ -236,7 +237,7 @@ export function SidebarLayout({children}: PropsWithChildren) {
 
                                 <NavbarSpacer/>
 
-                                <ChevronDownIcon className="z-1"/>
+                                <ExpandingArrow className="rotate-90 -translate-x-4 -mt-1 z-1"/>
                             </NavbarItem>
 
                             <SignedIn>
