@@ -19,12 +19,14 @@ export function Heading({
                             children,
                             size = 'lg',
                             alt,
+                            loading,
                             ...props
                         }: {
     as?: ElementType
     children?: ReactNode
     size?: TextSize
     alt?: boolean
+    loading?: boolean
     [_key: string]: any
 }): JSX.Element {
     const Comp = as || 'h1'
@@ -33,7 +35,8 @@ export function Heading({
         props.className,
         textSize[size],
         'font-medium leading-none tracking-tight',
-        alt ? 'text-muted-foreground' : 'text-default'
+        alt ? 'text-muted-foreground' : 'text-default',
+        loading && 'animate-thinking'
     )
     return <Comp {...props}>{children}</Comp>
 }
@@ -43,12 +46,14 @@ export function Text({
                          as,
                          size = 'sm',
                          alt,
+                         loading,
                          ...props
                      }: {
     children?: ReactNode
     as?: ElementType
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
     alt?: boolean
+    loading?: boolean
     [_: string]: any
 }): JSX.Element {
     const Comp = as || 'p'
@@ -57,6 +62,7 @@ export function Text({
         props.className,
         textSize[size],
         alt && 'text-muted-foreground',
+        loading && 'animate-thinking',
         '[&_p]:leading-relaxed'
     )
 

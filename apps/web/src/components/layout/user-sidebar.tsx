@@ -4,15 +4,15 @@
 
 import {InboxContent, UserMultipleAccounts} from '@/components/icons/plump'
 import Link from '@/components/shared/link'
-import {Heading, Text} from '@/components/shared/text'
+import {Text} from '@/components/shared/text'
 import UserAvatar from '@/components/shared/user/avatar'
 import {isVisible, useResourceStore} from '@/lib'
 import InboxPage from '@/pages/inbox/page'
-import {Code, CodeGroup, Desktop, Tab, TabsLayout, useContentFrame} from '@/src/components'
+import {Desktop, LoadingSpinner, Tab, TabsLayout, useContentFrame} from '@/src/components'
 import useWindowSize from '@/src/lib/hooks/use-window-size'
+import {PlusIcon} from '@heroicons/react/20/solid'
 import {Activity, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent, useCallback, useEffect, useRef, useState} from 'react'
 import {useInterval, useLocalStorage} from 'usehooks-ts'
-import {PlusIcon} from "@heroicons/react/20/solid";
 
 export default function UserSidebar() {
     const {
@@ -190,14 +190,9 @@ function PackMembersContainer() {
             </Activity>
 
             <Activity mode={isVisible(!members?.length)}>
-                <div className="items-center justify-between mx-3">
-                    <Heading size="sm">This pack has no members. You shouldn't be seeing this!</Heading>
-                    <Text size="sm">pls report :(</Text>
-                    <CodeGroup title={`GET pack.${id}.members`}
-                               code={JSON.stringify(members, null, 2)}>
-                        <Code
-                            title="String">{JSON.stringify(members, null, 2)}</Code>
-                    </CodeGroup>
+                <div className="flex items-center gap-4 mx-3">
+                    <LoadingSpinner className="h-5 w-5"/>
+                    <Text size="sm" alt loading>Loading member list...</Text>
                 </div>
             </Activity>
 
