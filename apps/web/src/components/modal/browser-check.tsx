@@ -93,7 +93,7 @@ export default function BrowserCheck() {
                 <Alert variant="destructive" className="max-w-md rounded-2xl!">
                     <AlertTitle>Your browser is not supported.</AlertTitle>
                     <AlertDescription>
-                        Due to a multitude of visual quirks, we cannot support Gecko-based and WebKit-based browsers (excluding Zen). For the
+                        Due to a multitude of visual quirks, we cannot fully support Gecko-based (excluding Zen and most of it's forks) and WebKit-based browsers. For the
                         best experience, please use a Chromium-based (or Zen) browser instead.
                     </AlertDescription>
                     <Divider className="my-2"/>
