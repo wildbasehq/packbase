@@ -48,18 +48,27 @@ export default (app: YapockType) =>
             })
 
             profile.joined_at = member.joined_at.toISOString()
+            profile.joined_at_stamp = member.joined_at
 
             members.push(profile)
         }
 
         // Sort by online, then last online, then joined_at
-        members.sort((a, b) => {
+        members.sort((a: {
+            online: boolean;
+            last_online?: Date;
+            joined_at_stamp: Date;
+        }, b: {
+            online: boolean;
+            last_online?: Date;
+            joined_at_stamp: Date;
+        }) => {
             if (a.online && !b.online) return -1
             if (!a.online && b.online) return 1
             if (a.last_online && b.last_online) {
                 return b.last_online.getTime() - a.last_online.getTime()
             }
-            if (a.joined_at && b.joined_at) return b.joined_at.getTime() - a.joined_at.getTime()
+            if (a.joined_at_stamp && b.joined_at_stamp) return b.joined_at_stamp.getTime() - a.joined_at_stamp.getTime()
             return 0
         })
 
