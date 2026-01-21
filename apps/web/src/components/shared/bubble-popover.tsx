@@ -73,7 +73,7 @@ export function BubblePopover({
     const childrenRender = typeof children === 'function' ? children({setOpen}) : children
 
     return (
-        <>
+        <div className="relative w-fit">
             <Mobile>
                 <Drawer.Root>
                     <Drawer.Trigger asChild>{trigger({open, setOpen})}</Drawer.Trigger>
@@ -103,8 +103,7 @@ export function BubblePopover({
                     <motion.div
                         ref={rootRef}
                         layoutId={`${id}-root-container`}
-                        style={{borderRadius: 24}}
-                        aria-hidden={open ? true : undefined}
+                        style={{borderRadius: 24, visibility: open ? 'hidden' : 'visible'}}
                         animate={{
                             filter: closingPulse ? 'blur(1px)' : 'blur(0px)',
                             opacity: closingPulse ? 0.2 : 1,
@@ -113,14 +112,7 @@ export function BubblePopover({
                             duration: 0.27,
                             ease: [0.26, 0.08, 0.25, 1],
                         }}
-                        drag
-                        dragElastic={0.005}
-                        dragTransition={{bounceStiffness: 1000}}
-                        dragConstraints={{top: 0, right: 0, bottom: 0, left: 0}}
-                        className={cn(
-                            open ? 'invisible' : '',
-                            'relative'
-                        )}
+                        className="relative w-fit"
                     >
                         {trigger({open, setOpen})}
                     </motion.div>
@@ -175,7 +167,7 @@ export function BubblePopover({
                                     </div>
                                 ) : (
                                     <motion.div
-                                        className={cn('absolute z-[101] w-sm overflow-hidden border bg-card p-6 drop-shadow-sm', cornerClasses, className)}
+                                        className={cn('absolute z-[101] w-fit overflow-hidden border bg-card p-6 drop-shadow-sm', cornerClasses, className)}
                                         layoutId={`${id}-root-container`}
                                         layout
                                         style={{borderRadius: 24}}
@@ -187,7 +179,7 @@ export function BubblePopover({
                                         }}
                                     >
                                         <motion.div
-                                            className="relative flex h-full w-full flex-col px-1 py-1"
+                                            className="relative flex flex-col px-1 py-1"
                                             layout
                                             key={animateKey}
                                             initial={{opacity: 0, scale: 0.96, filter: 'blur(8px)'}}
@@ -207,7 +199,7 @@ export function BubblePopover({
                     </PortaledIf>
                 </LayoutGroup>
             </Desktop>
-        </>
+        </div>
     )
 }
 

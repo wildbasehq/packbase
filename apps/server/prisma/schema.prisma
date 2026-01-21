@@ -309,7 +309,7 @@ model notifications {
   user_id    String    @db.Uuid
   type       String
   title      String
-  content    String
+  content    String?
   read       Boolean   @default(false)
   read_at    DateTime? @db.Timestamptz(6)
   metadata   Json?

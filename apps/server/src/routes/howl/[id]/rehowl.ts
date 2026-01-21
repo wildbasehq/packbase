@@ -1,6 +1,7 @@
 import {YapockType} from '@/index'
 import {HTTPError} from '@/lib/HTTPError'
 import {Settings} from '@/lib/settings'
+import {xpManager} from '@/lib/trinket-manager'
 import {t} from 'elysia'
 
 /**
@@ -93,6 +94,10 @@ export default (app: YapockType) =>
                         parent: howl.id
                     },
                 })
+
+                if (user.sub !== howl.user_id) {
+                    await xpManager.increment(howl.user_id, 20)
+                }
             },
             {
                 detail: {

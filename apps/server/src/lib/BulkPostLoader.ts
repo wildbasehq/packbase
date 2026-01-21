@@ -1,5 +1,6 @@
 import prisma from '@/db/prisma'
 import {Settings} from '@/lib/settings'
+import {xpManager} from '@/lib/trinket-manager'
 
 /**
  * BulkPostLoader - Efficiently loads multiple posts with a single query
@@ -126,6 +127,7 @@ export class BulkPostLoader {
                     type: profile.type,
                     display_name: profile.display_name,
                     badge: profile.badge,
+                    xp: profile.xp,
                     about: {
                         bio: profile.bio,
                     },
@@ -261,7 +263,7 @@ export class BulkPostLoader {
                         Object.assign(post, JSON.parse(JSON.stringify(parentPost)))
 
                         // Restore the original ID of the rehowl post so the feed maintains order and unique IDs
-                        post.id = originalId
+                        post.rehowl_id = originalId
                         post.rehowled_by = rehowled_by
 
                         // If the parent post already has user data (from parentLoader), preserve it
@@ -334,6 +336,7 @@ export class BulkPostLoader {
             for (const profile of data) {
                 let profileBuild: typeof profile & {
                     badge?: string;
+                    xp?: number;
                 } = {
                     ...profile,
                 }
@@ -350,6 +353,10 @@ export class BulkPostLoader {
                 if (userBadges) {
                     profileBuild.badge = userBadges.item_id
                 }
+
+                // XP
+                const xp = await xpManager.getBalance(profile.id, 1)
+                profileBuild.xp = xp || 1
 
                 profileBuild.images_avatar = `${process.env.HOSTNAME}/user/${profileBuild.id}/avatar`
 

@@ -18,6 +18,7 @@ export const UserProfile = t.Object(
             }),
         ),
         badge: t.Optional(t.String()),
+        xp: t.Optional(t.Number()),
         about: t.Optional(
             t.Partial(
                 t.Object({
@@ -220,6 +221,7 @@ export const HowlComment = t.Object({
 
 export const HowlResponse = t.Object({
     id: t.String(),
+    rehowl_id: t.Optional(t.String()),
     tenant_id: t.Optional(t.String()),
     channel_id: t.Optional(t.String()),
     content_type: t.Union([t.Literal('markdown'), t.Literal('rich'), t.Literal('asset'), t.Literal('howling_alongside'), t.Literal('howling_echo')]),

@@ -2,6 +2,7 @@ import clerkClient from '@/db/auth'
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
 import {HTTPError} from '@/lib/HTTPError'
+import {xpManager} from '@/lib/trinket-manager'
 import {UserProfile} from '@/models/defs'
 import posthog, {distinctId} from '@/utils/posthog'
 import {t} from 'elysia'
@@ -160,6 +161,8 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
     if (userBadges) {
         data.badge = userBadges.item_id
     }
+
+    data.xp = await xpManager.getBalance(data.id, 1)
 
     if (data.is_r18) {
         // Get unique adult content tags from their posts

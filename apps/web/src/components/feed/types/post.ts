@@ -16,6 +16,7 @@ export interface Asset {
 
 export interface FeedPostData {
     id: string
+    rehowl_id?: string
     user: UserProfileBasic
     body: string | JSONContent
     created_at: string

@@ -1,9 +1,9 @@
 import clerkClient from '@/db/auth'
 import prisma from '@/db/prisma'
 import {NotificationManager} from '@/lib/NotificationManager'
+import {trinketManager, xpManager} from '@/lib/trinket-manager'
 import {SignedInAuthObject} from '@clerk/backend/internal'
 import Debug from 'debug'
-import trinketManager, {toParentId} from '../../lib/trinket-manager'
 
 const log = {
     info: Debug('vg:verify-token'),
@@ -209,7 +209,8 @@ async function ensureProfileId(user: AuthUser): Promise<AuthUser | void> {
             const invited = isInvited
             try {
                 await prisma.invites.delete({where: {id: invited.id}})
-                await trinketManager.increment(toParentId('user', invited.invited_by), 5)
+                await trinketManager.increment(invited.invited_by, 5)
+                await xpManager.increment(invited.invited_by, 525)
                 await NotificationManager.createNotification(
                     invited.invited_by,
                     'invite',
@@ -244,7 +245,7 @@ export default async function verifyToken(req: any): Promise<AuthUser | undefine
         }
 
         result.user = await ensureProfileId(result.user)
-        
+
         // Is username different?
         if (result.user.sessionClaims?.nickname !== result.user?.username && result.user.sub) {
             // If so, change it on the DB.

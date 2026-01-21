@@ -2,6 +2,7 @@ import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
 import {HTTPError} from '@/lib/HTTPError'
 import {NotificationManager} from '@/lib/NotificationManager'
+import {xpManager} from '@/lib/trinket-manager'
 import {ErrorTypebox} from '@/utils/errors'
 import requiresAccount from '@/utils/identity/requires-account'
 import requiresToken from '@/utils/identity/requires-token'
@@ -43,6 +44,7 @@ export default (app: YapockType) =>
                     set.status = 500
                     throw HTTPError.fromError(reactionError)
                 }
+
                 if (reactionExists && reactionExists.length > 0) {
                     set.status = 400
                     throw HTTPError.badRequest({
@@ -50,14 +52,19 @@ export default (app: YapockType) =>
                     })
                 }
 
-                // Count all reactions for this post
-                const reactionCount = await prisma.posts_reactions.count({
+                // Count unique slots for this post
+                const reactionSlots = await prisma.posts_reactions.findMany({
                     where: {
                         post_id: id,
                     },
+                    select: {
+                        slot: true,
+                    },
                 })
 
-                if (reactionCount >= 10) {
+                const slotAmount = reactionSlots.length
+
+                if (slotAmount >= 25) {
                     set.status = 400
                     throw HTTPError.badRequest({
                         summary: 'Too many reactions.',
@@ -74,6 +81,21 @@ export default (app: YapockType) =>
                     })
                 } catch (insertError) {
                     throw HTTPError.fromError(insertError)
+                }
+
+                // Count all reactions for this post
+                const reactionCount = await prisma.posts_reactions.count({
+                    where: {
+                        post_id: id,
+                    },
+                })
+                const tooManyReactions = reactionCount > 100
+                if (user.sub !== postExists.user_id) {
+                    if (!tooManyReactions) {
+                        await xpManager.increment(postExists.user_id, 3)
+                    }
+
+                    await xpManager.increment(user.sub, 3)
                 }
 
                 await NotificationManager.createNotification(postExists.user_id, 'howl_react', `${user.sessionClaims.nickname} reacted ${slot}`, postExists.body, {

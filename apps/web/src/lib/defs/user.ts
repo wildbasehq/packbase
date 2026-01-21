@@ -11,6 +11,7 @@ export interface UserProfileBasic {
         header?: string
     }
     badge?: string
+    xp?: number
     type?: '1' | '2'
     is_content_moderator?: boolean
     is_staff?: boolean

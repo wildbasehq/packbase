@@ -4,6 +4,7 @@
 
 import {DeleteHowl} from '@/components/feed/content-moderation/delete-howl'
 import {IssueWarning} from '@/components/feed/content-moderation/issue-warning'
+import {Badges} from '@/components/icons/badges'
 import {RehowlIcon} from '@/components/icons/rehowl'
 import {Alert, AlertDescription, Button, Divider} from '@/components/shared'
 import Card from '@/components/shared/card'
@@ -17,7 +18,6 @@ import {vg} from '@/lib/api'
 import {UserProfileBasic} from '@/lib/defs/user'
 import {canContentModerate} from '@/lib/utils/can-content-moderate'
 import {formatRelativeTime} from '@/lib/utils/date'
-import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak'
 import {AvatarButton, Editor, FeedPostData, LoadingCircle} from '@/src/components'
 import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
 import {ChatBubbleLeftIcon} from '@heroicons/react/24/outline'
@@ -81,22 +81,8 @@ function ThreadPostUserInfoCol({user, post, showAvatar}: {
                 >
                     {user?.display_name || user?.username}
                 </Link>
-                {user?.type && (
-                    <BentoStaffBadge
-                        type={user?.type}
-                        className="relative inline-flex h-4 w-4 shrink-0"
-                        width={16}
-                        height={16}
-                    />
-                )}
-                {user?.badge && (
-                    <BentoGenericUnlockableBadge
-                        type={user?.badge}
-                        className="relative inline-flex h-4 w-4 shrink-0"
-                        width={16}
-                        height={16}
-                    />
-                )}
+
+                <Badges xp={user?.xp} genericUnlock={user?.badge} staffBadge={user?.type} className="relative inline-flex h-4 w-4 shrink-0"/>
             </div>
 
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -458,7 +444,7 @@ export default function ThreadPost({
                         {post.rehowled_by.id === signedInUser?.id && (
                             // @ts-ignore
                             <DeleteHowl post={{
-                                id: post.id + 'rehowl',
+                                id: post.rehowl_id + 'rehowl',
                                 user: post.rehowled_by
                             }} onAction={onDelete}/>
                         )}
@@ -493,7 +479,7 @@ export default function ThreadPost({
                                 </AlertDescription>
                             </Alert>
                         )}
-                        
+
                         {/* Unsavoury content notice */}
                         {(containsMature && !settings?.show_nsfw) && (
                             <Activity mode={isVisible(containsMature)}>
@@ -613,22 +599,8 @@ function ThreadComments({comments, handleNestedDelete}: {
                                     >
                                         {comment.user?.display_name || comment.user?.username}
                                     </Link>
-                                    {comment.user?.type && (
-                                        <BentoStaffBadge
-                                            type={comment.user?.type}
-                                            className="relative inline-flex h-4 w-4 shrink-0"
-                                            width={16}
-                                            height={16}
-                                        />
-                                    )}
-                                    {comment.user?.badge && (
-                                        <BentoGenericUnlockableBadge
-                                            type={comment.user?.badge}
-                                            className="relative inline-flex h-4 w-4 shrink-0"
-                                            width={16}
-                                            height={16}
-                                        />
-                                    )}
+                                    <Badges xp={comment.user?.xp} genericUnlock={comment.user?.badge} staffBadge={comment.user?.type}
+                                            className="relative inline-flex h-4 w-4 shrink-0"/>
                                 </div>
 
                                 <div className="flex items-center ml-1 gap-1 flex-1 text-xs text-muted-foreground">

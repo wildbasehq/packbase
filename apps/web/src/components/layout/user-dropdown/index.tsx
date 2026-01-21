@@ -4,6 +4,7 @@
 
 import LogoutIcon from '@/components/icons/logout'
 import {HardDisk} from '@/components/icons/plump'
+import {XPDisplay} from '@/components/icons/ranks/xp-display'
 import WildbaseAsteriskIcon from '@/components/icons/wildbase-asterisk'
 import ProfileSettings from '@/components/layout/user-dropdown/general/page'
 import InviteSettings from '@/components/layout/user-dropdown/invite/page'
@@ -16,8 +17,27 @@ import {BubblePopover, Button, DropdownHeader, Heading, Logo, PopoverHeader, Tex
 import {SignedIn, useAuth, UserAvatar, UserProfile} from '@clerk/clerk-react'
 import {EnvelopeOpenIcon} from '@heroicons/react/16/solid'
 import {Cog6ToothIcon, UserIcon} from '@heroicons/react/20/solid'
+import {AnimatePresence, motion} from 'motion/react'
+import {ReactNode, useEffect, useState} from 'react'
 import {useLocation} from 'wouter'
 import UserSettingsFromServer from './from-server'
+
+function StatusLabel({children}: { children: ReactNode }) {
+    return (
+        <motion.div
+            initial={{opacity: 0, scale: 0.96, filter: 'blur(8px)'}}
+            animate={{opacity: 1, scale: 1, y: 0, filter: 'blur(0)'}}
+            exit={{opacity: 0, scale: 0.96, filter: 'blur(8px)'}}
+            transition={{
+                duration: 0.27,
+                ease: [0.26, 0.08, 0.25, 1],
+            }}
+            className="flex items-center w-3/4"
+        >
+            {children}
+        </motion.div>
+    )
+}
 
 function UserMenu({close}: {
     close: () => void
@@ -75,17 +95,65 @@ function UserMenu({close}: {
 }
 
 export default function UserDropdown() {
+    const [isHovered, setIsHovered] = useState(false)
+    const {user: {xp}} = useUserAccountStore()
+
+    // Sets isHovered to true on load for 2 seconds, or until user interaction
+    useEffect(() => {
+        setIsHovered(true)
+        const timeout = setTimeout(() => setIsHovered(false), 5000)
+        return () => clearTimeout(timeout)
+    }, [])
+
     return (
         <SignedIn>
-            <BubblePopover corner="top-right" id="user-dropdown-action" className="p-0 w-fit" trigger={
-                ({setOpen}) => <div onClick={() => setOpen(true)}>
-                    <UserAvatar/>
-                </div>
-            }>
-                {({setOpen}) =>
-                    <UserMenu close={() => setOpen(false)}/>
-                }
-            </BubblePopover>
+            <div className="relative flex items-center">
+                <motion.div
+                    className="absolute flex bg-primary-midnight px-2 py-2 rounded-full items-center overflow-hidden whitespace-nowrap"
+                    initial={{width: '4rem', height: '1rem', opacity: 0, right: '-0.5rem'}}
+                    animate={{
+                        height: '2.5rem',
+                        width: isHovered ? '14rem' : '2.5rem',
+                        opacity: isHovered ? 1 : 0,
+                        right: '-0.4rem',
+                    }}
+                    transition={{
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 24,
+                        delay: isHovered ? 1 : 0,
+                    }}
+                >
+                    <AnimatePresence mode="popLayout">
+                        {isHovered && (
+                            <StatusLabel key="test">
+                                <XPDisplay xp={xp}/>
+                            </StatusLabel>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
+
+                <BubblePopover
+                    corner="top-right"
+                    id="user-dropdown-action"
+                    className="p-0 w-fit"
+                    trigger={
+                        ({setOpen}) => (
+                            <div
+                                onClick={() => setOpen(true)}
+                                onMouseEnter={() => setIsHovered(true)}
+                                onMouseLeave={() => setIsHovered(false)}
+                                className={`rounded-full duration-100 ease-in hover:duration-1000 hover:transition-shadow hover:ring-6 hover:ring-primary-midnight`}
+                            >
+                                <UserAvatar/>
+                            </div>
+                        )
+                    }>
+                    {({setOpen}) =>
+                        <UserMenu close={() => setOpen(false)}/>
+                    }
+                </BubblePopover>
+            </div>
         </SignedIn>
     )
 }

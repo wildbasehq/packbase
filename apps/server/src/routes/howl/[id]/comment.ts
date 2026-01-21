@@ -2,6 +2,7 @@ import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
 import {HTTPError} from '@/lib/HTTPError'
 import {NotificationManager} from '@/lib/NotificationManager'
+import {xpManager} from '@/lib/trinket-manager'
 import {ErrorTypebox} from '@/utils/errors'
 import requiresAccount from '@/utils/identity/requires-account'
 import {t} from 'elysia'
@@ -49,14 +50,33 @@ export default (app: YapockType) =>
                     },
                 })
 
-                await NotificationManager.createNotification(postExists.user_id, 'howl_comment', `${user.sessionClaims.nickname} replied`, body, {
-                    post_id: id,
-                    user: {
-                        id: user.sub,
-                        username: user.sessionClaims.nickname,
-                        images_avatar: `${process.env.HOSTNAME}/user/${user.sub}/avatar`,
+                if (user.sub !== postExists.user_id) {
+                    await xpManager.increment(user.sub, 15)
+                    await NotificationManager.createNotification(postExists.user_id, 'howl_comment', `${user.sessionClaims.nickname} replied`, body, {
+                        post_id: id,
+                        user: {
+                            id: user.sub,
+                            username: user.sessionClaims.nickname,
+                            images_avatar: `${process.env.HOSTNAME}/user/${user.sub}/avatar`,
+                        },
+                    })
+                }
+
+                // Is unique commenter?
+                const isUniqueCommenter = (await prisma.posts.count({
+                    where: {
+                        parent: id,
+                        user_id: user.sub,
                     },
-                })
+                })) === 0
+
+                if (isUniqueCommenter) {
+                    // Give OP 10 XP, unique
+                    await xpManager.increment(postExists.user_id, 10)
+                }
+
+                // Give commenter 15 XP
+                await xpManager.increment(user.sub, 15)
             } catch (insertError) {
                 set.status = 500
                 throw HTTPError.fromError(insertError)

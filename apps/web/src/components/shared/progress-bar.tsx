@@ -23,14 +23,14 @@ export default function ProgressBar({value, indeterminate, mask = false, classNa
         >
             {indeterminate ? (
                 <motion.div
-                    className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-transparent via-primary-light to-transparent"
+                    className="absolute left-0 top-0 h-full rounded-full bg-linear-to-r from-transparent via-primary-light to-transparent"
                     initial={{x: '-100%'}}
                     animate={{x: '100%'}}
                     transition={{duration: 0.75, repeat: Infinity}}
                     style={{width: '100%'}}
                 />
             ) : (
-                <div className="h-full rounded-full bg-primary transition-[width] duration-300 ease-out"
+                <div className="h-full rounded-full bg-linear-to-r from-primary to-primary-light transition-[width] duration-300 ease-out"
                      style={{width: `${clamped}%`}}/>
             )}
             <span className="sr-only">{indeterminate ? 'Loading' : `Progress: ${clamped}%`}</span>

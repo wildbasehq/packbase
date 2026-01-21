@@ -1,8 +1,8 @@
 // @ts-ignore
+import {Badges} from '@/components/icons/badges'
 import Link from '@/components/shared/link'
 import Markdown from '@/components/shared/markdown'
 import {cn} from '@/lib'
-import {BentoGenericUnlockableBadge, BentoStaffBadge} from '@/lib/utils/pak'
 import {Avatar, Text} from '@/src/components'
 import {getAvatar} from '@/src/lib/api/users/avatar'
 import * as HoverCard from '@radix-ui/react-hover-card'
@@ -59,12 +59,7 @@ export function UserInfo({
             <div className="flex flex-col">
                 <Link href={`/@${user.username}`} className="text-foreground text-sm font-semibold">
                     {user.display_name || user.username}
-                    {user.type &&
-                        <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5" width={20} height={20}/>}
-                    {user.badge && (
-                        <BentoGenericUnlockableBadge type={user.badge} className="ml-1 inline-flex h-5 w-5" width={20}
-                                                     height={20}/>
-                    )}
+                    <Badges xp={user?.xp} genericUnlock={user?.badge} staffBadge={user?.type}/>
                 </Link>
                 <Text alt>
                     {tag || user.tag || user.username || 'dummy'}
@@ -96,18 +91,7 @@ export function UserHoverCard({user}: { user: any }) {
                     <div>
                         <Text as="div" className="text-md">
                             {user.display_name || user.username}
-                            {user.type && (
-                                <BentoStaffBadge type={user.type} className="ml-1 inline-flex h-5 w-5"
-                                                 width={20} height={20}/>
-                            )}
-                            {user.badge && (
-                                <BentoGenericUnlockableBadge
-                                    type={user.badge}
-                                    className="ml-1 inline-flex h-5 w-5"
-                                    width={20}
-                                    height={20}
-                                />
-                            )}
+                            <Badges xp={user?.xp} genericUnlock={user?.badge} staffBadge={user?.type} className="ml-1 inline-flex h-5 w-5"/>
                         </Text>
 
                         <Text alt>@{user.username}</Text>

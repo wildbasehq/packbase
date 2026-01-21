@@ -8,6 +8,7 @@ import Baozi from '@/lib/events'
 import {FeedController} from '@/lib/FeedController'
 import {clearQueryCache} from '@/lib/search/cache'
 import createStorage from '@/lib/storage'
+import {xpManager} from '@/lib/trinket-manager'
 import {uploadFileStream} from '@/utils/upload-file'
 import {createReadStream, existsSync} from 'fs'
 import {readFile, unlink} from 'fs/promises'
@@ -29,7 +30,7 @@ export interface HowlJob {
     createdAt: number
     updatedAt: number
     expiresAt?: number // Only set for failed jobs (5 min expiry)
-    
+
     // Input data for processing
     userId: string
     tenantId: string
@@ -60,7 +61,7 @@ let cleanupIntervalId: ReturnType<typeof setInterval> | null = null
 
 function startCleanupInterval() {
     if (cleanupIntervalId) return
-    
+
     cleanupIntervalId = setInterval(() => {
         const now = Date.now()
         for (const [id, job] of jobs.entries()) {
@@ -106,10 +107,10 @@ export function createHowlJob(params: {
         tags: params.tags,
         assetIds: params.assetIds,
     }
-    
+
     jobs.set(params.id, job)
     console.log('[HOWL_JOB_QUEUE] Created new job', {id: params.id, assetCount: params.assetIds.length})
-    
+
     return job
 }
 
@@ -119,7 +120,7 @@ export function createHowlJob(params: {
 export function getHowlJobStatus(id: string): HowlJobStatusResponse | null {
     const job = jobs.get(id)
     if (!job) return null
-    
+
     return {
         id: job.id,
         status: job.status,
@@ -136,7 +137,7 @@ export function getHowlJobStatus(id: string): HowlJobStatusResponse | null {
 function updateJobStatus(id: string, updates: Partial<Pick<HowlJob, 'status' | 'progress' | 'error' | 'expiresAt'>>) {
     const job = jobs.get(id)
     if (!job) return
-    
+
     Object.assign(job, updates, {updatedAt: Date.now()})
     jobs.set(id, job)
 }
@@ -159,7 +160,7 @@ function markJobFailed(id: string, error: string) {
 function markJobCompleted(id: string) {
     updateJobStatus(id, {status: 'completed'})
     console.log('[HOWL_JOB_QUEUE] Job completed', {id})
-    
+
     // Keep completed jobs for 1 minute for status polling, then remove
     setTimeout(() => {
         jobs.delete(id)
@@ -177,13 +178,13 @@ export async function processHowlJob(id: string): Promise<void> {
         console.log('[HOWL_JOB_QUEUE] Job not found for processing', {id})
         return
     }
-    
+
     console.log('[HOWL_JOB_QUEUE] Starting job processing', {
         id,
         userId: job.userId,
         assetCount: job.assetIds.length,
     })
-    
+
     const UPLOAD_ROOT = path.join(process.cwd(), 'temp', 'uploads', 'pending')
     const uploadedS3Paths: string[] = []
     const uploadedAssets: {
@@ -193,15 +194,15 @@ export async function processHowlJob(id: string): Promise<void> {
             name: string
         }
     }[] = []
-    
+
     try {
         // Phase 1: Upload assets to S3
         if (job.assetIds.length > 0) {
             updateJobStatus(id, {status: 'uploading'})
-            
+
             for (let i = 0; i < job.assetIds.length; i++) {
                 const assetId = job.assetIds[i]
-                
+
                 updateJobStatus(id, {
                     progress: {
                         currentAsset: i + 1,
@@ -209,23 +210,23 @@ export async function processHowlJob(id: string): Promise<void> {
                         currentAssetProgress: 0,
                     },
                 })
-                
+
                 console.log('[HOWL_JOB_QUEUE] Processing asset', {
                     jobId: id,
                     assetId,
                     index: i + 1,
                     total: job.assetIds.length,
                 })
-                
+
                 const jsonPath = path.join(UPLOAD_ROOT, `${assetId}.json`)
                 const binPath = path.join(UPLOAD_ROOT, `${assetId}.bin`)
-                
+
                 if (!existsSync(jsonPath)) {
                     throw new Error(`Asset ID ${assetId} not found`)
                 }
-                
+
                 const meta = JSON.parse(await readFile(jsonPath, 'utf-8'))
-                
+
                 if (meta.user_id !== job.userId) {
                     throw new Error(`Asset ID ${assetId} unauthorized`)
                 }
@@ -235,10 +236,10 @@ export async function processHowlJob(id: string): Promise<void> {
                 if (meta.expires && Date.now() > meta.expires) {
                     throw new Error(`Asset ID ${assetId} has expired`)
                 }
-                
+
                 const contentType = meta.asset_type
                 const isVideo = meta.asset_type === 'video/webm' || meta.asset_type.startsWith('video/')
-                
+
                 const stream = createReadStream(binPath)
                 const upload = await uploadFileStream(
                     process.env.S3_PROFILES_BUCKET!,
@@ -258,11 +259,11 @@ export async function processHowlJob(id: string): Promise<void> {
                     }
                 )
                 stream.destroy()
-                
+
                 if (upload.error) {
                     throw upload.error
                 }
-                
+
                 uploadedS3Paths.push(upload.data.path)
                 uploadedAssets.push({
                     type: isVideo ? 'video' : 'image',
@@ -271,7 +272,7 @@ export async function processHowlJob(id: string): Promise<void> {
                         name: `${i}`,
                     },
                 })
-                
+
                 // Cleanup temp files
                 await unlink(jsonPath).catch((err) => {
                     console.log('[HOWL_JOB_QUEUE] Failed to delete JSON metadata', {assetId, error: err})
@@ -279,7 +280,7 @@ export async function processHowlJob(id: string): Promise<void> {
                 await unlink(binPath).catch((err) => {
                     console.log('[HOWL_JOB_QUEUE] Failed to delete binary file', {assetId, error: err})
                 })
-                
+
                 updateJobStatus(id, {
                     progress: {
                         currentAsset: i + 1,
@@ -287,7 +288,7 @@ export async function processHowlJob(id: string): Promise<void> {
                         currentAssetProgress: 100,
                     },
                 })
-                
+
                 console.log('[HOWL_JOB_QUEUE] Asset uploaded', {
                     jobId: id,
                     assetId,
@@ -295,11 +296,11 @@ export async function processHowlJob(id: string): Promise<void> {
                 })
             }
         }
-        
+
         // Phase 2: Create database record
         updateJobStatus(id, {status: 'processing'})
         console.log('[HOWL_JOB_QUEUE] Creating database record', {jobId: id})
-        
+
         const dbCreate = await Baozi.trigger('HOWL_CREATE', {
             id: job.id,
             tenant_id: job.tenantId,
@@ -310,10 +311,12 @@ export async function processHowlJob(id: string): Promise<void> {
             tags: job.tags,
             assets: uploadedAssets,
         })
-        
+
         const data = await prisma.posts.create({data: dbCreate})
         console.log('[HOWL_JOB_QUEUE] Post created', {postId: data.id})
-        
+
+        await xpManager.increment(job.userId, 10)
+
         // Phase 3: Update user R18 status if necessary
         if (job.tags.includes('rating_suggestive') || job.tags.includes('rating_explicit')) {
             await prisma.profiles.update({
@@ -322,12 +325,12 @@ export async function processHowlJob(id: string): Promise<void> {
             })
             console.log('[HOWL_JOB_QUEUE] Updated user R18 status', {userId: job.userId})
         }
-        
+
         // Phase 4: Clear caches
         clearQueryCache(`~${dbCreate.tenant_id}`)
         clearQueryCache(`~${dbCreate.channel_id}`)
         clearQueryCache(`~${dbCreate.user_id}`)
-        
+
         // Update home feed cache
         FeedController.homeFeedCache.forEach((value, key) => {
             if (key.includes(job.userId)) {
@@ -337,15 +340,15 @@ export async function processHowlJob(id: string): Promise<void> {
                 FeedController.homeFeedCache.set(key, value)
             }
         })
-        
+
         markJobCompleted(id)
-        
+
     } catch (error: any) {
         console.log('[HOWL_JOB_QUEUE] Job processing failed', {
             jobId: id,
             error: error.message || error,
         })
-        
+
         // Cleanup uploaded S3 files on failure
         if (uploadedS3Paths.length > 0) {
             console.log('[HOWL_JOB_QUEUE] Cleaning up S3 files', {
@@ -359,7 +362,7 @@ export async function processHowlJob(id: string): Promise<void> {
                 })
             }
         }
-        
+
         markJobFailed(id, error.message || 'Unknown error')
     }
 }

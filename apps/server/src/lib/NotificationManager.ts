@@ -26,7 +26,7 @@ export class NotificationManager {
         try {
             return await prisma.notifications.create({
                 data: {
-                    user_id: userId,
+                    user: {connect: {id: userId}},
                     type,
                     title,
                     content,

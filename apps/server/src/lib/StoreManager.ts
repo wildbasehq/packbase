@@ -1,7 +1,7 @@
 import prisma from '@/db/prisma'
 import {HTTPError} from '@/lib/HTTPError'
 import Items from '@/lib/store/items.json'
-import trinketManager, {toParentId} from '@/lib/trinket-manager'
+import {trinketManager} from '@/lib/trinket-manager'
 import debug from 'debug'
 
 const log = {
@@ -83,13 +83,11 @@ export default class StoreManager {
             throw HTTPError.serverError({summary: 'INVALID_PRICE'})
         }
 
-        const parentId = toParentId('user', userId)
-
         // Charge using TrinketManager, then update inventory.
         // If inventory update fails, attempt a best-effort refund.
         let newTrinketBalance = 0
         try {
-            newTrinketBalance = await trinketManager.decrement(parentId, totalCost)
+            newTrinketBalance = await trinketManager.decrement(userId, totalCost)
         } catch (e: any) {
             if (e?.message === 'insufficient trinkets') {
                 throw HTTPError.forbidden({summary: 'INSUFFICIENT_TRINKETS'})
@@ -154,7 +152,7 @@ export default class StoreManager {
         } catch (e) {
             // Best-effort refund
             try {
-                await trinketManager.increment(parentId, totalCost)
+                await trinketManager.increment(userId, totalCost)
             } catch (_) {
                 log.error('Failed to refund trinkets after purchase failure')
             }

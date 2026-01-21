@@ -29,6 +29,7 @@ export default (app: YapockType) =>
                 feed.data.forEach((post) => {
                     if (!post.user) console.log(post)
                 })
+
                 // Get feed data
                 return feed
             } catch (error) {

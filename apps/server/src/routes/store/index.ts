@@ -1,7 +1,7 @@
 import {YapockType} from '@/index'
 import Items from '@/lib/store/items.json'
 import StoreManager from '@/lib/StoreManager'
-import trinketManager from '@/lib/trinket-manager'
+import {trinketManager} from '@/lib/trinket-manager'
 import requiresAccount from '@/utils/identity/requires-account'
 import {t} from 'elysia'
 
