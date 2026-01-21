@@ -96,7 +96,7 @@ function UserMenu({close}: {
 
 export default function UserDropdown() {
     const [isHovered, setIsHovered] = useState(false)
-    const {user: {xp}} = useUserAccountStore()
+    const {user} = useUserAccountStore()
 
     // Sets isHovered to true on load for 2 seconds, or until user interaction
     useEffect(() => {
@@ -127,7 +127,7 @@ export default function UserDropdown() {
                     <AnimatePresence mode="popLayout">
                         {isHovered && (
                             <StatusLabel key="test">
-                                <XPDisplay xp={xp}/>
+                                <XPDisplay xp={user?.xp}/>
                             </StatusLabel>
                         )}
                     </AnimatePresence>
