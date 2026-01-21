@@ -360,9 +360,8 @@ export function SidebarLayout({children}: PropsWithChildren) {
                             <Desktop>
                                 <AlignLeft className="w-7 h-7 fill-indigo-600"
                                            onClick={() => setUserSidebarCollapsed(!userSidebarCollapsed)}/>
-
-                                <UserDropdown/>
                             </Desktop>
+                            <UserDropdown/>
                         </SignedIn>
                     </Navbar>
                 </div>
