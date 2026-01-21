@@ -1,4 +1,5 @@
 import UnrankedIcon from '@/components/icons/ranks/rank-none'
+import {NumberTicker} from '@/components/shared/number-ticker'
 import ProgressBar from '@/components/shared/progress-bar'
 import {cn} from '@/lib'
 import {lazy} from 'react'
@@ -184,12 +185,13 @@ export function XPDisplay({xp}: { xp: number }) {
                     <span className="text-xs font-bold uppercase grow text-muted-foreground select-none pointer-events-none">
                         {rankName}
                     </span>
-                    <span className="text-xs font-medium text-muted-foreground/60 select-none pointer-events-none">
-                        {xp} XP
+                    <span className="text-xs font-medium text-muted-foreground/60 select-none pointer-events-none flex gap-1">
+                        <NumberTicker value={xp} suffix=" XP"/>
                     </span>
                 </div>
 
                 <ProgressBar
+                    duration={2}
                     value={progress}
                     indeterminate={isMaxLevel}
                     className={cn('h-1.5 w-full bg-secondary rounded-full overflow-hidden', isMaxLevel && 'bg-primary-light/50 duration-5000 animate-hue-linear')}

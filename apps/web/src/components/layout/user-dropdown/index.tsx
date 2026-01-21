@@ -19,6 +19,7 @@ import {EnvelopeOpenIcon} from '@heroicons/react/16/solid'
 import {Cog6ToothIcon, UserIcon} from '@heroicons/react/20/solid'
 import {AnimatePresence, motion} from 'motion/react'
 import {ReactNode, useEffect, useState} from 'react'
+import {useLocalStorage} from 'usehooks-ts'
 import {useLocation} from 'wouter'
 import UserSettingsFromServer from './from-server'
 
@@ -94,22 +95,34 @@ function UserMenu({close}: {
     )
 }
 
+const XP_PILL_DELAY = 2
+
 export default function UserDropdown() {
     const [isHovered, setIsHovered] = useState(false)
+    const [lastXP, setLastXP] = useLocalStorage('last-xp', 0)
     const {user} = useUserAccountStore()
 
     // Sets isHovered to true on load for 2 seconds, or until user interaction
     useEffect(() => {
-        setIsHovered(true)
-        const timeout = setTimeout(() => setIsHovered(false), 5000)
-        return () => clearTimeout(timeout)
-    }, [])
-
+        if (!user) return
+        const showTimeout = setTimeout(() => setIsHovered(lastXP !== user?.xp), XP_PILL_DELAY * 1000)
+        const xpTimeout = setTimeout(() => {
+            if (user?.xp !== lastXP) {
+                setLastXP(user?.xp || 0)
+            }
+        }, XP_PILL_DELAY * 2000)
+        const timeout = setTimeout(() => setIsHovered(false), XP_PILL_DELAY * 5000)
+        return () => {
+            clearTimeout(showTimeout)
+            clearTimeout(xpTimeout)
+            clearTimeout(timeout)
+        }
+    }, [user?.xp, lastXP])
     return (
         <SignedIn>
-            <div className="relative flex items-center">
+            <div className="relative flex items-center z-10">
                 <motion.div
-                    className="absolute flex bg-primary-midnight px-2 py-2 rounded-full items-center overflow-hidden whitespace-nowrap"
+                    className="absolute pointer-events-none flex bg-primary-midnight px-2 py-2 rounded-full items-center overflow-hidden whitespace-nowrap"
                     initial={{width: '4rem', height: '1rem', opacity: 0, right: '-0.5rem'}}
                     animate={{
                         height: '2.5rem',
@@ -127,7 +140,7 @@ export default function UserDropdown() {
                     <AnimatePresence mode="popLayout">
                         {isHovered && (
                             <StatusLabel key="test">
-                                <XPDisplay xp={user?.xp}/>
+                                <XPDisplay xp={lastXP}/>
                             </StatusLabel>
                         )}
                     </AnimatePresence>

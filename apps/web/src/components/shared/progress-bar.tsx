@@ -1,8 +1,9 @@
 import {cn} from '@/src/lib'
 import {motion} from 'motion/react'
 
-export default function ProgressBar({value, indeterminate, mask = false, className}: {
+export default function ProgressBar({value, duration = 0.75, indeterminate, mask = false, className}: {
     value?: number;
+    duration?: number;
     indeterminate?: boolean;
     mask?: boolean;
     className?: string
@@ -26,12 +27,15 @@ export default function ProgressBar({value, indeterminate, mask = false, classNa
                     className="absolute left-0 top-0 h-full rounded-full bg-linear-to-r from-transparent via-primary-light to-transparent"
                     initial={{x: '-100%'}}
                     animate={{x: '100%'}}
-                    transition={{duration: 0.75, repeat: Infinity}}
+                    transition={{duration, repeat: Infinity}}
                     style={{width: '100%'}}
                 />
             ) : (
-                <div className="h-full rounded-full bg-linear-to-r from-primary to-primary-light transition-[width] duration-300 ease-out"
-                     style={{width: `${clamped}%`}}/>
+                <div className="h-full rounded-full bg-linear-to-r from-primary to-primary-light transition-[width] ease-out"
+                     style={{
+                         width: `${clamped}%`,
+                         transitionDuration: `${duration}s`,
+                     }}/>
             )}
             <span className="sr-only">{indeterminate ? 'Loading' : `Progress: ${clamped}%`}</span>
         </div>
