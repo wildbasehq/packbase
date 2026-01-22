@@ -16,7 +16,7 @@ export function CustomTheme({userId, packId}: CustomThemeProps) {
     const {settings} = useUserAccountStore()
     const [doNotAsk, setDoNotAsk] = useSessionStorage<boolean>(`do-not-ask-load-theme-${userId || packId || 'unknown'}-${packId ? 'pack' : 'user'}`, false)
 
-    const loadTheme = doNotAsk ? 'always' : settings.ask_load_themes
+    const loadTheme = doNotAsk ? 'always' : settings?.ask_load_themes || 'ask'
 
     useEffect(() => {
         if (userId && !packId) {
