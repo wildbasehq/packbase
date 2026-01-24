@@ -27,6 +27,7 @@ export default (app: YapockType) =>
                 const now = new Date()
                 const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
                 const shouldRecalculate = !lastUpdate || new Date(lastUpdate.updated_at) <= oneHourAgo
+                const nextUpdate = new Date(lastUpdate?.updated_at || now.getTime() + 60 * 60 * 1000)
 
                 // Fetch top XP holders and existing leaderboard in parallel
                 const [xpRows, leaderboardEntries] = await Promise.all([
@@ -54,7 +55,7 @@ export default (app: YapockType) =>
 
                 // Early return if no XP data
                 if (xpRows.length === 0) {
-                    return {profiles: []}
+                    return {profiles: [], update_in: nextUpdate.toISOString()}
                 }
 
                 // Build lookup maps
@@ -69,7 +70,7 @@ export default (app: YapockType) =>
                 const userIds = xpRows.map((row) => row.parent_id).filter((id): id is string => id !== null)
 
                 if (userIds.length === 0) {
-                    return {profiles: []}
+                    return {profiles: [], update_in: nextUpdate.toISOString()}
                 }
 
                 // Fetch all profiles in parallel
@@ -194,11 +195,12 @@ export default (app: YapockType) =>
 
                 return {
                     profiles: results,
+                    update_in: nextUpdate.toISOString()
                 }
             } catch (error) {
                 console.error('Leaderboard error:', error)
                 // Return empty results on error to prevent client crashes
-                return {profiles: []}
+                return {profiles: [], update_in: '0001-01-01T00:00:00.000Z'}
             }
         },
         {
