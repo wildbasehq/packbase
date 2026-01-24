@@ -222,6 +222,7 @@ export default (app: YapockType) =>
                             profile: UserProfile,
                         }),
                     ),
+                    update_in: t.String(),
                 }),
             },
         },
