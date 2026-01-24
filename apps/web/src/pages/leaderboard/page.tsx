@@ -141,7 +141,7 @@ export default function LeaderboardPage() {
                                                                 </Link>
                                                             </div>
                                                             <Text alt size="xs" className="truncate">
-                                                                {pack.about?.bio || `/${pack.slug}`}
+                                                                {(pack.about?.bio || `/${pack.slug}`).slice(0, 80)}
                                                             </Text>
                                                         </div>
                                                     </div>
