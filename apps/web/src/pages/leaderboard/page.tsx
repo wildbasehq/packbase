@@ -200,8 +200,8 @@ export default function LeaderboardPage() {
                 <Tab title="Profiles">
                     <div className="space-y-4">
                         <Text alt>Profile leaderboard updates every server hour.</Text>
-                        {profilesData.update_in && (
-                            <Text alt>Next update in {formatRelativeTime(profilesData.update_in)}</Text>
+                        {profilesData?.update_in && (
+                            <Text alt>Next update in {formatRelativeTime(profilesData?.update_in)}</Text>
                         )}
 
                         {profilesLoading && <Text alt>Loading profile leaderboard...</Text>}
