@@ -39,7 +39,7 @@ export default (app: YapockType) =>
                 const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
                 const hasCachedResponse = lastUpdate?.data && typeof lastUpdate.data === 'object' && 'profiles' in lastUpdate.data
                 const shouldRecalculate = !lastUpdate || !hasCachedResponse || new Date(lastUpdate.updated_at) <= oneHourAgo
-                const nextUpdate = shouldRecalculate ? now : new Date(lastUpdate.updated_at.getTime() + 60 * 60 * 1000)
+                const nextUpdate = shouldRecalculate ? new Date(now.getTime() + 60 * 60 * 1000) : new Date(lastUpdate.updated_at.getTime() + 60 * 60 * 1000)
 
                 // Return cached version if we shouldn't recalculate
                 if (!shouldRecalculate && hasCachedResponse) {
