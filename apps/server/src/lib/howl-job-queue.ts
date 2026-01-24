@@ -315,7 +315,10 @@ export async function processHowlJob(id: string): Promise<void> {
         const data = await prisma.posts.create({data: dbCreate})
         console.log('[HOWL_JOB_QUEUE] Post created', {postId: data.id})
 
-        await xpManager.increment(job.userId, 10)
+        const baseXp = 10
+        const xpVariance = 2
+        const xpAward = baseXp + Math.floor(Math.random() * (xpVariance * 2 + 1)) - xpVariance
+        await xpManager.increment(job.userId, xpAward)
 
         // Phase 3: Update user R18 status if necessary
         if (job.tags.includes('rating_suggestive') || job.tags.includes('rating_explicit')) {
