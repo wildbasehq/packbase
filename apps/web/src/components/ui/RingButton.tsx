@@ -27,8 +27,8 @@ export const RingButton: FC<ButtonProps> = ({
 
     const content = (
         <>
-            <Icon className="fill-muted-foreground h-4 w-4 group-hover:fill-white"/>
-            <Text className="group-hover:text-white">{label}</Text>
+            <Icon className="fill-muted-foreground h-4 w-4 group-hover:fill-foreground"/>
+            <Text className="text-muted-foreground group-hover:text-foreground">{label}</Text>
         </>
     )
 
