@@ -9,7 +9,7 @@ import {SidebarLayout} from '@/components/shared/sidebar-layout'
 import {resourceDefaultPackbase, useResourceStore} from '@/lib'
 import {SidebarProvider} from '@/lib/context/sidebar-context'
 import DefaultPackSunset from '@/pages/pack/universe/default-pack-sunset'
-import {AppTabs, FloatingCompose, LogoSpinner} from '@/src/components'
+import {FloatingCompose, LogoSpinner} from '@/src/components'
 import Preload from '@/src/preload'
 import Routes from '@/src/Routes'
 import {ClerkFailed, ClerkLoaded, ClerkLoading, SignedIn} from '@clerk/clerk-react'
@@ -53,10 +53,6 @@ function App() {
                         <SignedIn>
                             <FloatingCompose/>
                         </SignedIn>
-
-                        <div className="absolute bottom-0 left-0 z-40 w-full sm:hidden">
-                            <AppTabs/>
-                        </div>
 
                         <SidebarLayout>
                             <div id="NGContentArea" className="flex h-full overflow-hidden">

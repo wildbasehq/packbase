@@ -20,6 +20,7 @@ const PackHome = lazy(() => import('@/pages/pack/[slug]/page'))
 const NotFound = lazy(() => import('@/src/not-found'))
 const PackAdd = lazy(() => import('@/pages/pack/new/page'))
 const TermsPage = lazy(() => import('@/pages/terms/page'))
+const LeaderboardPage = lazy(() => import('@/pages/leaderboard/page'))
 const UserProfile = lazy(() => import('@/pages/user/[...slug]/page'))
 const ChatThreadPage = lazy(() => import('@/pages/c/[id]/page'))
 const GuestLanding = lazy(() => import('@/components/home/guestlanding'))
@@ -64,6 +65,12 @@ export default function Routes() {
             <Route path="/terms">
                 <Suspense fallback={<LoadingFallback/>}>
                     <TermsPage/>
+                </Suspense>
+            </Route>
+
+            <Route path="/leaderboard">
+                <Suspense fallback={<LoadingFallback/>}>
+                    <LeaderboardPage/>
                 </Suspense>
             </Route>
 

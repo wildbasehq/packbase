@@ -122,7 +122,7 @@ export default function UserDropdown() {
         <SignedIn>
             <div className="relative flex items-center z-10">
                 <motion.div
-                    className="absolute pointer-events-none flex bg-primary-midnight px-2 py-2 rounded-full items-center overflow-hidden whitespace-nowrap"
+                    className="dark absolute pointer-events-none flex bg-primary-midnight px-2 py-2 rounded-full items-center overflow-hidden whitespace-nowrap"
                     initial={{width: '4rem', height: '1rem', opacity: 0, right: '-0.5rem'}}
                     animate={{
                         height: '2.5rem',

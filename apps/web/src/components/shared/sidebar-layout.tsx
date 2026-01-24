@@ -131,6 +131,11 @@ export function SidebarLayout({children}: PropsWithChildren) {
                 href: '/store',
                 currentHref: ['/store'],
                 onlySignedIn: true
+            },
+            {
+                label: 'Leaderboard',
+                href: '/leaderboard',
+                currentHref: ['/leaderboard']
             }
         ])
     }, [resourceDefault])

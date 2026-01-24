@@ -60,6 +60,8 @@ export const useContentFrame = (
         enabled?: boolean
         refetchOnMount?: boolean
         initialData?: any
+        staleTime?: number
+        gcTime?: number
     }
 ) => {
     const {session, isLoaded, isSignedIn} = useSession()
@@ -70,6 +72,8 @@ export const useContentFrame = (
     const refetchInterval = (options?.refetchInterval || 0) * 1000
     const refetchOnMount = options?.refetchOnMount
     const initialData = options?.initialData
+    const staleTime = options?.staleTime != null ? options.staleTime * 1000 : undefined
+    const gcTime = options?.gcTime != null ? options.gcTime * 1000 : undefined
 
     const query = useQuery({
         queryKey: queryKey ? [queryKey] : undefined,
@@ -81,7 +85,9 @@ export const useContentFrame = (
         enabled,
         refetchInterval,
         refetchOnMount,
-        initialData
+        initialData,
+        staleTime,
+        gcTime,
     })
 
     const error = query.error

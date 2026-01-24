@@ -160,7 +160,7 @@ export function BadgeFromXP({xp, className}: {
     return <BadgeIcon className={cn('w-6 h-6 shrink-0', className)}/>
 }
 
-export function XPDisplay({xp}: { xp: number }) {
+export function XPDisplay({noProgress, xp}: { noProgress?: boolean, xp: number }) {
     const currentLevel = getLevelFromXP(xp)
     const nextLevel = currentLevel + 1
 
@@ -185,17 +185,19 @@ export function XPDisplay({xp}: { xp: number }) {
                     <span className="text-xs font-bold uppercase grow text-muted-foreground select-none pointer-events-none">
                         {rankName}
                     </span>
-                    <span className="text-xs font-medium text-muted-foreground/60 select-none pointer-events-none flex gap-1">
+                    <span className="text-xs ml-2 font-medium text-muted-foreground/60 select-none pointer-events-none flex gap-1">
                         <NumberTicker value={xp} suffix=" XP"/>
                     </span>
                 </div>
 
-                <ProgressBar
-                    duration={2}
-                    value={progress}
-                    indeterminate={isMaxLevel}
-                    className={cn('h-1.5 w-full bg-secondary rounded-full overflow-hidden', isMaxLevel && 'bg-primary-light/50 duration-5000 animate-hue-linear')}
-                />
+                {!noProgress && (
+                    <ProgressBar
+                        duration={2}
+                        value={progress}
+                        indeterminate={isMaxLevel}
+                        className={cn('h-1.5 w-full bg-secondary rounded-full overflow-hidden', isMaxLevel && 'bg-primary-light/50 duration-5000 animate-hue-linear')}
+                    />
+                )}
             </div>
         </div>
     )

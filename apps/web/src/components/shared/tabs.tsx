@@ -94,7 +94,7 @@ export function TabsLayout({
                                 className={clsx(
                                     'group relative inline-flex items-center border-t-[0.1rem] border-x-[0.1rem] gap-2 rounded-t-2xl px-4 py-3 font-medium transition-all',
                                     selected
-                                        ? `bg-white !z-20 dark:bg-n-8`
+                                        ? `bg-white z-20! dark:bg-n-8`
                                         : 'text-muted-foreground  hover:bg-card'
                                 )}
                             >
