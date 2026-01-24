@@ -33,7 +33,6 @@ export default (app: YapockType) =>
                     prisma.currency.findMany({
                         where: {
                             type: 'xp',
-                            parent_id: {not: null},
                             amount: {gt: 0},
                         },
                         orderBy: {
