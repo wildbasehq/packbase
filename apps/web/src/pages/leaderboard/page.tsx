@@ -199,6 +199,8 @@ export default function LeaderboardPage() {
 
                 <Tab title="Profiles">
                     <div className="space-y-4">
+                        <Text alt>Profile leaderboard updates every server hour.</Text>
+
                         {profilesLoading && <Text alt>Loading profile leaderboard...</Text>}
 
                         {profilesError && (

@@ -25,8 +25,8 @@ export default (app: YapockType) =>
                 })
 
                 const now = new Date()
-                const twelveHoursAgo = new Date(now.getTime() - 12 * 60 * 60 * 1000)
-                const shouldRecalculate = !lastUpdate || new Date(lastUpdate.updated_at) <= twelveHoursAgo
+                const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
+                const shouldRecalculate = !lastUpdate || new Date(lastUpdate.updated_at) <= oneHourAgo
 
                 // Fetch top XP holders and existing leaderboard in parallel
                 const [xpRows, leaderboardEntries] = await Promise.all([
