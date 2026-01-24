@@ -41,7 +41,7 @@ export default (app: YapockType) =>
                 const now = new Date()
                 const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
                 const shouldRecalculate = !lastUpdate || new Date(lastUpdate.updated_at) <= oneHourAgo
-                const nextUpdate = shouldRecalculate ? oneHourAgo : new Date(lastUpdate.updated_at)
+                const nextUpdate = shouldRecalculate ? now : new Date(lastUpdate.updated_at.getTime() + 60 * 60 * 1000)
 
                 // Return cached version if we shouldn't recalculate
                 if (!shouldRecalculate && cachedLeaderboard) {
