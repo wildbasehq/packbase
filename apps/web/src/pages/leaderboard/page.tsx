@@ -60,20 +60,25 @@ type ProfileLeaderboardEntry = {
 const numberFormatter = new Intl.NumberFormat()
 
 function MovementIndicator({movement, delta, since}: { movement: 'gained' | 'lost' | 'new' | 'same', delta: number, since: string }) {
-    if (movement === 'same') return null
-
     const date = new Date(since)
     const now = new Date()
     const hours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
 
     const isPositive = movement === 'gained' || movement === 'new'
     const Arrow = isPositive ? ArrowUpIcon : ArrowDownIcon
-    const color = isPositive ? 'text-green-500' : 'text-red-500'
+    // gained, new = green
+    // lost = red
+    // same = gray
+    const color = isPositive ? 'text-green-500' : movement === 'same' ? 'text-muted-foreground' : 'text-red-500'
 
     return (
         <div className={`flex items-center gap-1 text-xs ${color}`}>
-            <Arrow className="w-4 h-4"/>
-            <span>{movement === 'new' ? 'NEW' : delta}</span>
+            {movement !== 'same' && (
+                <>
+                    <Arrow className="w-4 h-4"/>
+                    <span>{movement === 'new' ? 'NEW' : delta}</span>
+                </>
+            )}
             {hours > 1 && (
                 <span className="text-muted-foreground">· held for {formatRelativeTime(since)}</span>
             )}
