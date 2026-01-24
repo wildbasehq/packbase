@@ -448,13 +448,19 @@ export default function PackAdd() {
                                 member!
                             </Text>
                             <div className="mt-6">
-                                <Button onClick={handleCreatePack} color="indigo">
-                                    Create a Pack
-                                </Button>
+                                <Heading size="lg" className="mb-2">
+                                    Choose a pack below, or create your own.
+                                </Heading>
                             </div>
                         </div>
                     )}
                 </>
+            )}
+
+            {user?.requires_setup && (
+                <Button onClick={handleCreatePack} color="indigo">
+                    Create a Pack
+                </Button>
             )}
 
             <SearchablePackList/>
