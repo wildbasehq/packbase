@@ -199,6 +199,7 @@ model profiles {
   invites         invites[]
   packsId         String?              @db.Uuid
   packsBanneds    packs_banned[]
+  leaderboards    leaderboard[]
 
   @@index([default_pack], type: Hash)
   @@schema("public")
@@ -504,6 +505,27 @@ model currency {
   /// Current balance (non-negative integer)
   amount     Int      @default(0)
   created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@schema("public")
+}
+
+model leaderboard {
+  position Int      @id
+  user_id  String   @db.Uuid
+  since    DateTime @default(now()) @db.Timestamptz(6)
+  movement String   @default("same")
+  delta    Int      @default(0)
+
+  user profiles @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@schema("public")
+}
+
+model server_meta {
+  kind       String   @id
+  data       Json
   updated_at DateTime @default(now()) @db.Timestamptz(6)
 
   @@schema("public")

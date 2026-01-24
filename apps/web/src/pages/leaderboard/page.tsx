@@ -1,3 +1,4 @@
+import {XPDisplay} from '@/components/icons/ranks/xp-display'
 import Body from '@/components/layout/body'
 import {
     Alert,
@@ -17,9 +18,10 @@ import {
     useContentFrame,
 } from '@/components/shared'
 import Link from '@/components/shared/link'
+import {getAvatar} from '@/lib/api/users/avatar'
+import {formatRelativeTime} from '@/lib/utils/date'
+import {ArrowDownIcon, ArrowUpIcon} from '@heroicons/react/20/solid'
 import {useEffect, useMemo} from 'react'
-import {XPDisplay} from "@/components/icons/ranks/xp-display";
-import {getAvatar} from "@/lib/api/users/avatar";
 
 type PackLeaderboardEntry = {
     activity: number
@@ -39,6 +41,9 @@ type PackLeaderboardEntry = {
 
 type ProfileLeaderboardEntry = {
     xp: number
+    since: string
+    movement: 'gained' | 'lost' | 'new' | 'same'
+    delta: number
     profile: {
         id?: string
         username?: string
@@ -53,6 +58,28 @@ type ProfileLeaderboardEntry = {
 }
 
 const numberFormatter = new Intl.NumberFormat()
+
+function MovementIndicator({movement, delta, since}: { movement: 'gained' | 'lost' | 'new' | 'same', delta: number, since: string }) {
+    if (movement === 'same') return null
+
+    const date = new Date(since)
+    const now = new Date()
+    const hours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+
+    const isPositive = movement === 'gained' || movement === 'new'
+    const Arrow = isPositive ? ArrowUpIcon : ArrowDownIcon
+    const color = isPositive ? 'text-green-500' : 'text-red-500'
+
+    return (
+        <div className={`flex items-center gap-1 text-xs ${color}`}>
+            <Arrow className="w-4 h-4"/>
+            <span>{movement === 'new' ? 'NEW' : delta}</span>
+            {hours > 1 && (
+                <span className="text-muted-foreground">· held for {formatRelativeTime(since)}</span>
+            )}
+        </div>
+    )
+}
 
 export default function LeaderboardPage() {
     const {
@@ -77,6 +104,8 @@ export default function LeaderboardPage() {
     const packs = useMemo<PackLeaderboardEntry[]>(() => packsData?.packs || [], [packsData])
     const profiles = useMemo<ProfileLeaderboardEntry[]>(() => profilesData?.profiles || [], [profilesData])
 
+    const noPackActivity = !packsLoading && !packsError && packs.length === 0
+    const noProfileActivity = !profilesLoading && !profilesError && profiles.length === 0
     useEffect(() => {
         document.title = 'Packbase - Leaderboard'
     }, [])
@@ -93,19 +122,22 @@ export default function LeaderboardPage() {
                 contentClassName="border rounded-2xl rounded-tl-none bg-card p-4"
                 headerClassName="flex-wrap"
             >
-                <Tab title={`Packs (${packs.length})`}>
+                <Tab title="Packs">
                     <div className="space-y-4">
                         {packsLoading && <Text alt>Loading pack leaderboard...</Text>}
+
                         {packsError && (
                             <Alert variant="destructive">
                                 <AlertTitle>Failed to load packs</AlertTitle>
                                 <AlertDescription>{packsError.message}</AlertDescription>
                             </Alert>
                         )}
-                        {!packsLoading && !packsError && packs.length === 0 && (
+
+                        {noPackActivity && (
                             <Text alt>No pack activity yet.</Text>
                         )}
-                        {!packsLoading && !packsError && packs.length > 0 && (
+
+                        {!noPackActivity && (
                             <Table striped grid dense bleed className="ring-1 ring-default rounded shadow-xs">
                                 <TableHead>
                                     <TableRow>
@@ -159,19 +191,23 @@ export default function LeaderboardPage() {
                         )}
                     </div>
                 </Tab>
-                <Tab title={`Profiles (${profiles.length})`}>
+
+                <Tab title="Profiles">
                     <div className="space-y-4">
                         {profilesLoading && <Text alt>Loading profile leaderboard...</Text>}
+
                         {profilesError && (
                             <Alert variant="destructive">
                                 <AlertTitle>Failed to load profiles</AlertTitle>
                                 <AlertDescription>{profilesError.message}</AlertDescription>
                             </Alert>
                         )}
-                        {!profilesLoading && !profilesError && profiles.length === 0 && (
+
+                        {noProfileActivity && (
                             <Text alt>No profiles ranked yet.</Text>
                         )}
-                        {!profilesLoading && !profilesError && profiles.length > 0 && (
+
+                        {!noProfileActivity && (
                             <Table striped grid dense bleed className="ring-1 ring-default rounded shadow-xs">
                                 <TableHead>
                                     <TableRow>
@@ -198,7 +234,7 @@ export default function LeaderboardPage() {
                                                             initials={initials}
                                                             className="size-9"
                                                         />
-                                                        <div className="min-w-0">
+                                                        <div className="min-w-0 flex-1">
                                                             <div className="font-medium truncate">
                                                                 {handle ? (
                                                                     <Link
@@ -216,10 +252,15 @@ export default function LeaderboardPage() {
                                                                 {profile.about?.bio?.length > 80 ? '...' : ''}
                                                             </Text>
                                                         </div>
+                                                        <MovementIndicator
+                                                            movement={entry.movement}
+                                                            delta={entry.delta}
+                                                            since={entry.since}
+                                                        />
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="sm:w-48 font-medium">
-                                                    <XPDisplay xp={entry.xp} />
+                                                    <XPDisplay xp={entry.xp}/>
                                                 </TableCell>
                                             </TableRow>
                                         )
