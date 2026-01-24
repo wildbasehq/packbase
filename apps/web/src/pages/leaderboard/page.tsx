@@ -143,6 +143,7 @@ export default function LeaderboardPage() {
                                                             </div>
                                                             <Text alt size="xs" className="truncate">
                                                                 {(pack.about?.bio || `/${pack.slug}`).slice(0, 80)}
+                                                                {pack.about?.bio?.length > 80 ? '...' : ''}
                                                             </Text>
                                                         </div>
                                                     </div>
@@ -211,7 +212,8 @@ export default function LeaderboardPage() {
                                                                 )}
                                                             </div>
                                                             <Text alt size="xs" className="truncate">
-                                                                {profile.about?.bio || handle || 'Unlisted profile'}
+                                                                {(profile.about?.bio || handle || 'Unlisted profile').slice(0, 80)}
+                                                                {profile.about?.bio?.length > 80 ? '...' : ''}
                                                             </Text>
                                                         </div>
                                                     </div>
