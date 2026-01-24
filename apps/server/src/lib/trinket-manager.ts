@@ -39,13 +39,18 @@ export class TrinketManager {
         return row.amount
     }
 
-    async increment(parentId: string, delta: number = 1): Promise<number> {
+    async increment(parentId: string, delta: number = 1, xpVariance: number = 0): Promise<number> {
         if (!Number.isInteger(delta) || delta < 0) throw new Error('delta must be a non-negative integer')
         if (delta === 0) return this.getBalance(parentId)
         const now = new Date()
         return await prisma.$transaction(async (tx) => {
             const existing = await tx.currency.findUnique({where: {parent_id: parentId, type: this.type}, select: {amount: true}})
-            const amount = (existing?.amount ?? 0) + delta
+            let amount = (existing?.amount ?? 0) + delta
+
+            if (xpVariance > 0) {
+                amount = amount + Math.floor(Math.random() * (xpVariance * 2 + 1)) - xpVariance
+            }
+
             const saved = await tx.currency.upsert({
                 where: {parent_id: parentId},
                 update: {amount, type: this.type, updated_at: now},

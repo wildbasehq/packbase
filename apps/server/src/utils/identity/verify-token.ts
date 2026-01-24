@@ -210,7 +210,7 @@ async function ensureProfileId(user: AuthUser): Promise<AuthUser | void> {
             try {
                 await prisma.invites.delete({where: {id: invited.id}})
                 await trinketManager.increment(invited.invited_by, 5)
-                await xpManager.increment(invited.invited_by, 525)
+                await xpManager.increment(invited.invited_by, 600, 50)
                 await NotificationManager.createNotification(
                     invited.invited_by,
                     'invite',

@@ -95,7 +95,7 @@ export default (app: YapockType) =>
                         await xpManager.increment(postExists.user_id, 3)
                     }
 
-                    await xpManager.increment(user.sub, 3)
+                    await xpManager.increment(user.sub, 3, 3)
                 }
 
                 await NotificationManager.createNotification(postExists.user_id, 'howl_react', `${user.sessionClaims.nickname} reacted ${slot}`, postExists.body, {

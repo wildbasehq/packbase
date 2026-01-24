@@ -51,7 +51,6 @@ export default (app: YapockType) =>
                 })
 
                 if (user.sub !== postExists.user_id) {
-                    await xpManager.increment(user.sub, 15)
                     await NotificationManager.createNotification(postExists.user_id, 'howl_comment', `${user.sessionClaims.nickname} replied`, body, {
                         post_id: id,
                         user: {
