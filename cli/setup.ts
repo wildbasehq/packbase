@@ -19,7 +19,6 @@ import tasuku, {type TaskFunction} from 'tasuku'
 const WORKSPACE_ROOT = join(import.meta.dir, '..')
 const SERVER_PATH = join(WORKSPACE_ROOT, 'apps/server')
 const WEB_PATH = join(WORKSPACE_ROOT, 'apps/web')
-const DEVCONTAINER_PATH = join(SERVER_PATH, 'prisma/devcontainer')
 
 const sleep = (ms = 1000 * Math.random() + 900) =>
     new Promise((resolve) => setTimeout(resolve, ms))
@@ -170,7 +169,8 @@ function startPostgresContainer(task: (title: string, func: TaskFunction<void>) 
     return task('Starting PostgreSQL container', async ({setTitle, setStatus}) => {
         setStatus('Launching container...')
 
-        await $`docker compose up -d`.cwd(DEVCONTAINER_PATH).quiet()
+        // postgresql image
+        await $`docker run --name postgres-dev-packbase-${process.pid} -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -p 5432:5432 -d postgres`
 
         setStatus('Waiting for health check...')
 
@@ -178,7 +178,7 @@ function startPostgresContainer(task: (title: string, func: TaskFunction<void>) 
         let retries = 30
         while (retries > 0) {
             try {
-                const result = await $`docker exec postgres-dev pg_isready -U postgres`.quiet()
+                const result = await $`docker exec postgres-dev-packbase-${process.pid} pg_isready -U postgres`.quiet()
                 if (result.exitCode === 0) {
                     break
                 }
@@ -347,7 +347,7 @@ async function initializeDatabase(): Promise<void> {
     await tasuku('Initializing database', async ({setTitle, setStatus}) => {
         setStatus('Running Prisma migrations...')
 
-        await $`bunx prisma db push`.cwd(SERVER_PATH).quiet()
+        await $`bun run prisma:push && bun run prisma:generate`.cwd(SERVER_PATH).quiet()
 
         setTitle('✓ Database initialized')
     })

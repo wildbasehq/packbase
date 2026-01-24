@@ -11,8 +11,8 @@
     "build": "bun run ./build.ts",
     "db-dev-container": "cd prisma/devcontainer && docker compose up -d",
     "create-route": "bun run src/scripts/create-route.tsx",
-    "prisma:push": "bunx --bun prisma@7 db push",
-    "prisma:generate": "bunx --bun prisma@7 generate"
+    "prisma:push": "bunx --bun prisma@7.2.0 db push",
+    "prisma:generate": "bunx --bun prisma@7.2.0 generate"
   },
   "devDependencies": {
     "@types/rss": "^0.0.32",
