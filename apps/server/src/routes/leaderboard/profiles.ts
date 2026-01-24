@@ -25,9 +25,6 @@ type LeaderboardResponse = {
     update_in: string
 }
 
-// In-memory cache for leaderboard results
-let cachedLeaderboard: LeaderboardResponse | null = null
-
 export default (app: YapockType) =>
     app.get(
         '',
@@ -40,12 +37,16 @@ export default (app: YapockType) =>
 
                 const now = new Date()
                 const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
-                const shouldRecalculate = !lastUpdate || new Date(lastUpdate.updated_at) <= oneHourAgo
+                const hasCachedResponse = lastUpdate?.data && typeof lastUpdate.data === 'object' && 'profiles' in lastUpdate.data
+                const shouldRecalculate = !lastUpdate || !hasCachedResponse || new Date(lastUpdate.updated_at) <= oneHourAgo
                 const nextUpdate = shouldRecalculate ? now : new Date(lastUpdate.updated_at.getTime() + 60 * 60 * 1000)
 
                 // Return cached version if we shouldn't recalculate
-                if (!shouldRecalculate && cachedLeaderboard) {
-                    return {...cachedLeaderboard}
+                if (!shouldRecalculate && hasCachedResponse) {
+                    return {
+                        ...(lastUpdate.data as LeaderboardResponse),
+                        update_in: nextUpdate.toISOString()
+                    }
                 }
 
                 // Fetch top XP holders and existing leaderboard in parallel
@@ -168,6 +169,11 @@ export default (app: YapockType) =>
                     })
                 }
 
+                const response: LeaderboardResponse = {
+                    profiles: results,
+                    update_in: nextUpdate.toISOString()
+                }
+
                 // Only update database if we should recalculate and have results
                 if (shouldRecalculate && updates.length > 0) {
                     await prisma.$transaction([
@@ -196,29 +202,21 @@ export default (app: YapockType) =>
                                 position: {gt: updates.length},
                             },
                         }),
-                        // Update last update timestamp
+                        // Update last update timestamp and cache response
                         prisma.server_meta.upsert({
                             where: {kind: 'leaderboard_last_update'},
                             create: {
                                 kind: 'leaderboard_last_update',
-                                data: {timestamp: now.toISOString()},
+                                data: response,
                                 updated_at: now,
                             },
                             update: {
-                                data: {timestamp: now.toISOString()},
+                                data: response,
                                 updated_at: now,
                             },
                         }),
                     ])
                 }
-
-                const response: LeaderboardResponse = {
-                    profiles: results,
-                    update_in: nextUpdate.toISOString()
-                }
-
-                // Update in-memory cache
-                cachedLeaderboard = response
 
                 return {...response}
             } catch (error) {
