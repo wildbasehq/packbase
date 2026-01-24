@@ -19,6 +19,7 @@ import {
 import Link from '@/components/shared/link'
 import {useEffect, useMemo} from 'react'
 import {XPDisplay} from "@/components/icons/ranks/xp-display";
+import {getAvatar} from "@/lib/api/users/avatar";
 
 type PackLeaderboardEntry = {
     activity: number
@@ -182,7 +183,6 @@ export default function LeaderboardPage() {
                                     {profiles.map((entry, index) => {
                                         const profile = entry.profile
                                         const name = profile.display_name || profile.username || 'Anonymous'
-                                        const avatarSrc = profile.images?.avatar
                                         const initials = (name || '?').slice(0, 1)
                                         const handle = profile.username ? `@${profile.username}` : null
 
@@ -192,9 +192,9 @@ export default function LeaderboardPage() {
                                                 <TableCell>
                                                     <div className="flex items-center gap-3 min-w-0">
                                                         <Avatar
-                                                            src={avatarSrc}
+                                                            src={getAvatar(profile.id)}
                                                             alt={name}
-                                                            initials={avatarSrc ? undefined : initials}
+                                                            initials={initials}
                                                             className="size-9"
                                                         />
                                                         <div className="min-w-0">
