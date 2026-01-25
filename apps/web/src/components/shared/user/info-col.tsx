@@ -57,7 +57,7 @@ export function UserInfo({
                 height: size ?? '2rem',
             }}/>
             <div className="flex flex-col">
-                <Link href={`/@${user.username}`} className="text-foreground text-sm font-semibold">
+                <Link href={`/@${user.username}`} className="flex text-foreground text-sm font-semibold">
                     {user.display_name || user.username}
                     <Badges xp={user?.xp} genericUnlock={user?.badge} staffBadge={user?.type}/>
                 </Link>

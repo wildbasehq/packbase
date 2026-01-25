@@ -18,7 +18,7 @@ import {
     useContentFrame,
 } from '@/components/shared'
 import Link from '@/components/shared/link'
-import {getAvatar} from '@/lib/api/users/avatar'
+import UserInfoCol from '@/components/shared/user/info-col'
 import {formatRelativeTime} from '@/lib/utils/date'
 import {ArrowDownIcon, ArrowUpIcon} from '@heroicons/react/20/solid'
 import {useEffect, useMemo} from 'react'
@@ -238,35 +238,7 @@ export default function LeaderboardPage() {
                                                 <TableCell className="text-muted-foreground">#{index + 1}</TableCell>
                                                 <TableCell>
                                                     <div className="flex items-center gap-3 min-w-0">
-                                                        <Avatar
-                                                            src={getAvatar(profile.id)}
-                                                            alt={name}
-                                                            initials={initials}
-                                                            className="size-9"
-                                                        />
-                                                        <div className="min-w-0 flex-1">
-                                                            <div className="font-medium truncate">
-                                                                {handle ? (
-                                                                    <Link
-                                                                        className="text-foreground hover:text-indigo-500"
-                                                                        href={`/@${profile.username}`}
-                                                                    >
-                                                                        {name}
-                                                                    </Link>
-                                                                ) : (
-                                                                    name
-                                                                )}
-                                                            </div>
-                                                            <Text alt size="xs" className="truncate">
-                                                                {(profile.about?.bio || handle || 'Unlisted profile').slice(0, 80)}
-                                                                {profile.about?.bio?.length > 80 ? '...' : ''}
-                                                            </Text>
-                                                        </div>
-                                                        <MovementIndicator
-                                                            movement={entry.movement}
-                                                            delta={entry.delta}
-                                                            since={entry.since}
-                                                        />
+                                                        <UserInfoCol user={profile}/>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="sm:w-48 font-medium">
