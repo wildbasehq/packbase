@@ -183,7 +183,7 @@ export function XPDisplay({noProgress, xp}: { noProgress?: boolean, xp: number }
             <div className="flex flex-col gap-1 items-center w-full">
                 <div className="flex justify-between w-full items-center">
                     <span className="text-xs font-bold uppercase grow text-muted-foreground select-none pointer-events-none">
-                        {rankName}
+                        {rankName} {currentLevel}
                     </span>
                     <span className="text-xs ml-2 font-medium text-muted-foreground/60 select-none pointer-events-none flex gap-1">
                         <NumberTicker value={xp} suffix=" XP"/>
