@@ -152,7 +152,7 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
 
     const userBadges = await prisma.inventory.findFirst({
         where: {
-            user_id: data.owner_id,
+            user_id: data.id,
             type: 'badge',
             is_set: true,
         },

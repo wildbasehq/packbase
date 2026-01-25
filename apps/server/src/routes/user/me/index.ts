@@ -21,6 +21,28 @@ export default (app: YapockType) =>
                 const {set, user, query} = res as any
                 requiresToken({set, user})
 
+                let is_staff = false
+                let is_content_moderator = false
+                let is_dx = false
+                let username = null
+
+                if (user?.userId) {
+                    try {
+                        username = user?.username || null
+
+                        // allow a couple of key spellings to avoid tight coupling
+                        const staffValue = user.is_staff
+                        const contentModerationValue = user.is_content_moderator
+                        const dxValue = await checkUserBillingPermission(user.userId)
+
+                        is_staff = Boolean(staffValue)
+                        is_content_moderator = Boolean(contentModerationValue)
+                        is_dx = Boolean(dxValue)
+                    } catch (_) {
+                        // If Clerk is unavailable or the user can't be fetched, just default to false.
+                    }
+                }
+
                 // Lightweight endpoint contract: if `?lec` exists, ONLY return these fields.
                 if (query?.lec !== undefined) {
                     const [followers, ownedPacks] = await Promise.all([
@@ -53,28 +75,6 @@ export default (app: YapockType) =>
                             }
                         }).then((memberships) => memberships.length)
                         : 0
-
-                    let is_staff = false
-                    let is_content_moderator = false
-                    let is_dx = false
-                    let username = null
-
-                    if (user?.userId) {
-                        try {
-                            username = user?.username || null
-
-                            // allow a couple of key spellings to avoid tight coupling
-                            const staffValue = user.is_staff
-                            const contentModerationValue = user.is_content_moderator
-                            const dxValue = await checkUserBillingPermission(user.userId)
-
-                            is_staff = Boolean(staffValue)
-                            is_content_moderator = Boolean(contentModerationValue)
-                            is_dx = Boolean(dxValue)
-                        } catch (_) {
-                            // If Clerk is unavailable or the user can't be fetched, just default to false.
-                        }
-                    }
 
                     return {
                         username,
@@ -111,6 +111,32 @@ export default (app: YapockType) =>
                     ...user.user_metadata,
                     ...user.app_metadata,
                     unlockables: unlockedBadges.map((badge) => badge.item_id),
+                }
+
+                if (is_staff || is_content_moderator || is_dx) {
+                    prisma.profiles.update({
+                        where: {
+                            id: user.sub,
+                            type: {
+                                not: '2'
+                            }
+                        },
+                        data: {
+                            type: (is_staff || is_content_moderator) ? '1' : '3',
+                        }
+                    })
+                } else if (userProfile.type) {
+                    prisma.profiles.update({
+                        where: {
+                            id: user.sub,
+                            type: {
+                                not: '2'
+                            }
+                        },
+                        data: {
+                            type: null,
+                        }
+                    })
                 }
 
                 // Default pack
