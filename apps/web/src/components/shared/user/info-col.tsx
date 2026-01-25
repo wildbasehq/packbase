@@ -59,7 +59,7 @@ export function UserInfo({
             <div className="flex flex-col">
                 <Link href={`/@${user.username}`} className="flex text-foreground text-sm font-semibold">
                     {user.display_name || user.username}
-                    <Badges xp={user?.xp} genericUnlock={user?.badge} staffBadge={user?.type}/>
+                    <Badges xp={user?.xp} genericUnlock={user?.badge} staffBadge={user?.type} className="inline-flex h-5! w-5!"/>
                 </Link>
                 <Text alt>
                     {tag || user.tag || user.username || 'dummy'}
