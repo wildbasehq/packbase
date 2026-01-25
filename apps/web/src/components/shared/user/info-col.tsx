@@ -91,7 +91,7 @@ export function UserHoverCard({user}: { user: any }) {
                     <div>
                         <Text as="div" className="text-md">
                             {user.display_name || user.username}
-                            <Badges xp={user?.xp} genericUnlock={user?.badge} staffBadge={user?.type} className="ml-1 inline-flex h-5 w-5"/>
+                            <Badges xp={user?.xp} genericUnlock={user?.badge} staffBadge={user?.type} className="ml-1 inline-flex h-5! w-5!"/>
                         </Text>
 
                         <Text alt>@{user.username}</Text>

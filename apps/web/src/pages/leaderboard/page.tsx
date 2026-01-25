@@ -237,7 +237,7 @@ export default function LeaderboardPage() {
                                             <TableRow key={profile.id || `${name}-${index}`}>
                                                 <TableCell className="text-muted-foreground">#{index + 1}</TableCell>
                                                 <TableCell>
-                                                    <div className="flex items-center gap-3 min-w-0">
+                                                    <div className="flex items-center gap-3 min-w-42">
                                                         <UserInfoCol user={profile}/>
                                                     </div>
                                                 </TableCell>
