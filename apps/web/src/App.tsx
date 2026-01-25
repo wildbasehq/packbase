@@ -6,7 +6,7 @@ import Body from '@/components/layout/body'
 import BrowserCheck from '@/components/modal/browser-check'
 import CommandPalette from '@/components/modal/command-palette'
 import {SidebarLayout} from '@/components/shared/sidebar-layout'
-import {resourceDefaultPackbase, useResourceStore} from '@/lib'
+import {resourceDefaultPackbase, useResourceStore, useUserAccountStore} from '@/lib'
 import {SidebarProvider} from '@/lib/context/sidebar-context'
 import DefaultPackSunset from '@/pages/pack/universe/default-pack-sunset'
 import {FloatingCompose, LogoSpinner} from '@/src/components'
@@ -22,6 +22,7 @@ const WaitlistCheck = lazy(() => import('@/components/layout/waitlist-check'))
 
 function App() {
     const {currentResource, setCurrentResource, resourceDefault} = useResourceStore()
+    const {settings} = useUserAccountStore()
 
     useEffect(() => {
         // if current resource is missing any data, reset to default
@@ -50,9 +51,11 @@ function App() {
 
                 {!(window.location.pathname === '/p/universe/sunset' || window.location.pathname === '/p/universe/sunset/') && (
                     <>
-                        <SignedIn>
-                            <FloatingCompose/>
-                        </SignedIn>
+                        {!settings?.howl_creator_as_sidebar && (
+                            <SignedIn>
+                                <FloatingCompose/>
+                            </SignedIn>
+                        )}
 
                         <SidebarLayout>
                             <div id="NGContentArea" className="flex h-full overflow-hidden">

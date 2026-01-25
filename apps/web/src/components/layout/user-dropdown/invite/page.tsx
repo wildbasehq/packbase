@@ -1,3 +1,4 @@
+import UserSettingsHeader from '@/components/layout/user-dropdown/user-settings-header'
 import {
     Button,
     Description,
@@ -72,13 +73,11 @@ const InviteSettings: FC = () => {
     const {data: invites} = useContentFrame('get', 'invite/list')
     return (
         <div>
-            <div className="border-b pb-4 mb-4 border-n-5/10">
-                <Heading className="font-bold !text-[17px]">Invite User</Heading>
-            </div>
+            <UserSettingsHeader title="Invite User"/>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col">
                 <form
-                    className="space-y-2"
+                    className="space-y-2 p-6 bg-new-card"
                     onSubmit={onInvite}
                     ref={formRef}
                     onInvalid={() => {
@@ -124,35 +123,37 @@ const InviteSettings: FC = () => {
 
                 <Divider/>
 
-                <div className="">
-                    <Heading>Invited by you</Heading>
-                    <Text alt>For security, emails are hashed when you invite, so we can't show them to you.</Text>
-                </div>
-                <Table striped grid dense bleed className="ring-1 ring-default rounded mt-2 shadow-xs">
-                    <TableHead>
-                        <TableRow>
-                            <TableHeader>ID</TableHeader>
-                            <TableHeader>Invited At</TableHeader>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {invites?.map(invite => (
-                            <TableRow key={invite.id}>
-                                <TableCell>{invite.invite_id}</TableCell>
-                                <TableCell>
-                                    {Intl.DateTimeFormat(navigator.language, {
-                                        weekday: 'long',
-                                        month: 'short',
-                                        day: 'numeric',
-                                        hour: 'numeric',
-                                        minute: 'numeric',
-                                        second: 'numeric',
-                                    }).format(new Date(invite.created_at))}
-                                </TableCell>
+                <div className="p-6 bg-new-card">
+                    <div className="">
+                        <Heading>Invited by you</Heading>
+                        <Text alt>For security, emails are hashed when you invite, so we can't show them to you.</Text>
+                    </div>
+                    <Table striped grid dense bleed className="ring-1 ring-default rounded mt-2 shadow-xs">
+                        <TableHead>
+                            <TableRow>
+                                <TableHeader>ID</TableHeader>
+                                <TableHeader>Invited At</TableHeader>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHead>
+                        <TableBody>
+                            {invites?.map(invite => (
+                                <TableRow key={invite.id}>
+                                    <TableCell>{invite.invite_id}</TableCell>
+                                    <TableCell>
+                                        {Intl.DateTimeFormat(navigator.language, {
+                                            weekday: 'long',
+                                            month: 'short',
+                                            day: 'numeric',
+                                            hour: 'numeric',
+                                            minute: 'numeric',
+                                            second: 'numeric',
+                                        }).format(new Date(invite.created_at))}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
     )

@@ -142,8 +142,8 @@ export function BubblePopover({
                                             style={{borderRadius: 24}}
                                             transition={{
                                                 type: 'spring',
-                                                stiffness: 300,
-                                                damping: 24,
+                                                duration: 0.5,
+                                                bounce: 0.2,
                                                 borderRadius: {
                                                     duration: 0,
                                                 }
@@ -173,8 +173,8 @@ export function BubblePopover({
                                         style={{borderRadius: 24}}
                                         transition={{
                                             type: 'spring',
-                                            stiffness: 300,
-                                            damping: 24,
+                                            duration: 0.5,
+                                            bounce: 0.3,
                                             borderRadius: {duration: 0}
                                         }}
                                     >

@@ -83,3 +83,34 @@
         --color-ring: hsl(240 4.9% 83.9%);
     }
 }
+
+@layer utilities {
+    .bg-new-card {
+        @apply bg-linear-to-b from-neutral-50 to-neutral-100 dark:from-neutral-800/20 dark:to-neutral-900;
+    }
+
+    /* Inset, reversed gradient */
+    .bg-new-card-inset {
+        @apply bg-linear-to-b from-neutral-100 to-neutral-50 dark:from-neutral-950/40 dark:to-neutral-900/20;
+    }
+
+    /* Subtle variant - less contrast */
+    .bg-new-card-subtle {
+        @apply bg-linear-to-b from-neutral-50 to-neutral-100 dark:from-neutral-900/20 dark:to-neutral-950/40;
+    }
+
+    /* Strong variant - more contrast */
+    .bg-new-card-strong {
+        @apply bg-linear-to-b from-neutral-200 to-neutral-300 dark:from-neutral-800 dark:to-neutral-900;
+    }
+
+    /* Muted variant - flatter gradient */
+    .bg-new-card-muted {
+        @apply bg-linear-to-b from-muted/50 to-muted;
+    }
+
+    /* Elevated variant - lighter feel */
+    .bg-new-card-elevated {
+        @apply bg-linear-to-b from-white to-neutral-50 dark:from-neutral-800/50 dark:to-neutral-800;
+    }
+}

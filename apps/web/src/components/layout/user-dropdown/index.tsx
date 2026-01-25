@@ -54,7 +54,7 @@ function UserMenu({close}: {
     }
 
     return (
-        <DropdownHeader className="flex w-96 flex-col p-0!">
+        <DropdownHeader className="flex md:w-96 flex-col p-0!">
             <div
                 className="h-fit w-full rounded-2xl bg-muted border shadow-sm transition-all ring-default hover:bg-muted/50 hover:ring-2">
                 <div className="p-1">
@@ -132,8 +132,8 @@ export default function UserDropdown() {
                     }}
                     transition={{
                         type: 'spring',
-                        stiffness: 300,
-                        damping: 24,
+                        duration: 0.5,
+                        bounce: 0.3,
                         delay: isHovered ? 1 : 0,
                     }}
                 >
@@ -227,8 +227,6 @@ function UserSettings() {
                 </PagedModal.Body>
             </PagedModal.Page>
 
-            <UserSettingsFromServer/>
-
             <PagedModal.Page
                 id="invite"
                 title="Invite"
@@ -238,6 +236,8 @@ function UserSettings() {
                     <InviteSettings/>
                 </PagedModal.Body>
             </PagedModal.Page>
+
+            <UserSettingsFromServer/>
         </PagedModal>
     )
 }

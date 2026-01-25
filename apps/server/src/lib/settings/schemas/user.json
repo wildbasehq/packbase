@@ -32,6 +32,14 @@
       "display_name": "When searching, immediately start with the tags prefix",
       "category": "content"
     },
+    "howl_creator_as_sidebar": {
+      "type": "boolean",
+      "default": false,
+      "userModifiable": true,
+      "display_name": "Show Howl Creator as a sidebar",
+      "description": "Moves the Howl Creator to the right sidebar, and the members/notifications into a unified dropdown in the header.",
+      "category": "labs"
+    },
     "ask_load_themes": {
       "type": "string",
       "default": "ask",

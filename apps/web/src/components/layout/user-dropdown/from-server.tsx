@@ -1,3 +1,4 @@
+import {FlaskIcon} from '@/components/icons/plump/flask'
 import UserSettingsHeader from '@/components/layout/user-dropdown/user-settings-header'
 import PagedModal from '@/components/shared/paged-modal'
 import {useUserAccountStore, vg} from '@/lib'
@@ -10,6 +11,11 @@ const categoryIcons: Record<string, any> = {
     content: ShieldCheckIcon,
     general: UserIcon,
     appearance: SparklesIcon,
+    labs: FlaskIcon
+}
+
+const categoryDescriptions: Record<string, string> = {
+    labs: 'Experimental features that are considered controversial to implement.'
 }
 
 export default function UserSettingsFromServer() {
@@ -42,11 +48,12 @@ export default function UserSettingsFromServer() {
     }
 
     const definitions = data?.definitions || {}
-    const settingsByGroup = Object.entries(definitions).reduce((acc, [key, def]: [string, any]) => {
-        if (!def.userModifiable) return acc
-        const category = def.category || 'general'
-        if (!acc[category]) acc[category] = []
-        acc[category].push({key, ...def})
+    const order = ['privacy', 'content', 'appearance', 'labs']
+
+    const settingsByGroup = order.reduce((acc, category) => {
+        acc[category] = Object.entries(definitions)
+            .filter(([, def]: [string, any]) => def.userModifiable && (def.category || 'general') === category)
+            .map(([key, def]: [string, any]) => ({key, ...def}))
         return acc
     }, {} as Record<string, any[]>)
 
@@ -57,15 +64,17 @@ export default function UserSettingsFromServer() {
                     key={category}
                     id={category}
                     title={category.charAt(0).toUpperCase() + category.slice(1)}
+                    description={categoryDescriptions[category] || ''}
                     icon={categoryIcons[category] || AdjustmentsHorizontalIcon}
                 >
                     <PagedModal.Body>
-                        <form className="space-y-8" key={JSON.stringify(data)}>
-                            <UserSettingsHeader
-                                title={category.charAt(0).toUpperCase() + category.slice(1)}
-                                loading={isLoading || isRefetching}
-                            />
+                        <UserSettingsHeader
+                            title={category.charAt(0).toUpperCase() + category.slice(1)}
+                            description={categoryDescriptions[category] || ''}
+                            loading={isLoading || isRefetching}
+                        />
 
+                        <form className="space-y-8 p-6 bg-new-card" key={JSON.stringify(data)}>
                             <FieldGroup>
                                 {settings.map((setting) => (
                                     <SettingField

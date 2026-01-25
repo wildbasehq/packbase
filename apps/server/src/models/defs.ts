@@ -354,7 +354,7 @@ export const NotificationType = t.Object({
     user_id: t.String(),
     type: t.String(),
     title: t.String(),
-    content: t.String(),
+    content: t.Optional(t.String()),
     read: t.Boolean(),
     read_at: t.Optional(t.String()),
     metadata: t.Optional(t.Any()),

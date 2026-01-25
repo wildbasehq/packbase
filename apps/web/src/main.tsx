@@ -10,6 +10,7 @@ import {ClerkProvider} from '@clerk/clerk-react'
 import {dark} from '@clerk/themes'
 import * as Sentry from '@sentry/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {Agentation} from 'agentation'
 import {Activity, StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import MaintenancePage from './_maintenance'
@@ -109,6 +110,7 @@ createRoot(document.getElementById('root')!).render(
 
                 <QueryClientProvider client={queryClient}>
                     {import.meta.env.VITE_MAINTENANCE ? <MaintenancePage/> : <App/>}
+                    {process.env.NODE_ENV === 'development' && <Agentation copyToClipboard/>}
                     {/*<ReactQueryDevtools initialIsOpen={false}/>*/}
                 </QueryClientProvider>
             </ClerkProvider>

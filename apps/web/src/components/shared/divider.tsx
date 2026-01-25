@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import {ComponentPropsWithoutRef} from 'react'
 
 export function Divider({
@@ -7,15 +6,13 @@ export function Divider({
                             ...props
                         }: { soft?: boolean } & ComponentPropsWithoutRef<'hr'>) {
     return (
-        <hr
-            role="presentation"
-            {...props}
-            className={clsx(
-                className,
-                'w-full border-t',
-                soft && 'border-zinc-950/5 dark:border-white/5',
-                !soft && 'border-zinc-950/10 dark:border-white/10'
-            )}
-        />
+        <div className={className}>
+            <div role="presentation"
+                 {...props}
+                 className="h-px w-full bg-neutral-200 dark:bg-neutral-950"
+            />
+            <div role="presentation"
+                 className="h-px w-full bg-border"/>
+        </div>
     )
 }

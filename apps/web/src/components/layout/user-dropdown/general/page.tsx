@@ -89,109 +89,104 @@ const ProfileSettingsComponent: FC = ({noHeader}: { noHeader?: boolean }) => {
     }
 
     return (
-        <form className="relative space-y-8" onSubmit={saveProfile} onChangeCapture={() => setHasChanges(true)}>
+        <div className="flex flex-col">
             {!noHeader && (
                 <>
                     <UserSettingsHeader title="Your Profile" loading={submitting}/>
-
-                    <div className="mb-4">
-                        <p className="text-sm text-muted-foreground">
-                            Username and your Avatar can be changed in your Wild ID
-                            settings.
-                        </p>
-                    </div>
                 </>
             )}
 
-            <FieldGroup>
+            <form className="relative space-y-8 p-6 bg-new-card" onSubmit={saveProfile} onChangeCapture={() => setHasChanges(true)}>
+                <FieldGroup>
                 <span className="block select-none pb-2 font-medium leading-6 border-b">
                     How you interact
                 </span>
 
-                <SwitchGroup>
-                    <SwitchField>
-                        <Label>
-                            I post and/or interact with content that's R18
-                        </Label>
-                        <Description>
-                            This marks your profile as R18 and applies some exposure limits to accounts that have
-                            opted out of R18 content. This is automatically enabled when you post your first R18
-                            howl and cannot be disabled until all R18 content has been removed from your profile.
-                            <br/><br/>
-                            Set this by posting R18 content; it cannot be changed manually.
-                        </Description>
-                        <Switch name="is_r18" defaultChecked={isAdultRestricted} disabled/>
-                    </SwitchField>
-                </SwitchGroup>
+                    <SwitchGroup>
+                        <SwitchField>
+                            <Label>
+                                I post and/or interact with content that's R18
+                            </Label>
+                            <Description>
+                                This marks your profile as R18 and applies some exposure limits to accounts that have
+                                opted out of R18 content. This is automatically enabled when you post your first R18
+                                howl and cannot be disabled until all R18 content has been removed from your profile.
+                                <br/><br/>
+                                Set this by posting R18 content; it cannot be changed manually.
+                            </Description>
+                            <Switch name="is_r18" defaultChecked={isAdultRestricted} disabled/>
+                        </SwitchField>
+                    </SwitchGroup>
 
-            </FieldGroup>
-            <FieldGroup>
+                </FieldGroup>
+                <FieldGroup>
                 <span className="block select-none pb-2 font-medium leading-6 border-b">
                     How you appear
                 </span>
 
-                <div className="col-span-full">
-                    <label htmlFor="cover-photo"
-                           className="block select-none text-sm font-medium leading-6">
-                        Cover photo
-                    </label>
-                    <span className="text-sm text-muted-foreground">
+                    <div className="col-span-full">
+                        <label htmlFor="cover-photo"
+                               className="block select-none text-sm font-medium leading-6">
+                            Cover photo
+                        </label>
+                        <span className="text-sm text-muted-foreground">
                         Must be SFW (G - PG) rated, regardless of account settings.
                     </span>
-                    <div
-                        className="relative mt-2 flex aspect-banner items-center justify-center overflow-hidden rounded border-2 border-dashed bg-card px-6 py-10"
-                        onClick={() => document.getElementById('cover-photo')?.click()}
-                        key={coverPicPreview}
-                    >
-                        {coverPicPreview && (
-                            <img
-                                src={coverPicPreview}
-                                alt=""
-                                className="absolute inset-0 h-full w-full rounded-lg object-cover opacity-50 blur-lg"
-                            />
-                        )}
-                        <div className="items-center justify-center text-center">
-                            <PhotoIcon className="text-muted-foreground mx-auto h-12 w-12" aria-hidden="true"/>
-                            <div className="text-muted-foreground mt-4 flex select-none text-sm leading-6">
-                                <p className="pl-1">Upload a file (drag and drop not supported)</p>
+                        <div
+                            className="relative mt-2 flex aspect-banner items-center justify-center overflow-hidden rounded border-2 border-dashed bg-card px-6 py-10"
+                            onClick={() => document.getElementById('cover-photo')?.click()}
+                            key={coverPicPreview}
+                        >
+                            {coverPicPreview && (
+                                <img
+                                    src={coverPicPreview}
+                                    alt=""
+                                    className="absolute inset-0 h-full w-full rounded-lg object-cover opacity-50 blur-lg"
+                                />
+                            )}
+                            <div className="items-center justify-center text-center">
+                                <PhotoIcon className="text-muted-foreground mx-auto h-12 w-12" aria-hidden="true"/>
+                                <div className="text-muted-foreground mt-4 flex select-none text-sm leading-6">
+                                    <p className="pl-1">Upload a file (drag and drop not supported)</p>
+                                </div>
+                                <p className="text-muted-foreground select-none text-xs leading-5">PNG, JPG, GIF up to 10MB,
+                                    Aspect Ratio 3 / 1</p>
                             </div>
-                            <p className="text-muted-foreground select-none text-xs leading-5">PNG, JPG, GIF up to 10MB,
-                                Aspect Ratio 3 / 1</p>
                         </div>
                     </div>
+
+                    <input id="cover-photo" name="file-upload" type="file" className="sr-only" accept="image/*"
+                           ref={coverPicRef}/>
+
+                    <Field>
+                        <Label>Display Name</Label>
+                        <Description>
+                            Must be SFW (G - PG) rated, regardless of account settings.
+                        </Description>
+                        <Input ref={displayNameRef} name="display_name"/>
+                    </Field>
+
+                    <Field>
+                        <Label>About Me</Label>
+                        <Description>
+                            Must be SFW (G - PG) rated, but can involve R18 links if your account is marked as R18.
+                        </Description>
+                        <Description>
+                            Markdown is supported. Add custom HTML in the "Theme" tab.
+                        </Description>
+                        <Textarea ref={bioRef} name="bio"/>
+                    </Field>
+                </FieldGroup>
+
+                <div className="mt-4">
+                    <Button type="submit" disabled={submitting}>
+                        {submitting ? 'Saving...' : 'Save'}
+                    </Button>
                 </div>
 
-                <input id="cover-photo" name="file-upload" type="file" className="sr-only" accept="image/*"
-                       ref={coverPicRef}/>
-
-                <Field>
-                    <Label>Display Name</Label>
-                    <Description>
-                        Must be SFW (G - PG) rated, regardless of account settings.
-                    </Description>
-                    <Input ref={displayNameRef} name="display_name"/>
-                </Field>
-
-                <Field>
-                    <Label>About Me</Label>
-                    <Description>
-                        Must be SFW (G - PG) rated, but can involve R18 links if your account is marked as R18.
-                    </Description>
-                    <Description>
-                        Markdown is supported. Add custom HTML in the "Theme" tab.
-                    </Description>
-                    <Textarea ref={bioRef} name="bio"/>
-                </Field>
-            </FieldGroup>
-
-            <div className="mt-4">
-                <Button type="submit" disabled={submitting}>
-                    {submitting ? 'Saving...' : 'Save'}
-                </Button>
-            </div>
-
-            <UnsavedChangesWarning hasChanges={hasChanges} submitting={submitting}/>
-        </form>
+                <UnsavedChangesWarning hasChanges={hasChanges} submitting={submitting}/>
+            </form>
+        </div>
     )
 }
 
