@@ -38,63 +38,63 @@ function App() {
 
     return (
         <Providers>
-            {/* Browser check */}
-            <BrowserCheck/>
-            <CommandPalette/>
+            <Preload>
+                {/* Browser check */}
+                <BrowserCheck/>
+                <CommandPalette/>
 
-            <SidebarProvider>
-                {(window.location.pathname === '/p/universe/sunset' || window.location.pathname === '/p/universe/sunset/') && (
-                    <Preload>
+                <SidebarProvider>
+                    {(window.location.pathname === '/p/universe/sunset' || window.location.pathname === '/p/universe/sunset/') && (
                         <DefaultPackSunset/>
-                    </Preload>
-                )}
+                    )}
 
-                {!(window.location.pathname === '/p/universe/sunset' || window.location.pathname === '/p/universe/sunset/') && (
-                    <>
-                        {!settings?.howl_creator_as_sidebar && (
-                            <SignedIn>
-                                <FloatingCompose/>
-                            </SignedIn>
-                        )}
+                    {!(window.location.pathname === '/p/universe/sunset' || window.location.pathname === '/p/universe/sunset/') && (
+                        <>
+                            {!settings?.howl_creator_as_sidebar && (
+                                <SignedIn>
+                                    <FloatingCompose/>
+                                </SignedIn>
+                            )}
 
-                        <SidebarLayout>
-                            <div id="NGContentArea" className="flex h-full overflow-hidden">
-                                <div className="grow w-full">
-                                    <main className="flex flex-1 h-full">
-                                        <div className="w-full h-full">
-                                            <ClerkLoading>
-                                                <Body bodyClassName="h-full"
-                                                      className="!h-full items-center justify-center">
-                                                    <LogoSpinner/>
-                                                    <span className="text-sm mt-1">Checking Wild ID</span>
-                                                </Body>
-                                            </ClerkLoading>
-                                            <ClerkFailed>
-                                                <Body bodyClassName="h-full"
-                                                      className="h-full! items-center justify-center">
-                                                    <ExclamationTriangleIcon className="h-12 w-12 text-red-500"/>
-                                                    <span className="mt-1 text-red-500">Wild ID is DOWN.</span>
-                                                </Body>
-                                            </ClerkFailed>
+                            <SidebarLayout>
+                                <div id="NGContentArea" className="flex h-full overflow-hidden">
+                                    <div className="grow w-full">
+                                        <main className="flex flex-1 h-full">
+                                            <div className="w-full h-full">
+                                                <ClerkLoading>
+                                                    <Body bodyClassName="h-full"
+                                                          className="!h-full items-center justify-center">
+                                                        <LogoSpinner/>
+                                                        <span className="text-sm mt-1">Checking Wild ID</span>
+                                                    </Body>
+                                                </ClerkLoading>
+                                                <ClerkFailed>
+                                                    <Body bodyClassName="h-full"
+                                                          className="h-full! items-center justify-center">
+                                                        <ExclamationTriangleIcon className="h-12 w-12 text-red-500"/>
+                                                        <span className="mt-1 text-red-500">Wild ID is DOWN.</span>
+                                                    </Body>
+                                                </ClerkFailed>
 
-                                            <ClerkLoaded>
-                                                <Preload>
-                                                    <div id="NGRoot"
-                                                         className="h-full overflow-y-auto overflow-x-hidden">
-                                                        <WaitlistCheck/>
+                                                <ClerkLoaded>
+                                                    <Preload>
+                                                        <div id="NGRoot"
+                                                             className="h-full overflow-y-auto overflow-x-hidden">
+                                                            <WaitlistCheck/>
 
-                                                        <Routes/>
-                                                    </div>
-                                                </Preload>
-                                            </ClerkLoaded>
-                                        </div>
-                                    </main>
+                                                            <Routes/>
+                                                        </div>
+                                                    </Preload>
+                                                </ClerkLoaded>
+                                            </div>
+                                        </main>
+                                    </div>
                                 </div>
-                            </div>
-                        </SidebarLayout>
-                    </>
-                )}
-            </SidebarProvider>
+                            </SidebarLayout>
+                        </>
+                    )}
+                </SidebarProvider>
+            </Preload>
         </Providers>
     )
 }

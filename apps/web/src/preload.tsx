@@ -4,21 +4,17 @@
 
 import SadComputerIcon from '@/components/icons/sad-computer'
 import Body from '@/components/layout/body'
+import {AppLoading} from '@/components/ui/app-loading'
 import {isVisible, resourceDefaultPackbase, useResourceStore, useUIStore, useUserAccountStore} from '@/lib'
 import {useContentFrame} from '@/lib/hooks/content-frame'
-import {Button, Heading, LogoSpinner, Text} from '@/src/components'
-import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
+import {Button, Heading, Text} from '@/src/components'
+import {useSession} from '@clerk/clerk-react'
 import {Activity, ReactNode, useEffect, useState} from 'react'
 
 export default function Preload({children}: { children: ReactNode }) {
     return (
         <>
-            <SignedIn>
-                <PreloadChild>{children}</PreloadChild>
-            </SignedIn>
-            <SignedOut>
-                <PreloadChild>{children}</PreloadChild>
-            </SignedOut>
+            <PreloadChild>{children}</PreloadChild>
         </>
     )
 }
@@ -150,31 +146,9 @@ function PreloadChild({children}: { children: ReactNode }) {
                     </div>
                 </Body>
             </Activity>
-
-            {serviceLoading === 'proceeding' ? (
-                <>
-                    {children}
-                </>
-            ) : (
-                <Body bodyClassName="h-full" className="h-full! items-center justify-center">
-                    <LogoSpinner/>
-                    <span className="text-sm mt-1">
-                        <Activity
-                            mode={isVisible(serviceLoading === 'auth')}>
-                            Checking data...
-                        </Activity>
-                        <Activity
-                            mode={isVisible(serviceLoading === 'auth:@me')}>
-                            Getting profile...
-                        </Activity>
-                        <Activity mode={isVisible(serviceLoading.startsWith('cron'))}>Welcome!</Activity>
-                        <Activity
-                            mode={isVisible(!serviceLoading.startsWith('auth') && !serviceLoading.startsWith('cron'))}>
-                            Get set...
-                        </Activity>
-                    </span>
-                </Body>
-            )}
+            <AppLoading loaded={serviceLoading === 'proceeding'}>
+                {children}
+            </AppLoading>
         </>
     )
 }
