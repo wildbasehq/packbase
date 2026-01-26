@@ -331,6 +331,16 @@ export async function processHowlJob(id: string): Promise<void> {
         clearQueryCache(`~${dbCreate.channel_id}`)
         clearQueryCache(`~${dbCreate.user_id}`)
 
+        // Phase 5: Update pack activity
+        await prisma.packs.update({
+            where: {id: job.tenantId},
+            data: {
+                last_activity_at: new Date(),
+            },
+        })
+
+        console.log('[HOWL_JOB_QUEUE] Updated pack activity', {packId: job.tenantId})
+
         // Update home feed cache
         FeedController.homeFeedCache.forEach((value, key) => {
             if (key.includes(job.userId)) {

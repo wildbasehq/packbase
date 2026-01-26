@@ -1,19 +1,29 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
 import {HTTPError} from '@/lib/HTTPError'
-import {getPack} from '@/routes/pack/[id]'
 import {ErrorTypebox} from '@/utils/errors'
 import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({params, set, user, error}) => {
+        async ({set, user}) => {
             let data
             try {
+                // Fetch all packs with related data in one query
                 data = await prisma.packs.findMany({
-                    select: {id: true},
-                    orderBy: {created_at: 'desc'},
+                    orderBy: {last_activity_at: 'desc'},
+                    include: {
+                        memberships: user?.sub
+                            ? {
+                                where: {user_id: user.sub},
+                                take: 1,
+                            }
+                            : false,
+                        _count: {
+                            select: {memberships: true},
+                        },
+                    },
                 })
             } catch (selectError) {
                 set.status = 500
@@ -30,15 +40,33 @@ export default (app: YapockType) =>
 
             let packs = []
             let hidden = 0
-            for (let packID of data) {
-                const pack = await getPack(packID.id, undefined, user?.sub)
-                if (pack) {
-                    if (!pack.membership) {
-                        // @ts-ignore - fails on SDK
-                        packs.push(pack)
-                    } else {
-                        hidden++
+
+            for (let pack of data) {
+                const hasMembership = pack.memberships && pack.memberships.length > 0
+
+                if (!hasMembership) {
+                    // Transform pack data to match expected format
+                    const transformedPack = {
+                        id: pack.id,
+                        display_name: pack.display_name,
+                        slug: pack.slug,
+                        about: {
+                            bio: pack.description,
+                        },
+                        images: {
+                            avatar: pack.images_avatar,
+                            header: pack.images_header,
+                        },
+                        created_at: pack.created_at.toString(),
+                        statistics: {
+                            members: pack._count.memberships,
+                            heartbeat: -1, // Skip heartbeat calculation for list view
+                        },
                     }
+
+                    packs.push(transformedPack)
+                } else {
+                    hidden++
                 }
             }
 

@@ -167,121 +167,114 @@ function convertBigIntsToNumbers(obj: any): any {
 
 export async function getPack(id: string, scope?: string, userId?: string) {
     const timer = new Date().getTime()
+
+    // Check cache with correct expiration logic
     let cached = PackCache.get(id)
-    if (cached && cached.expires_after < Date.now()) {
-        PackCache.delete(id)
-        cached = undefined
+    if (cached && cached.expires_after > Date.now()) {
+        const {expires_after, ...packData} = cached
+        return convertBigIntsToNumbers(packData)
     }
 
     const isIDUUID = RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i).exec(id)
 
     if (!id) return null
 
-    let pack
-    if (isIDUUID) {
-        pack = cached || (await prisma.packs.findUnique({where: {id}}))
-    } else {
-        pack = cached || (await prisma.packs.findUnique({where: {slug: id}}))
-    }
+    // Single optimized query with all related data
+    const pack = await prisma.packs.findUnique({
+        where: isIDUUID ? {id} : {slug: id},
+        include: {
+            memberships: userId ? {
+                where: {user_id: userId},
+                take: 1,
+            } : false,
+            pages: {
+                orderBy: {order: 'asc'},
+            },
+            _count: {
+                select: {memberships: true},
+            },
+        },
+    })
 
     if (!pack) return null
 
     // Cache for 5 minutes
     PackCache.set(pack.id, {...pack, expires_after: Date.now() + 1000 * 60 * 5})
 
-    pack.about = {
-        bio: pack.description,
+    // Transform pack data
+    const transformedPack: any = {
+        id: pack.id,
+        display_name: pack.display_name,
+        slug: pack.slug,
+        about: {
+            bio: pack.description,
+        },
+        images: {
+            avatar: pack.images_avatar,
+            header: pack.images_header,
+        },
+        created_at: pack.created_at.toString(),
     }
-    delete pack.description
-
-    pack.created_at = pack.created_at.toString()
-
-    pack.images = {
-        avatar: pack.images_avatar,
-        header: pack.images_header,
-    }
-    delete pack.images_avatar
-    delete pack.images_header
 
     if (scope !== 'basic') {
-        if (userId) {
-            const membership = await getPackMembership(pack.id, userId)
-            if (membership) {
-                pack.membership = membership
-            }
+        // Add membership if exists
+        if (pack.memberships && pack.memberships.length > 0) {
+            transformedPack.membership = pack.memberships[0]
         }
 
-        // Count all members
-        const membersCount = await prisma.packs_memberships.count({
-            where: {tenant_id: pack.id},
-        })
+        // Parallel execution of independent operations
+        const [heartbeat] = await Promise.all([
+            packCalculateHeartbeat(pack.id),
+        ])
 
-        pack.statistics = {
-            members: membersCount || -1,
-            heartbeat: await packCalculateHeartbeat(pack.id),
+        transformedPack.statistics = {
+            members: pack._count?.memberships || -1,
+            heartbeat,
         }
 
-        // Get custom pages
-        const pages = await prisma.packs_pages.findMany({
-            where: {tenant_id: pack.id},
-            orderBy: {order: 'asc'},
-        })
-        if (pages) {
-            pack.pages = pages
+        // Process pages with parallel ticker queries
+        if (pack.pages) {
+            const yesterdayISOString = new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
 
-            for (const page of pack.pages) {
-                page.created_at = page.created_at.toString()
-                page.order = page.order || 0
-
+            const tickerPromises = pack.pages.map(async (page: any) => {
                 if (page.ticker) {
-                    console.log('Ticker:', page.ticker)
-                    // ticker is ID of feed. Get first post within the last 24 hours in the feed
-                    const now = new Date()
-                    const yesterday = new Date(now.getTime() - 1000 * 60 * 60 * 24)
-
-                    // Convert date to ISO string for Prisma comparison
-                    const yesterdayISOString = yesterday.toISOString()
-
-                    // For now, just get anything from the last 24 hours
-                    // Note: Removed the 'gt' filter on body as it might not be working as expected
                     try {
-                        const posts = await prisma.posts.findMany({
+                        const posts = await prisma.posts.findFirst({
                             where: {
-                                // Use appropriate string comparison for body (if needed)
-                                body: {
-                                    not: null,
-                                },
+                                body: {not: null},
                                 channel_id: page.id,
-                                created_at: {gte: yesterdayISOString}, // Use ISO string format for date comparison
+                                created_at: {gte: yesterdayISOString},
                             },
-                            orderBy: {
-                                created_at: 'desc',
-                            },
-                            take: 1,
+                            orderBy: {created_at: 'desc'},
+                            select: {body: true},
                         })
 
-                        // replace page.ticker with the first post content, stripped of markdown. if no posts, set to null
-                        if (posts && posts.length > 0) {
-                            const post = posts[0]
-                            page.ticker = post.body
-                                .replace(/<[^>]+>/g, '')
-                                .replace(/&nbsp;/g, ' ')
-                                .replace(/\s+/g, ' ')
-                                .trim()
-                                .slice(0, 100)
-                        } else {
-                            page.ticker = null
-                        }
-                    } catch (error) {
-                        page.ticker = null
+                        return posts ? posts.body
+                            .replace(/<[^>]+>/g, '')
+                            .replace(/&nbsp;/g, ' ')
+                            .replace(/\s+/g, ' ')
+                            .trim()
+                            .slice(0, 100) : null
+                    } catch {
+                        return null
                     }
                 }
-            }
+                return page.ticker
+            })
+
+            const tickerResults = await Promise.all(tickerPromises)
+
+            transformedPack.pages = pack.pages.map((page: any, index: number) => ({
+                ...page,
+                created_at: page.created_at.toString(),
+                order: page.order || 0,
+                ticker: tickerResults[index],
+            }))
         }
     }
 
     // Convert any BigInt values before sending to Posthog and returning
-    const safePackForJSON = convertBigIntsToNumbers(pack)
+    const safePackForJSON = convertBigIntsToNumbers(transformedPack)
 
     posthog.capture({
         distinctId,
