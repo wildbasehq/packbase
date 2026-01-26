@@ -237,8 +237,12 @@ export default function LeaderboardPage() {
                                             <TableRow key={profile.id || `${name}-${index}`}>
                                                 <TableCell className="text-muted-foreground">#{index + 1}</TableCell>
                                                 <TableCell>
-                                                    <div className="flex items-center gap-3 min-w-42">
-                                                        <UserInfoCol user={profile}/>
+                                                    <div className="flex items-center justify-between min-w-42">
+                                                        <div>
+                                                            <UserInfoCol user={profile}/>
+                                                        </div>
+
+                                                        <MovementIndicator movement={entry.movement} delta={entry.delta} since={entry.since}/>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="sm:w-48 font-medium">
