@@ -44,9 +44,7 @@ export default function MaintenancePage() {
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-5 md:items-center md:gap-10">
                         <div className="space-y-3 text-sm md:col-span-3">
                             <p className="text-foreground">
-                                {ProjectSafeName} is currently undergoing an upgrade to
-                                a newer major version. During this maintenance, we cannot accept or
-                                process new data.
+                                {import.meta.env.VITE_MAINTENANCE}
                             </p>
 
                             <p className="text-muted-foreground text-xs">
