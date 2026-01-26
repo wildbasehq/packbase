@@ -11,7 +11,7 @@
     "build": "bun run ./build.ts",
     "db-dev-container": "cd prisma/devcontainer && docker compose up -d",
     "create-route": "bun run src/scripts/create-route.tsx",
-    "prisma:push": "bunx --bun prisma db push",
+    "prisma:push": "bunx --bun prisma db push && bunx --bun prisma migrate deploy",
     "prisma:generate": "bunx --bun prisma generate"
   },
   "devDependencies": {
@@ -65,6 +65,5 @@
     "zod": "^3.22.2",
     "zod-to-ts": "^1.2.0"
   },
-  
-   "packageManager": "bun@latest"
+  "packageManager": "bun@latest"
 }

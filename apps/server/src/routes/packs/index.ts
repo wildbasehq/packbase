@@ -9,22 +9,22 @@ export default (app: YapockType) =>
         '',
         async ({set, user}) => {
             let data
+            let userMemberships: Set<string> = new Set()
+
             try {
-                // Fetch all packs with related data in one query
-                data = await prisma.packs.findMany({
-                    orderBy: {last_activity_at: 'desc'},
-                    include: {
-                        memberships: user?.sub
-                            ? {
-                                where: {user_id: user.sub},
-                                take: 1,
-                            }
-                            : false,
-                        _count: {
-                            select: {memberships: true},
-                        },
-                    },
-                })
+                // Fetch all packs sorted by image priority using database view
+                const packsData = await prisma.packs_sorted.findMany()
+
+                // If user is logged in, fetch their memberships
+                if (user?.sub) {
+                    const memberships = await prisma.packs_memberships.findMany({
+                        where: {user_id: user.sub},
+                        select: {tenant_id: true},
+                    })
+                    memberships.forEach((m) => userMemberships.add(m.tenant_id))
+                }
+
+                data = packsData
             } catch (selectError) {
                 set.status = 500
                 throw HTTPError.fromError(selectError)
@@ -42,9 +42,11 @@ export default (app: YapockType) =>
             let hidden = 0
 
             for (let pack of data) {
-                const hasMembership = pack.memberships && pack.memberships.length > 0
+                const hasMembership = userMemberships.has(pack.id)
 
-                if (!hasMembership) {
+                if (hasMembership) {
+                    hidden++
+                } else {
                     // Transform pack data to match expected format
                     const transformedPack = {
                         id: pack.id,
@@ -59,14 +61,12 @@ export default (app: YapockType) =>
                         },
                         created_at: pack.created_at.toString(),
                         statistics: {
-                            members: pack._count.memberships,
+                            members: Number(pack.member_count),
                             heartbeat: -1, // Skip heartbeat calculation for list view
                         },
                     }
 
                     packs.push(transformedPack)
-                } else {
-                    hidden++
                 }
             }
 

@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -528,6 +529,23 @@ model server_meta {
   kind       String   @id
   data       Json
   updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@schema("public")
+}
+
+/// View: packs sorted by image priority, then by last_activity_at
+view packs_sorted {
+  id               String   @db.Uuid
+  created_at       DateTime @db.Timestamptz(6)
+  display_name     String
+  slug             String
+  images_avatar    String?
+  description      String?
+  owner_id         String?  @db.Uuid
+  images_header    String?
+  last_activity_at DateTime @db.Timestamptz(6)
+  image_priority   Int
+  member_count     BigInt
 
   @@schema("public")
 }
