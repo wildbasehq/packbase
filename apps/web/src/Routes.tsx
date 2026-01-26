@@ -245,12 +245,12 @@ function RequiresAccount({children}: { children?: ReactNode }) {
     const [location] = useLocation()
 
     if (!user) {
-        return <Redirect to="~/id/login"/>
+        return <SignedOut><Redirect to="~/id/login"/></SignedOut>
     }
 
     if (user?.requires_setup && !location.startsWith('/setup')) {
         return <Redirect to={'~/me/setup'}/>
     }
 
-    return children
+    return <SignedIn>{user ? children : null}</SignedIn>
 }
