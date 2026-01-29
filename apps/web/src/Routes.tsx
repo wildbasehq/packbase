@@ -39,6 +39,9 @@ const BooksLayout = lazy(() => import('@/pages/books/layout'))
 const BookList = lazy(() => import('@/pages/books/page'))
 const BookEditor = lazy(() => import('@/pages/books/editor'))
 
+// Funding
+const FundingPage = lazy(() => import('@/pages/funding/page'))
+
 // Loading fallback component
 const LoadingFallback = () => (
     <Body bodyClassName="h-full" className="h-full! items-center justify-center">
@@ -214,6 +217,13 @@ export default function Routes() {
                         </Route>
                     </Switch>
                 </BooksLayout>
+            </Route>
+
+            {/* Funding */}
+            <Route path="/funding">
+                <Suspense fallback={<LoadingFallback/>}>
+                    <FundingPage/>
+                </Suspense>
             </Route>
 
             {/* jank */}

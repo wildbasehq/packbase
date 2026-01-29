@@ -42,8 +42,8 @@ import {
 } from '@/src/components'
 import {SignedIn, SignedOut, useSession} from '@clerk/clerk-react'
 import * as Headless from '@headlessui/react'
-import {FaceSmileIcon, HomeIcon} from '@heroicons/react/16/solid'
-import {MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
+import {FaceSmileIcon, HeartIcon} from '@heroicons/react/16/solid'
+import {HomeIcon, MagnifyingGlassIcon, QuestionMarkCircleIcon, SparklesIcon} from '@heroicons/react/20/solid'
 import {EllipsisHorizontalIcon} from '@heroicons/react/24/solid'
 import {motion} from 'motion/react'
 import {Activity, ComponentType, PropsWithChildren, ReactNode, useEffect, useState} from 'react'
@@ -331,8 +331,12 @@ export function SidebarLayout({children}: PropsWithChildren) {
                                     <DropdownMenu anchor="top">
                                         <DropdownItem href="https://work.wildbase.xyz/maniphest/query/all/"
                                                       target="_blank">
-                                            <FaceSmileIcon className="w-4 h-4 inline-flex" data-slot="icon"/>
+                                            <FaceSmileIcon className="w-4 h-4 inline-flex"/>
                                             <SidebarLabel>Feedback</SidebarLabel>
+                                        </DropdownItem>
+                                        <DropdownItem href="/funding">
+                                            <HeartIcon className="w-4 h-4 inline-flex"/>
+                                            <SidebarLabel>Funding</SidebarLabel>
                                         </DropdownItem>
                                         <DropdownItem href="https://help.wildhq.org" target="_blank">
                                             <SupportHeadIcon className="w-4 h-4 inline-flex"/>
@@ -455,7 +459,7 @@ function SidebarContentContainer({children}: { children: ReactNode }) {
                 maxWidth={560}
             >
                 <div className="flex flex-col" style={{width: sidebarWidth ?? 320}}>
-                    <Sidebar className="w-full">
+                    <Sidebar className="w-full border-r">
                         <SidebarBody>
                             {children}
                             <SidebarSpacer/>
@@ -464,6 +468,7 @@ function SidebarContentContainer({children}: { children: ReactNode }) {
                         <SidebarFooter
                             className={articlesUnread ? 'bg-linear-to-b from-transparent to-muted/50' : ''}>
                             <SidebarHeading>(c) ✱base - Private alpha, things break!</SidebarHeading>
+                            <SidebarHeading>Work-in-progress, subject to change. Software is provided "as-is", without warranty of any kind.</SidebarHeading>
                             <div className="bottom-0 w-full">
                                 <News toggleUnread={setArticlesUnread}/>
                             </div>

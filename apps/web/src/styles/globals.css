@@ -41,7 +41,7 @@
     }
 
     a {
-        @apply text-foreground;
+        @apply text-primary-light;
     }
 
     body {

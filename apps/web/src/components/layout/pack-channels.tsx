@@ -82,15 +82,6 @@ export function PackChannels() {
                     />
                 ))}
             </SidebarSection>
-            <SidebarSection>
-                <SidebarHeading>Things are changin'</SidebarHeading>
-                <SidebarLabel className="flex items-center gap-2 px-2 text-wrap select-none">
-                    <span className="text-xs/5 text-muted-foreground">
-                        <span className="font-bold">Hold tight</span> - we're preparing final design details for Packbase, expect ultra
-                        levels of jank.
-                    </span>
-                </SidebarLabel>
-            </SidebarSection>
         </>
     )
 }

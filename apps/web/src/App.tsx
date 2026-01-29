@@ -9,7 +9,7 @@ import {SidebarLayout} from '@/components/shared/sidebar-layout'
 import {resourceDefaultPackbase, useResourceStore, useUserAccountStore} from '@/lib'
 import {SidebarProvider} from '@/lib/context/sidebar-context'
 import DefaultPackSunset from '@/pages/pack/universe/default-pack-sunset'
-import {FloatingCompose, LogoSpinner} from '@/src/components'
+import {Desktop, FloatingCompose, LogoSpinner, Mobile} from '@/src/components'
 import Preload from '@/src/preload'
 import Routes from '@/src/Routes'
 import {ClerkFailed, ClerkLoaded, ClerkLoading, SignedIn} from '@clerk/clerk-react'
@@ -50,11 +50,20 @@ function App() {
 
                     {!(window.location.pathname === '/p/universe/sunset' || window.location.pathname === '/p/universe/sunset/') && (
                         <>
-                            {!settings?.howl_creator_as_sidebar && (
+                            {/* Key needed as react doesn't re-render when Packbase initially loads */}
+                            <div key={settings?.howl_creator_as_sidebar ? 'sidebar' : 'floating'}>
                                 <SignedIn>
-                                    <FloatingCompose/>
+                                    <Desktop>
+                                        {!settings?.howl_creator_as_sidebar && (
+                                            <FloatingCompose/>
+                                        )}
+                                    </Desktop>
+
+                                    <Mobile>
+                                        <FloatingCompose/>
+                                    </Mobile>
                                 </SignedIn>
-                            )}
+                            </div>
 
                             <SidebarLayout>
                                 <div id="NGContentArea" className="flex h-full overflow-hidden">
