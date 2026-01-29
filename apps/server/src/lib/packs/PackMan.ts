@@ -200,7 +200,10 @@ export default class PackMan {
      */
     getPack() {
         log.info('PackMan.getPack called', {packId: this._pack.id})
-        return this._pack
+        return {
+            ...this._pack,
+            membership: this._user
+        }
     }
 
     /**
