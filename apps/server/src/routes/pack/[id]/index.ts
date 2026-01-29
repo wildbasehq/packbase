@@ -198,9 +198,6 @@ export async function getPack(id: string, scope?: string, userId?: string) {
 
     if (!pack) return null
 
-    // Cache for 5 minutes
-    PackCache.set(pack.id, {...pack, expires_after: Date.now() + 1000 * 60 * 5})
-
     // Transform pack data
     const transformedPack: any = {
         id: pack.id,
@@ -286,6 +283,9 @@ export async function getPack(id: string, scope?: string, userId?: string) {
             pack: safePackForJSON,
         },
     })
+
+    // Cache for 5 minutes
+    PackCache.set(pack.id, {...safePackForJSON, expires_after: Date.now() + 1000 * 60 * 5})
 
     return safePackForJSON
 }
