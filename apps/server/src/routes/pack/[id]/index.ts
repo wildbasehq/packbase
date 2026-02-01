@@ -211,13 +211,14 @@ export async function getPack(id: string, scope?: string, userId?: string) {
             header: pack.images_header,
         },
         created_at: pack.created_at.toString(),
+        owner_id: pack.owner_id
     }
 
     if (scope !== 'basic') {
         // Add membership if exists
         const currentUserMembership = pack.memberships.find(
             (m) => m.user_id === userId
-        );
+        )
 
         if (currentUserMembership) transformedPack.membership = currentUserMembership
 
