@@ -23,25 +23,26 @@ export default function DefaultPackSunset() {
     const [finaliseScreen, setFinaliseScreen] = useState(false)
 
     useEffect(() => {
-        vg.packs.default.get().then(({data}) => {
-            setTimeout(() => {
-                if (!data?.requires_switch) {
-                    window.location.href = '/'
-                    return
-                }
+        // Timeout is needed as *sometimes* user is null despite preloaded.
+        const timeout = setTimeout(() => {
+            if (!user?.requires_switch) {
+                window.location.href = '/'
+                return
+            }
 
-                vg.search.get({
-                    query: {
-                        q: `$posts = [Where posts:user_id ("${user.id}") AND posts:tenant_id ("00000000-0000-0000-0000-000000000000")] AS *;\n$posts:user = [Where profiles:id ($posts:user_id->ONE)] AS *;`
-                    }
-                }).then(({data: response}) => {
-                    setLoading(false)
-                    const posts = response?.posts
-                    setPostsBG([...Array(Math.max(25, posts?.length || 0)).keys()].map(i => posts?.[i % (posts?.length || 1)]))
-                })
-            }, 500)
-        })
-    }, [])
+            vg.search.get({
+                query: {
+                    q: `$posts = [Where posts:user_id ("${user.id}") AND posts:tenant_id ("00000000-0000-0000-0000-000000000000")] AS *;\n$posts:user = [Where profiles:id ($posts:user_id->ONE)] AS *;`
+                }
+            }).then(({data: response}) => {
+                setLoading(false)
+                const posts = response?.posts
+                setPostsBG([...Array(Math.max(25, posts?.length || 0)).keys()].map(i => posts?.[i % (posts?.length || 1)]))
+            })
+        }, 500)
+
+        return () => clearTimeout(timeout)
+    }, [user])
 
     return (
         <div className="relative flex flex-col items-center justify-center overflow-visible h-screen">
