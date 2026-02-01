@@ -6,7 +6,6 @@ import createStorage from '@/lib/storage'
 import {UserProfile} from '@/models/defs'
 import {checkDefaultPackSetup} from '@/routes/packs/default'
 import {getUser, UserCache} from '@/routes/user/[username]'
-import BannedUsernames from '@/tables/banned_usernames.json'
 import {checkUserBillingPermission} from '@/utils/clerk/check-user-permission'
 import ThrowError from '@/utils/errors'
 import requiresToken from '@/utils/identity/requires-token'
@@ -243,17 +242,6 @@ export async function updateUser({
                                      about,
                                      images
                                  }: Update, set: any, currentUser: { sub: any }) {
-    if (username) {
-        for (const bannedUsername of BannedUsernames) {
-            if (similarity(username, bannedUsername) > 0.8) {
-                set.status = 403
-                throw HTTPError.forbidden({
-                    summary: 'Username is banned!',
-                })
-            }
-        }
-    }
-
     if (
         about?.bio &&
         similarity(
