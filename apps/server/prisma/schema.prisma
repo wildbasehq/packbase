@@ -500,15 +500,14 @@ model settings {
 
 /// Value-less virtual currency balances for users and packs
 model currency {
-  /// ID of the owner (e.g., "user:<uuid>" or "pack:<uuid>")
-  parent_id  String   @id
-  /// Currency type (e.g., "trinket")
-  type       String
-  /// Current balance (non-negative integer)
+  parent_id String
+  type      String
+
   amount     Int      @default(0)
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @default(now()) @db.Timestamptz(6)
 
+  @@id([parent_id, type])
   @@schema("public")
 }
 
