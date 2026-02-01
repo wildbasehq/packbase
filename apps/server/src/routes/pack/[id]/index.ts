@@ -198,9 +198,6 @@ export async function getPack(id: string, scope?: string, userId?: string) {
 
     if (!pack) return null
 
-    // Cache for 5 minutes
-    PackCache.set(pack.id, {...pack, expires_after: Date.now() + 1000 * 60 * 5})
-
     // Transform pack data
     const transformedPack: any = {
         id: pack.id,
@@ -218,9 +215,11 @@ export async function getPack(id: string, scope?: string, userId?: string) {
 
     if (scope !== 'basic') {
         // Add membership if exists
-        if (pack.memberships && pack.memberships.length > 0) {
-            transformedPack.membership = pack.memberships[0]
-        }
+        const currentUserMembership = pack.memberships.find(
+            (m) => m.user_id === userId
+        );
+
+        if (currentUserMembership) transformedPack.membership = currentUserMembership
 
         // Parallel execution of independent operations
         const [heartbeat] = await Promise.all([
@@ -284,6 +283,9 @@ export async function getPack(id: string, scope?: string, userId?: string) {
             pack: safePackForJSON,
         },
     })
+
+    // Cache for 5 minutes
+    PackCache.set(pack.id, {...safePackForJSON, expires_after: Date.now() + 1000 * 60 * 5})
 
     return safePackForJSON
 }

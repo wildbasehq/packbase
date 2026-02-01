@@ -195,12 +195,15 @@ export default class PackMan {
     }
 
     /**
-     * Get the pack
-     * @returns
+     * Get the pack with the current user's membership
+     * @returns Pack object with membership field containing the user's membership (or null if no user context)
      */
-    getPack() {
+    getPack(): packs & { membership: packs_memberships | null } {
         log.info('PackMan.getPack called', {packId: this._pack.id})
-        return this._pack
+        return {
+            ...this._pack,
+            membership: this._user
+        }
     }
 
     /**
