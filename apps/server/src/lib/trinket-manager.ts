@@ -9,7 +9,7 @@ export class TrinketManager {
 
     async getBalance(parentId: string, minValue: number = 0): Promise<number> {
         const row = await prisma.currency.findUnique({
-            where: {parent_id: parentId, type: this.type},
+            where: {parent_id_type: {parent_id: parentId, type: this.type}},
             select: {amount: true},
         })
         return Math.max(row?.amount ?? 0, minValue)
@@ -21,7 +21,7 @@ export class TrinketManager {
         }
         const now = new Date()
         const row = await prisma.currency.upsert({
-            where: {parent_id: parentId, type: this.type},
+            where: {parent_id_type: {parent_id: parentId, type: this.type}},
             update: {amount, updated_at: now},
             create: {parent_id: parentId, type: this.type, amount, created_at: now, updated_at: now},
             select: {amount: true},
@@ -44,7 +44,7 @@ export class TrinketManager {
         if (delta === 0) return this.getBalance(parentId)
         const now = new Date()
         return await prisma.$transaction(async (tx) => {
-            const existing = await tx.currency.findUnique({where: {parent_id: parentId, type: this.type}, select: {amount: true}})
+            const existing = await tx.currency.findUnique({where: {parent_id_type: {parent_id: parentId, type: this.type}}, select: {amount: true}})
             let amount = (existing?.amount ?? 0) + delta
 
             if (xpVariance > 0) {
@@ -52,7 +52,7 @@ export class TrinketManager {
             }
 
             const saved = await tx.currency.upsert({
-                where: {parent_id: parentId},
+                where: {parent_id_type: {parent_id: parentId, type: this.type}},
                 update: {amount, type: this.type, updated_at: now},
                 create: {parent_id: parentId, type: this.type, amount, created_at: now, updated_at: now},
                 select: {amount: true},
@@ -77,11 +77,11 @@ export class TrinketManager {
         if (delta === 0) return this.getBalance(parentId)
         const now = new Date()
         return prisma.$transaction(async (tx) => {
-            const existing = await tx.currency.findUnique({where: {parent_id: parentId, type: this.type}, select: {amount: true}})
+            const existing = await tx.currency.findUnique({where: {parent_id_type: {parent_id: parentId, type: this.type}}, select: {amount: true}})
             const current = existing?.amount ?? 0
             if (current < delta) throw new Error('insufficient trinkets')
             const saved = await tx.currency.update({
-                where: {parent_id: parentId},
+                where: {parent_id_type: {parent_id: parentId, type: this.type}},
                 data: {amount: current - delta, updated_at: now},
                 select: {amount: true},
             })
@@ -105,17 +105,17 @@ export class TrinketManager {
         if (fromParentId === toParentId) throw new Error('cannot transfer to same parent')
         const now = new Date()
         return prisma.$transaction(async (tx) => {
-            const fromRow = await tx.currency.findUnique({where: {parent_id: fromParentId, type: this.type}, select: {amount: true}})
+            const fromRow = await tx.currency.findUnique({where: {parent_id_type: {parent_id: fromParentId, type: this.type}}, select: {amount: true}})
             const fromBalance = fromRow?.amount ?? 0
             if (fromBalance < amount) throw new Error('insufficient trinkets')
 
             const newFrom = fromBalance - amount
-            await tx.currency.update({where: {parent_id: fromParentId}, data: {amount: newFrom, type: this.type, updated_at: now}})
+            await tx.currency.update({where: {parent_id_type: {parent_id: fromParentId, type: this.type}}, data: {amount: newFrom, type: this.type, updated_at: now}})
 
-            const toRow = await tx.currency.findUnique({where: {parent_id: toParentId, type: this.type}, select: {amount: true}})
+            const toRow = await tx.currency.findUnique({where: {parent_id_type: {parent_id: toParentId, type: this.type}}, select: {amount: true}})
             const newTo = (toRow?.amount ?? 0) + amount
             await tx.currency.upsert({
-                where: {parent_id: toParentId},
+                where: {parent_id_type: {parent_id: toParentId, type: this.type}},
                 update: {amount: newTo, type: this.type, updated_at: now},
                 create: {parent_id: toParentId, type: this.type, amount: newTo, created_at: now, updated_at: now},
             })
