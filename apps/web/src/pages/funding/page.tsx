@@ -46,11 +46,8 @@ export default function FundingPage() {
                         </Heading>
                         <Text>
                             Funding for Packbase is 100% you, <i>and Rek's pockets</i>. We do not have any investors, we don't raise venture capital, we don't sell or
-                            trade any
-                            data,
-                            and we don't bend to anyone's will - we're an 100% volunteer team. We have some amazing brand partners that are graciously giving us cheaper
-                            services,
-                            but running costs are still a huge drain.
+                            trade any data, and we don't bend to anyone's will - we're an 100% volunteer team. We have some partners that are graciously giving us cheaper
+                            services for nothing, but running costs are still a huge drain.
                         </Text>
                     </div>
 
@@ -63,7 +60,7 @@ export default function FundingPage() {
                                 <CurrencyDollarIcon className="w-6 h-6 inline-flex"/> Our current financial status.
                             </Heading>
                             <Text>
-                                Packbase is making ${fundingData?.summary?.avgIncome?.toLocaleString()} USD per month,
+                                Packbase is making USD${fundingData?.summary?.avgIncome?.toLocaleString()} per month,
                                 with {fundingData?.summary?.totalDonators?.toLocaleString()} donators
                                 and {fundingData?.summary?.totalVolunteers?.toLocaleString()} volunteers.
                             </Text>
@@ -72,7 +69,7 @@ export default function FundingPage() {
                                 involved with Packbase without wanting anything in return.<sup>*1</sup>
                             </Text>
                             <Text>
-                                Revenue is published at the end of each calendar month.
+                                Revenue is published at the end of each calendar month. Includes one-off payments or donations made by or directed to Wildbase.
                             </Text>
 
                             <div className="mt-2">
@@ -176,10 +173,10 @@ export default function FundingPage() {
                     <Divider/>
 
                     <Text size="xs">
-                        *1: We do not disclose our external partners as we are not obligated to. These external partners help with providing us with cheaper service
-                        costs, providing their services free of charge, or otherwise provides professional guidance on how we should operate. None of
-                        them have a controlling influence on Packbase or Wildbase at all and we hold every right to cut ties with them or disregard their advice at any
-                        time, nor do they expect (or may even receive) anything in return.
+                        *1: We do not disclose our external partners as per our agreements with them, ff we fail, they'd be in the cross-fire. These external partners
+                        help with providing us with cheaper service costs, providing their services free of charge, or otherwise provides professional guidance on how we
+                        should operate. None of them have a controlling influence on Packbase or Wildbase at all and we hold every right to cut ties with them or
+                        disregard their advice at any time, nor do they expect (or may even receive) anything in return.
                     </Text>
                 </Body>
             )}

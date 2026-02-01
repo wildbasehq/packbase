@@ -7,7 +7,7 @@ const FUNDING_HISTORY = [
     {
         month: 'Jan \'26',
         income: '43',
-        spend: '133.25'
+        spend: '479.25'
     }
 ]
 
