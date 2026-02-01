@@ -14,7 +14,7 @@ export default (app: YapockType) =>
             async ({user, set}) => {
                 await requiresAccount({set, user})
                 const items = await store.listWithOwnership(user.sub)
-                const trinketCount = await trinketManager.getBalance(`user:${user.sub}`)
+                const trinketCount = await trinketManager.getBalance(user.sub)
                 const history = await prisma.admin_audit_log.findMany({
                     where: {
                         user_id: user.sub,
