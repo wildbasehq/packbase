@@ -23,6 +23,9 @@ export default function DefaultPackSunset() {
     const [finaliseScreen, setFinaliseScreen] = useState(false)
 
     useEffect(() => {
+        // DIRTY!
+        if (!user) return
+
         vg.search.get({
             query: {
                 q: `$posts = [Where posts:user_id ("${user?.id}") AND posts:tenant_id ("00000000-0000-0000-0000-000000000000")] AS *;\n$posts:user = [Where profiles:id ($posts:user_id->ONE)] AS *;`
@@ -281,14 +284,14 @@ function SwitchUsingExistingPack({disabled, setPack}: { disabled: boolean; setPa
         refetch().then(({data}) => {
             console.log(data)
             setTimeout(() => {
-                setHasEligible(data.find(pack => pack.owner_id === user.id))
+                setHasEligible(data.find(pack => pack.owner_id === user?.id))
                 setLoadState('idle')
                 setShowDrawer(true)
             }, 1000)
         })
     }
 
-    const ownedPacks = data?.filter(pack => pack.owner_id === user.id) ?? []
+    const ownedPacks = data?.filter(pack => pack.owner_id === user?.id) ?? []
 
     return (
         <Drawer.Root open={showDrawer} onClose={() => setShowDrawer(false)}>
@@ -325,7 +328,7 @@ function SwitchUsingExistingPack({disabled, setPack}: { disabled: boolean; setPa
                                        description="These are Packs you directly own"/>
                     </Drawer.Title>
                     <div className="overflow-y-auto max-h-96 space-y-2 mt-4">
-                        {ownedPacks?.filter(pack => pack.owner_id === user.id).map(pack => (
+                        {ownedPacks?.filter(pack => pack.owner_id === user?.id).map(pack => (
                             <Button
                                 outline
                                 key={pack.id}

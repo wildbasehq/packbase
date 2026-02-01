@@ -12,9 +12,10 @@ import DefaultPackSunset from '@/pages/pack/universe/default-pack-sunset'
 import {Desktop, FloatingCompose, LogoSpinner, Mobile} from '@/src/components'
 import Preload from '@/src/preload'
 import Routes from '@/src/Routes'
-import {ClerkFailed, ClerkLoaded, ClerkLoading, SignedIn} from '@clerk/clerk-react'
+import {ClerkFailed, ClerkLoaded, ClerkLoading, SignedIn, SignedOut} from '@clerk/clerk-react'
 import {ExclamationTriangleIcon} from '@heroicons/react/20/solid'
 import {lazy, useEffect} from 'react'
+import {Redirect} from 'wouter'
 import {Providers} from './provider'
 
 // Lazy load components
@@ -45,7 +46,15 @@ function App() {
 
                 <SidebarProvider>
                     {(window.location.pathname === '/p/universe/sunset' || window.location.pathname === '/p/universe/sunset/') && (
-                        <DefaultPackSunset/>
+                        <>
+                            <SignedIn>
+                                <DefaultPackSunset/>
+                            </SignedIn>
+
+                            <SignedOut>
+                                <Redirect to="~/"/>
+                            </SignedOut>
+                        </>
                     )}
 
                     {!(window.location.pathname === '/p/universe/sunset' || window.location.pathname === '/p/universe/sunset/') && (
