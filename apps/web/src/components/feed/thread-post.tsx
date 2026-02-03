@@ -469,10 +469,6 @@ export default function ThreadPost({
                                     }}/>
                                 </div>
                                 <Divider className="my-2"/>
-                                <AlertDescription>
-                                    @{post.user?.username} received a warning for the contents of this Howl.
-                                </AlertDescription>
-
                                 <AlertDescription className="text-foreground">
                                     {post.warning.reason}
                                 </AlertDescription>
