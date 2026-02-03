@@ -402,7 +402,7 @@ export default function ThreadPost({
             {/* Left column: avatar + thread line */}
             <div className="relative flex w-12 flex-col items-center">
                 <AvatarButton
-                    href={`/@/${post.user?.username}`}
+                    href={`/@${post.user?.username}`}
                     src={getAvatar(post.user?.id)}
                     className={cn(
                         'shadow-sm',
