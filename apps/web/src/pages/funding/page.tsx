@@ -173,7 +173,7 @@ export default function FundingPage() {
                     <Divider/>
 
                     <Text size="xs">
-                        *1: We do not disclose our external partners as per our agreements with them, ff we fail, they'd be in the cross-fire. These external partners
+                        *1: We do not disclose our external partners as per our agreements with them, if we fail, they'd be in the cross-fire. These external partners
                         help with providing us with cheaper service costs, providing their services free of charge, or otherwise provides professional guidance on how we
                         should operate. None of them have a controlling influence on Packbase or Wildbase at all and we hold every right to cut ties with them or
                         disregard their advice at any time, nor do they expect (or may even receive) anything in return.
