@@ -219,8 +219,8 @@ export function SidebarLayout({children}: PropsWithChildren) {
                                 <div
                                     className="flex flex-col -space-y-1 flex-1 relative rounded px-2 z-1">
                                     <NavbarLabel>
-                                        {currentResource?.display_name?.slice(0, 15) || 'dummy'}
-                                        {currentResource?.display_name?.length > 15 ? '...' : ''}
+                                        {currentResource?.display_name?.slice(0, 24) || 'dummy'}
+                                        {currentResource?.display_name?.length > 24 ? '...' : ''}
                                     </NavbarLabel>
 
                                     <NavbarLabel className="text-muted-foreground text-xs">
