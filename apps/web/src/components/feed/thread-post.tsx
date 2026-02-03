@@ -15,6 +15,7 @@ import UserAvatar from '@/components/shared/user/avatar'
 import UserInfoCol from '@/components/shared/user/info-col'
 import {cn, isVisible, useUserAccountStore} from '@/lib'
 import {vg} from '@/lib/api'
+import {getAvatar} from '@/lib/api/users/avatar'
 import {UserProfileBasic} from '@/lib/defs/user'
 import {canContentModerate} from '@/lib/utils/can-content-moderate'
 import {formatRelativeTime} from '@/lib/utils/date'
@@ -400,30 +401,27 @@ export default function ThreadPost({
         <div className={`relative flex w-full gap-3 ${isRoot ? '' : 'pt-3'}`}>
             {/* Left column: avatar + thread line */}
             <div className="relative flex w-12 flex-col items-center">
-                <div className="z-10">
-                    <UserAvatar
-                        user={post.user}
-                        size={depth > 0 ? 'md' : 'lg'}
-                        className="rounded-full shadow-sm transition-transform duration-150 hover:scale-[1.02]"
-                    />
-                </div>
+                <AvatarButton
+                    href={`/@/${post.user?.username}`}
+                    src={getAvatar(post.user?.id)}
+                    className={cn(
+                        'shadow-sm',
+                        depth > 0 ? 'w-8 h-8' : 'w-10 h-10'
+                    )}
+                />
 
                 {/* Pole linking both avatars */}
                 <div className="absolute inset-y-0 left-1/2 -z-10 w-px -translate-x-1/2 bg-border"/>
 
                 {post.pack && (
-                    <Link
+                    <AvatarButton
                         href={`/p/${post.pack?.slug}`}
-                        className="relative mt-3 inline-flex items-center justify-center"
-                    >
-                        <AvatarButton
-                            src={post.pack?.images?.avatar}
-                            alt={post.pack?.display_name}
-                            initials={post.pack?.display_name[0]}
-                            className="aspect-square h-8 w-8 rounded-lg border border-border bg-background shadow-sm"
-                            square
-                        />
-                    </Link>
+                        src={post.pack?.images?.avatar}
+                        alt={post.pack?.display_name}
+                        initials={post.pack?.display_name[0]}
+                        className="aspect-square mt-3 h-8 w-8 rounded-lg border border-border bg-background shadow-sm"
+                        square
+                    />
                 )}
 
                 {/* Vertical connector for nested threads */}
