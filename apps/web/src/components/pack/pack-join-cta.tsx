@@ -19,7 +19,7 @@ export default function PackJoinCTA() {
 
     return (
         <div
-            className="flex flex-col justify-center rounded-lg border border-dashed border-border/50 bg-primary-lime p-8 m-4">
+            className="flex flex-col justify-center rounded-lg border border-dashed border-border bg-primary-lime p-8 m-4">
             <h1 className="mb-2 text-3xl/12! font-bold! text-black!">
                 Go on, join the others.
             </h1>

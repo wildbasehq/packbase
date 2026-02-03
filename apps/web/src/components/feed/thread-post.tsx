@@ -453,7 +453,7 @@ export default function ThreadPost({
                 <ThreadPostHeader post={post} isAuthor={isAuthor} isMature={containsMature} onDelete={onDelete}/>
 
                 <Card
-                    className={`relative group max-w-full! overflow-hidden rounded-xl! border border-border ${depthTintClass} transition-shadow hover:shadow-sm`}
+                    className={`relative group max-w-full! overflow-hidden rounded-xl! border ${depthTintClass} transition-shadow hover:shadow-sm`}
                 >
                     <div className={innerPaddingClass}>
                         {/* User received a warning? */}

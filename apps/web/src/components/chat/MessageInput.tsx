@@ -47,7 +47,7 @@ export const MessageInput = forwardRef<HTMLTextAreaElement, MessageInputProps>(
                 <div
                     className={cn(
                         'flex items-center gap-2 rounded-2xl border bg-muted px-2 py-2 shadow-sm transition-all duration-200',
-                        isFocused ? 'ring-1 ring-ring' : 'border-border/60 hover:border-border',
+                        isFocused ? 'ring-1 ring-ring' : 'hover:border-border',
                         disabled && 'opacity-50 pointer-events-none'
                     )}
                 >

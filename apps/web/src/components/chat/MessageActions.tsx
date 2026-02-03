@@ -11,7 +11,7 @@ export function MessageActions({onEdit, onDelete, className}: MessageActionsProp
             absolute -top-2 right-0 
             opacity-0 group-hover/message:opacity-100 
             transition-all duration-200 
-            bg-background border border-border 
+            bg-background border 
             rounded-md shadow-sm p-1 
             flex gap-1 
             ${className || ''}
