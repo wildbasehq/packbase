@@ -1,5 +1,5 @@
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import {Settings} from '@/lib/settings'
 import {xpManager} from '@/lib/trinket-manager'
 import {t} from 'elysia'

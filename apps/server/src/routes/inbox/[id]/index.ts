@@ -1,6 +1,6 @@
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
-import {NotificationManager} from '@/lib/NotificationManager'
+import {HTTPError} from '@/lib/http-error'
+import {NotificationManager} from '@/lib/notification-manager'
 import {NotificationType} from '@/models/defs'
 import {t} from 'elysia'
 

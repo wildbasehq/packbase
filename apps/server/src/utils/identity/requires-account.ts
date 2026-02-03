@@ -1,4 +1,4 @@
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 
 export default async function requiresAccount({set, user}: { set: any; user: { sub: string } }) {
     if (!user) {

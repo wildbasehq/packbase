@@ -1,5 +1,5 @@
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import {t} from 'elysia'
 
 export default (app: YapockType) =>
@@ -7,7 +7,7 @@ export default (app: YapockType) =>
         // @ts-ignore - Not sure what's going on here
         .post(
             '',
-            async ({params, body, user, logAudit}) => {
+            async ({params, body, user, auditLog}) => {
                 const {id} = params
                 const {reason} = body
 
@@ -29,7 +29,7 @@ export default (app: YapockType) =>
 
                 if (howl.warning) throw HTTPError.conflict({summary: 'Howl already has a warning'})
 
-                const log = await logAudit({
+                const log = await auditLog({
                     action: 'HOWL_WARNED',
                     model_id: howl.user_id,
                     model_type: 'profiles',

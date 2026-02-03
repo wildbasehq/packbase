@@ -19,6 +19,7 @@ export interface RateLimitResult {
     limit: number;
     remaining: number;
     resetAt: number;
+    count: number;
     retryAfterSeconds?: number;
 }
 
@@ -148,6 +149,7 @@ export class DMRateLimiter {
         return {
             allowed,
             limit,
+            count: remaining,
             remaining,
             resetAt: entry.resetAt,
             retryAfterSeconds,

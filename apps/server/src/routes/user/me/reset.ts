@@ -1,5 +1,5 @@
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import requiresToken from '@/utils/identity/requires-token'
 
 export default (app: YapockType) =>

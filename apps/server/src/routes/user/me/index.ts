@@ -1,13 +1,12 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
-import PackMan from '@/lib/packs/PackMan'
+import {HTTPError} from '@/lib/http-error'
+import PackMan from '@/lib/packs/pack-manager'
 import createStorage from '@/lib/storage'
 import {UserProfile} from '@/models/defs'
 import {checkDefaultPackSetup} from '@/routes/packs/default'
 import {getUser, UserCache} from '@/routes/user/[username]'
 import {checkUserBillingPermission} from '@/utils/clerk/check-user-permission'
-import ThrowError from '@/utils/errors'
 import requiresToken from '@/utils/identity/requires-token'
 import {similarity} from '@/utils/similarity'
 import sharp from 'sharp'
@@ -293,10 +292,8 @@ export async function updateUser({
             })
         }
     } catch (error) {
-        set.status = 500
-        throw ThrowError({
-            name: 'ServerlandCommErr',
-            message: error.message,
+        throw HTTPError.serverError({
+            summary: 'Failed to update user',
         })
     }
 
@@ -326,10 +323,8 @@ export async function updateUser({
         const headerUpload = await storage.uploadBase64Image(currentUser.sub, `0/header.${header.ext}`, base64Data, header.ext === 'gif')
 
         if (!headerUpload.success) {
-            set.status = 500
-            throw ThrowError({
-                name: 'ServerlandCommErr',
-                message: headerUpload.error?.message || 'Failed to upload header image',
+            throw HTTPError.serverError({
+                summary: headerUpload.error?.message || 'Failed to upload header image'
             })
         }
 
@@ -346,10 +341,8 @@ export async function updateUser({
             },
         })
     } catch (error) {
-        set.status = 500
-        throw ThrowError({
-            name: 'ServerlandCommErr',
-            message: error.message,
+        throw HTTPError.serverError({
+            summary: error.message || 'Failed to update user',
         })
     }
 

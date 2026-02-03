@@ -1,5 +1,5 @@
 import prisma from '@/db/prisma'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import Items from '@/lib/store/items.json'
 import {trinketManager} from '@/lib/trinket-manager'
 import debug from 'debug'

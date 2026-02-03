@@ -1,15 +1,15 @@
 import prisma from '@/db/prisma'
 
 export default async function getIDType(id: string) {
-    try {
-        const data = await prisma.packs.findUnique({where: {id}})
-        if (data) return 1
-    } catch (_) {
-        try {
-            const data2 = await prisma.profiles.findUnique({where: {id}})
-            if (data2) return 2
-        } catch (_) {
-            return 0
-        }
+    let type = 0
+
+    const pack = await prisma.packs.findUnique({where: {id}})
+    if (pack) {
+        type = 1
+    } else {
+        const profile = await prisma.profiles.findUnique({where: {id}})
+        type = profile && 2
     }
+    
+    return type
 }

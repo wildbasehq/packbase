@@ -1,9 +1,12 @@
 /**
  * On server boot, check if any users have howls with `rating_suggestive` or `rating_explicit` tags. If so, set their `is_r18` flag to true on DB.
  */
+import Debug from 'debug'
+
+const log = Debug('vg:migrate:4_toggle_r18_user_status')
 
 export default async function migrateToggleR18UserStatus() {
-    console.log('Starting migration: Toggle R18 user status based on howl ratings...')
+    log('Starting migration: Toggle R18 user status based on howl ratings...')
 
     const startTime = Date.now()
 
@@ -34,12 +37,12 @@ export default async function migrateToggleR18UserStatus() {
             },
         })
 
-        console.log(`Migration successful: Updated ${updateResult.count} users to set is_r18 to true.`)
+        log(`Migration successful: Updated ${updateResult.count} users to set is_r18 to true.`)
     } catch (error) {
-        console.error('Migration failed:', error)
+        log('Migration failed:', error)
         return
     }
 
     const endTime = Date.now()
-    console.log(`Migration completed in ${(endTime - startTime) / 1000} seconds.`)
+    log(`Migration completed in ${(endTime - startTime) / 1000} seconds.`)
 }

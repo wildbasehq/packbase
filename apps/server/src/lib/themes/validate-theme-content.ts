@@ -4,7 +4,7 @@
  * and to support a "dry run" mode for testing content before actual upload
  */
 
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import beautifyCSS from '@/lib/sanitize/beautify'
 import DOMPurify from 'isomorphic-dompurify'
 

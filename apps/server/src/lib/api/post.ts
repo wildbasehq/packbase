@@ -1,16 +1,14 @@
-import {Database} from '@/database.types'
 import prisma from '@/db/prisma'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import createStorage from '@/lib/storage'
-import {UserProfile} from '@/models/defs'
 import {getPack} from '@/routes/pack/[id]'
 import {getUser} from '@/routes/user/[username]'
 import requiresToken from '@/utils/identity/requires-token'
 import posthog, {distinctId} from '@/utils/posthog'
 
-const HowlCache = new Map<string, Database['public']['Tables']['posts']['Row'] & typeof UserProfile>()
+const HowlCache = new Map<string, any>()
 
-export async function getPost(id: string, post?: (Database['public']['Tables']['posts']['Row'] & typeof UserProfile) | undefined) {
+export async function getPost(id: string, post?: any | undefined) {
     const timer = new Date().getTime()
     const cached = HowlCache.get(id)
     let data = post || cached
@@ -123,7 +121,7 @@ export async function getPost(id: string, post?: (Database['public']['Tables']['
     return data
 }
 
-export async function deletePost({params: {id}, body, set, user, logAudit}) {
+export async function deletePost({params: {id}, body, set, user, auditLog}) {
     requiresToken({set, user})
 
     const reason: string | undefined = body?.reason
@@ -152,7 +150,7 @@ export async function deletePost({params: {id}, body, set, user, logAudit}) {
         })
 
         if (user.is_content_moderator && reason) {
-            logAudit({
+            auditLog({
                 action: 'HOWL_DELETED',
                 model_id: post.user_id,
                 model_type: 'profiles',

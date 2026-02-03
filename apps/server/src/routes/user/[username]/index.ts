@@ -1,7 +1,7 @@
 import clerkClient from '@/db/auth'
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import {xpManager} from '@/lib/trinket-manager'
 import {UserProfile} from '@/models/defs'
 import posthog, {distinctId} from '@/utils/posthog'

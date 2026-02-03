@@ -1,6 +1,6 @@
 import prisma from '@/db/prisma'
-import {BulkPostLoader} from '@/lib/BulkPostLoader'
-import {HTTPError} from '@/lib/HTTPError'
+import {BulkPostLoader} from '@/lib/bulk-post-loader'
+import {HTTPError} from '@/lib/http-error'
 import debug from 'debug'
 import {makeCacheKey, withQueryCache} from './cache'
 import {getColumn, getDefaultIdColumn, Relations, Schemas} from './schema'

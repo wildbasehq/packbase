@@ -3,8 +3,7 @@
 import clerkClient from '@/db/auth'
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
-import {ErrorTypebox} from '@/utils/errors'
+import {ErrorTypebox, HTTPError} from '@/lib/http-error'
 import requiresAccount from '@/utils/identity/requires-account'
 import {Invitation} from '@clerk/backend'
 import {t} from 'elysia'
@@ -12,7 +11,7 @@ import {t} from 'elysia'
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({set, body, user, logAudit}) => {
+        async ({set, body, user, auditLog}) => {
             await requiresAccount({set, user})
 
             let is_admin = user.sessionClaims?.roles?.includes('admin')
@@ -92,7 +91,7 @@ export default (app: YapockType) =>
                 throw HTTPError.serverError({summary: 'Failed to create invite'})
             }
 
-            logAudit({
+            auditLog({
                 action: 'INVITE_CREATED',
                 model_id: inviteCreated.id,
                 model_type: 'invite',

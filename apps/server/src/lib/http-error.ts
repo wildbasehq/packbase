@@ -1,5 +1,7 @@
 // src/utils/errors/HTTPError.ts
 
+import {t} from 'elysia'
+
 /**
  * Type definition for HTTPError constructor parameters
  */
@@ -271,9 +273,8 @@ export class HTTPError extends Error {
     }
 }
 
-/**
- * Type guard to check if an object is an HTTPError
- */
-export function isHTTPError(error: any): error is HTTPError {
-    return error instanceof HTTPError
-}
+export const ErrorTypebox = t.Object({
+    summary: t.String(),
+}, {
+    additionalProperties: t.Any(),
+})

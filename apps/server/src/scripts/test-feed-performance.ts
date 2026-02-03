@@ -1,4 +1,4 @@
-import {FeedController} from '@/lib/FeedController'
+import {FeedController} from '@/lib/feed-controller'
 
 async function testFeedPerformance() {
     const userId = process.argv.find((arg) => arg.startsWith('--userId='))?.split('=')[1] || 'test-user-id'

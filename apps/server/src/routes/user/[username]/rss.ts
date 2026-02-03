@@ -1,6 +1,6 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import {RSSGenerator} from '@/lib/rss'
 import {getUser} from '@/routes/user/[username]/index'
 import {checkUserBillingPermission} from '@/utils/clerk/check-user-permission'

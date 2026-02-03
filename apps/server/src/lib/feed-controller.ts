@@ -1,6 +1,6 @@
 import prisma from '@/db/prisma'
-import {BulkPostLoader} from '@/lib/BulkPostLoader'
-import {HTTPError} from '@/lib/HTTPError'
+import {BulkPostLoader} from '@/lib/bulk-post-loader'
+import {HTTPError} from '@/lib/http-error'
 import getIDTypeDefault from '@/utils/get-id-type'
 import posthog, {distinctId} from '@/utils/posthog'
 

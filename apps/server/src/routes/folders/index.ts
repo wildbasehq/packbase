@@ -1,6 +1,6 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import requiresAccount from '@/utils/identity/requires-account'
 import requiresToken from '@/utils/identity/requires-token'
 import {t} from 'elysia'

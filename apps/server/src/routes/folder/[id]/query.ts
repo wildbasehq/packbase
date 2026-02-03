@@ -1,6 +1,6 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import {parseQuery} from '@/lib/search/parser'
 import {SearchAPI} from '@/routes/search'
 import {t} from 'elysia'

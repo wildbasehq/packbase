@@ -1,6 +1,6 @@
 import clerkClient from '@/db/auth'
 import prisma from '@/db/prisma'
-import {NotificationManager} from '@/lib/NotificationManager'
+import {NotificationManager} from '@/lib/notification-manager'
 import {trinketManager, xpManager} from '@/lib/trinket-manager'
 import {SignedInAuthObject} from '@clerk/backend/internal'
 import Debug from 'debug'

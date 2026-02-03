@@ -1,4 +1,4 @@
-import {FeedController} from '@/lib/FeedController'
+import {FeedController} from '@/lib/feed-controller'
 import {readFileSync} from 'fs'
 import {join} from 'path'
 import prisma from '../../db/prisma'

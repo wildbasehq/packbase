@@ -1,7 +1,6 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
-import {ErrorTypebox} from '@/utils/errors'
+import {ErrorTypebox, HTTPError} from '@/lib/http-error'
 import {t} from 'elysia'
 
 export default (app: YapockType) =>

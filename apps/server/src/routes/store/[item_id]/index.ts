@@ -1,7 +1,7 @@
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
+import StoreManager from '@/lib/store-manager'
 import Items from '@/lib/store/items.json'
-import StoreManager from '@/lib/StoreManager'
 import requiresAccount from '@/utils/identity/requires-account'
 import {t} from 'elysia'
 

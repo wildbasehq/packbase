@@ -1,5 +1,5 @@
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import getClerkAvatar from '@/utils/get-clerk-avatar'
 import {fetch} from 'bun'
 

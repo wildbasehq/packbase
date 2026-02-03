@@ -2,7 +2,7 @@ import path from 'path'
 import sharp from 'sharp'
 import {Readable} from 'stream'
 import {v4 as uuidv4} from 'uuid'
-import {StorageProvider} from '../../../plugins/storage-interface'
+import {StorageProvider} from './storage-interface'
 
 /**
  * Storage class for managing S3 compatible buckets
@@ -425,7 +425,8 @@ export class Storage {
  */
 export function createStorage(bucket: string): Storage {
     // Import the S3StorageProvider dynamically to avoid circular dependencies
-    const {S3StorageProvider} = require('../../../plugins/s3-storage-provider')
+    // @TODO: Make this customisable - its already built to be provider agnostic
+    const {S3StorageProvider} = require('./s3-storage-provider')
 
     // Create a new S3StorageProvider with default configuration
     const storageProvider = S3StorageProvider.createFromEnv(bucket)

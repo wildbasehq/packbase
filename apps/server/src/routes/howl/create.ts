@@ -1,7 +1,7 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
 import {createHowlJob, enqueueHowlJob, getHowlJobStatus} from '@/lib/howl-job-queue'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import {HowlBody} from '@/models/defs'
 import requiresAccount from '@/utils/identity/requires-account'
 import sanitizeTags from '@/utils/sanitize-tags'

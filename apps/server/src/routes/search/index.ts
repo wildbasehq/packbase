@@ -4,7 +4,7 @@
 
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import {executeQuery} from '@/lib/search/executor'
 import {parseQuery} from '@/lib/search/parser'
 import {t} from 'elysia'

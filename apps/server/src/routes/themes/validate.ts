@@ -1,5 +1,5 @@
 import {YapockType} from '@/index'
-import validateThemeContent from '@/lib/themes/validateThemeContent'
+import validateThemeContent from '@/lib/themes/validate-theme-content'
 import requiresAccount from '@/utils/identity/requires-account'
 import {t} from 'elysia'
 

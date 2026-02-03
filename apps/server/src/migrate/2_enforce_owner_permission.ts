@@ -1,4 +1,4 @@
-import PackMan from '@/lib/packs/PackMan'
+import PackMan from '@/lib/packs/pack-manager'
 import debug from 'debug'
 
 const log = debug('vg:migrate:2_enforce_owner_permission')

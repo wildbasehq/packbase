@@ -1,7 +1,7 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
-import validateThemeContent from '@/lib/themes/validateThemeContent'
+import {HTTPError} from '@/lib/http-error'
+import validateThemeContent from '@/lib/themes/validate-theme-content'
 import {Theme} from '@/models/themes.model'
 import {t} from 'elysia'
 

@@ -1,8 +1,8 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
-import PackMan from '@/lib/packs/PackMan'
-import validateThemeContent from '@/lib/themes/validateThemeContent'
+import {HTTPError} from '@/lib/http-error'
+import PackMan from '@/lib/packs/pack-manager'
+import validateThemeContent from '@/lib/themes/validate-theme-content'
 import {CreatePackTheme} from '@/models/pack-themes.model'
 import {t} from 'elysia'
 

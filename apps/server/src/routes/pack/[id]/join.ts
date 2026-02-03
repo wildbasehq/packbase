@@ -1,9 +1,8 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
-import {FeedController} from '@/lib/FeedController'
-import {HTTPError} from '@/lib/HTTPError'
-import PackMan from '@/lib/packs/PackMan'
-import {ErrorTypebox} from '@/utils/errors'
+import {FeedController} from '@/lib/feed-controller'
+import {ErrorTypebox, HTTPError} from '@/lib/http-error'
+import PackMan from '@/lib/packs/pack-manager'
 import requiresAccount from '@/utils/identity/requires-account'
 import requiresToken from '@/utils/identity/requires-token'
 import {t} from 'elysia'
@@ -44,7 +43,7 @@ export default (app: YapockType) =>
                                 default_pack: id
                             }
                         })
-                        
+
                     } catch (insertError) {
                         set.status = 400
                         throw HTTPError.badRequest({

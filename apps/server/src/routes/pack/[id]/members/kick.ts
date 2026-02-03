@@ -1,7 +1,6 @@
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
-import PackMan from '@/lib/packs/PackMan'
-import {ErrorTypebox} from '@/utils/errors'
+import {ErrorTypebox, HTTPError} from '@/lib/http-error'
+import PackMan from '@/lib/packs/pack-manager'
 import requiresToken from '@/utils/identity/requires-token'
 import {t} from 'elysia'
 

@@ -9,11 +9,10 @@ JSON.stringify = (obj) =>
         return value
     })
 import prisma from '@/db/prisma'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import {Inchat} from '@/lib/inchat'
 import deleteNulls from '@/utils/delete-nulls'
 import verifyToken from '@/utils/identity/verify-token'
-import posthog, {distinctId} from '@/utils/posthog'
 import {cors} from '@elysiajs/cors'
 import {swagger} from '@elysiajs/swagger'
 import Debug from 'debug'
@@ -21,24 +20,13 @@ import {Elysia} from 'elysia'
 import {autoload} from 'elysia-autoload'
 import fs from 'node:fs/promises'
 
-const isCluster = process.argv.includes('--cluster')
-const isBuildingSDK = process.argv.includes('--build-sdk')
-const isTestingStartupTime = process.argv.includes('--close-on-success')
-
-const log = isTestingStartupTime ? {
-    info: () => {
-    },
-    request: () => {
-    },
-    error: () => {
-    },
-} : {
+const log = {
     info: Debug('vg:init'),
     request: Debug('vg:request'),
     error: Debug('vg:init:error'),
 }
 
-log.info(`Server${isCluster ? ' (cluster)' : ''} \x1b[38;5;244mSTART\x1b[0m: Awake!!`)
+log.info(`Server Awake!!`)
 
 declare global {
     interface UserPrivateMetadata {
@@ -64,7 +52,7 @@ const Yapock = new Elysia({})
 
         const user = await verifyToken(request)
 
-        async function logAudit({action, model_id, model_type, model_object}: {
+        async function auditLog({action, model_id, model_type, model_object}: {
             action: string;
             model_id: string;
             model_type: string;
@@ -98,7 +86,7 @@ const Yapock = new Elysia({})
                     last_online: new Date()
                 }
             })
-            return {user, logAudit}
+            return {user, auditLog}
         }
     })
 
@@ -126,15 +114,6 @@ const Yapock = new Elysia({})
     .use(
         await autoload({
             dir: `${__dirname}/routes`,
-            ...(isBuildingSDK
-                ? {
-                    types: {
-                        output: './routes.ts',
-                        typeName: 'Packbase',
-                        useExport: true,
-                    },
-                }
-                : {}),
         }),
     )
     .use(
@@ -172,23 +151,6 @@ const Yapock = new Elysia({})
 Yapock.listen(process.env.PORT || 8000, async () => {
     const startupMs = performance.now()
 
-    if (isBuildingSDK) {
-        log.info(`Server \x1b[32mOK\x1b[0m: Heading back to the SDK build process`)
-        process.exit(0)
-    } else if (isTestingStartupTime) {
-        console.log(startupMs)
-        process.exit(0)
-    }
-
-    posthog.capture({
-        distinctId,
-        event: 'Server Start',
-        properties: {
-            startup: startupMs,
-            maintenance: process.env.MAINTENANCE,
-        },
-    })
-
     if (process.env.WEBHOOK_URL) {
         // Call webhook with message
         fetch(process.env.WEBHOOK_URL, {
@@ -210,13 +172,7 @@ Yapock.listen(process.env.PORT || 8000, async () => {
             })
     }
 
-    if (startupMs > 150) {
-        log.info(
-            `Server \x1b[31mSLOW\x1b[0m: Startup took ${startupMs}ms (true ${performance.now()}) (${Math.round(startupMs / 1000)}s${Math.round(startupMs / 1000) > 60 ? `, ${Math.round(startupMs / 1000 / 60)}m` : ''}), Listening on ${process.env.PORT || 8000}\nThis took too long! It will add up the more server instances you have.`,
-        )
-    } else {
-        log.info(`Server \x1b[32mOK\x1b[0m: Startup took ${startupMs}ms (true ${Math.round(performance.now())}), Listening on ${process.env.PORT || 8000}`)
-    }
+    log.info(`Server Startup took ${startupMs}ms (true ${Math.round(performance.now())}), Listening on ${process.env.PORT || 8000}`)
 
     // Run all files in order inside the migrate folder
     try {
@@ -237,11 +193,6 @@ Yapock.listen(process.env.PORT || 8000, async () => {
         log.error('Error running migrations', e)
     }
 })
-
-// process.on('unhandledRejection', (reason, promise) => {
-//     log.error('Unhandled Rejection at:', promise, 'reason:', reason)
-//     // Application specific logging, throwing an error, or other logic here
-// })
 
 type YapockTypeDerivative = typeof Yapock;
 declare module '@/index' {

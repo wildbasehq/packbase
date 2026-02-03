@@ -1,15 +1,14 @@
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
-import PackMan from '@/lib/packs/PackMan'
-import validateThemeContent from '@/lib/themes/validateThemeContent'
+import {ErrorTypebox, HTTPError} from '@/lib/http-error'
+import PackMan from '@/lib/packs/pack-manager'
+import validateThemeContent from '@/lib/themes/validate-theme-content'
 import {t} from 'elysia'
 
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({set, body, user, params}) => {
+        async ({body, user, params}) => {
             if (!user) {
-                set.status = 401
                 throw HTTPError.unauthorized({
                     summary: 'You must be logged in to validate pack theme content.',
                 })
@@ -34,7 +33,6 @@ export default (app: YapockType) =>
                     sanitized: result,
                 }
             } catch (error: any) {
-                set.status = 400
                 throw HTTPError.badRequest({
                     summary: 'Theme content validation failed.',
                     detail: error.message,
@@ -59,12 +57,15 @@ export default (app: YapockType) =>
                     sanitized: t.Object({
                         html: t.String(),
                         css: t.String(),
+                        isValid: t.Boolean(),
+                        htmlIssue: t.Optional(t.String()),
+                        cssIssue: t.Optional(t.String())
                     }),
                 }),
-                400: t.Undefined(),
-                401: t.Undefined(),
-                403: t.Undefined(),
-                404: t.Undefined(),
+                400: ErrorTypebox,
+                401: ErrorTypebox,
+                403: ErrorTypebox,
+                404: ErrorTypebox,
             },
         },
     );

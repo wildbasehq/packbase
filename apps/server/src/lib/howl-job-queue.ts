@@ -5,7 +5,7 @@
 
 import prisma from '@/db/prisma'
 import Baozi from '@/lib/events'
-import {FeedController} from '@/lib/FeedController'
+import {FeedController} from '@/lib/feed-controller'
 import {clearQueryCache} from '@/lib/search/cache'
 import createStorage from '@/lib/storage'
 import {xpManager} from '@/lib/trinket-manager'

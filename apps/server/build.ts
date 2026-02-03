@@ -4,22 +4,6 @@ import fs from 'node:fs/promises'
 
 console.log('+ Ensuring prisma is generated')
 await $`bun run prisma:generate`
-console.log('+ Startup testing before type build')
-let startupTime = parseFloat((await $`DEBUG=n bun start -- --close-on-success`.text()).trim())
-// Buffer to string
-startupTime = Math.round(startupTime * 100) / 100
-console.log(`  - Startup time: ${startupTime}ms`)
-if (startupTime > 94) {
-    console.error('  - (CI) Startup time is too long.')
-}
-
-
-console.log('+ Building Voyage')
-console.log('  - Trying to build routes')
-await $`DEBUG=init,init:* bun start -- --build-sdk`
-console.log('  - Building process file')
-await $`bun build --compile --outfile=dist/voyage ./src/index.ts`.text()
-
 console.log()
 
 // Clean up ./dist/voyage-schema from unwanted files and folders using glob

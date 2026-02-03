@@ -1,6 +1,5 @@
 import {YapockType} from '@/index'
-import {HTTPError} from '@/lib/HTTPError'
-import getUserPrivateSettings from '@/utils/get-user-private-settings'
+import {HTTPError} from '@/lib/http-error'
 import requiresToken from '@/utils/identity/requires-token'
 import {t} from 'elysia'
 
@@ -15,19 +14,13 @@ export async function checkDefaultPackSetup(userId: string) {
         }
     })
 
-    const lastSwitch = await getUserPrivateSettings(userId, 'last_default_pack_switch')
-    // More than 30 days since last switch
-    const can_switch = !lastSwitch || (Date.now() - new Date(lastSwitch || 0).getTime()) > 30 * 24 * 60 * 60 * 1000
-
     const requires_switch = !!(await hasPostsInUniverse(userId))
-    // !profile?.default_pack
     const requires_setup = !profile?.default_pack
 
     return {
         id: profile.default_pack,
         requires_switch,
         requires_setup,
-        can_switch,
     }
 }
 

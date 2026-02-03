@@ -2,7 +2,8 @@ import prisma from '@/db/prisma'
 import {faker} from '@faker-js/faker'
 
 async function main() {
-    const [, , limitArg] = process.argv
+    let [, , limitArg, tenant_id] = process.argv
+    if (!tenant_id) tenant_id = '00000000-0000-0000-0000-000000000000'
 
     const limit = limitArg ? Number.parseInt(limitArg, 10) : 100
     if (Number.isNaN(limit) || limit <= 0) {
@@ -57,6 +58,7 @@ async function main() {
                         content_type: 'markdown',
                         body,
                         user_id: userId,
+                        tenant_id,
                     }))
 
                     const result = await prisma.posts.createMany({data})

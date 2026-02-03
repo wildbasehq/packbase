@@ -1,4 +1,4 @@
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 
 /**
  * Sanitizes and validates an array of tags
