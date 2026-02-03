@@ -6,7 +6,13 @@ import {Alert, AlertDescription, AlertTitle} from '../shared/alert'
 import {useModal} from './provider'
 
 export default function BrowserCheck() {
-    const {show, hide} = useModal()
+    const modal = useModal()
+    const {show, hide} = modal || {
+        show: () => {
+        },
+        hide: () => {
+        }
+    }
     const [hasSeenWarningModal, setHasSeenWarningModal] = useLocalStorage('has-seen-browser-warning-modal', false)
     // Search navigator.userAgentData for Chromium.
     const isChrome = // @ts-ignore
