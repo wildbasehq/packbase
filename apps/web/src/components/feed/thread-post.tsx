@@ -408,6 +408,7 @@ export default function ThreadPost({
                         'shadow-sm',
                         depth > 0 ? 'w-8 h-8' : 'w-10 h-10'
                     )}
+                    square
                 />
 
                 {/* Pole linking both avatars */}
@@ -419,7 +420,7 @@ export default function ThreadPost({
                         src={post.pack?.images?.avatar}
                         alt={post.pack?.display_name}
                         initials={post.pack?.display_name[0]}
-                        className="aspect-square mt-3 h-8 w-8 rounded-lg border border-border bg-background shadow-sm"
+                        className="mt-3 h-8 w-8 border border-border bg-background shadow-sm"
                         square
                     />
                 )}
@@ -452,7 +453,7 @@ export default function ThreadPost({
                 <ThreadPostHeader post={post} isAuthor={isAuthor} isMature={containsMature} onDelete={onDelete}/>
 
                 <Card
-                    className={`relative group max-w-full! overflow-hidden rounded-xl! border border-border/60 ${depthTintClass} transition-shadow hover:shadow-sm`}
+                    className={`relative group max-w-full! overflow-hidden rounded-xl! border border-border ${depthTintClass} transition-shadow hover:shadow-sm`}
                 >
                     <div className={innerPaddingClass}>
                         {/* User received a warning? */}
