@@ -15,6 +15,13 @@ const HOP_BY_HOP_HEADERS = new Set([
     'upgrade'
 ])
 
+/** Headers to skip when body has been decoded/modified */
+const ENCODING_HEADERS = new Set([
+    ...HOP_BY_HOP_HEADERS,
+    'content-encoding',
+    'content-length'
+])
+
 /** Headers to skip only on requests */
 const REQUEST_SKIP_HEADERS = new Set([...HOP_BY_HOP_HEADERS, 'host'])
 
@@ -135,6 +142,6 @@ export default (app: YapockType) =>
 
             return new Response(body, {
                 status: response.status,
-                headers: filterHeaders(response.headers, HOP_BY_HOP_HEADERS)
+                headers: filterHeaders(response.headers, ENCODING_HEADERS)
             })
         })
