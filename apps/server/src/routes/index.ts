@@ -31,15 +31,10 @@ const PROXY_CACHE_MAX_ENTRIES = parseInt(process.env.PROXY_CACHE_MAX_ENTRIES || 
 const PROXY_CACHE_MAX_BYTES = parseInt(process.env.PROXY_CACHE_MAX_BYTES || String(50 * 1024 * 1024), 10)
 const PROXY_CACHE_TTL_MS = parseInt(process.env.PROXY_CACHE_TTL_MS || String(60 * 60 * 1000), 10)
 
-/** Browser cache max-age in seconds (1 year for versioned assets) */
-const BROWSER_CACHE_MAX_AGE = parseInt(process.env.BROWSER_CACHE_MAX_AGE || String(365 * 24 * 60 * 60), 10)
-/** Browser cache max-age for HTML (no-cache, must revalidate for fresh injections) */
-const BROWSER_CACHE_HTML_DIRECTIVE = 'no-cache'
-
 const proxyCache = new LRUCache<string, ProxyCacheEntry>({
     max: PROXY_CACHE_MAX_ENTRIES,
     maxSize: PROXY_CACHE_MAX_BYTES,
-    sizeCalculation: (entry) => entry.body.length || 1,
+    sizeCalculation: (entry) => entry.body.length,
     ttl: PROXY_CACHE_TTL_MS
 })
 
@@ -74,8 +69,7 @@ const HOP_BY_HOP_HEADERS = new Set([
 const ENCODING_HEADERS = new Set([
     ...HOP_BY_HOP_HEADERS,
     'content-encoding',
-    'content-length',
-    'cache-control'
+    'content-length'
 ])
 
 /** Headers to skip only on requests */
@@ -99,23 +93,6 @@ function shouldSkipCache(cacheControl: string | null): boolean {
     if (!cacheControl) return false
     const lower = cacheControl.toLowerCase()
     return lower.includes('no-store') || lower.includes('no-cache')
-}
-
-/** 
- * Check if the path represents a versioned/fingerprinted asset.
- * Matches patterns like:
- * - /assets/index-CUniEv2R.js (Vite hash)
- * - /assets/style.a1b2c3d4.css (content hash)
- * - /file.js?v=123 (query param version)
- */
-function isVersionedAsset(path: string, requestUrl: URL): boolean {
-    // Check for ?v= query param
-    if (requestUrl.searchParams.has('v')) return true
-    
-    // Check for hash pattern in filename: name-HASH.ext or name.HASH.ext
-    // Matches 8+ character alphanumeric hashes before the extension
-    const hashedFilenamePattern = /[-\.][a-zA-Z0-9]{8,}\.[a-z]+$/
-    return hashedFilenamePattern.test(path)
 }
 
 /** Generate cache key from path and version query param */
@@ -149,26 +126,6 @@ function cacheResponse(
         status,
         headers: headersToObject(headers, ENCODING_HEADERS)
     })
-}
-
-/** Add browser cache headers based on content type and whether it has a version param */
-function withBrowserCacheHeaders(
-    headers: Record<string, string>,
-    isHtml: boolean,
-    hasVersion: boolean
-): Record<string, string> {
-    if (isHtml) {
-        // HTML has dynamic injections, use no-cache so browser revalidates
-        return {...headers, 'cache-control': BROWSER_CACHE_HTML_DIRECTIVE}
-    }
-
-    if (hasVersion) {
-        // Versioned assets can be cached for a long time (immutable)
-        return {...headers, 'cache-control': `public, max-age=${BROWSER_CACHE_MAX_AGE}, immutable`}
-    }
-
-    // Non-versioned assets get a shorter cache with revalidation
-    return {...headers, 'cache-control': 'public, max-age=3600, must-revalidate'}
 }
 
 // ============================================================================
@@ -293,14 +250,13 @@ export default (app: YapockType) =>
 
         const requestUrl = new URL(request.url)
         const cacheKey = getCacheKey(path, requestUrl)
-        const hasVersion = isVersionedAsset(path, requestUrl)
         const cached = proxyCache.get(cacheKey)
 
         // Serve cached non-HTML responses immediately
         if (cached && !cached.contentType.includes('text/html')) {
             return new Response(cached.body, {
                 status: cached.status,
-                headers: withBrowserCacheHeaders(cached.headers, false, hasVersion)
+                headers: cached.headers
             })
         }
 
@@ -309,7 +265,7 @@ export default (app: YapockType) =>
             const body = await injectHtmlContent(cached.body, {path, request, user})
             return new Response(body, {
                 status: cached.status,
-                headers: withBrowserCacheHeaders(cached.headers, true, hasVersion)
+                headers: cached.headers
             })
         }
 
@@ -328,7 +284,6 @@ export default (app: YapockType) =>
 
         const contentType = response.headers.get('content-type')
         const cacheControl = response.headers.get('cache-control')
-        // Only cache 200 responses - 304 has no body to cache
         const canCache = !shouldSkipCache(cacheControl) && response.ok
 
         // Handle cacheable non-HTML text responses
@@ -337,11 +292,7 @@ export default (app: YapockType) =>
             cacheResponse(cacheKey, textBody, contentType || '', response.status, response.headers)
             return new Response(textBody, {
                 status: response.status,
-                headers: withBrowserCacheHeaders(
-                    headersToObject(response.headers, ENCODING_HEADERS),
-                    false,
-                    hasVersion
-                )
+                headers: headersToObject(response.headers, ENCODING_HEADERS)
             })
         }
 
@@ -358,11 +309,7 @@ export default (app: YapockType) =>
             const body = await injectHtmlContent(originalBody, {path, request, user})
             return new Response(body, {
                 status: response.status,
-                headers: withBrowserCacheHeaders(
-                    headersToObject(response.headers, ENCODING_HEADERS),
-                    true,
-                    hasVersion
-                )
+                headers: headersToObject(response.headers, ENCODING_HEADERS)
             })
         }
 
