@@ -13,16 +13,16 @@
     <title>Packbase</title>
 </head>
 <body>
-<div id="root">
+<div id="root" class="bg-neutral-800 text-white">
     <div aria-live="assertive"
          class="fixed z-50 inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 sm:items-start">
         <div class="w-full flex flex-col-reverse items-center space-y-2 sm:items-end"></div>
     </div>
     <div class="h-full flex overflow-none">
         <div class="flex-1 min-w-0 flex flex-col overflow-hidden">
-            <div class="drag-enable flex sticky top-0 z-40 h-16 bg-sidebar-default/75 border-b border-default border-solid dark:bg-sidebar-dark/75">
+            <div class="drag-enable flex sticky top-0 z-40 h-16 border-b border-neutral-700 border-solid bg-neutral-900">
                 <nav aria-label="Sections" class="hidden lg:flex lg:flex-col h-15 text-default">
-                    <div class="flex flex-row h-full divide-x divide-default border-r border-default">
+                    <div class="flex flex-row h-full divide-x divide-default border-r border-neutral-700">
                         <a aria-current="page"
                            class="flex items-center justify-center w-20 h-full logo-image cursor-pointer active"
                            href="/">
@@ -39,40 +39,30 @@
                         </a>
                     </div>
                 </nav>
-                <header class="w-full">
-                    <div class="max-w-7xl mx-auto px-2 sm:px-4">
-                        <div class="relative h-full flex justify-between">
-                            <div class="relative"></div>
-                        </div>
-                    </div>
-                </header>
             </div>
             <main class="flex-1 flex overflow-hidden">
                 <nav aria-label="Sections"
-                     class="w-20 hidden md:flex md:flex-col flex-shrink-0 bg-sidebar-default/75 dark:bg-sidebar-dark/75 backdrop-blur-lg overflow-y-auto">
+                     class="w-20 hidden md:flex md:flex-col flex-shrink-0 bg-neutral-900 overflow-y-auto">
                 </nav>
-                <nav aria-label="Sections"
-                     class="fixed md:hidden flex flex-row flex-shrink-0 bg-box w-full z-10 bottom-0 left-0 border-t border-x-0 border-b-0 border-solid border-default rounded-tl-xl rounded-tr-xl overflow-x-auto no-scrollbar dark:border-neutral-600">
-                </nav>
-                <div class="-mt-[1px] w-full border-l border-default">
+                <div class="-mt-[1px] w-full border-l border-neutral-700">
                     <div class="h-full overflow-y-auto" id="NGRoot">
                         <div class="lg:mb-0 flex-1 h-full overflow-x-hidden" id="NGContent">
                             <div aria-labelledby="primary-heading" class="h-full">
                                 <div class="justify-center m-auto pb-48 overflow-hidden" id="NGBody">
                                     <div id="YipnyapStatusComponent"
                                          class="flex flex-col max-w-3xl py-10 px-4 sm:px-6 lg:py-12 lg:px-8 mx-auto relative">
-                                        <div class="pt-12 a">
-                                            <h2 id="YipnyapStatusHeader"
-                                                class="text-base font-semibold leading-7 text-default">
+                                        <div class="pt-12 space-y-4">
+                                            <h2 class="font-semibold leading-7 text-lg">
                                                 Packbase is not available.
                                             </h2>
-                                            <p id="YipnyapStatusDescription"
-                                               class="mt-1 text-sm leading-6 text-default-alt">
+                                            <p class="text-sm leading-6">
                                                 An error has occurred which is rendering Packbase inaccessible. You'll
                                                 need to come back later, sorry.
-                                                <br/><br/>
-                                                <a href="https://discord.gg/StuuK55gYA" target="_blank"
-                                                   class="text-indigo-500 underline">
+                                            </p>
+                                            <p class="text-sm leading-6">
+                                                <a href="https://discord.gg/StuuK55gYA"
+                                                   target="_blank"
+                                                   class="text-indigo-500">
                                                     Join Discord for Help &rarr;
                                                 </a>
                                             </p>
