@@ -136,8 +136,8 @@ export const PackEditBody = t.Object({
 
 export const PackMembership = t.Object({
     id: t.Number(),
-    tenant_id: t.String(),
-    // created_at: t.String(),
+    user_id: t.String(),
+    permissions: t.Number()
 })
 
 export const PackResponse = t.Object({

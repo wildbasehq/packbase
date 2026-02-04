@@ -83,10 +83,8 @@ model packs_pages {
   ticker      String[] @default([])
   order       Int      @default(0)
 
-  pack         packs           @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "pack.pages_tenant_id_fkey")
-  posts        posts[]
-  chatMessages chat_messages[]
-  chatPresence chat_presence[]
+  pack  packs   @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "pack.pages_tenant_id_fkey")
+  posts posts[]
 
   @@index([tenant_id], type: Hash)
   @@map("packs.pages")
@@ -193,9 +191,6 @@ model profiles {
   followers       profiles_followers[] @relation("ProfileFollowersUser")
   following       profiles_followers[] @relation("ProfileFollowersFollowing")
   notifications   notifications[]
-  chat_messages   chat_messages[]
-  chat_presence   chat_presence[]
-  chat_reactions  chat_reactions[]
   dm_participants dm_participants[]
   dm_messages     dm_messages[]
   invites         invites[]
@@ -352,64 +347,6 @@ model invites {
   profilesId String?   @db.Uuid
   profiles   profiles? @relation(fields: [profilesId], references: [id])
 
-  @@schema("public")
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model chat_messages {
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at   DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
-  channel_id   String    @db.Uuid
-  user_id      String    @db.Uuid
-  content      String
-  message_type String    @default("text")
-  reply_to     String?   @db.Uuid
-  edited_at    DateTime? @db.Timestamptz(6)
-  deleted_at   DateTime? @db.Timestamptz(6)
-  metadata     Json?     @default("{}")
-
-  channel   packs_pages      @relation(fields: [channel_id], references: [id], onDelete: Cascade)
-  user      profiles         @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  reply     chat_messages?   @relation("ChatMessageReplies", fields: [reply_to], references: [id], onDelete: SetNull)
-  replies   chat_messages[]  @relation("ChatMessageReplies")
-  reactions chat_reactions[]
-
-  @@index([channel_id, created_at])
-  @@index([user_id])
-  @@index([reply_to])
-  @@schema("public")
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model chat_presence {
-  channel_id String   @db.Uuid
-  user_id    String   @db.Uuid
-  status     String   @default("online")
-  last_seen  DateTime @default(now()) @db.Timestamptz(6)
-
-  channel packs_pages @relation(fields: [channel_id], references: [id], onDelete: Cascade)
-  user    profiles    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@id([channel_id, user_id])
-  @@index([channel_id])
-  @@index([user_id])
-  @@schema("public")
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model chat_reactions {
-  message_id String   @db.Uuid
-  user_id    String   @db.Uuid
-  emoji      String
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-
-  message chat_messages @relation(fields: [message_id], references: [id], onDelete: Cascade)
-  user    profiles      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@id([message_id, user_id, emoji])
-  @@index([message_id])
-  @@index([user_id])
   @@schema("public")
 }
 

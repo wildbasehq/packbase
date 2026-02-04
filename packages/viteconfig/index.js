@@ -10,7 +10,11 @@ export default function viteConfig(sourceDir) {
         server: {
             host: true,
             port: parseInt(process.env.PORT || '5173'),
-            strictPort: false
+            strictPort: false,
+            hmr: {
+                protocol: process.env.HMR_PROTOCOL || 'ws', // ws or wss
+                host: process.env.HMR_HOST || undefined // Optional: override host via env; default lets Vite auto-detect
+            }
         },
         resolve: {
             alias: {

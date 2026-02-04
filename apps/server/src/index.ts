@@ -46,6 +46,8 @@ const Yapock = new Elysia({})
         }),
     )
     .resolve(async ({request, query}): Promise<any> => {
+        // This is so stupid.
+        // Old Voyage SDK uses authentication, not authorization.
         if (request.headers.get('authentication')) request.headers.set('Authorization', request.headers.get('authentication'))
         if (query.token) request.headers.set('Authorization', `Bearer ${query.token}`)
         request.headers.set('Authorization', request.headers.get('Authorization')?.replace('Bearer ', ''))
@@ -128,25 +130,6 @@ const Yapock = new Elysia({})
             },
         }),
     )
-    // Health
-    /**
-     * {
-     *               status?: string,
-     *               message?: string,
-     *               connections?: number,
-     *               cpu?: number,
-     *               memory?: number,
-     *             }
-     */
-    .get('/health', async () => {
-        return {
-            status: 'OK',
-            message: 'Server is healthy',
-            connections: process.env.CLUSTER_WORKERS ? process.env.CLUSTER_WORKERS : 1,
-            cpu: process.cpuUsage().system / 1000000000,
-            memory: process.memoryUsage().heapUsed / 1000000,
-        }
-    })
 
 Yapock.listen(process.env.PORT || 8000, async () => {
     const startupMs = performance.now()

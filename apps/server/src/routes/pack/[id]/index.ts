@@ -215,12 +215,10 @@ export async function getPack(id: string, scope?: string, userId?: string) {
     }
 
     if (scope !== 'basic') {
-        // Add membership if exists
-        const currentUserMembership = pack.memberships.find(
-            (m) => m.user_id === userId
-        )
-
-        if (currentUserMembership) transformedPack.membership = currentUserMembership
+        // Memberships -> Membership, if exist
+        if (pack.memberships?.length > 0) {
+            transformedPack.membership = pack.memberships[0]
+        }
 
         // Parallel execution of independent operations
         const [heartbeat] = await Promise.all([
