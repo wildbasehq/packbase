@@ -241,6 +241,11 @@ async function getErrorHtmlResponse(): Promise<Response> {
  */
 export default (app: YapockType) =>
     app.get('/*', async ({user, path, request}) => {
+        // Maintenance? Immediately show ui error
+        if (process.env.PACKBASE_FRONTEND_URL) {
+            return getErrorHtmlResponse()
+        }
+        
         const baseUrlEnv = process.env.PACKBASE_FRONTEND_URL
         if (!baseUrlEnv) {
             throw HTTPError.serverError({
