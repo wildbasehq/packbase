@@ -1,5 +1,6 @@
 import {YapockType} from '@/index'
 import Baozi from '@/lib/events'
+import {HTTPError} from '@/lib/http-error'
 import {getSelf} from '@/routes/user/me'
 
 /** Hop-by-hop headers that should not be forwarded (RFC 2616 §13.5.1) */
@@ -71,7 +72,9 @@ export default (app: YapockType) =>
     app
         .get('/*', async ({user, path, request}) => {
             const baseUrlEnv = process.env.PACKBASE_FRONTEND_URL
-            if (!baseUrlEnv) return
+            if (!baseUrlEnv) throw HTTPError.serverError({
+                summary: 'SSR Proxy is unavailable. API is online.'
+            })
 
             let response: Response
             try {
