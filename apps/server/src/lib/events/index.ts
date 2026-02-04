@@ -185,6 +185,23 @@ export const Baozi = new TriggerBus<{
             [key: string]: any
         }
     }
+    HOWL_CREATE: {
+        id: string,
+        tenant_id: string,
+        channel_id: string,
+        content_type: string,
+        body: string,
+        user_id: string,
+        tags: string[],
+        assets: {
+            type: 'image' | 'video'
+            data: {
+                url: string
+                name: string
+            }
+        }[],
+        [key: string]: any
+    }
 }>()
 
 export default Baozi
