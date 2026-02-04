@@ -2,7 +2,7 @@ import {Elysia} from 'elysia'
 import os from 'node:os'
 
 export default new Elysia()
-    .get('/health', () => {
+    .get('/', () => {
         const memoryUsage = process.memoryUsage()
         const cpuUsage = os.loadavg()[0] / os.cpus().length // Normalized CPU usage
 
