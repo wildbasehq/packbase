@@ -24,6 +24,7 @@ async function getSelfSettings(user) {
 }
 
 Baozi.on('ADDITIONAL_CONTEXT', async (ctx) => {
+    if (!ctx.context.user) return ctx
     ctx.context.settings = await getSelfSettings(ctx.context.user)
     return ctx
 })

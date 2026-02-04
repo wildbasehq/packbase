@@ -21,6 +21,7 @@ export default (app: YapockType) =>
     );
 
 Baozi.on('ADDITIONAL_CONTEXT', async (ctx) => {
+    if (!ctx.context.user) return ctx
     ctx.context.packs = await getUserPacks(ctx.context.user)
     return ctx
 })
