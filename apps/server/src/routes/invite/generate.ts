@@ -12,7 +12,7 @@ export default (app: YapockType) =>
     app.post(
         '',
         async ({set, body, user, auditLog}) => {
-            await requiresAccount({set, user})
+            await requiresAccount(user)
 
             let is_admin = user.sessionClaims?.roles?.includes('admin')
 

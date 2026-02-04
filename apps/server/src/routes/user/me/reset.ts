@@ -5,9 +5,9 @@ import requiresToken from '@/utils/identity/requires-token'
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({set, user}) => {
+        async ({user}) => {
             // Ensure the request is authenticated / authorized
-            requiresToken({set, user})
+            requiresToken(user)
 
             const userId = user.sub as string
 

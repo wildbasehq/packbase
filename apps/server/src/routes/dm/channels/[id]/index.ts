@@ -12,7 +12,7 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user, params}) => {
-                await requiresAccount({set, user})
+                await requiresAccount(user)
 
                 const {id} = params as { id: string }
 

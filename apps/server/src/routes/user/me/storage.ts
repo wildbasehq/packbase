@@ -9,7 +9,7 @@ export default (app: YapockType) =>
     app.get(
         '',
         async ({set, user}) => {
-            await requiresAccount({set, user})
+            await requiresAccount(user)
 
             // Check cache
             const cached = storageCache.get(user.sub)

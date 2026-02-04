@@ -1,5 +1,6 @@
+import {YapockType} from '@/index'
 import Baozi from '@/lib/events'
-import {Elysia} from 'elysia'
+import {getSelf} from '@/routes/user/me'
 
 /** Hop-by-hop headers that should not be forwarded (RFC 2616 §13.5.1) */
 const HOP_BY_HOP_HEADERS = new Set([
@@ -66,58 +67,71 @@ function generateOgMetaTags(og: Record<string, string>): string {
 /**
  * User front-end proxy. Fetches Packbase from some other URL, injects meta og, then serves it.
  */
-export default new Elysia()
-    .get('/*', async ({path, request}) => {
-        const baseUrlEnv = process.env.PACKBASE_FRONTEND_URL
-        if (!baseUrlEnv) return
+export default (app: YapockType) =>
+    app
+        .get('/*', async ({user, path, request}) => {
+            const baseUrlEnv = process.env.PACKBASE_FRONTEND_URL
+            if (!baseUrlEnv) return
 
-        let response: Response
-        try {
-            const baseUrl = new URL(baseUrlEnv)
-            const finalUrl = sanitizePath(path, baseUrl)
-            response = await fetch(finalUrl.toString(), {
-                headers: filterHeaders(request.headers, REQUEST_SKIP_HEADERS)
-            })
-        } catch (error) {
-            console.error('Error proxying Packbase frontend request', {
-                error,
-                path,
-                baseUrlEnv
-            })
-            let errorHTML: string
+            let response: Response
             try {
-                errorHTML = await Bun.file(new URL('../_ui-error.html', import.meta.url)).text()
-            } catch (fileError) {
-                console.error('Failed to load UI error page HTML', {fileError})
-                errorHTML =
-                    '<!doctype html><html><head><meta charset="utf-8"><title>Service error</title></head><body><h1>Something went wrong</h1><p>We were unable to load the error page. Please try again later.</p></body></html>'
+                const baseUrl = new URL(baseUrlEnv)
+                const finalUrl = sanitizePath(path, baseUrl)
+                response = await fetch(finalUrl.toString(), {
+                    headers: filterHeaders(request.headers, REQUEST_SKIP_HEADERS)
+                })
+            } catch (error) {
+                console.error('Error proxying Packbase frontend request', {
+                    error,
+                    path,
+                    baseUrlEnv
+                })
+                let errorHTML: string
+                try {
+                    errorHTML = await Bun.file(new URL('../_ui-error.html', import.meta.url)).text()
+                } catch (fileError) {
+                    console.error('Failed to load UI error page HTML', {fileError})
+                    errorHTML =
+                        '<!doctype html><html><head><meta charset="utf-8"><title>Service error</title></head><body><h1>Something went wrong</h1><p>We were unable to load the error page. Please try again later.</p></body></html>'
+                }
+                return new Response(errorHTML, {
+                    headers: {'Content-Type': 'text/html; charset=utf-8'}
+                })
             }
-            return new Response(errorHTML, {
-                headers: {'Content-Type': 'text/html; charset=utf-8'}
+
+            const contentType = response.headers.get('content-type')
+
+            let body: string | ReadableStream<string> = response.body
+
+            if (contentType?.includes('text/html')) {
+                // For HTML, process and inject meta tags
+                body = await response.text()
+
+                const meta = await Baozi.trigger('OPENGRAPH', {path})
+
+                if (meta?.og) {
+                    const metaTags = generateOgMetaTags(meta.og)
+                    body = body.replace('</head>', `${metaTags}\n  </head>`)
+                }
+
+                const contextualJSON = await Baozi.trigger('ADDITIONAL_CONTEXT', {
+                    request,
+                    context: {
+                        user: await getSelf(user)
+                    }
+                })
+
+                // Append into a script tag
+                if (contextualJSON) {
+                    const json = JSON.stringify(contextualJSON.context || {})
+
+                    const script = `<script id="__ADDITIONAL_CONTEXT" type="application/json">${json}</script>`
+                    body = body.replace('</head>', `${script}\n  </head>`)
+                }
+            }
+
+            return new Response(body, {
+                status: response.status,
+                headers: filterHeaders(response.headers, HOP_BY_HOP_HEADERS)
             })
-        }
-
-        const contentType = response.headers.get('content-type')
-
-        let body: string | ReadableStream<string> = response.body
-
-        if (contentType?.includes('text/html')) {
-            // For HTML, process and inject meta tags
-            body = await response.text()
-
-            const meta = await Baozi.trigger<'META_OG_REQUEST', {
-                path: string
-                og?: { type: string; [key: string]: string }
-            }>('META_OG_REQUEST', {path})
-
-            if (meta?.og) {
-                const metaTags = generateOgMetaTags(meta.og)
-                body = body.replace('</head>', `${metaTags}\n  </head>`)
-            }
-        }
-
-        return new Response(body, {
-            status: response.status,
-            headers: filterHeaders(response.headers, HOP_BY_HOP_HEADERS)
         })
-    })

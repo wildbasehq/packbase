@@ -12,7 +12,7 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user}) => {
-                await requiresAccount({set, user})
+                await requiresAccount(user)
 
                 try {
                     return await prisma.user_themes.findMany({
@@ -44,7 +44,7 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({set, body, user}) => {
-                await requiresAccount({set, user})
+                await requiresAccount(user)
 
                 // Validate and sanitize HTML and CSS
                 const {html: sanitizedHTML, css: sanitizedCSS} = validateThemeContent({

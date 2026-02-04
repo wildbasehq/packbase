@@ -6,7 +6,7 @@ import requiresAccount from '@/utils/identity/requires-account'
 
 export default (app: YapockType) =>
     app.get('', async ({params: {id}, set, user}) => {
-        await requiresAccount({set, user})
+        await requiresAccount(user)
 
         if (!isValidUUID(id)) {
             set.status = 404

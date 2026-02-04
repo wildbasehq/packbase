@@ -40,8 +40,8 @@ export default (app: YapockType) =>
         // List folders for current user
         .get(
             '',
-            async ({query, set, user}) => {
-                await requiresAccount({set, user})
+            async ({query, user}) => {
+                await requiresAccount(user)
                 const folders = await readUserFolders(query.user)
                 return {folders}
             },
@@ -61,8 +61,8 @@ export default (app: YapockType) =>
         // Create a folder
         .post(
             '',
-            async ({set, user, body}) => {
-                requiresToken({set, user})
+            async ({user, body}) => {
+                requiresToken(user)
                 const payload = body as Partial<Folder> & { name: string; }
 
                 if (!payload.name) {

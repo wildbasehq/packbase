@@ -15,8 +15,8 @@ const ValidationResponse = t.Object({
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({set, body, user}) => {
-            await requiresAccount({set, user})
+        async ({body, user}) => {
+            await requiresAccount(user)
 
             // Validate the theme content in dry run mode (no errors thrown)
             return validateThemeContent(

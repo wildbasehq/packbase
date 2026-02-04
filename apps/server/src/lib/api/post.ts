@@ -122,7 +122,7 @@ export async function getPost(id: string, post?: any | undefined) {
 }
 
 export async function deletePost({params: {id}, body, set, user, auditLog}) {
-    requiresToken({set, user})
+    requiresToken(user)
 
     const reason: string | undefined = body?.reason
 

@@ -41,8 +41,8 @@ async function hasPostsInUniverse(userId: string) {
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({set, user}) => {
-            requiresToken({set, user})
+        async ({user}) => {
+            requiresToken(user)
 
             return await checkDefaultPackSetup(user.sub)
         }
@@ -50,7 +50,7 @@ export default (app: YapockType) =>
         .patch(
             '',
             async ({set, user, body}) => {
-                requiresToken({set, user})
+                requiresToken(user)
                 const {pack_id} = body
 
                 if ((await hasPostsInUniverse(user.sub))) {

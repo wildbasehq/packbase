@@ -15,176 +15,9 @@ export default (app: YapockType) =>
     app
         .get(
             '',
-            async (res) => {
-                const {set, user, query} = res as any
-                requiresToken({set, user})
-
-                let is_staff = false
-                let is_content_moderator = false
-                let is_dx = false
-                let username = null
-
-                if (user?.userId) {
-                    try {
-                        username = user?.username || null
-
-                        // allow a couple of key spellings to avoid tight coupling
-                        const staffValue = user.is_staff
-                        const contentModerationValue = user.is_content_moderator
-                        const dxValue = await checkUserBillingPermission(user.userId)
-
-                        is_staff = Boolean(staffValue)
-                        is_content_moderator = Boolean(contentModerationValue)
-                        is_dx = Boolean(dxValue)
-                    } catch (_) {
-                        // If Clerk is unavailable or the user can't be fetched, just default to false.
-                    }
-                }
-
-                // Lightweight endpoint contract: if `?lec` exists, ONLY return these fields.
-                if (query?.lec !== undefined) {
-                    const [followers, ownedPacks] = await Promise.all([
-                        prisma.profiles_followers.count({
-                            where: {
-                                following_id: user.sub,
-                            },
-                        }),
-                        prisma.packs.findMany({
-                            where: {
-                                owner_id: user.sub,
-                            },
-                            select: {
-                                id: true,
-                            },
-                        }),
-                    ])
-
-                    const ownedPackIds = ownedPacks.map((p) => p.id)
-
-                    const owned_pack_collective_amount = ownedPackIds.length
-                        ? await prisma.packs_memberships.findMany({
-                            where: {
-                                tenant_id: {
-                                    in: ownedPackIds,
-                                },
-                            },
-                            select: {
-                                id: true
-                            }
-                        }).then((memberships) => memberships.length)
-                        : 0
-
-                    return {
-                        username,
-                        followers,
-                        owned_pack_collective_amount,
-                        is_staff,
-                        is_content_moderator,
-                        is_dx,
-                    }
-                }
-
-                let userProfile = await getUser({
-                    by: 'id',
-                    value: user.sub,
-                })
-
-                if (!userProfile) {
-                    return {
-                        id: user.sub,
-                    }
-                }
-
-                const unlockedBadges = await prisma.inventory.findMany({
-                    where: {
-                        user_id: user.sub,
-                        type: 'badge',
-                    },
-                    select: {
-                        item_id: true,
-                    },
-                })
-
-                userProfile.metadata = {
-                    ...user.user_metadata,
-                    ...user.app_metadata,
-                    unlockables: unlockedBadges.map((badge) => badge.item_id),
-                }
-
-                if (is_staff || is_content_moderator || is_dx) {
-                    prisma.profiles.update({
-                        where: {
-                            id: user.sub,
-                            type: {
-                                not: '2'
-                            }
-                        },
-                        data: {
-                            type: (is_staff || is_content_moderator) ? '1' : '3',
-                        }
-                    })
-                } else if (userProfile.type) {
-                    prisma.profiles.update({
-                        where: {
-                            id: user.sub,
-                            type: {
-                                not: '2'
-                            }
-                        },
-                        data: {
-                            type: null,
-                        }
-                    })
-                }
-
-                // Default pack
-                if (userProfile.default_pack && userProfile.default_pack !== '00000000-0000-0000-0000-000000000000') {
-                    let defaultPackMan
-
-                    try {
-                        defaultPackMan = await PackMan.init(userProfile.default_pack, user.sub)
-                    } catch (_) {
-                        await prisma.packs_memberships.create({
-                            data: {
-                                tenant_id: userProfile.default_pack,
-                                user_id: user.sub,
-                            },
-                        })
-
-                        defaultPackMan = await PackMan.init(userProfile.default_pack, user.sub)
-                    }
-
-                    if (!defaultPackMan) {
-                        throw HTTPError.serverError({
-                            summary: 'Failed to load user\'s default pack.',
-                        })
-                    }
-
-                    const defaultPack = defaultPackMan.getPack()
-
-                    if (defaultPack) {
-                        userProfile.default_pack = defaultPack
-
-                        if (userProfile.default_pack?.images_avatar) userProfile.default_pack.images = {
-                            ...userProfile.default_pack.images,
-                            avatar: userProfile.default_pack.images_avatar,
-                        }
-
-                        if (userProfile.default_pack?.images_header) userProfile.default_pack.images = {
-                            ...userProfile.default_pack.images,
-                            header: userProfile.default_pack.images_header,
-                        }
-                    }
-                }
-
-                const defaultPackSetup = await checkDefaultPackSetup(user.sub)
-
-                return {
-                    ...user,
-                    ...userProfile,
-                    requires_setup: defaultPackSetup.requires_setup,
-                    requires_switch: defaultPackSetup.requires_switch,
-                }
+            async ({user, query}) => {
+                requiresToken(user)
+                return getSelf(user, query.lec !== undefined)
             },
             {
                 detail: {
@@ -196,7 +29,7 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({set, body, user}) => {
-                requiresToken({set, user})
+                requiresToken(user)
 
                 return await updateUser(
                     {
@@ -215,6 +48,177 @@ export default (app: YapockType) =>
                 body: UserProfile,
             },
         );
+
+export async function getSelf(user, light_endpoint_contract = false) {
+    if (!user) return null
+
+    let is_staff = false
+    let is_content_moderator = false
+    let is_dx = false
+    let username = null
+
+    if (user?.id) {
+        try {
+            username = user?.username || null
+
+            // allow a couple of key spellings to avoid tight coupling
+            const staffValue = user.is_staff
+            const contentModerationValue = user.is_content_moderator
+            const dxValue = await checkUserBillingPermission(user.clerk.userId)
+
+            is_staff = Boolean(staffValue)
+            is_content_moderator = Boolean(contentModerationValue)
+            is_dx = Boolean(dxValue)
+        } catch (_) {
+            // If Clerk is unavailable or the user can't be fetched, just default to false.
+        }
+    }
+
+    // Lightweight endpoint contract: if `?lec` exists, ONLY return these fields.
+    if (light_endpoint_contract) {
+        const [followers, ownedPacks] = await Promise.all([
+            prisma.profiles_followers.count({
+                where: {
+                    following_id: user.sub,
+                },
+            }),
+            prisma.packs.findMany({
+                where: {
+                    owner_id: user.sub,
+                },
+                select: {
+                    id: true,
+                },
+            }),
+        ])
+
+        const ownedPackIds = ownedPacks.map((p) => p.id)
+
+        const owned_pack_collective_amount = ownedPackIds.length
+            ? await prisma.packs_memberships.findMany({
+                where: {
+                    tenant_id: {
+                        in: ownedPackIds,
+                    },
+                },
+                select: {
+                    id: true
+                }
+            }).then((memberships) => memberships.length)
+            : 0
+
+        return {
+            username,
+            followers,
+            owned_pack_collective_amount,
+            is_staff,
+            is_content_moderator,
+            is_dx,
+        }
+    }
+
+    let userProfile = await getUser({
+        by: 'id',
+        value: user.sub,
+    })
+
+    if (!userProfile) {
+        return {
+            id: user.sub,
+        }
+    }
+
+    const unlockedBadges = await prisma.inventory.findMany({
+        where: {
+            user_id: user.sub,
+            type: 'badge',
+        },
+        select: {
+            item_id: true,
+        },
+    })
+
+    userProfile.metadata = {
+        ...user.user_metadata,
+        ...user.app_metadata,
+        unlockables: unlockedBadges.map((badge) => badge.item_id),
+    }
+
+    if (is_staff || is_content_moderator || is_dx) {
+        prisma.profiles.update({
+            where: {
+                id: user.sub,
+                type: {
+                    not: '2'
+                }
+            },
+            data: {
+                type: (is_staff || is_content_moderator) ? '1' : '3',
+            }
+        })
+    } else if (userProfile.type) {
+        prisma.profiles.update({
+            where: {
+                id: user.sub,
+                type: {
+                    not: '2'
+                }
+            },
+            data: {
+                type: null,
+            }
+        })
+    }
+
+    // Default pack
+    if (userProfile.default_pack && userProfile.default_pack !== '00000000-0000-0000-0000-000000000000') {
+        let defaultPackMan
+
+        try {
+            defaultPackMan = await PackMan.init(userProfile.default_pack, user.sub)
+        } catch (_) {
+            await prisma.packs_memberships.create({
+                data: {
+                    tenant_id: userProfile.default_pack,
+                    user_id: user.sub,
+                },
+            })
+
+            defaultPackMan = await PackMan.init(userProfile.default_pack, user.sub)
+        }
+
+        if (!defaultPackMan) {
+            throw HTTPError.serverError({
+                summary: 'Failed to load user\'s default pack.',
+            })
+        }
+
+        const defaultPack = defaultPackMan.getPack()
+
+        if (defaultPack) {
+            userProfile.default_pack = defaultPack
+
+            if (userProfile.default_pack?.images_avatar) userProfile.default_pack.images = {
+                ...userProfile.default_pack.images,
+                avatar: userProfile.default_pack.images_avatar,
+            }
+
+            if (userProfile.default_pack?.images_header) userProfile.default_pack.images = {
+                ...userProfile.default_pack.images,
+                header: userProfile.default_pack.images_header,
+            }
+        }
+    }
+
+    const defaultPackSetup = await checkDefaultPackSetup(user.sub)
+
+    return {
+        ...user,
+        ...userProfile,
+        requires_setup: defaultPackSetup.requires_setup,
+        requires_switch: defaultPackSetup.requires_switch,
+    }
+}
 
 interface Update {
     username?: string;

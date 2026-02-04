@@ -44,7 +44,7 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({params: {id}, set, user, body}) => {
-                await requiresAccount({set, user})
+                await requiresAccount(user)
 
                 if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.ManagePack))) {
                     set.status = 403

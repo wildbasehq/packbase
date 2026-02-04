@@ -39,8 +39,8 @@ export default (app: YapockType) =>
             // Create a new page
             .post(
                 '',
-                async ({params: {id}, set, user, body}: any) => {
-                    requiresToken({set, user})
+                async ({params: {id}, user, body}: any) => {
+                    requiresToken(user)
                     if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.ManagePack))) return HTTPError.forbidden({
                         summary: 'Missing permission'
                     })
@@ -143,8 +143,8 @@ export default (app: YapockType) =>
             // Update a page
             .put(
                 '/:pageId',
-                async ({params: {id, pageId}, set, user, body}: any) => {
-                    requiresToken({set, user})
+                async ({params: {id, pageId}, user, body}: any) => {
+                    requiresToken(user)
                     if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.ManagePack))) return HTTPError.forbidden({
                         summary: 'Missing permission'
                     })
@@ -218,8 +218,8 @@ export default (app: YapockType) =>
             // Delete a page
             .delete(
                 '/:pageId',
-                async ({params: {id, pageId}, set, user}: any) => {
-                    requiresToken({set, user})
+                async ({params: {id, pageId}, user}: any) => {
+                    requiresToken(user)
                     if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.ManagePack))) return HTTPError.forbidden({
                         summary: 'Missing permission'
                     })
@@ -261,8 +261,8 @@ export default (app: YapockType) =>
             // Reorder pages
             .post(
                 '/reorder',
-                async ({params: {id}, set, user, body}: any) => {
-                    requiresToken({set, user})
+                async ({params: {id}, user, body}: any) => {
+                    requiresToken(user)
                     if (!(await PackMan.hasPermission(user.sub, id, PackMan.PERMISSIONS.ManagePack))) return HTTPError.forbidden({
                         summary: 'Missing permission'
                     })

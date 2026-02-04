@@ -10,7 +10,7 @@ export default (app: YapockType) =>
                    body,
                    user,
                }) => {
-            await requiresAccount({set, user})
+            await requiresAccount(user)
 
             const userBadge = await prisma.inventory.findFirst({
                 where: {

@@ -12,7 +12,7 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({user, params, set}) => {
-                await requiresAccount({set, user})
+                await requiresAccount(user)
 
                 const followUser = await getUser({
                     by: 'username',
@@ -73,7 +73,7 @@ export default (app: YapockType) =>
         .delete(
             '',
             async ({params, set, user}) => {
-                await requiresToken({set, user})
+                await requiresToken(user)
                 const followUser = await getUser({
                     by: 'username',
                     value: params.username,

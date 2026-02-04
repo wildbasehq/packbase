@@ -50,7 +50,13 @@ const Yapock = new Elysia({})
         // Old Voyage SDK uses authentication, not authorization.
         if (request.headers.get('authentication')) request.headers.set('Authorization', request.headers.get('authentication'))
         if (query.token) request.headers.set('Authorization', `Bearer ${query.token}`)
-        request.headers.set('Authorization', request.headers.get('Authorization')?.replace('Bearer ', ''))
+
+        // Strip "Bearer " prefix if present, but don't set header if it doesn't exist
+        // (allows Clerk to fall back to reading __session cookie)
+        const authHeader = request.headers.get('Authorization')
+        if (authHeader) {
+            request.headers.set('Authorization', authHeader.replace('Bearer ', ''))
+        }
 
         const user = await verifyToken(request)
 
@@ -98,7 +104,7 @@ const Yapock = new Elysia({})
         }
     })
 
-    .onError(({code, error, request}) => {
+    .onError(({code, error}) => {
         console.log(code, error)
         // Ensure JSON response
         try {

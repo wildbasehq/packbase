@@ -12,7 +12,7 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({params: {id}, body: {slot = '👍'}, set, user}: any) => {
-                await requiresAccount({set, user})
+                await requiresAccount(user)
 
                 let postExists
                 try {
@@ -131,7 +131,7 @@ export default (app: YapockType) =>
         .delete(
             '',
             async ({params: {id}, set, user}) => {
-                await requiresToken({set, user})
+                await requiresToken(user)
 
                 try {
                     await prisma.posts_reactions.deleteMany({

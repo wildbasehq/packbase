@@ -1,8 +1,7 @@
 import {HTTPError} from '@/lib/http-error'
 
-export default async function requiresAccount({set, user}: { set: any; user: { sub: string } }) {
+export default async function requiresAccount(user) {
     if (!user) {
-        set.status = 401
         throw HTTPError.unauthorized({summary: 'Unauthorized'})
     }
 
@@ -12,7 +11,6 @@ export default async function requiresAccount({set, user}: { set: any; user: { s
     })
 
     if (!hasAccount) {
-        set.status = 403
         throw HTTPError.forbidden({summary: 'Account required'})
     }
     return true

@@ -25,7 +25,7 @@ export default (app: YapockType) =>
                 body_length: body?.length || 0,
             })
 
-            await requiresAccount({set, user})
+            await requiresAccount(user)
             console.log('[HOWL_CREATE] Account validation passed')
 
             body = body?.trim() || ''

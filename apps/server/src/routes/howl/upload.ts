@@ -19,8 +19,8 @@ export default (app: YapockType) =>
         /**
          * INIT: Initiates the upload session
          */
-        .post('/init', async ({body, set, user}) => {
-            await requiresAccount({set, user})
+        .post('/init', async ({body, user}) => {
+            await requiresAccount(user)
 
             // @ts-ignore
             const {total_bytes, asset_type} = body
@@ -71,8 +71,8 @@ export default (app: YapockType) =>
         /**
          * APPEND: Uploads file data in consecutive chunks
          */
-        .post('/append', async ({body, set, user}) => {
-            await requiresAccount({set, user})
+        .post('/append', async ({body, user}) => {
+            await requiresAccount(user)
 
             // @ts-ignore
             const {asset_id, asset, segment_index} = body
@@ -126,8 +126,8 @@ export default (app: YapockType) =>
         /**
          * FINALIZE: Completes the upload process
          */
-        .post('/finalize', async ({body, set, user}) => {
-            await requiresAccount({set, user})
+        .post('/finalize', async ({body, user}) => {
+            await requiresAccount(user)
 
             // @ts-ignore
             const {asset_id} = body
@@ -197,7 +197,7 @@ export default (app: YapockType) =>
          * STATUS: Returns status of an upload
          */
         .get('/status', async ({query, set, user}) => {
-            await requiresAccount({set, user})
+            await requiresAccount(user)
             const {asset_id} = query
 
             if (!asset_id) {

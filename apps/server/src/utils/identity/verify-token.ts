@@ -17,13 +17,12 @@ const authorizedParties = ['https://packbase.app', 'http://localhost:5173', 'htt
 type Credentials =
     | { kind: 'none' }
     | { kind: 'apiKey'; token: string }
-    | { kind: 'clerkToken'; token: string };
+    | { kind: 'clerkToken'; token: string }
+    | { kind: 'clerkCookie' };
 
 type HeaderGetter = { get(name: string): string | null };
 type RequestLike = { headers: HeaderGetter; clone(): any };
 
-// In-process per-user lock to prevent duplicate profile creation inside a single runtime.
-// (Still not distributed; DB uniqueness must be the real source of truth.)
 const profileCreationLocks = new Map<string, Promise<void>>()
 
 function normalizeAuthorization(raw: string | null): string | null {
@@ -36,9 +35,16 @@ function normalizeAuthorization(raw: string | null): string | null {
 
 function extractCredentials(req: { headers: HeaderGetter }): Credentials {
     const raw = normalizeAuthorization(req.headers.get('authorization'))
-    if (!raw) return {kind: 'none'}
 
-    // API keys in this codebase appear to be passed as raw tokens (see apps/server/src/index.ts).
+    // Check for Clerk session cookie if no Authorization header
+    if (!raw) {
+        const cookieHeader = req.headers.get('cookie')
+        if (cookieHeader?.includes('__session=')) {
+            return {kind: 'clerkCookie'}
+        }
+        return {kind: 'none'}
+    }
+
     // Clerk API keys can vary in prefix; treat a likely set as API keys.
     if (raw.startsWith('ak_') || raw.startsWith('sk_') || raw.startsWith('pk_')) {
         return {kind: 'apiKey', token: raw}
@@ -92,9 +98,10 @@ async function authenticate(req: RequestLike): Promise<
             }
         }
 
+        // clerkToken and clerkCookie both use authenticateRequest
         const authReq = await clerkClient.authenticateRequest(shadowReq, {
             authorizedParties,
-            acceptsToken: 'any',
+            // acceptsToken: 'any',
         })
 
         if (!authReq.isSignedIn) return {ok: false, reason: 'invalid'}
@@ -116,7 +123,7 @@ async function ensureProfileId(user: AuthUser): Promise<AuthUser | void> {
     // If we already resolved the profile id, do nothing.
     if (user.sub) return
 
-    const userId = user.userId
+    const userId = user.clerk?.userId
     if (!userId) return
 
     const existing = await prisma.profiles.findFirst({
@@ -134,7 +141,7 @@ async function ensureProfileId(user: AuthUser): Promise<AuthUser | void> {
     }
 
     // Only auto-provision when we have a nickname
-    const nickname = user.sessionClaims?.nickname
+    const nickname = user.clerk?.nickname
     if (!nickname) return
 
     await withUserLock(userId, async () => {
@@ -232,6 +239,8 @@ async function ensureProfileId(user: AuthUser): Promise<AuthUser | void> {
  * Returns `undefined` for unauthenticated requests to match current call sites.
  */
 export default async function verifyToken(req: any): Promise<AuthUser | undefined> {
+    // If req.path contains `.tsx`, skip
+    if (req.url?.includes('.ts') || req.url?.includes('.js')) return undefined
     const result = await authenticate(req as RequestLike)
     if (!result.ok) return undefined
 
@@ -240,14 +249,17 @@ export default async function verifyToken(req: any): Promise<AuthUser | undefine
         const privateMeta = (clerkUser?.privateMetadata ?? {}) as any
 
         result.user = {
-            ...result.user,
+            clerk: {
+                userId: result.user.userId,
+                nickname: result.user.sessionClaims?.nickname,
+            },
             ...privateMeta
         }
 
         result.user = await ensureProfileId(result.user)
 
         // Is username different?
-        if (result.user.sessionClaims?.nickname !== result.user?.username && result.user.sub) {
+        if (result.user.clerk?.nickname !== result.user?.username && result.user.sub) {
             // If so, change it on the DB.
             await prisma.profiles.update({
                 where: {

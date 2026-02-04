@@ -23,7 +23,7 @@ export default (app: YapockType) =>
 
             try {
                 // Special handling for home feed - requires authentication
-                if (id === 'universe:home') requiresToken({set, user})
+                if (id === 'universe:home') requiresToken(user)
 
                 const feed = await feedController.getFeed(id, user?.sub, Number(page))
                 feed.data.forEach((post) => {

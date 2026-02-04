@@ -9,13 +9,14 @@ import {t} from 'elysia'
 export default (app: YapockType) =>
     app.post(
         '',
-        async ({params: {id}, body: {body}, set, user, error}) => {
-            await requiresAccount({set, user})
+        async ({params: {id}, body: {body}, user}) => {
+            await requiresAccount(user)
 
             body = body.trim()
             if (body.length === 0) {
-                set.status = 400
-                return
+                throw HTTPError.badRequest({
+                    summary: 'body required'
+                })
             }
 
             let postExists
@@ -25,12 +26,10 @@ export default (app: YapockType) =>
                     select: {user_id: true, id: true, tenant_id: true},
                 })
             } catch (postError) {
-                set.status = 500
                 throw HTTPError.fromError(postError)
             }
 
             if (!postExists) {
-                set.status = 404
                 return
             }
 
@@ -76,16 +75,15 @@ export default (app: YapockType) =>
                 // Give commenter 15 XP
                 await xpManager.increment(user.sub, 15)
             } catch (insertError) {
-                set.status = 500
                 throw HTTPError.fromError(insertError)
             }
 
             if (!data) {
-                set.status = 400
-                return
+                throw HTTPError.serverError({
+                    summary: 'Something went wrong and we cannot get the specific error.'
+                })
             }
 
-            set.status = 201
             return {
                 id: data.id,
             }

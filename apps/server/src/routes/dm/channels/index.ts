@@ -39,8 +39,8 @@ export default (app: YapockType) =>
         // GET /dm/channels - list all DM channels for current user
         .get(
             '',
-            async ({set, user}) => {
-                await requiresAccount({set, user})
+            async ({user}) => {
+                await requiresAccount(user)
 
                 const links = await prisma.dm_participants.findMany({
                     where: {user_id: user.sub},

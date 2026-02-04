@@ -42,22 +42,25 @@ export interface Subscription {
  * If a listener throws, the error is propagated and subsequent listeners are
  * not executed.
  *
- * Types are provided per-call instead of via a global TriggerMap. Example:
- *   bus.on<'HOWL_CREATE', { someKey: string }>('HOWL_CREATE', data => data);
+ * @typeParam T - A TriggerMap defining trigger names and their payload types.
+ *
+ * Example with typed triggers:
+ *   type MyTriggers = { HOWL_CREATE: { id: string }; PACK_UPDATE: { packId: number } };
+ *   const bus = new TriggerBus<MyTriggers>();
+ *   bus.on('HOWL_CREATE', data => { console.log(data.id); return data; });
  */
-export class TriggerBus {
+export class TriggerBus<T extends TriggerMap = TriggerMap> {
     private readonly listeners: Map<string, Set<TriggerListener<any>>> = new Map()
 
     /**
      * Register a listener for a trigger name.
      *
-     * @typeParam Name - The trigger name as a string literal type.
-     * @typeParam Payload - The payload type for this trigger.
+     * @typeParam Name - The trigger name, constrained to keys of T.
      * @param name - The trigger name.
      * @param listener - Callback executed when the trigger is fired.
      * @returns A subscription handle to remove the listener.
      */
-    on<Name extends string, Payload = unknown>(name: Name, listener: TriggerListener<Payload>): Subscription {
+    on<Name extends keyof T & string>(name: Name, listener: TriggerListener<T[Name]>): Subscription {
         let set = this.listeners.get(name)
         if (!set) {
             set = new Set()
@@ -79,17 +82,16 @@ export class TriggerBus {
      * Register a one-time listener for a trigger name. The listener is removed
      * after the first invocation.
      *
-     * @typeParam Name - The trigger name as a string literal type.
-     * @typeParam Payload - The payload type for this trigger.
+     * @typeParam Name - The trigger name, constrained to keys of T.
      * @param name - The trigger name.
      * @param listener - Callback executed when the trigger is fired.
      * @returns A subscription handle to remove the listener early if needed.
      */
-    once<Name extends string, Payload = unknown>(name: Name, listener: TriggerListener<Payload>): Subscription {
-        const sub = this.on<Name, Payload>(name, async (data: Payload) => {
+    once<Name extends keyof T & string>(name: Name, listener: TriggerListener<T[Name]>): Subscription {
+        const sub = this.on(name, async (data: T[Name]) => {
             try {
                 const result = await listener(data)
-                return (result === undefined ? data : result) as Payload
+                return (result === undefined ? data : result) as T[Name]
             } finally {
                 sub.unsubscribe()
             }
@@ -100,13 +102,12 @@ export class TriggerBus {
     /**
      * Remove a previously registered listener.
      *
-     * @typeParam Name - The trigger name as a string literal type.
-     * @typeParam Payload - The payload type for this trigger.
+     * @typeParam Name - The trigger name, constrained to keys of T.
      * @param name - The trigger name.
      * @param listener - The same function reference passed to on/listenForTrigger.
      * @returns true if the listener was removed; false otherwise.
      */
-    off<Name extends string, Payload = unknown>(name: Name, listener: TriggerListener<Payload>): boolean {
+    off<Name extends keyof T & string>(name: Name, listener: TriggerListener<T[Name]>): boolean {
         const set = this.listeners.get(name)
         if (!set) return false
         const had = set.delete(listener as TriggerListener<any>)
@@ -117,10 +118,10 @@ export class TriggerBus {
     /**
      * Determine whether the given trigger has any listeners.
      *
-     * @typeParam Name - The trigger name as a string literal type.
+     * @typeParam Name - The trigger name, constrained to keys of T.
      * @param name - The trigger name.
      */
-    hasListeners<Name extends string>(name: Name): boolean {
+    hasListeners<Name extends keyof T & string>(name: Name): boolean {
         const set = this.listeners.get(name)
         return !!set && set.size > 0
     }
@@ -128,10 +129,10 @@ export class TriggerBus {
     /**
      * Remove all listeners for a specific trigger or for all triggers.
      *
-     * @typeParam Name - The trigger name as a string literal type.
+     * @typeParam Name - The trigger name, constrained to keys of T.
      * @param name - The trigger name. If omitted, clears all triggers.
      */
-    clear<Name extends string>(name?: Name): void {
+    clear<Name extends keyof T & string>(name?: Name): void {
         if (name) this.listeners.delete(name)
         else this.listeners.clear()
     }
@@ -144,21 +145,20 @@ export class TriggerBus {
      * asynchronous. If any listener throws, the error is propagated and no further
      * listeners are executed.
      *
-     * @typeParam Name - The trigger name as a string literal type.
-     * @typeParam Payload - The payload type for this trigger.
+     * @typeParam Name - The trigger name, constrained to keys of T.
      * @param name - The trigger name.
      * @param data - The initial data to pass to listeners.
      * @returns The final data after all listeners have run.
      */
-    async trigger<Name extends string, Payload = unknown>(name: Name, data: Payload): Promise<Payload> {
+    async trigger<Name extends keyof T & string>(name: Name, data: T[Name]): Promise<T[Name]> {
         const set = this.listeners.get(name)
         if (!set || set.size === 0) return data
 
-        let current: Payload = data
+        let current: T[Name] = data
         // Preserve execution order: use a snapshot to avoid mutation during iteration.
         const snapshot = Array.from(set)
         for (const fn of snapshot) {
-            const result = await (fn as TriggerListener<Payload>)(current)
+            const result = await (fn as TriggerListener<T[Name]>)(current)
             if (result !== undefined) {
                 current = result
             }
@@ -172,6 +172,19 @@ export class TriggerBus {
  *
  * Projects may import this for shared triggers (e.g., "HOWL_CREATE", "PACK_UPDATE").
  */
-export const Baozi = new TriggerBus()
+export const Baozi = new TriggerBus<{
+    ADDITIONAL_CONTEXT: {
+        request: any,
+        context: {
+            [key: string]: any
+        }
+    }
+    OPENGRAPH: {
+        path: string,
+        og?: {
+            [key: string]: any
+        }
+    }
+}>()
 
 export default Baozi

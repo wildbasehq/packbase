@@ -11,7 +11,7 @@ export default (app: YapockType) =>
     app.post(
         '',
         async ({body: {display_name, slug, description}, set, user}) => {
-            await requiresAccount({set, user})
+            await requiresAccount(user)
 
             slug = slug.toLowerCase()
             for (const route of banned) {

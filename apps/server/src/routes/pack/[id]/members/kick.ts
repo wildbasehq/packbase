@@ -8,7 +8,7 @@ export default (app: YapockType) =>
     app.post(
         '',
         async ({params: {id}, set, user, body}) => {
-            requiresToken({set, user})
+            requiresToken(user)
 
             const targetUserId = body?.user_id || body?.userId
             if (!targetUserId || typeof targetUserId !== 'string') {

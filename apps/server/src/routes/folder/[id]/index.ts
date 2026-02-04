@@ -11,7 +11,7 @@ export default (app: YapockType) =>
         .get(
             '',
             async ({set, user, params}) => {
-                await requiresAccount({set, user})
+                await requiresAccount(user)
                 const {id} = params as { id: string }
                 const folder = await prisma.folders.findFirst({where: {id}})
                 if (!folder) {
@@ -54,7 +54,7 @@ export default (app: YapockType) =>
         .patch(
             '',
             async ({set, user, params, body}) => {
-                requiresToken({set, user})
+                requiresToken(user)
                 const {id} = params as { id: string }
                 const payload = body as Partial<Folder>
 
@@ -94,7 +94,7 @@ export default (app: YapockType) =>
         .delete(
             '',
             async ({set, user, params}) => {
-                requiresToken({set, user})
+                requiresToken(user)
                 const {id} = params as { id: string }
                 const result = await prisma.folders.deleteMany({where: {id, user_id: user.sub}})
                 if (result.count === 0) {

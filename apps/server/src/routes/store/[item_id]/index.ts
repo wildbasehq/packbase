@@ -11,7 +11,7 @@ export default (app: YapockType) =>
     app.post(
         '',
         async ({user, set, params, body}) => {
-            await requiresAccount({set, user})
+            await requiresAccount(user)
             const itemId = params.item_id
 
             if (!(itemId in Items)) {

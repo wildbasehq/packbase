@@ -28,19 +28,24 @@ function PreloadChild({children}: { children: ReactNode }) {
     const {setResources, setCurrentResource, setResourceDefault} = useResourceStore()
     const {session, isSignedIn, isLoaded} = useSession()
 
+    const hasAdditionalContext = JSON.parse(document.getElementById('__ADDITIONAL_CONTEXT')?.textContent || '{}')
+
     const {data: userMeData, isLoading: userMeLoading} = useContentFrame('get', 'user.me', undefined, {
         id: 'user.me',
-        enabled: isSignedIn,
+        enabled: isSignedIn && !hasAdditionalContext?.user,
+        initialData: hasAdditionalContext?.user,
     })
 
     const {data: userMeSettingsData, isLoading: userMeSettingsLoading} = useContentFrame('get', 'user.me.settings', undefined, {
         id: 'user.me.settings',
-        enabled: isSignedIn,
+        enabled: isSignedIn && !hasAdditionalContext?.settings,
+        initialData: hasAdditionalContext?.settings,
     })
 
     const {data: userPacksData, isLoading: userPacksLoading} = useContentFrame('get', 'user.me.packs', undefined, {
         id: 'user.me.packs',
-        enabled: isSignedIn,
+        enabled: isSignedIn && !hasAdditionalContext?.packs,
+        initialData: hasAdditionalContext?.packs,
     })
 
     const {data: server} = useContentFrame('get', 'server.describeServer', undefined, {
@@ -56,6 +61,9 @@ function PreloadChild({children}: { children: ReactNode }) {
         if (isSignedIn && (userMeLoading || userPacksLoading || userMeSettingsLoading)) return
         // if (!serviceLoading.startsWith('auth')) return
 
+        if (hasAdditionalContext?.user) {
+            log.info('Preload', 'Server sent additional context, no need to call user/me.')
+        }
         setBucketRoot(server.bucketRoot)
         setMaintenance(server.maintenance)
         setServerCapabilities(server.capabilities || [])

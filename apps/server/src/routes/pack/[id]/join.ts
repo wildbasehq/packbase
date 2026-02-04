@@ -13,7 +13,7 @@ export default (app: YapockType) =>
         .post(
             '',
             async ({params: {id}, set, user}) => {
-                await requiresAccount({set, user})
+                await requiresAccount(user)
 
                 const packExists = await getPack(id, 'id')
                 if (!packExists || id === '00000000-0000-0000-0000-000000000000') {
@@ -87,7 +87,7 @@ export default (app: YapockType) =>
         .delete(
             '',
             async ({params: {id}, set, user}) => {
-                await requiresToken({set, user})
+                await requiresToken(user)
 
                 const packExists = await getPack(id, 'id')
                 if (!packExists) {

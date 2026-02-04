@@ -1,5 +1,6 @@
 import prisma from '@/db/prisma'
 import {YapockType} from '@/index'
+import Baozi from '@/lib/events'
 import {HTTPError} from '@/lib/http-error'
 import {getPack} from '@/routes/pack/[id]'
 import requiresAccount from '@/utils/identity/requires-account'
@@ -7,10 +8,9 @@ import requiresAccount from '@/utils/identity/requires-account'
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({set, user}) => {
-            await requiresAccount({set, user})
-
-            return await getUserPacks({user, set})
+        async ({user}) => {
+            await requiresAccount(user)
+            return await getUserPacks(user)
         },
         {
             detail: {
@@ -20,7 +20,12 @@ export default (app: YapockType) =>
         },
     );
 
-export async function getUserPacks({user, set, error}: any) {
+Baozi.on('ADDITIONAL_CONTEXT', async (ctx) => {
+    ctx.context.packs = await getUserPacks(ctx.context.user)
+    return ctx
+})
+
+export async function getUserPacks(user) {
     try {
         const memberships = await prisma.packs_memberships.findMany({
             where: {
@@ -39,7 +44,6 @@ export async function getUserPacks({user, set, error}: any) {
             }),
         )
     } catch (error) {
-        set.status = 500
         throw HTTPError.serverError({
             summary: 'Failed to get user packs',
             detail: error.message,

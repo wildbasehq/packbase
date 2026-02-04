@@ -6,8 +6,8 @@ import {t} from 'elysia'
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({set, user}) => {
-            await requiresAccount({set, user})
+        async ({user}) => {
+            await requiresAccount(user)
 
             // 'id' as 'invite_code'
             let invites = await prisma.invites.findMany({

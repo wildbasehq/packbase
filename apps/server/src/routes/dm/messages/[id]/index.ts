@@ -24,7 +24,7 @@ export default (app: YapockType) =>
         .patch(
             '',
             async ({set, user, params, body}) => {
-                await requiresAccount({set, user})
+                await requiresAccount(user)
 
                 const {id} = params as { id: string }
                 const {content} = body as { content?: string }
