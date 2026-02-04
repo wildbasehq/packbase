@@ -46,6 +46,10 @@ const Yapock = new Elysia({})
         }),
     )
     .resolve(async ({request, query}): Promise<any> => {
+        if (process.env.MAINTENANCE) {
+            return {}
+        }
+
         // This is so stupid.
         // Old Voyage SDK uses authentication, not authorization.
         if (request.headers.get('authentication')) request.headers.set('Authorization', request.headers.get('authentication'))
