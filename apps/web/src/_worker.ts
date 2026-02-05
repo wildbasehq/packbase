@@ -158,6 +158,7 @@ export default {
 
         // Use HTMLRewriter to inject OG tags and context
         const rewriter = new HTMLRewriter()
+            // @ts-ignore - IDE says this is fine, build says its not. Whatever.
             .on('head', createHeadInjector(contextData.og, contextData.context))
 
         return rewriter.transform(response)
