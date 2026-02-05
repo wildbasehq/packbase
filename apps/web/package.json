@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && esbuild src/_worker.ts --bundle --outfile=dist/_worker.js --format=esm --platform=neutral",
     "lint": "eslint .",
     "preview": "vite preview",
     "check-types": "tsc --noEmit"

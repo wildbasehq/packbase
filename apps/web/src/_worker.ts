@@ -3,7 +3,7 @@
  * Fetches context from the backend API and injects Open Graph meta tags
  * and additional context into HTML responses.
  *
- * @see https://developers.cloudflare.com/pages/functions/
+ * @see https://developers.cloudflare.com/workers/static-assets/
  */
 
 /// <reference types="@cloudflare/workers-types" />
@@ -46,14 +46,14 @@ function generateOgMetaTags(og: Record<string, string>): string {
 /**
  * HTMLRewriter handler that injects content inside </head>
  */
-function createHeadInjector(og: Record<string, string> | null, context: Record<string, unknown>): HTMLRewriterElementContentHandlers {
+function createHeadInjector(og: Record<string, string> | null, context: Record<string, unknown>): HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     const ogTags = og ? generateOgMetaTags(og) : ''
     const contextScript = Object.keys(context).length > 0
         ? `<script id="__ADDITIONAL_CONTEXT" type="application/json">${JSON.stringify(context)}</script>`
         : ''
 
     return {
-        element(element: Element) {
+        element(element: HTMLRewriterTypes.Element) {
             if (ogTags) {
                 element.append(ogTags, {html: true})
             }
@@ -111,7 +111,7 @@ async function fetchContext(
  */
 async function serveErrorPage(env: Env): Promise<Response> {
     try {
-        const errorResponse = await env.ASSETS.fetch('/_ui-error.html')
+        const errorResponse = await env.ASSETS.fetch(new Request('http://fakehost/_ui-error.html'))
         return new Response(errorResponse.body, {
             status: 503,
             headers: {
@@ -129,36 +129,37 @@ async function serveErrorPage(env: Env): Promise<Response> {
     }
 }
 
-export const onRequest: PagesFunction<Env> = async (context) => {
-    const {request, env, next} = context
-    const url = new URL(request.url)
+export default {
+    async fetch(request: Request, env: Env): Promise<Response> {
+        const url = new URL(request.url)
 
-    // Let the static assets handler serve the request first
-    const response = await next()
+        // Serve static assets first
+        const response = await env.ASSETS.fetch(request)
 
-    // Only process HTML responses
-    const contentType = response.headers.get('content-type')
-    if (!contentType?.includes('text/html')) {
-        return response
+        // Only process HTML responses
+        const contentType = response.headers.get('content-type')
+        if (!contentType?.includes('text/html')) {
+            return response
+        }
+
+        // Check if backend URL is configured
+        if (!env.VITE_YAPOCK_URL) {
+            console.error('VITE_YAPOCK_URL not configured')
+            return response
+        }
+
+        // Fetch context from backend
+        const contextData = await fetchContext(env.VITE_YAPOCK_URL, url.pathname, request)
+
+        // If context fetch failed, serve error page
+        if (contextData === null) {
+            return serveErrorPage(env)
+        }
+
+        // Use HTMLRewriter to inject OG tags and context
+        const rewriter = new HTMLRewriter()
+            .on('head', createHeadInjector(contextData.og, contextData.context))
+
+        return rewriter.transform(response)
     }
-
-    // Check if backend URL is configured
-    if (!env.VITE_YAPOCK_URL) {
-        console.error('VITE_YAPOCK_URL not configured')
-        return response
-    }
-
-    // Fetch context from backend
-    const contextData = await fetchContext(env.VITE_YAPOCK_URL, url.pathname, request)
-
-    // If context fetch failed, serve error page
-    if (contextData === null) {
-        return serveErrorPage(env)
-    }
-
-    // Use HTMLRewriter to inject OG tags and context
-    const rewriter = new HTMLRewriter()
-        .on('head', createHeadInjector(contextData.og, contextData.context))
-
-    return rewriter.transform(response)
-}
+} satisfies ExportedHandler<Env>

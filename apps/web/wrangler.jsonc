@@ -1,13 +1,15 @@
 {
   "name": "packbase-web",
+  "main": "./dist/_worker.js",
   "compatibility_date": "2025-08-16",
   "assets": {
     "directory": "./dist/",
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   },
   // Backend API URL for SSR context injection
-  // Set via: wrangler pages secret put VITE_YAPOCK_URL
-  // Or in Cloudflare dashboard: Pages > Settings > Environment variables
+  // Set via: wrangler secret put VITE_YAPOCK_URL
+  // Or in Cloudflare dashboard: Workers > Settings > Variables
   "vars": {
     "VITE_YAPOCK_URL": ""
   }
