@@ -147,6 +147,7 @@
         "zustand": "^4.5.2",
       },
       "devDependencies": {
+        "@cloudflare/workers-types": "^4.20260205.0",
         "@packbase/viteconfig": "workspace:*",
         "@sentry/vite-plugin": "^4.6.1",
         "@tailwindcss/forms": "^0.5.3",
@@ -343,6 +344,8 @@
     "@clerk/themes": ["@clerk/themes@2.4.46", "", { "dependencies": { "@clerk/shared": "^3.41.1", "tslib": "2.8.1" } }, "sha512-26U+aInnWJwYHrT/LYX7sGRrLJwLk4NvfEoUyVc5EXUl7ue/TZ88r7ZiKDv0KutBTNopaz+p+7KD6F1j72nodA=="],
 
     "@clerk/types": ["@clerk/types@4.101.9", "", { "dependencies": { "@clerk/shared": "^3.41.1" } }, "sha512-RO00JqqmkIoI1o0XCtvudjaLpqEoe8PRDHlLS1r/aNZazUQCO0TT6nZOx1F3X+QJDjqYVY7YmYl3mtO2QVEk1g=="],
+
+    "@cloudflare/workers-types": ["@cloudflare/workers-types@4.20260205.0", "", {}, "sha512-LTnpvcodmiuMwxmbrO2Fd0+Avbm2UVLLJxT8J2pRWPfoM44gmbIecXwOPZmDAMeadKWrBsQ+B0sloQAhUu5fpA=="],
 
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
 

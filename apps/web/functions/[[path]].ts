@@ -1,0 +1,164 @@
+/**
+ * Cloudflare Worker for SSR HTML injection.
+ * Fetches context from the backend API and injects Open Graph meta tags
+ * and additional context into HTML responses.
+ * 
+ * @see https://developers.cloudflare.com/pages/functions/
+ */
+
+/// <reference types="@cloudflare/workers-types" />
+
+interface Env {
+    VITE_YAPOCK_URL: string
+    ASSETS: Fetcher
+}
+
+interface ContextResponse {
+    og: Record<string, string> | null
+    context: Record<string, unknown>
+}
+
+/**
+ * Escape HTML special characters for safe attribute values
+ */
+function escapeHtml(str: string): string {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+}
+
+/**
+ * Generate Open Graph meta tags HTML string
+ */
+function generateOgMetaTags(og: Record<string, string>): string {
+    return Object.entries(og)
+        .map(([key, value]) => {
+            const property = escapeHtml(`og:${key}`)
+            const content = escapeHtml(value)
+            return `<meta property="${property}" content="${content}" />`
+        })
+        .join('\n    ')
+}
+
+/**
+ * HTMLRewriter handler that injects content inside </head>
+ */
+function createHeadInjector(og: Record<string, string> | null, context: Record<string, unknown>) {
+    const ogTags = og ? generateOgMetaTags(og) : ''
+    const contextScript = Object.keys(context).length > 0
+        ? `<script id="__ADDITIONAL_CONTEXT" type="application/json">${JSON.stringify(context)}</script>`
+        : ''
+
+    return {
+        element(element: HTMLRewriterTypes.Element) {
+            if (ogTags) {
+                element.append(ogTags, {html: true})
+            }
+            if (contextScript) {
+                element.append(contextScript, {html: true})
+            }
+        }
+    }
+}
+
+/**
+ * Fetch context from the backend API
+ */
+async function fetchContext(
+    backendUrl: string,
+    path: string,
+    request: Request
+): Promise<ContextResponse | null> {
+    const contextUrl = new URL('/context', backendUrl)
+    contextUrl.searchParams.set('path', path)
+
+    // Forward auth headers and cookies
+    const headers = new Headers()
+
+    const authorization = request.headers.get('Authorization')
+    if (authorization) {
+        headers.set('Authorization', authorization)
+    }
+
+    const cookie = request.headers.get('Cookie')
+    if (cookie) {
+        headers.set('Cookie', cookie)
+    }
+
+    try {
+        const response = await fetch(contextUrl.toString(), {
+            method: 'GET',
+            headers
+        })
+
+        if (!response.ok) {
+            console.error(`Context fetch failed: ${response.status}`)
+            return null
+        }
+
+        return await response.json() as ContextResponse
+    } catch (error) {
+        console.error('Failed to fetch context:', error)
+        return null
+    }
+}
+
+/**
+ * Serve the error page
+ */
+async function serveErrorPage(env: Env): Promise<Response> {
+    try {
+        const errorResponse = await env.ASSETS.fetch('/_ui-error.html')
+        return new Response(errorResponse.body, {
+            status: 503,
+            headers: {
+                'Content-Type': 'text/html; charset=utf-8'
+            }
+        })
+    } catch {
+        return new Response(
+            '<!doctype html><html><head><meta charset="utf-8"><title>Service error</title></head><body><h1>Something went wrong</h1><p>We were unable to load the error page. Please try again later.</p></body></html>',
+            {
+                status: 503,
+                headers: {'Content-Type': 'text/html; charset=utf-8'}
+            }
+        )
+    }
+}
+
+export const onRequest: PagesFunction<Env> = async (context) => {
+    const {request, env, next} = context
+    const url = new URL(request.url)
+
+    // Let the static assets handler serve the request first
+    const response = await next()
+
+    // Only process HTML responses
+    const contentType = response.headers.get('content-type')
+    if (!contentType?.includes('text/html')) {
+        return response
+    }
+
+    // Check if backend URL is configured
+    if (!env.VITE_YAPOCK_URL) {
+        console.error('VITE_YAPOCK_URL not configured')
+        return response
+    }
+
+    // Fetch context from backend
+    const contextData = await fetchContext(env.VITE_YAPOCK_URL, url.pathname, request)
+
+    // If context fetch failed, serve error page
+    if (contextData === null) {
+        return serveErrorPage(env)
+    }
+
+    // Use HTMLRewriter to inject OG tags and context
+    const rewriter = new HTMLRewriter()
+        .on('head', createHeadInjector(contextData.og, contextData.context))
+
+    return rewriter.transform(response)
+}

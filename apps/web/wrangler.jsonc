@@ -4,5 +4,11 @@
   "assets": {
     "directory": "./dist/",
     "not_found_handling": "single-page-application"
+  },
+  // Backend API URL for SSR context injection
+  // Set via: wrangler pages secret put VITE_YAPOCK_URL
+  // Or in Cloudflare dashboard: Pages > Settings > Environment variables
+  "vars": {
+    "VITE_YAPOCK_URL": ""
   }
 }
