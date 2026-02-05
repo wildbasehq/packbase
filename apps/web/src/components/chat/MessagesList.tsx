@@ -69,7 +69,7 @@ export function MessagesList({channelId}: { channelId: string }) {
             )
 
             if (res.ok) {
-                const olderMessages = await res.json()
+                const olderMessages: any[] = await res.json()
                 if (olderMessages.length === 0) {
                     setHasMoreMessages(false)
                 } else {

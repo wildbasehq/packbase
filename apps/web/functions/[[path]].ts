@@ -2,7 +2,7 @@
  * Cloudflare Worker for SSR HTML injection.
  * Fetches context from the backend API and injects Open Graph meta tags
  * and additional context into HTML responses.
- * 
+ *
  * @see https://developers.cloudflare.com/pages/functions/
  */
 
@@ -46,14 +46,14 @@ function generateOgMetaTags(og: Record<string, string>): string {
 /**
  * HTMLRewriter handler that injects content inside </head>
  */
-function createHeadInjector(og: Record<string, string> | null, context: Record<string, unknown>) {
+function createHeadInjector(og: Record<string, string> | null, context: Record<string, unknown>): HTMLRewriterElementContentHandlers {
     const ogTags = og ? generateOgMetaTags(og) : ''
     const contextScript = Object.keys(context).length > 0
         ? `<script id="__ADDITIONAL_CONTEXT" type="application/json">${JSON.stringify(context)}</script>`
         : ''
 
     return {
-        element(element: HTMLRewriterTypes.Element) {
+        element(element: Element) {
             if (ogTags) {
                 element.append(ogTags, {html: true})
             }

@@ -37,7 +37,7 @@ const createApiCall = async (method: string, path: string, requestData?: any, to
         body: method !== 'get' && method !== 'delete' && requestData ? JSON.stringify(requestData) : undefined,
     })
 
-    const json = await res.json()
+    const json: any = await res.json()
     if (!res.ok) {
         throw {
             message: json?.summary || json?.meta?.message || 'Request failed',

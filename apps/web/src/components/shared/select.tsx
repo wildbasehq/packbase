@@ -24,6 +24,7 @@ export const Select = forwardRef(function Select(
             ])}
         >
       <Headless.Select
+          /* @ts-ignore why sudden errors? */
           ref={ref}
           multiple={multiple}
           {...props}

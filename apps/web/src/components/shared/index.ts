@@ -63,6 +63,3 @@ export * from './user/info-col'
 
 // API
 export * from '@/lib/hooks/content-frame'
-
-// Frames
-export * from './frames'
