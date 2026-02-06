@@ -73,7 +73,7 @@ Baozi.on('OPENGRAPH', async (ctx) => {
 
             // Video
             if (videoAsset?.data?.url) {
-                og['og:video'] = videoAsset.data.url
+                og['og:video'] = new URL(videoAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
                 og['og:video:type'] = 'video/mp4'
             }
 
