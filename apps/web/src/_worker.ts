@@ -40,9 +40,11 @@ function escapeHtml(str: string): string {
 function generateOgMetaTags(og: Record<string, string>): string {
     return Object.entries(og)
         .map(([key, value]) => {
-            const property = escapeHtml(key)
+            const escaped = escapeHtml(key)
             const content = escapeHtml(value)
-            return `<meta property="${property}" content="${content}" />`
+            // twitter: and theme-color use "name"; everything else uses "property"
+            const attr = key.startsWith('twitter:') || key === 'theme-color' ? 'name' : 'property'
+            return `<meta ${attr}="${escaped}" content="${content}" />`
         })
         .join('\n    ')
 }
