@@ -545,7 +545,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
 
     if (selectAll) {
         ensureAllColumnsAllowed(table)
-        const schema = Schemas[table]
+        const schema = Schemas.get(table)
         if (!schema) throw new Error(`Unknown schema for table ${table}`)
         Object.keys(schema.columns).forEach((c) => neededColumns.add(c))
     } else {
@@ -582,7 +582,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
     const fetchTake = take !== undefined ? take + 1 : 100
 
     // Check if table has a created_at column and add orderBy if it exists
-    const schema = Schemas[table]
+    const schema = Schemas.get(table)
     const hasCreatedAt = schema?.columns['created_at']
     const orderBy = hasCreatedAt ? {created_at: 'desc' as const} : undefined
 
@@ -698,7 +698,7 @@ const runStatement = async (stmt: Statement, ctx: ExecutionContext) => {
         values: resultValues,
         column: columnMeta,
         columns: hasAsAll
-            ? Object.values(Schemas[table]?.columns ?? {}) as any
+            ? Object.values(Schemas.get(table)?.columns ?? {}) as any
             : hasAsColumns && 'asColumns' in stmt
                 ? stmt.asColumns?.map((c) => getColumn(table, c)).filter(Boolean) as any
                 : undefined,

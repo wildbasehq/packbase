@@ -407,9 +407,10 @@ const parseColumnSelector = (segment: string): ColumnSelector => {
     let cols = match[2]?.split(',').map((c) => c.trim()).filter(Boolean)
     if (!cols?.length) {
         // Force all string columns if empty after filtering from schema
-        cols = Schemas[table]
-            ? Object.keys(Schemas[table].columns).filter(colName =>
-                Schemas[table].columns[colName].type === 'string' && !Schemas[table].columns[colName].isID
+        const tableSchema = Schemas.get(table)
+        cols = tableSchema
+            ? Object.keys(tableSchema.columns).filter(colName =>
+                tableSchema.columns[colName].type === 'string' && !tableSchema.columns[colName].isID
             )
             : []
     }

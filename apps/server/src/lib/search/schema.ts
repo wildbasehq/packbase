@@ -1,5 +1,6 @@
 import {Prisma} from '@prisma/client'
 import debug from 'debug'
+import {CompressedLRUCache} from '@/utils/compressed-cache'
 
 /**
  * Narrowed representation of the scalar types supported by the search layer.
@@ -73,9 +74,9 @@ const logSchema = debug('vg:search:schema')
  * Walk the Prisma DMMF models and build a simplified schema map of tables -> columns.
  * Only scalar fields are included; relational/object fields are excluded.
  */
-const buildSchemas = (): Record<string, TableSchema> => {
+const buildSchemas = (): CompressedLRUCache<string, TableSchema> => {
     const models = Prisma.dmmf.datamodel.models
-    const schemas: Record<string, TableSchema> = {}
+    const schemas = new CompressedLRUCache<string, TableSchema>({max: 1000})
     for (const model of models) {
         const columns: Record<string, TableColumn> = {}
         for (const field of model.fields) {
@@ -90,17 +91,17 @@ const buildSchemas = (): Record<string, TableSchema> => {
             }
             logSchema('Processed field for schema %s: %O', model.name, columns[field.name])
         }
-        schemas[model.name] = {
+        schemas.set(model.name, {
             name: model.name,
             columns,
-        }
-        logSchema('Built schema for model %s: %O', model.name, schemas[model.name])
+        })
+        logSchema('Built schema for model %s: %O', model.name, schemas.get(model.name))
     }
     return schemas
 }
 
 /** Cached table schemas keyed by model name, derived once at module load. */
-export const Schemas: Record<string, TableSchema> = buildSchemas()
+export const Schemas: CompressedLRUCache<string, TableSchema> = buildSchemas()
 
 /**
  * Build relation metadata from Prisma models to support relation-based WHERE clauses.
@@ -130,11 +131,11 @@ const buildRelations = (): RelationMeta[] => {
 export const Relations: RelationMeta[] = buildRelations()
 
 /** Quick existence check for tables supported by the search layer. */
-export const isValidTable = (name: string): boolean => !!Schemas[name]
+export const isValidTable = (name: string): boolean => Schemas.has(name)
 
 /** Retrieve column metadata if present on the given table. */
 export const getColumn = (table: string, column: string): TableColumn | undefined => {
-    return Schemas[table]?.columns[column]
+    return Schemas.get(table)?.columns[column]
 }
 
 /**

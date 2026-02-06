@@ -1,5 +1,5 @@
+import {CompressedLRUCache} from '@/utils/compressed-cache'
 import Debug from 'debug'
-import {LRUCache} from 'lru-cache'
 
 const debug = Debug('vg:rate-limit')
 
@@ -25,18 +25,18 @@ export interface RateLimitResult {
 
 export class DMRateLimiter {
     private static instance: DMRateLimiter
-    private readonly userGlobalCache: LRUCache<string, RateLimitEntry>
-    private readonly channelCache: LRUCache<string, RateLimitEntry>
+    private readonly userGlobalCache: CompressedLRUCache<string, RateLimitEntry>
+    private readonly channelCache: CompressedLRUCache<string, RateLimitEntry>
 
     private constructor() {
         // Cache for global per-user limits
-        this.userGlobalCache = new LRUCache({
+        this.userGlobalCache = new CompressedLRUCache({
             max: 10000, // Max 10k users tracked
             ttl: RATE_LIMITS.PER_USER_GLOBAL.windowMs * 2, // Double window for safety
         })
 
         // Cache for per-channel limits (user-channel combination)
-        this.channelCache = new LRUCache({
+        this.channelCache = new CompressedLRUCache({
             max: 50000, // Max 50k user-channel combinations
             ttl: RATE_LIMITS.PER_CHANNEL.windowMs * 2,
         })
@@ -125,7 +125,7 @@ export class DMRateLimiter {
     }
 
     private checkLimit(
-        cache: LRUCache<string, RateLimitEntry>,
+        cache: CompressedLRUCache<string, RateLimitEntry>,
         key: string,
         limit: number,
         windowMs: number
@@ -157,7 +157,7 @@ export class DMRateLimiter {
     }
 
     private incrementCounter(
-        cache: LRUCache<string, RateLimitEntry>,
+        cache: CompressedLRUCache<string, RateLimitEntry>,
         key: string,
         windowMs: number
     ): void {

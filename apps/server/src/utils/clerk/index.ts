@@ -1,6 +1,6 @@
 import clerkClient from '@/db/auth'
+import {CompressedLRUCache} from '@/utils/compressed-cache'
 import Debug from 'debug'
-import {LRUCache} from 'lru-cache'
 
 const debug = Debug('vg:clerk')
 
@@ -12,10 +12,10 @@ interface ClerkUserCacheEntry {
 
 export class ClerkService {
     private static instance: ClerkService
-    private userCache: LRUCache<string, ClerkUserCacheEntry>
+    private userCache: CompressedLRUCache<string, ClerkUserCacheEntry>
 
     private constructor() {
-        this.userCache = new LRUCache({
+        this.userCache = new CompressedLRUCache({
             max: 5000, // Cache up to 5000 users
             ttl: 5 * 60 * 1000, // 5 minutes TTL
         })

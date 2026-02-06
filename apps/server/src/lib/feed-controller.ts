@@ -1,19 +1,25 @@
 import prisma from '@/db/prisma'
 import {BulkPostLoader} from '@/lib/bulk-post-loader'
 import {HTTPError} from '@/lib/http-error'
+import {CompressedLRUCache} from '@/utils/compressed-cache'
 import getIDTypeDefault from '@/utils/get-id-type'
 import posthog, {distinctId} from '@/utils/posthog'
+
+const LRU_DEFAULT = {
+    max: 5000,
+    allowStale: false
+}
 
 /**
  * FeedController with integrated bulk post loading
  */
 export class FeedController {
-    // Cache storage
-    public static readonly followingCache = new Map<string, any[] | null>()
-    public static readonly packCache = new Map<string, any[] | null>()
-    public static readonly homeFeedCache = new Map<string, { data: any[]; expires_after: number }>()
-    public static readonly userFeedCache = new Map<string, { data: any[]; expires_after: number }>()
-    public static readonly packFeedCache = new Map<string, { data: any[]; expires_after: number }>()
+    // Cache storage (compressed to reduce memory footprint)
+    public static readonly followingCache = new CompressedLRUCache<string, any[] | null>(LRU_DEFAULT)
+    public static readonly packCache = new CompressedLRUCache<string, any[] | null>(LRU_DEFAULT)
+    public static readonly homeFeedCache = new CompressedLRUCache<string, { data: any[]; expires_after: number }>(LRU_DEFAULT)
+    public static readonly userFeedCache = new CompressedLRUCache<string, { data: any[]; expires_after: number }>(LRU_DEFAULT)
+    public static readonly packFeedCache = new CompressedLRUCache<string, { data: any[]; expires_after: number }>(LRU_DEFAULT)
 
     // Constants
     private static readonly ITEMS_PER_PAGE = 10
