@@ -29,7 +29,6 @@ Baozi.on('OPENGRAPH', async (ctx) => {
 
             // --- OpenGraph core ---
             og['og:type'] = videoAsset ? 'video.other' : 'article'
-            og['og:site_name'] = 'Packbase'
             og['og:url'] = canonicalUrl
 
             // Title — "Display Name (@username) in Pack Name"
@@ -38,7 +37,7 @@ Baozi.on('OPENGRAPH', async (ctx) => {
             const title = packName
                 ? `${displayName} (@${howl.user.username}) in ${packName}`
                 : `${displayName} (@${howl.user.username})`
-            og['og:title'] = title
+            og['og:site_name'] = title
 
             // Description — strip HTML, truncate
             let description = ''
@@ -108,6 +107,7 @@ Baozi.on('OPENGRAPH', async (ctx) => {
                 og['twitter:image'] = avatar
                 if (!og['og:image']) og['og:image'] = avatar
                 if (!og['twitter:card']) og['twitter:card'] = 'summary'
+                og['link:apple-touch-icon'] = avatar
             }
 
             // --- Twitter explicit tags (Discord reads these directly) ---

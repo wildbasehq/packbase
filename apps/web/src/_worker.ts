@@ -40,6 +40,12 @@ function escapeHtml(str: string): string {
 function generateOgMetaTags(og: Record<string, string>): string {
     return Object.entries(og)
         .map(([key, value]) => {
+            // link: prefix renders as <link> tags instead of <meta>
+            if (key.startsWith('link:')) {
+                const rel = escapeHtml(key.slice(5))
+                const href = escapeHtml(value)
+                return `<link rel="${rel}" href="${href}" />`
+            }
             const escaped = escapeHtml(key)
             const content = escapeHtml(value)
             // twitter: and theme-color use "name"; everything else uses "property"
