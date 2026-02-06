@@ -40,7 +40,7 @@ function escapeHtml(str: string): string {
 function generateOgMetaTags(og: Record<string, string>): string {
     return Object.entries(og)
         .map(([key, value]) => {
-            const property = escapeHtml(`og:${key}`)
+            const property = escapeHtml(key)
             const content = escapeHtml(value)
             return `<meta property="${property}" content="${content}" />`
         })
@@ -59,10 +59,10 @@ function createHeadInjector(og: Record<string, string> | null, context: Record<s
     return {
         element(element: HTMLRewriterTypes.Element) {
             if (ogTags) {
-                element.append(ogTags, { html: true })
+                element.append(ogTags, {html: true})
             }
             if (contextScript) {
-                element.append(contextScript, { html: true })
+                element.append(contextScript, {html: true})
             }
         }
     }
@@ -104,7 +104,7 @@ async function fetchContext(
                 const errorData = await response.json() as any
                 if (errorData?.maintenance) {
                     console.log('maintenance mode', errorData?.maintenance)
-                    return { maintenance: errorData.maintenance }
+                    return {maintenance: errorData.maintenance}
                 }
             } catch {
                 // Ignore JSON parse errors on error responses
@@ -130,7 +130,7 @@ async function serveErrorPage(env: Env, maintenanceMessage?: string): Promise<Re
         let html = await errorResponse.text()
 
         const heading = maintenanceMessage ? 'Packbase is in Maintenance Mode' : 'Packbase is Temporarily Unavailable'
-        const message = maintenanceMessage || "Something's stopping Packbase from connecting properly. This is on our end - your internet is working just fine."
+        const message = maintenanceMessage || 'Something\'s stopping Packbase from connecting properly. This is on our end - your internet is working just fine.'
 
         html = html
             .replace('{{ErrorHeading}}', heading)
@@ -147,7 +147,7 @@ async function serveErrorPage(env: Env, maintenanceMessage?: string): Promise<Re
             '<!doctype html><html><head><meta charset="utf-8"><title>Service error</title></head><body><h1>Something went wrong</h1><p>We were unable to load the error page. Please try again later.</p></body></html>',
             {
                 status: 503,
-                headers: { 'Content-Type': 'text/html; charset=utf-8' }
+                headers: {'Content-Type': 'text/html; charset=utf-8'}
             }
         )
     }

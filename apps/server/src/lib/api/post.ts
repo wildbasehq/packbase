@@ -8,7 +8,56 @@ import posthog, {distinctId} from '@/utils/posthog'
 
 const HowlCache = new Map<string, any>()
 
-export async function getPost(id: string, post?: any | undefined) {
+type HowlUser = {
+    id: string
+    username: string
+    display_name: string | null
+    about: {
+        bio: string | null
+    }
+    images: {
+        avatar: string
+        header: string | null
+    }
+    following?: boolean
+}
+
+type HowlReaction = {
+    key: string
+    emoji: string
+    count: number
+}
+
+type HowlComment = {
+    id: string
+    created_at: string
+    content_type: string
+    body: string | null
+    assets: unknown[]
+    parent: string | null
+    channel_id: string | null
+    tags: string[]
+    warning: unknown | null
+    user: HowlUser
+}
+
+type Howl = {
+    id: string
+    created_at: string
+    content_type: string
+    body: string | null
+    assets: unknown[]
+    parent: string | null
+    channel_id: string | null
+    tags: string[]
+    warning: unknown | null
+    user: HowlUser
+    reactions?: HowlReaction[]
+    comments?: HowlComment[]
+    pack: unknown
+}
+
+export async function getPost(id: string, post?: any | undefined): Promise<Howl> {
     const timer = new Date().getTime()
     const cached = HowlCache.get(id)
     let data = post || cached
