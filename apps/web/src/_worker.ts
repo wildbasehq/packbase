@@ -177,7 +177,7 @@ async function serveErrorPage(env: Env, maintenanceMessage?: string): Promise<Re
  * Discord fetches this to construct rich embeds with author icon + footer.
  */
 function buildOembedResponse(og: Record<string, string>): Record<string, string> {
-    return {
+    const response: Record<string, string> = {
         type: 'link',
         version: '1.0',
         author_name: og['og:title'] || 'Packbase',
@@ -186,6 +186,13 @@ function buildOembedResponse(og: Record<string, string>): Record<string, string>
         provider_url: 'https://packbase.app',
         title: og['og:title'] || 'Packbase',
     }
+
+    // Pass avatar as thumbnail so Discord can use it for the author icon
+    if (og['oembed:avatar']) {
+        response['thumbnail_url'] = og['oembed:avatar']
+    }
+
+    return response
 }
 
 export default {

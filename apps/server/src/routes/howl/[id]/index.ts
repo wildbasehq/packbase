@@ -100,23 +100,25 @@ Baozi.on('OPENGRAPH', async (ctx) => {
                 og['twitter:image'] = imageUrl
                 if (!og['twitter:card']) og['twitter:card'] = 'summary_large_image'
             } else if (avatar) {
-                // No content image — use avatar as og:image.
-                // Discord shows this as the author icon when oEmbed is present.
+                // No content image — use avatar as og:image so Discord
+                // renders it as the author icon in the embed. Crucially,
+                // do NOT set twitter:card here — an invalid/absent card
+                // tells Discord to treat og:image as the author icon
+                // rather than as a card thumbnail (this matches FxBluesky).
                 og['og:image'] = avatar
-                og['twitter:image'] = avatar
-                if (!og['twitter:card']) og['twitter:card'] = 'summary'
             }
 
-            // --- Favicon — Discord shows as footer icon ---
+            // --- Favicon ---
             og['link:icon'] = 'https://packbase.app/src/favicon.ico'
 
             // --- Discord accent color ---
             og['theme-color'] = '#6d5bff'
 
-            // --- oEmbed discovery — enables rich Discord embeds ---
+            // --- oEmbed discovery ---
             // The worker serves the oEmbed JSON at /oembed
             og['oembed:url'] = `https://packbase.app/oembed?path=${encodeURIComponent(path)}`
             og['oembed:title'] = title
+            if (avatar) og['oembed:avatar'] = avatar
 
             // --- Article metadata ---
             if (!videoAsset) {
