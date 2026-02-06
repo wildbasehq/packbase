@@ -21,8 +21,13 @@ Baozi.on('OPENGRAPH', async (ctx) => {
         if (howl) {
             const og: Record<string, string> = {}
 
-            // Type
-            og['og:type'] = 'article'
+            const assets = howl.assets as { type: string; data: { url: string; name?: string; width?: number; height?: number } }[]
+            const imageAsset = assets?.find(a => a.type === 'image')
+            const videoAsset = assets?.find(a => a.type === 'video')
+            const avatar = howl.user.images?.avatar
+
+            // Type — use video.other when the post has a video so Discord renders it
+            og['og:type'] = videoAsset ? 'video.other' : 'article'
             og['og:site_name'] = 'Packbase'
 
             // URL
@@ -47,18 +52,27 @@ Baozi.on('OPENGRAPH', async (ctx) => {
                     : stripped
             }
 
-            // Image — first image asset, fall back to author avatar
-            const assets = howl.assets as { type: string; data: { url: string; name?: string } }[]
-            const imageAsset = assets?.find(a => a.type === 'image')
-            const videoAsset = assets?.find(a => a.type === 'video')
-            const avatar = howl.user.images?.avatar
+            // Video — must come before image so twitter:card is set correctly
+            if (videoAsset?.data?.url) {
+                const videoUrl = new URL(videoAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
+                og['og:video'] = videoUrl
+                og['og:video:url'] = videoUrl
+                og['og:video:secure_url'] = videoUrl
+                og['og:video:type'] = 'video/mp4'
+                if (videoAsset.data.width) og['og:video:width'] = String(videoAsset.data.width)
+                if (videoAsset.data.height) og['og:video:height'] = String(videoAsset.data.height)
+                og['twitter:card'] = 'player'
+            }
 
+            // Image — first image asset, fall back to author avatar
             if (imageAsset?.data?.url) {
                 og['og:image'] = new URL(imageAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
                 if (imageAsset.data.name) {
                     og['og:image:alt'] = imageAsset.data.name
                 }
-                og['twitter:card'] = 'summary_large_image'
+                if (!og['twitter:card']) {
+                    og['twitter:card'] = 'summary_large_image'
+                }
             }
 
             if (avatar) {
@@ -71,15 +85,11 @@ Baozi.on('OPENGRAPH', async (ctx) => {
                 og['twitter:image'] = avatar
             }
 
-            // Video
-            if (videoAsset?.data?.url) {
-                og['og:video'] = new URL(videoAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
-                og['og:video:type'] = 'video/mp4'
-            }
-
             // Article metadata
-            og['og:article:published_time'] = howl.created_at
-            og['og:article:author'] = howl.user.username
+            if (!videoAsset) {
+                og['og:article:published_time'] = howl.created_at
+                og['og:article:author'] = howl.user.username
+            }
             if (howl.tags?.length > 0) {
                 og['og:article:tag'] = howl.tags.join(', ')
             }
