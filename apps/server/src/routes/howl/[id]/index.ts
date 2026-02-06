@@ -84,7 +84,7 @@ Baozi.on('OPENGRAPH', async (ctx) => {
 
                 og['og:type'] = 'video.other'
 
-                // OpenGraph video tags
+                // OpenGraph video tags — Discord plays og:video mp4 natively
                 og['og:video'] = videoUrl
                 og['og:video:url'] = videoUrl
                 og['og:video:secure_url'] = videoUrl
@@ -92,13 +92,7 @@ Baozi.on('OPENGRAPH', async (ctx) => {
                 if (videoAsset.data.width) og['og:video:width'] = String(videoAsset.data.width)
                 if (videoAsset.data.height) og['og:video:height'] = String(videoAsset.data.height)
 
-                // Twitter player card — Discord uses this for inline video playback
-                og['twitter:card'] = 'player'
-                og['twitter:player'] = videoUrl
-                if (videoAsset.data.width) og['twitter:player:width'] = String(videoAsset.data.width)
-                if (videoAsset.data.height) og['twitter:player:height'] = String(videoAsset.data.height)
-                og['twitter:player:stream'] = videoUrl
-                og['twitter:player:stream:content_type'] = 'video/mp4'
+                og['twitter:card'] = 'summary_large_image'
 
                 // Video poster/thumbnail
                 if (imageAsset?.data?.url) {
