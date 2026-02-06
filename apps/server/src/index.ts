@@ -179,6 +179,10 @@ Yapock.listen(process.env.PORT || 8000, async () => {
 
                 if (index === modules.length - 1) {
                     log.info('Finished running migrations')
+
+                    setTimeout(() => {
+                        console.log('Startup heap:', Math.round(process.memoryUsage().heapUsed / 1024 / 1024), 'MB')
+                    }, 5000)
                 }
             }
         }
