@@ -12,6 +12,6 @@
   // Set via: wrangler secret put VITE_YAPOCK_URL
   // Or in Cloudflare dashboard: Workers > Settings > Variables
   "vars": {
-    "VITE_YAPOCK_URL": ""
+    "VITE_YAPOCK_URL": "https://vgs.packbase.app"
   }
 }

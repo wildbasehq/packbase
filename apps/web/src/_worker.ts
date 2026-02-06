@@ -103,6 +103,7 @@ async function fetchContext(
             try {
                 const errorData = await response.json() as any
                 if (errorData?.maintenance) {
+                    console.log('maintenance mode', errorData?.maintenance)
                     return { maintenance: errorData.maintenance }
                 }
             } catch {
@@ -129,9 +130,7 @@ async function serveErrorPage(env: Env, maintenanceMessage?: string): Promise<Re
         let html = await errorResponse.text()
 
         const heading = maintenanceMessage ? 'Packbase is in Maintenance Mode' : 'Packbase is Temporarily Unavailable'
-        // Restore self-closing syntax for void elements (they get stripped somewhere)
-        const sanitizedMessage = maintenanceMessage?.replace(/<(br|hr)(\s*)>/gi, '<$1$2/>') ?? null
-        const message = sanitizedMessage || "Something's stopping Packbase from connecting properly. This is on our end - your internet is working just fine."
+        const message = maintenanceMessage || "Something's stopping Packbase from connecting properly. This is on our end - your internet is working just fine."
 
         html = html
             .replace('{{ErrorHeading}}', heading)
