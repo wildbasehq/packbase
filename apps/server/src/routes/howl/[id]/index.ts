@@ -5,6 +5,12 @@ import {ErrorTypebox} from '@/lib/http-error'
 import {stripHtml} from '@/utils/strip-html'
 import {t} from 'elysia'
 
+/**
+ * HOW THE FUCK DOES DISCORD GET AVATAR.ICON_URL?
+ * 
+ * WHY do they refuse to document how they unfurl their embeds?
+ * It's clearly not fucking standard.
+ */
 Baozi.on('OPENGRAPH', async (ctx) => {
     const {path} = ctx
     // Is path `/p/{pack}/{channel}/{howl-uuid}`?
@@ -26,51 +32,33 @@ Baozi.on('OPENGRAPH', async (ctx) => {
             const imageAsset = assets?.find(a => a.type === 'image')
             const videoAsset = assets?.find(a => a.type === 'video')
             const avatar = howl.user.images?.avatar
+            const displayName = howl.user.display_name || howl.user.username
             const canonicalUrl = `https://packbase.app${path}`
 
-            // --- URL & canonical ---
-            og['link:canonical'] = canonicalUrl
+            // --- Always present ---
             og['og:url'] = canonicalUrl
-
-            // --- Discord accent color ---
-            og['theme-color'] = '#6d5bff'
-
-            // --- Title (Discord → embed author name) ---
-            const displayName = howl.user.display_name || howl.user.username
-            const packName = (howl.pack as any)?.display_name
-            const title = packName
-                ? `${displayName} (@${howl.user.username}) in ${packName}`
-                : `${displayName} (@${howl.user.username})`
-            og['og:title'] = title
-            og['twitter:title'] = title
-
-            // --- Site name (Discord → embed footer text) ---
             og['og:site_name'] = 'Packbase'
+            og['og:type'] = 'website'
+            og['theme-color'] = '#6d5bff'
 
             // --- Description ---
             let description = stripHtml(howl.body, 200)
-
-            // Content warning — prepend to description
             if (howl.warning) {
                 const reason = (howl.warning as { reason?: string })?.reason
                 if (reason) {
                     description = `⚠️ ${reason}${description ? ' — ' + description : ''}`
                 }
             }
-
             if (description) {
                 og['og:description'] = description
-                og['twitter:description'] = description
             }
 
-            // Author avatar
+            // --- Site icon (Discord uses favicon as embed author icon) ---
             if (avatar) {
-                og['link:apple-touch-icon'] = avatar
+                og['link:icon'] = avatar
             }
-            // Site logo
-            og['link:icon'] = 'https://packbase.app/img/logo.png'
 
-            // oEmbed discovery — Discord fetches this for author block
+            // --- oEmbed discovery ---
             const oembedUrl = `${process.env.VITE_YAPOCK_URL || 'https://packbase.app'}/howl/${howlId}/oembed`
             og['link:alternate'] = JSON.stringify({
                 href: oembedUrl,
@@ -78,62 +66,36 @@ Baozi.on('OPENGRAPH', async (ctx) => {
                 title: displayName,
             })
 
-            // --- Video ---
+            // --- Video (takes priority over images) ---
             if (videoAsset?.data?.url) {
                 const videoUrl = new URL(videoAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
-
-                og['og:type'] = 'video.other'
-
-                // OpenGraph video tags — Discord plays og:video mp4 natively
                 og['og:video'] = videoUrl
-                og['og:video:url'] = videoUrl
-                og['og:video:secure_url'] = videoUrl
                 og['og:video:type'] = 'video/mp4'
                 if (videoAsset.data.width) og['og:video:width'] = String(videoAsset.data.width)
                 if (videoAsset.data.height) og['og:video:height'] = String(videoAsset.data.height)
 
-                og['twitter:card'] = 'summary_large_image'
-
-                // Video poster/thumbnail
                 if (imageAsset?.data?.url) {
-                    const thumbUrl = new URL(imageAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
-                    og['og:image'] = thumbUrl
-                    og['twitter:image'] = thumbUrl
+                    og['og:image'] = new URL(imageAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
                 } else if (avatar) {
                     og['og:image'] = avatar
                 }
+
+                og['twitter:card'] = 'player'
             }
             // --- Image (no video) ---
             else if (imageAsset?.data?.url) {
                 const imageUrl = new URL(imageAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
-
-                og['og:type'] = 'article'
                 og['og:image'] = imageUrl
-                og['og:image:url'] = imageUrl
                 if (imageAsset.data.width) og['og:image:width'] = String(imageAsset.data.width)
                 if (imageAsset.data.height) og['og:image:height'] = String(imageAsset.data.height)
-                if (imageAsset.data.name) og['og:image:alt'] = imageAsset.data.name
-
                 og['twitter:card'] = 'summary_large_image'
-                og['twitter:image'] = imageUrl
-                if (imageAsset.data.name) og['twitter:image:alt'] = imageAsset.data.name
             }
             // --- Text only ---
             else {
-                og['og:type'] = 'article'
-                og['twitter:card'] = 'summary'
                 if (avatar) {
                     og['og:image'] = avatar
                 }
-            }
-
-            // --- Article metadata ---
-            if (og['og:type'] === 'article') {
-                og['og:article:published_time'] = howl.created_at
-                og['og:article:author'] = howl.user.username
-                if (howl.tags?.length > 0) {
-                    og['og:article:tag'] = howl.tags.join(', ')
-                }
+                og['twitter:card'] = 'summary'
             }
 
             return {path, og}

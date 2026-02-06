@@ -1,6 +1,5 @@
 import {YapockType} from '@/index'
 import {getPost} from '@/lib/api/post'
-import {stripHtml} from '@/utils/strip-html'
 import {t} from 'elysia'
 
 /**
@@ -23,25 +22,14 @@ export default (app: YapockType) =>
             }
 
             const displayName = howl.user.display_name || howl.user.username
-            const authorName = `${displayName} (@${howl.user.username})`
-            const authorUrl = `https://packbase.app/@${howl.user.username}`
-            const plainBody = stripHtml(howl.body)
-            const postUrl = `https://packbase.app/p/${(howl.pack as any)?.slug || '_'}/${howl.channel_id || '_'}/${id}`
 
             return {
-                type: 'rich',
+                type: 'link',
                 version: '1.0',
-                author_name: authorName,
-                author_url: authorUrl,
+                author_name: `${displayName} (@${howl.user.username})`,
+                author_url: `https://packbase.app/@${howl.user.username}`,
                 provider_name: 'Packbase',
                 provider_url: 'https://packbase.app',
-                title: plainBody.length > 100
-                    ? plainBody.slice(0, 97) + '...'
-                    : plainBody || authorName,
-                cache_age: 86400,
-                width: 600,
-                height: null,
-                html: `<blockquote><p>${stripHtml(howl.body, 200)}</p>&mdash; <a href="${authorUrl}">${authorName}</a> <a href="${postUrl}">${howl.created_at}</a></blockquote>`,
             }
         },
         {
