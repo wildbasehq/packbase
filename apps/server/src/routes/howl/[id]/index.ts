@@ -27,17 +27,19 @@ Baozi.on('OPENGRAPH', async (ctx) => {
             const avatar = howl.user.images?.avatar
             const canonicalUrl = `https://packbase.app${path}`
 
-            // --- OpenGraph core ---
-            og['og:type'] = videoAsset ? 'video.other' : 'article'
+            // --- Core OpenGraph ---
             og['og:url'] = canonicalUrl
 
-            // Title — "Display Name (@username) in Pack Name"
+            // Title — "Display Name (@username)"
+            // Discord maps og:title → author.name in the embed
             const displayName = howl.user.display_name || howl.user.username
-            const packName = (howl.pack as any)?.display_name
-            const title = packName
-                ? `${displayName} (@${howl.user.username}) in ${packName}`
-                : `${displayName} (@${howl.user.username})`
-            og['og:site_name'] = title
+            const title = `${displayName} (@${howl.user.username})`
+            og['og:title'] = title
+            og['twitter:title'] = title
+
+            // Site name — Discord maps og:site_name → provider/footer text
+            // when oEmbed is absent; oEmbed provider_name takes precedence.
+            og['og:site_name'] = 'Packbase'
 
             // Description — strip HTML, truncate
             let description = ''
@@ -61,12 +63,13 @@ Baozi.on('OPENGRAPH', async (ctx) => {
                     og['og:description'] = description
                 }
             }
+            if (description) og['twitter:description'] = description
 
             // --- Video ---
             if (videoAsset?.data?.url) {
                 const videoUrl = new URL(videoAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
 
-                // OpenGraph video tags
+                og['og:type'] = 'video.other'
                 og['og:video'] = videoUrl
                 og['og:video:url'] = videoUrl
                 og['og:video:secure_url'] = videoUrl
@@ -81,9 +84,11 @@ Baozi.on('OPENGRAPH', async (ctx) => {
                 if (videoAsset.data.height) og['twitter:player:height'] = String(videoAsset.data.height)
                 og['twitter:player:stream'] = videoUrl
                 og['twitter:player:stream:content_type'] = 'video/mp4'
+            } else {
+                og['og:type'] = 'article'
             }
 
-            // --- Image ---
+            // --- Image asset (content image) ---
             if (imageAsset?.data?.url) {
                 const imageUrl = new URL(imageAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
                 og['og:image'] = imageUrl
@@ -93,27 +98,25 @@ Baozi.on('OPENGRAPH', async (ctx) => {
                 if (imageAsset.data.name) og['og:image:alt'] = imageAsset.data.name
 
                 og['twitter:image'] = imageUrl
-                if (imageAsset.data.name) og['twitter:image:alt'] = imageAsset.data.name
-
-                if (!og['twitter:card']) {
-                    og['twitter:card'] = 'summary_large_image'
-                }
-            }
-
-            // Author avatar — always set as twitter:image so Discord
-            // shows it as the small thumbnail beside the embed text,
-            // even when a video or image asset is the main media.
-            if (avatar) {
+                if (!og['twitter:card']) og['twitter:card'] = 'summary_large_image'
+            } else if (avatar) {
+                // No content image — use avatar as og:image.
+                // Discord shows this as the author icon when oEmbed is present.
+                og['og:image'] = avatar
                 og['twitter:image'] = avatar
-                if (!og['og:image']) og['og:image'] = avatar
                 if (!og['twitter:card']) og['twitter:card'] = 'summary'
-                og['link:apple-touch-icon'] = avatar
             }
 
-            // --- Twitter explicit tags (Discord reads these directly) ---
-            og['twitter:site'] = 'Packbase'
-            og['twitter:title'] = title
-            if (description) og['twitter:description'] = description
+            // --- Favicon — Discord shows as footer icon ---
+            og['link:icon'] = 'https://packbase.app/src/favicon.ico'
+
+            // --- Discord accent color ---
+            og['theme-color'] = '#6d5bff'
+
+            // --- oEmbed discovery — enables rich Discord embeds ---
+            // The worker serves the oEmbed JSON at /oembed
+            og['oembed:url'] = `https://packbase.app/oembed?path=${encodeURIComponent(path)}`
+            og['oembed:title'] = title
 
             // --- Article metadata ---
             if (!videoAsset) {
@@ -123,9 +126,6 @@ Baozi.on('OPENGRAPH', async (ctx) => {
             if (howl.tags?.length > 0) {
                 og['og:article:tag'] = howl.tags.join(', ')
             }
-
-            // --- Discord accent color ---
-            og['theme-color'] = '#6d5bff'
 
             return {path, og}
         }
