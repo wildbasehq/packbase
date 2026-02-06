@@ -43,18 +43,22 @@ function generateOgMetaTags(og: Record<string, string>): string {
             // link: prefix renders as <link> tags instead of <meta>
             if (key.startsWith('link:')) {
                 const rel = escapeHtml(key.slice(5))
+                // Support JSON value with extra attributes (type, title, etc.)
+                try {
+                    const parsed = JSON.parse(value)
+                    if (typeof parsed === 'object' && parsed.href) {
+                        const href = escapeHtml(parsed.href)
+                        const extras = Object.entries(parsed)
+                            .filter(([k]) => k !== 'href')
+                            .map(([k, v]) => `${escapeHtml(k)}="${escapeHtml(String(v))}"`)
+                            .join(' ')
+                        return `<link rel="${rel}" href="${href}"${extras ? ' ' + extras : ''} />`
+                    }
+                } catch {
+                    // Not JSON — fall through to simple link
+                }
                 const href = escapeHtml(value)
                 return `<link rel="${rel}" href="${href}" />`
-            }
-            // oembed:url — render as oEmbed discovery link
-            if (key === 'oembed:url') {
-                const href = escapeHtml(value)
-                const title = og['oembed:title'] ? escapeHtml(og['oembed:title']) : 'Packbase'
-                return `<link rel="alternate" href="${href}" type="application/json+oembed" title="${title}" />`
-            }
-            // skip internal oembed: keys (used only for link generation above)
-            if (key.startsWith('oembed:')) {
-                return ''
             }
             const escaped = escapeHtml(key)
             const content = escapeHtml(value)
@@ -62,7 +66,6 @@ function generateOgMetaTags(og: Record<string, string>): string {
             const attr = key.startsWith('twitter:') || key === 'theme-color' ? 'name' : 'property'
             return `<meta ${attr}="${escaped}" content="${content}" />`
         })
-        .filter(Boolean)
         .join('\n    ')
 }
 
@@ -172,56 +175,9 @@ async function serveErrorPage(env: Env, maintenanceMessage?: string): Promise<Re
     }
 }
 
-/**
- * Build an oEmbed JSON response from OG tags.
- * Discord fetches this to construct rich embeds with author icon + footer.
- */
-function buildOembedResponse(og: Record<string, string>): Record<string, string> {
-    const response: Record<string, string> = {
-        type: 'link',
-        version: '1.0',
-        author_name: og['og:title'] || 'Packbase',
-        author_url: og['og:url'] || 'https://packbase.app',
-        provider_name: og['og:site_name'] || 'Packbase',
-        provider_url: 'https://packbase.app',
-        title: og['og:title'] || 'Packbase',
-    }
-
-    // Pass avatar as thumbnail so Discord can use it for the author icon
-    if (og['oembed:avatar']) {
-        response['thumbnail_url'] = og['oembed:avatar']
-    }
-
-    return response
-}
-
 export default {
     async fetch(request: Request, env: Env): Promise<Response> {
         const url = new URL(request.url)
-
-        // Handle oEmbed endpoint — Discord fetches this for rich embeds
-        if (url.pathname === '/oembed') {
-            const path = url.searchParams.get('path')
-            if (!path || !env.VITE_YAPOCK_URL) {
-                return new Response(JSON.stringify({type: 'link', version: '1.0'}), {
-                    headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
-                })
-            }
-
-            const contextData = await fetchContext(env.VITE_YAPOCK_URL, path, request)
-            if (!contextData || 'maintenance' in contextData) {
-                return new Response(JSON.stringify({type: 'link', version: '1.0'}), {
-                    headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
-                })
-            }
-
-            const data = contextData as ContextResponse
-            const oembed = data.og ? buildOembedResponse(data.og) : {type: 'link', version: '1.0'}
-
-            return new Response(JSON.stringify(oembed), {
-                headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
-            })
-        }
 
         // Serve static assets first
         const response = await env.ASSETS.fetch(request)
