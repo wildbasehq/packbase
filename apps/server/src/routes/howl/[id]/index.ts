@@ -59,12 +59,15 @@ Baozi.on('OPENGRAPH', async (ctx) => {
                     og['og:image:alt'] = imageAsset.data.name
                 }
                 og['twitter:card'] = 'summary_large_image'
-            } else if (avatar) {
-                og['og:image'] = avatar
-                og['twitter:card'] = 'summary'
             }
 
             if (avatar) {
+                if (!og['og:image']) {
+                    og['og:image'] = avatar
+                }
+                if (!og['twitter:card']) {
+                    og['twitter:card'] = 'summary'
+                }
                 og['twitter:image'] = avatar
             }
 
