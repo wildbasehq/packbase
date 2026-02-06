@@ -50,9 +50,9 @@ function generateOgMetaTags(og: Record<string, string>): string {
 /**
  * HTMLRewriter handler that injects content inside </head>
  */
-function createHeadInjector(og: Record<string, string> | null, context: Record<string, unknown>): HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
+function createHeadInjector(og: Record<string, string> | null, context: Record<string, unknown> | null | undefined): HTMLRewriterTypes.HTMLRewriterElementContentHandlers {
     const ogTags = og ? generateOgMetaTags(og) : ''
-    const contextScript = Object.keys(context).length > 0
+    const contextScript = context && Object.keys(context).length > 0
         ? `<script id="__ADDITIONAL_CONTEXT" type="application/json">${JSON.stringify(context)}</script>`
         : ''
 
