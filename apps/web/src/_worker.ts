@@ -18,6 +18,10 @@ interface ContextResponse {
     context: Record<string, unknown>
 }
 
+interface MaintenanceResponse {
+    maintenance: string
+}
+
 /**
  * Escape HTML special characters for safe attribute values
  */
@@ -55,10 +59,10 @@ function createHeadInjector(og: Record<string, string> | null, context: Record<s
     return {
         element(element: HTMLRewriterTypes.Element) {
             if (ogTags) {
-                element.append(ogTags, {html: true})
+                element.append(ogTags, { html: true })
             }
             if (contextScript) {
-                element.append(contextScript, {html: true})
+                element.append(contextScript, { html: true })
             }
         }
     }
@@ -71,7 +75,7 @@ async function fetchContext(
     backendUrl: string,
     path: string,
     request: Request
-): Promise<ContextResponse | null> {
+): Promise<ContextResponse | MaintenanceResponse | null> {
     const contextUrl = new URL('/context', backendUrl)
     contextUrl.searchParams.set('path', path)
 
@@ -95,6 +99,16 @@ async function fetchContext(
         })
 
         if (!response.ok) {
+            // Check for maintenance mode in error response
+            try {
+                const errorData = await response.json() as any
+                if (errorData?.maintenance) {
+                    return { maintenance: errorData.maintenance }
+                }
+            } catch {
+                // Ignore JSON parse errors on error responses
+            }
+
             console.error(`Context fetch failed: ${response.status}`)
             return null
         }
@@ -109,10 +123,19 @@ async function fetchContext(
 /**
  * Serve the error page
  */
-async function serveErrorPage(env: Env): Promise<Response> {
+async function serveErrorPage(env: Env, maintenanceMessage?: string): Promise<Response> {
     try {
         const errorResponse = await env.ASSETS.fetch(new Request('http://fakehost/_ui-error.html'))
-        return new Response(errorResponse.body, {
+        let html = await errorResponse.text()
+
+        const heading = maintenanceMessage ? 'Packbase is in Maintenance Mode' : 'Packbase is Temporarily Unavailable'
+        const message = maintenanceMessage || "Something's stopping Packbase from connecting properly. This is on our end - your internet is working just fine."
+
+        html = html
+            .replace('{{ErrorHeading}}', heading)
+            .replace('{{ErrorMessage}}', message)
+
+        return new Response(html, {
             status: 503,
             headers: {
                 'Content-Type': 'text/html; charset=utf-8'
@@ -123,7 +146,7 @@ async function serveErrorPage(env: Env): Promise<Response> {
             '<!doctype html><html><head><meta charset="utf-8"><title>Service error</title></head><body><h1>Something went wrong</h1><p>We were unable to load the error page. Please try again later.</p></body></html>',
             {
                 status: 503,
-                headers: {'Content-Type': 'text/html; charset=utf-8'}
+                headers: { 'Content-Type': 'text/html; charset=utf-8' }
             }
         )
     }
@@ -151,15 +174,22 @@ export default {
         // Fetch context from backend
         const contextData = await fetchContext(env.VITE_YAPOCK_URL, url.pathname, request)
 
+        // Handle maintenance mode
+        if (contextData && 'maintenance' in contextData) {
+            return serveErrorPage(env, (contextData as MaintenanceResponse).maintenance)
+        }
+
         // If context fetch failed, serve error page
         if (contextData === null) {
             return serveErrorPage(env)
         }
 
+        const data = contextData as ContextResponse
+
         // Use HTMLRewriter to inject OG tags and context
         const rewriter = new HTMLRewriter()
             // @ts-ignore - IDE says this is fine, build says its not. Whatever.
-            .on('head', createHeadInjector(contextData.og, contextData.context))
+            .on('head', createHeadInjector(data.og, data.context))
 
         return rewriter.transform(response)
     }

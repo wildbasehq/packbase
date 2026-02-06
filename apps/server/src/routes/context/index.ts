@@ -1,8 +1,8 @@
-import {YapockType} from '@/index'
+import { YapockType } from '@/index'
 import Baozi from '@/lib/events'
-import {HTTPError} from '@/lib/http-error'
-import {getSelf} from '@/routes/user/me'
-import {t} from 'elysia'
+import { HTTPError } from '@/lib/http-error'
+import { getSelf } from '@/routes/user/me'
+import { t } from 'elysia'
 
 /**
  * Context endpoint for SSR injection.
@@ -11,18 +11,20 @@ import {t} from 'elysia'
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({user, query}) => {
+        async ({ user, query }) => {
             const path = query.path || '/'
 
             // Maintenance?
             if (process.env.MAINTENANCE) {
-                throw HTTPError.serverError({
-                    summary: 'Server is unavailable.'
+                throw new HTTPError({
+                    status: 503,
+                    summary: 'Server is in maintenance mode.',
+                    maintenance: process.env.MAINTENANCE
                 })
             }
 
             // Trigger OPENGRAPH event for path-specific meta tags
-            const ogResult = await Baozi.trigger('OPENGRAPH', {path})
+            const ogResult = await Baozi.trigger('OPENGRAPH', { path })
             const og = ogResult?.og || null
 
             // Build user context if authenticated
