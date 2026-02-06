@@ -1,8 +1,8 @@
-import { YapockType } from '@/index'
+import {YapockType} from '@/index'
 import Baozi from '@/lib/events'
-import { HTTPError } from '@/lib/http-error'
-import { getSelf } from '@/routes/user/me'
-import { t } from 'elysia'
+import {HTTPError} from '@/lib/http-error'
+import {getSelf} from '@/routes/user/me'
+import {t} from 'elysia'
 
 /**
  * Context endpoint for SSR injection.
@@ -11,7 +11,7 @@ import { t } from 'elysia'
 export default (app: YapockType) =>
     app.get(
         '',
-        async ({ user, query }) => {
+        async ({user, query}) => {
             const path = query.path || '/'
 
             // Maintenance?
@@ -24,7 +24,7 @@ export default (app: YapockType) =>
             }
 
             // Trigger OPENGRAPH event for path-specific meta tags
-            const ogResult = await Baozi.trigger('OPENGRAPH', { path })
+            const ogResult = await Baozi.trigger('OPENGRAPH', {path})
             const og = ogResult?.og || null
 
             // Build user context if authenticated
@@ -59,11 +59,11 @@ export default (app: YapockType) =>
             }),
             response: {
                 200: t.Object({
-                    og: t.Union([
+                    og: t.Optional(t.Union([
                         t.Record(t.String(), t.String()),
                         t.Null()
-                    ]),
-                    context: t.Record(t.String(), t.Any())
+                    ])),
+                    context: t.Optional(t.Record(t.String(), t.Any()))
                 })
             }
         }
