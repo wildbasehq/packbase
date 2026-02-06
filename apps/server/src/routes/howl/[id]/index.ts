@@ -2,18 +2,11 @@ import {YapockType} from '@/index'
 import {deletePost, getPost} from '@/lib/api/post'
 import Baozi from '@/lib/events'
 import {ErrorTypebox} from '@/lib/http-error'
-import {stripHtml} from '@/utils/strip-html'
 import {t} from 'elysia'
 
-/**
- * HOW THE FUCK DOES DISCORD GET AVATAR.ICON_URL?
- * 
- * WHY do they refuse to document how they unfurl their embeds?
- * It's clearly not fucking standard.
- */
 Baozi.on('OPENGRAPH', async (ctx) => {
     const {path} = ctx
-    // Is path `/p/{pack}/{channel}/{howl-uuid}`?
+    // Is path `/p/{pack}/{channel}/{howl-uuid}?
     const match = path.match(/^\/p\/([^\/]+)\/([^\/]+)\/([^\/]+)$/)
     if (match) {
         const [, , , howlId] = match
@@ -32,71 +25,107 @@ Baozi.on('OPENGRAPH', async (ctx) => {
             const imageAsset = assets?.find(a => a.type === 'image')
             const videoAsset = assets?.find(a => a.type === 'video')
             const avatar = howl.user.images?.avatar
-            const displayName = howl.user.display_name || howl.user.username
             const canonicalUrl = `https://packbase.app${path}`
 
-            // --- Always present ---
-            og['og:url'] = canonicalUrl
+            // --- OpenGraph core ---
+            og['og:type'] = videoAsset ? 'video.other' : 'article'
             og['og:site_name'] = 'Packbase'
-            og['og:type'] = 'website'
-            og['theme-color'] = '#6d5bff'
+            og['og:url'] = canonicalUrl
 
-            // --- Description ---
-            let description = stripHtml(howl.body, 200)
+            // Title — "Display Name (@username) in Pack Name"
+            const displayName = howl.user.display_name || howl.user.username
+            const packName = (howl.pack as any)?.display_name
+            const title = packName
+                ? `${displayName} (@${howl.user.username}) in ${packName}`
+                : `${displayName} (@${howl.user.username})`
+            og['og:title'] = title
+
+            // Description — strip HTML, truncate
+            let description = ''
+            if (howl.body) {
+                const stripped = howl.body
+                    .replace(/<[^>]*>/g, '')   // strip HTML tags
+                    .replace(/&[^;]+;/g, ' ')  // strip HTML entities
+                    .replace(/\s+/g, ' ')      // collapse whitespace
+                    .trim()
+                description = stripped.length > 200
+                    ? stripped.slice(0, 197) + '...'
+                    : stripped
+                og['og:description'] = description
+            }
+
+            // Content warning — prepend to description
             if (howl.warning) {
                 const reason = (howl.warning as { reason?: string })?.reason
                 if (reason) {
                     description = `⚠️ ${reason}${description ? ' — ' + description : ''}`
+                    og['og:description'] = description
                 }
             }
-            if (description) {
-                og['og:description'] = description
-            }
 
-            // --- Site icon (Discord uses favicon as embed author icon) ---
-            if (avatar) {
-                og['link:icon'] = avatar
-            }
-
-            // --- oEmbed discovery ---
-            const oembedUrl = `${process.env.VITE_YAPOCK_URL || 'https://packbase.app'}/howl/${howlId}/oembed`
-            og['link:alternate'] = JSON.stringify({
-                href: oembedUrl,
-                type: 'application/json+oembed',
-                title: displayName,
-            })
-
-            // --- Video (takes priority over images) ---
+            // --- Video ---
             if (videoAsset?.data?.url) {
                 const videoUrl = new URL(videoAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
+
+                // OpenGraph video tags
                 og['og:video'] = videoUrl
+                og['og:video:url'] = videoUrl
+                og['og:video:secure_url'] = videoUrl
                 og['og:video:type'] = 'video/mp4'
                 if (videoAsset.data.width) og['og:video:width'] = String(videoAsset.data.width)
                 if (videoAsset.data.height) og['og:video:height'] = String(videoAsset.data.height)
 
-                if (imageAsset?.data?.url) {
-                    og['og:image'] = new URL(imageAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
-                } else if (avatar) {
-                    og['og:image'] = avatar
-                }
-
+                // Twitter player card — Discord uses this for inline video playback
                 og['twitter:card'] = 'player'
+                og['twitter:player'] = videoUrl
+                if (videoAsset.data.width) og['twitter:player:width'] = String(videoAsset.data.width)
+                if (videoAsset.data.height) og['twitter:player:height'] = String(videoAsset.data.height)
+                og['twitter:player:stream'] = videoUrl
+                og['twitter:player:stream:content_type'] = 'video/mp4'
             }
-            // --- Image (no video) ---
-            else if (imageAsset?.data?.url) {
+
+            // --- Image ---
+            if (imageAsset?.data?.url) {
                 const imageUrl = new URL(imageAsset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString()
                 og['og:image'] = imageUrl
+                og['og:image:url'] = imageUrl
                 if (imageAsset.data.width) og['og:image:width'] = String(imageAsset.data.width)
                 if (imageAsset.data.height) og['og:image:height'] = String(imageAsset.data.height)
-                og['twitter:card'] = 'summary_large_image'
-            }
-            // --- Text only ---
-            else {
-                if (avatar) {
-                    og['og:image'] = avatar
+                if (imageAsset.data.name) og['og:image:alt'] = imageAsset.data.name
+
+                og['twitter:image'] = imageUrl
+                if (imageAsset.data.name) og['twitter:image:alt'] = imageAsset.data.name
+
+                if (!og['twitter:card']) {
+                    og['twitter:card'] = 'summary_large_image'
                 }
-                og['twitter:card'] = 'summary'
             }
+
+            // Author avatar — always set as twitter:image so Discord
+            // shows it as the small thumbnail beside the embed text,
+            // even when a video or image asset is the main media.
+            if (avatar) {
+                og['twitter:image'] = avatar
+                if (!og['og:image']) og['og:image'] = avatar
+                if (!og['twitter:card']) og['twitter:card'] = 'summary'
+            }
+
+            // --- Twitter explicit tags (Discord reads these directly) ---
+            og['twitter:site'] = 'Packbase'
+            og['twitter:title'] = title
+            if (description) og['twitter:description'] = description
+
+            // --- Article metadata ---
+            if (!videoAsset) {
+                og['og:article:published_time'] = howl.created_at
+                og['og:article:author'] = howl.user.username
+            }
+            if (howl.tags?.length > 0) {
+                og['og:article:tag'] = howl.tags.join(', ')
+            }
+
+            // --- Discord accent color ---
+            og['theme-color'] = '#6d5bff'
 
             return {path, og}
         }
