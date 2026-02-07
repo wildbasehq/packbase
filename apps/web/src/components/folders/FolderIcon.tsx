@@ -111,8 +111,6 @@ export default function Folder({
                 >
                     {fileCount} {fileCount === 1 ? 'howl' : 'howls'}
                 </div>
-
-
             </div>
         </motion.div>
     )

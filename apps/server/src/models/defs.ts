@@ -184,6 +184,7 @@ export const PackResponse = t.Object({
                 ticker: t.Optional(t.String()),
                 order: t.Optional(t.Number()),
                 query: t.Optional(t.Any()),
+                pch_staff_only: t.Optional(t.Boolean()),
             }),
         ),
     ),
