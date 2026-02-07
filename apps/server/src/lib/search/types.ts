@@ -1,5 +1,6 @@
-import {z} from 'zod'
+import {CompressedLRUCache} from '@/utils/compressed-cache'
 import {PrismaClient} from '@prisma/client'
+import {z} from 'zod'
 
 // ============================================================================
 // Schema Types (duplicated to avoid circular imports)
@@ -76,7 +77,7 @@ export type ExpressionNode =
 export type FunctionCategory = 'aggregation' | 'transform' | 'loader';
 
 /** Input/Output type for pipeline validation */
-export type PipelineDataType = 
+export type PipelineDataType =
     | 'any'
     | 'rows'           // Array of database rows
     | 'values'         // Array of primitive values (ids, strings, etc.)
@@ -90,25 +91,25 @@ export type PipelineDataType =
 export interface FunctionDefinition<TArgs = any, TInput = any, TOutput = any> {
     /** Function name (e.g., 'COUNT', 'PAGE') */
     name: string;
-    
+
     /** Optional namespace for organization (e.g., 'agg' for agg.COUNT) */
     namespace?: string;
-    
+
     /** Category of the function */
     category: FunctionCategory;
-    
+
     /** Zod schema for validating function arguments */
     argsSchema: z.ZodSchema<TArgs>;
-    
+
     /** Expected input type from previous pipeline stage */
     inputType: PipelineDataType;
-    
+
     /** Output type produced by this function */
     outputType: PipelineDataType;
-    
+
     /** Human-readable description of the function */
     description: string;
-    
+
     /** Execute the function with validated arguments and context */
     execute(args: TArgs, context: ExecutionContext): Promise<TOutput>;
 }
@@ -121,16 +122,16 @@ export interface FunctionDefinition<TArgs = any, TInput = any, TOutput = any> {
 export interface FunctionCall {
     /** Full function name as parsed (e.g., 'COUNT' or 'agg.COUNT') */
     rawName: string;
-    
+
     /** Resolved function name without namespace */
     name: string;
-    
+
     /** Optional namespace prefix */
     namespace?: string;
-    
+
     /** Parsed and validated arguments */
     args: Record<string, any>;
-    
+
     /** Raw argument tokens for debugging */
     rawArgs: string[];
 }
@@ -139,7 +140,7 @@ export interface FunctionCall {
 export interface Projection {
     /** Project all columns */
     all?: boolean;
-    
+
     /** Specific columns to project */
     columns?: string[];
 }
@@ -148,16 +149,16 @@ export interface Projection {
 export interface Statement {
     /** The base WHERE query */
     query: ExpressionNode;
-    
+
     /** Pipeline of function calls to apply */
     pipeline: FunctionCall[];
-    
+
     /** Optional projection (AS clause) */
     projection?: Projection;
-    
+
     /** Optional variable assignment name */
     variableName?: string;
-    
+
     /** Optional target key for nested assignment */
     targetKey?: string;
 }
@@ -193,40 +194,40 @@ export interface QueryMeter {
 export interface ExecutionContext {
     /** Prisma client instance */
     prisma: PrismaClient;
-    
+
     /** Table schemas from Prisma DMMF */
-    schemas: Record<string, TableSchema>;
-    
+    schemas: CompressedLRUCache<string, TableSchema>;
+
     /** Stored variable values */
     variables: Record<string, VariableValue>;
-    
+
     /** Input results from previous pipeline stage */
     inputResults: any[];
-    
+
     /** Input data type from previous stage */
     inputType: PipelineDataType;
-    
+
     /** Current user ID for permission checks */
     userId?: string;
-    
+
     /** Additional metadata */
     metadata: Record<string, any>;
-    
+
     /** Allowed tables for this query */
     allowedTables?: string[];
-    
+
     /** Relation checks cache */
     relationChecks?: WeakMap<WhereNode, (record: Record<string, any>) => boolean>;
-    
+
     /** Loop context for iterating over variable values */
     loop?: { variable: string; value: any; index: number };
-    
+
     /** Query meter for cost tracking */
     meter: QueryMeter;
-    
+
     /** Inferred table from query */
     table?: string;
-    
+
     /** Has more results available (for pagination) */
     hasMore?: boolean;
 }
@@ -241,24 +242,27 @@ export interface ExecutionContext {
 export interface TableExtension {
     /** Name of the table this extension applies to */
     tableName: string;
-    
+
     /** Search weights for ranking results by column */
     searchWeights?: Record<string, number>;
-    
+
     /** Column name aliases for convenience */
     aliases?: Record<string, string>;
-    
+
     /** Custom validators for column values */
     validators?: Record<string, z.ZodSchema>;
-    
+
     /** Default sort order */
     defaultSort?: {
         column: string;
         direction: 'asc' | 'desc';
     };
-    
+
     /** Columns to exclude from wildcard selection */
     excludeFromSelect?: string[];
+
+    /** Column type overrides (useful for array types not detected by Prisma DMMF) */
+    columnTypes?: Record<string, ColumnType>;
 }
 
 // ============================================================================

@@ -149,7 +149,7 @@ Yapock.listen(process.env.PORT || 8000, async () => {
     try {
         await initializeSearchSystem()
     } catch (e) {
-        log.error('Failed to initialize search system', e)
+        log.error('Failed to initialize search system', e.message)
     }
 
     if (process.env.WEBHOOK_URL) {

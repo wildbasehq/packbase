@@ -6,7 +6,9 @@ import {vg} from '@/lib/api'
 import {FeedPostData} from '@/src/components'
 
 export interface FeedPageResult {
-    posts: FeedPostData[]
+    posts: FeedPostData[] | {
+        [key: string]: FeedPostData[]
+    },
     hasMore: boolean
 }
 
@@ -16,6 +18,7 @@ export interface FeedPageParams {
 }
 
 export interface SearchPageParams {
+    tagsSplit?: string[]
     channelID: string
     q?: string
     page: number
@@ -39,16 +42,42 @@ export async function fetchFolderPage({folderID, page = 1}: { folderID: string; 
     }
 }
 
-export async function fetchSearchPage({channelID, q, page}: SearchPageParams): Promise<FeedPageResult> {
+export async function fetchSearchPage({channelID, q, page, tagsSplit}: SearchPageParams): Promise<FeedPageResult> {
     const take = 5
     const skip = (page - 1) * take
-    const query = (q || `$posts = [Where posts:channel_id ("${channelID}")] | PAGE({SKIP}, {TAKE}) | BULKPOSTLOAD() AS *;`)
+
+    let query = q
+    if (!query) {
+        if (tagsSplit?.length > 0) {
+            query = tagsSplit.map((tag) => {
+                return `$${tag} = [Where posts:channel_id ("${channelID}") AND posts:tags ("${tag}")] | PAGE({SKIP}, {TAKE}) | BULKPOSTLOAD() AS *;`
+            }).join('\n')
+        } else {
+            query = `$posts = [Where posts:channel_id ("${channelID}")] | PAGE({SKIP}, {TAKE}) | BULKPOSTLOAD() AS *;`
+        }
+    }
+
+    const formattedQuery = query
         .replaceAll('{SKIP}', skip.toString())
         .replaceAll('{TAKE}', take.toString())
-    const response = await vg.search.get({query: {page, q: query}})
+
+    const response = await vg.search.get({query: {page, q: formattedQuery}})
+
+    if (tagsSplit?.length > 0) {
+        const postsByTag: { [key: string]: FeedPostData[] } = {}
+
+        for (const tag of tagsSplit) {
+            postsByTag[tag] = response.data?.[tag] || []
+        }
+
+        return {
+            posts: postsByTag,
+            hasMore: response.data?.has_more || false,
+        }
+    }
 
     return {
         posts: response.data?.posts || [],
-        hasMore: response.data?.posts_has_more || false,
+        hasMore: response.data?.has_more || false,
     }
 }

@@ -102,7 +102,7 @@ export const clearQueryCache = (key?: string) => {
 }
 
 function isBulkCache(key) {
-    return key.includes('"@BULKPOSTLOAD"') || key.includes('\'@BULKPOSTLOAD\'') || key.includes(`"type":"bulkpostload"`)
+    return key.includes('"name":"BULKPOSTLOAD","namespace":"loader"')
 }
 
 /** Exposed for tests to align expectations with implementation. */

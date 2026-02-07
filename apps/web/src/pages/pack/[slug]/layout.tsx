@@ -61,6 +61,7 @@ export default function PackLayout({children}: { children: ReactNode }) {
                                 icon: page.icon || OrbitIcon,
                                 ticker: page.ticker,
                                 query: page.query || null,
+                                split_howls_by: page.split_howls_by
                             })
                         }
                         setNavigation(naviBuild)

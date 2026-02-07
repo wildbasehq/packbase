@@ -2,6 +2,7 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
+import {useUIStore} from '@/lib'
 import {FeedPageResult, fetchFeedPage, fetchFolderPage, fetchSearchPage} from '@/lib/api/feed'
 import {useQuery} from '@tanstack/react-query'
 
@@ -22,6 +23,8 @@ export function useFeedQuery({
                                  page,
                                  isSignedIn,
                              }: UseFeedQueryProps) {
+    const {navigation} = useUIStore()
+
     const hasChannelID = Boolean(channelID)
     const hasFeedQuery = Boolean(feedQueryOverride)
     const isFolder = Boolean(folderID)
@@ -35,10 +38,13 @@ export function useFeedQuery({
         queryFn: async () => {
             if (isSearch) {
                 console.log('Fetching search page', {channelID, feedQueryOverride, page})
+                const currentChannel = navigation.find(nav => nav.id === channelID)
+
                 return fetchSearchPage({
                     channelID: channelID!,
                     q: feedQueryOverride,
                     page,
+                    tagsSplit: currentChannel?.split_howls_by,
                 })
             } else if (isFolder) {
                 console.log('Fetching folder page', {folderID, page})

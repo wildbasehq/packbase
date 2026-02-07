@@ -1,6 +1,6 @@
 import debug from 'debug'
 import {z} from 'zod'
-import {FunctionDefinition, FunctionCategory, PipelineDataType} from './types'
+import {FunctionCategory, FunctionDefinition, PipelineDataType} from './types'
 
 const logRegistry = debug('vg:search:registry')
 
@@ -11,10 +11,10 @@ const logRegistry = debug('vg:search:registry')
 export class FunctionRegistry {
     /** Map of function key to definition. Key format: "name" or "namespace.name" */
     private functions: Map<string, FunctionDefinition> = new Map()
-    
+
     /** Map of namespace to function names within that namespace */
     private namespaces: Map<string, Set<string>> = new Map()
-    
+
     /** Whether the registry has been initialized */
     private initialized = false
 
@@ -24,19 +24,19 @@ export class FunctionRegistry {
      */
     register<TArgs, TInput, TOutput>(definition: FunctionDefinition<TArgs, TInput, TOutput>): void {
         const {name, namespace} = definition
-        
+
         // Validate the definition
         this.validateDefinition(definition)
-        
+
         // Register with full key (namespace.name or just name)
         const fullKey = namespace ? `${namespace}.${name}` : name
-        
+
         if (this.functions.has(fullKey)) {
             logRegistry('Warning: Overwriting existing function %s', fullKey)
         }
-        
+
         this.functions.set(fullKey, definition as FunctionDefinition)
-        
+
         // Also register without namespace for convenience lookups
         if (namespace) {
             // Track namespace
@@ -44,31 +44,32 @@ export class FunctionRegistry {
                 this.namespaces.set(namespace, new Set())
             }
             this.namespaces.get(namespace)!.add(name)
-            
+
             // Register short name if not already taken by a non-namespaced function
             if (!this.functions.has(name)) {
                 this.functions.set(name, definition as FunctionDefinition)
             }
         }
-        
-        logRegistry('Registered function: %s (category: %s, input: %s, output: %s)', 
+
+        logRegistry('Registered function: %s (category: %s, input: %s, output: %s)',
             fullKey, definition.category, definition.inputType, definition.outputType)
     }
 
     /**
      * Resolve a function by name, supporting both namespaced and non-namespaced lookups.
-     * 
+     *
      * @param name - Function name (e.g., "COUNT", "agg.COUNT", "loader.BULKPOSTLOAD")
      * @returns The function definition or undefined if not found
      */
     resolveFunction(name: string): FunctionDefinition | undefined {
         // Try exact match first (handles both "name" and "namespace.name")
+        console.log(this.functions)
         const exact = this.functions.get(name)
         if (exact) {
             logRegistry('Resolved function %s (exact match)', name)
             return exact
         }
-        
+
         // Try case-insensitive match
         const upperName = name.toUpperCase()
         for (const [key, def] of this.functions) {
@@ -77,7 +78,7 @@ export class FunctionRegistry {
                 return def
             }
         }
-        
+
         logRegistry('Function not found: %s', name)
         return undefined
     }
@@ -96,7 +97,7 @@ export class FunctionRegistry {
         // Deduplicate since functions may be registered under multiple keys
         const seen = new Set<string>()
         const result: FunctionDefinition[] = []
-        
+
         for (const def of this.functions.values()) {
             const key = def.namespace ? `${def.namespace}.${def.name}` : def.name
             if (!seen.has(key)) {
@@ -104,7 +105,7 @@ export class FunctionRegistry {
                 result.push(def)
             }
         }
-        
+
         return result
     }
 
@@ -121,7 +122,7 @@ export class FunctionRegistry {
     getFunctionsByNamespace(namespace: string): FunctionDefinition[] {
         const names = this.namespaces.get(namespace)
         if (!names) return []
-        
+
         return Array.from(names)
             .map(name => this.functions.get(`${namespace}.${name}`))
             .filter((def): def is FunctionDefinition => def !== undefined)
@@ -136,7 +137,7 @@ export class FunctionRegistry {
 
     /**
      * Validate that a pipeline is compatible (input/output types match).
-     * 
+     *
      * @param functionNames - Array of function names in pipeline order
      * @param initialInputType - The input type from the base query
      * @returns Validation result with errors if incompatible
@@ -148,16 +149,16 @@ export class FunctionRegistry {
     } {
         const errors: string[] = []
         let currentType: PipelineDataType = initialInputType
-        
+
         for (let i = 0; i < functionNames.length; i++) {
             const funcName = functionNames[i]
             const func = this.resolveFunction(funcName)
-            
+
             if (!func) {
                 errors.push(`Stage ${i + 1}: Unknown function "${funcName}"`)
                 continue
             }
-            
+
             // Check input type compatibility
             if (func.inputType !== 'any' && func.inputType !== currentType) {
                 errors.push(
@@ -165,11 +166,11 @@ export class FunctionRegistry {
                     `but received "${currentType}" from previous stage`
                 )
             }
-            
+
             // Update current type for next stage
             currentType = func.outputType
         }
-        
+
         return {
             valid: errors.length === 0,
             errors,
@@ -183,7 +184,7 @@ export class FunctionRegistry {
     generateDocumentation(): string {
         const functions = this.getAllFunctions()
         const lines: string[] = ['# Search Functions Reference\n']
-        
+
         // Group by category
         const byCategory = new Map<FunctionCategory, FunctionDefinition[]>()
         for (const func of functions) {
@@ -191,10 +192,10 @@ export class FunctionRegistry {
             list.push(func)
             byCategory.set(func.category, list)
         }
-        
+
         for (const [category, funcs] of byCategory) {
             lines.push(`## ${category.charAt(0).toUpperCase() + category.slice(1)} Functions\n`)
-            
+
             for (const func of funcs) {
                 const fullName = func.namespace ? `${func.namespace}.${func.name}` : func.name
                 lines.push(`### ${fullName}\n`)
@@ -203,18 +204,18 @@ export class FunctionRegistry {
                 lines.push(`- **Category:** ${func.category}`)
                 lines.push(`- **Input Type:** ${func.inputType}`)
                 lines.push(`- **Output Type:** ${func.outputType}`)
-                
+
                 // Generate args documentation from Zod schema
                 const argsDoc = this.zodSchemaToMarkdown(func.argsSchema)
                 if (argsDoc) {
                     lines.push(`- **Arguments:**`)
                     lines.push(argsDoc)
                 }
-                
+
                 lines.push('')
             }
         }
-        
+
         return lines.join('\n')
     }
 
@@ -250,23 +251,23 @@ export class FunctionRegistry {
         if (!definition.name || typeof definition.name !== 'string') {
             throw new Error('Function definition must have a name')
         }
-        
+
         if (!definition.category) {
             throw new Error(`Function ${definition.name}: category is required`)
         }
-        
+
         if (!definition.argsSchema) {
             throw new Error(`Function ${definition.name}: argsSchema is required`)
         }
-        
+
         if (typeof definition.execute !== 'function') {
             throw new Error(`Function ${definition.name}: execute must be a function`)
         }
-        
+
         if (!definition.inputType) {
             throw new Error(`Function ${definition.name}: inputType is required`)
         }
-        
+
         if (!definition.outputType) {
             throw new Error(`Function ${definition.name}: outputType is required`)
         }
@@ -281,23 +282,23 @@ export class FunctionRegistry {
             if (schema instanceof z.ZodObject) {
                 const shape = schema.shape
                 const lines: string[] = []
-                
+
                 for (const [key, value] of Object.entries(shape)) {
                     const zodType = value as z.ZodTypeAny
                     const typeName = this.getZodTypeName(zodType)
                     const isOptional = zodType.isOptional()
-                    
+
                     lines.push(`  - \`${key}\`: ${typeName}${isOptional ? ' (optional)' : ''}`)
                 }
-                
+
                 return lines.join('\n')
             }
-            
+
             // Empty object schema
             if (schema instanceof z.ZodObject && Object.keys(schema.shape).length === 0) {
                 return '  - None'
             }
-            
+
             return ''
         } catch {
             return ''

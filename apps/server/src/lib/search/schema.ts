@@ -1,6 +1,7 @@
+import {CompressedLRUCache} from '@/utils/compressed-cache'
 import {Prisma} from '@prisma/client'
 import debug from 'debug'
-import {CompressedLRUCache} from '@/utils/compressed-cache'
+import {z} from 'zod'
 
 /**
  * Narrowed representation of the scalar types supported by the search layer.
@@ -46,8 +47,15 @@ export type RelationMeta = {
  * Returns undefined for unsupported scalar kinds (e.g., enums) so they are skipped.
  */
 const scalarToColumnType = (field: Prisma.DMMF.Field): ColumnType | undefined => {
-    const base = field.type as string
-    const isList = field.isList
+    const typeStr = field.type as string
+
+    // Check if type ends with [] to detect arrays (Prisma 7 format)
+    const isArray = typeStr.endsWith('[]')
+    const base = isArray ? typeStr.slice(0, -2) : typeStr
+
+    // Fallback to isList property if available (older Prisma versions)
+    const isList = isArray || field.isList
+
     switch (base) {
         case 'String':
             return isList ? 'string_array' : 'string'
@@ -77,6 +85,7 @@ const logSchema = debug('vg:search:schema')
 const buildSchemas = (): CompressedLRUCache<string, TableSchema> => {
     const models = Prisma.dmmf.datamodel.models
     const schemas = new CompressedLRUCache<string, TableSchema>({max: 1000})
+
     for (const model of models) {
         const columns: Record<string, TableColumn> = {}
         for (const field of model.fields) {
@@ -134,7 +143,19 @@ export const isValidTable = (name: string): boolean => Schemas.has(name)
 
 /** Retrieve column metadata if present on the given table. */
 export const getColumn = (table: string, column: string): TableColumn | undefined => {
-    return Schemas.get(table)?.columns[column]
+    const columnMeta = Schemas.get(table)?.columns[column]
+    if (!columnMeta) return undefined
+
+    // Check if table extension has a type override for this column
+    const extension = tableExtensions.get(table)
+    if (extension?.columnTypes?.[column]) {
+        return {
+            ...columnMeta,
+            type: extension.columnTypes[column]
+        }
+    }
+
+    return columnMeta
 }
 
 /**
@@ -159,8 +180,6 @@ export const getDefaultIdColumn = (table: string): TableColumn | undefined => {
 // Table Extension System
 // ============================================================================
 
-import {z} from 'zod'
-
 /**
  * Extension configuration for a table to customize search behavior.
  * Defined here to avoid circular imports with types.ts
@@ -168,24 +187,27 @@ import {z} from 'zod'
 export interface TableExtension {
     /** Name of the table this extension applies to */
     tableName: string;
-    
+
     /** Search weights for ranking results by column */
     searchWeights?: Record<string, number>;
-    
+
     /** Column name aliases for convenience */
     aliases?: Record<string, string>;
-    
+
     /** Custom validators for column values */
     validators?: Record<string, z.ZodSchema>;
-    
+
     /** Default sort order */
     defaultSort?: {
         column: string;
         direction: 'asc' | 'desc';
     };
-    
+
     /** Columns to exclude from wildcard selection */
     excludeFromSelect?: string[];
+
+    /** Column type overrides (useful for array types not detected by Prisma DMMF) */
+    columnTypes?: Record<string, ColumnType>;
 }
 
 /** Cached table extensions keyed by table name */
@@ -239,15 +261,15 @@ export const getSearchWeight = (table: string, column: string): number => {
 export const loadTableExtensions = async (): Promise<void> => {
     // Import all extensions from the tables directory
     const extensions = await import('./tables')
-    
+
     for (const [key, value] of Object.entries(extensions)) {
         if (key === 'default') continue
-        
+
         const extension = value as TableExtension
         if (extension && typeof extension === 'object' && 'tableName' in extension) {
             registerTableExtension(extension)
         }
     }
-    
+
     logSchema('Loaded %d table extensions', tableExtensions.size)
 }

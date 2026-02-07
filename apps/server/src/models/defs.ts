@@ -185,6 +185,7 @@ export const PackResponse = t.Object({
                 order: t.Optional(t.Number()),
                 query: t.Optional(t.Any()),
                 pch_staff_only: t.Optional(t.Boolean()),
+                split_howls_by: t.Optional(t.Array(t.String())),
             }),
         ),
     ),

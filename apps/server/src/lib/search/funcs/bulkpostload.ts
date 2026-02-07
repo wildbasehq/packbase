@@ -1,6 +1,6 @@
+import {BulkPostLoader} from '@/lib/bulk-post-loader'
 import {z} from 'zod'
-import {BulkPostLoader} from '@/lib/BulkPostLoader'
-import {FunctionDefinition, ExecutionContext} from '../types'
+import {ExecutionContext, FunctionDefinition} from '../types'
 
 /** Arguments schema for BULKPOSTLOAD function */
 const bulkPostLoadArgsSchema = z.object({})
@@ -19,7 +19,7 @@ export const bulkPostLoadFunction: FunctionDefinition<BulkPostLoadArgs, any[], a
     inputType: 'values',  // Expects array of post IDs
     outputType: 'posts',  // Returns enriched post objects
     description: 'Enriches post IDs with full post data including user profiles, reactions, and comments. Optional userId argument provides context for user-specific data.',
-    
+
     async execute(args: BulkPostLoadArgs, context: ExecutionContext): Promise<any[]> {
         // Extract post IDs from input
         let postIds: string[] = context.inputResults
@@ -30,24 +30,22 @@ export const bulkPostLoadFunction: FunctionDefinition<BulkPostLoadArgs, any[], a
                 return null
             })
             .filter((id): id is string => id !== null)
-        
+
         if (postIds.length === 0) {
             return []
         }
-        
+
         // Resolve userId from args or context
         let currentUserId = context.userId
-        
+
         // Use BulkPostLoader to enrich the posts
         const loader = new BulkPostLoader()
         const postsMap = await loader.loadPosts(postIds, currentUserId)
-        
+
         // Convert map to array maintaining order
-        const enrichedPosts = postIds
+        return postIds
             .map(id => postsMap[id])
             .filter(Boolean)
-        
-        return enrichedPosts
     }
 }
 

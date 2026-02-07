@@ -82,10 +82,13 @@ model packs_pages {
   query          String?
   ticker         String[] @default([])
   order          Int      @default(0)
-  permission_bit Int?     @default(0)
+  permission_bit Int      @default(0)
+
+  // Tag to split howls by.
+  split_howls_by String[] @default([])
 
   // Packbase Community Hub - We don't have roles yet, remove when added
-  pch_staff_only Boolean? @default(false)
+  pch_staff_only Boolean @default(false)
 
   pack  packs   @relation(fields: [tenant_id], references: [id], onDelete: Cascade, map: "pack.pages_tenant_id_fkey")
   posts posts[]

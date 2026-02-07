@@ -5,6 +5,7 @@
 import {isVisible} from '@/lib'
 import {useResourceStore, useUIStore} from '@/lib/state'
 import PackbaseInstance from '@/lib/workers/global-event-emit'
+import {Heading} from '@/src/components'
 import {useSession} from '@clerk/clerk-react'
 import {Activity, useEffect} from 'react'
 import {FeedError, FeedList, FeedLoading, FeedMaintenance} from '.'
@@ -33,7 +34,7 @@ export default function Feed({
         folderID,
         feedQueryOverride,
         page,
-        isSignedIn,
+        isSignedIn
     })
 
     useFeedTitle({
@@ -70,6 +71,16 @@ export default function Feed({
         return <FeedError error={error as Error}/>
     }
 
+    const isPostsArray = Array.isArray(posts)
+    const postsObject = isPostsArray ? null : posts as Record<string, any[]>
+    const isEmptyObjectWithMore = postsObject && Object.keys(postsObject).length === 0 && hasMore
+
+    const formatKeyToHumanReadable = (key: string): string => {
+        return key
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, char => char.toUpperCase())
+    }
+
     return (
         <div className="pb-20 max-w-3xl space-y-4 mx-auto">
             <Activity mode={isVisible(isLoading)}>
@@ -77,7 +88,27 @@ export default function Feed({
             </Activity>
 
             <Activity mode={isVisible(!isLoading)}>
-                <FeedList posts={posts} hasMore={hasMore} onPostDelete={handleDeletePost}/>
+                {isPostsArray ? (
+                    <FeedList posts={posts as any[]} hasMore={hasMore} onPostDelete={handleDeletePost}/>
+                ) : (
+                    <div className="space-y-8">
+                        {postsObject && Object.keys(postsObject).map((sectionKey) => (
+                            <div key={sectionKey} className="space-y-4">
+                                <Heading size="xl" className="px-4">
+                                    {formatKeyToHumanReadable(sectionKey)}
+                                </Heading>
+                                <FeedList
+                                    posts={postsObject[sectionKey]}
+                                    hasMore={false}
+                                    onPostDelete={handleDeletePost}
+                                />
+                            </div>
+                        ))}
+                        {isEmptyObjectWithMore && (
+                            <FeedList posts={[]} hasMore={hasMore} onPostDelete={handleDeletePost}/>
+                        )}
+                    </div>
+                )}
             </Activity>
         </div>
     )

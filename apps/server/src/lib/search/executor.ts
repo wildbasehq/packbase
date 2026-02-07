@@ -1,19 +1,10 @@
 import prisma from '@/db/prisma'
-import {HTTPError} from '@/lib/HTTPError'
+import {HTTPError} from '@/lib/http-error'
 import debug from 'debug'
 import {makeCacheKey, withQueryCache} from './cache'
 import {registry} from './registry'
 import {getColumn, getDefaultIdColumn, Relations, Schemas} from './schema'
-import {
-    ExecutionContext,
-    ExpressionNode,
-    FunctionCall,
-    PipelineDataType,
-    QueryValue,
-    Statement,
-    VariableValue,
-    WhereNode
-} from './types'
+import {ExecutionContext, ExpressionNode, FunctionCall, PipelineDataType, QueryValue, Statement, VariableValue, WhereNode} from './types'
 import {ensureAllColumnsAllowed, ensureColumnsWhitelisted, ensureTableWhitelisted} from './whitelist'
 
 const logExec = debug('vg:search:executor')
@@ -59,7 +50,7 @@ const calculateComplexity = (where: any | null): number => {
 const trackQuery = (ctx: ExecutionContext, where: any | null, addModifier?: number) => {
     const complexity = calculateComplexity(where)
     let cost = 1 + complexity
-    
+
     if (ctx.loop) {
         cost *= 1 + ctx.loop.index
     }
@@ -111,13 +102,41 @@ const buildDatePredicate = (from?: string, to?: string): Predicate => {
     }
 }
 
-const buildValuePredicate = (value: QueryValue, ctx: ExecutionContext, columnName?: string): Predicate => {
+const buildValuePredicate = (value: QueryValue, ctx: ExecutionContext, table?: string, columnName?: string): Predicate => {
     if (logPred.enabled) {
-        logPred('buildValuePredicate type=%s column=%s', value.type, columnName ?? '<any>')
+        logPred('buildValuePredicate type=%s table=%s column=%s', value.type, table ?? '<any>', columnName ?? '<any>')
     }
+
+    // Get column type if available
+    const columnMeta = table && columnName ? getColumn(table, columnName) : undefined
+    const columnType = columnMeta?.type
+
     switch (value.type) {
-        case 'string':
+        case 'string': {
+            // Handle array columns with exact matching
+            if (columnType === 'string_array') {
+                return (v: any) => {
+                    if (!Array.isArray(v)) return false
+                    const searchValue = value.caseSensitive ? value.value : value.value.toLowerCase()
+                    return v.some((item: any) => {
+                        const itemStr = String(item)
+                        const compareValue = value.caseSensitive ? itemStr : itemStr.toLowerCase()
+                        return compareValue === searchValue
+                    })
+                }
+            }
+
+            if (columnType === 'number_array') {
+                const numValue = parseFloat(value.value)
+                if (isNaN(numValue)) return () => false
+                return (v: any) => {
+                    if (!Array.isArray(v)) return false
+                    return v.includes(numValue)
+                }
+            }
+
             return buildStringPredicate(value.value, value.caseSensitive, value.prefix, value.suffix)
+        }
 
         case 'list': {
             const itemPredicates = value.items.map((item) => {
@@ -199,7 +218,8 @@ const buildWherePredicate = (expr: ExpressionNode, ctx: ExecutionContext): Predi
         case 'ATOM': {
             const where = expr.where
             if (where.kind === 'basic') {
-                const predicate = buildValuePredicate(where.value, ctx, where.selector.columns?.[0])
+                const table = where.selector.table
+                const predicate = buildValuePredicate(where.value, ctx, table, where.selector.columns?.[0])
                 return (record: Record<string, any>) => {
                     const cols = where.selector.columns ?? Object.keys(record)
                     const checkFn = where.value.type === 'list' ? 'every' : 'some'
@@ -292,6 +312,20 @@ const buildPrismaWhere = (expr: ExpressionNode, ctx: ExecutionContext, table?: s
                 }
 
                 if (value.type === 'string') {
+                    // Handle array columns with string values (check before generic string)
+                    if (columnType === 'string_array') {
+                        // Note: Prisma's has filter for arrays doesn't support mode parameter
+                        // Array matching is always case-sensitive
+                        return {[column]: {has: value.value}}
+                    }
+
+                    if (columnType === 'number_array') {
+                        const numValue = parseFloat(value.value)
+                        if (!isNaN(numValue)) {
+                            return {[column]: {has: numValue}}
+                        }
+                    }
+
                     if (columnType === 'string' && value.value.length === 36 && value.value.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)) {
                         return {[column]: value.value}
                     }
@@ -305,6 +339,45 @@ const buildPrismaWhere = (expr: ExpressionNode, ctx: ExecutionContext, table?: s
                         if (value.prefix) return {[column]: {startsWith: value.value, mode}}
                         if (value.suffix) return {[column]: {endsWith: value.value, mode}}
                         return {[column]: {contains: value.value, mode}}
+                    }
+
+                    return null
+                }
+
+                if (value.type === 'list') {
+                    // Handle list values on array columns
+                    if (columnType === 'string_array') {
+                        // Note: Prisma's has filter for arrays doesn't support mode parameter
+                        const conditions = value.items.map(item => {
+                            const condition = {[column]: {has: item.value}}
+                            if (item.not) return {NOT: condition}
+                            return condition
+                        })
+
+                        // Check if any items have OR flag
+                        const hasOr = value.items.some(item => item.or)
+                        if (hasOr || conditions.length === 1) {
+                            return conditions.length === 1 ? conditions[0] : {OR: conditions}
+                        }
+                        return {AND: conditions}
+                    }
+
+                    if (columnType === 'number_array') {
+                        const conditions = value.items.map(item => {
+                            const numValue = parseFloat(item.value)
+                            if (isNaN(numValue)) return null
+                            const condition = {[column]: {has: numValue}}
+                            if (item.not) return {NOT: condition}
+                            return condition
+                        }).filter((c): c is NonNullable<typeof c> => c !== null)
+
+                        if (conditions.length === 0) return null
+
+                        const hasOr = value.items.some(item => item.or)
+                        if (hasOr || conditions.length === 1) {
+                            return conditions.length === 1 ? conditions[0] : {OR: conditions}
+                        }
+                        return {AND: conditions}
                     }
 
                     return null
@@ -466,17 +539,17 @@ const findTable = (expr: ExpressionNode): string | null => {
  */
 const executeBaseQuery = async (stmt: Statement, ctx: ExecutionContext): Promise<any[]> => {
     const expr = stmt.query
-    
+
     // Determine table from query
     const table = findTable(expr)
     if (!table) throw new Error('Unable to infer table from query')
-    
+
     ctx.table = table
-    
+
     if (logExec.enabled) {
         logExec('executeBaseQuery table=%s allowedTables=%o', table, ctx.allowedTables)
     }
-    
+
     ensureTableWhitelisted(table)
     if (ctx.allowedTables && !ctx.allowedTables.includes(table)) {
         if (logExec.enabled) {
@@ -488,12 +561,12 @@ const executeBaseQuery = async (stmt: Statement, ctx: ExecutionContext): Promise
     // Determine columns to select
     const idColumn = getDefaultIdColumn(table)?.name || 'id'
     const neededColumns = new Set<string>([idColumn])
-    
+
     // Add projection columns if specified
     if (stmt.projection?.columns) {
         stmt.projection.columns.forEach(c => neededColumns.add(c))
     }
-    
+
     let selectAll = stmt.projection?.all || needsAllColumns(expr)
     gatherColumns(expr, neededColumns)
 
@@ -508,7 +581,7 @@ const executeBaseQuery = async (stmt: Statement, ctx: ExecutionContext): Promise
 
     if (selectAll) {
         ensureAllColumnsAllowed(table)
-        const schema = Schemas[table]
+        const schema = Schemas.get(table)
         if (!schema) throw new Error(`Unknown schema for table ${table}`)
         Object.keys(schema.columns).forEach((c) => neededColumns.add(c))
     } else {
@@ -527,7 +600,7 @@ const executeBaseQuery = async (stmt: Statement, ctx: ExecutionContext): Promise
     }
 
     // Get orderBy from schema
-    const schema = Schemas[table]
+    const schema = Schemas.get(table)
     const hasCreatedAt = schema?.columns['created_at']
     const orderBy = hasCreatedAt ? {created_at: 'desc' as const} : undefined
 
@@ -562,7 +635,7 @@ const executeBaseQuery = async (stmt: Statement, ctx: ExecutionContext): Promise
     // Apply in-memory filtering
     const predicate = buildWherePredicate(expr, ctx)
     const filtered = rows.filter((r: any) => predicate(r))
-    
+
     if (logExec.enabled) {
         logExec('executeBaseQuery filtered rows=%d (from %d)', filtered.length, rows.length)
     }
@@ -588,7 +661,7 @@ const executePipelineFunction = async (
     }
 
     if (logPipeline.enabled) {
-        logPipeline('executePipelineFunction stage=%d func=%s inputCount=%d', 
+        logPipeline('executePipelineFunction stage=%d func=%s inputCount=%d',
             stageIndex + 1, funcCall.name, ctx.inputResults.length)
     }
 
@@ -597,11 +670,11 @@ const executePipelineFunction = async (
 
     try {
         const result = await funcDef.execute(resolvedArgs, ctx)
-        
+
         // Update context for next stage
         ctx.inputResults = result
         ctx.inputType = funcDef.outputType
-        
+
         if (logPipeline.enabled) {
             logPipeline('executePipelineFunction stage=%d func=%s outputCount=%d outputType=%s',
                 stageIndex + 1, funcCall.name, result.length, funcDef.outputType)
@@ -618,7 +691,7 @@ const executePipelineFunction = async (
  */
 const resolveVariableArgs = (args: Record<string, any>, ctx: ExecutionContext): Record<string, any> => {
     const resolved: Record<string, any> = {}
-    
+
     for (const [key, value] of Object.entries(args)) {
         if (typeof value === 'string' && value.startsWith('$')) {
             const varName = value.slice(1)
@@ -630,7 +703,7 @@ const resolveVariableArgs = (args: Record<string, any>, ctx: ExecutionContext): 
     }
 
     resolved.userId = ctx.userId
-    
+
     return resolved
 }
 
@@ -678,7 +751,7 @@ const executeStatement = async (stmt: Statement, ctx: ExecutionContext): Promise
 
     // Execute base WHERE query
     let results = await executeBaseQuery(stmt, ctx)
-    
+
     // Initialize context for pipeline
     ctx.inputResults = results
     ctx.inputType = 'rows' as PipelineDataType
@@ -745,11 +818,12 @@ export const executeQuery = async (statements: Statement[], userId?: string) => 
                 if (logExec.enabled) {
                     logExec('executeStatement error: %s', err?.message ?? err)
                 }
-                if (err.message?.includes('Unknown argument `contains`')) {
-                    throw HTTPError.badRequest({
-                        summary: 'Trying to search column with unsupported type. Are you trying to search a UUID/JSON/Date/Etc. with partial string matching?',
-                    })
-                }
+                // if (err.message?.includes('Unknown argument `contains`')) {
+                //     throw HTTPError.badRequest({
+                //         summary: 'Trying to search column with unsupported type. Are you trying to search a UUID/JSON/Date/Etc. with partial string matching?',
+                //     })
+                // }
+
                 throw err
             }
         }
