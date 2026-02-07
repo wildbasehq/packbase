@@ -62,12 +62,11 @@ export default (app: YapockType) =>
                 console.log('[HOWL_CREATE] Validating channel', {channel_id, tenant_id})
                 const page = await prisma.packs_pages.findUnique({
                     where: {id: channel_id},
-                    select: {tenant_id: true},
+                    select: {tenant_id: true, pch_staff_only: true},
                 })
 
                 if (!page) {
                     console.log('[HOWL_CREATE] Channel not found', {channel_id})
-                    set.status = 404
                     throw HTTPError.notFound({
                         summary: 'Page not found',
                     })
@@ -79,9 +78,16 @@ export default (app: YapockType) =>
                         expected_tenant_id: tenant_id,
                         actual_tenant_id: page.tenant_id,
                     })
-                    set.status = 400
+
                     throw HTTPError.badRequest({
                         summary: 'Page does not belong to the specified pack',
+                    })
+                }
+
+                if (page.pch_staff_only && (!user?.is_staff || !user?.is_content_moderator)) {
+                    console.log('[HOWL_CREATE] Channel staff only', {channel_id})
+                    throw HTTPError.forbidden({
+                        summary: 'You do not have permission to post to this channel.',
                     })
                 }
                 console.log('[HOWL_CREATE] Channel validation passed', {channel_id})
