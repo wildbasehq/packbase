@@ -24,7 +24,7 @@ export function HeroCardMarquee() {
         vg.search
             .get({
                 query: {
-                    q: `$posts = @PAGE(0, 25, [Where posts:content_type ("markdown") AND posts:tags ("~rating_safe")]) AS *;\n$posts:user = [Where profiles:id ($posts:user_id->ONE)] AS *;`,
+                    q: `$posts = [Where posts:content_type ("markdown") AND posts:tags ("~rating_safe")] | PAGE(0, 25) | BULKPOSTLOAD() AS *;`,
                 },
             })
             .then(({data: response}) => {

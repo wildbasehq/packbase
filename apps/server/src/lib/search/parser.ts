@@ -1,10 +1,25 @@
 import debug from 'debug'
 import {isValidTable, Schemas} from './schema'
-import {Aggregation, ColumnSelector, ExpressionNode, ParsedQuery, QueryValue, Statement, WhereNode} from './types'
+import {registry} from './registry'
+import {
+    ColumnSelector,
+    ExpressionNode,
+    FunctionCall,
+    ParsedQuery,
+    Projection,
+    QueryValue,
+    Statement,
+    WhereNode
+} from './types'
 
 const logParser = debug('vg:search:parser')
 const logValue = debug('vg:search:parser:value')
 const logWhere = debug('vg:search:parser:where')
+const logPipeline = debug('vg:search:parser:pipeline')
+
+// ============================================================================
+// Comment Stripping
+// ============================================================================
 
 /**
  * Strip `//` line comments from a query string while preserving newlines and keeping
@@ -57,250 +72,307 @@ const stripLineComments = (input: string): string => {
     return result
 }
 
-/**
- * Remove a single pair of outer square brackets if present while keeping inner whitespace.
- * Used to normalize pipeline segments that are enclosed in [] for easier downstream parsing.
- */
-const trimOuterBrackets = (input: string): string => {
-    const trimmed = input.trim()
-    if (trimmed.startsWith('[') && trimmed.endsWith(']')) return trimmed.slice(1, -1).trim()
-    return trimmed
-}
+// ============================================================================
+// Pipeline Splitting
+// ============================================================================
 
 /**
- * Parse an aggregation prefix at the start of a segment, e.g. `COUNT()`.
- * Returns the aggregation token (upper-cased) and the remaining unparsed segment.
- */
-const parseAggregation = (segment: string): { aggregation?: Aggregation; rest: string } => {
-    const aggMatch = segment.match(/^(COUNT|UNIQUE|FIRST|LAST)\(\)\s*/i)
-    if (aggMatch) {
-        return {aggregation: aggMatch[1].toUpperCase() as Aggregation, rest: segment.slice(aggMatch[0].length)}
-    }
-    return {rest: segment}
-}
-
-/**
- * Parse an `AS` projection from a segment.
- * Supports single column, comma-delimited columns, or `*` to project all columns.
- */
-const parseAsColumn = (segment: string): { asColumn?: string; asColumns?: string[]; asAll?: boolean; rest: string } => {
-    const match = segment.match(/^AS\s+([A-Za-z0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*/i)
-    if (match) {
-        const raw = match[1].trim()
-        if (raw === '*') {
-            return {asAll: true, rest: segment.slice(match[0].length)}
-        }
-        const columns = raw.split(',').map((c) => c.trim()).filter(Boolean)
-        return {
-            asColumn: columns.length === 1 ? columns[0] : undefined,
-            asColumns: columns.length > 1 ? columns : undefined,
-            rest: segment.slice(match[0].length)
-        }
-    }
-    return {rest: segment}
-}
-
-/**
- * Detect a variable assignment of the form `$var[:target]=[ ... ]` or `$var[:target]=@PAGE(...)`.
- * Returns the variable name, optional target key, and the raw inner query text to parse later.
- */
-const parseVariableAssignment = (input: string): { name: string; targetKey?: string; inner: string } | null => {
-    // Allow starting with [ (normal query) or @ (page wrapper)
-    const match = input.match(/^\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_]+))?\s*=\s*([\[@].*)$/s)
-    if (!match) return null
-    return {name: match[1], targetKey: match[2], inner: match[3]}
-}
-
-/**
- * Split a full query string into pipeline segments separated by top-level bracketed expressions.
- * Maintains association between trailing "AS" clauses and the preceding bracketed block.
- * Also respects parentheses for @PAGE(...) and @BULKPOSTLOAD(...) grouping.
+ * Split a query string on `|` pipe characters at the top level,
+ * respecting bracket/parenthesis nesting and quoted strings.
  */
 const splitPipeline = (input: string): string[] => {
     const parts: string[] = []
-    let depth = 0
     let current = ''
+    let depth = 0
+    let inString = false
+    let escape = false
 
     for (let i = 0; i < input.length; i++) {
         const ch = input[i]
 
-        // Check for @PAGE or @BULKPOSTLOAD start to treat it as a segment starter
-        const isPageStart = ch === '@' && input.slice(i).toUpperCase().startsWith('@PAGE')
-        const isBulkPostLoadStart = ch === '@' && input.slice(i).toUpperCase().startsWith('@BULKPOSTLOAD')
+        // Handle string literals
+        if (inString) {
+            current += ch
+            if (escape) {
+                escape = false
+            } else if (ch === '\\') {
+                escape = true
+            } else if (ch === '"') {
+                inString = false
+            }
+            continue
+        }
 
-        // If we're about to start a new bracketed group while not nested,
-        // flush the previous accumulator (this keeps trailing "AS <col>" with the group).
-        if ((ch === '[' || isPageStart || isBulkPostLoadStart) && depth === 0 && current.trim()) {
-            parts.push(current.trim())
+        if (ch === '"') {
+            inString = true
+            current += ch
+            continue
+        }
+
+        // Track nesting depth
+        if (ch === '[' || ch === '(') {
+            depth++
+            current += ch
+            continue
+        }
+        if (ch === ']' || ch === ')') {
+            depth--
+            current += ch
+            continue
+        }
+
+        // Split on | at top level
+        if (ch === '|' && depth === 0) {
+            if (current.trim()) {
+                parts.push(current.trim())
+            }
             current = ''
+            continue
         }
 
         current += ch
-
-        if (ch === '[' || ch === '(') depth++
-        else if (ch === ']' || ch === ')') depth--
     }
 
-    if (current.trim()) parts.push(current.trim())
+    if (current.trim()) {
+        parts.push(current.trim())
+    }
+
+    if (logPipeline.enabled) {
+        logPipeline('splitPipeline parts=%d', parts.length)
+    }
+
     return parts
 }
 
+// ============================================================================
+// Variable Assignment Parsing
+// ============================================================================
+
 /**
- * Parse a @PAGE(skip, take, [Query]) wrapper.
- * Returns the skip/take values and the inner query string (including any trailing AS).
+ * Detect a variable assignment of the form `$var[:target]=...`.
+ * Returns the variable name, optional target key, and the raw inner query text.
  */
-const parsePageWrapper = (input: string): { skip?: string | number; take?: string | number; inner: string } => {
-    const trimmed = input.trim()
-    if (!trimmed.toUpperCase().startsWith('@PAGE')) {
-        return {inner: input}
+const parseVariableAssignment = (input: string): { name: string; targetKey?: string; inner: string } | null => {
+    const match = input.match(/^\$([A-Za-z_][A-Za-z0-9_]*)(?::([A-Za-z0-9_]+))?\s*=\s*(.*)$/s)
+    if (!match) return null
+    return {name: match[1], targetKey: match[2], inner: match[3]}
+}
+
+// ============================================================================
+// Projection (AS clause) Parsing
+// ============================================================================
+
+/**
+ * Parse a trailing `AS` projection clause.
+ * Supports single column, comma-delimited columns, or `*` for all columns.
+ */
+const parseProjection = (input: string): { projection?: Projection; rest: string } => {
+    // Check for trailing AS clause
+    const match = input.match(/^(.*)\s+AS\s+([A-Za-z0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*$/is)
+    if (!match) {
+        return {rest: input}
     }
 
-    // Find the closing parenthesis for @PAGE(...)
-    let depth = 0
-    let endIdx = -1
-    const startIdx = trimmed.indexOf('(')
-    if (startIdx === -1) throw new Error('Invalid @PAGE syntax: missing parenthesis')
+    const raw = match[2].trim()
+    const rest = match[1].trim()
 
-    for (let i = startIdx; i < trimmed.length; i++) {
-        if (trimmed[i] === '(') depth++
-        else if (trimmed[i] === ')') {
-            depth--
-            if (depth === 0) {
-                endIdx = i
-                break
+    if (raw === '*') {
+        return {projection: {all: true}, rest}
+    }
+
+    const columns = raw.split(',').map(c => c.trim()).filter(Boolean)
+    return {projection: {columns}, rest}
+}
+
+// ============================================================================
+// Function Call Parsing
+// ============================================================================
+
+/**
+ * Parse a function call of the form `FUNC(arg1, arg2)` or `namespace.FUNC(arg1)`.
+ * Validates that the function exists in the registry.
+ */
+const parseFunctionCall = (segment: string): FunctionCall => {
+    const trimmed = segment.trim()
+    
+    // Match function name (with optional namespace) and arguments
+    const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?)\s*\(\s*(.*?)\s*\)$/s)
+    if (!match) {
+        throw new Error(`Invalid function call syntax: ${trimmed}`)
+    }
+
+    const rawName = match[1]
+    const argsStr = match[2]
+
+    // Parse namespace.name or just name
+    let namespace: string | undefined
+    let name: string
+    
+    if (rawName.includes('.')) {
+        const parts = rawName.split('.')
+        namespace = parts[0]
+        name = parts[1]
+    } else {
+        name = rawName
+    }
+
+    // Resolve function from registry
+    const funcDef = registry.resolveFunction(rawName)
+    if (!funcDef) {
+        throw new Error(`Unknown function: ${rawName}`)
+    }
+
+    // Parse arguments
+    const rawArgs = parseArguments(argsStr)
+    const args = validateAndParseArgs(rawArgs, funcDef)
+
+    if (logPipeline.enabled) {
+        logPipeline('parseFunctionCall name=%s namespace=%s args=%o', name, namespace, args)
+    }
+
+    return {
+        rawName,
+        name: funcDef.name,  // Use canonical name from definition
+        namespace: funcDef.namespace,
+        args,
+        rawArgs
+    }
+}
+
+/**
+ * Parse comma-separated arguments, respecting nested parentheses and quoted strings.
+ */
+const parseArguments = (argsStr: string): string[] => {
+    if (!argsStr.trim()) return []
+
+    const args: string[] = []
+    let current = ''
+    let depth = 0
+    let inString = false
+    let escape = false
+
+    for (let i = 0; i < argsStr.length; i++) {
+        const ch = argsStr[i]
+
+        if (inString) {
+            current += ch
+            if (escape) {
+                escape = false
+            } else if (ch === '\\') {
+                escape = true
+            } else if (ch === '"') {
+                inString = false
             }
+            continue
+        }
+
+        if (ch === '"') {
+            inString = true
+            current += ch
+            continue
+        }
+
+        if (ch === '(' || ch === '[') {
+            depth++
+            current += ch
+            continue
+        }
+
+        if (ch === ')' || ch === ']') {
+            depth--
+            current += ch
+            continue
+        }
+
+        if (ch === ',' && depth === 0) {
+            args.push(current.trim())
+            current = ''
+            continue
+        }
+
+        current += ch
+    }
+
+    if (current.trim()) {
+        args.push(current.trim())
+    }
+
+    return args
+}
+
+/**
+ * Validate and parse arguments against a function's Zod schema.
+ * Supports positional arguments and variable references.
+ */
+const validateAndParseArgs = (rawArgs: string[], funcDef: any): Record<string, any> => {
+    const schema = funcDef.argsSchema
+    
+    // Get schema shape to map positional args
+    const shape = schema._def?.shape?.() || {}
+    const keys = Object.keys(shape)
+    
+    // Build args object from positional arguments
+    const argsObj: Record<string, any> = {}
+    
+    for (let i = 0; i < rawArgs.length; i++) {
+        const arg = rawArgs[i]
+        const key = keys[i]
+        
+        if (!key && rawArgs.length > 0) {
+            // If we have args but no schema keys, this might be an error
+            // or the function uses a different schema structure
+            continue
+        }
+        
+        if (key) {
+            argsObj[key] = parseArgValue(arg)
         }
     }
-
-    if (endIdx === -1) throw new Error('Unclosed @PAGE')
-
-    const argsContent = trimmed.slice(startIdx + 1, endIdx)
-    const trailing = trimmed.slice(endIdx + 1)
-
-    // Expect: skip, take, [Query]
-    // We find the first two commas to separate skip and take
-    const firstComma = argsContent.indexOf(',')
-    const secondComma = argsContent.indexOf(',', firstComma + 1)
-
-    if (firstComma === -1 || secondComma === -1) {
-        throw new Error('Invalid @PAGE arguments. Expected: @PAGE(skip, take, [Query])')
+    
+    // Validate with Zod
+    try {
+        return schema.parse(argsObj)
+    } catch (e: any) {
+        throw new Error(`Invalid arguments for ${funcDef.name}: ${e.message}`)
     }
+}
 
-    const skipRaw = argsContent.slice(0, firstComma).trim()
-    const takeRaw = argsContent.slice(firstComma + 1, secondComma).trim()
-    const queryRaw = argsContent.slice(secondComma + 1).trim()
-
-    const parseNumOrVar = (val: string) => {
-        if (val.startsWith('$')) return val
-        const num = parseInt(val, 10)
-        if (isNaN(num)) return val // Fallback to string if not a valid number, though likely invalid
+/**
+ * Parse a single argument value (number, string, variable reference).
+ */
+const parseArgValue = (arg: string): any => {
+    const trimmed = arg.trim()
+    
+    // Variable reference
+    if (trimmed.startsWith('$')) {
+        return trimmed  // Keep as variable reference for runtime resolution
+    }
+    
+    // Quoted string
+    if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+        return trimmed.slice(1, -1)
+    }
+    
+    // Number
+    const num = Number(trimmed)
+    if (!isNaN(num)) {
         return num
     }
-
-    return {
-        skip: parseNumOrVar(skipRaw),
-        take: parseNumOrVar(takeRaw),
-        inner: queryRaw + trailing
-    }
+    
+    // Boolean
+    if (trimmed.toLowerCase() === 'true') return true
+    if (trimmed.toLowerCase() === 'false') return false
+    
+    // Plain string
+    return trimmed
 }
 
-/**
- * Parse a @BULKPOSTLOAD(currentUserId, [Query]) or @BULKPOSTLOAD(@PAGE(...)) wrapper.
- * Returns the currentUserId and the inner query string (which may contain @PAGE).
- */
-const parseBulkPostLoadWrapper = (input: string, userId?: string): {
-    isBulkPostLoad: boolean;
-    currentUserId?: string;
-    inner: string;
-    skip?: string | number;
-    take?: string | number;
-} => {
-    const trimmed = input.trim()
-    if (!trimmed.toUpperCase().startsWith('@BULKPOSTLOAD')) {
-        return {isBulkPostLoad: false, inner: input}
-    }
-
-    // Find the closing parenthesis for @BULKPOSTLOAD(...)
-    let depth = 0
-    let endIdx = -1
-    const startIdx = trimmed.indexOf('(')
-    if (startIdx === -1) throw new Error('Invalid @BULKPOSTLOAD syntax: missing parenthesis')
-
-    for (let i = startIdx; i < trimmed.length; i++) {
-        if (trimmed[i] === '(') depth++
-        else if (trimmed[i] === ')') {
-            depth--
-            if (depth === 0) {
-                endIdx = i
-                break
-            }
-        }
-    }
-
-    if (endIdx === -1) throw new Error('Unclosed @BULKPOSTLOAD')
-
-    const argsContent = trimmed.slice(startIdx + 1, endIdx)
-    const trailing = trimmed.slice(endIdx + 1)
-
-    let currentUserId: string | undefined = userId
-    let queryRaw: string
-    let skip: string | number | undefined
-    let take: string | number | undefined
-
-    // Check if the content starts with @PAGE
-    if (argsContent.trim().toUpperCase().startsWith('@PAGE')) {
-        // @BULKPOSTLOAD(@PAGE(...))
-        queryRaw = argsContent.trim()
-
-        // Parse the @PAGE wrapper to extract skip/take
-        const pageResult = parsePageWrapper(queryRaw)
-        skip = pageResult.skip
-        take = pageResult.take
-        queryRaw = pageResult.inner
-    } else {
-        // Check if there's a comma (meaning currentUserId is provided)
-        const firstComma = argsContent.indexOf(',')
-
-        if (firstComma === -1) {
-            // No comma, only query: @BULKPOSTLOAD([Query])
-            queryRaw = argsContent.trim()
-        } else {
-            // Has comma: @BULKPOSTLOAD(currentUserId, [Query]) or @BULKPOSTLOAD(currentUserId, @PAGE(...))
-            const userIdRaw = argsContent.slice(0, firstComma).trim()
-            const afterComma = argsContent.slice(firstComma + 1).trim()
-
-            // Parse userId
-            if (userIdRaw.startsWith('"') && userIdRaw.endsWith('"')) {
-                currentUserId = userIdRaw.slice(1, -1)
-            } else if (userIdRaw.startsWith('$')) {
-                currentUserId = userIdRaw // Keep variable reference as-is
-            } else {
-                currentUserId = userIdRaw
-            }
-
-            // Check if query part is @PAGE
-            if (afterComma.toUpperCase().startsWith('@PAGE')) {
-                const pageResult = parsePageWrapper(afterComma)
-                skip = pageResult.skip
-                take = pageResult.take
-                queryRaw = pageResult.inner
-            } else {
-                queryRaw = afterComma
-            }
-        }
-    }
-
-    return {
-        isBulkPostLoad: true,
-        currentUserId,
-        inner: queryRaw + trailing,
-        skip,
-        take
-    }
-}
+// ============================================================================
+// Value Parsing (for WHERE clauses)
+// ============================================================================
 
 /**
- * Parse the value portion of a WHERE atom. Supports
+ * Parse the value portion of a WHERE atom. Supports:
  * - ("text"[:i|s]) with optional wildcards *prefix/suffix
  * - lists of quoted values: ("foo" "~bar" "-baz" [:i|s])
  * - ("from".."to") date ranges
@@ -313,6 +385,7 @@ const parseValue = (raw: string): QueryValue => {
         const preview = trimmed.length > 200 ? trimmed.slice(0, 200) + '…' : trimmed
         logValue('parseValue rawLen=%d preview="%s"', trimmed.length, preview)
     }
+    
     if (/^\(\s*EMPTY\s*\)$/i.test(trimmed)) return {type: 'empty'}
     if (/^\(\s*NOT\s+EMPTY\s*\)$/i.test(trimmed)) return {type: 'not_empty'}
 
@@ -322,7 +395,7 @@ const parseValue = (raw: string): QueryValue => {
             type: 'variable',
             name: variableMatch[1],
             key: variableMatch[2],
-            mode: variableMatch[3].toUpperCase() as 'ANY' | 'ALL'
+            mode: variableMatch[3].toUpperCase() as 'ANY' | 'ALL' | 'ONE'
         }
         if (logValue.enabled) {
             logValue('parseValue variable name=%s key=%s mode=%s', value.name, value.key, value.mode)
@@ -399,6 +472,13 @@ const parseValue = (raw: string): QueryValue => {
     throw new Error(`Unsupported value: ${raw}`)
 }
 
+// ============================================================================
+// WHERE Clause Parsing
+// ============================================================================
+
+/**
+ * Parse a column selector from a WHERE clause segment.
+ */
 const parseColumnSelector = (segment: string): ColumnSelector => {
     const match = segment.match(/^Where\s+([A-Za-z0-9_\.]+)(?::([A-Za-z0-9_,\.]+))?/i)
     if (!match) throw new Error(`Invalid Where clause: ${segment}`)
@@ -423,7 +503,6 @@ const parseColumnSelector = (segment: string): ColumnSelector => {
 
 /**
  * Parse a relation hop of the form `Where A -> B` (forward) or `Where A <- B` (backward).
- * Returns a relation node or null if the segment is not a relation clause.
  */
 const parseRelation = (segment: string): WhereNode | null => {
     const relMatch = segment.match(/^Where\s+([A-Za-z0-9_]+)\s*(->|<-)\s*([A-Za-z0-9_]+)/i)
@@ -444,7 +523,6 @@ const parseRelation = (segment: string): WhereNode | null => {
 
 /**
  * Parse a single atomic WHERE clause (either relation or basic column comparison).
- * Normalizes missing leading `Where` keyword for more permissive syntax.
  */
 const parseAtom = (segment: string): WhereNode => {
     // Allow atoms that omit the leading "Where" by normalizing here
@@ -452,13 +530,16 @@ const parseAtom = (segment: string): WhereNode => {
 
     const relation = parseRelation(normalized)
     if (relation) return relation
+    
     const valueMatch = normalized.match(/\(.*\)$/s)
     if (!valueMatch) throw new Error(`Missing value in clause: ${segment}`)
+    
     const valueStr = valueMatch[0]
     const selectorStr = normalized.slice(0, normalized.length - valueStr.length).trim()
     const selector = parseColumnSelector(selectorStr)
     const value = parseValue(valueStr)
     const node: WhereNode = {kind: 'basic', selector, value}
+    
     if (logWhere.enabled) {
         logWhere('parseAtom basic table=%s columns=%o valueType=%s', selector.table, selector.columns ?? '*', value.type)
     }
@@ -467,7 +548,7 @@ const parseAtom = (segment: string): WhereNode => {
 
 /**
  * Split an expression string on top-level delimiters (AND/OR) while
- * respecting bracket/parenthesis nesting to avoid splitting inside values.
+ * respecting bracket/parenthesis nesting.
  */
 const splitTopLevel = (input: string, delimiters: string[]): string[] => {
     const parts: string[] = []
@@ -502,7 +583,6 @@ const splitTopLevel = (input: string, delimiters: string[]): string[] => {
 
 /**
  * Recursively parse boolean expressions with NOT/AND/OR precedence.
- * Leaves terminals as ATOM nodes handled by `parseAtom`.
  */
 const parseExpression = (segment: string): ExpressionNode => {
     // Handle NOT
@@ -545,164 +625,136 @@ const parseExpression = (segment: string): ExpressionNode => {
     if (logWhere.enabled) {
         logWhere('parseExpression ATOM kind=%s', atom.kind, atom)
     }
-    // Atom
     return {op: 'ATOM', where: atom}
 }
 
+// ============================================================================
+// Query Stage Parsing
+// ============================================================================
+
+/**
+ * Remove outer square brackets from a string if present.
+ */
+const trimOuterBrackets = (input: string): string => {
+    const trimmed = input.trim()
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        return trimmed.slice(1, -1).trim()
+    }
+    return trimmed
+}
+
+/**
+ * Check if a string looks like a WHERE clause (starts with [ or contains "Where").
+ */
+const isWhereClause = (segment: string): boolean => {
+    const trimmed = segment.trim()
+    return trimmed.startsWith('[') || /^Where\s+/i.test(trimmed)
+}
+
+/**
+ * Check if a string looks like a function call.
+ */
+const isFunctionCall = (segment: string): boolean => {
+    const trimmed = segment.trim()
+    return /^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?\s*\(/.test(trimmed)
+}
+
+// ============================================================================
+// Main Parser
+// ============================================================================
+
 /**
  * Parse a full search query string into a sequence of statements.
- * Supports semicolon-separated statements, pipeline segments, leading/trailing AS, and variable assignment.
+ * 
+ * New syntax: `[Where table ("value")] | FUNC(args) | FUNC(args) AS column`
+ * 
+ * Example:
+ * ```
+ * $posts = [Where posts ("hello")] | PAGE(0, 20) | BULKPOSTLOAD($userId) AS title, body
+ * ```
  */
 export const parseQuery = (input: string, userId?: string): ParsedQuery => {
     if (logParser.enabled) {
         const preview = input.length > 200 ? input.slice(0, 200) + '…' : input
         logParser('parseQuery rawLen=%d preview="%s"', input.length, preview)
     }
+    
     const statements: Statement[] = []
     const cleaned = stripLineComments(input)
-    const segments = cleaned.split(/;+/).map((s) => s.trim()).filter(Boolean)
+    const segments = cleaned.split(/;+/).map(s => s.trim()).filter(Boolean)
+    
     if (logParser.enabled) {
         logParser('parseQuery segments=%d', segments.length)
     }
+
     for (const raw of segments) {
+        // Check for variable assignment
         const assign = parseVariableAssignment(raw)
-        const targetName = assign?.name
+        const variableName = assign?.name
         const targetKey = assign?.targetKey
         const body = assign ? assign.inner : raw
-        if (logParser.enabled && assign) {
-            logParser('parseQuery assignment name=%s targetKey=%s', targetName, targetKey)
+
+        // Check for trailing AS projection
+        const {projection, rest: bodyWithoutAs} = parseProjection(body)
+
+        // Split into pipeline stages
+        const stages = splitPipeline(bodyWithoutAs)
+        
+        if (stages.length === 0) continue
+
+        // First stage must be a WHERE clause
+        const firstStage = stages[0]
+        if (!isWhereClause(firstStage)) {
+            throw new Error(`Query must start with a WHERE clause: ${firstStage}`)
         }
-        const pipelineParts = splitPipeline(body)
-        if (!pipelineParts.length) continue
+
+        // Parse the WHERE expression
+        const whereContent = trimOuterBrackets(firstStage)
+        const query = parseExpression(whereContent)
+
+        // Parse remaining stages as function calls
+        const pipeline: FunctionCall[] = []
+        for (let i = 1; i < stages.length; i++) {
+            const stage = stages[i]
+            
+            if (!isFunctionCall(stage)) {
+                throw new Error(`Expected function call at pipeline stage ${i + 1}: ${stage}`)
+            }
+            
+            const funcCall = parseFunctionCall(stage)
+            pipeline.push(funcCall)
+        }
+
+        // Build the statement
+        const statement: Statement = {
+            query,
+            pipeline,
+            projection,
+            variableName,
+            targetKey
+        }
+
+        // Add userId to context if provided
+        if (userId) {
+            // Find BULKPOSTLOAD calls and inject userId if not already specified
+            for (const call of pipeline) {
+                if (call.name === 'BULKPOSTLOAD' && !call.args.userId) {
+                    call.args.userId = userId
+                }
+            }
+        }
+
+        statements.push(statement)
 
         if (logParser.enabled) {
-            logParser('parseQuery pipelineParts=%d', pipelineParts.length)
+            logParser('parseQuery statement: variableName=%s pipeline=%d functions projection=%o',
+                variableName, pipeline.length, projection)
         }
-
-        pipelineParts.forEach((part, idx) => {
-            const {skip, take, inner} = parsePageWrapper(part)
-            const {
-                isBulkPostLoad,
-                currentUserId,
-                inner: bulkInner,
-                skip: bulkSkip,
-                take: bulkTake
-            } = parseBulkPostLoadWrapper(inner, userId)
-
-            // Use skip/take from @BULKPOSTLOAD's @PAGE if present, otherwise from outer @PAGE
-            const effectiveSkip = bulkSkip ?? skip
-            const effectiveTake = bulkTake ?? take
-
-            // Support trailing "AS <column>" after the bracketed expression
-            let trailingAs: string | undefined
-            let trailingAsColumns: string[] | undefined
-            let trimmedPart = bulkInner
-            const trailingMatch = trimmedPart.match(/^(.*\])\s+AS\s+([A-Za-z0-9_\.\*]+(?:\s*,\s*[A-Za-z0-9_\.\*]+)*)\s*$/i)
-            if (trailingMatch) {
-                trimmedPart = trailingMatch[1]
-                const rawAs = trailingMatch[2].trim()
-                if (rawAs === '*') {
-                    trailingAs = undefined
-                    trailingAsColumns = ['*']
-                } else {
-                    const cols = rawAs.split(',').map((c) => c.trim()).filter(Boolean)
-                    trailingAs = cols.length === 1 ? cols[0] : undefined
-                    trailingAsColumns = cols.length > 1 ? cols : undefined
-                }
-                if (logParser.enabled) {
-                    logParser('parseQuery trailing AS columns=%o', trailingAsColumns ?? trailingAs)
-                }
-            }
-
-            let remaining = trimOuterBrackets(trimmedPart) // inner content
-
-            const {aggregation, rest: aggRest} = parseAggregation(remaining)
-            remaining = aggRest
-            const {
-                asColumn: leadingAs,
-                asColumns: leadingAsColumns,
-                asAll: leadingAsAll,
-                rest
-            } = parseAsColumn(remaining)
-            const asColumn = leadingAs || trailingAs
-            let asColumns = leadingAsColumns || trailingAsColumns
-            const asAll = leadingAsAll || (asColumns?.[0] === '*' ? true : undefined)
-            if (asAll) asColumns = undefined
-            remaining = rest
-
-            if (logParser.enabled) {
-                logParser('parseQuery segment idx=%d aggregation=%s asColumn=%s asColumns=%o asAll=%s isBulkPostLoad=%s skip=%s take=%s',
-                    idx,
-                    aggregation,
-                    asColumn,
-                    asColumns,
-                    asAll,
-                    isBulkPostLoad,
-                    effectiveSkip,
-                    effectiveTake,
-                )
-            }
-
-            const expr = parseExpression(remaining.trim())
-
-            // If this is a @BULKPOSTLOAD wrapper, create a bulkpostload statement
-            if (isBulkPostLoad) {
-                const isLast = idx === pipelineParts.length - 1
-                if (targetName && isLast) {
-                    // Variable assignment with bulkpostload
-                    statements.push({
-                        type: 'bulkpostload',
-                        name: targetName,
-                        targetKey,
-                        expr,
-                        asColumn,
-                        currentUserId,
-                        skip: effectiveSkip,
-                        take: effectiveTake,
-                    })
-                } else {
-                    // No variable assignment
-                    statements.push({
-                        type: 'bulkpostload',
-                        expr,
-                        asColumn,
-                        currentUserId,
-                        skip: effectiveSkip,
-                        take: effectiveTake,
-                    })
-                }
-                return
-            }
-
-            const isLast = idx === pipelineParts.length - 1
-            if (targetName && isLast) {
-                statements.push({
-                    name: targetName,
-                    targetKey,
-                    query: expr,
-                    asColumn,
-                    asColumns,
-                    asAll,
-                    aggregation,
-                    skip: effectiveSkip,
-                    take: effectiveTake
-                })
-            } else {
-                statements.push({
-                    type: 'expression',
-                    expr,
-                    asColumn,
-                    asColumns,
-                    asAll,
-                    aggregation,
-                    skip: effectiveSkip,
-                    take: effectiveTake
-                })
-            }
-        })
     }
+
     if (logParser.enabled) {
         logParser('parseQuery statements=%d', statements.length)
     }
+
     return {statements}
 }

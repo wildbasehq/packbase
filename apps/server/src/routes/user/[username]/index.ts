@@ -93,7 +93,7 @@ export async function getUser({by, value, user, scope}: { by: string; value: str
         }
 
         data = userData
-        data.username = clerkUser.username
+        data.username = clerkUser?.username
     } catch (error: any) {
         // Handle specific Prisma errors if needed
         throw error

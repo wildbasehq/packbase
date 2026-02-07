@@ -11,6 +11,7 @@ JSON.stringify = (obj) =>
 import prisma from '@/db/prisma'
 import {HTTPError} from '@/lib/http-error'
 import {Inchat} from '@/lib/inchat'
+import {initializeSearchSystem} from '@/lib/search/init'
 import deleteNulls from '@/utils/delete-nulls'
 import verifyToken from '@/utils/identity/verify-token'
 import {cors} from '@elysiajs/cors'
@@ -143,6 +144,13 @@ const Yapock = new Elysia({})
 
 Yapock.listen(process.env.PORT || 8000, async () => {
     const startupMs = performance.now()
+
+    // Initialize the search system with function plugins and table extensions
+    try {
+        await initializeSearchSystem()
+    } catch (e) {
+        log.error('Failed to initialize search system', e)
+    }
 
     if (process.env.WEBHOOK_URL) {
         // Call webhook with message
