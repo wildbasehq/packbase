@@ -38,7 +38,6 @@ export function IssueWarning({post}: ContentModerationPopoverProps) {
         <BubblePopover
             isCentered
             corner="top-right"
-            id={`cm-issue-warning-${post.id}`}
             trigger={({setOpen}) => (
                 <Button
                     type="button"

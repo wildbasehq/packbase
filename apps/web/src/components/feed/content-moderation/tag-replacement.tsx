@@ -11,7 +11,6 @@ export function IssueTagReplacement({post, onAction}: ContentModerationPopoverPr
         <BubblePopover
             isCentered
             corner="top-right"
-            id={`cm-issue-tag-replacement-${post.id}`}
             trigger={({setOpen}) => (
                 <Button
                     type="button"

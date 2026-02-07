@@ -12,7 +12,6 @@ export function DeleteHowl({post, onAction}: ContentModerationPopoverProps) {
         <BubblePopover
             isCentered
             corner="top-right"
-            id={`delete-howl-${post.id}`}
             trigger={({setOpen}) => (
                 <Button
                     type="button"

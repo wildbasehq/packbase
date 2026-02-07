@@ -5,7 +5,8 @@
 import {FeedPost} from '@/components/feed'
 import PagedContainer from '@/components/shared/paged-container'
 import {Text} from '@/components/shared/text'
-import {useLocation} from 'wouter'
+import {AnimatePresence, motion} from 'motion/react'
+import {useLocation, useSearchParams} from 'wouter'
 import {FeedListProps} from './types/feed'
 
 /**
@@ -13,6 +14,9 @@ import {FeedListProps} from './types/feed'
  */
 export default function FeedList({posts, pages, hasMore, onPostDelete}: FeedListProps) {
     const [location] = useLocation()
+    const [searchParams] = useSearchParams()
+    const page = searchParams.get('page') || '1'
+
     return (
         <div className="mx-auto">
             <PagedContainer
@@ -25,14 +29,46 @@ export default function FeedList({posts, pages, hasMore, onPostDelete}: FeedList
                     </Text>
                 }
             >
-                <div className="space-y-12">
-                    {posts.map(post => (
-                        <div key={post.id}>
-                            <FeedPost post={post} postState={[posts, () => {
-                            }]} onDelete={() => onPostDelete(post.id)}/>
-                        </div>
-                    ))}
-                </div>
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={page}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        className="space-y-12"
+                    >
+                        {posts.map((post, index) => (
+                            <motion.div
+                                key={post.id}
+                                variants={{
+                                    initial: {opacity: 0, y: 10},
+                                    animate: {
+                                        opacity: 1,
+                                        y: 0,
+                                        transition: {
+                                            delay: index * 0.05,
+                                            duration: 0.3,
+                                            type: 'spring',
+                                            bounce: 0.3
+                                        }
+                                    },
+                                    exit: {
+                                        opacity: 0,
+                                        y: -10,
+                                        transition: {
+                                            delay: (posts.length - 1 - index) * 0.02,
+                                            duration: 0.2,
+                                            ease: 'easeIn'
+                                        }
+                                    }
+                                }}
+                            >
+                                <FeedPost post={post} postState={[posts, () => {
+                                }]} onDelete={() => onPostDelete(post.id)}/>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                </AnimatePresence>
             </PagedContainer>
         </div>
     )

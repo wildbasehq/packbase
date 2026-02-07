@@ -411,9 +411,6 @@ export default function ThreadPost({
                     square
                 />
 
-                {/* Pole linking both avatars */}
-                <div className="absolute inset-y-0 left-1/2 -z-10 w-px -translate-x-1/2 bg-border"/>
-
                 {post.pack && (
                     <AvatarButton
                         href={`/p/${post.pack?.slug}`}

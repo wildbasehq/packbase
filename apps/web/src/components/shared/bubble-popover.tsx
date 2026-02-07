@@ -8,13 +8,13 @@ import {CheckCircleIcon, ExclamationCircleIcon, QuestionMarkCircleIcon} from '@h
 import {ExclamationTriangleIcon} from '@heroicons/react/24/solid'
 import {XIcon} from 'lucide-react'
 import {AnimatePresence, LayoutGroup, motion} from 'motion/react'
-import {Activity, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react'
+import {Activity, ReactNode, useEffect, useId, useLayoutEffect, useMemo, useRef, useState} from 'react'
 import {createPortal} from 'react-dom'
 import {Drawer} from 'vaul'
 
 export interface BubblePopoverProps {
     /** Unique id for Framer Motion layoutId grouping */
-    id: string
+    id?: string
     /** Trigger button / element */
     trigger: (props: { open: boolean; setOpen: (open: boolean) => void }) => ReactNode
     /** Popover content. Will be rendered inside the animated card container. */
@@ -29,7 +29,7 @@ export interface BubblePopoverProps {
 }
 
 export function BubblePopover({
-                                  id,
+                                  id = useId(),
                                   trigger,
                                   children,
                                   className,
