@@ -22,6 +22,7 @@ export type FolderResponse = {
     created_at: string
     updated_at: string
     assets: string[]
+    howl_count: number
 }
 
 export function FolderForm({
@@ -131,7 +132,7 @@ export default function UserFolders({user: folderUser}: { user: { id: string; us
                         <Folder
                             href={`/@${folderUser.username}/folders/${f.id}`}
                             name={f.name || 'Test'}
-                            fileCount={8}
+                            fileCount={f.howl_count || 0}
                             size={10}
                             visibleFiles={f.assets}
                         />

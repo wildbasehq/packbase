@@ -109,7 +109,7 @@ export default function Folder({
                     className="relative flex items-center justify-start w-full font-normal text-white/90 tracking-tight leading-none whitespace-nowrap mt-0.5"
                     style={{fontSize: `${size / 18}rem`}}
                 >
-                    {fileCount} {fileCount === 1 ? 'file' : 'files'}
+                    {fileCount} {fileCount === 1 ? 'howl' : 'howls'}
                 </div>
 
 

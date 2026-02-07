@@ -12,7 +12,8 @@ export const FolderSchema = t.Object({
     description: t.Optional(t.String()),
     emoji: t.Optional(t.String()),
     query: t.Optional(t.String()),
-    assets: t.Optional(t.Array(t.String()))
+    assets: t.Optional(t.Array(t.String())),
+    howl_count: t.Optional(t.Number())
     // created_at: t.String(),
     // updated_at: t.String(),
 })
@@ -23,6 +24,7 @@ export type Folder = {
     description?: string;
     emoji?: string;
     query?: string; // when mode === 'dynamic'
+    howl_count?: number;
     created_at: string;
     updated_at: string;
     assets: string[];
@@ -47,6 +49,8 @@ export async function readUserFolders(userId: string): Promise<Folder[]> {
                 }
             }
         })
+
+        folder.howl_count = posts.length
 
         const folderAssets: string[] = []
         for (const post of posts) {
