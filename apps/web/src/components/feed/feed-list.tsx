@@ -31,7 +31,7 @@ export default function FeedList({posts, pages, hasMore, onPostDelete}: FeedList
             >
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={page}
+                        key={location + page}
                         initial="initial"
                         animate="animate"
                         exit="exit"

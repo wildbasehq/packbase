@@ -5,6 +5,7 @@
 import {Feed} from '@/components/feed'
 import {LoadingCircle} from '@/components/icons'
 import Body from '@/components/layout/body'
+import UserFolders from '@/components/layout/user-folders'
 import {CustomTheme} from '@/components/shared/theme/custom-theme'
 import ProfileHeader from '@/components/shared/user/header'
 import {useUserAccountStore} from '@/lib'
@@ -54,6 +55,8 @@ export default function UserProfile() {
             {user && (
                 <>
                     <ProfileHeader user={user}/>
+
+                    <UserFolders user={user}/>
 
                     <CustomTheme userId={user.id}/>
 

@@ -12,6 +12,7 @@ export const FolderSchema = t.Object({
     description: t.Optional(t.String()),
     emoji: t.Optional(t.String()),
     query: t.Optional(t.String()),
+    assets: t.Optional(t.Array(t.String()))
     // created_at: t.String(),
     // updated_at: t.String(),
 })
@@ -24,6 +25,7 @@ export type Folder = {
     query?: string; // when mode === 'dynamic'
     created_at: string;
     updated_at: string;
+    assets: string[];
 };
 
 export async function readUserFolders(userId: string): Promise<Folder[]> {
@@ -31,6 +33,40 @@ export async function readUserFolders(userId: string): Promise<Folder[]> {
         where: {user_id: userId},
         orderBy: {created_at: 'asc'},
     })
+
+    // For each folder, run the query and get the first 3 assets
+    for (const row of rows) {
+        const folder = row as unknown as Folder
+        const posts = await prisma.posts.findMany({
+            where: {
+                tags: {
+                    hasEvery: folder.query.split(','),
+                },
+                assets: {
+                    isEmpty: false
+                }
+            }
+        })
+
+        const folderAssets: string[] = []
+        for (const post of posts) {
+            if (!post.assets || folderAssets.length >= 3) continue
+
+            // Filter assets array for images
+            const imageAssets = (post.assets as any[]).filter(
+                asset => asset?.type === 'image' && asset?.data?.url
+            )
+
+            for (const asset of imageAssets) {
+                if (folderAssets.length >= 3) break
+                folderAssets.push(new URL(asset.data.url, process.env.PROFILES_CDN_URL_PREFIX).toString())
+            }
+        }
+
+        // Add assets to the folder object
+        folder.assets = folderAssets
+    }
+
     // Prisma will serialize Date to ISO strings via JSON.stringify
     return rows as unknown as Folder[]
 }

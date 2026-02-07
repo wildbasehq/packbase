@@ -2,9 +2,7 @@
  * Copyright (c) Wildbase 2025. All rights and ownership reserved. Not for distribution.
  */
 
-import UserFolders from '@/components/layout/user-folders'
 import {isVisible, useUserAccountStore} from '@/lib'
-import {SidebarPortal} from '@/lib/context/sidebar-context'
 import PackbaseInstance from '@/lib/workers/global-event-emit'
 import {useContentFrame} from '@/src/components'
 import {Activity, ReactNode, useEffect} from 'react'
@@ -27,9 +25,6 @@ export default function UserLayout({children}: { children: ReactNode }) {
 
     return (
         <Activity mode={isVisible(!!user)}>
-            <SidebarPortal>
-                <UserFolders user={user}/>
-            </SidebarPortal>
             {children}
         </Activity>
     )

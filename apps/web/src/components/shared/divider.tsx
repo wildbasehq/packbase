@@ -9,7 +9,7 @@ export function Divider({
         <div className={className}>
             <div role="presentation"
                  {...props}
-                 className="h-px w-full bg-neutral-200 dark:bg-neutral-950"
+                 className="h-px w-full dark:bg-neutral-950"
             />
             <div role="presentation"
                  className="h-px w-full bg-border"/>

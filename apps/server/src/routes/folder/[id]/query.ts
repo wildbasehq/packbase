@@ -35,8 +35,7 @@ export default (app: YapockType) =>
                     const parsed = parseQuery(folder.query, user?.sub)
                     isWhskrdRequest = !!parsed
                 } catch (_) {
-                    // gross
-                    isWhskrdRequest = false
+                    // do nothing
                 }
 
                 if (isWhskrdRequest) {
